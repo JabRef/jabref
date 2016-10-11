@@ -19,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Entry;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.File;
@@ -37,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * http://bibtexml.sourceforge.net/
  */
-public class BibTeXMLImporter extends ImportFormat {
+public class BibTeXMLImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 
@@ -48,7 +49,7 @@ public class BibTeXMLImporter extends ImportFormat {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "BibTeXML";
     }
 

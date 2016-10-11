@@ -1,11 +1,28 @@
-package net.sf.jabref.logic.importer.fileformat;
+package net.sf.jabref.logic.importer;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.fileformat.BibTeXMLImporter;
+import net.sf.jabref.logic.importer.fileformat.BiblioscapeImporter;
+import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
+import net.sf.jabref.logic.importer.fileformat.CopacImporter;
+import net.sf.jabref.logic.importer.fileformat.EndnoteImporter;
+import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.importer.fileformat.InspecImporter;
+import net.sf.jabref.logic.importer.fileformat.IsiImporter;
+import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
+import net.sf.jabref.logic.importer.fileformat.MedlinePlainImporter;
+import net.sf.jabref.logic.importer.fileformat.ModsImporter;
+import net.sf.jabref.logic.importer.fileformat.MsBibImporter;
+import net.sf.jabref.logic.importer.fileformat.OvidImporter;
+import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
+import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
+import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
+import net.sf.jabref.logic.importer.fileformat.RisImporter;
+import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -20,10 +37,10 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
-public class ImportFormatTest {
+public class ImporterTest {
 
     @Parameter
-    public ImportFormat format;
+    public Importer format;
 
     @Test(expected = NullPointerException.class)
     public void isRecognizedFormatWithNullThrowsException() throws IOException {
@@ -37,7 +54,7 @@ public class ImportFormatTest {
 
     @Test
     public void getFormatterNameDoesNotReturnNull() {
-        Assert.assertNotNull(format.getFormatName());
+        Assert.assertNotNull(format.getName());
     }
 
     @Test
@@ -58,9 +75,9 @@ public class ImportFormatTest {
 
     @Test
     public void getIdStripsSpecialCharactersAndConvertsToLowercase() {
-        ImportFormat importFormat = Mockito.mock(ImportFormat.class, Mockito.CALLS_REAL_METHODS);
-        when(importFormat.getFormatName()).thenReturn("*Test-Importer");
-        Assert.assertEquals("testimporter", importFormat.getId());
+        Importer importer = Mockito.mock(Importer.class, Mockito.CALLS_REAL_METHODS);
+        when(importer.getName()).thenReturn("*Test-Importer");
+        Assert.assertEquals("testimporter", importer.getId());
     }
 
     @Test
@@ -70,7 +87,7 @@ public class ImportFormatTest {
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
-        // all classes implementing {@link ImportFormat}
+        // all classes implementing {@link Importer}
         // sorted alphabetically
 
         ImportFormatPreferences importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();

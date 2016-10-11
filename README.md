@@ -104,9 +104,7 @@ Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A ful
 
 ## License
 
-We are currently in transition from [GPL](https://tldrlegal.com/license/gnu-general-public-license-v2) to the [MIT license](https://tldrlegal.com/license/mit-license).
-Thus, all new contributions are considered being made under MIT license.
-
+Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
 JabRef also uses libraries distributed by other parties.

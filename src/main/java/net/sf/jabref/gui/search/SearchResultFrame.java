@@ -54,7 +54,6 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -613,9 +612,7 @@ public class SearchResultFrame {
             }
             else {
                 String field = FIELDS[column - PAD];
-
-                String fieldContent = entry.getField(field).orElse("");
-                fieldContent = new LatexToUnicodeFormatter().format(fieldContent);
+                String fieldContent = entry.getLatexFreeField(field).orElse("");
 
                 if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                     // For name fields, tap into a MainTableFormat instance and use

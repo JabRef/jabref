@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
@@ -19,7 +20,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 /**
  * Imports an Ovid file.
  */
-public class OvidImporter extends ImportFormat {
+public class OvidImporter extends Importer {
 
     private static final Pattern OVID_SOURCE_PATTERN = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
@@ -42,7 +43,7 @@ public class OvidImporter extends ImportFormat {
     private static final int MAX_ITEMS = 50;
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Ovid";
     }
 

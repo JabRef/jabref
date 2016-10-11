@@ -35,7 +35,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.ParseException;
+
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -285,7 +285,7 @@ class GroupDialog extends JDialog {
                     }
                 }
                 dispose();
-            } catch (ParseException exception) {
+            } catch (IllegalArgumentException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });

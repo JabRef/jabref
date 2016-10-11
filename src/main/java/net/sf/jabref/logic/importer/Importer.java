@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.fileformat;
+package net.sf.jabref.logic.importer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -10,13 +10,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Role of an importer for JabRef.
  */
-public abstract class ImportFormat implements Comparable<ImportFormat> {
+public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Using this when I have no database open or when I read
@@ -36,7 +35,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * Thus the correct behaviour is to return false if it is certain that the file is
      * not of the suitable type, and true otherwise. Returning true is the safe choice if not certain.
      */
-    protected abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
+    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
     public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
@@ -59,7 +58,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *
      * @param input the input to read from
      */
-    protected abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
+    public abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
 
     /**
      * Parse the database in the specified file.
@@ -100,7 +99,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      *
      * @return format name, must be unique and not <code>null</code>
      */
-    public abstract String getFormatName();
+    public abstract String getName();
 
 
     /**
@@ -116,7 +115,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * @return ID, must be unique and not <code>null</code>
      */
     public String getId() {
-        String id = getFormatName();
+        String id = getName();
         StringBuilder result = new StringBuilder(id.length());
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
@@ -143,7 +142,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     @Override
     public int hashCode() {
-        return getFormatName().hashCode();
+        return getName().hashCode();
     }
 
     @Override
@@ -151,20 +150,20 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
         if (this == obj) {
             return true;
         }
-        if(!(obj instanceof ImportFormat)) {
+        if(!(obj instanceof Importer)) {
             return false;
         }
-        ImportFormat other = (ImportFormat)obj;
-        return Objects.equals(this.getFormatName(), other.getFormatName());
+        Importer other = (Importer)obj;
+        return Objects.equals(this.getName(), other.getName());
     }
 
     @Override
     public String toString() {
-        return getFormatName();
+        return getName();
     }
 
     @Override
-    public int compareTo(ImportFormat o) {
-        return getFormatName().compareTo(o.getFormatName());
+    public int compareTo(Importer o) {
+        return getName().compareTo(o.getName());
     }
 }
