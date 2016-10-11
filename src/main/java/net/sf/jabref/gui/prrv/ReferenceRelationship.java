@@ -41,7 +41,7 @@ public class ReferenceRelationship {
             // Init
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
                 // Split references
-                String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split("\\n");
+                String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split(";");
                 // Create node of bibtex entry
                 entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("title").get(), referenceLines.length + 1,g));
             }
@@ -50,7 +50,7 @@ public class ReferenceRelationship {
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
 
                 // Split references
-                String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split("\\n");
+                String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split(";");
 
                 // Go trough all reference lines of your current entry and check if it refers to some of your bibtex entries
                 for (String referenceLine : referenceLines) {
@@ -112,7 +112,7 @@ public class ReferenceRelationship {
 
         System.out.println("getEdgeCount" + graph.getEdgeCount());
         System.out.println("getNodeCount" + graph.getNodeCount());
-       Edge edge = graph.addEdge(graph.getNode(sourceID),graph.getNode(targetID));
+        Edge edge = graph.addEdge(graph.getNode(sourceID),graph.getNode(targetID));
     }
 
     /**
@@ -127,10 +127,9 @@ public class ReferenceRelationship {
         prefux.data.Node node = graph.addNode();
 
         // Set & add title
-        node.set("id", ID);
         node.set("title",title);
+        node.set("id", ID);
         node.set("referenceCount", referenceCount);
-
         return node;
     }
 
