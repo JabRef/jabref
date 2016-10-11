@@ -19,7 +19,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
+import net.sf.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
  * moment?!
  */
-public class TextField extends JTextFieldWithUnfocusedText implements FieldEditor {
+public class TextField extends JTextFieldWithPlaceholder implements FieldEditor {
 
     private static final Log LOGGER = LogFactory.getLog(TextField.class);
 

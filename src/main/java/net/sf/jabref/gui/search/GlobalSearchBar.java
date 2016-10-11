@@ -27,7 +27,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
+import net.sf.jabref.gui.util.component.JTextFieldWithPlaceholder;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
@@ -47,7 +47,7 @@ public class GlobalSearchBar extends JPanel {
     private final JabRefFrame frame;
 
     private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
-    private final JTextFieldWithUnfocusedText searchField = new JTextFieldWithUnfocusedText(Localization.lang("Search") + "...");
+    private final JTextFieldWithPlaceholder searchField = new JTextFieldWithPlaceholder(Localization.lang("Search") + "...");
     private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
 
     private final JToggleButton caseSensitive;
