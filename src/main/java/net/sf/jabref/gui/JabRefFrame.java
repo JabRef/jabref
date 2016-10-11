@@ -99,6 +99,7 @@ import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
+import net.sf.jabref.gui.openoffice.OpenOfficeSidePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
@@ -653,7 +654,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
-            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.OOPanel.class));
+            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
