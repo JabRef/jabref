@@ -10,7 +10,6 @@ import net.sf.jabref.support.DevEnvironment;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DoiResolutionTest {
@@ -48,10 +47,10 @@ public class DoiResolutionTest {
         );
     }
 
-    @Ignore
     @Test
     public void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
-        // To be implemented
+        entry.setField("doi", "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
