@@ -9,6 +9,7 @@ import javax.swing.SwingWorker;
 
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.database.BibDatabase;
@@ -92,14 +93,17 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         }
 
         // only selects the first match if the selected entries are no hits or no entry is selected
-        List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
-        boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
-        if (!isHitSelected && !matchedEntries.isEmpty()) {
-            for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
-                BibEntry entry = basePanel.getMainTable().getEntryAt(i);
-                if (entry.isSearchHit()) {
-                    basePanel.getMainTable().setSelected(i);
-                    break;
+        // and no editor is open (to avoid jumping around when editing an entry)
+        if (basePanel.getMode() != BasePanelMode.SHOWING_EDITOR && basePanel.getMode() != BasePanelMode.WILL_SHOW_EDITOR) {
+            List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
+            boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
+            if (!isHitSelected && !matchedEntries.isEmpty()) {
+                for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
+                    BibEntry entry = basePanel.getMainTable().getEntryAt(i);
+                    if (entry.isSearchHit()) {
+                        basePanel.getMainTable().setSelected(i);
+                        break;
+                    }
                 }
             }
         }
