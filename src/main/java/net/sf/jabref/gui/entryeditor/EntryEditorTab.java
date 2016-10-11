@@ -155,7 +155,7 @@ class EntryEditorTab {
             } else {
                 String prompt = "";
                 if (field.equals(FieldName.AUTHOR) || field.equals(FieldName.EDITOR)) {
-                     prompt = Localization.lang("Firstname Lastname and Firstname Lastname") + " and others";
+                    prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
                 }
 
                 fieldEditor = new TextArea(field, null, prompt);
