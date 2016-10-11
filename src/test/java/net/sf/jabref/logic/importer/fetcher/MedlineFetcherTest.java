@@ -155,7 +155,7 @@ public class MedlineFetcherTest {
     public void testMultipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
         entryList.forEach(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright);
-        assertEquals(50, entryList.size());
+        assertEquals(20, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
         assertTrue(entryList.contains(bibEntrySari));
     }
