@@ -17,7 +17,7 @@ import org.json.JSONObject;
  */
 public class Version {
 
-    public static final String JABREF_DOWNLOAD_URL = "http://www.fosshub.com/JabRef.html";
+    public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
     private static final Log LOGGER = LogFactory.getLog(Version.class);
     private static final String JABREF_GITHUB_URL = "https://api.github.com/repos/JabRef/jabref/releases/latest";
 
