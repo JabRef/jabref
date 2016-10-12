@@ -62,20 +62,6 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void readOtherTypeTest() throws Exception {
-        String bibtexEntry = "@Other{test," + OS.NEWLINE +
-                " Comment                  = {testentry}" + OS.NEWLINE +
-                "}";
-
-        // read in bibtex string
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
-        BibEntry entry = entries.iterator().next();
-
-        String resourceName = "/testbib/othertype.bib";
-        BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
-    }
-
-    @Test
     public void writeOtherTypeTest() throws Exception {
         String expected = OS.NEWLINE + "@Other{test," + OS.NEWLINE +
                 "  comment = {testentry}," + OS.NEWLINE +
@@ -92,20 +78,6 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         assertEquals(expected, actual);
-    }
-
-    @Test
-    public void readReallyUnknownTypeTest() throws Exception {
-        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
-                " Comment                  = {testentry}" + OS.NEWLINE +
-                "}";
-
-        // read in bibtex string
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
-        BibEntry entry = entries.iterator().next();
-
-        String resourceName = "/testbib/reallyunknowntype.bib";
-        BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
     }
 
     @Test
