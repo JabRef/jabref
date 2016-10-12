@@ -64,7 +64,7 @@ public class PrrvDialogView extends FXMLView {
 
             nodeData.addColumn("id", int.class);
             nodeData.addColumn("bibtexkey", String.class);
-            nodeData.addColumn("referenceCount", int.class);
+            nodeData.addColumn("citeCount", int.class);
             nodeData.addColumn("location", String.class);
 
             edgeData.addColumn(Graph.DEFAULT_SOURCE_KEY, int.class);
@@ -130,9 +130,9 @@ public class PrrvDialogView extends FXMLView {
                 // Apply colors to the predicates
                 ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
                 nStroke.setDefaultColor(ColorLib.gray(100));
-                DataColorAction colorI = new DataColorAction(NODES, internExp, "referenceCount",
+                DataColorAction colorI = new DataColorAction(NODES, internExp, "citeCount",
                         Constants.NUMERICAL, VisualItem.FILLCOLOR, internPalette);
-                DataColorAction colorE = new DataColorAction(NODES, externalExp, "referenceCount",
+                DataColorAction colorE = new DataColorAction(NODES, externalExp, "citeCount",
                         Constants.NUMERICAL, VisualItem.FILLCOLOR, externalPalette);
                 ColorAction edges = new ColorAction("graph.edges",
                         VisualItem.STROKECOLOR, ColorLib.gray(255));
@@ -158,7 +158,7 @@ public class PrrvDialogView extends FXMLView {
                 vis.run("color");
                 vis.run("layout");
             }
-            // Throw if some reference fields are not accessible
+            // Throw if some cite fields are not accessible
         } catch (NullPointerException e) {
             showErrorDialog();
         }
@@ -177,24 +177,21 @@ public class PrrvDialogView extends FXMLView {
     private static void showErrorDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
-        String title = "Error while loading references";
-        String content = "All used entry types need an optional field named references\n"
+        String title = "Error while loading cites";
+        String content = "All used entry types need an optional field named cites\n"
                 + "Should JabRef insert them automatically?\n"
-                + "Node:\n "
-                + "- You can insert them under BibTeX < Customize entry types.\n"
-                + "- Several references need to be seperated by a semicolon!\n"
-                + "- BibTex entries that are not referenced are not displayed.";
+                + "Note:\n "
+                + "- You can insert entry types under BibTeX < Customize entry types.\n"
+                + "- BibTex entries which are not cited are not displayed.";
         Optional<ButtonType> result = FXDialogs.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, ButtonType.OK, ButtonType.CANCEL);
-        System.out.println("PRRV DIALOG SHOW");
         if (result.isPresent() && result.get() == ButtonType.OK) {
             // ... user chose OK
-
-            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext();
-
             List<BibEntry> pureEntryList = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries();
             if (!pureEntryList.isEmpty()) {
                 for (int id = 0; pureEntryList.size() > id; id++) {
-                    pureEntryList.get(id).getFieldMap().put("references", "");
+                    if(!pureEntryList.get(id).getField("cites").isPresent()) {
+                        pureEntryList.get(id).getFieldMap().put("cites", "Your document");
+                    }
                 }
             }
             primaryStage.close();

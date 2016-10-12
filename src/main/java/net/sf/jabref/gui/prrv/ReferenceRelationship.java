@@ -28,70 +28,67 @@ public class ReferenceRelationship {
      */
     public void parseBibTexForReferences(Graph g) {
 
-        if (JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries() == null) {
-            FXDialogs.showInformationDialogAndWait(Localization.lang("No_references_found"), "content");
+        if (JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries().isEmpty()) {
+            FXDialogs.showInformationDialogAndWait(Localization.lang("No_references_found"), "Please load a database");
         } else {
-
             // Init - Create nodes for bibtex entries
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
-                if (pureEntryList.get(sourceID).getField("references").isPresent()) {
-                    // Split references for referenceCount
-                    String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split(";");
+                if (pureEntryList.get(sourceID).getField("cites").isPresent()) {
+                    // Split cites for citeCount
+                    String[] citeLines = pureEntryList.get(sourceID).getField("cites").get().split(",");
                     // Create node of bibtex entry
-                    entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("bibtexkey").get(), referenceLines.length + 1, "I", g));
+                    entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("bibtexkey").get(), citeLines.length + 1, "I", g));
                 }
             }
 
             // Create edges & external nodes
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
-                if (pureEntryList.get(sourceID).getField("references").isPresent()) {
-                    // Split references
-                    String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split(";");
+                if (pureEntryList.get(sourceID).getField("cites").isPresent()) {
+                    // Split cites
+                    String[] citeLines = pureEntryList.get(sourceID).getField("cites").get().split(",");
 
-                    // Go trough all reference lines of your current entry and check if it refers to some of your bibtex entries
-                    for (String referenceLine : referenceLines) {
+                    // Go trough all cites lines of your current entry and check if it refers to some of your bibtex entries
+                    for (String citeLine : citeLines) {
 
-                        // boolean to know if reference was found
-                        boolean foundReference = false;
+                        // boolean to know if cites was found
+                        boolean foundCite = false;
 
                         // Skip empty lines
-                        if (referenceLine != null) {
+                        if (citeLine != null) {
                             // Check every other entry
                             for (int targetID = 0; pureEntryList.size() > targetID; targetID++) {
                                 // Don't refer to yourself
-                                // Reference matching with bibtexkey of any bibtex entry?
-                                if (referenceLine.trim().equals((pureEntryList.get(targetID).getField("bibtexkey").get().trim())) && sourceID != targetID) {
+                                // Cite matching with bibtexkey of any bibtex entry?
+                                if (citeLine.trim().equals((pureEntryList.get(targetID).getField("bibtexkey").get().trim())) && sourceID != targetID) {
                                     // Add edge and skip rest of search
                                     addEdge(sourceID, targetID, g);
-                                    foundReference = true;
+                                    foundCite = true;
                                 }
                             }
 
-                            // Reference doesen't belong to your bibtex entries
-                            if (!foundReference) {
+                            // Cites doesen't belong to your bibtex entries
+                            if (!foundCite) {
                                 // Check external library
                                 if (externalNodeList.size() > 0) {
                                     // Already in external library?
                                     for (int targetID = 0; externalNodeList.size() > targetID; targetID++) {
-                                        if (referenceLine.trim().equals(externalNodeList.get(targetID).getString("bibtexkey").trim())) {
+                                        if (citeLine.trim().equals(externalNodeList.get(targetID).getString("bibtexkey").trim())) {
                                             // Refer to external node
                                             addEdge(sourceID, targetID + pureEntryList.size(), g);
-                                            foundReference = true;
+                                            foundCite = true;
                                             break;
                                         }
                                     }
                                 } else {
-                                    // Create first external reference node and set edge
-                                    externalNodeList.add(createNode(entryNodeList.size(), referenceLine, 1, "E", g));
+                                    // Create first external cites node and set edge
+                                    externalNodeList.add(createNode(entryNodeList.size(), citeLine, 1, "E", g));
                                     addEdge(sourceID, entryNodeList.size(), g);
-                                    System.out.println("Added external node: " + referenceLine);
-                                    foundReference = true;
+                                    foundCite = true;
                                 }
-                                if (!foundReference) {
-                                    // Create another external reference node and set edge
-                                    externalNodeList.add(createNode(entryNodeList.size() + externalNodeList.size() - 1, referenceLine, 1, "E", g));
+                                if (!foundCite) {
+                                    // Create another external cite node and set edge
+                                    externalNodeList.add(createNode(entryNodeList.size() + externalNodeList.size() - 1, citeLine, 1, "E", g));
                                     addEdge(sourceID, entryNodeList.size() + externalNodeList.size() - 1, g);
-                                    System.out.println("Added external node: " + referenceLine);
                                 }
                             }
                         }
@@ -117,19 +114,19 @@ public class ReferenceRelationship {
      *
      * @param ID             unique value
      * @param bibtexkey          should be unique
-     * @param referenceCount
+     * @param citeCount
      * @param location
      * @param graph
      * @return node
      */
-    private prefux.data.Node createNode(int ID, String bibtexkey, int referenceCount, String location, Graph graph) {
+    private prefux.data.Node createNode(int ID, String bibtexkey, int citeCount, String location, Graph graph) {
         // Create node
         prefux.data.Node node = graph.addNode();
 
         // Set & add node
         node.set("id", ID);
         node.set("bibtexkey", bibtexkey);
-        node.set("referenceCount", referenceCount);
+        node.set("citeCount", citeCount);
         node.set("location", location);
 
         return node;
