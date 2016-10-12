@@ -12,8 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -30,16 +33,15 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Fetch or search from PubMed <a href=http://www.ncbi.nlm.nih.gov/sites/entrez/>www.ncbi.nlm.nih.gov</a>
+ * Fetch or search from PubMed "<a href=http://www.ncbi.nlm.nih.gov/sites/entrez/>www.ncbi.nlm.nih.gov</a>"
  * The MedlineFetcher fetches the entries from the PubMed database.
- * See <a href=http://help.jabref.org/en/MedlineRIS>help.jabref.org</a> for a detailed documentation of the available fields.
+ * See "<a href=http://help.jabref.org/en/MedlineRIS>help.jabref.org</a>" for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
-    private static final Pattern ID_PATTERN = Pattern.compile("<Id>(\\d+)</Id>");
-    private static final Pattern COUNT_PATTERN = Pattern.compile("<Count>(\\d+)<\\/Count>");
+    private static final int NUMBER_TO_FETCH = 50;
 
     private int numberOfResultsFound;
 
@@ -61,28 +63,55 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
      * @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25500/">www.ncbi.nlm.nih.gov/books/NBK25500/</a>
      */
     private List<String> getPubMedIdsFromQuery(String query) throws FetcherException {
+        boolean fetchIDs = false;
+        boolean firstOccurrenceOfCount = false;
         List<String> idList = new ArrayList<>();
         try {
             URL ncbi = createSearchUrl(query);
-            BufferedReader in = new BufferedReader(new InputStreamReader(ncbi.openStream()));
-            String inLine;
-            //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-            while ((inLine = in.readLine()) != null) {
-                if (inLine.contains("</IdList>")) {
-                    break;
+
+            XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+            XMLStreamReader eventReader = inputFactory.createXMLStreamReader(ncbi.openStream());
+
+            fetchLoop:
+            while (eventReader.hasNext()) {
+                int event = eventReader.getEventType();
+
+                switch (event) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        if (eventReader.getName().toString().equals("Count")) {
+                            firstOccurrenceOfCount = true;
+                        }
+
+                        if (eventReader.getName().toString().equals("IdList")) {
+                            fetchIDs = true;
+                        }
+                        break;
+
+                    case XMLStreamConstants.CHARACTERS:
+                        if (firstOccurrenceOfCount) {
+                            numberOfResultsFound = Integer.parseInt(eventReader.getText());
+                            firstOccurrenceOfCount = false;
+                        }
+
+                        if (fetchIDs) {
+                            idList.add(eventReader.getText());
+                        }
+                        break;
+
+                    case XMLStreamConstants.END_ELEMENT:
+                        //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+                        if (eventReader.getName().toString().equals("IdList")) {
+                            break fetchLoop;
+                        }
                 }
-                Matcher idMatcher = ID_PATTERN.matcher(inLine);
-                if (idMatcher.find()) {
-                    idList.add(idMatcher.group(1));
-                }
-                Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
-                if (countMatcher.find()) {
-                    numberOfResultsFound = Integer.parseInt(countMatcher.group(1));
-                }
+                eventReader.next();
             }
+            eventReader.close();
             return idList;
         } catch (IOException | URISyntaxException e) {
             throw new FetcherException("Unable to get PubMed IDs", e);
+        } catch (XMLStreamException e) {
+            throw new FetcherException("Error while parsing ID list", e);
         }
     }
 
@@ -131,9 +160,10 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
             if (idList.isEmpty()) {
                 LOGGER.info(Localization.lang("No results found."));
+                return Collections.emptyList();
             }
-            if (numberOfResultsFound > 20) {
-                LOGGER.info(numberOfResultsFound + " results found. Only 20 relevant results will be fetched by default.");
+            if (numberOfResultsFound > 50) {
+                LOGGER.info(numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
             //pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
@@ -148,6 +178,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         URIBuilder uriBuilder = new URIBuilder("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
+        uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
         uriBuilder.addParameter("term", term);
         return uriBuilder.build().toURL();
     }
@@ -170,7 +201,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 LOGGER.warn(result.getErrorMessage());
             }
             List<BibEntry> resultList = result.getDatabase().getEntries();
-            resultList.forEach(entry -> doPostCleanup(entry));
+            resultList.forEach(this::doPostCleanup);
             return resultList;
         } catch (URISyntaxException | IOException e) {
             throw new FetcherException(e.getLocalizedMessage(), e);

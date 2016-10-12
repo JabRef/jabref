@@ -49,6 +49,7 @@ public class MedlineFetcherTest {
         entryEndharti.setField("title", "Dendrophthoe pentandra (L.) Miq extract effectively inhibits inflammation, proliferation and induces p53 expression on colitis-associated colon cancer.");
         entryEndharti.setField("author", "Endharti, Agustina Tri and Wulandari, Adisti and Listyana, Anik and Norahmawati, Eviana and Permana, Sofy");
         entryEndharti.setField("created", "2016-9-27");
+        entryEndharti.setField("country", "England");
         entryEndharti.setField("issn", "1472-6882");
         entryEndharti.setField("issn-linking", "1472-6882");
         entryEndharti.setField("issue", "1");
@@ -57,10 +58,11 @@ public class MedlineFetcherTest {
         entryEndharti.setField("nlm-id", "101088661");
         entryEndharti.setField("owner", "NLM");
         entryEndharti.setField("pages", "374");
+        entryEndharti.setField("month", "Sep");
         entryEndharti.setField("pmid", "27670445");
         entryEndharti.setField("pubmodel", "Electronic");
         entryEndharti.setField("pubstatus", "epublish");
-        entryEndharti.setField("revised", "2016-9-27");
+        entryEndharti.setField("revised", "2016-10-11");
         entryEndharti.setField("volume", "16");
         entryEndharti.setField("year", "2016");
 
@@ -155,7 +157,7 @@ public class MedlineFetcherTest {
     public void testMultipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
         entryList.forEach(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright);
-        assertEquals(20, entryList.size());
+        assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
         assertTrue(entryList.contains(bibEntrySari));
     }
