@@ -21,5 +21,5 @@ public interface FulltextFetcher {
      * @throws NullPointerException if no BibTex entry is given
      * @throws java.io.IOException
      */
-    Optional<URL> findFullText(BibEntry entry) throws IOException;
+    Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException;
 }

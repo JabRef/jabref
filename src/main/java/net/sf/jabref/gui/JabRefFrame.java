@@ -99,6 +99,7 @@ import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
+import net.sf.jabref.gui.openoffice.OpenOfficeSidePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
@@ -192,11 +193,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     // for the name and message strings.
 
     /* References to the toggle buttons in the toolbar */
-    // the groups interface
-    public JToggleButton groupToggle;
     private JToggleButton previewToggle;
-    private JToggleButton fetcherToggle;
-
 
     private final OpenDatabaseAction open = new OpenDatabaseAction(this, true);
     private final EditModeAction editModeAction = new EditModeAction();
@@ -353,11 +350,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     });
 
-    private final Action toggleGroups = enableToggle(new GeneralAction(Actions.TOGGLE_GROUPS,
-            Localization.menuTitle("Toggle groups interface"),
-            Localization.lang("Toggle groups interface"),
-            Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
-            IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon()));
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
@@ -395,8 +387,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Write XMP-metadata to PDFs"),
             Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
             Globals.getKeyPrefs().getKey(KeyBinding.WRITE_XMP));
-
-    private JMenuItem optMenuItem;
 
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER,
             Localization.menuTitle("Open folder"), Localization.lang("Open folder"),
@@ -483,7 +473,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PushToApplications pushApplications;
 
     private GeneralFetcher generalFetcher;
-
+    private OpenOfficePanel openOfficePanel;
     private GroupSelector groupSelector;
 
     private int previousTabCount = -1;
@@ -663,9 +653,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             currentBasePanel.getPreviewPanel().updateLayout();
 
-            groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
+            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
+            generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
@@ -726,10 +717,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sidePaneManager = new SidePaneManager(this);
 
         groupSelector = new GroupSelector(this, sidePaneManager);
+        openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
+        generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
-        generalFetcher = new GeneralFetcher(sidePaneManager, this);
-
-        sidePaneManager.register("groups", groupSelector);
+        sidePaneManager.register(groupSelector);
     }
 
     /**
@@ -1227,14 +1218,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(normalSearch);
         search.add(replaceAll);
         search.addSeparator();
-        search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
+        search.add(new JCheckBoxMenuItem(generalFetcher.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
-            sidePaneManager.register(generalFetcher.getTitle(), generalFetcher);
-            sidePaneManager.show(generalFetcher.getTitle());
+            sidePaneManager.register(generalFetcher);
+            sidePaneManager.show(GeneralFetcher.class);
         }
         mb.add(search);
 
-        groups.add(new JCheckBoxMenuItem(toggleGroups));
+        groups.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         groups.addSeparator();
         groups.add(addToGroup);
         groups.add(removeFromGroup);
@@ -1274,8 +1265,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(decreseFontSize);
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
-        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
-        view.add(new JCheckBoxMenuItem(toggleGroups));
+        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
+        view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
@@ -1316,10 +1307,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
-        OpenOfficePanel otp = OpenOfficePanel.getInstance();
-        otp.init(this, sidePaneManager);
-        optMenuItem = otp.getMenuItem();
-        tools.add(optMenuItem);
+        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleAction()));
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1477,14 +1465,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         tlb.addSeparator();
 
-        fetcherToggle = new JToggleButton(generalFetcher.getAction());
-        tlb.addJToggleButton(fetcherToggle);
+        tlb.addJToggleButton(new JToggleButton(generalFetcher.getToggleAction()));
 
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
 
-        groupToggle = new JToggleButton(toggleGroups);
-        tlb.addJToggleButton(groupToggle);
+        tlb.addJToggleButton(new JToggleButton(groupSelector.getToggleAction()));
 
         tlb.addSeparator();
 
@@ -1511,8 +1497,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, globalSearch,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
-                toggleGroups, makeKeyAction, normalSearch, generalFetcher.getAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction, optMenuItem, findUnlinkedFiles, addToGroup, removeFromGroup,
+                groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
@@ -2392,10 +2378,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public GroupSelector getGroupSelector() {
         return groupSelector;
-    }
-
-    public void setFetcherToggle(boolean enabled) {
-        fetcherToggle.setSelected(enabled);
     }
 
     public void setPreviewToggle(boolean enabled) {

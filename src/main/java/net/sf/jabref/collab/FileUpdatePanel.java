@@ -17,10 +17,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class FileUpdatePanel extends SidePaneComponent implements ActionListener,
-        ChangeScanner.DisplayResultCallback {
-
-    public static final String NAME = "fileUpdate";
+public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     private final SidePaneManager manager;
 
@@ -65,12 +62,17 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      */
     @Override
     public void componentClosing() {
-        manager.unregisterComponent(FileUpdatePanel.NAME);
+        manager.unregisterComponent(FileUpdatePanel.class);
     }
 
     @Override
     public int getRescalingWeight() {
         return 0;
+    }
+
+    @Override
+    public ToggleAction getToggleAction() {
+        throw new UnsupportedOperationException();
     }
 
     /**
