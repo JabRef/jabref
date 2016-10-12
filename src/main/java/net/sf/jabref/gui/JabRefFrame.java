@@ -1533,7 +1533,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
-                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
+                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent(), prrv));
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 
