@@ -60,6 +60,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improve language quality of the German translation of shared database
 - Change "Recent files" to "Recent databases" to keep the file menu consistent
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
+- [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 
 ### Fixed
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
