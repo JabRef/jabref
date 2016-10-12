@@ -103,7 +103,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         final BibEntry newSelected = selected.get(0);
         if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
-                && newSelected == panel.getCurrentEditor().getEntry()) {
+                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
             // entry already selected and currently editing it, do not steal the focus from the selected textfield
             return;
         }
