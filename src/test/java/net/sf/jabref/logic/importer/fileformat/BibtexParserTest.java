@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
@@ -243,23 +242,29 @@ public class BibtexParserTest {
                 "}";
 
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
-        BibEntry entry = entries.iterator().next();
 
-        String resourceName = "/testbib/reallyunknowntype.bib";
-        BibEntryAssert.assertEquals(BibtexParser.class, resourceName, entry);
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
     }
 
     @Test
-    public void readOtherTypeTest() throws Exception {
+    public void parseOtherTypeTest() throws Exception {
         String bibtexEntry = "@Other{test," + OS.NEWLINE +
                 " Comment                  = {testentry}" + OS.NEWLINE +
                 "}";
 
         Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
-        BibEntry entry = entries.iterator().next();
 
-        String resourceName = "/testbib/othertype.bib";
-        BibEntryAssert.assertEquals(BibtexParser.class, resourceName, entry);
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
     }
 
     @Test
