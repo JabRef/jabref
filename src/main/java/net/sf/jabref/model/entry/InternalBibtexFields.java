@@ -65,6 +65,8 @@ public class InternalBibtexFields {
     private static final List<String> BIBLATEX_LANGUAGE_FIELDS = Arrays.asList(FieldName.LANGUAGE,
             FieldName.ORIGLANGUAGE);
 
+    private static final List<String> BIBLATEX_CITE_KEY_FIELDS = Arrays.asList(FieldName.CITE, FieldName.ENTRYSET);
+
     private static final List<String> BIBLATEX_MULTI_KEY_FIELDS = Arrays.asList(FieldName.RELATED, FieldName.ENTRYSET);
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
@@ -331,6 +333,16 @@ public class InternalBibtexFields {
 
         // Set all fields with multiple key links
         for (String fieldText : BIBLATEX_MULTI_KEY_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getFieldProperties().add(FieldProperty.CITE);
+            add(field);
+        }
+
+        // Set all fields with references key links
+        for (String fieldText : BIBLATEX_CITE_KEY_FIELDS) {
             BibtexSingleField field = fieldSet.get(fieldText);
             if (field == null) {
                 field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);

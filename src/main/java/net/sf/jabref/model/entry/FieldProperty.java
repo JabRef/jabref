@@ -28,7 +28,8 @@ public enum FieldProperty {
     SINGLE_ENTRY_LINK,
     MULTIPLE_ENTRY_LINK,
     PUBLICATION_STATE,
-    VERBATIM;
+    VERBATIM,
+    CITE;
 
     public static final Set<FieldProperty> ALL_OPTS = EnumSet.allOf(FieldProperty.class);
 
