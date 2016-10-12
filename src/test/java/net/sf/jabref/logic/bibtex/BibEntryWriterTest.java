@@ -3,7 +3,6 @@ package net.sf.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -63,47 +62,69 @@ public class BibEntryWriterTest {
     }
 
     @Test
-    public void roundTripTestOtherType() throws IOException, URISyntaxException {
+    public void readOtherTypeTest() throws Exception {
         String bibtexEntry = "@Other{test," + OS.NEWLINE +
-                "  Comment                  = {testentry}" + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
                 "}";
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
-        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
         BibEntry entry = entries.iterator().next();
 
         String resourceName = "/testbib/othertype.bib";
         BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
+    }
+
+    @Test
+    public void writeOtherTypeTest() throws Exception {
+        String expected = OS.NEWLINE + "@Other{test," + OS.NEWLINE +
+                "  comment = {testentry}," + OS.NEWLINE +
+                "}"+ OS.NEWLINE;
+
+        BibEntry entry = new BibEntry();
+        entry.setType("other");
+        entry.setField("Comment","testentry");
+        entry.setCiteKey("test");
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
-        assertEquals(bibtexEntry, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void roundTripTestReallyunknownType() throws IOException, URISyntaxException {
+    public void readReallyUnknownTypeTest() throws Exception {
         String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
-                "  Comment                  = {testentry}" + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
                 "}";
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
-        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
         BibEntry entry = entries.iterator().next();
 
         String resourceName = "/testbib/reallyunknowntype.bib";
         BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
+    }
+
+    @Test
+    public void writeReallyunknownTypeTest() throws Exception {
+        String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
+                "  comment = {testentry}," + OS.NEWLINE +
+                "}"+ OS.NEWLINE;
+
+        BibEntry entry = new BibEntry();
+        entry.setType("ReallyUnknownType");
+        entry.setField("Comment","testentry");
+        entry.setCiteKey("test");
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
-        assertEquals(bibtexEntry, actual);
+        assertEquals(expected, actual);
     }
 
     @Test
