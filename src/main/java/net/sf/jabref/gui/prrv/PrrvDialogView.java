@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
@@ -14,7 +15,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.EntryTypeList;
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -76,7 +76,7 @@ public class PrrvDialogView extends FXMLView {
             ReferenceRelationship rr = new ReferenceRelationship();
             rr.parseBibTexForReferences(graph);
             if (rr.entryNodeList.isEmpty()) {
-                showErrorDialog();
+                showErrorDialogs();
             } else {
                 // -- 3. the visualization --------------------------------------------
                 Visualization vis = new Visualization();
@@ -153,6 +153,7 @@ public class PrrvDialogView extends FXMLView {
                 root.setCenter(display);
                 // Setup zoom box
                 root.setBottom(buildControlPanel(display));
+                root.setTop(showKeyCheckBox(display));
                 // -- 7. launch the visualization -------------------------------------
                 vis.run("nodes");
                 vis.run("color");
@@ -160,7 +161,7 @@ public class PrrvDialogView extends FXMLView {
             }
             // Throw if some cite fields are not accessible
         } catch (NullPointerException e) {
-            showErrorDialog();
+            showErrorDialogs();
         }
     }
 
@@ -174,34 +175,68 @@ public class PrrvDialogView extends FXMLView {
         return vbox;
     }
 
-    private static void showErrorDialog() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    private Node showKeyCheckBox(FxDisplay display) {
+        VBox vbox = new VBox();
+        CheckBox keyCB = new CheckBox();
+        CheckBox titleCB = new CheckBox();
+        keyCB.setText("Show all keys");
+        titleCB.setText("Show all keys");
+        vbox.getChildren().addAll(keyCB, titleCB);
+        return vbox;
+    }
 
+    private static void showErrorDialogs() {
+
+        boolean makeCiteFields = false;
+        boolean considerYourDocument = false;
+        String mainDocument = "Your document";
+        List<BibEntry> pureEntryList = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries();
+
+        // ----- First dialog with option to create cites field as optional field
         String title = "Error while loading cites";
         String content = "All used entry types need an optional field named cites\n"
                 + "Should JabRef insert them automatically?\n"
                 + "Note:\n "
                 + "- You can insert entry types under BibTeX < Customize entry types.\n"
                 + "- BibTex entries which are not cited are not displayed.";
-        Optional<ButtonType> result = FXDialogs.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, ButtonType.OK, ButtonType.CANCEL);
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            // ... user chose OK
-            List<BibEntry> pureEntryList = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries();
+        Optional<ButtonType> buttonType = FXDialogs.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, ButtonType.OK, ButtonType.CANCEL);
+        if (buttonType.isPresent() && buttonType.get() == ButtonType.OK) {
             if (!pureEntryList.isEmpty()) {
-                for (int id = 0; pureEntryList.size() > id; id++) {
-                    if(!pureEntryList.get(id).getField("cites").isPresent()) {
-                        pureEntryList.get(id).getFieldMap().put("cites", "Your document");
+                makeCiteFields = true;
+            }
+            primaryStage.close();
+        } else {
+            primaryStage.close();
+        }
+
+        // ----- Second dialog which asks to use your document as root node
+        Optional<ButtonType> rootNodeButtonType = FXDialogs.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
+                "Your document as root node", "Should JabRef consider your document as a root node of the visualization?",
+                ButtonType.OK, ButtonType.CANCEL);
+        if (rootNodeButtonType.isPresent() && buttonType.get() == ButtonType.OK) {
+            mainDocument = FXDialogs.showTextInputDialogAndWait("Name" +
+                    " of your document", "Document name","Please write the name of your document");
+            considerYourDocument = true;
+        }
+
+        // ----- Apply cite fields and root node in consideration of made decisions
+        if(makeCiteFields) {
+            // Setup new cites field
+            for (int id = 0; pureEntryList.size() > id; id++) {
+                if(!pureEntryList.get(id).getField("cites").isPresent()) {
+                    if(considerYourDocument) {
+                        pureEntryList.get(id).getFieldMap().put("cites", mainDocument);
+                        //TODO Add not external node
+                    }
+                    else {
+                        pureEntryList.get(id).getFieldMap().put("cites", "");
                     }
                 }
             }
-            primaryStage.close();
-            EntryTypeList typeComp;
-            //typeComp.addF
-
-        } else {
-            primaryStage.close();
-            // ... user chose CANCEL or closed the dialog
+            // TODO load new entry edit window
+            // TODO maybe start new prrv window
         }
+
     }
 
 }
