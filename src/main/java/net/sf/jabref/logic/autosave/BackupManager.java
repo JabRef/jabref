@@ -1,4 +1,4 @@
-package net.sf.jabref.autosave;
+package net.sf.jabref.logic.autosave;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +17,13 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -42,6 +42,7 @@ public class BackupManager {
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
+    private final JabRefPreferences preferences;
     private final BlockingQueue<Runnable> workerQueue;
     private final ExecutorService executor;
     private final Charset charset;
@@ -52,9 +53,10 @@ public class BackupManager {
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
+        this.preferences = JabRefPreferences.getInstance();
         this.workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
-        this.charset = bibDatabaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding());
+        this.charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
     }
 
 
@@ -62,7 +64,7 @@ public class BackupManager {
         @Override
         public void run() {
             try {
-                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(charset).withMakeBackup(false);
+                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding(charset).withMakeBackup(false);
                 new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, prefs).commit(backupPath);
             } catch (SaveException e) {
                 LOGGER.error("Error while saving file.", e);

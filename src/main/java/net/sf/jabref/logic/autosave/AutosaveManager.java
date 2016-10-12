@@ -1,4 +1,4 @@
-package net.sf.jabref.autosave;
+package net.sf.jabref.logic.autosave;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -9,9 +9,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.jabref.autosave.event.AutosaveEvent;
 import net.sf.jabref.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.event.AutosaveEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

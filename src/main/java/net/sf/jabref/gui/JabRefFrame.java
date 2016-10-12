@@ -60,8 +60,6 @@ import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.autosave.AutosaveManager;
-import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -109,6 +107,8 @@ import net.sf.jabref.gui.search.GlobalSearchBar;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.autosave.AutosaveManager;
+import net.sf.jabref.logic.autosave.BackupManager;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;

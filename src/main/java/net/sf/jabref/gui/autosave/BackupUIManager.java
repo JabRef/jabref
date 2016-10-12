@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.autosave.BackupManager;
+import net.sf.jabref.logic.autosave.BackupManager;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

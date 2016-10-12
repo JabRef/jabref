@@ -15,8 +15,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.autosave.AutosaveManager;
-import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
@@ -25,6 +23,8 @@ import net.sf.jabref.gui.autosave.AutosaveUIManager;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.autosave.AutosaveManager;
+import net.sf.jabref.logic.autosave.BackupManager;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
