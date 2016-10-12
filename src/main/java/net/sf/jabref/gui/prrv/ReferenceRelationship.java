@@ -16,8 +16,6 @@ import prefux.data.Graph;
  */
 public class ReferenceRelationship {
 
-    private PrrvDialogView prrv;
-
     // List to store the temporary data for graph visualisation
     private List<BibEntry> pureEntryList = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries();
     public List<prefux.data.Node> entryNodeList = new ArrayList<>();
@@ -40,7 +38,7 @@ public class ReferenceRelationship {
                     // Split references for referenceCount
                     String[] referenceLines = pureEntryList.get(sourceID).getField("references").get().split(";");
                     // Create node of bibtex entry
-                    entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("title").get(), referenceLines.length + 1, "I", g));
+                    entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("bibtexkey").get(), referenceLines.length + 1, "I", g));
                 }
             }
 
@@ -61,13 +59,11 @@ public class ReferenceRelationship {
                             // Check every other entry
                             for (int targetID = 0; pureEntryList.size() > targetID; targetID++) {
                                 // Don't refer to yourself
-                                if (sourceID != targetID) {
-                                    // Reference matching with title of any bibtex entry?
-                                    if (referenceLine.trim().equals((pureEntryList.get(targetID).getField("title").get().trim()))) {
-                                        // Add edge and skip rest of search
-                                        addEdge(sourceID, targetID, g);
-                                        foundReference = true;
-                                    }
+                                // Reference matching with bibtexkey of any bibtex entry?
+                                if (referenceLine.trim().equals((pureEntryList.get(targetID).getField("bibtexkey").get().trim())) && sourceID != targetID) {
+                                    // Add edge and skip rest of search
+                                    addEdge(sourceID, targetID, g);
+                                    foundReference = true;
                                 }
                             }
 
@@ -77,7 +73,7 @@ public class ReferenceRelationship {
                                 if (externalNodeList.size() > 0) {
                                     // Already in external library?
                                     for (int targetID = 0; externalNodeList.size() > targetID; targetID++) {
-                                        if (referenceLine.trim().equals(externalNodeList.get(targetID).getString("title").trim())) {
+                                        if (referenceLine.trim().equals(externalNodeList.get(targetID).getString("bibtexkey").trim())) {
                                             // Refer to external node
                                             addEdge(sourceID, targetID + pureEntryList.size(), g);
                                             foundReference = true;
@@ -120,19 +116,19 @@ public class ReferenceRelationship {
      * Creates a node with necessary attributes
      *
      * @param ID             unique value
-     * @param title          should be unique
+     * @param bibtexkey          should be unique
      * @param referenceCount
      * @param location
      * @param graph
      * @return node
      */
-    private prefux.data.Node createNode(int ID, String title, int referenceCount, String location, Graph graph) {
+    private prefux.data.Node createNode(int ID, String bibtexkey, int referenceCount, String location, Graph graph) {
         // Create node
         prefux.data.Node node = graph.addNode();
 
-        // Set & add title
+        // Set & add node
         node.set("id", ID);
-        node.set("title", title);
+        node.set("bibtexkey", bibtexkey);
         node.set("referenceCount", referenceCount);
         node.set("location", location);
 

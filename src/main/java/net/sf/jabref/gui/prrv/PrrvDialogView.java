@@ -63,7 +63,7 @@ public class PrrvDialogView extends FXMLView {
             Table edgeData = new Table();
 
             nodeData.addColumn("id", int.class);
-            nodeData.addColumn("title", String.class);
+            nodeData.addColumn("bibtexkey", String.class);
             nodeData.addColumn("referenceCount", int.class);
             nodeData.addColumn("location", String.class);
 
