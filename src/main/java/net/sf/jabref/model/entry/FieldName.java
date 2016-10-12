@@ -18,7 +18,7 @@ public class FieldName {
     public static final String FIELD_SEPARATOR = "/";
 
     public static final String ABSTRACT_ALL_FIELD = "all";
-    public static final String ABSTRACT_ALL_TEXT_FIELDS_FIELD = "all_text_fields";
+    public static final String ABSTRACT_ALL_TEXT_FIELDS_FIELD = "all-text-fields";
 
     // Field name constants
     public static final String ABSTRACT = "abstract";

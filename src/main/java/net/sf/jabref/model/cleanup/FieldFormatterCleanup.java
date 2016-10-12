@@ -81,7 +81,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         Set<String> fields = entry.getFieldNames();
-        fields.removeAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI));
+        fields.removeAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
         for (String fieldKey : fields) {
             fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
         }
