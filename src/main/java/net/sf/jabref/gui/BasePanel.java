@@ -77,6 +77,7 @@ import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
+import net.sf.jabref.gui.specialfields.SpecialFieldActions;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -670,13 +671,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Localization.lang("Toggle print status")));
 
         for (SpecialFieldValue prio : Priority.getInstance().getValues()) {
-            actions.put(prio.getActionName(), prio.getAction(this.frame));
+            actions.put(prio.getActionName(), SpecialFieldActions.getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : Rank.getInstance().getValues()) {
-            actions.put(rank.getActionName(), rank.getAction(this.frame));
+            actions.put(rank.getActionName(), SpecialFieldActions.getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : ReadStatus.getInstance().getValues()) {
-            actions.put(status.getActionName(), status.getAction(this.frame));
+            actions.put(status.getActionName(), SpecialFieldActions.getSpecialFieldAction(status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {

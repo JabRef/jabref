@@ -33,6 +33,7 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
+import net.sf.jabref.gui.specialfields.SpecialFieldActions;
 import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -330,7 +331,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 // special field found
                 if (field.isSingleValueField()) {
                     // directly execute toggle action instead of showing a menu with one action
-                    field.getValues().get(0).getAction(panel.frame()).action();
+                    SpecialFieldActions.getSpecialFieldAction(field.getValues().get(0),panel.frame()).action();
                 } else {
                     JPopupMenu menu = new JPopupMenu();
                     for (SpecialFieldValue val : field.getValues()) {

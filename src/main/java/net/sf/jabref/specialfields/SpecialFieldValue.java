@@ -2,9 +2,6 @@ package net.sf.jabref.specialfields;
 
 import java.util.Optional;
 
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.specialfields.SpecialFieldAction;
-import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.model.entry.Keyword;
 
 public class SpecialFieldValue {
@@ -20,13 +17,7 @@ public class SpecialFieldValue {
     // localized menu string used at menu / button
     private final String menuString;
 
-    private SpecialFieldAction action;
-
     private final String toolTipText;
-
-
-    // value when used in a separate vield
-    //private String fieldValue;
 
     /**
      *
@@ -69,15 +60,8 @@ public class SpecialFieldValue {
         return this.toolTipText;
     }
 
-    public SpecialFieldAction getAction(JabRefFrame frame) {
-        if (this.action == null) {
-            action = new SpecialFieldAction(frame, this.field, this.getFieldValue().orElse(null),
-                    // if field contains only one value, it has to be nulled
-                    // otherwise, another setting does not empty the field
-                    this.field.getValues().size() == 1,
-                    this.getMenuString());
-        }
-        return action;
+    public SpecialField getField() {
+        return field;
     }
 
 }
