@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -160,12 +159,7 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog;
-            if(Objects.nonNull(lastExportedPath)) {
-                dialog = new FileDialog(frame, lastExportedPath.toString()).withExtension(FileExtensions.XML);
-            } else {
-                dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
-            }
+            FileDialog dialog = new FileDialog(frame, getPrefsExportPath()).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
@@ -210,6 +204,10 @@ public class PreferencesDialog extends JDialog {
 
         pack();
 
+    }
+
+    private String getPrefsExportPath() {
+        return Globals.prefs.get(JabRefPreferences.PREFS_EXPORT_PATH);
     }
 
     private void updateAfterPreferenceChanges() {
@@ -275,7 +273,7 @@ public class PreferencesDialog extends JDialog {
                 try {
                     storeAllSettings();
                     Globals.prefs.exportPreferences(exportFile.toString());
-                    lastExportedPath = exportFile;
+                    Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
