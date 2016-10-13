@@ -11,9 +11,9 @@ import javax.swing.JPopupMenu;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialField;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;

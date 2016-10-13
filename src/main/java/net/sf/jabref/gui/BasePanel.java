@@ -109,6 +109,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -133,7 +134,6 @@ import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
-import net.sf.jabref.specialfields.SpecialField;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;

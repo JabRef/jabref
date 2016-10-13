@@ -5,10 +5,10 @@ import java.io.IOException;
 
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

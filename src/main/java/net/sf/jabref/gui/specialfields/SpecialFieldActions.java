@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.specialfields;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialField;
 
 public class SpecialFieldActions {
 

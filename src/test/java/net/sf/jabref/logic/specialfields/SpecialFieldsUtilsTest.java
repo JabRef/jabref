@@ -1,40 +1,19 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import static net.sf.jabref.Globals.prefs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
 public class SpecialFieldsUtilsTest {
-
-    private JabRefPreferences backup;
-
-    @Before
-    public void setUp() {
-        prefs = JabRefPreferences.getInstance();
-        backup = prefs;
-
-        prefs.putBoolean(JabRefPreferences.SPECIALFIELDSENABLED, true);
-        prefs.putBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS, true);
-    }
-
-    @After
-    public void tearDown() {
-        //clean up preferences to default state
-        prefs.overwritePreferences(backup);
-    }
 
     @Test
     public void testSyncKeywordsFromSpecialFieldsBibEntry() {

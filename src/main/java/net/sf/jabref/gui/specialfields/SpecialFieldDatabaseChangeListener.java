@@ -6,10 +6,10 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.google.common.eventbus.Subscribe;
 

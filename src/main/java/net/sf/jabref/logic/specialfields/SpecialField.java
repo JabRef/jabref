@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.ArrayList;
 import java.util.HashMap;

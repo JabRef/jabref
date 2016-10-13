@@ -13,10 +13,10 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

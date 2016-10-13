@@ -4,8 +4,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialField;
 
 
 public class SpecialFieldIcon {
