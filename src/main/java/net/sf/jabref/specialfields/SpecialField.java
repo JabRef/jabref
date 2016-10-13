@@ -17,8 +17,11 @@ public enum SpecialField {
         new SpecialFieldValue("printed", "togglePrinted", Localization.lang("Toggle print status"), Localization.lang("Toggle print status"))
     ),
 
-    PRIORITY(SpecialFields.FIELDNAME_PRIORITY, "Priority", true,
-        new SpecialFieldValue("priority", "togglePrinted", Localization.lang("Toggle print status"), Localization.lang("Toggle print status"))
+    PRIORITY(SpecialFields.FIELDNAME_PRIORITY, "Priority", false,
+        new SpecialFieldValue(null, "clearPriority", Localization.lang("Clear priority"), Localization.lang("No priority information")),
+        new SpecialFieldValue("prio1", "setPriority1", Localization.lang("Set priority to high"), Localization.lang("Priority high")),
+        new SpecialFieldValue("prio2", "setPriority2", Localization.lang("Set priority to medium"), Localization.lang("Priority medium")),
+        new SpecialFieldValue("prio3", "setPriority3", Localization.lang("Set priority to low"), Localization.lang("Priority low"))
     ),
 
     QUALITY(SpecialFields.FIELDNAME_QUALITY, "Quality", true,

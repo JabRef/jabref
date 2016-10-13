@@ -28,58 +28,43 @@ public class SpecialFieldIcon {
     }
 
     public static Icon getSpecialFieldValueIcon(SpecialFieldValue value){
-        if(SpecialField.PRINTED.equals(value)){
+        if("togglePrinted".equals(value.getActionName())){
             return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-        } else if(SpecialField.PRIORITY.equals(value)){
-            return getPriorityIcon(value);
-        } else if(SpecialField.QUALITY.equals(value)){
-            return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
-        } else if(SpecialField.RANK.equals(value)){
-            return getRankIcon(value);
-        } else if(SpecialField.READ_STATUS.equals(value)){
-            return getReadStatusIcon(value);
-        } else {
-            return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
-        }
-    }
-
-    private static Icon getPriorityIcon(SpecialFieldValue value){
-        if(value.getKeyword().equals("prio1")){
+        } else if("clearPriority".equals(value.getActionName())){
+            return null;
+        } else if("setPriority1".equals(value.getActionName())){
             return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
-        } else if(value.getKeyword().equals("prio2")) {
+        } else if("setPriority2".equals(value.getActionName())){
             return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
-        } else if(value.getKeyword().equals("prio3")) {
+        } else if("setPriority3".equals(value.getActionName())){
             return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
-        } else {
+        } else if("toggleQualityAssured".equals(value.getActionName())) {
+            return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
+        } else if("clearRank".equals(value.getActionName())) {
             return null;
-        }
-    }
-
-    private static Icon getRankIcon(SpecialFieldValue value){
-        if(value.getKeyword().equals("rank1")){
+        } else if("setRank1".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.RANK1.getSmallIcon();
-        } else if(value.getKeyword().equals("rank2")) {
+        } else if("setRank2".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.RANK2.getSmallIcon();
-        } else if(value.getKeyword().equals("rank3")) {
+        } else if("setRank3".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.RANK3.getSmallIcon();
-        } else if(value.getKeyword().equals("rank4")) {
+        } else if("setRank4".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.RANK4.getSmallIcon();
-        } else if(value.getKeyword().equals("rank5")) {
+        } else if("setRank5".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.RANK5.getSmallIcon();
+        } else if("clearReadStatus".equals(value.getActionName())) {
+            return null;
+        } else if("setReadStatusToRead".equals(value.getActionName())) {
+            return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+        } else if("setReadStatusToSkimmed".equals(value.getActionName())) {
+            return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+        } else if("toggleRelevance".equals(value.getActionName())) {
+            return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
         } else {
             return null;
         }
     }
 
-    private static Icon getReadStatusIcon(SpecialFieldValue value){
-        if(value.getKeyword().equals("read")){
-            return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
-        } else if (value.getKeyword().equals("skimmed")){
-            return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
-        } else {
-            return null;
-        }
-    }
 
     public static JLabel createSpecialFieldValueLabel(SpecialFieldValue value) {
         JLabel label = new JLabel(getSpecialFieldValueIcon(value));
