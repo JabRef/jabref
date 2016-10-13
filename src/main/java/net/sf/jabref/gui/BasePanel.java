@@ -125,6 +125,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.SpecialFieldValue;
 import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
@@ -132,8 +133,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.specialfields.SpecialField;
-import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
-import net.sf.jabref.model.entry.SpecialFieldValue;
+import net.sf.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;

@@ -96,7 +96,7 @@ import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
+import net.sf.jabref.gui.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
