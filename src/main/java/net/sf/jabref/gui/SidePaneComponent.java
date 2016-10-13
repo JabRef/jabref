@@ -3,12 +3,17 @@ package net.sf.jabref.gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -17,7 +22,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
     protected final JButton close = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
 
-    private final SidePaneManager manager;
+    protected final SidePaneManager manager;
 
     protected BasePanel panel;
 
@@ -100,4 +105,51 @@ public abstract class SidePaneComponent extends JXTitledPanel {
      * 0: fixed height, 1: fill the remaining space
      */
     public abstract int getRescalingWeight();
+
+    /**
+     * @return the action which toggles this {@link SidePaneComponent}
+     */
+    public abstract ToggleAction getToggleAction();
+
+
+    public class ToggleAction extends AbstractAction {
+
+        public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon){
+            super(text, icon.getSmallIcon());
+            putValue(Action.ACCELERATOR_KEY, key);
+            putValue(Action.LARGE_ICON_KEY, icon.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, description);
+        }
+
+        public ToggleAction(String text, String description, KeyStroke key, Icon icon){
+            super(text, icon);
+            putValue(Action.ACCELERATOR_KEY, key);
+            putValue(Action.SHORT_DESCRIPTION, description);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!manager.hasComponent(SidePaneComponent.this.getClass())) {
+                manager.register(SidePaneComponent.this);
+            }
+
+            // if clicked by mouse just toggle
+            if ((e.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
+                manager.toggle(SidePaneComponent.this.getClass());
+            } else {
+                manager.toggleThreeWay(SidePaneComponent.this.getClass());
+            }
+            putValue(Action.SELECTED_KEY, manager.isComponentVisible(SidePaneComponent.this.getClass()));
+        }
+
+        public void setSelected(boolean selected){
+            putValue(Action.SELECTED_KEY, selected);
+        }
+
+        public boolean isSelected() {
+            return Boolean.TRUE.equals(getValue(Action.SELECTED_KEY));
+        }
+
+    }
+
 }
