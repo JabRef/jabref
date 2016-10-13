@@ -73,7 +73,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     private boolean fixedLayout;
     private Optional<Layout> layout = Optional.empty();
-    private JEditorPane previewPane;
+    private JEditorPaneWithHighlighting previewPane;
 
     private final JScrollPane scrollPane;
 
@@ -156,7 +156,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     }
 
     private void createPreviewPane() {
-        previewPane = new JEditorPane() {
+        previewPane = new JEditorPaneWithHighlighting() {
             @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();
@@ -277,7 +277,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             bibEntry.ifPresent(entry -> sb.append(layout.get()
                     .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
-            this.markHighlights();
+            markHighlights();
         }
         else if (basePanel.isPresent()){
             citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
@@ -287,22 +287,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     }
 
     public void markHighlights() {
-        if (!highlightPattern.isPresent()) {
-            return;
-        }
-        try {
-            Document doc = previewPane.getDocument();
-            Highlighter highlighter = previewPane.getHighlighter();
-            String text = doc.getText(0, doc.getLength());
-            Matcher matcher = highlightPattern.get().matcher(text);
-            Highlighter.HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
-            while(matcher.find()) {
-                highlighter.addHighlight(matcher.start(), matcher.end(), painter);
-            }
-
-        } catch (Exception e) {
-            LOGGER.error("Error while getting preview text");
-        }
+        previewPane.highlightPattern(highlightPattern);
     }
 
     public void setPreviewLabel(String text) {
