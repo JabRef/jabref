@@ -20,6 +20,11 @@ public class MatchesHighlighterTest {
         assertEquals("<span style=\"background-color:#3399FF;\">Einstein</span>", MatchesHighlighter.highlightWordsWithHTML("Einstein", Optional.of(Pattern.compile("Einstein"))));
     }
 
+    @Test
+    public void testHighlightWordsIgnoreHTMLTags() {
+        assertEquals("<div></div>", MatchesHighlighter.highlightWordsWithHTML("<div></div>", Optional.of(Pattern.compile("div"))));
+    }
+
     @Test(expected = NullPointerException.class)
     public void testNullText() {
         MatchesHighlighter.highlightWordsWithHTML(null, Optional.empty());
