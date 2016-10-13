@@ -2,6 +2,7 @@ package net.sf.jabref.gui.specialfields;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -29,12 +30,12 @@ public class SpecialFieldUpdateListener {
         // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed.
         SwingUtilities.invokeLater(() -> {
             if (FieldName.KEYWORDS.equals(fieldName)) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
                 SwingUtilities
                         .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
             } else {
                 if (SpecialFieldsUtils.isSpecialField(fieldName)) {
-                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
+                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
                     SwingUtilities.invokeLater(
                             () -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
                 }

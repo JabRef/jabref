@@ -310,7 +310,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
 
             if (Globals.prefs.isKeywordSyncEnabled()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
             }
         }
         ce.end();

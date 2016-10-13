@@ -1,10 +1,9 @@
 package net.sf.jabref.specialfields;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -14,59 +13,62 @@ import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.entry.SpecialFields;
 
 @Deprecated // the class should be refactored and partly integrated into BibEntry
-            // instead of synchronizing special fields with the keyword field, the BibEntry class should have a method
-            // setSpecialField(field, newValue, syncToKeyword) which directly performs the correct action
-            // i.e. sets the field to newValue (in the case syncToKeyword = false) or adds newValue to keywords (sync = true)
+// instead of synchronizing special fields with the keyword field, the BibEntry class should have a method
+// setSpecialField(field, newValue, syncToKeyword) which directly performs the correct action
+// i.e. sets the field to newValue (in the case syncToKeyword = false) or adds newValue to keywords (sync = true)
 public class SpecialFieldsUtils {
 
     /**
-     * @param e - Field to be handled
-     * @param value - may be null to state that field should be emptied
-     * @param be - BibTeXEntry to be handled
-     * @param ce - Filled with undo info (if necessary)
+     * @param e                         - Field to be handled
+     * @param value                     - may be null to state that field should be emptied
+     * @param be                        - BibTeXEntry to be handled
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
-    public static void updateField(SpecialField e, String value, BibEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
+    public static List<FieldChange> updateField(SpecialField e, String value, BibEntry be, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
-                .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                .ifPresent(fieldChange -> fieldChanges.add(fieldChange));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be, ce);
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(e, be, isKeywordSyncEnabled, keywordDelimiter));
+
+        return fieldChanges;
     }
 
-    private static void exportFieldToKeywords(SpecialField specialField, BibEntry entry, NamedCompound ce) {
-        if (!Globals.prefs.isKeywordSyncEnabled()) {
-            return;
+    private static List<FieldChange> exportFieldToKeywords(SpecialField specialField, BibEntry entry, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+
+        if (!isKeywordSyncEnabled) {
+            return fieldChanges;
         }
 
         Optional<Keyword> newValue = entry.getField(specialField.getFieldName()).map(Keyword::new);
         KeywordList keyWords = specialField.getKeyWords();
 
-        Optional<FieldChange> change = entry.replaceKeywords(keyWords, newValue, Globals.prefs.getKeywordDelimiter());
-        if (ce != null){
-            change.ifPresent(changeValue -> ce.addEdit(new UndoableFieldChange(changeValue)));
-        }
-    }
+        Optional<FieldChange> change = entry.replaceKeywords(keyWords, newValue, keywordDelimiter);
+        change.ifPresent(changeValue -> fieldChanges.add(changeValue));
 
-    public static void syncKeywordsFromSpecialFields(BibEntry be) {
-        syncKeywordsFromSpecialFields(be, null);
+        return fieldChanges;
     }
 
     /**
      * Update keywords according to values of special fields
-     *
-     * @param nc indicates the undo named compound. May be null
      */
-    public static void syncKeywordsFromSpecialFields(BibEntry be, NamedCompound nc) {
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRIORITY, be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RANK, be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RELEVANCE, be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.QUALITY, be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.READ_STATUS, be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRINTED, be, nc);
+    public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry be, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRIORITY, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RANK, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RELEVANCE, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.QUALITY, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.READ_STATUS, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRINTED, be, isKeywordSyncEnabled, keywordDelimiter));
+
+        return fieldChanges;
     }
 
-    private static void importKeywordsForField(KeywordList keywordList, SpecialField c, BibEntry be,
-            NamedCompound nc) {
+    private static List<FieldChange> importKeywordsForField(KeywordList keywordList, SpecialField c, BibEntry be) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
         KeywordList values = c.getKeyWords();
         Optional<Keyword> newValue = Optional.empty();
         for (Keyword val : values) {
@@ -78,32 +80,29 @@ public class SpecialFieldsUtils {
 
         UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue.map(Keyword::toString).orElse(null))
                 .ifPresent(fieldChange -> {
-                    if (nc != null) {
-                        nc.addEdit(new UndoableFieldChange(fieldChange));
-                    }
+                    fieldChanges.add(fieldChange);
                 });
-    }
-
-    public static void syncSpecialFieldsFromKeywords(BibEntry be) {
-        syncSpecialFieldsFromKeywords(be, null);
+        return fieldChanges;
     }
 
     /**
-    * updates field values according to keywords
-    *
-    * @param ce indicates the undo named compound. May be null
-    */
-    public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
+     * updates field values according to keywords
+     */
+    public static List<FieldChange> syncSpecialFieldsFromKeywords(BibEntry be, Character keywordDelimiter) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
         if (!be.hasField(FieldName.KEYWORDS)) {
-            return;
+            return fieldChanges;
         }
-        KeywordList keywordList = be.getKeywords(Globals.prefs.getKeywordDelimiter());
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRIORITY, be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RANK, be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.QUALITY, be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RELEVANCE, be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.READ_STATUS, be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRINTED, be, ce);
+        KeywordList keywordList = be.getKeywords(keywordDelimiter);
+
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRIORITY, be));
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RANK, be));
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.QUALITY, be));
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RELEVANCE, be));
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.READ_STATUS, be));
+        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRINTED, be));
+
+        return fieldChanges;
     }
 
     /**
@@ -112,20 +111,20 @@ public class SpecialFieldsUtils {
      */
     public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
         switch (fieldName) {
-        case SpecialFields.FIELDNAME_PRIORITY:
-            return Optional.of(SpecialField.PRIORITY);
-        case SpecialFields.FIELDNAME_QUALITY:
-            return Optional.of(SpecialField.QUALITY);
-        case SpecialFields.FIELDNAME_RANKING:
-            return Optional.of(SpecialField.RANK);
-        case SpecialFields.FIELDNAME_RELEVANCE:
-            return Optional.of(SpecialField.RELEVANCE);
-        case SpecialFields.FIELDNAME_READ:
-            return Optional.of(SpecialField.READ_STATUS);
-        case SpecialFields.FIELDNAME_PRINTED:
-            return Optional.of(SpecialField.PRINTED);
-        default:
-            return Optional.empty();
+            case SpecialFields.FIELDNAME_PRIORITY:
+                return Optional.of(SpecialField.PRIORITY);
+            case SpecialFields.FIELDNAME_QUALITY:
+                return Optional.of(SpecialField.QUALITY);
+            case SpecialFields.FIELDNAME_RANKING:
+                return Optional.of(SpecialField.RANK);
+            case SpecialFields.FIELDNAME_RELEVANCE:
+                return Optional.of(SpecialField.RELEVANCE);
+            case SpecialFields.FIELDNAME_READ:
+                return Optional.of(SpecialField.READ_STATUS);
+            case SpecialFields.FIELDNAME_PRINTED:
+                return Optional.of(SpecialField.PRINTED);
+            default:
+                return Optional.empty();
         }
     }
 

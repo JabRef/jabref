@@ -1,10 +1,11 @@
 package net.sf.jabref.specialfields;
 
+import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
@@ -40,17 +41,16 @@ public class SpecialFieldsUtilsTest {
     public void testSyncKeywordsFromSpecialFieldsBibEntry() {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
         assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
     public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundHasEdits() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
         entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc);
-        assertTrue(nc.hasEdits());
+        List<FieldChange> changes = SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
+        assertTrue(changes.size() > 0);
     }
 
     @Test
@@ -58,59 +58,54 @@ public class SpecialFieldsUtilsTest {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
         entry.setField("keywords", "rank3");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
         assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
     public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundCorrectContent() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
         entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc);
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
         assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
     public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundNoEdits() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc);
-        assertFalse(nc.hasEdits());
+        List<FieldChange> changes = SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
+        assertFalse(changes.size() > 0);
     }
 
     @Test
     public void testSyncSpecialFieldsFromKeywordsBibEntry() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
+        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
         assertEquals(Optional.of("rank2"), entry.getField("ranking"));
     }
 
     @Test
     public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundHasEdits() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
         entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-        assertTrue(nc.hasEdits());
+        List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
+        assertTrue(changes.size() > 0);
     }
 
     @Test
     public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundCorrectContent() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
         entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
+        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
         assertEquals(Optional.of("rank2"), entry.getField("ranking"));
     }
 
     @Test
     public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundNoEdit() {
         BibEntry entry = new BibEntry();
-        NamedCompound nc = new NamedCompound("Test");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-        assertFalse(nc.hasEdits());
+        List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
+        assertFalse(changes.size() > 0);
     }
 
     @Test
