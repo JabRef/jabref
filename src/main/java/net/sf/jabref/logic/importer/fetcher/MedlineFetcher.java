@@ -206,7 +206,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Error while generating fetch URL", Localization.lang("Error while generating fetch URL"), e);
         } catch (IOException e) {
-            throw new FetcherException("Error while fetching from Medline", Localization.lang("Error while fetching from Medline"), e);
+            throw new FetcherException("Error while fetching from Medline", Localization.lang("Error while fetching from %0", "Medline"), e);
         }
     }
 
