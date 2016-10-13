@@ -46,14 +46,12 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
 
     @Override
     protected String doInBackground() throws Exception {
-        Optional<BasePanel> basePanel = this.previewPanel.getBasePanel();
-        BibEntry entry = this.previewPanel.getEntry();
-        Optional<Pattern> highlightPattern = this.previewPanel.getHighlightPattern();
+        Optional<BasePanel> basePanel = previewPanel.getBasePanel();
+        BibEntry entry = previewPanel.getEntry();
 
         String fieldText = "";
         if (entry != null && basePanel.isPresent()) {
             fieldText = basePanel.get().getCitationStyleCache().getCitationFor(entry);
-            fieldText = MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern);
         }
         return fieldText;
     }
@@ -72,6 +70,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         }
 
         previewPanel.setPreviewLabel(text);
+        previewPanel.markHighlights();
     }
 
 }

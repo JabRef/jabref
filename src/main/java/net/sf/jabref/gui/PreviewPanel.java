@@ -1,13 +1,12 @@
 package net.sf.jabref.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -26,6 +25,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
@@ -273,12 +275,33 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         if (layout.isPresent()){
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
-                    .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null), highlightPattern)));
+                    .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
+            this.markHighlights();
         }
         else if (basePanel.isPresent()){
             citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
             citationStyleWorker.get().execute();
+        }
+
+    }
+
+    public void markHighlights() {
+        if (!highlightPattern.isPresent()) {
+            return;
+        }
+        try {
+            Document doc = previewPane.getDocument();
+            Highlighter highlighter = previewPane.getHighlighter();
+            String text = doc.getText(0, doc.getLength());
+            Matcher matcher = highlightPattern.get().matcher(text);
+            Highlighter.HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.RED);
+            while(matcher.find()) {
+                highlighter.addHighlight(matcher.start(), matcher.end(), painter);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Error while getting preview text");
         }
     }
 

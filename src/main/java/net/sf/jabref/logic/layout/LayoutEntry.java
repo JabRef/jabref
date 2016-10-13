@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
@@ -75,7 +74,6 @@ import net.sf.jabref.logic.layout.format.WrapContent;
 import net.sf.jabref.logic.layout.format.WrapFileLinks;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
-import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
@@ -184,11 +182,7 @@ class LayoutEntry {
         this.postFormatter = formatter;
     }
 
-    private String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, Optional.empty());
-    }
-
-    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
@@ -202,7 +196,7 @@ class LayoutEntry {
             return value;
         case LayoutHelper.IS_FIELD_START:
         case LayoutHelper.IS_GROUP_START:
-            return handleFieldOrGroupStart(bibtex, database, highlightPattern);
+            return handleFieldOrGroupStart(bibtex, database);
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
@@ -251,7 +245,7 @@ class LayoutEntry {
         return fieldEntry;
     }
 
-    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
             field = BibDatabase.getResolvedField(text, bibtex, database);
@@ -315,17 +309,7 @@ class LayoutEntry {
                             sb.append(fieldText.substring(eol));
                         }
                     } else {
-                        /*
-                         * if fieldText is not null and the bibtexentry is marked
-                         * as a searchhit, try to highlight the searched words
-                         *
-                        */
-                        if (bibtex.isSearchHit()) {
-                            sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
-                        } else {
-                            sb.append(fieldText);
-                        }
-
+                        sb.append(fieldText);
                     }
                 }
 
