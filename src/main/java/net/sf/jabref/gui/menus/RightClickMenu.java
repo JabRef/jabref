@@ -31,9 +31,9 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFieldValue;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialField;
-import net.sf.jabref.model.entry.SpecialFieldValue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

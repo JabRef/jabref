@@ -79,6 +79,7 @@ import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.specialfields.SpecialFieldAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldActions;
+import net.sf.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -133,7 +134,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.specialfields.SpecialField;
-import net.sf.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;
