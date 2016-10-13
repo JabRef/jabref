@@ -39,19 +39,19 @@ public class Cleanups {
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
-        List<FieldFormatterCleanup> recommendBibTexFormatters = new ArrayList<>(defaultFormatters);
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new UnicodeToLatexFormatter()));
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new UnicodeToLatexFormatter()));
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.JOURNAL, new UnicodeToLatexFormatter()));
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.AUTHOR, new UnicodeToLatexFormatter()));
-        recommendBibTexFormatters.add(new FieldFormatterCleanup(FieldName.EDITOR, new UnicodeToLatexFormatter()));
-        RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendBibTexFormatters);
+        List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>(defaultFormatters);
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.JOURNAL, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.AUTHOR, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.EDITOR, new UnicodeToLatexFormatter()));
+        RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
-        List<FieldFormatterCleanup> recommendBibLatexFormatters = new ArrayList<>(defaultFormatters);
-        recommendBibLatexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
-        recommendBibLatexFormatters.add(new FieldFormatterCleanup(FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
-        RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendBibLatexFormatters);
+        List<FieldFormatterCleanup> recommendedBibLaTeXFormatters = new ArrayList<>(defaultFormatters);
+        recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
+        recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibLaTeXFormatters);
     }
 
     public static List<Formatter> getAvailableFormatters() {

@@ -135,19 +135,19 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
 
-        boolean isBibTex = !JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext().isBiblatexMode();
+        boolean isBibTeX = !JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext().isBiblatexMode();
         String mode;
 
-        if (isBibTex) {
-            mode = "BibTex";
+        if (isBibTeX) {
+            mode = "BibTeX";
         } else {
-            mode = "BibLaTex";
+            mode = "BibLaTeX";
         }
 
-        recommendButton = new JButton(Localization.lang("Recommend for %0", mode));
+        recommendButton = new JButton(Localization.lang("Recommended for %0", mode));
         recommendButton.addActionListener(e -> {
 
-            if (isBibTex) {
+            if (isBibTeX) {
                 ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBTEX_ACTIONS);
             } else {
                 ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBLATEX_ACTIONS);
