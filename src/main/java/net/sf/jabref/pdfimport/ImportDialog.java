@@ -8,8 +8,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -19,11 +23,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -80,6 +87,15 @@ public class ImportDialog extends JDialog {
         checkBoxDoNotShowAgain = new JCheckBox(Localization.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow", ""));
+        List<BibEntry> foundEntries = getEntriesFromXMP(fileName);
+        JPanel entriesPanel = new JPanel();
+        entriesPanel.setLayout(new BoxLayout(entriesPanel, BoxLayout.Y_AXIS));
+        foundEntries.forEach(entry -> {
+            JTextArea entryArea = new JTextArea(entry.toString());
+            entryArea.setEditable(false);
+            entriesPanel.add(entryArea);
+        });
+
         b.appendSeparator(Localization.lang("Create new entry"));
         b.append(radioButtonNoMeta, 3);
         b.append(radioButtonXmp, 3);
@@ -89,6 +105,10 @@ public class ImportDialog extends JDialog {
         b.nextLine();
         b.append(checkBoxDoNotShowAgain);
         b.append(useDefaultPDFImportStyle);
+        if (!foundEntries.isEmpty()) {
+            b.appendSeparator(Localization.lang("XMP-metadata"));
+            b.append(entriesPanel, 3);
+        }
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -153,6 +173,16 @@ public class ImportDialog extends JDialog {
         }
 
         this.setSize(555, 371);
+    }
+
+    private List<BibEntry> getEntriesFromXMP(String fileName) {
+        List<BibEntry> foundEntries = new ArrayList<>();
+        try {
+            foundEntries =  XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return foundEntries;
     }
 
     private void onOK() {

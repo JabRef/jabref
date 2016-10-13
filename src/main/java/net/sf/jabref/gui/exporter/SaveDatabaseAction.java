@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
+import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
@@ -381,7 +382,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.setUpdatedExternally(false);
-                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
+                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
                             } else {
                                 canceled = true;
                             }
@@ -399,7 +400,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     canceled = true;
                 } else {
                     panel.setUpdatedExternally(false);
-                    panel.getSidePaneManager().hide("fileUpdate");
+                    panel.getSidePaneManager().hide(FileUpdatePanel.class);
                 }
             }
         }

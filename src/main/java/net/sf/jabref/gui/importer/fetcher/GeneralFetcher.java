@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -44,15 +42,13 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final JPanel optionsPanel = new JPanel(optionsCards);
     private final JPanel optPanel = new JPanel(new BorderLayout());
 
-    private final SidePaneManager sidePaneManager;
-    private final Action action;
+    private final ToggleAction action;
     private final JabRefFrame frame;
     private EntryFetcher activeFetcher;
 
 
-    public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
-        super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
-        this.sidePaneManager = p0;
+    public GeneralFetcher(JabRefFrame frame, SidePaneManager sidePaneManager) {
+        super(sidePaneManager, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.frame = frame;
         List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
         EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
@@ -93,9 +89,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             revalidate();
         });
 
-        action = new FetcherAction();
-
-
+        action = new ToggleAction(Localization.lang("Web search"),
+                Localization.lang("Toggle web search interface"),
+                Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH),
+                IconTheme.JabRefIcon.WWW);
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
         tf.setPreferredSize(new Dimension(1, tf.getPreferredSize().height));
@@ -158,7 +155,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         return tf;
     }
 
-    public Action getAction() {
+    @Override
+    public ToggleAction getToggleAction() {
         return action;
     }
 
@@ -225,37 +223,15 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         }
     }
 
-
-    class FetcherAction extends AbstractAction {
-
-        public FetcherAction() {
-            super(Localization.lang("Web search"), IconTheme.JabRefIcon.WWW.getSmallIcon());
-            //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH));
-            putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Toggle web search interface"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (!sidePaneManager.hasComponent(GeneralFetcher.this.getTitle())) {
-                sidePaneManager.register(GeneralFetcher.this.getTitle(), GeneralFetcher.this);
-            }
-
-            if (frame.getTabbedPane().getTabCount() > 0) {
-                sidePaneManager.toggle(GeneralFetcher.this.getTitle());
-                if (sidePaneManager.isComponentVisible(GeneralFetcher.this.getTitle())) {
-                    getTextField().requestFocus();
-                }
-            }
-        }
+    @Override
+    public void grabFocus() {
+        getTextField().grabFocus();
     }
-
 
     @Override
     public void componentClosing() {
         super.componentClosing();
-        frame.setFetcherToggle(false);
+        getToggleAction().setSelected(false);
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 
