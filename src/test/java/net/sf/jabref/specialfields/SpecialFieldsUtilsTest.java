@@ -3,7 +3,6 @@ package net.sf.jabref.specialfields;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
