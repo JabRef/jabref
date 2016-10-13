@@ -33,9 +33,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- * Fetch or search from PubMed "<a href=http://www.ncbi.nlm.nih.gov/sites/entrez/>www.ncbi.nlm.nih.gov</a>"
+ * Fetch or search from PubMed <a href="http://www.ncbi.nlm.nih.gov/sites/entrez/">www.ncbi.nlm.nih.gov</a>
  * The MedlineFetcher fetches the entries from the PubMed database.
- * See "<a href=http://help.jabref.org/en/MedlineRIS>help.jabref.org</a>" for a detailed documentation of the available fields.
+ * See <a href="http://help.jabref.org/en/MedlineRIS">help.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
 
@@ -70,43 +70,43 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             URL ncbi = createSearchUrl(query);
 
             XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-            XMLStreamReader eventReader = inputFactory.createXMLStreamReader(ncbi.openStream());
+            XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());
 
             fetchLoop:
-            while (eventReader.hasNext()) {
-                int event = eventReader.getEventType();
+            while (streamReader.hasNext()) {
+                int event = streamReader.getEventType();
 
                 switch (event) {
                     case XMLStreamConstants.START_ELEMENT:
-                        if (eventReader.getName().toString().equals("Count")) {
+                        if (streamReader.getName().toString().equals("Count")) {
                             firstOccurrenceOfCount = true;
                         }
 
-                        if (eventReader.getName().toString().equals("IdList")) {
+                        if (streamReader.getName().toString().equals("IdList")) {
                             fetchIDs = true;
                         }
                         break;
 
                     case XMLStreamConstants.CHARACTERS:
                         if (firstOccurrenceOfCount) {
-                            numberOfResultsFound = Integer.parseInt(eventReader.getText());
+                            numberOfResultsFound = Integer.parseInt(streamReader.getText());
                             firstOccurrenceOfCount = false;
                         }
 
                         if (fetchIDs) {
-                            idList.add(eventReader.getText());
+                            idList.add(streamReader.getText());
                         }
                         break;
 
                     case XMLStreamConstants.END_ELEMENT:
                         //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                        if (eventReader.getName().toString().equals("IdList")) {
+                        if (streamReader.getName().toString().equals("IdList")) {
                             break fetchLoop;
                         }
                 }
-                eventReader.next();
+                streamReader.next();
             }
-            eventReader.close();
+            streamReader.close();
             return idList;
         } catch (IOException | URISyntaxException e) {
             throw new FetcherException("Unable to get PubMed IDs", e);
@@ -162,7 +162,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 LOGGER.info(Localization.lang("No results found."));
                 return Collections.emptyList();
             }
-            if (numberOfResultsFound > 50) {
+            if (numberOfResultsFound > NUMBER_TO_FETCH) {
                 LOGGER.info(numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
