@@ -3,7 +3,6 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.SpecialFields;
 
@@ -15,7 +14,7 @@ public class Printed extends SpecialField {
     private Printed() {
         List<SpecialFieldValue> values = new ArrayList<>();
         // DO NOT TRANSLATE "printed" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toggle print status"), IconTheme.JabRefIcon.PRINTED.getSmallIcon(),
+        values.add(new SpecialFieldValue(this, "printed", "togglePrinted", Localization.lang("Toggle print status"),
                 Localization.lang("Toggle print status")));
         this.setValues(values);
     }

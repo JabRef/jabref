@@ -3,9 +3,6 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.SpecialFields;
 
@@ -16,19 +13,14 @@ public class Priority extends SpecialField {
 
     private Priority() {
         List<SpecialFieldValue> values = new ArrayList<>();
-        values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null,
+        values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"),
                 Localization.lang("No priority information")));
-        Icon tmpicon;
-        tmpicon = IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
-        // DO NOT TRANSLATE "prio1" etc. as this makes the .bib files non portable
         values.add(new SpecialFieldValue(this, "prio1", "setPriority1", Localization.lang("Set priority to high"),
-                tmpicon, Localization.lang("Priority high")));
-        tmpicon = IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
+                Localization.lang("Priority high")));
         values.add(new SpecialFieldValue(this, "prio2", "setPriority2", Localization.lang("Set priority to medium"),
-                tmpicon, Localization.lang("Priority medium")));
-        tmpicon = IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
+                Localization.lang("Priority medium")));
         values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Localization.lang("Set priority to low"),
-                tmpicon, Localization.lang("Priority low")));
+                 Localization.lang("Priority low")));
         this.setValues(values);
     }
 

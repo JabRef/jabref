@@ -16,7 +16,7 @@ public class Relevance extends SpecialField {
         List<SpecialFieldValue> values = new ArrayList<>();
         // action directly set by JabRefFrame
         // DO NOT TRANSLATE "relevant" as this makes the produced .bib files non portable
-        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"), IconTheme.JabRefIcon.RELEVANCE.getSmallIcon(),
+        values.add(new SpecialFieldValue(this, "relevant", "toggleRelevance", Localization.lang("Toggle relevance"),
                 Localization.lang("Toggle relevance")));
         this.setValues(values);
     }

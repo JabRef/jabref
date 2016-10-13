@@ -44,7 +44,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_RANKING)
-                    .flatMap(Rank.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
+                    .flatMap(Rank.getInstance()::parse).map(rank -> SpecialFieldIcon.createSpecialFieldValueLabel(rank)).orElse(null);
         }
     };
 
@@ -56,7 +56,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_PRIORITY)
-                    .flatMap(Priority.getInstance()::parse).map(prio -> prio.createLabel()).orElse(null);
+                    .flatMap(Priority.getInstance()::parse).map(prio -> SpecialFieldIcon.createSpecialFieldValueLabel(prio)).orElse(null);
         }
     };
 
@@ -68,7 +68,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_READ)
-                    .flatMap(ReadStatus.getInstance()::parse).map(status -> status.createLabel()).orElse(null);
+                    .flatMap(ReadStatus.getInstance()::parse).map(status -> SpecialFieldIcon.createSpecialFieldValueLabel(status)).orElse(null);
         }
     };
 

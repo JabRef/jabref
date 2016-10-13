@@ -2,9 +2,6 @@ package net.sf.jabref.specialfields;
 
 import java.util.Optional;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.specialfields.SpecialFieldAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
@@ -27,8 +24,6 @@ public class SpecialFieldValue {
 
     private SpecialFieldMenuAction menuAction;
 
-    private final Icon icon;
-
     private final String toolTipText;
 
 
@@ -41,7 +36,6 @@ public class SpecialFieldValue {
      * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
      * @param actionName - the action to call
      * @param menuString - the string to display at a menu
-     * @param icon - the icon of this value
      * @param toolTipText - the tool tip text
      */
     public SpecialFieldValue(
@@ -49,13 +43,11 @@ public class SpecialFieldValue {
             String keyword,
             String actionName,
             String menuString,
-            Icon icon,
             String toolTipText) {
         this.field = field;
         this.keyword = Optional.ofNullable(keyword).map(Keyword::new);
         this.actionName = actionName;
         this.menuString = menuString;
-        this.icon = icon;
         this.toolTipText = toolTipText;
     }
 
@@ -71,18 +63,8 @@ public class SpecialFieldValue {
         return this.menuString;
     }
 
-    public JLabel createLabel() {
-        JLabel label = new JLabel(this.icon);
-        label.setToolTipText(this.toolTipText);
-        return label;
-    }
-
     public Optional<String> getFieldValue() {
         return keyword.map(Keyword::toString);
-    }
-
-    public Icon getIcon() {
-        return this.icon;
     }
 
     public String getToolTipText() {
