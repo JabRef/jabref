@@ -90,13 +90,10 @@ public class ModsExportFormatTestFiles {
 
     @Test
     public final void testExportAsModsAndThenImportAsMods() throws Exception {
-        String xmlFileName = filename.replace(".bib", ".xml");
-        Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
-        Path modsFile = importFile.resolve(xmlFile);
 
-        modsExportFormat.performExport(databaseContext, modsFile, charset, entries);
-        BibEntryAssert.assertEquals(entries, modsFile, modsImporter);
+        modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+        BibEntryAssert.assertEquals(entries, Paths.get(tempFile.getPath()), modsImporter);
     }
 
     @Test

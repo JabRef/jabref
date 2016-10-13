@@ -4,14 +4,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * Search rule for contain-based search.
  */
 public class ContainBasedSearchRule implements SearchRule {
-
-    private static final LatexToUnicode LATEX_TO_UNICODE_FORMATTER = new LatexToUnicode();
 
     private final boolean caseSensitive;
 
