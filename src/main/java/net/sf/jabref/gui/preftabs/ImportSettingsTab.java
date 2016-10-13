@@ -103,6 +103,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         pan3.add(fileDirPattern);
 
         builder.nextLine();
+        builder.append(pan);
         builder.append(pan3);
 
         pan = builder.getPanel();
@@ -136,7 +137,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
 
         String pattern = "";
-        fileDirPattern.setText(pattern);
+        fileDirPattern.setText(prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
     }
 
     @Override

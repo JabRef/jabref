@@ -144,9 +144,27 @@ public class FileUtil {
      */
     public static boolean renameFile(Path fromFile, Path toFile) {
 
-        try {
+        return renameFile(fromFile, toFile, false);
+    }
 
-            return Files.move(fromFile, fromFile.resolveSibling(toFile), StandardCopyOption.REPLACE_EXISTING) != null;
+    /**
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @param replaceExisting Wether to replace existing files or not
+     * @return True if the rename was successful, false if an exception occurred
+     *
+     */
+    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
+
+        try {
+            if (replaceExisting) {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                        StandardCopyOption.REPLACE_EXISTING) != null;
+            } else {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+            }
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;
