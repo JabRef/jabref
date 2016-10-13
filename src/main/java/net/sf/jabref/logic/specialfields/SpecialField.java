@@ -38,14 +38,24 @@ public enum SpecialField {
     ),
 
     READ_STATUS(SpecialFields.FIELDNAME_READ, "Read status", false,
-            new SpecialFieldValue(null, "clearReadStatus", Localization.lang("Clear read status"), Localization.lang("No read status information")),
-            new SpecialFieldValue("read", "setReadStatusToRead", Localization.lang("Set read status to read"), Localization.lang("Read status read")),
-            new SpecialFieldValue("skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), Localization.lang("Read status skimmed"))
+        new SpecialFieldValue(null, "clearReadStatus", Localization.lang("Clear read status"), Localization.lang("No read status information")),
+        new SpecialFieldValue("read", "setReadStatusToRead", Localization.lang("Set read status to read"), Localization.lang("Read status read")),
+        new SpecialFieldValue("skimmed", "setReadStatusToSkimmed", Localization.lang("Set read status to skimmed"), Localization.lang("Read status skimmed"))
     ),
 
     RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, "Relevance", true,
-            new SpecialFieldValue("relevant", "toggleRelevance", Localization.lang("Toggle relevance"), Localization.lang("Toggle relevance"))
+        new SpecialFieldValue("relevant", "toggleRelevance", Localization.lang("Toggle relevance"), Localization.lang("Toggle relevance"))
     );
+
+    // this is just to satisfy our own localization tests, since they will not detect if a variable is passed into Localization.lang()
+    static {
+        Localization.lang("Printed");
+        Localization.lang("Priority");
+        Localization.lang("Quality");
+        Localization.lang("Rank");
+        Localization.lang("Read status");
+        Localization.lang("Relevance");
+    }
 
     private List<SpecialFieldValue> values;
     private KeywordList keywords;
