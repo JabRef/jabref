@@ -26,6 +26,7 @@ import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -121,13 +122,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                add(Relevance.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(Relevance.getInstance().getValues().get(0), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                add(Quality.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(Quality.getInstance().getValues().get(0), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                add(Printed.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(Printed.getInstance().getValues().get(0), frame));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
@@ -214,7 +215,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         menu.setText(field.getMenuString());
         menu.setIcon(((IconTheme.FontBasedIcon) SpecialFieldIcon.getRepresentingIcon(field)));
         for (SpecialFieldValue val : field.getValues()) {
-            menu.add(val.getMenuAction(frame));
+            menu.add(new SpecialFieldMenuAction(val, frame));
         }
     }
 

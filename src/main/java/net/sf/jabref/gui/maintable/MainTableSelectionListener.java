@@ -33,6 +33,7 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
@@ -333,7 +334,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 } else {
                     JPopupMenu menu = new JPopupMenu();
                     for (SpecialFieldValue val : field.getValues()) {
-                        menu.add(val.getMenuAction(panel.frame()));
+                        menu.add(new SpecialFieldMenuAction(val, panel.frame()));
                     }
                     menu.show(table, e.getX(), e.getY());
                 }

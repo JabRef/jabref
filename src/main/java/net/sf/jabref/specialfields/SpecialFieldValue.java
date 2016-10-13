@@ -22,8 +22,6 @@ public class SpecialFieldValue {
 
     private SpecialFieldAction action;
 
-    private SpecialFieldMenuAction menuAction;
-
     private final String toolTipText;
 
 
@@ -80,13 +78,6 @@ public class SpecialFieldValue {
                     this.getMenuString());
         }
         return action;
-    }
-
-    public SpecialFieldMenuAction getMenuAction(JabRefFrame frame) {
-        if (this.menuAction == null) {
-            this.menuAction = new SpecialFieldMenuAction(this, frame);
-        }
-        return this.menuAction;
     }
 
 }
