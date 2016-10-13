@@ -39,8 +39,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFieldValue;
 import net.sf.jabref.preferences.PreviewPreferences;
-import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.EventList;

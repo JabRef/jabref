@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.KeywordList;
+import net.sf.jabref.model.entry.SpecialFieldValue;
 import net.sf.jabref.model.entry.SpecialFields;
 
 

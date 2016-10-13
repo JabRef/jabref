@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.model.entry.SpecialFieldValue;
 
 public class SpecialFieldMenuAction extends AbstractAction {
 

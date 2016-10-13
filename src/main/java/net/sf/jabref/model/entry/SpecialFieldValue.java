@@ -1,8 +1,6 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.model.entry;
 
 import java.util.Optional;
-
-import net.sf.jabref.model.entry.Keyword;
 
 public class SpecialFieldValue {
 
