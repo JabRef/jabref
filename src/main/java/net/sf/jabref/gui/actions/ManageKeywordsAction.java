@@ -40,12 +40,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.strings.StringUtil;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -332,44 +327,44 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         // Priority
         clone = keywordsToAdd.createClone();
-        clone.retainAll(Priority.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.PRIORITY.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.PRIORITY.getKeyWords());
         }
 
         // Quality
         clone = keywordsToAdd.createClone();
-        clone.retainAll(Quality.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.QUALITY.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.QUALITY.getKeyWords());
         }
 
         // Rank
         clone = keywordsToAdd.createClone();
-        clone.retainAll(Rank.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.RANK.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.RANK.getKeyWords());
         }
 
         // Relevance
         clone = keywordsToAdd.createClone();
-        clone.retainAll(Relevance.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.RELEVANCE.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.RELEVANCE.getKeyWords());
         }
 
         // Read status
         clone = keywordsToAdd.createClone();
-        clone.retainAll(ReadStatus.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.READ_STATUS.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.READ_STATUS.getKeyWords());
         }
 
         // Printed
         clone = keywordsToAdd.createClone();
-        clone.retainAll(Printed.getInstance().getKeyWords());
+        clone.retainAll(SpecialField.PRINTED.getKeyWords());
         if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
+            keywordsToRemove.addAll(SpecialField.PRINTED.getKeyWords());
         }
     }
 

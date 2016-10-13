@@ -331,7 +331,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 // special field found
                 if (field.isSingleValueField()) {
                     // directly execute toggle action instead of showing a menu with one action
-                    SpecialFieldActions.getSpecialFieldAction(field.getValues().get(0),panel.frame()).action();
+                    SpecialFieldActions.getSpecialFieldAction(field, field.getValues().get(0), panel.frame()).action();
                 } else {
                     JPopupMenu menu = new JPopupMenu();
                     for (SpecialFieldValue val : field.getValues()) {

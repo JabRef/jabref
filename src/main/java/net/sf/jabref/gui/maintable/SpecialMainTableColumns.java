@@ -14,12 +14,7 @@ import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
+import net.sf.jabref.specialfields.SpecialField;
 
 public class SpecialMainTableColumns {
 
@@ -44,45 +39,45 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_RANKING)
-                    .flatMap(Rank.getInstance()::parse).map(rank -> SpecialFieldIcon.createSpecialFieldValueLabel(rank)).orElse(null);
+                    .flatMap(SpecialField.RANK::parse).map(rank -> SpecialFieldIcon.createSpecialFieldValueLabel(rank)).orElse(null);
         }
     };
 
     public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_PRIORITY,
             Collections.singletonList(SpecialFields.FIELDNAME_PRIORITY),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(Priority.getInstance()))) {
+            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRIORITY))) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_PRIORITY)
-                    .flatMap(Priority.getInstance()::parse).map(prio -> SpecialFieldIcon.createSpecialFieldValueLabel(prio)).orElse(null);
+                    .flatMap(SpecialField.PRIORITY::parse).map(prio -> SpecialFieldIcon.createSpecialFieldValueLabel(prio)).orElse(null);
         }
     };
 
     public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_READ,
             Collections.singletonList(SpecialFields.FIELDNAME_READ),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(ReadStatus.getInstance()))) {
+            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.READ_STATUS))) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_READ)
-                    .flatMap(ReadStatus.getInstance()::parse).map(status -> SpecialFieldIcon.createSpecialFieldValueLabel(status)).orElse(null);
+                    .flatMap(SpecialField.READ_STATUS::parse).map(status -> SpecialFieldIcon.createSpecialFieldValueLabel(status)).orElse(null);
         }
     };
 
     public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFields.FIELDNAME_RELEVANCE,
             Collections.singletonList(SpecialFields.FIELDNAME_RELEVANCE),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(Relevance.getInstance())));
+            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.RELEVANCE)));
 
     public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFields.FIELDNAME_PRINTED,
             Collections.singletonList(SpecialFields.FIELDNAME_PRINTED),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(Printed.getInstance())));
+            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRINTED)));
 
     public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFields.FIELDNAME_QUALITY,
             Collections.singletonList(SpecialFields.FIELDNAME_QUALITY),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(Quality.getInstance())));
+            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.QUALITY)));
 
 
     public static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE,

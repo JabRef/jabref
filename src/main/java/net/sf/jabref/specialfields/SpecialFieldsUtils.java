@@ -57,12 +57,12 @@ public class SpecialFieldsUtils {
      * @param nc indicates the undo named compound. May be null
      */
     public static void syncKeywordsFromSpecialFields(BibEntry be, NamedCompound nc) {
-        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRIORITY, be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RANK, be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RELEVANCE, be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.QUALITY, be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.READ_STATUS, be, nc);
+        SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRINTED, be, nc);
     }
 
     private static void importKeywordsForField(KeywordList keywordList, SpecialField c, BibEntry be,
@@ -98,12 +98,12 @@ public class SpecialFieldsUtils {
             return;
         }
         KeywordList keywordList = be.getKeywords(Globals.prefs.getKeywordDelimiter());
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRIORITY, be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RANK, be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.QUALITY, be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RELEVANCE, be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.READ_STATUS, be, ce);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRINTED, be, ce);
     }
 
     /**
@@ -113,17 +113,17 @@ public class SpecialFieldsUtils {
     public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
         switch (fieldName) {
         case SpecialFields.FIELDNAME_PRIORITY:
-            return Optional.of(Priority.getInstance());
+            return Optional.of(SpecialField.PRIORITY);
         case SpecialFields.FIELDNAME_QUALITY:
-            return Optional.of(Quality.getInstance());
+            return Optional.of(SpecialField.QUALITY);
         case SpecialFields.FIELDNAME_RANKING:
-            return Optional.of(Rank.getInstance());
+            return Optional.of(SpecialField.RANK);
         case SpecialFields.FIELDNAME_RELEVANCE:
-            return Optional.of(Relevance.getInstance());
+            return Optional.of(SpecialField.RELEVANCE);
         case SpecialFields.FIELDNAME_READ:
-            return Optional.of(ReadStatus.getInstance());
+            return Optional.of(SpecialField.READ_STATUS);
         case SpecialFields.FIELDNAME_PRINTED:
-            return Optional.of(Printed.getInstance());
+            return Optional.of(SpecialField.PRINTED);
         default:
             return Optional.empty();
         }

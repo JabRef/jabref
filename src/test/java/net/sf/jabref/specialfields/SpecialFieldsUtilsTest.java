@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
@@ -114,7 +115,7 @@ public class SpecialFieldsUtilsTest {
 
     @Test
     public void testGetSpecialFieldInstanceFromFieldNameValid() {
-        assertEquals(Optional.of(Rank.getInstance()),
+        assertEquals(Optional.of(SpecialField.RANK),
                 SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName("ranking"));
     }
 

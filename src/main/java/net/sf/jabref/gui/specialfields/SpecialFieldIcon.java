@@ -4,44 +4,39 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
+
 import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 
 public class SpecialFieldIcon {
 
     public static Icon getRepresentingIcon(SpecialField field) {
-        if (Printed.getInstance().equals(field)) {
+        if (SpecialField.PRINTED.equals(field)) {
             return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-        } else if (Priority.getInstance().equals(field)) {
+        } else if (SpecialField.PRIORITY.equals(field)) {
             return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
-        } else if (Quality.getInstance().equals(field)) {
+        } else if (SpecialField.QUALITY.equals(field)) {
             return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-        } else if (Rank.getInstance().equals(field)) {
+        } else if (SpecialField.RANK.equals(field)) {
             return IconTheme.JabRefIcon.RANKING.getSmallIcon();
-        } else if (ReadStatus.getInstance().equals(field)) {
+        } else if (SpecialField.READ_STATUS.equals(field)) {
             return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
-        } else if (Relevance.getInstance().equals(field)) {
+        } else if (SpecialField.RELEVANCE.equals(field)) {
             return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
         }
         return null;
     }
 
     public static Icon getSpecialFieldValueIcon(SpecialFieldValue value){
-        if(Printed.getInstance().equals(value)){
+        if(SpecialField.PRINTED.equals(value)){
             return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-        } else if(Priority.getInstance().equals(value)){
+        } else if(SpecialField.PRIORITY.equals(value)){
             return getPriorityIcon(value);
-        } else if(Quality.getInstance().equals(value)){
+        } else if(SpecialField.QUALITY.equals(value)){
             return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
-        } else if(Rank.getInstance().equals(value)){
+        } else if(SpecialField.RANK.equals(value)){
             return getRankIcon(value);
-        } else if(ReadStatus.getInstance().equals(value)){
+        } else if(SpecialField.READ_STATUS.equals(value)){
             return getReadStatusIcon(value);
         } else {
             return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();

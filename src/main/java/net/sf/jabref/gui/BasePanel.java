@@ -77,6 +77,7 @@ import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
+import net.sf.jabref.gui.specialfields.SpecialFieldAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldActions;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -130,13 +131,7 @@ import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.gui.specialfields.SpecialFieldAction;
+import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 
@@ -657,27 +652,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         });
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
-        actions.put(Relevance.getInstance().getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, Relevance.getInstance(),
-                        Relevance.getInstance().getValues().get(0).getFieldValue().get(), true,
+        actions.put(SpecialField.RELEVANCE.getValues().get(0).getActionName(),
+                new SpecialFieldAction(frame, SpecialField.RELEVANCE,
+                        SpecialField.RELEVANCE.getValues().get(0).getFieldValue().get(), true,
                         Localization.lang("Toggle relevance")));
-        actions.put(Quality.getInstance().getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, Quality.getInstance(),
-                        Quality.getInstance().getValues().get(0).getFieldValue().get(), true,
+        actions.put(SpecialField.QUALITY.getValues().get(0).getActionName(),
+                new SpecialFieldAction(frame, SpecialField.QUALITY,
+                        SpecialField.QUALITY.getValues().get(0).getFieldValue().get(), true,
                         Localization.lang("Toggle quality assured")));
-        actions.put(Printed.getInstance().getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, Printed.getInstance(),
-                        Printed.getInstance().getValues().get(0).getFieldValue().get(), true,
+        actions.put(SpecialField.PRINTED.getValues().get(0).getActionName(),
+                new SpecialFieldAction(frame, SpecialField.PRINTED,
+                        SpecialField.PRINTED.getValues().get(0).getFieldValue().get(), true,
                         Localization.lang("Toggle print status")));
 
-        for (SpecialFieldValue prio : Priority.getInstance().getValues()) {
-            actions.put(prio.getActionName(), SpecialFieldActions.getSpecialFieldAction(prio, this.frame));
+        for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
+            actions.put(prio.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.PRIORITY, prio, this.frame));
         }
-        for (SpecialFieldValue rank : Rank.getInstance().getValues()) {
-            actions.put(rank.getActionName(), SpecialFieldActions.getSpecialFieldAction(rank, this.frame));
+        for (SpecialFieldValue rank : SpecialField.RANK.getValues()) {
+            actions.put(rank.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.RANK, rank, this.frame));
         }
-        for (SpecialFieldValue status : ReadStatus.getInstance().getValues()) {
-            actions.put(status.getActionName(), SpecialFieldActions.getSpecialFieldAction(status, this.frame));
+        for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
+            actions.put(status.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.READ_STATUS, status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
