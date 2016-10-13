@@ -109,9 +109,9 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             streamReader.close();
             return idList;
         } catch (IOException | URISyntaxException e) {
-            throw new FetcherException("Unable to get PubMed IDs", e);
+            throw new FetcherException("Unable to get PubMed IDs", Localization.lang("Unable to get PubMed IDs"), e);
         } catch (XMLStreamException e) {
-            throw new FetcherException("Error while parsing ID list", e);
+            throw new FetcherException("Error while parsing ID list", Localization.lang("Error while parsing ID list"), e);
         }
     }
 
@@ -159,7 +159,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             List<String> idList = getPubMedIdsFromQuery(searchTerm);
 
             if (idList.isEmpty()) {
-                LOGGER.info(Localization.lang("No results found."));
+                LOGGER.info("No results found.");
                 return Collections.emptyList();
             }
             if (numberOfResultsFound > NUMBER_TO_FETCH) {
@@ -203,8 +203,10 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             List<BibEntry> resultList = result.getDatabase().getEntries();
             resultList.forEach(this::doPostCleanup);
             return resultList;
-        } catch (URISyntaxException | IOException e) {
-            throw new FetcherException(e.getLocalizedMessage(), e);
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Error while generating fetch URL", Localization.lang("Error while generating fetch URL"), e);
+        } catch (IOException e) {
+            throw new FetcherException("Error while fetching from Medline", Localization.lang("Error while fetching from Medline"), e);
         }
     }
 
