@@ -6,6 +6,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.specialfields.SpecialFieldAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.model.entry.Keyword;
 
 public class SpecialFieldValue {

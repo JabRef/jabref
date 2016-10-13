@@ -51,8 +51,6 @@ public abstract class SpecialField {
 
     public abstract String getLocalizedFieldName();
 
-    public abstract Icon getRepresentingIcon();
-
     public String getMenuString() {
         return getLocalizedFieldName();
     }

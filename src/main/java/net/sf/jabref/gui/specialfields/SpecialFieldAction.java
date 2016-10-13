@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import java.util.List;
 
@@ -7,6 +7,8 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
 
+import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

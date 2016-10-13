@@ -49,9 +49,4 @@ public class ReadStatus extends SpecialField {
     public String getLocalizedFieldName() {
         return Localization.lang("Read status");
     }
-
-    @Override
-    public Icon getRepresentingIcon() {
-        return this.icon;
-    }
 }

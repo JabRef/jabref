@@ -41,11 +41,6 @@ public class Quality extends SpecialField {
     }
 
     @Override
-    public Icon getRepresentingIcon() {
-        return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-    }
-
-    @Override
     public boolean isSingleValueField() {
         return true;
     }

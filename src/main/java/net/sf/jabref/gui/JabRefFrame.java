@@ -105,6 +105,7 @@ import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
+import net.sf.jabref.gui.specialfields.SpecialFieldDropDown;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -1444,7 +1445,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addAction(unmark);
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                JButton button = SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
@@ -1456,7 +1457,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.addAction(toggleQualityAssured);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                JButton button = SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
@@ -1465,7 +1466,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 tlb.addAction(togglePrinted);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
+                JButton button = SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);

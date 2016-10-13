@@ -135,7 +135,7 @@ import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 

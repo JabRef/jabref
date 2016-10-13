@@ -3,8 +3,6 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.SpecialFields;
@@ -37,11 +35,6 @@ public class Printed extends SpecialField {
             Printed.INSTANCE = new Printed();
         }
         return Printed.INSTANCE;
-    }
-
-    @Override
-    public Icon getRepresentingIcon() {
-        return this.getValues().get(0).getIcon();
     }
 
     @Override

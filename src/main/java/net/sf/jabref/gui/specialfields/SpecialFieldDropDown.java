@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -11,16 +11,19 @@ import javax.swing.JPopupMenu;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.logic.util.OS;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.specialfields.SpecialFieldValue;
 
 public class SpecialFieldDropDown {
 
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
-        JButton button = new JButton(field.getRepresentingIcon());
+        JButton button = new JButton(SpecialFieldIcon.getRepresentingIcon(field));
         button.setToolTipText(field.getToolTip());
         button.setPreferredSize(buttonDim);
         if (!OS.OS_X) {
