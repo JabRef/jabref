@@ -117,6 +117,8 @@ public class SharedDatabasePreferences {
     }
 
     public void putAllDBMSConnectionProperties(DBMSConnectionProperties properties) {
+        assert (properties.isValid());
+
         setType(properties.getType().toString());
         setHost(properties.getHost());
         setPort(String.valueOf(properties.getPort()));
