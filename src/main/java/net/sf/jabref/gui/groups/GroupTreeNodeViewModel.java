@@ -54,7 +54,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
                     + ";class="+GroupTreeNode.class.getCanonicalName());
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Creating DataFlavor failed. This should not happen.");
+            LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
         }
         FLAVOR = df;
         FLAVORS = new DataFlavor[] {GroupTreeNodeViewModel.FLAVOR};
