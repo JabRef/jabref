@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.specialfields;
+package net.sf.jabref.model.entry.specialfields;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.entry.SpecialFieldValue;
-import net.sf.jabref.model.entry.SpecialFields;
-
 
 public enum SpecialField {
 
@@ -86,7 +83,7 @@ public enum SpecialField {
     public String getLocalizationKey() {
         return localizationKey;
     }
-    
+
     public boolean isSingleValueField() {
         return isSingleFieldValue;
     }

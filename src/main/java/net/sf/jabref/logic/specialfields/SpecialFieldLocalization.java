@@ -3,7 +3,7 @@ package net.sf.jabref.logic.specialfields;
 import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.SpecialFieldValue;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldLocalization {
 

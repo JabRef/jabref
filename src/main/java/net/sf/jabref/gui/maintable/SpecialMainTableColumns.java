@@ -11,10 +11,10 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
-import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 public class SpecialMainTableColumns {
 

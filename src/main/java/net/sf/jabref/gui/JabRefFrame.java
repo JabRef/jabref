@@ -115,7 +115,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoChangeEvent;

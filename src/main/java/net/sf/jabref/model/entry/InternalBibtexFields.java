@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;

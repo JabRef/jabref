@@ -29,10 +29,10 @@ import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFieldValue;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

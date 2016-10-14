@@ -82,7 +82,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.model.strings.StringUtil;

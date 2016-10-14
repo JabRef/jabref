@@ -1,4 +1,4 @@
-package net.sf.jabref.model.entry;
+package net.sf.jabref.model.entry.specialfields;
 
 
 public class SpecialFields {

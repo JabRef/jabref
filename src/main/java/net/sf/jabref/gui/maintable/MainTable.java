@@ -47,7 +47,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.EventList;

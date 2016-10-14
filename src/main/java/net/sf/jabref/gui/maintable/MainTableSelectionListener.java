@@ -40,7 +40,7 @@ import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFieldValue;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.PreviewPreferences;
 
 import ca.odell.glazedlists.EventList;

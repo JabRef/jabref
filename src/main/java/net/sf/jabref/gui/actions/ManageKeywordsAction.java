@@ -34,7 +34,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;

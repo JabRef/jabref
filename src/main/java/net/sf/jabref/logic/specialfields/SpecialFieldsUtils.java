@@ -10,7 +10,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 @Deprecated // the class should be refactored and partly integrated into BibEntry
 // instead of synchronizing special fields with the keyword field, the BibEntry class should have a method
