@@ -590,10 +590,13 @@ public class BibDatabase {
         return this.databaseID;
     }
 
+    /**
+     * @param databaseID use null to unset the id
+     */
     public void setDatabaseID(String databaseID) {
         this.databaseID = databaseID;
     }
-    
+
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
