@@ -13,8 +13,8 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 

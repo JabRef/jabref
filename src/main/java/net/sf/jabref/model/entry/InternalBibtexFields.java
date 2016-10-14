@@ -1,7 +1,5 @@
 package net.sf.jabref.model.entry;
 
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 /**
  * Handling of bibtex fields.
