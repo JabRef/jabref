@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.OverlayLayout;
+import javax.swing.ScrollPaneConstants;
 
 /**
  * Supports an underlying text for JComponent
@@ -30,7 +31,7 @@ public class OverlayPanel extends JPanel {
 
         JScrollPane scroller = new JScrollPane(overlay);
         scroller.setLocation(0, 0);
-        scroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         add(label);
         add(scroller);
