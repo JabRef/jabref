@@ -350,7 +350,9 @@ public class IconTheme {
         List<Image> jabrefLogos = new ArrayList<>();
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon32")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon40")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon48")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon64")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon128")).getImage());
 
