@@ -170,6 +170,7 @@ public class ParserResult {
     }
 
     public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabaseContext = bibDatabaseContext;
     }
 
