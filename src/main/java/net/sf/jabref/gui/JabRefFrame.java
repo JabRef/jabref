@@ -116,6 +116,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoChangeEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
@@ -283,17 +284,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private JMenu rankSubMenu;
     private final AbstractAction toggleRelevance = new GeneralAction(
             SpecialField.RELEVANCE.getValues().get(0).getActionName(),
-            SpecialField.RELEVANCE.getValues().get(0).getMenuString(),
+            SpecialFieldLocalization.getMenuString(SpecialField.RELEVANCE.getValues().get(0)),
             SpecialField.RELEVANCE.getValues().get(0).getToolTipText(),
             IconTheme.JabRefIcon.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             SpecialField.QUALITY.getValues().get(0).getActionName(),
-            SpecialField.QUALITY.getValues().get(0).getMenuString(),
+            SpecialFieldLocalization.getMenuString(SpecialField.QUALITY.getValues().get(0)),
             SpecialField.QUALITY.getValues().get(0).getToolTipText(),
             IconTheme.JabRefIcon.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
             SpecialField.PRINTED.getValues().get(0).getActionName(),
-            SpecialField.PRINTED.getValues().get(0).getMenuString(),
+            SpecialFieldLocalization.getMenuString(SpecialField.PRINTED.getValues().get(0)),
             SpecialField.PRINTED.getValues().get(0).getToolTipText(),
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),

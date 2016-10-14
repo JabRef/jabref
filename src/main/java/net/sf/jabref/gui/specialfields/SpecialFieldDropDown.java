@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.SpecialFieldValue;
 
@@ -65,7 +66,7 @@ public class SpecialFieldDropDown {
                 popup = new JPopupMenu();
                 for (SpecialFieldValue val : field.getValues()) {
                     JMenuItem item = new JMenuItem(SpecialFieldIcon.getSpecialFieldValueIcon(val));
-                    item.setText(val.getMenuString());
+                    item.setText(SpecialFieldLocalization.getMenuString(val));
                     item.setToolTipText(val.getToolTipText());
                     item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), val.getActionName()));
                     item.setMargin(new Insets(0, 0, 0, 0));
