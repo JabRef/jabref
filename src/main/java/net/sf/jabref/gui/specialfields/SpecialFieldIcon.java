@@ -18,7 +18,7 @@ public class SpecialFieldIcon {
         } else if (SpecialField.QUALITY.equals(field)) {
             return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
         } else if (SpecialField.RANK.equals(field)) {
-            return IconTheme.JabRefIcon.RANKING.getSmallIcon();
+            return IconTheme.JabRefIcon.RANKING.getIcon();
         } else if (SpecialField.READ_STATUS.equals(field)) {
             return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
         } else if (SpecialField.RELEVANCE.equals(field)) {
@@ -55,7 +55,7 @@ public class SpecialFieldIcon {
         } else if("clearReadStatus".equals(value.getActionName())) {
             return null;
         } else if("setReadStatusToRead".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+            return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
         } else if("setReadStatusToSkimmed".equals(value.getActionName())) {
             return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
         } else if("toggleRelevance".equals(value.getActionName())) {
