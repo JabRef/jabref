@@ -33,10 +33,11 @@ public class ReferenceRelationship {
         } else {
             // Init - Create nodes for bibtex entries
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
-                if (pureEntryList.get(sourceID).getField("cites").isPresent()) {
+                if (pureEntryList.get(sourceID).getField("cites").isPresent() && pureEntryList.get(sourceID).getField("bibtexkey").isPresent()) {
                     // Split cites for citeCount
                     String[] citeLines = pureEntryList.get(sourceID).getField("cites").get().split(",");
                     // Create node of bibtex entry
+                    System.out.println(pureEntryList.get(sourceID).getField("bibtexkey").get());
                     entryNodeList.add(createNode(sourceID, pureEntryList.get(sourceID).getField("bibtexkey").get(), citeLines.length + 1, "I", g));
                 }
             }

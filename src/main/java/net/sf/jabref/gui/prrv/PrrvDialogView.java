@@ -1,8 +1,10 @@
 package net.sf.jabref.gui.prrv;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -44,10 +46,15 @@ import prefux.visual.VisualItem;
  * @author Daniel Brühl
  */
 public class PrrvDialogView extends FXMLView {
+
     private static final double WIDTH = 600;
     private static final double HEIGHT = 600;
     private static final String GROUP = "graph";
     private static Stage primaryStage = new Stage();
+    private CheckBox keyCB = new CheckBox();
+    private CheckBox titleCB = new CheckBox();
+    private Visualization vis = new Visualization();
+    private FxDisplay display;
 
     public void show() {
         try {
@@ -67,6 +74,8 @@ public class PrrvDialogView extends FXMLView {
             nodeData.addColumn("citeCount", int.class);
             nodeData.addColumn("location", String.class);
 
+
+
             edgeData.addColumn(Graph.DEFAULT_SOURCE_KEY, int.class);
             edgeData.addColumn(Graph.DEFAULT_TARGET_KEY, int.class);
 
@@ -76,10 +85,10 @@ public class PrrvDialogView extends FXMLView {
             ReferenceRelationship rr = new ReferenceRelationship();
             rr.parseBibTexForReferences(graph);
             if (rr.entryNodeList.isEmpty()) {
-                showErrorDialogs();
+                showGuideDialogs();
             } else {
                 // -- 3. the visualization --------------------------------------------
-                Visualization vis = new Visualization();
+
                 vis.addGraph(GROUP, graph);
 
                 // -- 4. the renderers and renderer factory ---------------------------
@@ -148,7 +157,7 @@ public class PrrvDialogView extends FXMLView {
                 vis.putAction("color", color);
 
                 // -- 6. the display and interactive controls -------------------------
-                FxDisplay display = new FxDisplay(vis);
+                display = new FxDisplay(vis);
                 display.addControlListener(new DragControl());
                 root.setCenter(display);
                 // Setup zoom box
@@ -161,7 +170,7 @@ public class PrrvDialogView extends FXMLView {
             }
             // Throw if some cite fields are not accessible
         } catch (NullPointerException e) {
-            showErrorDialogs();
+            showGuideDialogs();
         }
     }
 
@@ -176,16 +185,37 @@ public class PrrvDialogView extends FXMLView {
     }
 
     private Node showKeyCheckBox(FxDisplay display) {
+        // HERE NEXT - most important dude
         VBox vbox = new VBox();
-        CheckBox keyCB = new CheckBox();
-        CheckBox titleCB = new CheckBox();
         keyCB.setText("Show all keys");
         titleCB.setText("Show all keys");
+        //attach click-method to all 3 checkboxes
+        keyCB.setOnAction(e -> handleCheckBoxAction(e));
+        titleCB.setOnAction(e -> handleCheckBoxAction(e));
         vbox.getChildren().addAll(keyCB, titleCB);
         return vbox;
     }
 
-    private static void showErrorDialogs() {
+    private void handleCheckBoxAction(ActionEvent e) {
+        if(keyCB.isSelected()){
+            DisplayControl dc = new DisplayControl();
+            Iterator<VisualItem> it = vis.items();
+
+
+            System.out.println("Key activated");
+        }
+        else {
+            System.out.println("Key deactivated");
+        }
+        if(titleCB.isSelected()){
+            System.out.println("Title activated");
+        }
+        else {
+            System.out.println("Title deactivated");
+        }
+    }
+
+    private static void showGuideDialogs() {
 
         boolean makeCiteFields = false;
         boolean considerYourDocument = false;
@@ -210,6 +240,7 @@ public class PrrvDialogView extends FXMLView {
         }
 
         // ----- Second dialog which asks to use your document as root node
+        if(makeCiteFields) {
         Optional<ButtonType> rootNodeButtonType = FXDialogs.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION,
                 "Your document as root node", "Should JabRef consider your document as a root node of the visualization?",
                 ButtonType.OK, ButtonType.CANCEL);
@@ -220,7 +251,7 @@ public class PrrvDialogView extends FXMLView {
         }
 
         // ----- Apply cite fields and root node in consideration of made decisions
-        if(makeCiteFields) {
+
             // Setup new cites field
             for (int id = 0; pureEntryList.size() > id; id++) {
                 if(!pureEntryList.get(id).getField("cites").isPresent()) {
@@ -233,8 +264,15 @@ public class PrrvDialogView extends FXMLView {
                     }
                 }
             }
-            // TODO load new entry edit window
-            // TODO maybe start new prrv window
+
+            // TODO Alle tooltips anzeigen
+            // TODO Knoten ohne edges anzeigen
+            // TODO Legende für farben
+
+            // TODO Root node ist ausgewählter bibentry (getselectedentry)
+
+            // Selected
+            //  View in Zentrum von selected bibentry
         }
 
     }
