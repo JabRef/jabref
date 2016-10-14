@@ -10,37 +10,37 @@ import net.sf.jabref.model.entry.KeywordList;
 public enum SpecialField {
 
     PRINTED(SpecialFields.FIELDNAME_PRINTED, "Printed", true,
-        new SpecialFieldValue("printed", "togglePrinted")
+        SpecialFieldValue.PRINTED
     ),
 
     PRIORITY(SpecialFields.FIELDNAME_PRIORITY, "Priority", false,
-        new SpecialFieldValue(null, "clearPriority"),
-        new SpecialFieldValue("prio1", "setPriority1"),
-        new SpecialFieldValue("prio2", "setPriority2"),
-        new SpecialFieldValue("prio3", "setPriority3")
+        SpecialFieldValue.CLEAR_PRIORITY,
+        SpecialFieldValue.PRIO_1,
+        SpecialFieldValue.PRIO_2,
+        SpecialFieldValue.PRIO_3
     ),
 
     QUALITY(SpecialFields.FIELDNAME_QUALITY, "Quality", true,
-        new SpecialFieldValue("qualityAssured", "toggleQualityAssured")
+        SpecialFieldValue.QUALITY_ASSURED
     ),
 
     RANK(SpecialFields.FIELDNAME_RANKING, "Rank", false,
-        new SpecialFieldValue(null, "clearRank"),
-        new SpecialFieldValue("rank1", "setRank1"),
-        new SpecialFieldValue("rank2", "setRank2"),
-        new SpecialFieldValue("rank3", "setRank3"),
-        new SpecialFieldValue("rank4", "setRank4"),
-        new SpecialFieldValue("rank5", "setRank5")
+        SpecialFieldValue.CLEAR_RANK,
+        SpecialFieldValue.RANK_1,
+        SpecialFieldValue.RANK_2,
+        SpecialFieldValue.RANK_3,
+        SpecialFieldValue.RANK_4,
+        SpecialFieldValue.RANK_5
     ),
 
     READ_STATUS(SpecialFields.FIELDNAME_READ, "Read status", false,
-        new SpecialFieldValue(null, "clearReadStatus"),
-        new SpecialFieldValue("read", "setReadStatusToRead"),
-        new SpecialFieldValue("skimmed", "setReadStatusToSkimmed")
+        SpecialFieldValue.CLEAR_READ_STATUS,
+        SpecialFieldValue.READ,
+        SpecialFieldValue.SKIMMED
     ),
 
     RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, "Relevance", true,
-        new SpecialFieldValue("relevant", "toggleRelevance")
+        SpecialFieldValue.RELEVANT
     );
 
     private List<SpecialFieldValue> values;
