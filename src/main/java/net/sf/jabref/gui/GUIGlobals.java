@@ -112,31 +112,31 @@ public class GUIGlobals {
         }
 
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.RELEVANCE));
-        label.setToolTipText(SpecialField.RELEVANCE.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.RELEVANCE.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RELEVANCE, label);
 
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.QUALITY));
-        label.setToolTipText(SpecialField.QUALITY.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.QUALITY.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_QUALITY, label);
 
         // Ranking item in the menu uses one star
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.RANK));
-        label.setToolTipText(SpecialField.RANK.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.RANK.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RANKING, label);
 
         // Priority icon used for the menu
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRIORITY));
-        label.setToolTipText(SpecialField.PRIORITY.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.PRIORITY.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRIORITY, label);
 
         // Read icon used for menu
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.READ_STATUS));
-        label.setToolTipText(SpecialField.READ_STATUS.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.READ_STATUS.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_READ, label);
 
         // Print icon used for menu
         label = new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRINTED));
-        label.setToolTipText(SpecialField.PRINTED.getToolTip());
+        label.setToolTipText(Localization.lang(SpecialField.PRINTED.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRINTED, label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {

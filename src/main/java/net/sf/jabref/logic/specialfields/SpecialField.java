@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.entry.SpecialFieldValue;
 import net.sf.jabref.model.entry.SpecialFields;
@@ -84,18 +83,10 @@ public enum SpecialField {
         return fieldName;
     }
 
-    public String getLocalizedFieldName() {
-        return Localization.lang(localizationKey);
+    public String getLocalizationKey() {
+        return localizationKey;
     }
-
-    public String getMenuString() {
-        return getLocalizedFieldName();
-    }
-
-    public String getToolTip() {
-        return getLocalizedFieldName();
-    }
-
+    
     public boolean isSingleValueField() {
         return isSingleFieldValue;
     }

@@ -11,6 +11,7 @@ import javax.swing.JPopupMenu;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.util.OS;
@@ -25,7 +26,7 @@ public class SpecialFieldDropDown {
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
         JButton button = new JButton(SpecialFieldIcon.getRepresentingIcon(field));
-        button.setToolTipText(field.getToolTip());
+        button.setToolTipText(Localization.lang(field.getLocalizationKey()));
         button.setPreferredSize(buttonDim);
         if (!OS.OS_X) {
             button.setMargin(new Insets(1, 0, 2, 0));
