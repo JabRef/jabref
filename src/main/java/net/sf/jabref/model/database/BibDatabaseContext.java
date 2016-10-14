@@ -57,6 +57,7 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults, DatabaseLocation location) {
         this(database, metaData, defaults);
+        Objects.requireNonNull(location);
         this.setDatabaseFile(file);
 
         if (location == DatabaseLocation.LOCAL) {
