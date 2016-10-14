@@ -47,7 +47,6 @@ public class BibtexImporter extends Importer {
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
-        ParserResult result;
         Optional<Charset> suppliedEncoding;
         try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
             suppliedEncoding = getSuppliedEncoding(utf8Reader);
@@ -59,17 +58,16 @@ public class BibtexImporter extends Importer {
             }
         }
 
-        if (suppliedEncoding.isPresent()) {
-            result = super.importDatabase(filePath, suppliedEncoding.get());
+        if(suppliedEncoding.isPresent()) {
+            return super.importDatabase(filePath, suppliedEncoding.get());
         } else {
-            result = super.importDatabase(filePath, defaultEncoding);
+            return super.importDatabase(filePath, defaultEncoding);
         }
-        return result;
     }
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences).parse(reader);
+        return BibtexParser.parse(reader, importFormatPreferences);
     }
 
     @Override
@@ -93,13 +91,10 @@ public class BibtexImporter extends Importer {
      * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
      */
     private static Optional<Charset> getSuppliedEncoding(BufferedReader reader) {
-        final int MAX_HEADER_LINES = 10;
-        int rowNumber = 0;
         try {
             String line;
-            while (((line = reader.readLine()) != null) && (rowNumber < MAX_HEADER_LINES)) {
+            while ((line = reader.readLine()) != null) {
                 line = line.trim();
-                rowNumber++;
 
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
                 if (!line.startsWith("%")) {
@@ -123,6 +118,9 @@ public class BibtexImporter extends Importer {
                     }
 
                     return Optional.of(Charset.forName(encoding));
+                } else {
+                    // Line not recognized so stop parsing
+                    return Optional.empty();
                 }
             }
         } catch (IOException ignored) {
