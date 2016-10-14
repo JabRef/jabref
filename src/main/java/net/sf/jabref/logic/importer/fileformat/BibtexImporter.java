@@ -93,10 +93,13 @@ public class BibtexImporter extends Importer {
      * Searches the file for "Encoding: myEncoding" and returns the found supplied encoding.
      */
     private static Optional<Charset> getSuppliedEncoding(BufferedReader reader) {
+        final int MAX_HEADER_LINES = 10;
+        int rowNumber = 0;
         try {
             String line;
-            while ((line = reader.readLine()) != null) {
+            while (((line = reader.readLine()) != null) && (rowNumber < MAX_HEADER_LINES)) {
                 line = line.trim();
+                rowNumber++;
 
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
                 if (!line.startsWith("%")) {
