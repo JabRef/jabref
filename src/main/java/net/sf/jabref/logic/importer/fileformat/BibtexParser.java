@@ -191,7 +191,7 @@ public class BibtexParser implements Parser {
 
                 if (label.equals(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
                     skipWhitespace();
-                    database.setDatabaseID(parseTextToken().trim());
+                    database.setSharedDatabaseID(parseTextToken().trim());
                 }
             } else if (c == '@') {
                 unread(c);

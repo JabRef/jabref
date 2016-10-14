@@ -20,7 +20,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.autosave.BackupUIManager;
+import net.sf.jabref.gui.autosaveandbackup.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
@@ -34,6 +34,7 @@ import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import net.sf.jabref.shared.exception.NotASharedDatabaseException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -115,12 +116,13 @@ public class JabRefGUI {
                 if (pr.isInvalid()) {
                     failed.add(pr);
                     parserResultIterator.remove();
-                } else if (Objects.nonNull(pr.getDatabase().getDatabaseID())) {
+                } else if (pr.getDatabase().isShared()) {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
+                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                            NotASharedDatabaseException e) {
                         pr.getDatabaseContext().setDatabaseFile(null); // do not open the original file
-                        pr.getDatabase().setDatabaseID(null);
+                        pr.getDatabase().setSharedDatabaseID(null);
 
                         LOGGER.error("Connection error", e);
                         JOptionPane.showMessageDialog(mainFrame,

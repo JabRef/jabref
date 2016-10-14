@@ -40,8 +40,8 @@ public class SharedDatabasePreferences {
         this(DEFAULT_NODE);
     }
 
-    public SharedDatabasePreferences(String databaseID) {
-        internalPrefs = Preferences.userNodeForPackage(JabRefMain.class).parent().node(PARENT_NODE).node(databaseID);
+    public SharedDatabasePreferences(String sharedDatabaseID) {
+        internalPrefs = Preferences.userNodeForPackage(JabRefMain.class).parent().node(PARENT_NODE).node(sharedDatabaseID);
     }
 
     public Optional<String> getType() {

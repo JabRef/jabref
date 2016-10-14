@@ -125,8 +125,7 @@ public class BibtexImporterTest {
     @Test
     public void testRecognizesDatabaseID() throws Exception {
         Path file = Paths.get(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
-        String databaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getDatabaseID();
-        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", databaseID);
+        String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
+        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
-
 }

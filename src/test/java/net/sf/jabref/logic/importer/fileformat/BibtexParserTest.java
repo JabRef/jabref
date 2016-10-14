@@ -1406,7 +1406,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseRecognizesDatabaseID() throws IOException {
+    public void parseRecognizesDatabaseID() throws Exception {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 
         String expectedDatabaseID = "q1w2e3r4t5z6";
@@ -1418,7 +1418,7 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
 
-        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+        String actualDatabaseID = parserResult.getDatabase().getSharedDatabaseID().get();
 
         assertEquals(expectedDatabaseID, actualDatabaseID);
     }

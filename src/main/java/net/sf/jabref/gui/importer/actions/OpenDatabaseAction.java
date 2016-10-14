@@ -24,7 +24,7 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.autosave.BackupUIManager;
+import net.sf.jabref.gui.autosaveandbackup.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
@@ -40,6 +40,7 @@ import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import net.sf.jabref.shared.exception.NotASharedDatabaseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -216,12 +217,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             }
 
-            if (Objects.nonNull(result.getDatabase().getDatabaseID())) {
+            if (result.getDatabase().isShared()) {
                 try {
                     new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
-                } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
-                    result.getDatabaseContext().setDatabaseFile(null); // do not open the original file
-                    result.getDatabase().setDatabaseID(null);
+                } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                        NotASharedDatabaseException e) {
+                    result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                    result.getDatabase().clearSharedDatabaseID();
                     LOGGER.error("Connection error", e);
                     JOptionPane.showMessageDialog(frame,
                             e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
