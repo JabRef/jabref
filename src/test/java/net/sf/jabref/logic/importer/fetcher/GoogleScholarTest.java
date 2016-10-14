@@ -50,7 +50,7 @@ public class GoogleScholarTest {
     @Test
     public void linkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+        Assume.assumeFalse(DevEnvironment.isCircleCI());
 
         entry.setField("title", "Towards Application Portability in Platform as a Service");
 
@@ -63,7 +63,7 @@ public class GoogleScholarTest {
     @Test
     public void noLinkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+        Assume.assumeFalse(DevEnvironment.isCircleCI());
 
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
@@ -72,6 +72,9 @@ public class GoogleScholarTest {
 
     @Test
     public void findSingleEntry() throws FetcherException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCircleCI());
+
         entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
         entry.setCiteKey("geiger2013detecting");
         entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
@@ -87,6 +90,9 @@ public class GoogleScholarTest {
 
     @Test
     public void find20Entries() throws FetcherException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCircleCI());
+
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
         Assert.assertEquals(20, foundEntries.size());
