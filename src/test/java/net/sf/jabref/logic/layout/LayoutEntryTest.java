@@ -2,9 +2,6 @@ package net.sf.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -86,92 +83,6 @@ public class LayoutEntryTest {
     /*************************/
     /****** tests Cases ******/
     /*************************/
-
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testNoHighlighting() throws IOException {
-        // say that this bibtex object was found
-        mBTE.setSearchHit(true);
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE);
-        String expecting = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices</font>";
-
-        Assert.assertEquals(expecting, result);
-    }
-
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testHighlightingOneWordCaseInsesitive() throws IOException {
-        // say that this bibtex object was found
-        mBTE.setSearchHit(true);
-
-        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(google)", Pattern.CASE_INSENSITIVE));
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE);
-        String containing = "<span style=\"background-color:#3399FF;\">Google</span>";
-
-        // check
-        Assert.assertTrue("Actual message: " + result, result.contains(containing));
-    }
-
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testHighlightingTwoWordsCaseInsesitive() throws IOException {
-        // say that this bibtex object was found
-        mBTE.setSearchHit(true);
-
-        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(Android|study)", Pattern.CASE_INSENSITIVE));
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE);
-
-        String containing = "<span style=\"background-color:#3399FF;\">Android</span>";
-        String containing2 = "<span style=\"background-color:#3399FF;\">study</span>";
-
-        // check
-        Assert.assertTrue(result.contains(containing));
-        Assert.assertTrue(result.contains(containing2));
-    }
-
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testHighlightingOneWordCaseSesitive() throws IOException {
-        // say that this bibtex object was found
-        mBTE.setSearchHit(true);
-
-        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(google)"));
-
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE);
-        String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android <span style=\"background-color:#3399FF;\">google</span> Open-Source Devices</font>";
-
-        // check
-        Assert.assertEquals(expected, result);
-    }
-
-    /**
-     * @throws Exception
-     */
-    @Test
-    public void testHighlightingMoreWordsCaseSesitive() throws IOException {
-        // say that this bibtex object was found
-        mBTE.setSearchHit(true);
-
-        Optional<Pattern> highlightPattern = Optional.of(Pattern.compile("(Android|study|Open)", Pattern.CASE_INSENSITIVE));
-
-        String highlightColor = "#3399FF;";
-        String result = this.layout("<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>", mBTE);
-        String expected = "<font face=\"arial\"><BR><BR><b>Abstract: </b> In this paper, we initiate a formal <span style=\"background-color:" + highlightColor + "\">study</span> of security on <span style=\"background-color:" + highlightColor + "\">Android</span>: Google's new <span style=\"background-color:" + highlightColor + "\">open</span>-source platform for mobile devices. Tags: Paper <span style=\"background-color:" + highlightColor + "\">android</span> google <span style=\"background-color:" + highlightColor + "\">Open</span>-Source Devices</font>";
-
-        // check
-        Assert.assertEquals(expected, result);
-    }
 
     @Test
     public void testParseMethodCalls() {
