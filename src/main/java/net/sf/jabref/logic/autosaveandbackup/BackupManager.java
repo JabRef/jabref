@@ -126,12 +126,11 @@ public class BackupManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        for (BackupManager backupManager : runningInstances) {
-            if (backupManager.bibDatabaseContext == bibDatabaseContext) {
-                backupManager.shutdown();
-                runningInstances.remove(backupManager);
-            }
-        }
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
+                .ifPresent(instance -> {
+                    instance.shutdown();
+                    runningInstances.remove(instance);
+                });
     }
 
     /**

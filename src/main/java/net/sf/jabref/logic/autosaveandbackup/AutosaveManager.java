@@ -77,10 +77,10 @@ public class AutosaveManager {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        runningInstances.stream().filter(autosaver -> autosaver.bibDatabaseContext == bibDatabaseContext).findAny()
-                .ifPresent(autosaver -> {
-                    autosaver.shutdown();
-                    runningInstances.remove(autosaver);
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
+                .ifPresent(instance -> {
+                    instance.shutdown();
+                    runningInstances.remove(instance);
                 });
     }
 
