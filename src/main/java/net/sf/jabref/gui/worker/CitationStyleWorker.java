@@ -3,6 +3,7 @@ package net.sf.jabref.gui.worker;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 
@@ -59,15 +60,20 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
             return;
         }
         String text;
+        Boolean success = true;
         try {
             text = this.get();
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while generating citation style", e);
             text = Localization.lang("Error while generating citation style");
+            success = false;
         }
 
         previewPanel.setPreviewLabel(text);
-        previewPanel.markHighlights();
+
+        if (success) {
+            previewPanel.markHighlights();
+        }
     }
 
 }
