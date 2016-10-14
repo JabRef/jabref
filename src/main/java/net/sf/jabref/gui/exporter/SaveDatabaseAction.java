@@ -37,6 +37,7 @@ import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.model.database.event.ChangePropagation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
@@ -242,7 +243,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         try {
             if (success) {
                 session.commit(file.toPath());
-                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, false); // Make sure to remember which encoding we used.
+                // Make sure to remember which encoding we used.
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
             } else {
                 session.cancel();
             }
@@ -254,7 +256,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
                 session.commit(file.toPath());
-                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, false);
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
             } else {
                 success = false;
             }
