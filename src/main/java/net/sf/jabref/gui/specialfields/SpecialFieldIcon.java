@@ -1,68 +1,76 @@
 package net.sf.jabref.gui.specialfields;
 
+import java.util.Objects;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
-
 
 public class SpecialFieldIcon {
 
     public static Icon getRepresentingIcon(SpecialField field) {
-        if (SpecialField.PRINTED.equals(field)) {
-            return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-        } else if (SpecialField.PRIORITY.equals(field)) {
-            return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
-        } else if (SpecialField.QUALITY.equals(field)) {
-            return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-        } else if (SpecialField.RANK.equals(field)) {
-            return IconTheme.JabRefIcon.RANKING.getIcon();
-        } else if (SpecialField.READ_STATUS.equals(field)) {
-            return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
-        } else if (SpecialField.RELEVANCE.equals(field)) {
-            return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
+        Objects.requireNonNull(field);
+
+        switch (field) {
+            case PRINTED:
+                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
+            case PRIORITY:
+                return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
+            case QUALITY:
+                return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
+            case RANK:
+                return IconTheme.JabRefIcon.RANKING.getIcon();
+            case READ_STATUS:
+                return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
+            case RELEVANCE:
+                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
+            default:
+                return null;
         }
-        return null;
     }
 
-    public static Icon getSpecialFieldValueIcon(SpecialFieldValue value){
-        if("togglePrinted".equals(value.getActionName())){
-            return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-        } else if("clearPriority".equals(value.getActionName())){
-            return null;
-        } else if("setPriority1".equals(value.getActionName())){
-            return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
-        } else if("setPriority2".equals(value.getActionName())){
-            return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
-        } else if("setPriority3".equals(value.getActionName())){
-            return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
-        } else if("toggleQualityAssured".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
-        } else if("clearRank".equals(value.getActionName())) {
-            return null;
-        } else if("setRank1".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RANK1.getSmallIcon();
-        } else if("setRank2".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RANK2.getSmallIcon();
-        } else if("setRank3".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RANK3.getSmallIcon();
-        } else if("setRank4".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RANK4.getSmallIcon();
-        } else if("setRank5".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RANK5.getSmallIcon();
-        } else if("clearReadStatus".equals(value.getActionName())) {
-            return null;
-        } else if("setReadStatusToRead".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
-        } else if("setReadStatusToSkimmed".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
-        } else if("toggleRelevance".equals(value.getActionName())) {
-            return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
-        } else {
-            return null;
+    public static Icon getSpecialFieldValueIcon(SpecialFieldValue value) {
+        Objects.requireNonNull(value);
+
+        switch (value) {
+            case PRINTED:
+                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
+            case CLEAR_PRIORITY:
+                return null;
+            case PRIO_1:
+                return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
+            case PRIO_2:
+                return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
+            case PRIO_3:
+                return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
+            case QUALITY_ASSURED:
+                return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
+            case CLEAR_RANK:
+                return null;
+            case RANK_1:
+                return IconTheme.JabRefIcon.RANK1.getSmallIcon();
+            case RANK_2:
+                return IconTheme.JabRefIcon.RANK2.getSmallIcon();
+            case RANK_3:
+                return IconTheme.JabRefIcon.RANK3.getSmallIcon();
+            case RANK_4:
+                return IconTheme.JabRefIcon.RANK4.getSmallIcon();
+            case RANK_5:
+                return IconTheme.JabRefIcon.RANK5.getSmallIcon();
+            case CLEAR_READ_STATUS:
+                return null;
+            case READ:
+                return IconTheme.JabRefIcon.READ_STATUS_READ.getSmallIcon();
+            case SKIMMED:
+                return IconTheme.JabRefIcon.READ_STATUS_SKIMMED.getSmallIcon();
+            case RELEVANT:
+                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
+            default:
+                return null;
         }
     }
 
