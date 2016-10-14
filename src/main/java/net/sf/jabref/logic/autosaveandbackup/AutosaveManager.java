@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.autosave;
+package net.sf.jabref.logic.autosaveandbackup;
 
 import java.util.HashSet;
 import java.util.Set;

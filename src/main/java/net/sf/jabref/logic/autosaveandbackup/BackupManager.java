@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.autosave;
+package net.sf.jabref.logic.autosaveandbackup;
 
 import java.io.File;
 import java.io.IOException;
