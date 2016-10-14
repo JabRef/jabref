@@ -2,12 +2,14 @@ package net.sf.jabref.shared;
 
 import java.sql.SQLException;
 
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+
 public class TestConnector {
 
     public static DBMSType currentConnectionType;
 
 
-    public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException {
+    public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
         currentConnectionType = dbmsType;
 
         DBMSConnectionProperties properties = getTestConnectionProperties(dbmsType);

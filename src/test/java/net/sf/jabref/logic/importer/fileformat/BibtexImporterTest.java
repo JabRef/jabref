@@ -121,4 +121,12 @@ public class BibtexImporterTest {
                         + "The metadata is not required to be read here, as this class is NOT called at --import.",
                 importer.getDescription());
     }
+
+    @Test
+    public void testRecognizesDatabaseID() throws Exception {
+        Path file = Paths.get(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
+        String databaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getDatabaseID();
+        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", databaseID);
+    }
+
 }

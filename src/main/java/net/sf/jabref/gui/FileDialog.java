@@ -101,6 +101,8 @@ public class FileDialog {
         for (FileExtensions ext : fileExtensions) {
             FileNameExtensionFilter extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
             fileChooser.addChoosableFileFilter(extFilter);
+            // explictly needed for OSX to enable *.* file filter
+            fileChooser.setAcceptAllFileFilterUsed(true);
         }
 
         return this;

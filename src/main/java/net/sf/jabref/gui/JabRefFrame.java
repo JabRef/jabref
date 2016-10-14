@@ -76,9 +76,9 @@ import net.sf.jabref.gui.actions.OpenBrowserAction;
 import net.sf.jabref.gui.actions.OpenSharedDatabaseAction;
 import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
+import net.sf.jabref.gui.autosave.AutosaveUIManager;
 import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
-import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.exporter.ExportAction;
 import net.sf.jabref.gui.exporter.ExportCustomizationDialog;
 import net.sf.jabref.gui.exporter.SaveAllAction;
@@ -109,6 +109,8 @@ import net.sf.jabref.gui.search.GlobalSearchBar;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.autosaveandbackup.AutosaveManager;
+import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -699,9 +701,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         String mode = panel.getBibDatabaseContext().getMode().getFormattedName();
         String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
+        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
 
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
-            String changeFlag = panel.isModified() ? "*" : "";
+            String changeFlag = panel.isModified() && !isAutosaveEnabled ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
@@ -787,8 +790,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
                 File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
-                prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED,
-                        getCurrentBasePanel().getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED);
             }
 
         }
@@ -798,19 +799,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         prefs.customImports.store();
         CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 
-        // Clear autosave files:
-        // TODO: Is this really needed since clearAutoSave() is called in stopAutoSaveManager() a few rows below?
-        Globals.getAutoSaveManager().ifPresent(manager -> manager.clearAutoSaves());
-
         prefs.flush();
 
         // dispose all windows, even if they are not displayed anymore
         for (Window window : Window.getWindows()) {
             window.dispose();
         }
-
-        // shutdown any timers that are may be active
-        Globals.stopAutoSaveManager();
     }
 
     /**
@@ -828,8 +822,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
-
-        prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.FALSE);
 
         List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
@@ -865,12 +857,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                         }
                     }
                 } else if (context.getLocation() == DatabaseLocation.SHARED) {
-                    prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.TRUE);
                     context.convertToLocalDatabase();
                     context.getDBMSSynchronizer().closeSharedDatabase();
                     context.clearDBMSSynchronizer();
                 }
-
+                AutosaveManager.shutdown(context);
+                BackupManager.shutdown(context);
                 context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
         }
@@ -1674,27 +1666,47 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public void addTab(BasePanel bp, boolean raisePanel) {
+    public void addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
-        tabbedPane.add(bp.getTabTitle(), bp);
+        tabbedPane.add(basePanel.getTabTitle(), basePanel);
 
         // update all tab titles
         updateAllTabTitles();
 
         if (raisePanel) {
-            tabbedPane.setSelectedComponent(bp);
+            tabbedPane.setSelectedComponent(basePanel);
         }
 
         // Register undo/redo listener
-        bp.getUndoManager().registerListener(new UndoRedoEventManager());
+        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
+
+        BibDatabaseContext context = basePanel.getBibDatabaseContext();
+
+        if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(basePanel));
+        }
+
+        if (readyForBackup(context)) {
+            BackupManager.start(context);
+        }
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-
         BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
         addTab(bp, raisePanel);
         return bp;
+    }
+
+    private boolean readyForAutosave(BibDatabaseContext context) {
+        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
+                context.getDatabaseFile().isPresent();
+    }
+
+    private boolean readyForBackup(BibDatabaseContext context) {
+        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
     }
 
     /**
@@ -2188,6 +2200,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             removeTab(panel);
         }
+        AutosaveManager.shutdown(context);
+        BackupManager.shutdown(context);
     }
 
     // Ask if the user really wants to close, if the base has not been saved
@@ -2220,7 +2234,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void removeTab(BasePanel panel) {
         panel.cleanUp();
-        AutoSaveManager.deleteAutoSaveFile(panel);
         tabbedPane.remove(panel);
         if (tabbedPane.getTabCount() > 0) {
             markActiveBasePanel();
