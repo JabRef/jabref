@@ -1,11 +1,7 @@
 package net.sf.jabref;
 
-import java.util.Optional;
-
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.gui.GlobalFocusListener;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.importer.ImportFormatReader;
@@ -49,9 +45,6 @@ public class Globals {
     private static FileUpdateMonitor fileUpdateMonitor;
     private static StreamEavesdropper streamEavesdropper;
 
-    // Autosave manager
-    private static AutoSaveManager autoSaveManager;
-
     // Key binding preferences
     public static KeyBindingPreferences getKeyPrefs() {
         if (keyPrefs == null) {
@@ -82,24 +75,5 @@ public class Globals {
 
     public static StreamEavesdropper getStreamEavesdropper() {
         return streamEavesdropper;
-    }
-
-    // Autosave manager
-    public static void startAutoSaveManager(JabRefFrame frame) {
-        Globals.autoSaveManager = new AutoSaveManager(frame);
-        Globals.autoSaveManager.startAutoSaveTimer();
-    }
-
-    // Stop the autosave manager if it has been started
-    public static void stopAutoSaveManager() {
-        if (Globals.autoSaveManager != null) {
-            Globals.autoSaveManager.stopAutoSaveTimer();
-            Globals.autoSaveManager.clearAutoSaves();
-            Globals.autoSaveManager = null;
-        }
-    }
-
-    public static Optional<AutoSaveManager> getAutoSaveManager() {
-        return Optional.ofNullable(Globals.autoSaveManager);
     }
 }

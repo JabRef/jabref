@@ -192,9 +192,8 @@ public class JabRefPreferences {
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
-    public static final String SHARED_DATABASE_LAST_EDITED = "sharedDatabaseLastEdited";
-    public static final String SHARED_DATABASE_LAST_FOCUSED = "sharedDatabaseLastFocused";
     public static final String BACKUP = "backup";
+
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String FILE_WORKING_DIRECTORY = "fileWorkingDirectory";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
@@ -311,9 +310,8 @@ public class JabRefPreferences {
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
-    public static final String PROMPT_BEFORE_USING_AUTOSAVE = "promptBeforeUsingAutosave";
-    public static final String AUTO_SAVE_INTERVAL = "autoSaveInterval";
-    public static final String AUTO_SAVE = "autoSave";
+    public static final String LOCAL_AUTO_SAVE = "localAutoSave";
+    public static final String SHARED_AUTO_SAVE = "sharedAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
@@ -604,8 +602,6 @@ public class JabRefPreferences {
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
-        defaults.put(SHARED_DATABASE_LAST_EDITED, Boolean.FALSE);
-        defaults.put(SHARED_DATABASE_LAST_FOCUSED, Boolean.FALSE);
         defaults.put(LAST_FOCUSED, "");
         defaults.put(STRINGS_POS_X, 0);
         defaults.put(STRINGS_POS_Y, 0);
@@ -782,9 +778,8 @@ public class JabRefPreferences {
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
-        defaults.put(AUTO_SAVE, Boolean.TRUE);
-        defaults.put(AUTO_SAVE_INTERVAL, 5);
-        defaults.put(PROMPT_BEFORE_USING_AUTOSAVE, Boolean.TRUE);
+        defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
+        defaults.put(SHARED_AUTO_SAVE, Boolean.TRUE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them

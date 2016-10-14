@@ -35,7 +35,9 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -151,7 +153,12 @@ class EntryEditorTab {
                         false);
                 defaultHeight = 0;
             } else {
-                fieldEditor = new TextArea(field, null);
+                String prompt = "";
+                if (field.equals(FieldName.AUTHOR) || field.equals(FieldName.EDITOR)) {
+                    prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
+                }
+
+                fieldEditor = new TextArea(field, null, prompt);
                 bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }

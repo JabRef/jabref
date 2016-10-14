@@ -52,6 +52,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -127,6 +128,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final AddToGroupAction moveToGroup = new AddToGroupAction(true);
     private final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
 
+    private ToggleAction toggleAction;
+
 
     /**
      * The first element for each group defines which field to use for the quicksearch. The next two define the name and
@@ -134,6 +137,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
+
+        toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
+                Localization.menuTitle("Toggle groups interface"),
+                Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
+                IconTheme.JabRefIcon.TOGGLE_GROUPS);
 
         this.frame = frame;
         hideNonHits = new JRadioButtonMenuItem(Localization.lang("Hide non-hits"),
@@ -712,7 +720,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (panel != null) {// panel may be null if no file is open any more
             panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
         }
-        frame.groupToggle.setSelected(false);
+        getToggleAction().setSelected(false);
     }
 
     private void setGroups(GroupTreeNode groupsRoot) {
@@ -1206,7 +1214,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            frame.getSidePaneManager().hide("groups");
+            frame.getSidePaneManager().hide(GroupSelector.class);
             return;
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
@@ -1263,4 +1271,15 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public void listen(GroupUpdatedEvent updateEvent) {
         setGroups(updateEvent.getMetaData().getGroups().orElse(null));
     }
+
+    @Override
+    public void grabFocus() {
+        groupsTree.grabFocus();
+    }
+
+    @Override
+    public ToggleAction getToggleAction() {
+        return toggleAction;
+    }
+
 }

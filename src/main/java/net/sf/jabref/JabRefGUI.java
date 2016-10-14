@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -20,12 +20,12 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.autosave.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
-import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
-import net.sf.jabref.gui.shared.OpenSharedDatabaseDialog;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
 import net.sf.jabref.gui.worker.VersionWorker;
+import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -33,6 +33,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -46,7 +47,6 @@ public class JabRefGUI {
 
     private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
-    private final List<File> postponed = new ArrayList<>();
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
@@ -107,7 +107,6 @@ public class JabRefGUI {
         if (!bibDatabases.isEmpty()) {
             for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
                 ParserResult pr = parserResultIterator.next();
-
                 // Define focused tab
                 if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
                     first = true;
@@ -116,18 +115,26 @@ public class JabRefGUI {
                 if (pr.isInvalid()) {
                     failed.add(pr);
                     parserResultIterator.remove();
-                } else if (!pr.isPostponedAutosaveFound()) {
-                    if (pr.toOpenTab()) {
-                        // things to be appended to an opened tab should be done after opening all tabs
-                        // add them to the list
-                        toOpenTab.add(pr);
-                    } else {
-                        JabRefGUI.getMainFrame().addParserResult(pr, first);
-                        first = false;
+                } else if (Objects.nonNull(pr.getDatabase().getDatabaseID())) {
+                    try {
+                        new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
+                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
+                        pr.getDatabaseContext().setDatabaseFile(null); // do not open the original file
+                        pr.getDatabase().setDatabaseID(null);
+
+                        LOGGER.error("Connection error", e);
+                        JOptionPane.showMessageDialog(mainFrame,
+                                e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
+                                Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
                     }
+                    toOpenTab.add(pr);
+                } else if (pr.toOpenTab()) {
+                    // things to be appended to an opened tab should be done after opening all tabs
+                    // add them to the list
+                    toOpenTab.add(pr);
                 } else {
-                    parserResultIterator.remove();
-                    postponed.add(pr.getFile().get());
+                    JabRefGUI.getMainFrame().addParserResult(pr, first);
+                    first = false;
                 }
             }
         }
@@ -138,11 +145,9 @@ public class JabRefGUI {
             first = false;
         }
 
-        // Start auto save timer:
-        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_SAVE)) {
-            Globals.startAutoSaveManager(JabRefGUI.getMainFrame());
-        }
-
+        // If we are set to remember the window location, we also remember the maximised
+        // state. This needs to be set after the window has been made visible, so we
+        // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
         }
@@ -181,26 +186,8 @@ public class JabRefGUI {
 
         LOGGER.debug("Finished adding panels");
 
-        // If any database loading was postponed due to an autosave, schedule them
-        // for handing now:
-        if (!postponed.isEmpty()) {
-            AutosaveStartupPrompter asp = new AutosaveStartupPrompter(JabRefGUI.getMainFrame(), postponed);
-            SwingUtilities.invokeLater(asp);
-        }
-
         if (!bibDatabases.isEmpty()) {
             JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
-        }
-
-        boolean isSharedDatabaseEdited = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED);
-        if (isSharedDatabaseEdited) {
-            boolean isFocused = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED);
-            try {
-                new SharedDatabaseUIManager(mainFrame).openLastSharedDatabaseTab(isFocused);
-            } catch (SQLException | DatabaseNotSupportedException e) {
-                LOGGER.info("Failed to restore shared database. Use connection dialog to connect.");
-                new OpenSharedDatabaseDialog(mainFrame).setVisible(true);
-            }
         }
     }
 
@@ -208,7 +195,6 @@ public class JabRefGUI {
         if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
             return;
         }
-
         List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
 
         for (String fileName : lastFiles) {
@@ -219,7 +205,11 @@ public class JabRefGUI {
                 continue;
             }
 
-            ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
+            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+                BackupUIManager.showRestoreBackupDialog(mainFrame, dbFile.toPath());
+            }
+
+            ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
                     Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isNullResult()) {

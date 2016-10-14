@@ -13,11 +13,18 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.HttpCookie;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -134,6 +141,23 @@ public class URLDownload {
             LOGGER.warn("Could not copy input", e);
             throw e;
         }
+    }
+
+    public List<HttpCookie> getCookieFromUrl() throws IOException {
+        CookieManager cookieManager = new CookieManager();
+        CookieHandler.setDefault(cookieManager);
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+
+        URLConnection con = openConnection();
+        con.getHeaderFields(); // must be read to store the cookie
+
+        try {
+            return cookieManager.getCookieStore().get(source.toURI());
+        } catch (URISyntaxException e) {
+            LOGGER.error("Unable to convert download URL to URI", e);
+            return Collections.emptyList();
+        }
+
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
