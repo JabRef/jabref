@@ -1,6 +1,6 @@
 package net.sf.jabref.model.groups.event;
 
-import net.sf.jabref.event.BibDatabaseContextChangedEvent;
+import net.sf.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.model.metadata.MetaData;
 
 public class GroupUpdatedEvent extends BibDatabaseContextChangedEvent {

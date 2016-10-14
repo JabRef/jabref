@@ -2,7 +2,7 @@ package net.sf.jabref.model.entry.event;
 
 import java.util.Objects;
 
-import net.sf.jabref.event.BibDatabaseContextChangedEvent;
+import net.sf.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
