@@ -7,6 +7,7 @@ import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +15,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -341,6 +344,16 @@ public class IconTheme {
         public FontBasedIcon createWithNewColor(Color newColor) {
             return new FontBasedIcon(this.iconCode, newColor, this.size);
         }
+    }
 
+    public static List<Image> getLogoSet() {
+        List<Image> jabrefLogos = new ArrayList<>();
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon40")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon64")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon128")).getImage());
+
+        return jabrefLogos;
     }
 }

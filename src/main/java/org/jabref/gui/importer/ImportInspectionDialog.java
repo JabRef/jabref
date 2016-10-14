@@ -27,7 +27,6 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -197,7 +196,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();
         this.undoName = undoName;
         this.newDatabase = newDatabase;
-        setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
+        setIconImages(IconTheme.getLogoSet());
         preview = new PreviewPanel(panel, bibDatabaseContext);
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));

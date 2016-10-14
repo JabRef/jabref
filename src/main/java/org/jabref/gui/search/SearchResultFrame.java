@@ -123,7 +123,7 @@ public class SearchResultFrame {
     private void init(String title) {
         searchResultFrame = new JFrame();
         searchResultFrame.setTitle(title);
-        searchResultFrame.setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
+        searchResultFrame.setIconImages(IconTheme.getLogoSet());
 
         preview = new PreviewPanel(null, null);
 
