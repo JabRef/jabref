@@ -47,4 +47,45 @@ public class SpecialFieldLocalization {
                 return "";
         }
     }
+
+    public static String getToolTipText(SpecialFieldValue value) {
+        Objects.requireNonNull(value.getActionName());
+
+        switch(value.getActionName()){
+            case "togglePrinted":
+                return Localization.lang("Toggle print status");
+            case "clearPriority":
+                return Localization.lang("No priority information");
+            case "setPriority1":
+                return Localization.lang("Priority high");
+            case "setPriority2":
+                return Localization.lang("Priority medium");
+            case "setPriority3":
+                return Localization.lang("Priority low");
+            case "qualityAssured":
+                return Localization.lang("Toggle quality assured");
+            case "clearRank":
+                return Localization.lang("No rank information");
+            case "setRank1":
+                return Localization.lang("One star");
+            case "setRank2":
+                return Localization.lang("Two stars");
+            case "setRank3":
+                return Localization.lang("Three stars");
+            case "setRank4":
+                return Localization.lang("Four stars");
+            case "setRank5":
+                return Localization.lang("Five stars");
+            case "clearReadStatus":
+                return Localization.lang("No read status information");
+            case "setReadStatusToRead":
+                return Localization.lang("Read status read");
+            case "setReadStatusToSkimmed":
+                return Localization.lang("Read status skimmed");
+            case "toggleRelevance":
+                return Localization.lang("Toggle relevance");
+            default:
+                return "";
+        }
+    }
 }

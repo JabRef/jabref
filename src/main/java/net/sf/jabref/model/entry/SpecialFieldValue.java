@@ -10,21 +10,16 @@ public class SpecialFieldValue {
     // action belonging to this value
     private final String actionName;
 
-    private final String toolTipText;
-
     /**
      *
      * @param keyword - The keyword to be used at BibTex's keyword field. May be "null" if no keyword is to be set
      * @param actionName - the action to call
-     * @param toolTipText - the tool tip text
      */
     public SpecialFieldValue(
             String keyword,
-            String actionName,
-            String toolTipText) {
+            String actionName) {
         this.keyword = Optional.ofNullable(keyword).map(Keyword::new);
         this.actionName = actionName;
-        this.toolTipText = toolTipText;
     }
 
     public Optional<Keyword> getKeyword() {
@@ -37,10 +32,6 @@ public class SpecialFieldValue {
 
     public Optional<String> getFieldValue() {
         return keyword.map(Keyword::toString);
-    }
-
-    public String getToolTipText() {
-        return this.toolTipText;
     }
 
 }

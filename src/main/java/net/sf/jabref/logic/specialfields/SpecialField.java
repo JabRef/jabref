@@ -14,37 +14,37 @@ import net.sf.jabref.model.entry.SpecialFields;
 public enum SpecialField {
 
     PRINTED(SpecialFields.FIELDNAME_PRINTED, "Printed", true,
-        new SpecialFieldValue("printed", "togglePrinted", Localization.lang("Toggle print status"))
+        new SpecialFieldValue("printed", "togglePrinted")
     ),
 
     PRIORITY(SpecialFields.FIELDNAME_PRIORITY, "Priority", false,
-        new SpecialFieldValue(null, "clearPriority", Localization.lang("No priority information")),
-        new SpecialFieldValue("prio1", "setPriority1", Localization.lang("Priority high")),
-        new SpecialFieldValue("prio2", "setPriority2", Localization.lang("Priority medium")),
-        new SpecialFieldValue("prio3", "setPriority3", Localization.lang("Priority low"))
+        new SpecialFieldValue(null, "clearPriority"),
+        new SpecialFieldValue("prio1", "setPriority1"),
+        new SpecialFieldValue("prio2", "setPriority2"),
+        new SpecialFieldValue("prio3", "setPriority3")
     ),
 
     QUALITY(SpecialFields.FIELDNAME_QUALITY, "Quality", true,
-        new SpecialFieldValue("qualityAssured", "toggleQualityAssured", Localization.lang("Toggle quality assured"))
+        new SpecialFieldValue("qualityAssured", "toggleQualityAssured")
     ),
 
     RANK(SpecialFields.FIELDNAME_RANKING, "Rank", false,
-        new SpecialFieldValue(null, "clearRank", Localization.lang("No rank information")),
-        new SpecialFieldValue("rank1", "setRank1", Localization.lang("One star")),
-        new SpecialFieldValue("rank2", "setRank2", Localization.lang("Two stars")),
-        new SpecialFieldValue("rank3", "setRank3", Localization.lang("Three stars")),
-        new SpecialFieldValue("rank4", "setRank4", Localization.lang("Four stars")),
-        new SpecialFieldValue("rank5", "setRank5", Localization.lang("Five stars"))
+        new SpecialFieldValue(null, "clearRank"),
+        new SpecialFieldValue("rank1", "setRank1"),
+        new SpecialFieldValue("rank2", "setRank2"),
+        new SpecialFieldValue("rank3", "setRank3"),
+        new SpecialFieldValue("rank4", "setRank4"),
+        new SpecialFieldValue("rank5", "setRank5")
     ),
 
     READ_STATUS(SpecialFields.FIELDNAME_READ, "Read status", false,
-        new SpecialFieldValue(null, "clearReadStatus", Localization.lang("No read status information")),
-        new SpecialFieldValue("read", "setReadStatusToRead", Localization.lang("Read status read")),
-        new SpecialFieldValue("skimmed", "setReadStatusToSkimmed", Localization.lang("Read status skimmed"))
+        new SpecialFieldValue(null, "clearReadStatus"),
+        new SpecialFieldValue("read", "setReadStatusToRead"),
+        new SpecialFieldValue("skimmed", "setReadStatusToSkimmed")
     ),
 
     RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, "Relevance", true,
-        new SpecialFieldValue("relevant", "toggleRelevance", Localization.lang("Toggle relevance"))
+        new SpecialFieldValue("relevant", "toggleRelevance")
     );
 
     private List<SpecialFieldValue> values;

@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.model.entry.SpecialFieldValue;
 
 
@@ -68,7 +69,7 @@ public class SpecialFieldIcon {
 
     public static JLabel createSpecialFieldValueLabel(SpecialFieldValue value) {
         JLabel label = new JLabel(getSpecialFieldValueIcon(value));
-        label.setToolTipText(value.getToolTipText());
+        label.setToolTipText(SpecialFieldLocalization.getToolTipText(value));
         return label;
     }
 
