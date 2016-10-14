@@ -2,6 +2,7 @@ package net.sf.jabref.shared;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
@@ -132,5 +133,14 @@ public class DBMSConnectionProperties {
             // Some DBMS require a non-null value as a password (in case of using an empty string).
             this.password = "";
         }
+    }
+
+    public boolean isValid() {
+        return Objects.nonNull(type)
+                && Objects.nonNull(host)
+                && Objects.nonNull(port)
+                && Objects.nonNull(database)
+                && Objects.nonNull(user)
+                && Objects.nonNull(password);
     }
 }
