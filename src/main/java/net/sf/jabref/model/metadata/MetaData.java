@@ -13,6 +13,7 @@ import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.database.event.ChangePropagation;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.event.GroupUpdatedEvent;
@@ -209,8 +210,17 @@ public class MetaData {
     }
 
     public void setEncoding(Charset encoding) {
+        setEncoding(encoding, ChangePropagation.POST_EVENT);
+    }
+
+    /**
+     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     */
+    public void setEncoding(Charset encoding, ChangePropagation postChanges) {
         this.encoding = Objects.requireNonNull(encoding);
-        postChange();
+        if (postChanges == ChangePropagation.POST_EVENT) {
+            postChange();
+        }
     }
 
     public void registerListener(Object listener) {
