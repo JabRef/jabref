@@ -31,7 +31,7 @@ public class SpecialFieldLocalization {
                 return Localization.lang("Set priority to medium");
             case "setPriority3":
                 return Localization.lang("Set priority to low");
-            case "qualityAssured":
+            case "toggleQualityAssured":
                 return Localization.lang("Toggle quality assured");
             case "clearRank":
                 return Localization.lang("Clear rank");
