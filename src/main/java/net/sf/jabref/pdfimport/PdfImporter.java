@@ -102,9 +102,8 @@ public class PdfImporter {
         // other files: variable noPdfFiles
         List<String> files = new ArrayList<>(fileNames);
         List<String> noPdfFiles = new ArrayList<>();
-        PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
-            if (!pdfFilter.accept(file)) {
+            if (!PdfFileFilter.accept(file)) {
                 noPdfFiles.add(file);
             }
         }

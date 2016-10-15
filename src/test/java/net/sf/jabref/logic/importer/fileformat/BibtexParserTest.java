@@ -1406,6 +1406,24 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseRecognizesDatabaseID() throws IOException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        String expectedDatabaseID = "q1w2e3r4t5z6";
+
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% DBID: ").append(expectedDatabaseID)
+                .append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+
+        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+
+        assertEquals(expectedDatabaseID, actualDatabaseID);
+    }
+
+    @Test
     public void integrationTestSaveActions() throws IOException {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 

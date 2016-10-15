@@ -48,6 +48,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -267,7 +268,7 @@ public class TextInputDialog extends JDialog {
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
         JScrollPane fieldScroller = new JScrollPane(fieldList);
-        fieldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        fieldScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // insert buttons
         insertButton.addActionListener(event -> insertTextForTag(override.isSelected()));
@@ -369,7 +370,7 @@ public class TextInputDialog extends JDialog {
         sourcePreview.setEditable(false);
         sourcePreview.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         JScrollPane paneScrollPane = new JScrollPane(sourcePreview);
-        paneScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        paneScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         paneScrollPane.setPreferredSize(new Dimension(500, 255));
         paneScrollPane.setMinimumSize(new Dimension(10, 10));
 

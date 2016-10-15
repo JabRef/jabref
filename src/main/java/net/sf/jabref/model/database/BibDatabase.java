@@ -63,6 +63,8 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
+    private String databaseID;
+
 
     public BibDatabase() {
         this.eventBus.register(duplicationChecker);
@@ -584,8 +586,18 @@ public class BibDatabase {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
     }
 
+    public String getDatabaseID() {
+        return this.databaseID;
+    }
+
+    /**
+     * @param databaseID use null to unset the id
+     */
+    public void setDatabaseID(String databaseID) {
+        this.databaseID = databaseID;
+    }
+
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
-
 }
