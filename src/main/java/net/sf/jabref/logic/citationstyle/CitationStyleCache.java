@@ -3,7 +3,6 @@ package net.sf.jabref.logic.citationstyle;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
@@ -19,7 +18,7 @@ import com.google.common.eventbus.Subscribe;
  */
 public class CitationStyleCache {
 
-    private Optional<CitationStyle> citationStyle = Optional.of(CitationStyle.getDefault());
+    private CitationStyle citationStyle = CitationStyle.getDefault();
     private Map<BibEntry, String> citationStylesCache = new HashMap<>();
 
 
@@ -38,7 +37,7 @@ public class CitationStyleCache {
     public String getCitationFor(BibEntry entry) {
         String citation = citationStylesCache.get(entry);
         if (citation == null) {
-            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle.get().getSource());
+            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle);
             citationStylesCache.put(entry, citation);
         }
         return citation;
@@ -46,13 +45,13 @@ public class CitationStyleCache {
 
     public void setCitationStyle(CitationStyle citationStyle) {
         Objects.requireNonNull(citationStyle);
-        if (!this.citationStyle.isPresent() || !this.citationStyle.get().equals(citationStyle)){
-            this.citationStyle = Optional.of(citationStyle);
+        if (!this.citationStyle.equals(citationStyle)){
+            this.citationStyle = citationStyle;
             this.citationStylesCache.clear();
         }
     }
 
-    public Optional<CitationStyle> getCitationStyle() {
+    public CitationStyle getCitationStyle() {
         return citationStyle;
     }
 

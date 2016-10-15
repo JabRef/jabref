@@ -28,6 +28,13 @@ public class CitationStyleGenerator {
     private static final UnicodeToLatexFormatter UNICODE_TO_LATEX_FORMATTER = new UnicodeToLatexFormatter();
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
 
+    /**
+     * Generates a Citation based on the given entry and style
+     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
+     */
+    protected static String generateCitation(BibEntry entry, CitationStyle style) {
+        return generateCitation(entry, style.getSource(), CitationStyleOutputFormat.HTML);
+    }
 
     /**
      * Generates a Citation based on the given entry and style
