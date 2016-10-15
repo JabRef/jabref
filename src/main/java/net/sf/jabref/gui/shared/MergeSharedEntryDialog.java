@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.jabref.gui.JabRefFrame;
@@ -76,7 +77,7 @@ public class MergeSharedEntryDialog {
         buttonPanel.add(cancelButton, BorderLayout.EAST);
 
         mergeDialog.add(buttonPanel, BorderLayout.SOUTH);
-        mergeDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        mergeDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         mergeDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

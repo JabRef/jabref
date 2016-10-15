@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
@@ -107,7 +108,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
         }
 
         con.weighty = 1;
-        sp = new JScrollPane(list, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        sp = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         gbl.setConstraints(sp, con);
         add(sp);
         con.weighty = 0;

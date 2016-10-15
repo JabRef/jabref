@@ -26,9 +26,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -262,7 +264,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                 String nm = StringUtil.capitalizeFirst(stringListEntry.getKey());
                 EntryTypes.removeType(nm, bibDatabaseMode);
 
-                updateTypesForEntries(nm);
+                updateTypesForEntries();
                 continue;
             }
 
@@ -288,7 +290,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                         new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 EntryTypes.addOrModifyCustomEntryType(typ);
-                updateTypesForEntries(typ.getName());
+                updateTypesForEntries();
             }
         }
 
@@ -326,7 +328,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateTypesForEntries(StringUtil.capitalizeFirst(name));
+            updateTypesForEntries();
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);
@@ -376,19 +378,17 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
      * a valid type, that no obsolete entry editors are around, and that
      * the right-click menus' change type menu is up-to-date.
      */
-    private void updateTypesForEntries(String typeName) {
+    private void updateTypesForEntries() {
         for (BasePanel bp : frame.getBasePanelList()) {
-
             for (BibEntry entry : bp.getDatabase().getEntries()) {
                 EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
             }
         }
-
     }
 
     private void updateTables() {
         for (BasePanel basePanel : frame.getBasePanelList()) {
-            ((javax.swing.table.AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
+            ((AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
         }
     }
 
@@ -433,17 +433,17 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     class DataListener implements ListDataListener {
 
         @Override
-        public void intervalAdded(javax.swing.event.ListDataEvent e) {
+        public void intervalAdded(ListDataEvent e) {
             record();
         }
 
         @Override
-        public void intervalRemoved(javax.swing.event.ListDataEvent e) {
+        public void intervalRemoved(ListDataEvent e) {
             record();
         }
 
         @Override
-        public void contentsChanged(javax.swing.event.ListDataEvent e) {
+        public void contentsChanged(ListDataEvent e) {
             record();
         }
 

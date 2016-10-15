@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
@@ -66,8 +67,8 @@ public class ImportCustomizationDialog extends JDialog {
         cm.getColumn(1).setPreferredWidth(COL_1_WIDTH);
         cm.getColumn(2).setPreferredWidth(COL_2_WIDTH);
         cm.getColumn(3).setPreferredWidth(COL_3_WIDTH);
-        JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(customImporterTable, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         customImporterTable.setPreferredScrollableViewportSize(getSize());
         if (customImporterTable.getRowCount() > 0) {
