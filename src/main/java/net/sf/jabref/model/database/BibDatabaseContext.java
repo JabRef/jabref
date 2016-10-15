@@ -31,6 +31,7 @@ public class BibDatabaseContext {
     private DBMSSynchronizer dbmsSynchronizer;
     private DatabaseLocation location;
 
+
     public BibDatabaseContext() {
         this(new Defaults());
     }
@@ -58,7 +59,8 @@ public class BibDatabaseContext {
         this(database, metaData, new Defaults());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults, DatabaseLocation location) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults,
+            DatabaseLocation location) {
         this(database, metaData, defaults);
         Objects.requireNonNull(location);
         this.setDatabaseFile(file);
@@ -91,7 +93,7 @@ public class BibDatabaseContext {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
             BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
             if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                newMode =  BibDatabaseMode.BIBLATEX;
+                newMode = BibDatabaseMode.BIBLATEX;
             }
             this.setMode(newMode);
             return newMode;
@@ -167,13 +169,13 @@ public class BibDatabaseContext {
 
         // 1. metadata user-specific directory
         Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
-        if(userFileDirectory.isPresent()) {
+        if (userFileDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
         }
 
         // 2. metadata general directory
         Optional<String> metaDataDirectory = metaData.getDefaultFileDirectory();
-        if(metaDataDirectory.isPresent()) {
+        if (metaDataDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(metaDataDirectory.get()));
         }
 

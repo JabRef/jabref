@@ -84,87 +84,93 @@ public class RenamePdfCleanup implements CleanupJob {
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
                     databaseContext.getFileDirectories(fileDirectoryPreferences));
 
+            expandedOldFile.ifPresent(f -> System.out.println("Expanded old file " + f));
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 newFileList.add(flEntry);
                 continue;
             }
+            Path newPath = Paths.get("");
+            Optional<Path> dir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+            if (dir.isPresent()) {
+                System.out.println("Dir from setting " + dir.get());
 
-            Path newPath = expandedOldFile.get().toPath().getParent().resolve(targetDirName)
-                    .resolve(targetFileName.toString());
+                newPath = dir.get().resolve(targetDirName).resolve(targetFileName.toString());
 
-            System.out.println("New Path 2 " + newPath);
-            //            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
+                System.out.println("New Path 2 " + newPath);
+                //            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
 
-            String expandedOldFilePath = expandedOldFile.get().toString();
-            boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                    && !newPath.equals(expandedOldFilePath);
-            if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
-                // we do not overwrite files
-                // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
-                // nonetheless rename files to a new name which just differs by case.
-                // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-                newFileList.add(flEntry);
-                continue;
-            }
+                String expandedOldFilePath = expandedOldFile.get().toString();
+                boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
+                        && !newPath.equals(expandedOldFilePath);
 
-            try {
-                if (!Files.exists(newPath)) {
-                    Files.createDirectories(newPath);
-
+                if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
+                    // we do not overwrite files
+                    // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+                    // nonetheless rename files to a new name which just differs by case.
+                    // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
+                    newFileList.add(flEntry);
+                    continue;
                 }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                LOGGER.error("Could no create target necessary target directoires for renaming", e);
-            }
-            //do rename
-            boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
-            if (renameSuccessful) {
-                changed = true;
 
-                //Change the path for this entry
-                String description = flEntry.getDescription();
-                String type = flEntry.getFileType();
+                try {
+                    if (!Files.exists(newPath)) {
+                        Files.createDirectories(newPath);
 
-                Optional<Path> dir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
-                if (dir.isPresent()) {
-                    System.out.println("Dir from setting " + dir);
-
-                    Path parent = dir.get();
-                    System.out.println("oldDir " + parent);
-
-                    String newFileEntryFileName;
-                    if ((parent == null)
-                            || databaseContext.getFileDirectories(fileDirectoryPreferences).contains(parent)) {
-                        newFileEntryFileName = targetFileName.toString();
-
-                    } else {
-
-                        String par = parent.relativize(newPath).toString();
-                        System.out.println("NewEntryFileName " + par);
-                        newFileEntryFileName = par;
                     }
-
-                    newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    LOGGER.error("Could no create target necessary target directoires for renaming", e);
                 }
-            } else {
-                unsuccessfulRenames++;
+                //do rename
+                boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
+                if (renameSuccessful) {
+                    changed = true;
+
+                    //Change the path for this entry
+                    String description = flEntry.getDescription();
+                    String type = flEntry.getFileType();
+
+                    Optional<Path> settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+                    if (settingsDir.isPresent()) {
+                        System.out.println("Dir from setting " + settingsDir);
+
+                        Path parent = settingsDir.get();
+                        System.out.println("oldDir " + parent);
+
+                        String newFileEntryFileName;
+                        if ((parent == null)
+                                || databaseContext.getFileDirectories(fileDirectoryPreferences).contains(parent)) {
+                            newFileEntryFileName = targetFileName.toString();
+
+                        } else {
+
+                            String par = parent.relativize(newPath).toString();
+                            System.out.println("NewEntryFileName " + par);
+                            newFileEntryFileName = par;
+                        }
+
+                        newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
+                    }
+                } else {
+                    unsuccessfulRenames++;
+                }
+            }
+
+            if (changed) {
+                Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+                //we put an undo of the field content here
+                //the file is not being renamed back, which leads to inconsistencies
+                //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
+                if (change.isPresent()) {
+                    return Collections.singletonList(change.get());
+                } else {
+                    return Collections.emptyList();
+                }
             }
         }
-
-        if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
-            //we put an undo of the field content here
-            //the file is not being renamed back, which leads to inconsistencies
-            //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            if (change.isPresent()) {
-                return Collections.singletonList(change.get());
-            } else {
-                return Collections.emptyList();
-            }
-        }
-
         return Collections.emptyList();
+
     }
 
     public int getUnsuccessfulRenames() {
