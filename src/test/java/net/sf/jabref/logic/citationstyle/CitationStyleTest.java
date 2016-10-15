@@ -16,6 +16,8 @@ public class CitationStyleTest {
     @Test
     public void testDefaultCitation() {
         String citation = CitationStyleGenerator.generateCitation(TestEntry.getTestEntry(), CitationStyle.getDefault());
+
+        // if the default citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">\n" +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">" +
                 "B. Smith, B. Jones, and J. Williams, “Title of the test entry,” " +
