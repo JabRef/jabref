@@ -267,8 +267,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtrip() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -284,8 +283,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -301,8 +299,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         BibEntry entry = result.getDatabase().getEntryByKey("1137631").get();
         entry.setField("author", "Mr. Author");
@@ -322,8 +319,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed

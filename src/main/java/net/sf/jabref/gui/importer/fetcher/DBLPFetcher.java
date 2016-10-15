@@ -13,6 +13,7 @@ import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.DBLPHelper;
 import net.sf.jabref.logic.net.URLDownload;
@@ -32,7 +33,7 @@ public class DBLPFetcher implements EntryFetcher {
 
     private volatile boolean shouldContinue;
     private String query;
-    private final DBLPHelper helper = new DBLPHelper(Globals.prefs.getImportFormatPreferences());
+    private final DBLPHelper helper = new DBLPHelper();
 
 
     @Override
@@ -102,8 +103,8 @@ public class DBLPFetcher implements EntryFetcher {
                         final String bibtexPage = new URLDownload(bibtexUrl)
                                 .downloadToString(Globals.prefs.getDefaultEncoding());
 
-                        Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage,
-                                Globals.prefs.getImportFormatPreferences());
+                        Collection<BibEntry> bibtexEntries = new BibtexParser(
+                                Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexPage);
 
                         for (BibEntry be : bibtexEntries) {
 
@@ -122,7 +123,7 @@ public class DBLPFetcher implements EntryFetcher {
             }
             return true;
 
-        } catch (IOException e) {
+        } catch (ParseException | IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         } finally {
