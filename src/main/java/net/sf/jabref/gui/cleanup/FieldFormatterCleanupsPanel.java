@@ -328,6 +328,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             addButton.setEnabled(status);
             removeButton.setEnabled(status);
             resetButton.setEnabled(status);
+            recommendButton.setEnabled(status);
 
         }
     }
