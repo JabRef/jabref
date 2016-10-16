@@ -3,8 +3,6 @@ package net.sf.jabref.model.entry;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.logic.l10n.Localization;
-
 /**
  * Utility class for everything related to months.
  */
@@ -14,18 +12,18 @@ public class MonthUtil {
     private static final Month NULL_OBJECT = new UnknownMonth();
 
     private static final List<Month> MONTHS = Arrays.asList(
-            new Month(Localization.lang("January"), Localization.lang("jan"), "01", Localization.lang("#jan#"), 1, 0),
-            new Month(Localization.lang("February"), Localization.lang("feb"), "02", Localization.lang("#feb#"), 2, 1),
-            new Month(Localization.lang("March"), Localization.lang("mar"), "03", Localization.lang("#mar#"), 3, 2),
-            new Month(Localization.lang("April"), Localization.lang("apr"), "04", Localization.lang("#apr#"), 4, 3),
-            new Month(Localization.lang("May"), Localization.lang("may"), "05", Localization.lang("#may#"), 5, 4),
-            new Month(Localization.lang("June"), Localization.lang("jun"), "06", Localization.lang("#jun#"), 6, 5),
-            new Month(Localization.lang("July"), Localization.lang("jul"), "07", Localization.lang("#jul#"), 7, 6),
-            new Month(Localization.lang("August"), Localization.lang("aug"), "08", Localization.lang("#aug#"), 8, 7),
-            new Month(Localization.lang("September"), Localization.lang("sep"), "09", Localization.lang("#sep#"), 9, 8),
-            new Month(Localization.lang("October"), Localization.lang("oct"), "10", Localization.lang("#oct#"), 10, 9),
-            new Month(Localization.lang("November"), Localization.lang("nov"), "11", Localization.lang("#nov#"), 11, 10),
-            new Month(Localization.lang("December"), Localization.lang("dec"), "12", Localization.lang("#dec#"), 12, 11)
+            new Month("January", "jan", "01", "#jan#", 1, 0),
+            new Month("February", "feb", "02", "#feb#", 2, 1),
+            new Month("March", "mar", "03", "#mar#", 3, 2),
+            new Month("April", "apr", "04", "#apr#", 4, 3),
+            new Month("May", "may", "05", "#may#", 5, 4),
+            new Month("June", "jun", "06", "#jun#", 6, 5),
+            new Month("July", "jul", "07", "#jul#", 7, 6),
+            new Month("August", "aug", "08", "#aug#", 8, 7),
+            new Month("September", "sep", "09", "#sep#", 9, 8),
+            new Month("October", "oct", "10", "#oct#", 10, 9),
+            new Month("November", "nov", "11", "#nov#", 11, 10),
+            new Month("December", "dec", "12", "#dec#", 12, 11)
             );
 
 
