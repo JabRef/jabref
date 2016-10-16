@@ -83,8 +83,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        add.setToolTipText(Localization.lang("New entry link (INSERT)"));
-        remove.setToolTipText(Localization.lang("Remove entry link (DELETE)"));
+        add.setToolTipText(("New entry link (INSERT)"));
+        remove.setToolTipText(("Remove entry link (DELETE)"));
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(e -> addEntry());
@@ -471,7 +471,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 case 1:
                     return entry.getLinkedEntry()
                             .map(bibEntry -> formatEntry(bibEntry, entry.getDataBase()))
-                            .orElse(Localization.lang("Unknown entry"));
+                            .orElse("Unknown entry");
                 default:
                     return null;
                 }

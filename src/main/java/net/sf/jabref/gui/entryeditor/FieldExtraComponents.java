@@ -320,7 +320,7 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getYesNoExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor) {
-        final String[] options = {"", Localization.lang("Yes"), Localization.lang("No")};
+        final String[] options = {"", "Yes", "No"};
         JComboBox<String> yesno = new JComboBox<>(options);
         yesno.addActionListener(actionEvent -> {
             fieldEditor.setText(((String) yesno.getSelectedItem()).toLowerCase());
