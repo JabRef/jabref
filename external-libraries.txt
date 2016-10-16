@@ -161,12 +161,12 @@ License: LGPL 2.1+
 
 Id:      org.citationstyles.styles
 Project: CSL Styles
-URL:     citationStyles.org
+URL:     https://github.com/citation-style-language/styles
 Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
 
 Id:      org.citationstyles.locales
 Project: CSL Locales
-URL:     citationStyles.org
+URL:     https://github.com/citation-style-language/locales
 Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
 
 Id:      de.undercouch.citeproc-java
