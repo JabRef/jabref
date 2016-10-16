@@ -174,9 +174,4 @@ Project: Citeproc-Java
 URL:     http://michel-kraemer.github.io/citeproc-java/
 Licence: Apache License, Version 2.0
 
-Id:      org.mozilla.rhino
-Project: Rhino
-URL:     https://developer.mozilla.org/de/docs/Rhino
-Licence: Mozilla Public License Version 2.0
-
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
