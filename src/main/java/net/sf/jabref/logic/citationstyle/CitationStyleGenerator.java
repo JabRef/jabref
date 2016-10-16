@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.jbibtex.BibTeXEntry;
 import org.jbibtex.DigitStringValue;
 import org.jbibtex.Key;
-import org.jbibtex.TokenMgrError;
+import org.jbibtex.TokenMgrException;
 
 
 /**
@@ -53,7 +53,7 @@ public class CitationStyleGenerator {
             String citeKey = entry.getCiteKeyOptional().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(citeKey));
             for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
-                String value = UNICODE_TO_LATEX_FORMATTER.format(field.getValue()).replace("\r", " ");
+                String value = UNICODE_TO_LATEX_FORMATTER.format(field.getValue());
                 bibTeXEntry.addField(new Key(field.getKey()), new DigitStringValue(value));
             }
 
@@ -64,7 +64,7 @@ public class CitationStyleGenerator {
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
             return Localization.lang("Cannot generate preview based on selected citation style");
-        } catch (TokenMgrError e) {
+        } catch (TokenMgrException e) {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
             return  new StringBuilder()

@@ -122,9 +122,7 @@ dependencies {
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
-    compile 'de.undercouch:citeproc-java:0.6'
-    // in Java 8 Rhino was replaced by Nashorn, but 'de.undercouch:citeproc-java:0.6' depends on Rhino
-    compile 'org.mozilla:rhino:1.7.7.1'
+    compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
