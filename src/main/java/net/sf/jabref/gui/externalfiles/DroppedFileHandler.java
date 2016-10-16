@@ -238,10 +238,8 @@ public class DroppedFileHandler {
             return false;
         }
 
-        JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several BibTeX-records.")
-                        + "\n"
-                        + Localization.lang("Do you want to import these as new entries into the current database?"));
+        JLabel confirmationMessage = new JLabel(Localization.lang("The PDF contains one or several BibTeX-records.")
+                + "\n" + Localization.lang("Do you want to import these as new entries into the current database?"));
         JPanel entriesPanel = new JPanel();
         entriesPanel.setLayout(new BoxLayout(entriesPanel, BoxLayout.Y_AXIS));
         xmpEntriesInFile.forEach(entry -> {
@@ -360,18 +358,26 @@ public class DroppedFileHandler {
 
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN), layoutPrefs);
 
-        String targetDirName = FileUtil.createFileNameFromPattern(database, entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN), layoutPrefs);
+        String fileDirPattern = Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN);
+
+        String targetDirName = "";
+        if (!fileDirPattern.isEmpty()) {
+            targetDirName = FileUtil.createFileNameFromPattern(database, entry, fileDirPattern, layoutPrefs);
+        }
 
         System.out.println("TARGET Filename " + targetName); //fileNam pattern, e.g bibtexkey
         System.out.println("TARGET FileDir " + targetDirName); //e.g. inBook
 
-        renameToTextBox
-                .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
+        if (targetDirName.isEmpty()) {
 
+            renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
+        } else {
+
+            renameToTextBox
+                    .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
+        }
         linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
         copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
         moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
@@ -478,52 +484,41 @@ public class DroppedFileHandler {
      * @return true if the operation succeeded.
      */
     private boolean doMove(String fileName, String destFilename, NamedCompound edits) {
-        List<String> dirs = panel.getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-        int found = -1;
-        for (int i = 0; i < dirs.size(); i++) {
-            if (new File(dirs.get(i)).exists()) {
-                found = i;
-                break;
-            }
-        }
-        if (found < 0) {
-            // OOps, we don't know which directory to put it in, or the given
-            // dir doesn't exist....
-            // This should not happen!!
-            LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
-            return false;
-        }
-        Path destFile = Paths.get(dirs.get(found)).resolve(destFilename);
+        Optional<Path> dir = panel.getBibDatabaseContext()
+                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
 
-        if (Files.exists(destFile)) {
-            int answer = JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
-                    Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
-            if (answer == JOptionPane.NO_OPTION) {
+        if (dir.isPresent()) {
+            Path destFile = dir.get().resolve(destFilename);
+
+            if (Files.exists(destFile)) {
+                int answer = JOptionPane.showConfirmDialog(frame,
+                        Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
+                        Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
+                if (answer == JOptionPane.NO_OPTION) {
+                    return false;
+                }
+            }
+
+            Path fromFile = Paths.get(fileName);
+            try {
+                if (!Files.exists(destFile)) {
+                    Files.createDirectories(destFile);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                LOGGER.error("Problem creating target direcotires", e);
+            }
+            if (FileUtil.renameFile(fromFile, destFile, true)) {
+                return true;
+            } else {
+                JOptionPane.showMessageDialog(frame,
+                        Localization.lang("Could not move file '%0'.", destFile.toString())
+                                + Localization.lang("Please move the file manually and link in place."),
+                        Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }
-
-        Path fromFile = Paths.get(fileName);
-        try {
-            if (!Files.exists(destFile)) {
-                Files.createDirectories(destFile);
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            LOGGER.error("Problem creating target direcotires", e);
-        }
-        if (FileUtil.renameFile(fromFile, destFile)) {
-            return true;
-        } else {
-            JOptionPane.showMessageDialog(frame,
-                    Localization.lang("Could not move file '%0'.", destFile.toString())
-                            + Localization.lang("Please move the file manually and link in place."),
-                    Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
+        return false;
     }
 
     /**
