@@ -33,6 +33,7 @@ import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.exporter.SaveDatabaseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
@@ -82,13 +83,27 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
+    private final String saveQuestionMessage = new StringBuilder()
+            .append(Localization.lang("You are now connected to the shared database."))
+            .append(" ")
+            .append(Localization.lang("Do you want to save the shared database locally?"))
+            .append("\n\n")
+            .append(Localization.lang("Note that a shared database can be saved anytime using \"File\" -> \"Save as...\"."))
+            .append("\n\n")
+            .toString();
+
+    private final JCheckBox dontShowThisDialogAgain = new JCheckBox("Do not show this dialog again.");
+
+
     private DBMSConnectionProperties connectionProperties;
+
+
 
     /**
      * @param frame the JabRef Frame
      */
     public OpenSharedDatabaseDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Open shared database"));
+        super(frame, Localization.lang("Connect to shared database"));
         this.frame = frame;
         initLayout();
         applyPreferences();
@@ -109,9 +124,31 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
+            BasePanel panel = new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
             dispose();
+
+            if (prefs.getShowAskingSaveDialog()) {
+                dontShowThisDialogAgain.setSelected(!prefs.getShowAskingSaveDialog());
+
+                Object[] options = {Localization.lang("No, work online"), Localization.lang("Yes, save as...")};
+                int answer = JOptionPane.showOptionDialog(frame,
+                        new Object[] {saveQuestionMessage, dontShowThisDialogAgain},
+                        Localization.lang("Shared database"),
+                        JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+                if (answer == 1) {
+                    try {
+                        new SaveDatabaseAction(panel).runCommand();
+                    } catch (Throwable e) {
+                        LOGGER.error("Error while saving the database", e);
+                    }
+                }
+
+                prefs.setShowAskingSaveDialog(!dontShowThisDialogAgain.isSelected());
+            }
+
+
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),

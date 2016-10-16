@@ -19,8 +19,8 @@ public class OpenSharedDatabaseAction extends MnemonicAwareAction {
     public OpenSharedDatabaseAction(JabRefFrame jabRefFrame) {
         super();
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, Localization.menuTitle("Open shared database"));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open shared database"));
+        putValue(Action.NAME, Localization.menuTitle("Connect to shared database"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Connect to shared database"));
     }
 
     @Override

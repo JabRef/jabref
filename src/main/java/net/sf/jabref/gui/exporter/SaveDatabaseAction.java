@@ -358,9 +358,9 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
-                context.getDatabaseFile().isPresent();
+        return (context.getLocation() == DatabaseLocation.SHARED || ((context.getLocation() == DatabaseLocation.LOCAL)
+                && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                && context.getDatabaseFile().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {
