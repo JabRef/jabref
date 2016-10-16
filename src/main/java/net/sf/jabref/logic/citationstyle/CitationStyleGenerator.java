@@ -63,12 +63,12 @@ public class CitationStyleGenerator {
 
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
-            return Localization.lang("Cannot generate preview based on selected citation style");
+            return Localization.lang("Cannot generate preview based on selected citation style.");
         } catch (TokenMgrException e) {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
             return  new StringBuilder()
-                    .append(Localization.lang("Cannot generate preview based on selected citation style"))
+                    .append(Localization.lang("Cannot generate preview based on selected citation style."))
                     .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")
                     .append(Localization.lang("Bad character inside entry"))
                     .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")

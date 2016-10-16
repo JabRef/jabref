@@ -26,7 +26,7 @@ public class CitationStyleGeneratorTest {
 
     @Test
     public void testMissingCitationStyle() {
-        String expected = Localization.lang("Cannot generate preview based on selected citation style");
+        String expected = Localization.lang("Cannot generate preview based on selected citation style.");
         String citation = CitationStyleGenerator.generateCitation(new BibEntry(), "faulty citation style");
         assertEquals(expected, citation);
     }
