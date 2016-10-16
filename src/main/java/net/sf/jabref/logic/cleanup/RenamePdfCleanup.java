@@ -90,7 +90,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            Path newPath = Paths.get("");
+            Path newPath = null;
             Optional<Path> dir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
             if (dir.isPresent()) {
                 System.out.println("Dir from setting " + dir.get());
@@ -156,6 +156,8 @@ public class RenamePdfCleanup implements CleanupJob {
                     unsuccessfulRenames++;
                 }
             }
+
+            //TODO: Checken: Der macht das return wenn change = true, aber wenn noch ein nicht change dahinter kommt?`
 
             if (changed) {
                 Optional<FieldChange> change = typedEntry.setFiles(newFileList);

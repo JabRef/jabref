@@ -144,7 +144,9 @@ public class BibDatabaseContext {
      * @return Optional of Path
      */
     public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
-        return getFileDirectories(preferences).stream().map(p -> Paths.get(p)).filter(Files::exists).findFirst();
+        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(p -> Paths.get(p))
+                .filter(Files::exists).findFirst();
+        //Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
     }
 
     /**
@@ -192,8 +194,7 @@ public class BibDatabaseContext {
                 fileDirs.add(parentDir);
             }
         });
-
-        return fileDirs;
+        return  fileDirs;
     }
 
     private String getFileDirectoryPath(String directoryName) {
