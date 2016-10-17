@@ -40,7 +40,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -285,7 +284,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         if (Globals.prefs.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
-            synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
+            SpecialFieldsUtils.synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
         }
 
         NamedCompound ce = updateKeywords(bp.getSelectedEntries(), keywordsToAdd, keywordsToRemove);
@@ -315,57 +314,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
         ce.end();
         return ce;
-    }
-
-    private void synchronizeSpecialFields(KeywordList keywordsToAdd, KeywordList keywordsToRemove) {
-        // we need to check whether a special field is added
-        // for each field:
-        //   check if something is added
-        //   if yes, add all keywords of that special fields to the keywords to be removed
-
-        KeywordList clone;
-
-        // Priority
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.PRIORITY.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.PRIORITY.getKeyWords());
-        }
-
-        // Quality
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.QUALITY.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.QUALITY.getKeyWords());
-        }
-
-        // Rank
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.RANK.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.RANK.getKeyWords());
-        }
-
-        // Relevance
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.RELEVANCE.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.RELEVANCE.getKeyWords());
-        }
-
-        // Read status
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.READ_STATUS.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.READ_STATUS.getKeyWords());
-        }
-
-        // Printed
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(SpecialField.PRINTED.getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(SpecialField.PRINTED.getKeyWords());
-        }
     }
 
     private void fillKeyWordList() {

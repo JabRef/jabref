@@ -140,4 +140,22 @@ public class SpecialFieldsUtils {
     public static boolean isSpecialField(String fieldName) {
         return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
     }
+
+    public static void synchronizeSpecialFields(KeywordList keywordsToAdd, KeywordList keywordsToRemove) {
+        // we need to check whether a special field is added
+        // for each field:
+        //   check if something is added
+        //   if yes, add all keywords of that special fields to the keywords to be removed
+
+        KeywordList clone;
+
+        // Priority
+        clone = keywordsToAdd.createClone();
+        for(SpecialField field: SpecialField.values()){
+            clone.retainAll(field.getKeyWords());
+            if(!clone.isEmpty()) {
+                keywordsToRemove.addAll(field.getKeyWords());
+            }
+        }
+    }
 }
