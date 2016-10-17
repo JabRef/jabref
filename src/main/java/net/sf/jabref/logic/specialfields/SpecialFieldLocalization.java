@@ -35,6 +35,16 @@ public class SpecialFieldLocalization {
                 return Localization.lang("Toggle quality assured");
             case "clearRank":
                 return Localization.lang("Clear rank");
+            case "setRank1":
+                return "";
+            case "setRank2":
+                return "";
+            case "setRank3":
+                return "";
+            case "setRank4":
+                return "";
+            case "setRank5":
+                return "";
             case "clearReadStatus":
                 return Localization.lang("Clear read status");
             case "setReadStatusToRead":
@@ -44,7 +54,7 @@ public class SpecialFieldLocalization {
             case "toggleRelevance":
                 return Localization.lang("Toggle relevance");
             default:
-                return "";
+                throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
         }
     }
 
