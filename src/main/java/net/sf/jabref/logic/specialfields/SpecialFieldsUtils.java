@@ -13,10 +13,14 @@ import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
-@Deprecated // the class should be refactored and partly integrated into BibEntry
-// instead of synchronizing special fields with the keyword field, the BibEntry class should have a method
-// setSpecialField(field, newValue, syncToKeyword) which directly performs the correct action
-// i.e. sets the field to newValue (in the case syncToKeyword = false) or adds newValue to keywords (sync = true)
+/**
+ * @deprecated the class should be refactored and partly integrated into BibEntry
+ * instead of synchronizing special fields with the keyword field, the BibEntry class should have a method
+ * setSpecialField(field, newValue, syncToKeyword) which directly performs the correct action
+ * i.e.sets the field to newValue(in the case syncToKeyword=false)or adds newValue to keywords(sync=true)
+ */
+
+@Deprecated
 public class SpecialFieldsUtils {
 
     /**
