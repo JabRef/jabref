@@ -29,6 +29,7 @@ public class MedlineFetcherTest {
         entryWijedasa.setType(BibLatexEntryTypes.ARTICLE);
         entryWijedasa.setField("author", "Wijedasa, Lahiru S and Jauhiainen, Jyrki and Könönen, Mari and Lampela, Maija and Vasander, Harri and LeBlanc, Marie-Claire and Evers, Stephanie and Smith, Thomas E L and Yule, Catherine M and Varkkey, Helena and Lupascu, Massimo and Parish, Faizal and Singleton, Ian and Clements, Gopalasamy R and Aziz, Sheema Abdul and Harrison, Mark E and Cheyne, Susan and Anshari, Gusti Z and Meijaard, Erik and Goldstein, Jenny E and Waldron, Susan and Hergoualc'h, Kristell and Dommain, René and Frolking, Steve and Evans, Christopher D and Posa, Mary Rose C and Glaser, Paul H and Suryadiputra, Nyoman and Lubis, Reza and Santika, Truly and Padfield, Rory and Kurnianto, Sofyan and Hadisiswoyo, Panut and Lim, Teck Wyn and Page, Susan E and Gauci, Vincent and van der Meer, Peter J and Buckland, Helen and Garnier, Fabien and Samuel, Marshall K and Choo, Liza Nuriati Lim Kim and O'Reilly, Patrick and Warren, Matthew and Suksuwan, Surin and Sumarga, Elham and Jain, Anuj and Laurance, William F and Couwenberg, John and Joosten, Hans and Vernimmen, Ronald and Hooijer, Aljosja and Malins, Chris and Cochrane, Mark A and Perumal, Balu and Siegert, Florian and Peh, Kelvin S-H and Comeau, Louis-Pierre and Verchot, Louis and Harvey, Charles F and Cobb, Alex and Jaafar, Zeehan and Wösten, Henk and Manuri, Solichin and Müller, Moritz and Giesen, Wim and Phelps, Jacob and Yong, Ding Li and Silvius, Marcel and Wedeux, Béatrice M M and Hoyt, Alison and Osaki, Mitsuru and Takashi, Hirano and Takahashi, Hidenori and Kohyama, Takashi S and Haraguchi, Akira and Nugroho, Nunung P and Coomes, David A and Quoi, Le Phat and Dohong, Alue and Gunawan, Haris and Gaveau, David L A and Langner, Andreas and Lim, Felix K S and Edwards, David P and Giam, Xingli and van der Werf, Guido and Carmenta, Rachel and Verwer, Caspar C and Gibson, Luke and Grandois, Laure and Graham, Laura Linda Bozena and Regalino, Jhanson and Wich, Serge A and Rieley, Jack and Kettridge, Nicholas and Brown, Chloe and Pirard, Romain and Moore, Sam and Ripoll Capilla, B and Ballhorn, Uwe and Ho, Hua Chew and Hoscilo, Agata and Lohberger, Sandra and Evans, Theodore A and Yulianti, Nina and Blackham, Grace and Onrizal and Husson, Simon and Murdiyarso, Daniel and Pangala, Sunita and Cole, Lydia E S and Tacconi, Luca and Segah, Hendrik and Tonoto, Prayoto and Lee, Janice S H and Schmilewski, Gerald and Wulffraat, Stephan and Putra, Erianto Indra and Cattau, Megan E and Clymo, R S and Morrison, Ross and Mujahid, Aazani and Miettinen, Jukka and Liew, Soo Chin and Valpola, Samu and Wilson, David and D'Arcy, Laura and Gerding, Michiel and Sundari, Siti and Thornton, Sara A and Kalisz, Barbara and Chapman, Stephen J and Su, Ahmad Suhaizi Mat and Basuki, Imam and Itoh, Masayuki and Traeholt, Carl and Sloan, Sean and Sayok, Alexander K and Andersen, Roxane");
         entryWijedasa.setField("created", "2016-9-27");
+        entryWijedasa.setField("country", "England");
         entryWijedasa.setField("doi", "10.1111/gcb.13516");
         entryWijedasa.setField("issn", "1365-2486");
         entryWijedasa.setField("issn-linking", "1354-1013");
@@ -73,9 +74,11 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField("citation-subset", "IM");
         bibEntryIchikawa.setField("completed", "2016-07-26");
         bibEntryIchikawa.setField("country", "Netherlands");
-        bibEntryIchikawa.setField("created", "2015-09-26");
+        bibEntryIchikawa.setField("created", "2015-9-26");
         bibEntryIchikawa.setField("doi", "10.1016/j.parint.2015.07.004");
         bibEntryIchikawa.setField("issn", "1873-0329");
+        bibEntryIchikawa.setField("pubstatus", "ppublish");
+        bibEntryIchikawa.setField("revised", "2015-9-26");
         bibEntryIchikawa.setField("issn-linking", "1383-5769");
         bibEntryIchikawa.setField("issue", "6");
         bibEntryIchikawa.setField("journal", "Parasitology international");
@@ -98,13 +101,15 @@ public class MedlineFetcherTest {
         bibEntrySari.setField("citation-subset", "IM");
         bibEntrySari.setField("completed", "2016-04-21");
         bibEntrySari.setField("country", "Thailand");
-        bibEntrySari.setField("created", "2016-02-12");
+        bibEntrySari.setField("created", "2016-2-12");
         bibEntrySari.setField("issn", "0125-1562");
         bibEntrySari.setField("issn-linking", "0125-1562");
         bibEntrySari.setField("issue", "6");
         bibEntrySari.setField("journal", "The Southeast Asian journal of tropical medicine and public health");
         bibEntrySari.setField("keywords", "Antibodies, Protozoan; Antibodies, Viral, immunology; Coinfection, epidemiology, immunology; Female; HIV Infections, epidemiology; HTLV-I Antibodies, immunology; HTLV-I Infections, epidemiology, immunology; HTLV-II Antibodies, immunology; HTLV-II Infections, epidemiology, immunology; Hepatitis Antibodies, immunology; Hepatitis B Antibodies, immunology; Hepatitis C Antibodies, immunology; Hepatitis Delta Virus, immunology; Hepatitis, Viral, Human, epidemiology, immunology; Humans; Immunoglobulin G, immunology; Immunoglobulin M, immunology; Indonesia, epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma, immunology; Toxoplasmosis, epidemiology, immunology");
         bibEntrySari.setField("month", "Nov");
+        bibEntrySari.setField("pubstatus", "ppublish");
+        bibEntrySari.setField("revised", "2016-2-12");
         bibEntrySari.setField("nlm-id", "0266303");
         bibEntrySari.setField("owner", "NLM");
         bibEntrySari.setField("pages", "977--985");
