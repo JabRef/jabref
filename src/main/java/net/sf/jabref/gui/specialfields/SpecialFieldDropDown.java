@@ -25,8 +25,9 @@ public class SpecialFieldDropDown {
 
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
-        JButton button = new JButton(new SpecialFieldViewModel(field).getRepresentingIcon());
-        button.setToolTipText(Localization.lang(field.getLocalizationKey()));
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        JButton button = new JButton(viewModel.getRepresentingIcon());
+        button.setToolTipText(Localization.lang(viewModel.getLocalizationKey()));
         button.setPreferredSize(buttonDim);
         if (!OS.OS_X) {
             button.setMargin(new Insets(1, 0, 2, 0));

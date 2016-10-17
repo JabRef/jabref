@@ -111,32 +111,38 @@ public class GUIGlobals {
             GUIGlobals.TABLE_ICONS.put(fileType.getName(), label);
         }
 
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.RELEVANCE).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.RELEVANCE.getLocalizationKey()));
+        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE);
+        label = new JLabel(relevanceViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(relevanceViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RELEVANCE, label);
 
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.QUALITY).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.QUALITY.getLocalizationKey()));
+        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY);
+        label = new JLabel(qualityViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(qualityViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_QUALITY, label);
 
         // Ranking item in the menu uses one star
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.RANK).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.RANK.getLocalizationKey()));
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANK);
+        label = new JLabel(rankViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(rankViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RANKING, label);
 
         // Priority icon used for the menu
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.PRIORITY).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.PRIORITY.getLocalizationKey()));
+        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY);
+        label = new JLabel(priorityViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(priorityViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRIORITY, label);
 
         // Read icon used for menu
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.READ_STATUS).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.READ_STATUS.getLocalizationKey()));
+        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS);
+        label = new JLabel(readViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(readViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_READ, label);
 
         // Print icon used for menu
-        label = new JLabel(new SpecialFieldViewModel(SpecialField.PRINTED).getRepresentingIcon());
-        label.setToolTipText(Localization.lang(SpecialField.PRINTED.getLocalizationKey()));
+        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED);
+        label = new JLabel(printedViewModel.getRepresentingIcon());
+        label.setToolTipText(Localization.lang(printedViewModel.getLocalizationKey()));
         GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRINTED, label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {

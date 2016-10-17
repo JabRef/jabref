@@ -206,8 +206,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      * Then cycle through all available values, and add them.
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
-        menu.setText(Localization.lang(field.getLocalizationKey()));
-        menu.setIcon(new SpecialFieldViewModel(field).getRepresentingIcon());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        menu.setText(Localization.lang(viewModel.getLocalizationKey()));
+        menu.setIcon(viewModel.getRepresentingIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(new SpecialFieldMenuAction(val, frame));
         }

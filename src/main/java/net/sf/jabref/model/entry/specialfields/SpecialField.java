@@ -9,22 +9,22 @@ import net.sf.jabref.model.entry.KeywordList;
 
 public enum SpecialField {
 
-    PRINTED(SpecialFields.FIELDNAME_PRINTED, "Printed", true,
+    PRINTED(SpecialFields.FIELDNAME_PRINTED, true,
         SpecialFieldValue.PRINTED
     ),
 
-    PRIORITY(SpecialFields.FIELDNAME_PRIORITY, "Priority", false,
+    PRIORITY(SpecialFields.FIELDNAME_PRIORITY, false,
         SpecialFieldValue.CLEAR_PRIORITY,
         SpecialFieldValue.PRIO_1,
         SpecialFieldValue.PRIO_2,
         SpecialFieldValue.PRIO_3
     ),
 
-    QUALITY(SpecialFields.FIELDNAME_QUALITY, "Quality", true,
+    QUALITY(SpecialFields.FIELDNAME_QUALITY, true,
         SpecialFieldValue.QUALITY_ASSURED
     ),
 
-    RANK(SpecialFields.FIELDNAME_RANKING, "Rank", false,
+    RANK(SpecialFields.FIELDNAME_RANKING, false,
         SpecialFieldValue.CLEAR_RANK,
         SpecialFieldValue.RANK_1,
         SpecialFieldValue.RANK_2,
@@ -33,13 +33,13 @@ public enum SpecialField {
         SpecialFieldValue.RANK_5
     ),
 
-    READ_STATUS(SpecialFields.FIELDNAME_READ, "Read status", false,
+    READ_STATUS(SpecialFields.FIELDNAME_READ, false,
         SpecialFieldValue.CLEAR_READ_STATUS,
         SpecialFieldValue.READ,
         SpecialFieldValue.SKIMMED
     ),
 
-    RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, "Relevance", true,
+    RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, true,
         SpecialFieldValue.RELEVANT
     );
 
@@ -47,12 +47,10 @@ public enum SpecialField {
     private KeywordList keywords;
     private HashMap<String, SpecialFieldValue> map;
     private String fieldName;
-    private String localizationKey;
     private boolean isSingleFieldValue;
 
-    SpecialField(String fieldName, String localizationKey, boolean isSingleFieldValue, SpecialFieldValue... values) {
+    SpecialField(String fieldName, boolean isSingleFieldValue, SpecialFieldValue... values) {
         this.fieldName = fieldName;
-        this.localizationKey = localizationKey;
         this.isSingleFieldValue = isSingleFieldValue;
         this.values = new ArrayList<>();
         this.keywords = new KeywordList();
@@ -78,10 +76,6 @@ public enum SpecialField {
 
     public String getFieldName() {
         return fieldName;
-    }
-
-    public String getLocalizationKey() {
-        return localizationKey;
     }
 
     public boolean isSingleValueField() {
