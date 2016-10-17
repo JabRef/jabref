@@ -29,7 +29,7 @@ public class SpecialFieldIcon {
             case RELEVANCE:
                 return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
             default:
-                return null;
+                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
         }
     }
 
@@ -70,7 +70,7 @@ public class SpecialFieldIcon {
             case RELEVANT:
                 return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
             default:
-                return null;
+                throw new IllegalArgumentException("There is no icon mapping for special field value " + value);
         }
     }
 
@@ -82,3 +82,4 @@ public class SpecialFieldIcon {
     }
 
 }
+

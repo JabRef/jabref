@@ -62,7 +62,7 @@ public class SpecialFieldLocalization {
                 return Localization.lang("Priority medium");
             case "setPriority3":
                 return Localization.lang("Priority low");
-            case "qualityAssured":
+            case "toggleQualityAssured":
                 return Localization.lang("Toggle quality assured");
             case "clearRank":
                 return Localization.lang("No rank information");
@@ -85,7 +85,7 @@ public class SpecialFieldLocalization {
             case "toggleRelevance":
                 return Localization.lang("Toggle relevance");
             default:
-                return "";
+                throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
         }
     }
 }
