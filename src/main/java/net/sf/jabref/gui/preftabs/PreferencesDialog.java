@@ -63,7 +63,6 @@ public class PreferencesDialog extends JDialog {
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
 
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
-    private Path lastExportedPath;
 
 
     public PreferencesDialog(JabRefFrame parent) {
