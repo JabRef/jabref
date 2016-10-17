@@ -106,6 +106,7 @@ import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
 import net.sf.jabref.gui.specialfields.SpecialFieldDropDown;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -117,7 +118,6 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoChangeEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
@@ -286,18 +286,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private JMenu rankSubMenu;
     private final AbstractAction toggleRelevance = new GeneralAction(
             SpecialField.RELEVANCE.getValues().get(0).getActionName(),
-            SpecialFieldLocalization.getMenuString(SpecialField.RELEVANCE.getValues().get(0)),
-            SpecialFieldLocalization.getToolTipText(SpecialField.RELEVANCE.getValues().get(0)),
+            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
+            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
             SpecialField.QUALITY.getValues().get(0).getActionName(),
-            SpecialFieldLocalization.getMenuString(SpecialField.QUALITY.getValues().get(0)),
-            SpecialFieldLocalization.getToolTipText(SpecialField.QUALITY.getValues().get(0)),
+            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getMenuString(),
+            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
             SpecialField.PRINTED.getValues().get(0).getActionName(),
-            SpecialFieldLocalization.getMenuString(SpecialField.PRINTED.getValues().get(0)),
-            SpecialFieldLocalization.getToolTipText(SpecialField.PRINTED.getValues().get(0)),
+            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
+            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());

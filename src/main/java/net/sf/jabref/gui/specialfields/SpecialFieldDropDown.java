@@ -11,8 +11,6 @@ import javax.swing.JPopupMenu;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
@@ -27,7 +25,7 @@ public class SpecialFieldDropDown {
         Dimension buttonDim = new Dimension(23, 23);
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
         JButton button = new JButton(viewModel.getRepresentingIcon());
-        button.setToolTipText(Localization.lang(viewModel.getLocalizationKey()));
+        button.setToolTipText(viewModel.getLocalization());
         button.setPreferredSize(buttonDim);
         if (!OS.OS_X) {
             button.setMargin(new Insets(1, 0, 2, 0));
@@ -67,9 +65,10 @@ public class SpecialFieldDropDown {
             if (popup == null) {
                 popup = new JPopupMenu();
                 for (SpecialFieldValue val : field.getValues()) {
-                    JMenuItem item = new JMenuItem(new SpecialFieldValueViewModel(val).getSpecialFieldValueIcon());
-                    item.setText(SpecialFieldLocalization.getMenuString(val));
-                    item.setToolTipText(SpecialFieldLocalization.getToolTipText(val));
+                    SpecialFieldValueViewModel viewModel = new SpecialFieldValueViewModel(val);
+                    JMenuItem item = new JMenuItem(viewModel.getSpecialFieldValueIcon());
+                    item.setText(viewModel.getMenuString());
+                    item.setToolTipText(viewModel.getToolTipText());
                     item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), val.getActionName()));
                     item.setMargin(new Insets(0, 0, 0, 0));
                     popup.add(item);

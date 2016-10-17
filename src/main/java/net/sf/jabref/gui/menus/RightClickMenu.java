@@ -207,7 +207,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
-        menu.setText(Localization.lang(viewModel.getLocalizationKey()));
+        menu.setText(viewModel.getLocalization());
         menu.setIcon(viewModel.getRepresentingIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(new SpecialFieldMenuAction(val, frame));

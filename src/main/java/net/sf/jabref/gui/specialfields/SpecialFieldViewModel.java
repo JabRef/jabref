@@ -25,7 +25,7 @@ public class SpecialFieldViewModel {
                 // if field contains only one value, it has to be nulled
                 // otherwise, another setting does not empty the field
                 field.getValues().size() == 1,
-                Localization.lang(getLocalizationKey()));
+                getLocalization());
     }
 
     public Icon getRepresentingIcon() {
@@ -47,22 +47,23 @@ public class SpecialFieldViewModel {
         }
     }
 
-    public String getLocalizationKey(){
+    public String getLocalization(){
         switch (field) {
             case PRINTED:
-                return "Printed";
+                return Localization.lang("Printed");
             case PRIORITY:
-                return "Priority";
+                return Localization.lang("Priority");
             case QUALITY:
-                return "Quality";
+                return Localization.lang("Quality");
             case RANK:
-                return "Rank";
+                return Localization.lang("Rank");
             case READ_STATUS:
-                return "Read status";
+                return Localization.lang("Read status");
             case RELEVANCE:
-                return "Relevance";
+                return Localization.lang("Relevance");
             default:
                 throw new IllegalArgumentException("There is no icon mapping for special field " + field);
         }
     }
+
 }
