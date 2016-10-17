@@ -51,6 +51,9 @@ public class MedlineFetcherTest {
         entryEndharti.setField("author", "Endharti, Agustina Tri and Wulandari, Adisti and Listyana, Anik and Norahmawati, Eviana and Permana, Sofy");
         entryEndharti.setField("created", "2016-9-27");
         entryEndharti.setField("country", "England");
+        entryEndharti.setField("doi", "10.1186/s12906-016-1345-0");
+        entryEndharti.setField("pii", "10.1186/s12906-016-1345-0");
+        entryEndharti.setField("pmc", "PMC5037598");
         entryEndharti.setField("issn", "1472-6882");
         entryEndharti.setField("issn-linking", "1472-6882");
         entryEndharti.setField("issue", "1");
