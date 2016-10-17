@@ -59,7 +59,6 @@ public class BibtexParserTest {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void parseWithNullThrowsNullPointerException() throws Exception {
         new BibtexParser(importFormatPreferences).parse(null);
@@ -1404,6 +1403,24 @@ public class BibtexParserTest {
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    public void parseRecognizesDatabaseID() throws IOException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        String expectedDatabaseID = "q1w2e3r4t5z6";
+
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% DBID: ").append(expectedDatabaseID)
+                .append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+
+        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+
+        assertEquals(expectedDatabaseID, actualDatabaseID);
     }
 
     @Test

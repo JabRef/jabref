@@ -6,7 +6,6 @@ import java.io.IOException;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -17,14 +16,12 @@ public class OpenDatabase {
     public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
 
     /**
-     * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
+     * Load database (bib-file)
      *
      * @param name Name of the BIB-file to open
-     * @param ignoreAutosave true if autosave version of the file should be ignored
      * @return ParserResult which never is null
      */
-    public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave,
-            ImportFormatPreferences importFormatPreferences) {
+    public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences) {
         File file = new File(name);
         LOGGER.info("Opening: " + name);
 
@@ -37,18 +34,6 @@ public class OpenDatabase {
         }
 
         try {
-            if (!ignoreAutosave) {
-                boolean autoSaveFound = AutoSaveUtil.newerAutoSaveExists(file);
-                if (autoSaveFound) {
-                    // We have found a newer autosave. Make a note of this, so it can be
-                    // handled after startup:
-                    ParserResult postp = new ParserResult(null, null, null);
-                    postp.setPostponedAutosaveFound(true);
-                    postp.setFile(file);
-                    return postp;
-                }
-            }
-
             if (!FileBasedLock.waitForFileLock(file.toPath())) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");

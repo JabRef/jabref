@@ -158,6 +158,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         session = saveSessionFactory.createSaveSession(preferences.getEncodingOrDefault(), preferences.getMakeBackup());
 
+        writeDatabaseID(bibDatabaseContext.getDatabase().getDatabaseID());
+
         // Map to collect entry type definitions that we must save along with entries using them.
         Map<String, EntryType> typesToWrite = new TreeMap<>();
 
@@ -236,6 +238,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException;
 
     protected abstract void writePreamble(String preamble) throws SaveException;
+
+    protected abstract void writeDatabaseID(String databaseID) throws SaveException;
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for

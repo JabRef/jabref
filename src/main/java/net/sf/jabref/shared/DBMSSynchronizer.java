@@ -27,6 +27,7 @@ import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import com.google.common.eventbus.EventBus;
@@ -352,7 +353,8 @@ public class DBMSSynchronizer {
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws SQLException, DatabaseNotSupportedException {
+    public void openSharedDatabase(DBMSConnectionProperties properties)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         openSharedDatabase(new DBMSConnection(properties));
     }
 

@@ -53,6 +53,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.gui.AbstractTableComparatorChooser;
 import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
@@ -148,7 +149,7 @@ public class MainTable extends JTable {
         this.setTableHeader(new PreventDraggingJTableHeader(this, tableFormat));
 
         comparatorChooser = this.createTableComparatorChooser(this, model.getSortedForUserDefinedTableColumnSorting(),
-                TableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
+                AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
 
         this.tableColumnListener = new PersistenceTableColumnListener(this);
 
