@@ -5,14 +5,22 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
+
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 
-public class SpecialFieldIcon {
+public class SpecialFieldValueViewModel {
 
-    public static Icon getSpecialFieldValueIcon(SpecialFieldValue value) {
+    private final SpecialFieldValue value;
+
+    public SpecialFieldValueViewModel(SpecialFieldValue value){
         Objects.requireNonNull(value);
+
+        this.value = value;
+    }
+
+    public Icon getSpecialFieldValueIcon() {
 
         switch (value) {
             case PRINTED:
@@ -52,12 +60,9 @@ public class SpecialFieldIcon {
         }
     }
 
-
-    public static JLabel createSpecialFieldValueLabel(SpecialFieldValue value) {
-        JLabel label = new JLabel(getSpecialFieldValueIcon(value));
+    public JLabel createSpecialFieldValueLabel() {
+        JLabel label = new JLabel(new SpecialFieldValueViewModel(value).getSpecialFieldValueIcon());
         label.setToolTipText(SpecialFieldLocalization.getToolTipText(value));
         return label;
     }
-
 }
-

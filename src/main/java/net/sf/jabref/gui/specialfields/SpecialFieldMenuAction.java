@@ -15,7 +15,7 @@ public class SpecialFieldMenuAction extends AbstractAction {
 
 
     public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
-        super(SpecialFieldLocalization.getMenuString(val), SpecialFieldIcon.getSpecialFieldValueIcon(val));
+        super(SpecialFieldLocalization.getMenuString(val), new SpecialFieldValueViewModel(val).getSpecialFieldValueIcon());
         this.frame = frame;
         this.actionName = val.getActionName();
     }

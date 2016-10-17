@@ -10,7 +10,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListTableModel;
-import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -40,7 +40,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_RANKING)
-                    .flatMap(SpecialField.RANK::parse).map(rank -> SpecialFieldIcon.createSpecialFieldValueLabel(rank)).orElse(null);
+                    .flatMap(SpecialField.RANK::parse).map(rank -> new SpecialFieldValueViewModel(rank).getSpecialFieldValueIcon()).orElse(null);
         }
     };
 
@@ -52,7 +52,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_PRIORITY)
-                    .flatMap(SpecialField.PRIORITY::parse).map(prio -> SpecialFieldIcon.createSpecialFieldValueLabel(prio)).orElse(null);
+                    .flatMap(SpecialField.PRIORITY::parse).map(prio -> new SpecialFieldValueViewModel(prio).getSpecialFieldValueIcon()).orElse(null);
         }
     };
 
@@ -64,7 +64,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getField(SpecialFields.FIELDNAME_READ)
-                    .flatMap(SpecialField.READ_STATUS::parse).map(status -> SpecialFieldIcon.createSpecialFieldValueLabel(status)).orElse(null);
+                    .flatMap(SpecialField.READ_STATUS::parse).map(status -> new SpecialFieldValueViewModel(status).getSpecialFieldValueIcon()).orElse(null);
         }
     };
 

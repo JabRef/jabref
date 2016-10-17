@@ -13,7 +13,7 @@ import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldViewModel {
 
-    private SpecialField field;
+    private final SpecialField field;
 
     public SpecialFieldViewModel(SpecialField field){
         Objects.requireNonNull(field);

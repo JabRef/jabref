@@ -66,7 +66,7 @@ public class SpecialFieldDropDown {
             if (popup == null) {
                 popup = new JPopupMenu();
                 for (SpecialFieldValue val : field.getValues()) {
-                    JMenuItem item = new JMenuItem(SpecialFieldIcon.getSpecialFieldValueIcon(val));
+                    JMenuItem item = new JMenuItem(new SpecialFieldValueViewModel(val).getSpecialFieldValueIcon());
                     item.setText(SpecialFieldLocalization.getMenuString(val));
                     item.setToolTipText(SpecialFieldLocalization.getToolTipText(val));
                     item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), val.getActionName()));

@@ -25,7 +25,6 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
-import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
