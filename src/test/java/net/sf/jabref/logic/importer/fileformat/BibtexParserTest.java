@@ -59,7 +59,6 @@ public class BibtexParserTest {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void parseWithNullThrowsNullPointerException() throws Exception {
         new BibtexParser(importFormatPreferences).parse(null);
