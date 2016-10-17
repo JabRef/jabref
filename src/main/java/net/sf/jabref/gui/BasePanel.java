@@ -77,9 +77,8 @@ import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
-import net.sf.jabref.gui.specialfields.SpecialFieldAction;
-import net.sf.jabref.gui.specialfields.SpecialFieldActions;
 import net.sf.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -654,26 +653,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Note that we can't put the number of entries that have been reverted into the undoText as the concrete number cannot be injected
         actions.put(SpecialField.RELEVANCE.getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, SpecialField.RELEVANCE,
-                        SpecialField.RELEVANCE.getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle relevance")));
+                new SpecialFieldViewModel(SpecialField.RELEVANCE).getSpecialFieldAction(
+                        SpecialField.RELEVANCE.getValues().get(0), frame));
         actions.put(SpecialField.QUALITY.getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, SpecialField.QUALITY,
-                        SpecialField.QUALITY.getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle quality assured")));
+                new SpecialFieldViewModel(SpecialField.QUALITY).getSpecialFieldAction(SpecialField.QUALITY.getValues().get(0), frame));
         actions.put(SpecialField.PRINTED.getValues().get(0).getActionName(),
-                new SpecialFieldAction(frame, SpecialField.PRINTED,
-                        SpecialField.PRINTED.getValues().get(0).getFieldValue().get(), true,
-                        Localization.lang("Toggle print status")));
+                new SpecialFieldViewModel(SpecialField.PRINTED).getSpecialFieldAction(
+                        SpecialField.PRINTED.getValues().get(0), frame));
 
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
-            actions.put(prio.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.PRIORITY, prio, this.frame));
+            actions.put(prio.getActionName(), new SpecialFieldViewModel(SpecialField.PRIORITY).getSpecialFieldAction(prio, this.frame));
         }
         for (SpecialFieldValue rank : SpecialField.RANK.getValues()) {
-            actions.put(rank.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.RANK, rank, this.frame));
+            actions.put(rank.getActionName(), new SpecialFieldViewModel(SpecialField.RANK).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
-            actions.put(status.getActionName(), SpecialFieldActions.getSpecialFieldAction(SpecialField.READ_STATUS, status, this.frame));
+            actions.put(status.getActionName(), new SpecialFieldViewModel(SpecialField.READ_STATUS).getSpecialFieldAction(status, this.frame));
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
