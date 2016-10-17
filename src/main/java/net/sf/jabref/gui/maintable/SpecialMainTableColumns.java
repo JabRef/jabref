@@ -11,6 +11,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
@@ -45,7 +46,7 @@ public class SpecialMainTableColumns {
 
     public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_PRIORITY,
             Collections.singletonList(SpecialFields.FIELDNAME_PRIORITY),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRIORITY))) {
+            new JLabel(new SpecialFieldViewModel(SpecialField.PRIORITY).getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -57,7 +58,7 @@ public class SpecialMainTableColumns {
 
     public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_READ,
             Collections.singletonList(SpecialFields.FIELDNAME_READ),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.READ_STATUS))) {
+            new JLabel(new SpecialFieldViewModel(SpecialField.READ_STATUS).getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -69,15 +70,15 @@ public class SpecialMainTableColumns {
 
     public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFields.FIELDNAME_RELEVANCE,
             Collections.singletonList(SpecialFields.FIELDNAME_RELEVANCE),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.RELEVANCE)));
+            new JLabel(new SpecialFieldViewModel(SpecialField.RELEVANCE).getRepresentingIcon()));
 
     public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFields.FIELDNAME_PRINTED,
             Collections.singletonList(SpecialFields.FIELDNAME_PRINTED),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.PRINTED)));
+            new JLabel(new SpecialFieldViewModel(SpecialField.PRINTED).getRepresentingIcon()));
 
     public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFields.FIELDNAME_QUALITY,
             Collections.singletonList(SpecialFields.FIELDNAME_QUALITY),
-            new JLabel(SpecialFieldIcon.getRepresentingIcon(SpecialField.QUALITY)));
+            new JLabel(new SpecialFieldViewModel(SpecialField.QUALITY).getRepresentingIcon()));
 
 
     public static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE,

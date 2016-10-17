@@ -7,31 +7,9 @@ import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.specialfields.SpecialFieldLocalization;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldIcon {
-
-    public static Icon getRepresentingIcon(SpecialField field) {
-        Objects.requireNonNull(field);
-
-        switch (field) {
-            case PRINTED:
-                return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
-            case PRIORITY:
-                return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
-            case QUALITY:
-                return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-            case RANK:
-                return IconTheme.JabRefIcon.RANKING.getIcon();
-            case READ_STATUS:
-                return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
-            case RELEVANCE:
-                return IconTheme.JabRefIcon.RELEVANCE.getSmallIcon();
-            default:
-                throw new IllegalArgumentException("There is no icon mapping for special field " + field);
-        }
-    }
 
     public static Icon getSpecialFieldValueIcon(SpecialFieldValue value) {
         Objects.requireNonNull(value);
