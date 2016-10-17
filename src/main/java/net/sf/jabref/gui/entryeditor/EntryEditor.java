@@ -48,7 +48,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
-
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
@@ -103,6 +102,7 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
@@ -150,6 +150,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     private final JPanel srcPanel = new JPanel();
+
+    private final JPanel relatedArticlePanel = new JPanel();
 
     private JTextArea source;
 
@@ -234,6 +236,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // optional fields
         List<String> displayedOptionalFields = new ArrayList<>();
 
+
+
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
                 addOptionalTab(type);
@@ -301,6 +305,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addGeneralTabs();
         // source tab
         addSourceTab();
+        //related articles
+        addRelatedArticlesTab("example title");
     }
 
     private void addGeneralTabs() {
@@ -349,6 +355,24 @@ public class EntryEditor extends JPanel implements EntryContainer {
         return requiredFields;
     }
 
+
+
+    private void addRelatedArticlesTab(String title) {
+        title = entry.getField("title").toString().replaceAll("\\{|\\[|\\]|\\}|(Optional)", "");
+
+        relatedArticlePanel.setName(Localization.lang("Related articles"));
+        relatedArticlePanel.setLayout(new BorderLayout());
+        EntryEditorTabRelatedArticles tabbb = new EntryEditorTabRelatedArticles("asd");
+        Thread t = new Thread(tabbb);
+        t.start();
+        relatedArticlePanel.add(tabbb);
+        //TODO native component, how does it work
+        tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
+                relatedArticlePanel, Localization.lang("Show/edit Related articles"));
+        tabs.add(relatedArticlePanel);
+        //relatedArticlePanel.setFocusCycleRoot(true);
+    }
+
     private void addOptionalTab(EntryType type) {
         EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                 false, true, Localization.lang("Optional fields"));
@@ -356,7 +380,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (optionalPanel.fileListEditor != null) {
             fileListEditor = optionalPanel.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
+        // name tab
+        tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                optionalPanel
                 .getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
     }
@@ -535,6 +561,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
+
+
     }
 
     public void updateSource() {
