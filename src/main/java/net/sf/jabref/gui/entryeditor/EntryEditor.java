@@ -221,6 +221,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    public void unregisterFromEntry() {
+        entry.unregisterListener(this);
+    }
+
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
