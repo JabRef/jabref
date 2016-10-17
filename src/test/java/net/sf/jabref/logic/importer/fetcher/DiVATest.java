@@ -7,6 +7,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,6 +36,7 @@ public class DiVATest {
     }
 
     @Test
+    @Ignore("Server currently sends 500")
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType("article");
