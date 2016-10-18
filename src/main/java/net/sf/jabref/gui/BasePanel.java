@@ -1671,6 +1671,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanelMode.SHOWING_EDITOR;
+        if (currentEditor != null) {
+            currentEditor.unregisterFromEntry();
+        }
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
         if (editor.getEntry() != getShowing()) {
