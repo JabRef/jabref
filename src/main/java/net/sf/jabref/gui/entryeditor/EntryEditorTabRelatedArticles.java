@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * @author Stefan Feyer
+ *
  *
  */
 public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnable {
@@ -102,7 +102,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             };
             Client client = ClientBuilder.newBuilder().sslContext(sc).hostnameVerifier(allHostsValid).build();
             WebTarget mdlServer = client
-                    .target("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000003284/related_documents/");
+                    .target("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000003299/related_documents/");
             response = mdlServer.request(MediaType.APPLICATION_XML).get(String.class);
             //Server delivers false format, conversion here, TODO to fix
             response = response.replaceAll("&gt;", ">");
