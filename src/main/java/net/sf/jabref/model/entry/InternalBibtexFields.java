@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 /**
@@ -72,10 +73,10 @@ public class InternalBibtexFields {
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
             FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
 
-    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFields.FIELDNAME_PRINTED,
-            SpecialFields.FIELDNAME_PRIORITY, SpecialFields.FIELDNAME_QUALITY,
-            SpecialFields.FIELDNAME_RANKING, SpecialFields.FIELDNAME_READ,
-            SpecialFields.FIELDNAME_RELEVANCE);
+    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
+            SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
+            SpecialField.RANK.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
+            SpecialField.RELEVANCE.getFieldName());
 
     // singleton instance
     private static InternalBibtexFields RUNTIME = new InternalBibtexFields(

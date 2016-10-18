@@ -110,37 +110,6 @@ public class SpecialFieldsUtils {
         return fieldChanges;
     }
 
-    /**
-     * @param fieldName the fieldName
-     * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
-     */
-    public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
-        switch (fieldName) {
-            case SpecialFields.FIELDNAME_PRIORITY:
-                return Optional.of(SpecialField.PRIORITY);
-            case SpecialFields.FIELDNAME_QUALITY:
-                return Optional.of(SpecialField.QUALITY);
-            case SpecialFields.FIELDNAME_RANKING:
-                return Optional.of(SpecialField.RANK);
-            case SpecialFields.FIELDNAME_RELEVANCE:
-                return Optional.of(SpecialField.RELEVANCE);
-            case SpecialFields.FIELDNAME_READ:
-                return Optional.of(SpecialField.READ_STATUS);
-            case SpecialFields.FIELDNAME_PRINTED:
-                return Optional.of(SpecialField.PRINTED);
-            default:
-                return Optional.empty();
-        }
-    }
-
-    /**
-     * @param fieldName the name of the field to check
-     * @return true if given field is a special field, false otherwise
-     */
-    public static boolean isSpecialField(String fieldName) {
-        return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
-    }
-
     public static void synchronizeSpecialFields(KeywordList keywordsToAdd, KeywordList keywordsToRemove) {
         // we need to check whether a special field is added
         // for each field:

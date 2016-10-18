@@ -90,21 +90,21 @@ public class SpecialFieldsUtilsTest {
     @Test
     public void testGetSpecialFieldInstanceFromFieldNameValid() {
         assertEquals(Optional.of(SpecialField.RANK),
-                SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName("ranking"));
+                SpecialField.getSpecialFieldInstanceFromFieldName("ranking"));
     }
 
     @Test
     public void testGetSpecialFieldInstanceFromFieldNameInvalid() {
-        assertEquals(Optional.empty(), SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName("title"));
+        assertEquals(Optional.empty(), SpecialField.getSpecialFieldInstanceFromFieldName("title"));
     }
 
     @Test
     public void testIsSpecialFieldTrue() {
-        assertTrue(SpecialFieldsUtils.isSpecialField("ranking"));
+        assertTrue(SpecialField.isSpecialField("ranking"));
     }
 
     @Test
     public void testIsSpecialFieldFalse() {
-        assertFalse(SpecialFieldsUtils.isSpecialField("title"));
+        assertFalse(SpecialField.isSpecialField("title"));
     }
 }

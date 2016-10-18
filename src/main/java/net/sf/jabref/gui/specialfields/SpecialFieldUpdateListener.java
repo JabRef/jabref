@@ -10,6 +10,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 
 /**
  * Listener triggering
@@ -34,7 +35,7 @@ public class SpecialFieldUpdateListener {
                 SwingUtilities
                         .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
             } else {
-                if (SpecialFieldsUtils.isSpecialField(fieldName)) {
+                if (SpecialField.isSpecialField(fieldName)) {
                     SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
                     SwingUtilities.invokeLater(
                             () -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());

@@ -9,22 +9,22 @@ import net.sf.jabref.model.entry.KeywordList;
 
 public enum SpecialField {
 
-    PRINTED(SpecialFields.FIELDNAME_PRINTED, true,
+    PRINTED("printed", true,
         SpecialFieldValue.PRINTED
     ),
 
-    PRIORITY(SpecialFields.FIELDNAME_PRIORITY, false,
+    PRIORITY("priority", false,
         SpecialFieldValue.CLEAR_PRIORITY,
         SpecialFieldValue.PRIO_1,
         SpecialFieldValue.PRIO_2,
         SpecialFieldValue.PRIO_3
     ),
 
-    QUALITY(SpecialFields.FIELDNAME_QUALITY, true,
+    QUALITY("qualityassured", true,
         SpecialFieldValue.QUALITY_ASSURED
     ),
 
-    RANK(SpecialFields.FIELDNAME_RANKING, false,
+    RANK("ranking", false,
         SpecialFieldValue.CLEAR_RANK,
         SpecialFieldValue.RANK_1,
         SpecialFieldValue.RANK_2,
@@ -33,13 +33,13 @@ public enum SpecialField {
         SpecialFieldValue.RANK_5
     ),
 
-    READ_STATUS(SpecialFields.FIELDNAME_READ, false,
+    READ_STATUS("readstatus", false,
         SpecialFieldValue.CLEAR_READ_STATUS,
         SpecialFieldValue.READ,
         SpecialFieldValue.SKIMMED
     ),
 
-    RELEVANCE(SpecialFields.FIELDNAME_RELEVANCE, true,
+    RELEVANCE("relevance", true,
         SpecialFieldValue.RELEVANT
     );
 
@@ -80,6 +80,34 @@ public enum SpecialField {
 
     public boolean isSingleValueField() {
         return isSingleFieldValue;
+    }
+
+    public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
+        switch (fieldName) {
+            case "priority":
+                return Optional.of(SpecialField.PRIORITY);
+            case "qualityassured":
+                return Optional.of(SpecialField.QUALITY);
+            case "ranking":
+                return Optional.of(SpecialField.RANK);
+            case "readstatus":
+                return Optional.of(SpecialField.RELEVANCE);
+            case "relevance":
+                return Optional.of(SpecialField.READ_STATUS);
+            case "printed":
+                return Optional.of(SpecialField.PRINTED);
+            default:
+                return Optional.empty();
+        }
+    }
+
+
+    /**
+     * @param fieldName the name of the field to check
+     * @return true if given field is a special field, false otherwise
+     */
+    public static boolean isSpecialField(String fieldName) {
+        return SpecialField.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
     }
 
 }

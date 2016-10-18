@@ -41,6 +41,7 @@ import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.PreviewPreferences;
 
@@ -246,7 +247,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if (modelColumn.isIconColumn() && (SpecialFieldsUtils.isSpecialField(modelColumn.getColumnName()))) {
+        if (modelColumn.isIconColumn() && (SpecialField.isSpecialField(modelColumn.getColumnName()))) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -328,7 +329,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
         if ((e.getClickCount() == 1)) {
-            SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
+            SpecialField.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
                 // special field found
                 if (field.isSingleValueField()) {
                     // directly execute toggle action instead of showing a menu with one action
@@ -397,7 +398,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         showDefaultPopup = false;
                     }
                 } else {
-                    if (SpecialFieldsUtils.isSpecialField(column.getColumnName())) {
+                    if (SpecialField.isSpecialField(column.getColumnName())) {
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {

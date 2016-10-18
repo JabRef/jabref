@@ -32,52 +32,52 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_RANKING,
-            Collections.singletonList(SpecialFields.FIELDNAME_RANKING),
-            new JLabel(SpecialFields.FIELDNAME_RANKING)) {
+    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialField.RANK.getFieldName(),
+            Collections.singletonList(SpecialField.RANK.getFieldName()),
+            new JLabel(SpecialField.RANK.getFieldName())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getField(SpecialFields.FIELDNAME_RANKING)
+            return entry.getField(SpecialField.RANK.getFieldName())
                     .flatMap(SpecialField.RANK::parse).map(rank -> new SpecialFieldValueViewModel(rank).createSpecialFieldValueLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_PRIORITY,
-            Collections.singletonList(SpecialFields.FIELDNAME_PRIORITY),
+    public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialField.PRIORITY.getFieldName(),
+            Collections.singletonList(SpecialField.PRIORITY.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.PRIORITY).getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getField(SpecialFields.FIELDNAME_PRIORITY)
+            return entry.getField(SpecialField.PRIORITY.getFieldName())
                     .flatMap(SpecialField.PRIORITY::parse).map(prio -> new SpecialFieldValueViewModel(prio).createSpecialFieldValueLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_READ,
-            Collections.singletonList(SpecialFields.FIELDNAME_READ),
+    public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialField.READ_STATUS.getFieldName(),
+            Collections.singletonList(SpecialField.READ_STATUS.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.READ_STATUS).getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getField(SpecialFields.FIELDNAME_READ)
+            return entry.getField(SpecialField.READ_STATUS.getFieldName())
                     .flatMap(SpecialField.READ_STATUS::parse).map(status -> new SpecialFieldValueViewModel(status).createSpecialFieldValueLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFields.FIELDNAME_RELEVANCE,
-            Collections.singletonList(SpecialFields.FIELDNAME_RELEVANCE),
+    public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialField.RELEVANCE.getFieldName(),
+            Collections.singletonList(SpecialField.RELEVANCE.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.RELEVANCE).getRepresentingIcon()));
 
-    public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFields.FIELDNAME_PRINTED,
-            Collections.singletonList(SpecialFields.FIELDNAME_PRINTED),
+    public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialField.PRINTED.getFieldName(),
+            Collections.singletonList(SpecialField.PRINTED.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.PRINTED).getRepresentingIcon()));
 
-    public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFields.FIELDNAME_QUALITY,
-            Collections.singletonList(SpecialFields.FIELDNAME_QUALITY),
+    public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialField.QUALITY.getFieldName(),
+            Collections.singletonList(SpecialField.QUALITY.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.QUALITY).getRepresentingIcon()));
 
 

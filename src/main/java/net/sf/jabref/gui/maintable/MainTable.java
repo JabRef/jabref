@@ -47,6 +47,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -324,7 +325,7 @@ public class MainTable extends JTable {
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < cm.getColumnCount(); i++) {
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
-            if (SpecialFields.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
+            if (SpecialField.RANK.getFieldName().equals(mainTableColumn.getColumnName())) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
@@ -404,7 +405,7 @@ public class MainTable extends JTable {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
 
-            if (SpecialFields.FIELDNAME_RANKING.equals(tableColumn.getColumnName())) {
+            if (SpecialField.RANK.getFieldName().equals(tableColumn.getColumnName())) {
                 comparators.add(new RankingFieldComparator());
             } else if (tableColumn.isIconColumn()) {
                 comparators.add(new IconComparator(tableColumn.getBibtexFields()));
