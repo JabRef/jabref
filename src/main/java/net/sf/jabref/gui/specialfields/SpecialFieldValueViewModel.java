@@ -145,4 +145,44 @@ public class SpecialFieldValueViewModel {
                 throw new IllegalArgumentException("There is no tooltip localization for special field value " + value);
         }
     }
+
+    public String getActionName() {
+
+        switch(value){
+            case PRINTED:
+                return "togglePrinted";
+            case CLEAR_PRIORITY:
+                return "clearPriority";
+            case PRIO_1:
+                return "setPriority1";
+            case PRIO_2:
+                return "setPriority2";
+            case PRIO_3:
+                return "setPriority3";
+            case QUALITY_ASSURED:
+                return "toggleQualityAssured";
+            case CLEAR_RANK:
+                return "clearRank";
+            case RANK_1:
+                return "setRank1";
+            case RANK_2:
+                return "setRank2";
+            case RANK_3:
+                return "setRank3";
+            case RANK_4:
+                return "setRank4";
+            case RANK_5:
+                return "setRank5";
+            case CLEAR_READ_STATUS:
+                return "clearReadStatus";
+            case READ:
+                return "setReadStatusToRead";
+            case SKIMMED:
+                return "setReadStatusToSkimmed";
+            case RELEVANT:
+                return "toggleRelevance";
+            default:
+                throw new IllegalArgumentException("There is no action name for special field value " + value);
+        }
+    }
 }

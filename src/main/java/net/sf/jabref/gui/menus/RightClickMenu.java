@@ -26,6 +26,7 @@ import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
@@ -116,13 +117,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                add(new SpecialFieldMenuAction(SpecialField.RELEVANCE.getValues().get(0), frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                add(new SpecialFieldMenuAction(SpecialField.QUALITY.getValues().get(0), frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                add(new SpecialFieldMenuAction(SpecialField.PRINTED.getValues().get(0), frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)), frame));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
@@ -210,7 +211,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         menu.setText(viewModel.getLocalization());
         menu.setIcon(viewModel.getRepresentingIcon());
         for (SpecialFieldValue val : field.getValues()) {
-            menu.add(new SpecialFieldMenuAction(val, frame));
+            menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), frame));
         }
     }
 

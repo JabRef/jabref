@@ -285,17 +285,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
     private JMenu rankSubMenu;
     private final AbstractAction toggleRelevance = new GeneralAction(
-            SpecialField.RELEVANCE.getValues().get(0).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.RELEVANCE.getIcon());
     private final AbstractAction toggleQualityAssured = new GeneralAction(
-            SpecialField.QUALITY.getValues().get(0).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.QUALITY_ASSURED.getIcon());
     private final AbstractAction togglePrinted = new GeneralAction(
-            SpecialField.PRINTED.getValues().get(0).getActionName(),
+            new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getActionName(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getMenuString(),
             new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)).getToolTipText(),
             IconTheme.JabRefIcon.PRINTED.getIcon());

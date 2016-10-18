@@ -69,7 +69,7 @@ public class SpecialFieldDropDown {
                     JMenuItem item = new JMenuItem(viewModel.getSpecialFieldValueIcon());
                     item.setText(viewModel.getMenuString());
                     item.setToolTipText(viewModel.getToolTipText());
-                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), val.getActionName()));
+                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getActionName()));
                     item.setMargin(new Insets(0, 0, 0, 0));
                     popup.add(item);
                 }

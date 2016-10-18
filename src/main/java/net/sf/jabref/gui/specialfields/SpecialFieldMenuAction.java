@@ -13,8 +13,8 @@ public class SpecialFieldMenuAction extends AbstractAction {
     private final String actionName;
 
 
-    public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
-        super(new SpecialFieldValueViewModel(val).getMenuString(), new SpecialFieldValueViewModel(val).getSpecialFieldValueIcon());
+    public SpecialFieldMenuAction(SpecialFieldValueViewModel val, JabRefFrame frame) {
+        super(val.getMenuString(), val.getSpecialFieldValueIcon());
         this.frame = frame;
         this.actionName = val.getActionName();
     }
