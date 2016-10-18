@@ -187,6 +187,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final TabListener tabListener = new TabListener();
 
+    private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
@@ -527,7 +529,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
+        addSearchListener((SearchQueryHighlightListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -543,6 +545,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    void addSearchListener(SearchQueryHighlightListener listener) {
+        searchListeners.add(listener);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
+    }
+
+    void removeSearchListeners() {
+        for (SearchQueryHighlightListener listener : searchListeners) {
+            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().removeSearchListener(listener);
+        }
     }
 
     public void updateSource() {
@@ -927,8 +940,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public void setMovingToDifferentEntry() {
         movingToDifferentEntry = true;
+        unregisterListeners();
     }
 
+    private void unregisterListeners() {
+        entry.unregisterListener(this);
+        removeSearchListeners();
+    }
 
     private class TypeButton extends JButton {
         public TypeButton() {
