@@ -159,6 +159,7 @@ class EntryEditorTab {
                 }
 
                 fieldEditor = new TextArea(field, null, prompt);
+                parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
