@@ -6,6 +6,7 @@ package net.sf.jabref.gui.entryeditor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -49,10 +50,20 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
         this.setContentType("text/html");
         this.request = request;
         this.setEditable(false);
-        htmlContentLoading = "<html><head><title>Hallo </title></head><body bgcolor='#ffffff'><font size=5>"
-                + "Loading Recommendations for " + request + "</font></body></html>";
+        //What is the best way to include that gif?
+        URL url = getClass().getResource("loading_animation.gif");
+        System.out.println(url);
+        System.out.println("Working Directory = " + System.getProperty("user.dir"));
+        htmlContentLoading = "<html><head><title>Hallo </title></head><body bgcolor='#ffffff'><font size=8>"
+                + "Loading Recommendations for " + request + "<img width=\"100\" height=\"100\" src=\""
+                + url
+                + "\"></img>"
+                + "</font></body></html>";
+        System.out.println("----html Content: " + htmlContentLoading);
         this.setText(htmlContentLoading);
     }
+
+
 
     @Override
     public void run() {
@@ -89,29 +100,17 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                     return true;
                 }
             };
-            System.out.println("Hostname verifyer complete");
             Client client = ClientBuilder.newBuilder().sslContext(sc).hostnameVerifier(allHostsValid).build();
-            System.out.println("client builded");
             WebTarget mdlServer = client
                     .target("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000003284/related_documents/");
-            System.out.println("Target set");
             response = mdlServer.request(MediaType.APPLICATION_XML).get(String.class);
-            System.out.println("tried to get the response");
-            System.out.println(response);
+            //Server delivers false format, conversion here, TODO to fix
+            response = response.replaceAll("&gt;", ">");
+            response = response.replaceAll("&lt;", "<");
+            System.out.println("response formatted: " + response);
             client.close();
-            //            String[] responsear = response.split("((?=<snippet)|(?=<snippet))|((?<=</snippet>)|(?<=/snippet>))");
-            String[] responsear = response.split("(<snippet format=\"html_fully_formatted\">)|</snippet>");
 
-            for (int i = 1; i < (responsear.length); i += 2) {
-                htmlContent = htmlContent + responsear[i] + "<br>";
-                System.out.println(htmlContent);
-            }
-            htmlContent = htmlContent.replaceAll("&gt;", ">");
-            htmlContent = htmlContent.replaceAll("&lt;", "<");
-            System.out.println(htmlContent);
-            this.setText("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>"
-                    + "<a href=\"http://www.feyer.de\">feyer</a>" + "<a href=\"http://www.feyer2.de\">feyer2</a>"
-                    + "</font></body></html>");
+            //make links clickable with a hyperlink listener, opening the browser with a JABREF desktop
             this.addHyperlinkListener(new HyperlinkListener() {
 
                 @Override
@@ -119,8 +118,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                     if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         System.out.println(e.getURL());
                         try {
-                            //new Windows().openFileWithApplication(e.getURL().toString(), ExternalFileTypes.getInstance()
-                            //.getExternalFileTypeByExt("html").get().getOpenWithApplication());
                             new JabRefDesktop().openBrowser(e.getURL().toString());
                         } catch (IOException e1) {
                             // TODO Auto-generated catch block
@@ -143,6 +140,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             System.out.println("ProcessingException");
         }
 
+        //Parsing the response
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
@@ -154,14 +152,9 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes)
                         throws SAXException {
-
-                    //                    System.out.println("Start Element :" + qName);
-                    //                    System.out.println("uri: " + uri);
-                    //                    System.out.println("localName: " + localName);
-
                     if (qName.equalsIgnoreCase("snippet")) {
                         if (attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
-                            System.out.println("dasda: " + qName + attributes.getValue(0));
+                            System.out.println("das da: " + qName + attributes.getValue(0));
                             snippet = true;
                         }
 
@@ -171,26 +164,22 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                 @Override
                 public void endElement(String uri, String localName, String qName) throws SAXException {
 
-                    //                    System.out.println("End Element :" + qName);
-
                 }
 
                 @Override
                 public void characters(char ch[], int start, int length) throws SAXException {
-                    //                    System.out.println("start: " + start);
-                    //                    System.out.println("length: " + length);
+                    System.out.println("start: " + start);
+                    System.out.println("length: " + length);
 
                     if (snippet) {
                         System.out.println("snippet: " + new String(ch, start, length));
-                        htmlContent += htmlContent;
+                        htmlContent = htmlContent + "<li>" + new String(ch, start, length) + "</li>";
                         snippet = false;
                     }
 
                 }
 
             };
-            response = response.replaceAll("&", "&amp;");
-            //            response = response.replaceAll("&lt;", "yyyyy");
             try {
                 InputStream stream = new ByteArrayInputStream(response.getBytes());
                 saxParser.parse(stream, handler);
@@ -205,6 +194,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        this.setText(
+                "<html><head><title></title></head><body bgcolor='#ffffff'><ul>" + htmlContent + "</ul></body></html>");
 
     }
 

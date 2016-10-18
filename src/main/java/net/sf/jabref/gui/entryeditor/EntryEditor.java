@@ -362,15 +362,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         relatedArticlePanel.setName(Localization.lang("Related articles"));
         relatedArticlePanel.setLayout(new BorderLayout());
-        EntryEditorTabRelatedArticles tabbb = new EntryEditorTabRelatedArticles("asd");
-        Thread t = new Thread(tabbb);
+        EntryEditorTabRelatedArticles relatedArticleTab = new EntryEditorTabRelatedArticles("asd");
+        Thread t = new Thread(relatedArticleTab);
         t.start();
-        relatedArticlePanel.add(tabbb);
+        relatedArticlePanel.add(relatedArticleTab);
         //TODO native component, how does it work
         tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
                 relatedArticlePanel, Localization.lang("Show/edit Related articles"));
         tabs.add(relatedArticlePanel);
-        //relatedArticlePanel.setFocusCycleRoot(true);
+        relatedArticlePanel.setFocusCycleRoot(true);
     }
 
     private void addOptionalTab(EntryType type) {
