@@ -148,7 +148,7 @@ URL:     https://swingx.java.net/
 License: LGPL 3.0
 
 Id:      microba
-Path:    lib/microba.jar
+Path:    lib/microba-0.4.4.jar
 Project: Microba
 URL:     https://github.com/tdbear/microba
 License: BSD
