@@ -926,6 +926,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public void setMovingToDifferentEntry() {
         movingToDifferentEntry = true;
+        entry.unregisterListener(this);
     }
 
 
