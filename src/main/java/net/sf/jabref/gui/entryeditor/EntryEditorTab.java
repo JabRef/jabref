@@ -159,7 +159,6 @@ class EntryEditorTab {
                 }
 
                 fieldEditor = new TextArea(field, null, prompt);
-                bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
