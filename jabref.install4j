@@ -750,9 +750,4 @@ return true;</string>
   </mediaSets>
   <buildIds buildAll="true" />
   <buildOptions verbose="false" faster="false" disableSigning="false" disableJreBundling="false" debug="false" />
-  <jvmArguments>
-      <arg>-XX:+UseG1GC</arg>
-      <arg>-XX:+UseStringDeduplication</arg>
-      <arg>-XX:StringTableSize=1000003</arg>
-  </jvmArguments>
 </install4j>
