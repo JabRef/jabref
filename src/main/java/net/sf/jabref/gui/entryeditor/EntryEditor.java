@@ -795,8 +795,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             if (newKey != null) {
                 entry.setCiteKey(newKey);
-            }
-            else {
+            } else {
                 entry.clearCiteKey();
             }
 
