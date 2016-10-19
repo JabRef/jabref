@@ -195,7 +195,6 @@ public class JabRefPreferences {
     public static final String BACKUP = "backup";
 
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
-    public static final String FILE_WORKING_DIRECTORY = "fileWorkingDirectory";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String PREFS_EXPORT_PATH = "prefsExportPath";
@@ -598,7 +597,6 @@ public class JabRefPreferences {
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
-        defaults.put(FILE_WORKING_DIRECTORY, USER_HOME);
         defaults.put(PREFS_EXPORT_PATH, WORKING_DIRECTORY);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
         defaults.put(BACKUP, Boolean.TRUE);
