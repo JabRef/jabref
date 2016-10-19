@@ -1,19 +1,16 @@
 package net.sf.jabref.logic.search;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
-/**
- * @deprecated rewrite this class using the EventBus framework
- */
-@Deprecated
+import com.google.common.eventbus.EventBus;
+
 public class SearchQueryHighlightObservable {
 
-    private final List<SearchQueryHighlightListener> listeners = new ArrayList<>();
+    private final EventBus eventBus = new EventBus();
 
     private Optional<Pattern> pattern = Optional.empty();
 
@@ -23,17 +20,19 @@ public class SearchQueryHighlightObservable {
      *
      * @param newListener SearchQueryHighlightListener to be added
      */
-    public SearchQueryHighlightObservable addSearchListener(SearchQueryHighlightListener newListener) {
+    public void addSearchListener(SearchQueryHighlightListener newListener) {
         Objects.requireNonNull(newListener);
 
-        if (!listeners.contains(newListener)) {
-            listeners.add(newListener);
-            newListener.highlightPattern(pattern);
-        }
+        eventBus.register(newListener);
+        newListener.highlightPattern(pattern);
 
-        return this;
     }
 
+    public void removeSearchListener(SearchQueryHighlightListener listener) {
+        Objects.requireNonNull(listener);
+
+        eventBus.unregister(listener);
+    }
     /**
      * Fires an event if a search was started (or cleared)
      *
@@ -56,9 +55,7 @@ public class SearchQueryHighlightObservable {
 
     private void update() {
         // Fire an event for every listener
-        for (SearchQueryHighlightListener s : listeners) {
-            s.highlightPattern(pattern);
-        }
+        eventBus.post(pattern);
     }
 
     // Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled

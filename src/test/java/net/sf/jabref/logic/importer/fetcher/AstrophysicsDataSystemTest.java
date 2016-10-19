@@ -71,7 +71,7 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("journal", "Living Reviews in Relativity");
         famaeyMcGaughEntry.setField("year", "2012");
         famaeyMcGaughEntry.setField("volume", "15");
-        famaeyMcGaughEntry.setField("month", "#sep#");
+        famaeyMcGaughEntry.setField("month", "#dec#");
         famaeyMcGaughEntry.setField("archiveprefix", "arXiv");
         famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
         famaeyMcGaughEntry.setField("eid", "#10");
