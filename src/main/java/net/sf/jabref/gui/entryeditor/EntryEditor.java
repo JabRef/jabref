@@ -841,7 +841,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
             boolean entryChanged = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
-            entry.setCiteKey(newKey);
+            if (newKey != null) {
+                entry.setCiteKey(newKey);
+            } else {
+                entry.clearCiteKey();
+            }
 
             // First, remove fields that the user has removed.
             for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -1171,11 +1175,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     return;
                 }
 
-                entry.setCiteKey(newValue);
-
                 if (newValue == null) {
+                    entry.clearCiteKey();
                     warnEmptyBibtexkey();
                 } else {
+                    entry.setCiteKey(newValue);
                     boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
