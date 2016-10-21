@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 /**
  * Handling of bibtex fields.
@@ -79,11 +78,10 @@ public class InternalBibtexFields {
             SpecialField.RELEVANCE.getFieldName());
 
     // singleton instance
-    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(
-            SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
+    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(FieldName.TIMESTAMP);
 
 
-    private InternalBibtexFields(boolean serializeSpecialFields, String timeStampFieldName) {
+    private InternalBibtexFields(String timeStampFieldName) {
         fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
@@ -142,11 +140,11 @@ public class InternalBibtexFields {
         // custom fields not displayed at editor, but as columns in the UI
         for (String fieldName : SPECIAL_FIELDS) {
             dummy = new BibtexSingleField(fieldName, false);
-            if (!serializeSpecialFields) {
-                dummy.setPrivate();
-                dummy.setWriteable(false);
-                dummy.setDisplayable(false);
-            }
+
+            dummy.setPrivate();
+            dummy.setWriteable(false);
+            dummy.setDisplayable(false);
+
             add(dummy);
         }
 

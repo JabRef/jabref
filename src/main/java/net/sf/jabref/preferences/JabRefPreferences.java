@@ -82,7 +82,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.model.strings.StringUtil;
@@ -726,15 +725,15 @@ public class JabRefPreferences {
         defaults.put(STYLES_SIZE_X, 600);
         defaults.put(STYLES_SIZE_Y, 400);
 
-        defaults.put(SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
-        defaults.put(SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
-        defaults.put(SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
-        defaults.put(SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
-        defaults.put(SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
-        defaults.put(SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
-        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
-        defaults.put(SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+        defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
+        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.TRUE);
+        defaults.put(SERIALIZESPECIALFIELDS, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
