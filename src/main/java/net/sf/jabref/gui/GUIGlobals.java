@@ -15,7 +15,6 @@ import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

@@ -37,7 +37,6 @@ import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;

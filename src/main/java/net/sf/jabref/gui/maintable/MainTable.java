@@ -48,7 +48,6 @@ import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.EventList;
@@ -62,14 +61,6 @@ import ca.odell.glazedlists.swing.TableComparatorChooser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * The central table which displays the bibtex entries.
- *
- * User: alver
- * Date: Oct 12, 2005
- * Time: 10:29:39 PM
- *
- */
 public class MainTable extends JTable {
 
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);

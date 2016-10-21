@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 /**
  * Comparator that handles the ranking icon column

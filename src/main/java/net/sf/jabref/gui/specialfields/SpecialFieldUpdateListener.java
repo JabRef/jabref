@@ -8,9 +8,9 @@ import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 
 import com.google.common.eventbus.Subscribe;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 
 /**
  * Listener triggering

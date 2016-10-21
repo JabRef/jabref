@@ -11,7 +11,6 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.model.entry.specialfields.SpecialFields;
 
 /**
  * @deprecated the class should be refactored and partly integrated into BibEntry
