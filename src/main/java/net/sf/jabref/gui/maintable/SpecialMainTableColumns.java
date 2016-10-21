@@ -16,9 +16,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
 
-public class SpecialMainTableColumns {
+class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(FieldName.NUMBER_COL) {
+    static final MainTableColumn NUMBER_COL = new MainTableColumn(FieldName.NUMBER_COL) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -31,7 +31,7 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialField.RANKING.getFieldName(),
+    static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialField.RANKING.getFieldName(),
             Collections.singletonList(SpecialField.RANKING.getFieldName()),
             new JLabel(SpecialField.RANKING.getFieldName())) {
 
@@ -43,7 +43,7 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialField.PRIORITY.getFieldName(),
+    static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialField.PRIORITY.getFieldName(),
             Collections.singletonList(SpecialField.PRIORITY.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.PRIORITY).getRepresentingIcon())) {
 
@@ -55,7 +55,7 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialField.READ_STATUS.getFieldName(),
+    static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialField.READ_STATUS.getFieldName(),
             Collections.singletonList(SpecialField.READ_STATUS.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.READ_STATUS).getRepresentingIcon())) {
 
@@ -67,20 +67,20 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialField.RELEVANCE.getFieldName(),
+    static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialField.RELEVANCE.getFieldName(),
             Collections.singletonList(SpecialField.RELEVANCE.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.RELEVANCE).getRepresentingIcon()));
 
-    public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialField.PRINTED.getFieldName(),
+    static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialField.PRINTED.getFieldName(),
             Collections.singletonList(SpecialField.PRINTED.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.PRINTED).getRepresentingIcon()));
 
-    public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialField.QUALITY.getFieldName(),
+    static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialField.QUALITY.getFieldName(),
             Collections.singletonList(SpecialField.QUALITY.getFieldName()),
             new JLabel(new SpecialFieldViewModel(SpecialField.QUALITY).getRepresentingIcon()));
 
 
-    public static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE,
+    static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE,
             Collections.singletonList(FieldName.FILE), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
@@ -110,7 +110,7 @@ public class SpecialMainTableColumns {
      * @param fields     the entry fields which should be shown
      * @return the crated MainTableColumn
      */
-    public static MainTableColumn createIconColumn(String columnName, List<String> fields, JLabel iconLabel) {
+    static MainTableColumn createIconColumn(String columnName, List<String> fields, JLabel iconLabel) {
         return new MainTableColumn(columnName, fields, iconLabel) {
 
             @Override
@@ -144,7 +144,7 @@ public class SpecialMainTableColumns {
      *
      * @return the created MainTableColumn
      */
-    public static MainTableColumn createFileIconColumn(String externalFileTypeName) {
+    static MainTableColumn createFileIconColumn(String externalFileTypeName) {
 
 
 
