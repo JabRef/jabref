@@ -70,8 +70,8 @@ public enum SpecialField {
         return this.keywords;
     }
 
-    public Optional<SpecialFieldValue> parse(String s) {
-        return Optional.ofNullable(map.get(s));
+    public Optional<SpecialFieldValue> parse(String value) {
+        return Optional.ofNullable(map.get(value));
     }
 
     public String getFieldName() {

@@ -97,7 +97,7 @@ public class SpecialFieldsUtils {
         }
 
         KeywordList keywordList = entry.getKeywords(keywordDelimiter);
-        
+
         for(SpecialField field: SpecialField.values()) {
             fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, field, entry));
         }

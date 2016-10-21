@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class SpecialFieldsUtilsTest {
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntry() {
+    public void syncKeywordsFromSpecialFieldsWritesToKeywords() {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
@@ -25,7 +25,7 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundHasEdits() {
+    public void syncKeywordsFromSpecialFieldsCausesChange() {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
         List<FieldChange> changes = SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
@@ -33,7 +33,7 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryExisitingKeyword() {
+    public void syncKeywordsFromSpecialFieldsOverwritesKeywords() {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
         entry.setField("keywords", "rank3");
@@ -42,22 +42,14 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundCorrectContent() {
-        BibEntry entry = new BibEntry();
-        entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
-        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
-    }
-
-    @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundNoEdits() {
+    public void syncKeywordsFromSpecialFieldsForEmptyFieldCausesNoChange() {
         BibEntry entry = new BibEntry();
         List<FieldChange> changes = SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, true, ',');
         assertFalse(changes.size() > 0);
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntry() {
+    public void syncSpecialFieldsFromKeywordWritesToSpecialField() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "rank2");
         SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
@@ -65,7 +57,7 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundHasEdits() {
+    public void syncSpecialFieldsFromKeywordCausesChange() {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "rank2");
         List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
@@ -73,38 +65,9 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundCorrectContent() {
-        BibEntry entry = new BibEntry();
-        entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
-        assertEquals(Optional.of("rank2"), entry.getField("ranking"));
-    }
-
-    @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundNoEdit() {
+    public void syncSpecialFieldsFromKeywordCausesNoChangeWhenKeywordsAreEmpty() {
         BibEntry entry = new BibEntry();
         List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ',');
         assertFalse(changes.size() > 0);
-    }
-
-    @Test
-    public void testGetSpecialFieldInstanceFromFieldNameValid() {
-        assertEquals(Optional.of(SpecialField.RANK),
-                SpecialField.getSpecialFieldInstanceFromFieldName("ranking"));
-    }
-
-    @Test
-    public void testGetSpecialFieldInstanceFromFieldNameInvalid() {
-        assertEquals(Optional.empty(), SpecialField.getSpecialFieldInstanceFromFieldName("title"));
-    }
-
-    @Test
-    public void testIsSpecialFieldTrue() {
-        assertTrue(SpecialField.isSpecialField("ranking"));
-    }
-
-    @Test
-    public void testIsSpecialFieldFalse() {
-        assertFalse(SpecialField.isSpecialField("title"));
     }
 }
