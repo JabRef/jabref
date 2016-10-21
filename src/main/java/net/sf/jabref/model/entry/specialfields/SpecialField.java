@@ -15,9 +15,9 @@ public enum SpecialField {
 
     PRIORITY("priority",
         SpecialFieldValue.CLEAR_PRIORITY,
-        SpecialFieldValue.PRIORITY_1,
-        SpecialFieldValue.PRIORITY_2,
-        SpecialFieldValue.PRIORITY_3
+        SpecialFieldValue.PRIORITY_HIGH,
+        SpecialFieldValue.PRIORITY_MEDIUM,
+        SpecialFieldValue.PRIORITY_LOW
     ),
 
     QUALITY("qualityassured",
