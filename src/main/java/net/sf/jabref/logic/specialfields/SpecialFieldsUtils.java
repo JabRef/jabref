@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.specialfields;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,18 +24,18 @@ import net.sf.jabref.model.entry.specialfields.SpecialField;
 public class SpecialFieldsUtils {
 
     /**
-     * @param e                         - Field to be handled
+     * @param field                         - Field to be handled
      * @param value                     - may be null to state that field should be emptied
-     * @param be                        - BibTeXEntry to be handled
+     * @param entry                        - BibTeXEntry to be handled
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
-    public static List<FieldChange> updateField(SpecialField e, String value, BibEntry be, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+    public static List<FieldChange> updateField(SpecialField field, String value, BibEntry entry, boolean nullFieldIfValueIsTheSame, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
+        UpdateField.updateField(entry, field.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> fieldChanges.add(fieldChange));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(e, be, isKeywordSyncEnabled, keywordDelimiter));
+        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, isKeywordSyncEnabled, keywordDelimiter));
 
         return fieldChanges;
     }
@@ -58,28 +59,28 @@ public class SpecialFieldsUtils {
     /**
      * Update keywords according to values of special fields
      */
-    public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry be, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+    public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry entry, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         for(SpecialField field: SpecialField.values()) {
-            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, be, isKeywordSyncEnabled, keywordDelimiter));
+            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, isKeywordSyncEnabled, keywordDelimiter));
         }
-        
+
         return fieldChanges;
     }
 
-    private static List<FieldChange> importKeywordsForField(KeywordList keywordList, SpecialField c, BibEntry be) {
+    private static List<FieldChange> importKeywordsForField(KeywordList keywordList, SpecialField field, BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-        KeywordList values = c.getKeyWords();
+        KeywordList values = field.getKeyWords();
         Optional<Keyword> newValue = Optional.empty();
-        for (Keyword val : values) {
-            if (keywordList.contains(val)) {
-                newValue = Optional.of(val);
+        for (Keyword keyword : values) {
+            if (keywordList.contains(keyword)) {
+                newValue = Optional.of(keyword);
                 break;
             }
         }
 
-        UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue.map(Keyword::toString).orElse(null))
+        UpdateField.updateNonDisplayableField(entry, field.getFieldName(), newValue.map(Keyword::toString).orElse(null))
                 .ifPresent(fieldChange -> {
                     fieldChanges.add(fieldChange);
                 });
@@ -89,19 +90,17 @@ public class SpecialFieldsUtils {
     /**
      * updates field values according to keywords
      */
-    public static List<FieldChange> syncSpecialFieldsFromKeywords(BibEntry be, Character keywordDelimiter) {
+    public static List<FieldChange> syncSpecialFieldsFromKeywords(BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-        if (!be.hasField(FieldName.KEYWORDS)) {
+        if (!entry.hasField(FieldName.KEYWORDS)) {
             return fieldChanges;
         }
-        KeywordList keywordList = be.getKeywords(keywordDelimiter);
 
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRIORITY, be));
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RANK, be));
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.QUALITY, be));
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.RELEVANCE, be));
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.READ_STATUS, be));
-        fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, SpecialField.PRINTED, be));
+        KeywordList keywordList = entry.getKeywords(keywordDelimiter);
+        
+        for(SpecialField field: SpecialField.values()) {
+            fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, field, entry));
+        }
 
         return fieldChanges;
     }
