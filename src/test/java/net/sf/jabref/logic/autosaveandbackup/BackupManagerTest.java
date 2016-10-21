@@ -12,7 +12,7 @@ public class BackupManagerTest {
     public void testBackupFileNameGenerationWithLinuxPath() {
         Path bibPath = Paths.get("tmp", "test.bib");
         Path savPath = BackupManager.getBackupPath(bibPath);
-        Assert.assertEquals(Paths.get("tmp", "test.sav"), savPath);
+        Assert.assertEquals(Paths.get("tmp", "test.bib.sav"), savPath);
     }
 
 }

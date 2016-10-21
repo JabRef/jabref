@@ -99,7 +99,7 @@ public class BackupManager {
     static Path getBackupPath(Path originalPath) {
         Objects.requireNonNull(originalPath.getParent());
         Path oldFileName = originalPath.getFileName();
-        String newFileName = oldFileName.toString().replace(".bib", BACKUP_FILENAME_ENDING);
+        String newFileName = oldFileName.toString() + BACKUP_FILENAME_ENDING;
         return originalPath.getParent().resolve(newFileName);
     }
 
