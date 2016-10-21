@@ -9,22 +9,22 @@ import net.sf.jabref.model.entry.KeywordList;
 
 public enum SpecialField {
 
-    PRINTED("printed", true,
+    PRINTED("printed",
         SpecialFieldValue.PRINTED
     ),
 
-    PRIORITY("priority", false,
+    PRIORITY("priority",
         SpecialFieldValue.CLEAR_PRIORITY,
         SpecialFieldValue.PRIO_1,
         SpecialFieldValue.PRIO_2,
         SpecialFieldValue.PRIO_3
     ),
 
-    QUALITY("qualityassured", true,
+    QUALITY("qualityassured",
         SpecialFieldValue.QUALITY_ASSURED
     ),
 
-    RANK("ranking", false,
+    RANK("ranking",
         SpecialFieldValue.CLEAR_RANK,
         SpecialFieldValue.RANK_1,
         SpecialFieldValue.RANK_2,
@@ -33,13 +33,13 @@ public enum SpecialField {
         SpecialFieldValue.RANK_5
     ),
 
-    READ_STATUS("readstatus", false,
+    READ_STATUS("readstatus",
         SpecialFieldValue.CLEAR_READ_STATUS,
         SpecialFieldValue.READ,
         SpecialFieldValue.SKIMMED
     ),
 
-    RELEVANCE("relevance", true,
+    RELEVANCE("relevance",
         SpecialFieldValue.RELEVANT
     );
 
@@ -47,11 +47,9 @@ public enum SpecialField {
     private KeywordList keywords;
     private HashMap<String, SpecialFieldValue> map;
     private String fieldName;
-    private boolean isSingleFieldValue;
 
-    SpecialField(String fieldName, boolean isSingleFieldValue, SpecialFieldValue... values) {
+    SpecialField(String fieldName, SpecialFieldValue... values) {
         this.fieldName = fieldName;
-        this.isSingleFieldValue = isSingleFieldValue;
         this.values = new ArrayList<>();
         this.keywords = new KeywordList();
         this.map = new HashMap<>();
@@ -79,7 +77,7 @@ public enum SpecialField {
     }
 
     public boolean isSingleValueField() {
-        return isSingleFieldValue;
+        return this.values.size() == 1;
     }
 
     public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
