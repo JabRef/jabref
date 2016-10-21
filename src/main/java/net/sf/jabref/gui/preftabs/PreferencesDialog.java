@@ -158,7 +158,7 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
+            FileDialog dialog = new FileDialog(frame, getPrefsExportPath()).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
@@ -203,6 +203,10 @@ public class PreferencesDialog extends JDialog {
 
         pack();
 
+    }
+
+    private String getPrefsExportPath() {
+        return Globals.prefs.get(JabRefPreferences.PREFS_EXPORT_PATH);
     }
 
     private void updateAfterPreferenceChanges() {
@@ -268,6 +272,7 @@ public class PreferencesDialog extends JDialog {
                 try {
                     storeAllSettings();
                     Globals.prefs.exportPreferences(exportFile.toString());
+                    Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
