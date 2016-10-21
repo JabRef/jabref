@@ -31,15 +31,15 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialField.RANK.getFieldName(),
-            Collections.singletonList(SpecialField.RANK.getFieldName()),
-            new JLabel(SpecialField.RANK.getFieldName())) {
+    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialField.RANKING.getFieldName(),
+            Collections.singletonList(SpecialField.RANKING.getFieldName()),
+            new JLabel(SpecialField.RANKING.getFieldName())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getField(SpecialField.RANK.getFieldName())
-                    .flatMap(SpecialField.RANK::parse).map(rank -> new SpecialFieldValueViewModel(rank).createSpecialFieldValueLabel()).orElse(null);
+            return entry.getField(SpecialField.RANKING.getFieldName())
+                    .flatMap(SpecialField.RANKING::parse).map(rank -> new SpecialFieldValueViewModel(rank).createSpecialFieldValueLabel()).orElse(null);
         }
     };
 

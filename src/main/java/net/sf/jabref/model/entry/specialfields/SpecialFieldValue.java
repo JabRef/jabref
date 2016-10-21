@@ -8,9 +8,9 @@ public enum SpecialFieldValue {
 
     PRINTED("printed"),
     CLEAR_PRIORITY(null),
-    PRIO_1("prio1"),
-    PRIO_2("prio2"),
-    PRIO_3("prio3"),
+    PRIORITY_1("prio1"),
+    PRIORITY_2("prio2"),
+    PRIORITY_3("prio3"),
     QUALITY_ASSURED("qualityAssured"),
     CLEAR_RANK(null),
     RANK_1("rank1"),

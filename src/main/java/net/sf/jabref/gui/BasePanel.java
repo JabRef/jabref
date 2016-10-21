@@ -665,8 +665,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         for (SpecialFieldValue prio : SpecialField.PRIORITY.getValues()) {
             actions.put(new SpecialFieldValueViewModel(prio).getActionName(), new SpecialFieldViewModel(SpecialField.PRIORITY).getSpecialFieldAction(prio, this.frame));
         }
-        for (SpecialFieldValue rank : SpecialField.RANK.getValues()) {
-            actions.put(new SpecialFieldValueViewModel(rank).getActionName(), new SpecialFieldViewModel(SpecialField.RANK).getSpecialFieldAction(rank, this.frame));
+        for (SpecialFieldValue rank : SpecialField.RANKING.getValues()) {
+            actions.put(new SpecialFieldValueViewModel(rank).getActionName(), new SpecialFieldViewModel(SpecialField.RANKING).getSpecialFieldAction(rank, this.frame));
         }
         for (SpecialFieldValue status : SpecialField.READ_STATUS.getValues()) {
             actions.put(new SpecialFieldValueViewModel(status).getActionName(), new SpecialFieldViewModel(SpecialField.READ_STATUS).getSpecialFieldAction(status, this.frame));

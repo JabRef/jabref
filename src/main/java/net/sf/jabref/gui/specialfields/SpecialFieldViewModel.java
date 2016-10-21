@@ -36,7 +36,7 @@ public class SpecialFieldViewModel {
                 return IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
             case QUALITY:
                 return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
-            case RANK:
+            case RANKING:
                 return IconTheme.JabRefIcon.RANKING.getIcon();
             case READ_STATUS:
                 return IconTheme.JabRefIcon.READ_STATUS.getSmallIcon();
@@ -55,7 +55,7 @@ public class SpecialFieldViewModel {
                 return Localization.lang("Priority");
             case QUALITY:
                 return Localization.lang("Quality");
-            case RANK:
+            case RANKING:
                 return Localization.lang("Rank");
             case READ_STATUS:
                 return Localization.lang("Read status");

@@ -74,7 +74,7 @@ public class InternalBibtexFields {
 
     private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
             SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
-            SpecialField.RANK.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
+            SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
             SpecialField.RELEVANCE.getFieldName());
 
     // singleton instance

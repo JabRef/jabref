@@ -121,10 +121,10 @@ public class GUIGlobals {
         GUIGlobals.TABLE_ICONS.put(SpecialField.QUALITY.getFieldName(), label);
 
         // Ranking item in the menu uses one star
-        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANK);
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING);
         label = new JLabel(rankViewModel.getRepresentingIcon());
         label.setToolTipText(rankViewModel.getLocalization());
-        GUIGlobals.TABLE_ICONS.put(SpecialField.RANK.getFieldName(), label);
+        GUIGlobals.TABLE_ICONS.put(SpecialField.RANKING.getFieldName(), label);
 
         // Priority icon used for the menu
         SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY);

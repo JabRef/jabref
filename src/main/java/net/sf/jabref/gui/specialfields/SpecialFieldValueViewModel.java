@@ -27,11 +27,11 @@ public class SpecialFieldValueViewModel {
                 return IconTheme.JabRefIcon.PRINTED.getSmallIcon();
             case CLEAR_PRIORITY:
                 return null;
-            case PRIO_1:
+            case PRIORITY_1:
                 return IconTheme.JabRefIcon.PRIORITY_HIGH.getSmallIcon();
-            case PRIO_2:
+            case PRIORITY_2:
                 return IconTheme.JabRefIcon.PRIORITY_MEDIUM.getSmallIcon();
-            case PRIO_3:
+            case PRIORITY_3:
                 return IconTheme.JabRefIcon.PRIORITY_LOW.getSmallIcon();
             case QUALITY_ASSURED:
                 return IconTheme.JabRefIcon.QUALITY_ASSURED.getSmallIcon();
@@ -73,11 +73,11 @@ public class SpecialFieldValueViewModel {
                 return Localization.lang("Toggle print status");
             case CLEAR_PRIORITY:
                 return Localization.lang("Clear priority");
-            case PRIO_1:
+            case PRIORITY_1:
                 return Localization.lang("Set priority to high");
-            case PRIO_2:
+            case PRIORITY_2:
                 return Localization.lang("Set priority to medium");
-            case PRIO_3:
+            case PRIORITY_3:
                 return Localization.lang("Set priority to low");
             case QUALITY_ASSURED:
                 return Localization.lang("Toggle quality assured");
@@ -113,11 +113,11 @@ public class SpecialFieldValueViewModel {
                 return Localization.lang("Toggle print status");
             case CLEAR_PRIORITY:
                 return Localization.lang("No priority information");
-            case PRIO_1:
+            case PRIORITY_1:
                 return Localization.lang("Priority high");
-            case PRIO_2:
+            case PRIORITY_2:
                 return Localization.lang("Priority medium");
-            case PRIO_3:
+            case PRIORITY_3:
                 return Localization.lang("Priority low");
             case QUALITY_ASSURED:
                 return Localization.lang("Toggle quality assured");
@@ -153,11 +153,11 @@ public class SpecialFieldValueViewModel {
                 return "togglePrinted";
             case CLEAR_PRIORITY:
                 return "clearPriority";
-            case PRIO_1:
+            case PRIORITY_1:
                 return "setPriority1";
-            case PRIO_2:
+            case PRIORITY_2:
                 return "setPriority2";
-            case PRIO_3:
+            case PRIORITY_3:
                 return "setPriority3";
             case QUALITY_ASSURED:
                 return "toggleQualityAssured";

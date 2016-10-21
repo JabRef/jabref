@@ -109,7 +109,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 JMenu rankingMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankingMenu, SpecialField.RANK, frame);
+                RightClickMenu.populateSpecialFieldMenu(rankingMenu, SpecialField.RANKING, frame);
                 add(rankingMenu);
             }
 

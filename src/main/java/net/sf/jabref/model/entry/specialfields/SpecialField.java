@@ -15,16 +15,16 @@ public enum SpecialField {
 
     PRIORITY("priority",
         SpecialFieldValue.CLEAR_PRIORITY,
-        SpecialFieldValue.PRIO_1,
-        SpecialFieldValue.PRIO_2,
-        SpecialFieldValue.PRIO_3
+        SpecialFieldValue.PRIORITY_1,
+        SpecialFieldValue.PRIORITY_2,
+        SpecialFieldValue.PRIORITY_3
     ),
 
     QUALITY("qualityassured",
         SpecialFieldValue.QUALITY_ASSURED
     ),
 
-    RANK("ranking",
+    RANKING("ranking",
         SpecialFieldValue.CLEAR_RANK,
         SpecialFieldValue.RANK_1,
         SpecialFieldValue.RANK_2,
@@ -87,7 +87,7 @@ public enum SpecialField {
             case "qualityassured":
                 return Optional.of(SpecialField.QUALITY);
             case "ranking":
-                return Optional.of(SpecialField.RANK);
+                return Optional.of(SpecialField.RANKING);
             case "readstatus":
                 return Optional.of(SpecialField.RELEVANCE);
             case "relevance":

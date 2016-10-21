@@ -17,8 +17,8 @@ public class RankingFieldComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-        Optional<String> val1 = e1.getField(SpecialField.RANK.getFieldName());
-        Optional<String> val2 = e2.getField(SpecialField.RANK.getFieldName());
+        Optional<String> val1 = e1.getField(SpecialField.RANKING.getFieldName());
+        Optional<String> val2 = e2.getField(SpecialField.RANKING.getFieldName());
         if (val1.isPresent()) {
             if (val2.isPresent()) {
                 // val1 is not null AND val2 is not null

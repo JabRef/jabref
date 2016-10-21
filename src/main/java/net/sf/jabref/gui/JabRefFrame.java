@@ -1173,7 +1173,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             boolean menuitem = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 rankSubMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.RANK, this);
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, SpecialField.RANKING, this);
                 edit.add(rankSubMenu);
                 menuitem = true;
             }
@@ -1434,7 +1434,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 JButton button = SpecialFieldDropDown
-                        .generateSpecialFieldButtonWithDropDown(SpecialField.RANK, this);
+                        .generateSpecialFieldButtonWithDropDown(SpecialField.RANKING, this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }

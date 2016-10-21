@@ -14,7 +14,7 @@ public class SpecialFieldTest {
 
     @Test
     public void getSpecialFieldInstanceFromFieldNameValid() {
-        assertEquals(Optional.of(SpecialField.RANK),
+        assertEquals(Optional.of(SpecialField.RANKING),
                 SpecialField.getSpecialFieldInstanceFromFieldName("ranking"));
     }
 
