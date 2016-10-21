@@ -61,13 +61,10 @@ public class SpecialFieldsUtils {
     public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry be, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRIORITY, be, isKeywordSyncEnabled, keywordDelimiter));
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RANK, be, isKeywordSyncEnabled, keywordDelimiter));
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.RELEVANCE, be, isKeywordSyncEnabled, keywordDelimiter));
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.QUALITY, be, isKeywordSyncEnabled, keywordDelimiter));
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.READ_STATUS, be, isKeywordSyncEnabled, keywordDelimiter));
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(SpecialField.PRINTED, be, isKeywordSyncEnabled, keywordDelimiter));
-
+        for(SpecialField field: SpecialField.values()) {
+            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, be, isKeywordSyncEnabled, keywordDelimiter));
+        }
+        
         return fieldChanges;
     }
 
