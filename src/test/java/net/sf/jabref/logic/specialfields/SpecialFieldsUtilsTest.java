@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
 
 import org.junit.Test;
 
