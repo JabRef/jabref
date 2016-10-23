@@ -157,6 +157,12 @@ class EntryEditorTab {
                 if (field.equals(FieldName.AUTHOR) || field.equals(FieldName.EDITOR)) {
                     prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
                 }
+                if (field.equals(FieldName.YEAR)) {
+                    prompt = String.format("yyyy");
+                }
+                if (field.equals(FieldName.DATE)) {
+                    prompt = String.format("yyyy-mm-dd");
+                }
 
                 fieldEditor = new TextArea(field, null, prompt);
                 parent.addSearchListener((TextArea) fieldEditor);
