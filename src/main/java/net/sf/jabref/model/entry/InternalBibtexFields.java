@@ -41,8 +41,8 @@ public class InternalBibtexFields {
             FieldName.CTLUSE_PAPER, FieldName.CTLUSE_URL, FieldName.CTLUSE_FORCED_ETAL, FieldName.CTLUSE_ALT_SPACING,
             FieldName.CTLDASH_REPEATED_NAMES);
 
-    private static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate",
-            FieldName.URLDATE);
+    private static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, FieldName.EVENTDATE,
+            FieldName.ORIGDATE, FieldName.URLDATE);
 
     private static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR,
             "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction",

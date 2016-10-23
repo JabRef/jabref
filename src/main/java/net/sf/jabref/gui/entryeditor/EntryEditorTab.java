@@ -158,10 +158,14 @@ class EntryEditorTab {
                     prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
                 }
                 if (field.equals(FieldName.YEAR)) {
-                    prompt = String.format("yyyy");
+                    prompt = String.format("YYYY");
                 }
-                if (field.equals(FieldName.DATE)) {
-                    prompt = String.format("yyyy-mm-dd");
+                if (field.equals(FieldName.DATE) || field.equals(FieldName.URLDATE) || field.equals(FieldName.EVENTDATE)
+                        || field.equals(FieldName.ORIGDATE)) {
+                    prompt = String.format("YYYY-MM-DD");
+                }
+                if (field.equals(FieldName.URL)) {
+                    prompt = String.format("http://");
                 }
 
                 fieldEditor = new TextArea(field, null, prompt);

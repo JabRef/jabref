@@ -45,6 +45,7 @@ public class FieldName {
     public static final String EPRINTCLASS = "eprintclass";
     public static final String EPRINTTYPE = "eprinttype";
     public static final String EVENTTITLE = "eventtitle";
+    public static final String EVENTDATE = "eventdate";
     public static final String FILE = "file";
     public static final String FOLDER = "folder";
     public static final String GENDER = "gender";
@@ -73,6 +74,7 @@ public class FieldName {
     public static final String NOTE = "note";
     public static final String NUMBER = "number";
     public static final String ORGANIZATION = "organization";
+    public static final String ORIGDATE = "origdate";
     public static final String ORIGLANGUAGE = "origlanguage";
     public static final String PAGES = "pages";
     public static final String PAGETOTAL = "pagetotal";
