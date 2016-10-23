@@ -166,15 +166,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     // text area from getting updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
-    private boolean lastSourceAccepted = true; // This indicates whether the last
-
-    // attempt
+    private boolean lastFieldAccepted = true;
+    private boolean lastSourceAccepted = true; // This indicates whether the last attempt
     // at parsing the source was successful. It is used to determine whether the
     // dialog should close; it should stay open if the user received an error
     // message about the source, whatever he or she chose to do about it.
-    private String lastSourceStringAccepted; // This is used to prevent double
-
-    // fields.
+    private String lastSourceStringAccepted; // This is used to prevent double fields.
     // These values can be used to calculate the preferred height for the form.
     // reqW starts at 1 because it needs room for the bibtex key field.
     private int sourceIndex = -1; // The index the source panel has in tabbed.
@@ -1068,9 +1065,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
             updateField(source);
             if (lastSourceAccepted) {
                 panel.entryEditorClosing(EntryEditor.this);
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastSourceAccepted = true;
             }
         } else {
-            panel.entryEditorClosing(EntryEditor.this);
+            if (lastFieldAccepted) {
+                panel.entryEditorClosing(EntryEditor.this);
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
         }
     }
 
@@ -1083,6 +1088,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
             close();
+
         }
     }
 
@@ -1118,6 +1124,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
+                    lastFieldAccepted = false;
                     textField.setInvalidBackgroundColor();
                     if (!SwingUtilities.isEventDispatchThread()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
@@ -1224,6 +1231,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         updateSource();
                         panel.markBaseChanged();
                     } catch (IllegalArgumentException ex) {
+                        lastFieldAccepted = false;
                         fieldEditor.setInvalidBackgroundColor();
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
