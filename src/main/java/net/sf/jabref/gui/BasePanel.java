@@ -1645,7 +1645,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // We must instantiate a new editor. First make sure the old one
         // stores its last edit:
-        this.runCommand(Actions.SAVE);
+        storeCurrentEdit();
         // Then start the new one:
         entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
