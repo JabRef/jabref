@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,6 +20,7 @@ import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -97,10 +97,7 @@ public class BackupManager {
     }
 
     static Path getBackupPath(Path originalPath) {
-        Objects.requireNonNull(originalPath.getParent());
-        Path oldFileName = originalPath.getFileName();
-        String newFileName = oldFileName.toString() + BACKUP_FILENAME_ENDING;
-        return originalPath.getParent().resolve(newFileName);
+        return FileUtil.addExtension(originalPath, BACKUP_FILENAME_ENDING);
     }
 
     /**
