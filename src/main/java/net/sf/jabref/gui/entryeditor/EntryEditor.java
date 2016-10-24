@@ -356,20 +356,33 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-
+    /*
+     * Creates the related Article Tab
+     */
     private void addRelatedArticlesTab(String title) {
+        //Getting the title of the selected element
         title = entry.getField("title").toString().replaceAll("\\{|\\[|\\]|\\}|(Optional)", "");
 
+        //localization is not yet set
         relatedArticlePanel.setName(Localization.lang("Related articles"));
         relatedArticlePanel.setLayout(new BorderLayout());
-        EntryEditorTabRelatedArticles relatedArticleTab = new EntryEditorTabRelatedArticles("asd");
+
+        //Creating a new Related Articles Tab. Necessary to create every time a new one?
+        EntryEditorTabRelatedArticles relatedArticleTab = new EntryEditorTabRelatedArticles(title);
+
+        //adding the Panel to the Tab
+        relatedArticlePanel.add(relatedArticleTab);
+
+        //Starting the Thread that makes the request to the server
         Thread t = new Thread(relatedArticleTab);
         t.start();
-        relatedArticlePanel.add(relatedArticleTab);
-        //TODO native component, how does it work
+
+        //TODO native component, check: how does it work
         tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
                 relatedArticlePanel, Localization.lang("Show/edit Related articles"));
         tabs.add(relatedArticlePanel);
+
+        //CP, TODO check what this is doing
         relatedArticlePanel.setFocusCycleRoot(true);
     }
 

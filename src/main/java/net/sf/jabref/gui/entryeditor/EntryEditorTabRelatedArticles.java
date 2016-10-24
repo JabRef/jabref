@@ -34,23 +34,42 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
+ *Works only 5 times. TODO: Check why
  *
  */
 public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnable {
 
+    //The title of the selected entry, transfered to server
     private String request;
+
+    //The content displayed in the tab
     private String htmlContent = "";
-    private final String htmlContentLoading;
+
+    //Default content while getting the server content from the server
+    private String htmlContentLoading = "";
+
+    //Stores the single recommendations in html format
     private final String[] htmlSnippets = new String[10];
+
+    //The response from the server
     private String response;
 
 
+    //Constructor initialised with the default content.
     public EntryEditorTabRelatedArticles(String request) {
         this.setContentType("text/html");
         this.request = request;
         this.setEditable(false);
+        setDefaultContent();
+    }
+
+    /*
+     * Sets the default content. Like a "loading screen".
+     * With a gif as animation (gif is only a placeholder and can be adjusted at any time).
+     */
+    private void setDefaultContent() {
         //What is the best way to include that gif?
+        //File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPreferences.getInstance().getFileDirectoryPreferences()).get();
         URL url = getClass().getResource("loading_animation.gif");
         System.out.println(url);
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
@@ -65,11 +84,17 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
 
 
 
+    /*
+     *Makes a REST request in an own Thread. Parses the resopns and formats it into the panel.
+     *At the very end, the panel is updated (setText()) with the 6 recommendations
+     */
     @Override
     public void run() {
+        System.out.println("----- Thread Started -----");
         try {
             SSLContext sc = SSLContext.getInstance("TLSv1");
             System.setProperty("https.protocols", "TLSv1");
+            //Manages certificates for SSL communication
             TrustManager[] trustAllCerts = {new X509TrustManager() {
 
                 @Override
@@ -92,6 +117,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             }};
             System.out.println("TrustManager setup complete");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
+
+            //Returns true, accepts all certificates. To change.
             HostnameVerifier allHostsValid = new HostnameVerifier() {
 
                 @Override
@@ -100,17 +127,21 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                     return true;
                 }
             };
+
+            //Makes a request to the RESTful MDL-API. Example document.
+            //Servers-side implementations in implementation.
             Client client = ClientBuilder.newBuilder().sslContext(sc).hostnameVerifier(allHostsValid).build();
             WebTarget mdlServer = client
                     .target("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000003299/related_documents/");
             response = mdlServer.request(MediaType.APPLICATION_XML).get(String.class);
-            //Server delivers false format, conversion here, TODO to fix
+
+            //Conversion. Server delivers false format, conversion here, TODO to fix
             response = response.replaceAll("&gt;", ">");
             response = response.replaceAll("&lt;", "<");
             System.out.println("response formatted: " + response);
             client.close();
 
-            //make links clickable with a hyperlink listener, opening the browser with a JABREF desktop
+            //Makes links clickable with a hyperlink listener, opening the browser with a JABREF desktop
             this.addHyperlinkListener(new HyperlinkListener() {
 
                 @Override
@@ -140,7 +171,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             System.out.println("ProcessingException");
         }
 
-        //Parsing the response
+        //Parsing the response with a SAX parser
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
@@ -154,7 +185,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
                         throws SAXException {
                     if (qName.equalsIgnoreCase("snippet")) {
                         if (attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
-                            System.out.println("das da: " + qName + attributes.getValue(0));
+                            //System.out.println("qualified name and atrribute value: " + qName + attributes.getValue(0));
                             snippet = true;
                         }
 
@@ -168,8 +199,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
 
                 @Override
                 public void characters(char ch[], int start, int length) throws SAXException {
-                    System.out.println("start: " + start);
-                    System.out.println("length: " + length);
 
                     if (snippet) {
                         System.out.println("snippet: " + new String(ch, start, length));
@@ -194,6 +223,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        //Updates the content with the 6 recommentations
         this.setText(
                 "<html><head><title></title></head><body bgcolor='#ffffff'><ul>" + htmlContent + "</ul></body></html>");
 
