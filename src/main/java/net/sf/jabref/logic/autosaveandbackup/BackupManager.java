@@ -37,7 +37,7 @@ public class BackupManager {
 
     private static final Log LOGGER = LogFactory.getLog(BackupManager.class);
 
-    private static final String BACKUP_FILENAME_ENDING = ".sav";
+    private static final String BACKUP_EXTENSION = ".sav";
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
@@ -97,7 +97,7 @@ public class BackupManager {
     }
 
     static Path getBackupPath(Path originalPath) {
-        return FileUtil.addExtension(originalPath, BACKUP_FILENAME_ENDING);
+        return FileUtil.addExtension(originalPath, BACKUP_EXTENSION);
     }
 
     /**
