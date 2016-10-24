@@ -11,6 +11,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
@@ -29,6 +30,7 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -70,7 +72,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
     private void setDefaultContent() {
         //What is the best way to include that gif?
         //AuxCommandLineTest.class.getResource("paper.aux");
-        //File f = Paths.get(url.toUri()).toFile(); 
+        //File f = Paths.get(url.toUri()).toFile();
         //concrete example
         //File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         URL url = getClass().getResource("loading_animation.gif");

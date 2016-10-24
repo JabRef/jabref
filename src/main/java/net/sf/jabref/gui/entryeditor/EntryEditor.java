@@ -48,7 +48,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
+
 import net.sf.jabref.Globals;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.GUIGlobals;
