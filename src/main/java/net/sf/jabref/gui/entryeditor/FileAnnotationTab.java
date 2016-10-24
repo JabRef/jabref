@@ -101,8 +101,7 @@ public class FileAnnotationTab extends JPanel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            tab.setUpPdfCommentsPanel();
-            tab.setUpInformationPanel();
+            tab.setupGui();
 
             tab.isInitialized = true;
             return tab;
@@ -197,7 +196,7 @@ public class FileAnnotationTab extends JPanel {
         updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem().toString()));
     }
 
-    private void setUpPdfCommentsPanel() {
+    private void setupGui() {
         JPanel commentListPanel = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, fill:pref:grow, $lg, pref")
@@ -208,10 +207,6 @@ public class FileAnnotationTab extends JPanel {
                 .build();
         commentScrollPane.setViewportView(commentList);
 
-        this.add(commentListPanel);
-    }
-
-    private void setUpInformationPanel(){
         JPanel informationPanel  = FormBuilder.create()
                 .columns("pref:grow, $lcgap, pref:grow")
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref:grow, $lg, pref:grow, $lg, fill:pref")
@@ -255,7 +250,12 @@ public class FileAnnotationTab extends JPanel {
         fileNameComboBox.setEditable(false);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
 
-        this.add(informationPanel);
+        this.add(FormBuilder.create()
+                .columns("0:grow, $lcgap, 0:grow")
+                .rows("fill:pref:grow")
+                .add(commentListPanel).xy(1, 1)
+                .add(informationPanel).xy(3, 1)
+                .build());
     }
 
     private JPanel setUpButtons(){
