@@ -2,9 +2,11 @@ package net.sf.jabref.gui.exporter;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
+import java.security.SecureRandom;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -14,12 +16,16 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
+import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.autosave.AutosaveUIManager;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
+import net.sf.jabref.logic.autosaveandbackup.AutosaveManager;
+import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -29,8 +35,14 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.model.database.event.ChangePropagation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.DBMSConnectionProperties;
+import net.sf.jabref.shared.DBMSProcessor;
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -134,7 +146,6 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             if (success) {
                 panel.getUndoManager().markUnchanged();
-                AutoSaveManager.deleteAutoSaveFile(panel);
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:
@@ -232,7 +243,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         try {
             if (success) {
                 session.commit(file.toPath());
-                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
+                // Make sure to remember which encoding we used.
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
             } else {
                 session.cancel();
             }
@@ -244,7 +256,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
                 session.commit(file.toPath());
-                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding);
+                panel.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);
             } else {
                 success = false;
             }
@@ -303,24 +315,56 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         }
 
-        File oldFile = panel.getBibDatabaseContext().getDatabaseFile().orElse(null);
-        panel.getBibDatabaseContext().setDatabaseFile(file);
+        BibDatabaseContext context = panel.getBibDatabaseContext();
+
+        if (context.getLocation() == DatabaseLocation.SHARED) {
+            // Generate an ID when saving a shared database
+            String databaseID = new BigInteger(128, new SecureRandom()).toString(32);
+            context.getDatabase().setDatabaseID(databaseID);
+            DBMSProcessor dbmsProcessor = context.getDBMSSynchronizer().getDBProcessor();
+            DBMSConnectionProperties properties = dbmsProcessor.getDBMSConnectionProperties();
+            // Save all properties dependent on the ID. This makes it possible to restore them.
+            new SharedDatabasePreferences(databaseID).putAllDBMSConnectionProperties(properties);
+        }
+
+        context.setDatabaseFile(file);
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
-            panel.getBibDatabaseContext().setDatabaseFile(oldFile);
+            context.setDatabaseFile(context.getDatabaseFile().orElse(null));
             return;
         }
         // Register so we get notifications about outside changes to the file.
+
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
-                    panel.getBibDatabaseContext().getDatabaseFile().orElse(null)));
+                    context.getDatabaseFile().orElse(null)));
         } catch (IOException ex) {
             LOGGER.error("Problem registering file change notifications", ex);
         }
-        frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().get().getPath());
+
+        if (readyForAutosave(context)) {
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(panel));
+        }
+
+        if (readyForBackup(context)) {
+            BackupManager.start(context);
+        }
+
+        context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
         frame.updateEnabledState();
+    }
+
+    private boolean readyForAutosave(BibDatabaseContext context) {
+        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
+                context.getDatabaseFile().isPresent();
+    }
+
+    private boolean readyForBackup(BibDatabaseContext context) {
+        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
     }
 
     /**
@@ -381,7 +425,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.setUpdatedExternally(false);
-                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
+                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
                             } else {
                                 canceled = true;
                             }
@@ -399,7 +443,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     canceled = true;
                 } else {
                     panel.setUpdatedExternally(false);
-                    panel.getSidePaneManager().hide("fileUpdate");
+                    panel.getSidePaneManager().hide(FileUpdatePanel.class);
                 }
             }
         }

@@ -284,4 +284,8 @@ public class AutoCompleteSupport<E> {
         popup.setVisible(visible);
     }
 
+    public boolean isVisible() {
+        return popup.isVisible();
+    }
+
 }

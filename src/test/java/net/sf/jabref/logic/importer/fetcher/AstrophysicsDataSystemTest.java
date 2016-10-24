@@ -71,10 +71,12 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("journal", "Living Reviews in Relativity");
         famaeyMcGaughEntry.setField("year", "2012");
         famaeyMcGaughEntry.setField("volume", "15");
-        famaeyMcGaughEntry.setField("month", "#sep#");
+        famaeyMcGaughEntry.setField("month", "#dec#");
         famaeyMcGaughEntry.setField("archiveprefix", "arXiv");
         famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
+        famaeyMcGaughEntry.setField("eid", "10");
         famaeyMcGaughEntry.setField("eprint", "1112.3960");
+        famaeyMcGaughEntry.setField("pages", "10");
         famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
 
         sunWelchEntry = new BibEntry();

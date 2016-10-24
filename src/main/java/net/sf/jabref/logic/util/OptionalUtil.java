@@ -16,7 +16,7 @@ public class OptionalUtil {
         }
     }
 
-    @SuppressWarnings("varargs")
+    @SafeVarargs
     public static <T> List<T> toList(Optional<T>... values) {
         return Stream.of(values).flatMap(optional -> toList(optional).stream()).collect(Collectors.toList());
     }

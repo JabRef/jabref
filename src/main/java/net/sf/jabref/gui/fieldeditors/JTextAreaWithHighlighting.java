@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -20,13 +19,14 @@ import javax.swing.undo.UndoManager;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.util.component.JTextAreaWithPlaceholder;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
+public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implements SearchQueryHighlightListener {
 
     private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
@@ -35,13 +35,22 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
     private UndoManager undo;
 
     public JTextAreaWithHighlighting() {
-        super();
-        setupUndoRedo();
-        setupPasteListener();
+        this("");
     }
 
-    JTextAreaWithHighlighting(String text) {
-        super(text);
+    public JTextAreaWithHighlighting(String text) {
+        this(text, "");
+    }
+
+    /**
+     * Creates a text area with the ability to highlight parts of the content.
+     * It also defines a placeholder which will be displayed the content is empty.
+     *
+     * @param text
+     * @param placeholder
+     */
+    public JTextAreaWithHighlighting(String text, String placeholder) {
+        super(text, placeholder);
         setupUndoRedo();
         setupPasteListener();
     }

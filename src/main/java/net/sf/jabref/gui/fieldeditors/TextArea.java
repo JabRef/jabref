@@ -36,7 +36,11 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
 
     public TextArea(String fieldName, String content) {
-        super(content);
+        this(fieldName, content, "");
+    }
+
+    public TextArea(String fieldName, String content, String title) {
+        super(content, title);
 
 
         updateFont();

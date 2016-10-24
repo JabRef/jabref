@@ -53,7 +53,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
 
     private EntryType type;
-    private SwingWorker fetcherWorker = new FetcherWorker();
+    private SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new FetcherWorker();
     private JButton generateButton;
     private JTextField idTextField;
     private JComboBox<String> comboBox;
@@ -233,6 +233,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         jPanel.add(generateButton, constraints);
 
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+
+        SwingUtilities.invokeLater(() -> idTextField.requestFocus());
 
         return jPanel;
     }

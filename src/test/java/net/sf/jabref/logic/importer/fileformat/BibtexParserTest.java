@@ -59,7 +59,6 @@ public class BibtexParserTest {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void parseWithNullThrowsNullPointerException() throws Exception {
         new BibtexParser(importFormatPreferences).parse(null);
@@ -233,6 +232,38 @@ public class BibtexParserTest {
         assertEquals(Optional.of("test"), e.getCiteKeyOptional());
         assertEquals(2, e.getFieldNames().size());
         assertEquals(Optional.of("Ed von Test"), e.getField("author"));
+    }
+
+    @Test
+    public void parseReallyUnknownType() throws Exception {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
+    public void parseOtherTypeTest() throws Exception {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
     }
 
     @Test
@@ -1404,6 +1435,24 @@ public class BibtexParserTest {
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    public void parseRecognizesDatabaseID() throws IOException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        String expectedDatabaseID = "q1w2e3r4t5z6";
+
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% DBID: ").append(expectedDatabaseID)
+                .append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+
+        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+
+        assertEquals(expectedDatabaseID, actualDatabaseID);
     }
 
     @Test
