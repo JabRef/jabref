@@ -69,7 +69,10 @@ public class EntryEditorTabRelatedArticles extends JEditorPane implements Runnab
      */
     private void setDefaultContent() {
         //What is the best way to include that gif?
-        //File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPreferences.getInstance().getFileDirectoryPreferences()).get();
+        //AuxCommandLineTest.class.getResource("paper.aux");
+        //File f = Paths.get(url.toUri()).toFile(); 
+        //concrete example
+        //File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         URL url = getClass().getResource("loading_animation.gif");
         System.out.println(url);
         System.out.println("Working Directory = " + System.getProperty("user.dir"));
