@@ -45,6 +45,10 @@ public class FieldName {
     public static final String EDITORA = "editora";
     public static final String EDITORB = "editorb";
     public static final String EDITORC = "editorc";
+    public static final String EDITORTYPE = "editortype";
+    public static final String EDITORTYPEA = "editortypea";
+    public static final String EDITORTYPEB = "editortypeb";
+    public static final String EDITORTYPEC = "editortypec";
     public static final String EID = "eid";
     public static final String ENTRYSET = "entryset";
     public static final String EPRINT = "eprint";
@@ -79,6 +83,7 @@ public class FieldName {
     public static final String MAINTITLEADDON = "maintitleaddon";
     public static final String MONTH = "month";
     public static final String MONTHFILED = "monthfiled";
+    public static final String NAMEADDON = "nameaddon";
     public static final String NATIONALITY = "nationality";
     public static final String NOTE = "note";
     public static final String NUMBER = "number";
@@ -100,6 +105,9 @@ public class FieldName {
     public static final String REVISION = "revision";
     public static final String SCHOOL = "school";
     public static final String SERIES = "series";
+    public static final String SHORTAUTHOR = "shortauthor";
+    public static final String SHORTEDITOR = "shorteditor";
+    public static final String SORTNAME = "sortname";
     public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";
     public static final String TITLEADDON = "titleaddon";
