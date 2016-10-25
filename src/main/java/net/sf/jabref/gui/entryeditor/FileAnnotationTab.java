@@ -101,7 +101,7 @@ public class FileAnnotationTab extends JPanel {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            tab.setupGui();
+            tab.setUpGui();
 
             tab.isInitialized = true;
             return tab;
@@ -196,7 +196,7 @@ public class FileAnnotationTab extends JPanel {
         updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem().toString()));
     }
 
-    private void setupGui() {
+    private void setUpGui() {
         JPanel commentListPanel = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, fill:pref:grow, $lg, pref")
@@ -208,7 +208,7 @@ public class FileAnnotationTab extends JPanel {
         commentScrollPane.setViewportView(commentList);
 
         JPanel informationPanel  = FormBuilder.create()
-                .columns("pref:grow, $lcgap, pref:grow")
+                .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref:grow, $lg, pref:grow, $lg, fill:pref")
                 .padding(Paddings.DIALOG)
                 .add(authorLabel).xy(1,3, "left, top")
