@@ -153,22 +153,7 @@ class EntryEditorTab {
                         false);
                 defaultHeight = 0;
             } else {
-                String prompt = "";
-                if (field.equals(FieldName.AUTHOR) || field.equals(FieldName.EDITOR)) {
-                    prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
-                }
-                if (field.equals(FieldName.YEAR)) {
-                    prompt = String.format("YYYY");
-                }
-                if (field.equals(FieldName.DATE) || field.equals(FieldName.URLDATE) || field.equals(FieldName.EVENTDATE)
-                        || field.equals(FieldName.ORIGDATE)) {
-                    prompt = String.format("YYYY-MM-DD");
-                }
-                if (field.equals(FieldName.URL)) {
-                    prompt = String.format("https://");
-                }
-
-                fieldEditor = new TextArea(field, null, prompt);
+                fieldEditor = new TextArea(field, null, getPrompt(field));
                 parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
@@ -228,6 +213,36 @@ class EntryEditorTab {
         }
     }
 
+    private String getPrompt(String field) {
+        String prompt = "";
+        switch (field) {
+        case FieldName.AUTHOR:
+            prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
+            break;
+        case FieldName.EDITOR:
+            prompt = String.format("%1$s andk %1$s and others", Localization.lang("Firstname Lastname"));
+            break;
+        case FieldName.YEAR:
+            prompt = String.format("YYYY");
+            break;
+        case FieldName.DATE:
+            prompt = String.format("YYYY-MM-DD");
+            break;
+        case FieldName.URLDATE:
+            prompt = String.format("YYYY-MM-DD");
+            break;
+        case FieldName.EVENTDATE:
+            prompt = String.format("YYYY-MM-DD");
+            break;
+        case FieldName.ORIGDATE:
+            prompt = String.format("YYYY-MM-DD");
+            break;
+        case FieldName.URL:
+            prompt = String.format("https://");
+            break;
+        }
+        return prompt;
+    }
 
     private BibEntry getEntry() {
         return entry;
