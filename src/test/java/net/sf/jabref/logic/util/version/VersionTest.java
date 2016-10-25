@@ -188,13 +188,13 @@ public class VersionTest {
     }
 
     @Test
-    public void changelogWithTwoDigits(){
+    public void changelogWithTwoDigits() {
         Version version = new Version("3.4");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4/CHANGELOG.md", version.getChangelogUrl());
     }
 
     @Test
-    public void changelogWithThreeDigits(){
+    public void changelogWithThreeDigits() {
         Version version = new Version("3.4.1");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4.1/CHANGELOG.md", version.getChangelogUrl());
     }
@@ -211,6 +211,20 @@ public class VersionTest {
         String versionText = "";
         Version version = new Version(versionText);
         assertEquals(BuildInfo.UNKNOWN_VERSION, version.getFullVersion());
+    }
+
+    @Test
+    public void betaNewerThanAlpha() {
+        Version older = new Version("2.7-alpha");
+        Version newer = new Version("2.7-beta");
+        assertTrue(newer.isNewerThan(older));
+    }
+
+    @Test
+    public void stableNewerThanBeta() {
+        Version older = new Version("2.8-alpha");
+        Version newer = new Version("2.8");
+        assertTrue(newer.isNewerThan(older));
     }
 
 }

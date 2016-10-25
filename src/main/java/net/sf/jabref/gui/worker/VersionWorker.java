@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.worker;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
@@ -15,7 +16,7 @@ import net.sf.jabref.logic.util.Version;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class VersionWorker extends SwingWorker<Version, Void> {
+public class VersionWorker extends SwingWorker<List<Version>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(VersionWorker.class);
 
@@ -32,9 +33,9 @@ public class VersionWorker extends SwingWorker<Version, Void> {
     }
 
     @Override
-    protected Version doInBackground() throws Exception {
+    protected List<Version> doInBackground() throws Exception {
         try {
-            return Version.getLatestVersion();
+            return Version.getAllAvailableVersions();
         } catch (IOException ioException) {
             LOGGER.warn("Could not connect to the updateserver.", ioException);
             return null;
@@ -48,9 +49,10 @@ public class VersionWorker extends SwingWorker<Version, Void> {
         }
 
         try {
-            Version latestVersion = this.get();
+            List<Version> availableVersions = this.get();
 
-            if (latestVersion == null){
+            // couldn't find any version, connection problems?
+            if (availableVersions.isEmpty()){
                 String couldNotConnect = Localization.lang("Could not connect to the update server.");
                 String tryLater = Localization.lang("Please try again later and/or check your network connection.");
                 if (manualExecution) {
@@ -61,22 +63,32 @@ public class VersionWorker extends SwingWorker<Version, Void> {
                 return;
             }
 
-            // only respect the ignored version on automated version checks
-            if (latestVersion.equals(toBeIgnored) && !manualExecution) {
+            // the newest version, excluding any alpha or beta builds, except if the installed one is one too
+            Version newestVersion = null;
+            for (Version version : availableVersions) {
+                // ignoring any version which is not stable except if the installed version itself is not stable
+                if (installedVersion.getDevelopmentStage() == Version.DevelopmentStage.STABLE && version.getDevelopmentStage() != Version.DevelopmentStage.STABLE) {
+                    continue;
+                }
+
+                // check if this version is newer than the installed one and the last found "newer" version
+                if (version.isNewerThan(installedVersion) && (newestVersion == null || version.isNewerThan(newestVersion))) {
+                    newestVersion = version;
+                }
+            }
+
+            // no new version could be found (or it's already being ignored by the user)
+            if (newestVersion == null || newestVersion.equals(toBeIgnored)) {
+                String upToDate = Localization.lang("JabRef is up-to-date.");
+                if (manualExecution) {
+                    JOptionPane.showMessageDialog(this.mainFrame, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
+                }
+                this.mainFrame.output(upToDate);
                 return;
             }
 
-            boolean newer = latestVersion.isNewerThan(installedVersion);
-            if (newer){
-                new NewVersionDialog(this.mainFrame, installedVersion, latestVersion);
-                return;
-            }
-
-            String upToDate = Localization.lang("JabRef is up-to-date.");
-            if (manualExecution) {
-                JOptionPane.showMessageDialog(this.mainFrame, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
-            }
-            this.mainFrame.output(upToDate);
+            // notify the user about a newer version
+            new NewVersionDialog(this.mainFrame, installedVersion, newestVersion);
 
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while checking for updates", e);
