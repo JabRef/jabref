@@ -21,6 +21,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -125,8 +126,18 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             }
 
             return foundEntries;
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             throw new FetcherException("Error while fetching from "+getName(), e);
+        } catch (IOException e) {
+            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                throw new FetcherException("Fetching from Google Scholar failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                throw new FetcherException("Error while fetching from "+getName(), e);
+            }
         }
     }
 
