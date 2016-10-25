@@ -46,12 +46,10 @@ public class GenFieldsCustomizer extends JDialog {
     private final JLabel jLabel2 = new JLabel();
     private final JTextArea fieldsArea = new JTextArea();
     private final GridBagLayout gridBagLayout2 = new GridBagLayout();
-    private final JabRefFrame parentFrame;
     private final JButton revert = new JButton();
 
     public GenFieldsCustomizer(JabRefFrame frame) {
         super(frame, Localization.lang("Set general fields"), false);
-        parentFrame = frame;
         helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));
@@ -139,7 +137,6 @@ public class GenFieldsCustomizer extends JDialog {
         Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);
         Globals.prefs.updateEntryEditorTabList();
 
-        parentFrame.removeCachedEntryEditors();
         dispose();
     }
 

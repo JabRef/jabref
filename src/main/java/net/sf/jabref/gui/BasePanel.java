@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,6 +69,7 @@ import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.importer.actions.AppendDatabaseAction;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
@@ -112,6 +112,7 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.DatabaseLocation;
@@ -195,8 +196,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
-    // To indicate which entry is currently shown.
-    private final Map<String, EntryEditor> entryEditors = new HashMap<>();
 
     // in switching between entries.
     private PreambleEditor preambleEditor;
@@ -261,11 +260,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public String getTabTitle() {
         StringBuilder title = new StringBuilder();
         DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
+        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
             if (this.bibDatabaseContext.getDatabaseFile().isPresent()) {
                 // check if file is modified
-                String changeFlag = isModified() ? "*" : "";
+                String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
                 title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
             } else {
                 title.append(GUIGlobals.UNTITLED_TITLE);
@@ -397,12 +397,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         });
 
-        // The action for toggling the groups interface
-        actions.put(Actions.TOGGLE_GROUPS, (BaseAction) () -> {
-            sidePaneManager.toggle("groups");
-            frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-        });
-
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
             final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
             dialog.setLocationRelativeTo(frame);
@@ -436,63 +430,47 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run second, on a different thread:
             @Override
             public void run() {
-                BibEntry bes;
+                // We don't want to generate keys for entries which already have one thus remove the entries
+                if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
+                    entries.removeIf(BibEntry::hasCiteKey);
 
-                // First check if any entries have keys set already. If so, possibly remove
-                // them from consideration, or warn about overwriting keys.
-                // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
-                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
-                    bes = i.next();
-                    if (bes.hasCiteKey()) {
-                        if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                            // Remove the entry, because its key is already set:
-                            i.remove();
-                        } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                            // Ask if the user wants to cancel the operation:
-                            CheckBoxMessage cbm = new CheckBoxMessage(
-                                    Localization.lang("One or more keys will be overwritten. Continue?"),
-                                    Localization.lang("Disable this confirmation dialog"), false);
-                            final int answer = JOptionPane.showConfirmDialog(frame, cbm,
-                                    Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
-                            if (cbm.isSelected()) {
-                                Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
-                            }
-                            if (answer == JOptionPane.NO_OPTION) {
-                                // Ok, break off the operation.
-                                canceled = true;
-                                return;
-                            }
-                            // No need to check more entries, because the user has already confirmed
-                            // that it's ok to overwrite keys:
-                            break;
+                // if we're going to override some cite keys warn the user about it
+                } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
+                    if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
+                        CheckBoxMessage cbm = new CheckBoxMessage(
+                                Localization.lang("One or more keys will be overwritten. Continue?"),
+                                Localization.lang("Disable this confirmation dialog"), false);
+                        final int answer = JOptionPane.showConfirmDialog(frame, cbm,
+                                Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
+                        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
+
+                        // The user doesn't want to overide cite keys
+                        if (answer == JOptionPane.NO_OPTION) {
+                            canceled = true;
+                            return;
                         }
                     }
                 }
 
-                Map<BibEntry, String> oldvals = new HashMap<>();
-                // Iterate again, removing already set keys. This is skipped if overwriting
-                // is disabled, since all entries with keys set will have been removed.
-                if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                    for (BibEntry entry : entries) {
-                        bes = entry;
-                        // Store the old value:
-                        oldvals.put(bes, bes.getCiteKeyOptional().orElse(null));
-                        bes.clearCiteKey();
+                // generate the new cite keys for each entry
+                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
+                AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
+                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
+                for (BibEntry entry : entries) {
+                    String oldCiteKey = entry.getCiteKeyOptional().orElse("");
+                    BibtexKeyPatternUtil.makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
+                            entry, Globals.prefs.getBibtexKeyPatternPreferences());
+                    String newCiteKey = entry.getCiteKeyOptional().orElse("");
+                    if (!oldCiteKey.equals(newCiteKey)) {
+                        ce.addEdit(new UndoableKeyChange(entry, oldCiteKey, newCiteKey));
                     }
                 }
-
-                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-
-                // Finally, set the new keys:
-                for (BibEntry entry : entries) {
-                    bes = entry;
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
-                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, oldvals.get(bes),
-                            bes.getCiteKeyOptional().orElse(null)));
-                }
                 ce.end();
-                getUndoManager().addEdit(ce);
+
+                // register the undo event only if new cite keys were generated
+                if (ce.hasEdits()) {
+                    getUndoManager().addEdit(ce);
+                }
             }
 
             // Run third, on EDT:
@@ -1217,7 +1195,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             // Automatically add new entry to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.groupToggle.isSelected()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.getGroupSelector().getToggleAction().isSelected()) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
                 final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
                 if (selection != null) {
@@ -1301,6 +1279,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryRemovedEvent removedEntryEvent) {
+            // IMO only used to update the status (found X entries)
             frame.getGlobalSearchBar().performSearch();
         }
     }
@@ -1380,6 +1359,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         };
         mainTable.addSelectionListener(groupsHighlightListener);
+
+        String clearSearch = "clearSearch";
+        mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
+        mainTable.getActionMap().put(clearSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
+                switch (mode) {
+                    case SHOWING_NOTHING:
+                        frame.getGlobalSearchBar().endSearch();
+                        break;
+                    case SHOWING_PREVIEW:
+                        getPreviewPanel().close();
+                        break;
+                    case SHOWING_EDITOR:
+                    case WILL_SHOW_EDITOR:
+                        getCurrentEditor().close();
+                        break;
+                    default:
+                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
+                        break;
+                }
+            }
+        });
 
         mainTable.getActionMap().put(Actions.CUT, new AbstractAction() {
 
@@ -1486,10 +1489,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
-
-        for (EntryEditor ee : entryEditors.values()) {
-            ee.validateAllFields();
-        }
 
         splitPane.setTopComponent(mainTable.getPane());
 
@@ -1619,25 +1618,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             divLoc = splitPane.getDividerLocation();
         }
 
-        if (entryEditors.containsKey(be.getType())) {
-            // We already have an editor for this entry type.
-            entryEditor = entryEditors.get(be.getType());
-            entryEditor.switchTo(be);
-            if (visName != null) {
-                entryEditor.setVisiblePanel(visName);
-            }
-            splitPane.setBottomComponent(entryEditor);
-        } else {
-            // We must instantiate a new editor for this type.
-            entryEditor = new EntryEditor(frame, BasePanel.this, be);
-            if (visName != null) {
-                entryEditor.setVisiblePanel(visName);
-            }
-            splitPane.setBottomComponent(entryEditor);
-
-            entryEditors.put(be.getType(), entryEditor);
-
+        // We must instantiate a new editor.
+        entryEditor = new EntryEditor(frame, BasePanel.this, be);
+        if (visName != null) {
+            entryEditor.setVisiblePanel(visName);
         }
+        splitPane.setBottomComponent(entryEditor);
+
         if (divLoc > 0) {
             splitPane.setDividerLocation(divLoc);
         } else {
@@ -1658,28 +1645,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
         EntryEditor entryEditor;
-        if (entryEditors.containsKey(entry.getType())) {
-            EntryEditor visibleNow = currentEditor;
 
-            // We already have an editor for this entry type.
-            entryEditor = entryEditors.get(entry.getType());
+        // We must instantiate a new editor. First make sure the old one
+        // stores its last edit:
+        storeCurrentEdit();
+        // Then start the new one:
+        entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
-            // If the cached editor is not the same as the currently shown one,
-            // make sure the current one stores its current edit:
-            if ((visibleNow != null) && (!(entryEditor.equals(visibleNow)))) {
-                visibleNow.storeCurrentEdit();
-            }
-
-            entryEditor.switchTo(entry);
-        } else {
-            // We must instantiate a new editor for this type. First make sure the old one
-            // stores its last edit:
-            storeCurrentEdit();
-            // Then start the new one:
-            entryEditor = new EntryEditor(frame, BasePanel.this, entry);
-
-            entryEditors.put(entry.getType(), entryEditor);
-        }
         return entryEditor;
     }
 
@@ -1809,13 +1781,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void rebuildAllEntryEditors() {
-        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
-            EntryEditor ed = stringEntryEditorEntry.getValue();
-            ed.rebuildPanels();
-        }
-    }
-
     public void markBaseChanged() {
         baseChanged = true;
 
@@ -1941,20 +1906,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void autoGenerateKeysBeforeSaving() {
         if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-            boolean any = false;
 
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
+                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData()
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, null,
-                            bes.getCiteKeyOptional().get())); // Cite key is set here
-                    any = true;
+                    ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), bes.getCiteKeyOptional().get()));
                 }
             }
+
             // Store undo information, if any:
-            if (any) {
+            if (ce.hasEdits()) {
                 ce.end();
                 getUndoManager().addEdit(ce);
             }
@@ -2153,15 +2118,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             // Check if there is already a notification about external
             // changes:
-            boolean hasAlready = sidePaneManager.hasComponent(FileUpdatePanel.NAME);
+            boolean hasAlready = sidePaneManager.hasComponent(FileUpdatePanel.class);
             if (hasAlready) {
-                sidePaneManager.hideComponent(FileUpdatePanel.NAME);
-                sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
+                sidePaneManager.hideComponent(FileUpdatePanel.class);
+                sidePaneManager.unregisterComponent(FileUpdatePanel.class);
             }
             FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager,
                     getBibDatabaseContext().getDatabaseFile().orElse(null), scanner);
-            sidePaneManager.register(FileUpdatePanel.NAME, pan);
-            sidePaneManager.show(FileUpdatePanel.NAME);
+            sidePaneManager.register(pan);
+            sidePaneManager.show(FileUpdatePanel.class);
         };
 
         if (scanner.changesFound()) {
@@ -2185,10 +2150,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
         // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
         // remove it:
-        if (sidePaneManager.hasComponent("fileUpdate")) {
-            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent("fileUpdate");
+        if (sidePaneManager.hasComponent(FileUpdatePanel.class)) {
+            FileUpdatePanel fup = (FileUpdatePanel) sidePaneManager.getComponent(FileUpdatePanel.class);
             if (fup.getPanel() == this) {
-                sidePaneManager.hideComponent("fileUpdate");
+                sidePaneManager.hideComponent(FileUpdatePanel.class);
             }
         }
     }
@@ -2432,10 +2397,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public MainTable getMainTable() {
         return mainTable;
-    }
-
-    public Map<String, EntryEditor> getEntryEditors() {
-        return entryEditors;
     }
 
     public BibDatabaseContext getDatabaseContext() {

@@ -4,16 +4,24 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import org.junit.After;
@@ -32,26 +40,28 @@ public class DBMSSynchronizerTest {
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
+    private GlobalBibtexKeyPattern pattern;
 
     @Parameter
     public DBMSType dbmsType;
 
-
     @Before
-    public void setUp() throws SQLException, DatabaseNotSupportedException {
+    public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
+        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',');
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern);
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
 
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
     }
 
     @Parameters(name = "Test with {0} database system")
@@ -117,9 +127,9 @@ public class DBMSSynchronizerTest {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
-        testMetaData.putData("databaseType", Arrays.asList("bibtex"));
+        testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
-        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData);
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
@@ -181,7 +191,8 @@ public class DBMSSynchronizerTest {
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.putData("saveActions", Arrays.asList("enabled", "author[lower_case]"));
+        testMetaData.setSaveActions(new FieldFormatterCleanups(true,
+                Collections.singletonList(new FieldFormatterCleanup("author", new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();

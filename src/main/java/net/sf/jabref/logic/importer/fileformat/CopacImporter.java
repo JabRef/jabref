@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -19,12 +20,12 @@ import net.sf.jabref.model.entry.FieldName;
  *
  * http://copac.ac.uk/faq/#format
  */
-public class CopacImporter extends ImportFormat {
+public class CopacImporter extends Importer {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Copac";
     }
 

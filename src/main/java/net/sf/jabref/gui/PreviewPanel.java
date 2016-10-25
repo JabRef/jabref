@@ -112,7 +112,6 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         this.basePanel = Optional.ofNullable(panel);
 
         createPreviewPane();
-        updateLayout();
 
         if (this.basePanel.isPresent()) {
             // dropped files handler only created for main window
@@ -129,6 +128,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         add(scrollPane, BorderLayout.CENTER);
 
         this.createKeyBindings();
+        updateLayout();
     }
 
     private void createKeyBindings(){
@@ -357,7 +357,10 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                 }
             });
         }
+    }
 
+    public void close() {
+        basePanel.ifPresent(BasePanel::hideBottomComponent);
     }
 
     class CloseAction extends AbstractAction {
@@ -366,12 +369,11 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            basePanel.ifPresent(BasePanel::hideBottomComponent);
+            close();
         }
-
-
     }
 
     class CopyPreviewAction extends AbstractAction {

@@ -28,14 +28,13 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.ParseException;
+
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -111,7 +110,7 @@ class GroupDialog extends JDialog {
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
+    public GroupDialog(JabRefFrame jabrefFrame,
             AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
 
@@ -285,7 +284,7 @@ class GroupDialog extends JDialog {
                     }
                 }
                 dispose();
-            } catch (ParseException exception) {
+            } catch (IllegalArgumentException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });

@@ -10,17 +10,17 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
@@ -373,11 +373,12 @@ public class BibtexKeyPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
+     * @param citeKeyPattern
      * @param dBase a <code>BibDatabase</code>
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase dBase, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         database = dBase;
         String key;
@@ -386,8 +387,7 @@ public class BibtexKeyPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(
-                    metaData.getBibtexKeyPattern(bibtexKeyPatternPreferences.getKeyPattern()).getValue(entryType));
+            List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
@@ -429,7 +429,7 @@ public class BibtexKeyPatternUtil {
         }
 
         String oldKey = entry.getCiteKeyOptional().orElse(null);
-        int occurrences = database.getNumberOfKeyOccurrences(key);
+        int occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -439,48 +439,24 @@ public class BibtexKeyPatternUtil {
         boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
-            // No dupes found, so we can just go ahead.
-            if (!key.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, key);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(key);
-                }
-            }
-
+            entry.setCiteKey(key);
         } else {
             // The key is already in use, so we must modify it.
-            int number = 0;
-            if (!alwaysAddLetter && !firstLetterA) {
-                number = 1;
-            }
+            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            String moddedKey;
 
-            String moddedKey = key + getAddition(number);
-            occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-
-            if (Objects.equals(oldKey, moddedKey)) {
-                occurrences--;
-            }
-
-            while (occurrences > 0) {
-                number++;
+            do {
                 moddedKey = key + getAddition(number);
+                number++;
 
-                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
+                // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
-            }
+            } while (occurrences > 0);
 
-            if (!moddedKey.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, moddedKey);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(moddedKey);
-                }
-            }
+            entry.setCiteKey(moddedKey);
         }
     }
 

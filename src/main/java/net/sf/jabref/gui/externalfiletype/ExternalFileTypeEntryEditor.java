@@ -55,13 +55,13 @@ public class ExternalFileTypeEntryEditor {
     private final ActionListener browsePressed = e -> {
         String appDir = application.getText().trim();
         if (appDir.isEmpty()) {
-            appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
+            appDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
         Optional<Path> path = new FileDialog(fParent, appDir).showDialogAndGetSelectedFile();
         path.ifPresent(applicationDir -> {
             if (applicationDir.getParent() != null) {
-                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, applicationDir.getParent().toString());
             }
             application.setText(applicationDir.toString());
         });

@@ -207,7 +207,6 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 sb.append(FieldName.FILE);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
-                panel.frame().removeCachedEntryEditors();
             }
             panel.frame().setupAllTables();
         }

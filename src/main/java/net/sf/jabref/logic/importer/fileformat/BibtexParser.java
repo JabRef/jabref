@@ -19,14 +19,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.FieldContentParser;
+import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
-import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.MetaDataParser;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -126,20 +126,20 @@ public class BibtexParser implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
         return parseEntries(reader);
     }
 
-    public List<BibEntry> parseEntries(Reader reader) throws ParserException {
+    public List<BibEntry> parseEntries(Reader reader) throws ParseException {
         try {
             return parse(reader).getDatabase().getEntries();
         } catch (IOException e) {
-            throw new ParserException(e);
+            throw new ParseException(e);
         }
     }
 
-    public List<BibEntry> parseEntries(String bibtexString) throws ParserException {
+    public List<BibEntry> parseEntries(String bibtexString) throws ParseException {
         return parseEntries(new StringReader(bibtexString));
     }
 
@@ -161,6 +161,8 @@ public class BibtexParser implements Parser {
         // Bibtex related contents.
         initializeParserResult();
 
+        parseDatabaseID();
+
         skipWhitespace();
 
         try {
@@ -174,6 +176,28 @@ public class BibtexParser implements Parser {
         database = new BibDatabase();
         entryTypes = new HashMap<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
+    }
+
+
+    private void parseDatabaseID() throws IOException {
+
+        while (!eof) {
+            skipWhitespace();
+            char c = (char) read();
+
+            if (c == '%') {
+                skipWhitespace();
+                String label = parseTextToken().trim();
+
+                if (label.equals(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
+                    skipWhitespace();
+                    database.setDatabaseID(parseTextToken().trim());
+                }
+            } else if (c == '@') {
+                unread(c);
+                break;
+            }
+        }
     }
 
     private ParserResult parseFileContent() throws IOException {

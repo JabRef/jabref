@@ -182,7 +182,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
 
         fontButton.addActionListener(
-                e -> new FontSelectorDialog(null, GUIGlobals.currentFont).getSelectedFont().ifPresent(x -> usedFont = x));
+                e -> new FontSelectorDialog(null, usedFont).getSelectedFont().ifPresent(x -> usedFont = x));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));

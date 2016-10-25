@@ -4,13 +4,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.util.MetaDataParser;
-import net.sf.jabref.model.ParseException;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
@@ -25,6 +27,7 @@ import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import com.google.common.eventbus.EventBus;
@@ -49,14 +52,16 @@ public class DBMSSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
+    private GlobalBibtexKeyPattern globalCiteKeyPattern;
 
-
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator) {
-        this.bibDatabaseContext = bibDatabaseContext;
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
+            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
+        this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
     }
 
     /**
@@ -116,7 +121,7 @@ public class DBMSSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
-            synchronizeSharedMetaData(event.getMetaData());
+            synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
             synchronizeLocalDatabase();
             applyMetaData();
             dbmsProcessor.notifyClients();
@@ -256,8 +261,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setParsedData(MetaDataParser.getParsedData(dbmsProcessor.getSharedMetaData(), keywordSeparator,
-                    metaData));
+            metaData = MetaDataParser.parse(dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
@@ -266,12 +270,12 @@ public class DBMSSynchronizer {
     /**
      * Synchronizes all shared meta data.
      */
-    public void synchronizeSharedMetaData(MetaData data) {
+    private void synchronizeSharedMetaData(MetaData data, GlobalBibtexKeyPattern globalCiteKeyPattern) {
         if (!checkCurrentConnection()) {
             return;
         }
         try {
-            dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data));
+            dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -349,7 +353,8 @@ public class DBMSSynchronizer {
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws SQLException, DatabaseNotSupportedException {
+    public void openSharedDatabase(DBMSConnectionProperties properties)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         openSharedDatabase(new DBMSConnection(properties));
     }
 

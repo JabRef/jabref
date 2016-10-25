@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
@@ -20,7 +21,7 @@ import net.sf.jabref.shared.DBMSSynchronizer;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private final MetaData metaData;
+    private MetaData metaData;
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
@@ -54,20 +55,29 @@ public class BibDatabaseContext {
         this(database, metaData, new Defaults());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults, DatabaseLocation location) {
         this(database, metaData, defaults);
-
+        Objects.requireNonNull(location);
         this.setDatabaseFile(file);
+
+        if (location == DatabaseLocation.LOCAL) {
+            convertToLocalDatabase();
+        }
+    }
+
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
+        this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData, file, new Defaults());
     }
 
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator) {
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
+            GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this(new BibDatabase(), new MetaData(), defaults);
         if (location == DatabaseLocation.SHARED) {
-            convertToSharedDatabase(keywordSeparator);
+            convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
         }
     }
 
@@ -109,6 +119,10 @@ public class BibDatabaseContext {
 
     public MetaData getMetaData() {
         return metaData;
+    }
+
+    public void setMetaData(MetaData metaData) {
+        this.metaData = Objects.requireNonNull(metaData);
     }
 
     public boolean isBiblatexMode() {
@@ -202,8 +216,8 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void convertToSharedDatabase(Character keywordSeparator) {
-        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator);
+    public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
         this.database.registerListener(dbmsSynchronizer);
         this.metaData.registerListener(dbmsSynchronizer);
 
@@ -211,7 +225,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if ((this.location == DatabaseLocation.SHARED)) {
+        if (Objects.nonNull(dbmsSynchronizer) && (location == DatabaseLocation.SHARED)) {
             this.database.unregisterListener(dbmsSynchronizer);
             this.metaData.unregisterListener(dbmsSynchronizer);
         }

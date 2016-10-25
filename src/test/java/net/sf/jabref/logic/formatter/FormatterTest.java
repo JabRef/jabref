@@ -26,6 +26,7 @@ import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import net.sf.jabref.model.cleanup.Formatter;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -102,7 +103,7 @@ public class FormatterTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
-        // all classes implementing {@link net.sf.jabref.logic.formatter.Formatter}
+        // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
         // sorted alphabetically
         // Alternative: Use reflection - https://github.com/ronmamo/reflections
         // @formatter:off

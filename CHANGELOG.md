@@ -12,6 +12,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implementation of eventbased autosave and backup functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
+- Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
+- [koppor#171](https://github.com/koppor/jabref/issues/171): Add Shortcuts to context menu
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - [koppor#31](https://github.com/koppor/jabref/issues/31): Number column in the main table is always Left aligned
@@ -54,10 +57,22 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 - [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
 - Complete vietnam language translation in menu
+- Generalize German translation of database into "Datenbank"
+- Improve language quality of the German translation of shared database
+- Change "Recent files" to "Recent databases" to keep the file menu consistent
+- Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
+- [koppor/#97] (https://github.com/koppor/jabref/issues/97): When importing preferences, the explorer will start where the preferences are last exported
+- [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
+- [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
+- Updated Vietnam translation
 
 ### Fixed
+- Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
+- Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
+- Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
+- Fixed [#1542](https://github.com/JabRef/jabref/issues/1542): Improved error messages when using fetcher
 - Fixed selecting an entry out of multiple duplicates
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
@@ -80,14 +95,23 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 - Fixed loop when pulling changes (shared database) when current selected field has changed
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
+- Fixed [#1808](https://github.com/JabRef/jabref/issues/1808): Font preference dialog now keeps changes
 - Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
 - Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
+- Fixed file menu displays wrong hotkey in the German translation
+- Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
+- Fixed [#2021](https://github.com/JabRef/jabref/issues/2021): All filetypes can be selected on MacOS again
+- Fixed [#2064](https://github.com/JabRef/jabref/issues/2064): Not all `other fields` are shown on entry change of same type
+- Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
+- Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl-s</kbd> doesn't trigger parsing error message
+- Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
 
 ### Removed
 - Removed 2nd preview style
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
+- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
 
 
 

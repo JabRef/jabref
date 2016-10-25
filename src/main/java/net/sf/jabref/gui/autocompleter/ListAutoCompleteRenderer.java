@@ -11,6 +11,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 
 /**
  * Renders possible autocomplete items in form of a simple list.
@@ -57,8 +58,8 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
         scrollPane.setFocusable(false);
         scrollPane.setRequestFocusEnabled(false);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         return scrollPane;
     }

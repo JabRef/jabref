@@ -102,9 +102,8 @@ public class PdfImporter {
         // other files: variable noPdfFiles
         List<String> files = new ArrayList<>(fileNames);
         List<String> noPdfFiles = new ArrayList<>();
-        PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
-            if (!pdfFilter.accept(file)) {
+            if (!PdfFileFilter.accept(file)) {
                 noPdfFiles.add(file);
             }
         }
@@ -237,7 +236,8 @@ public class PdfImporter {
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+                .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);

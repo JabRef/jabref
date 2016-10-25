@@ -242,7 +242,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = ParserResult.getNullResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
+                    pr = OpenDatabase.loadDatabase(aLeftOver,
                             Globals.prefs.getImportFormatPreferences());
                 }
 
@@ -452,7 +452,9 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    BibtexKeyPatternUtil.makeLabel(metaData, database, entry,
+                    BibtexKeyPatternUtil.makeLabel(
+                            metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            database, entry,
                             Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {

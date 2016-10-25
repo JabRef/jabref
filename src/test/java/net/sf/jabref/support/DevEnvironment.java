@@ -10,4 +10,9 @@ public class DevEnvironment {
         // See https://circleci.com/docs/environment-variables
         return Boolean.valueOf(System.getenv("CI"));
     }
+
+    public static boolean isCircleCI() {
+        // See https://circleci.com/docs/environment-variables
+        return Boolean.valueOf(System.getenv("CIRCLECI"));
+    }
 }

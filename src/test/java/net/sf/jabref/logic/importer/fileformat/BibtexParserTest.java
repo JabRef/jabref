@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -59,7 +59,6 @@ public class BibtexParserTest {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void parseWithNullThrowsNullPointerException() throws Exception {
         new BibtexParser(importFormatPreferences).parse(null);
@@ -233,6 +232,38 @@ public class BibtexParserTest {
         assertEquals(Optional.of("test"), e.getCiteKeyOptional());
         assertEquals(2, e.getFieldNames().size());
         assertEquals(Optional.of("Ed von Test"), e.getField("author"));
+    }
+
+    @Test
+    public void parseReallyUnknownType() throws Exception {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
+    public void parseOtherTypeTest() throws Exception {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
     }
 
     @Test
@@ -1399,11 +1430,29 @@ public class BibtexParserTest {
                         + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}")
                 );
 
-        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
                 saveActions.getConfiguredActions());
+    }
+
+    @Test
+    public void parseRecognizesDatabaseID() throws IOException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        String expectedDatabaseID = "q1w2e3r4t5z6";
+
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% DBID: ").append(expectedDatabaseID)
+                .append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+
+        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+
+        assertEquals(expectedDatabaseID, actualDatabaseID);
     }
 
     @Test
@@ -1412,7 +1461,7 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse(
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
-        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1456,7 +1505,7 @@ public class BibtexParserTest {
                         + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences);
 
         GlobalBibtexKeyPattern pattern = JabRefPreferences.getInstance().getKeyPattern();
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getBibtexKeyPattern(pattern);
+        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
 
         AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
@@ -1712,10 +1761,10 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseEmptyPreambleLeadsToEmptyString() throws IOException {
+    public void parseEmptyPreambleLeadsToEmpty() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@preamble{}"), importFormatPreferences);
         assertFalse(result.hasWarnings());
-        assertEquals(Optional.of(""), result.getDatabase().getPreamble());
+        assertEquals(Optional.empty(), result.getDatabase().getPreamble());
     }
 
     @Test

@@ -22,7 +22,6 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -142,7 +141,7 @@ public class AppendDatabaseAction implements BaseAction {
                                 Globals.prefs.getKeywordDelimiter());
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
-                    } catch (ParseException e) {
+                    } catch (IllegalArgumentException e) {
                         LOGGER.error(e);
                     }
                 }

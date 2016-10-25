@@ -4,11 +4,14 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -34,13 +37,16 @@ public class SynchronizationTestSimulator {
 
 
     @Before
-    public void setUp() throws SQLException, DatabaseNotSupportedException {
+    public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
+        GlobalBibtexKeyPattern pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',',
+                pattern);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
+        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',',
+                pattern);
         clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);

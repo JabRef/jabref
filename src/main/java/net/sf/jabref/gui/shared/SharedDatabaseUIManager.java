@@ -12,6 +12,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -23,6 +24,7 @@ import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -96,37 +98,37 @@ public class SharedDatabaseUIManager {
      * @param dbmsConnectionProperties Connection data
      * @param raiseTab If <code>true</code> the new tab gets selected.
      */
-    private void openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties, boolean raiseTab)
-            throws SQLException, DatabaseNotSupportedException {
+    public void openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
-                Globals.prefs.getKeywordDelimiter());
+                Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
-        frame.addTab(bibDatabaseContext, raiseTab);
         dbmsSynchronizer.registerListener(this);
         frame.output(Localization.lang("Connection_to_%0_server_established.", dbmsConnectionProperties.getType().toString()));
+        frame.addTab(bibDatabaseContext, true);
     }
 
-    /**
-     * Opens a new shared database tab with the given {@link DBMSConnectionProperties}.
-     *
-     * @param dbmsConnectionProperties Connection data
-     */
-    public void openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
-            throws SQLException, DatabaseNotSupportedException {
-        openNewSharedDatabaseTab(dbmsConnectionProperties, true);
-    }
+    public void openSharedDatabaseFromParserResult(ParserResult parserResult)
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
+        String databaseID = parserResult.getDatabase().getDatabaseID();
+        DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(databaseID));
 
-    /**
-     * Opens a new shared database tab with the already set {@link DBMSConnectionProperties}.
-     *
-     * @param raiseTab If <code>true</code> the new tab gets selected.
-     */
-    public void openLastSharedDatabaseTab(boolean raiseTab)
-            throws SQLException, DatabaseNotSupportedException {
-        openNewSharedDatabaseTab(new DBMSConnectionProperties(new SharedDatabasePreferences()), raiseTab);
+        JabRefFrame frame = JabRefGUI.getMainFrame();
+        BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
+                Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
+
+        bibDatabaseContext.getDatabase().setDatabaseID(databaseID);
+        bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabaseFile().orElse(null));
+
+        dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
+        dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);
+        dbmsSynchronizer.registerListener(this);
+        parserResult.setDatabaseContext(bibDatabaseContext);
+        frame.output(Localization.lang("Connection_to_%0_server_established.", dbmsConnectionProperties.getType().toString()));
     }
 }

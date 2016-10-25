@@ -302,4 +302,14 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
+
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle, String localizedMessage) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedMessage,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
+    }
 }

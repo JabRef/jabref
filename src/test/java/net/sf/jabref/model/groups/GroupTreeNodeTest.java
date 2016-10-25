@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.matchers.AndMatcher;
 import net.sf.jabref.model.search.matchers.OrMatcher;
@@ -39,7 +38,7 @@ public class GroupTreeNodeTest {
      *      A ExplicitParent, Independent (= parent)
      *          B ExplicitNode, Refining (<-- this)
      */
-    private GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) throws ParseException {
+    private GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) {
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode parent = root
                 .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT, ','));
@@ -48,7 +47,7 @@ public class GroupTreeNodeTest {
         return node;
     }
 
-    private GroupTreeNode getNodeInSimpleTree() throws ParseException {
+    private GroupTreeNode getNodeInSimpleTree() {
         return getNodeInSimpleTree(getRoot());
     }
 
@@ -69,7 +68,7 @@ public class GroupTreeNodeTest {
      *          B KeywordB
      *      A KeywordA
      */
-    private GroupTreeNode getNodeInComplexTree(GroupTreeNode root) throws ParseException {
+    private GroupTreeNode getNodeInComplexTree(GroupTreeNode root) {
         root.addSubgroup(getSearchGroup("SearchA"));
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode grandParent = root
@@ -90,7 +89,7 @@ public class GroupTreeNodeTest {
         return node;
     }
 
-    private AbstractGroup getKeywordGroup(String name) throws ParseException {
+    private AbstractGroup getKeywordGroup(String name) {
         return new KeywordGroup(name, "searchField", "searchExpression", true, false, GroupHierarchyType.INDEPENDENT,
                 ',');
     }
@@ -99,7 +98,7 @@ public class GroupTreeNodeTest {
         return new SearchGroup(name, "searchExpression", true, false, GroupHierarchyType.INCLUDING);
     }
 
-    private AbstractGroup getExplict(String name) throws ParseException {
+    private AbstractGroup getExplict(String name) {
         return new ExplicitGroup(name, GroupHierarchyType.REFINING, ',');
     }
 
@@ -170,14 +169,14 @@ public class GroupTreeNodeTest {
     }
 
     @Test
-    public void getSearchRuleForIndependentGroupReturnsGroupAsMatcher() throws ParseException {
+    public void getSearchRuleForIndependentGroupReturnsGroupAsMatcher() {
         GroupTreeNode node = GroupTreeNode
                 .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT, ','));
         assertEquals(node.getGroup(), node.getSearchRule());
     }
 
     @Test
-    public void getSearchRuleForRefiningGroupReturnsParentAndGroupAsMatcher() throws ParseException {
+    public void getSearchRuleForRefiningGroupReturnsParentAndGroupAsMatcher() {
         GroupTreeNode parent = GroupTreeNode
                 .fromGroup(
                         new ExplicitGroup("parent", GroupHierarchyType.INDEPENDENT, ','));
@@ -191,7 +190,7 @@ public class GroupTreeNodeTest {
     }
 
     @Test
-    public void getSearchRuleForIncludingGroupReturnsGroupOrSubgroupAsMatcher() throws ParseException {
+    public void getSearchRuleForIncludingGroupReturnsGroupOrSubgroupAsMatcher() {
         GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup("node", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode child = node.addSubgroup(new ExplicitGroup("child", GroupHierarchyType.INDEPENDENT, ','));
 

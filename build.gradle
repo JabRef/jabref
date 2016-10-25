@@ -14,13 +14,11 @@ buildscript {
 }
 
 plugins {
-    id "com.install4j.gradle" version "6.1.2"
+    id "com.install4j.gradle" version "6.1.3"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
-    // TODO replaced by spotless plugin, needs to be updated
-    id "com.github.youribonnaffe.gradle.format" version "1.5"
     // If this is updated to 0.0.9, check configurations.errorprone
     id "net.ltgt.errorprone" version "0.0.8"
-    id 'me.champeau.gradle.jmh' version '0.3.0'
+    id 'me.champeau.gradle.jmh' version '0.3.1'
 }
 
 apply plugin: "java"
@@ -115,9 +113,9 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.18'
 
-    compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
-    compile 'org.apache.logging.log4j:log4j-api:2.6.2'
-    compile 'org.apache.logging.log4j:log4j-core:2.6.2'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.7'
+    compile 'org.apache.logging.log4j:log4j-api:2.7'
+    compile 'org.apache.logging.log4j:log4j-core:2.7'
     compile 'org.xmlunit:xmlunit-core:2.2.1'
     compile 'org.xmlunit:xmlunit-matchers:2.2.1'
 
@@ -125,11 +123,14 @@ dependencies {
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:0.6'
+	
     // in Java 8 Rhino was replaced by Nashorn, but 'de.undercouch:citeproc-java:0.6' depends on Rhino
     compile 'org.mozilla:rhino:1.7.7.1'
 	
 	// communication with Mr. DLib
 	compile 'org.glassfish.jersey.core:jersey-client:2.23.2'
+    compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
+
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -250,6 +251,11 @@ test {
     }
 }
 
+task copyTestResources(type: Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+processTestResources.dependsOn copyTestResources
 
 task databaseTest(type: Test) {
     testClassesDir = sourceSets.databaseTest.output.classesDir
@@ -273,13 +279,6 @@ jacocoTestReport {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
     }
-}
-
-// enables `gradlew format`. Currently `LabelPatternUtil.java` is destroyed. Use with care!
-format {
-    configurationFile = file('ide-settings/formatter_settings.xml')
-    // default: reformat main and test
-    //files = sourceSets.main.java
 }
 
 shadowJar {
