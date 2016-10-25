@@ -165,7 +165,7 @@ class EntryEditorTab {
                     prompt = String.format("YYYY-MM-DD");
                 }
                 if (field.equals(FieldName.URL)) {
-                    prompt = String.format("http://");
+                    prompt = String.format("https://");
                 }
 
                 fieldEditor = new TextArea(field, null, prompt);
