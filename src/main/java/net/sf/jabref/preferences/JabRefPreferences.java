@@ -770,7 +770,7 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_USERNAME, "root");
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
-        insertCleanupPreset(defaults);
+        insertDefaultCleanupPreset(defaults);
 
         // defaults for DroppedFileHandler UI
         defaults.put(DROPPEDFILEHANDLER_LEAVE, Boolean.FALSE);
@@ -1325,7 +1325,7 @@ public class JabRefPreferences {
         put(DEFAULT_ENCODING, encoding.name());
     }
 
-    private static void insertCleanupPreset(Map<String, Object> storage) {
+    private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
         EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
                 CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
                 CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,

@@ -1,7 +1,6 @@
 package net.sf.jabref.model.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -27,9 +26,9 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if (FieldName.ABSTRACT_ALL_FIELD.equalsIgnoreCase(field)) {
+        if (FieldName.INTERNAL_ALL_FIELD.equalsIgnoreCase(field)) {
             return cleanupAllFields(entry);
-        } else if (FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD.equalsIgnoreCase(field)) {
+        } else if (FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD.equalsIgnoreCase(field)) {
             return cleanupAllTextFields(entry);
         } else {
             return cleanupSingleField(field, entry);
@@ -81,7 +80,7 @@ public class FieldFormatterCleanup implements CleanupJob {
     private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
         Set<String> fields = entry.getFieldNames();
-        fields.removeAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
+        fields.removeAll(FieldName.getNotTextFieldNames());
         for (String fieldKey : fields) {
             fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
         }
