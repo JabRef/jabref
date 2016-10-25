@@ -240,6 +240,9 @@ class EntryEditorTab {
         case FieldName.URL:
             prompt = String.format("https://");
             break;
+        default:
+            prompt = "";
+            break;
         }
         return prompt;
     }
