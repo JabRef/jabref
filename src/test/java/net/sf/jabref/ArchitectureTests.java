@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
@@ -29,7 +30,7 @@ public class ArchitectureTests {
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
 
-    private static Map<String, List<String>> exceptionStrings;
+    private Map<String, List<String>> exceptionStrings;
 
     private final String firstPackage;
     private final String secondPackage;
@@ -44,6 +45,7 @@ public class ArchitectureTests {
         exceptionStrings.put(PACKAGE_NET_SF_JABREF_LOGIC,
                 Arrays.asList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
     }
+
 
     @Parameterized.Parameters(name = "{index} -- is {0} independent of {1}?")
     public static Iterable<Object[]> data() {
@@ -65,12 +67,20 @@ public class ArchitectureTests {
 
     @Test
     public void fistPackageIsIndependentOfSecondPackage() throws IOException {
+
+
+        Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage) && !(exceptionStrings.get(firstPackage).stream()
+                .filter(exception -> s.startsWith("import " + exception)).findAny().isPresent()
+        );
+
+        Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
+
         List<Path> files = Files.walk(Paths.get("src"))
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
                 return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
-                        .filter(s -> s.startsWith("package " + firstPackage)).findAny().isPresent();
+                        .filter(isPackage).findAny().isPresent();
                     } catch (IOException e) {
                         return false;
                     }
@@ -78,11 +88,7 @@ public class ArchitectureTests {
                 .filter(p -> {
                     try {
                         return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
-                                .filter(s -> s.startsWith("import " + secondPackage) &&
-                                        //filter for (sub packages that are allowed to use in the firstPackage
-                                       !(exceptionStrings.get(firstPackage).stream()
-                                               .filter(exception -> s.startsWith("import " + exception)).findAny().isPresent()
-                                       )).findAny().isPresent();
+                                .filter(isExceptionPackage).findAny().isPresent();
                     } catch (IOException e) {
                         return false;
                     }

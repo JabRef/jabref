@@ -104,6 +104,7 @@ public class FileAnnotationTab extends JPanel {
             tab.setUpGui();
 
             tab.isInitialized = true;
+            tab.parent.repaint();
             return tab;
         }
         return tab;
