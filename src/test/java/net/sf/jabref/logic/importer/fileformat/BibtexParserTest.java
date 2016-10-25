@@ -235,6 +235,38 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseReallyUnknownType() throws Exception {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
+    public void parseOtherTypeTest() throws Exception {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
     public void parseRecognizesEntryWithVeryLongType() throws IOException {
 
         ParserResult result = BibtexParser.parse(

@@ -61,6 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improve language quality of the German translation of shared database
 - Change "Recent files" to "Recent databases" to keep the file menu consistent
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
+- [koppor/#97] (https://github.com/koppor/jabref/issues/97): When importing preferences, the explorer will start where the preferences are last exported
 - [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
 - Updated Vietnam translation

@@ -67,8 +67,7 @@ public class FileSaveSession extends SaveSession {
             return;
         }
         if (backup && Files.exists(file)) {
-            Path fileName = file.getFileName();
-            Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
+            Path backupFile = FileUtil.addExtension(file, BACKUP_EXTENSION);
             FileUtil.copyFile(file, backupFile, true);
         }
         try {
