@@ -1092,7 +1092,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    public class StoreFieldAction extends AbstractAction {
+    class StoreFieldAction extends AbstractAction {
 
         public StoreFieldAction() {
             super("Store field value");
@@ -1193,8 +1193,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
-                                    .format(toSet, fieldEditor.getFieldName());
+                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()).format(toSet,
+                                    fieldEditor.getFieldName());
                         }
 
                         String oldValue = entry.getField(fieldEditor.getFieldName()).orElse(null);
@@ -1214,7 +1214,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
-                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
+                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry,
+                                fieldEditor.getFieldName(), oldValue, toSet);
                         if (updateTimeStampIsSet()) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
@@ -1235,7 +1236,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         fieldEditor.setInvalidBackgroundColor();
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                                    Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                             LOGGER.debug("Error setting field", ex);
                             requestFocus();
                         }
@@ -1248,8 +1249,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (fieldEditor.getTextComponent().hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
-            } else if (source.isEditable()
-                    && !source.getText().equals(lastSourceStringAccepted)) {
+            } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {
                 validEntry = storeSource();
             }
 
