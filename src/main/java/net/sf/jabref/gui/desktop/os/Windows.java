@@ -10,6 +10,8 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
 import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Windows implements NativeDesktop {
@@ -59,9 +61,10 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-        if (!JabRefPreferences.getInstance().get(USE_PDF_READER).equals(USE_PDF_READER)) {
+        String pdfReaderPath = JabRefPreferences.getInstance().get(USE_PDF_READER);
+        if (pdfReaderPath.equals(SUMATRA_PDF_COMMAND) || pdfReaderPath.equals(ADOBE_ACROBAT_COMMAND)) {
             String[] command = new String[parameters.size() + 2];
-            command[0] = "\"" + Paths.get(JabRefPreferences.getInstance().get(USE_PDF_READER)).toString() + "\"";
+            command[0] = "\"" + Paths.get(pdfReaderPath).toString() + "\"";
             for (int i = 1; i < command.length - 1; i++) {
                 command[i] = "\"" + parameters.get(i - 1) + "\"";
             }

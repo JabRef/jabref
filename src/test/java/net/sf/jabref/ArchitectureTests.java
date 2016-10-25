@@ -68,7 +68,6 @@ public class ArchitectureTests {
     @Test
     public void fistPackageIsIndependentOfSecondPackage() throws IOException {
 
-
         Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage) && !(exceptionStrings.get(firstPackage).stream()
                 .filter(exception -> s.startsWith("import " + exception)).findAny().isPresent()
         );
@@ -79,8 +78,8 @@ public class ArchitectureTests {
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
-                return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
-                        .filter(isPackage).findAny().isPresent();
+                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
+                                .filter(isPackage).findAny().isPresent();
                     } catch (IOException e) {
                         return false;
                     }

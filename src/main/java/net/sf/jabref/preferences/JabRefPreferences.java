@@ -287,7 +287,7 @@ public class JabRefPreferences {
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
 
     public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
-    public static final String SUMATRA_COMMAND = "sumatraCommand";
+    public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
     public static final String USE_PDF_READER = "usePDFReader";
 
     // Currently, it is not possible to specify defaults for specific entry types
@@ -831,12 +831,12 @@ public class JabRefPreferences {
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
             defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
-            defaults.put(SUMATRA_COMMAND, "C:\\Program Files\\SumatraPDF");
+            defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
             defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
         } else {
             defaults.put(CONSOLE_COMMAND, "");
             defaults.put(ADOBE_ACROBAT_COMMAND, "");
-            defaults.put(SUMATRA_COMMAND, "");
+            defaults.put(SUMATRA_PDF_COMMAND, "");
             defaults.put(USE_PDF_READER, "");
         }
 

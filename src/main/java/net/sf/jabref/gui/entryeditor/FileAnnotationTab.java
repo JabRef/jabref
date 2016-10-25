@@ -40,10 +40,14 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.pdf.FileAnnotation;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
+
+import static net.sf.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class FileAnnotationTab extends JPanel {
 
@@ -307,7 +311,11 @@ public class FileAnnotationTab extends JPanel {
             }
             String pathToFile = fileNameComboBox.getSelectedItem().toString();
             StringJoiner sj = new StringJoiner(" ");
-            sj.add("/a page=" + pageNo);
+            if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(SUMATRA_PDF_COMMAND)){
+                sj.add("-page " + pageNo);
+            } else {
+                sj.add("/a page=" + pageNo);
+            }
 
             if(desktop instanceof Linux){
                 pathToFile = System.getProperty("file.separator")
