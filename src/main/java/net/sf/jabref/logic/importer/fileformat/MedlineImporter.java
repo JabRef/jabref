@@ -2,8 +2,12 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,10 +23,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.logic.importer.Importer;
+import net.sf.jabref.logic.importer.ParseException;
+import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
 import net.sf.jabref.logic.importer.fileformat.medline.AffiliationInfo;
+import net.sf.jabref.logic.importer.fileformat.medline.ArticleId;
+import net.sf.jabref.logic.importer.fileformat.medline.ArticleIdList;
 import net.sf.jabref.logic.importer.fileformat.medline.ArticleTitle;
 import net.sf.jabref.logic.importer.fileformat.medline.Author;
 import net.sf.jabref.logic.importer.fileformat.medline.AuthorList;
@@ -76,11 +84,11 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Importer for the Medline/Pubmed format.
- *
+ * <p>
  * check here for details on the format
  * https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
  */
-public class MedlineImporter extends Importer {
+public class MedlineImporter extends Importer implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -319,6 +327,10 @@ public class MedlineImporter extends Importer {
                 DateRevised dateRevised = article.getMedlineCitation().getDateRevised();
                 addDateRevised(fields, dateRevised);
                 putIfValueNotNull(fields, "pubstatus", article.getPubmedData().getPublicationStatus());
+                if (article.getPubmedData().getArticleIdList() != null) {
+                    ArticleIdList articleIdList = article.getPubmedData().getArticleIdList();
+                    addArticleIdList(fields, articleIdList);
+                }
             }
         }
         if (article.getMedlineCitation() != null) {
@@ -385,6 +397,18 @@ public class MedlineImporter extends Importer {
         entry.setField(fields);
 
         bibItems.add(entry);
+    }
+
+    private void addArticleIdList(Map<String, String> fields, ArticleIdList articleIdList) {
+        for (ArticleId id : articleIdList.getArticleId()) {
+            if (id.getIdType() != null) {
+                if ("pubmed".equals(id.getIdType())) {
+                    fields.put("pmid", id.getContent());
+                } else {
+                    fields.put(id.getIdType(), id.getContent());
+                }
+            }
+        }
     }
 
     private void addNotes(Map<String, String> fields, List<GeneralNote> generalNote) {
@@ -645,7 +669,7 @@ public class MedlineImporter extends Importer {
      * Medline reports page ranges in a shorthand format.
      * The last page is reported using only the digits which
      * differ from the first page.
-     *    i.e. 12345-51 refers to the actual range 12345-12351
+     * i.e. 12345-51 refers to the actual range 12345-12351
      */
     private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
@@ -662,4 +686,15 @@ public class MedlineImporter extends Importer {
         return startPage + "--" + endPage;
     }
 
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+        try {
+            return importDatabase(
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+
+        } catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage(), e);
+        }
+        return Collections.emptyList();
+    }
 }
