@@ -11,6 +11,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
@@ -35,7 +36,6 @@ public class Cleanups {
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-//        defaultFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new OrdinalsToSuperscriptFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
         List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
@@ -46,12 +46,14 @@ public class Cleanups {
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.JOURNAL, new UnicodeToLatexFormatter()));
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.AUTHOR, new UnicodeToLatexFormatter()));
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.EDITOR, new UnicodeToLatexFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
         List<FieldFormatterCleanup> recommendedBibLaTeXFormatters = new ArrayList<>();
         recommendedBibLaTeXFormatters.addAll(defaultFormatters);
         recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
         recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibLaTeXFormatters);
     }
 
