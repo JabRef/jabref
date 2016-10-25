@@ -220,7 +220,7 @@ class EntryEditorTab {
             prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
             break;
         case FieldName.EDITOR:
-            prompt = String.format("%1$s andk %1$s and others", Localization.lang("Firstname Lastname"));
+            prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
             break;
         case FieldName.YEAR:
             prompt = String.format("YYYY");
