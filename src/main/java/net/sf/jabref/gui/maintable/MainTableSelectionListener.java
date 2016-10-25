@@ -138,6 +138,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     updatePreview(newSelected, false);
                 }
             }
+            //  Show current selected entry on prrv window
+            if(true) {
+                //viewOnSelectedBibTexKey(selected.get(0).getField("bibtexkey").get());
+            }
         }
     }
 

@@ -20,7 +20,6 @@ import java.util.Optional;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
-import javafx.scene.control.TextInputDialog;
 
 /**
  * This class provides static methods to create default
@@ -124,29 +123,6 @@ public abstract class FXDialogs {
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
-    }
-
-    /**
-     * This will create and display a new textinputdialog of the specified
-     * {@link AlertType} but with user defined buttons as optional
-     * {@link ButtonType}s.
-     *
-     * @param defaultText as default value for the input field
-     * @param title as String
-     * @param context as String
-     * @return inputValue as String of the input field
-     */
-    public static String showTextInputDialogAndWait(String defaultText, String title, String context) {
-        TextInputDialog dialog = new TextInputDialog(defaultText);
-        dialog.setTitle(title);
-        //dialog.setHeaderText("Look, a Text Input Dialog");
-        dialog.setContentText(context);
-
-        // Traditional way to get the response value.
-        Optional<String> result = dialog.showAndWait();
-        String inputValue = result.get();
-
-        return inputValue;
     }
 
     private static FXAlert createDialog(AlertType type, String title, String content) {
