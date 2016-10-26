@@ -211,37 +211,22 @@ class EntryEditorTab {
     }
 
     private String getPrompt(String field) {
-        String prompt = "";
         switch (field) {
-        case FieldName.AUTHOR:
-            prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
-            break;
-        case FieldName.EDITOR:
-            prompt = String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
-            break;
-        case FieldName.YEAR:
-            prompt = String.format("YYYY");
-            break;
-        case FieldName.DATE:
-            prompt = String.format("YYYY-MM-DD");
-            break;
-        case FieldName.URLDATE:
-            prompt = String.format("YYYY-MM-DD");
-            break;
-        case FieldName.EVENTDATE:
-            prompt = String.format("YYYY-MM-DD");
-            break;
-        case FieldName.ORIGDATE:
-            prompt = String.format("YYYY-MM-DD");
-            break;
-        case FieldName.URL:
-            prompt = String.format("https://");
-            break;
-        default:
-            prompt = "";
-            break;
+            case FieldName.AUTHOR:
+            case FieldName.EDITOR:
+                return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
+            case FieldName.YEAR:
+                return "YYYY";
+            case FieldName.DATE:
+            case FieldName.URLDATE:
+            case FieldName.EVENTDATE:
+            case FieldName.ORIGDATE:
+                return "YYYY-MM-DD";
+            case FieldName.URL:
+                return "https://";
+            default:
+                return "";
         }
-        return prompt;
     }
 
     private BibEntry getEntry() {
