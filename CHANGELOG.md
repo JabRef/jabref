@@ -74,6 +74,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
 - Updated Vietnam translation
+- Added greyed-out suggestion for `year`/`date`/`url` fields
 
 ### Fixed
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
