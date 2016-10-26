@@ -96,7 +96,7 @@ public class KeywordGroup extends AbstractGroup {
                 if (!contains(entry)) {
                     String oldContent = entry.getField(searchField).orElse(null);
                     String newContent = (oldContent == null ? "" : oldContent
-                            + keywordSeparator)
+                            + keywordSeparator + " ")
                             + searchExpression;
                     entry.setField(searchField, newContent);
 
