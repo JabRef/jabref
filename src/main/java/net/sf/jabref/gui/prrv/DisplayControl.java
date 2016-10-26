@@ -6,7 +6,6 @@ import java.util.List;
 
 import javafx.event.Event;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 
 import prefux.FxDisplay;
@@ -23,7 +22,7 @@ import prefux.visual.VisualItem;
  */
 public class DisplayControl extends ControlAdapter implements TableListener {
 
-    private List<Tooltip> toolTipList = new ArrayList<>();
+    private List<Label> labelList = new ArrayList<>();
 
 
     @Override
@@ -43,7 +42,7 @@ public class DisplayControl extends ControlAdapter implements TableListener {
         Visualization vis = fdx.getVisualization();
         Iterator it = vis.items();
 
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             VisualItem item = (VisualItem) it.next();
             if (item instanceof NodeItem) {
                 System.out.println(item.get("bibtexkey"));
@@ -52,51 +51,39 @@ public class DisplayControl extends ControlAdapter implements TableListener {
     }
 
     public void showNodeKey(VisualItem item, FxDisplay display, BorderPane pane) {
-        // TODO Instead tooltip -> label with border
-/*
-            Tooltip mousePositionToolTip = new Tooltip("");
-            toolTipList.add(mousePositionToolTip);
-            System.out.println("parent"+ display.localToScreen(item.getX(),item.getY()));
-            String msg = item.get("bibtexkey").toString();
-            mousePositionToolTip.setGraphicTextGap(0);
-            mousePositionToolTip.setText(msg);
-            Node node = (Node) item.getNode();
-            mousePositionToolTip.show(pane.getScene().getWindow(),
-                    display.localToScreen(item.getX(),item.getY()).getX() ,
-                    display.localToScreen(item.getX(),item.getY()).getY());
-//            mousePositionToolTip.xProperty().doubleExpression(node.translateXProperty());
-  //          mousePositionToolTip.yProperty().doubleExpression(node.translateYProperty());
-*/
-// ******************* NEW TRY
         String msg = item.get("bibtexkey").toString();
         Label label = new Label(msg);
-        //label.getStyleClass().add("outline");
+        label.getStyleClass().add("outline");
         label.translateXProperty().bind(item.xProperty());
         label.translateYProperty().bind(item.yProperty());
         label.setStyle("-fx-fill: lightseagreen;" +
                 "-fx-stroke: firebrick;" +
                 "-fx-stroke-width: 2px;");
-//pane.getChildren().addAll(label);
-display.getChildren().addAll(label);
-       // display.repaint();
-
-            //mousePositionToolTip.xProperty().doubleExpression(((ObservableDoubleValue) display.localToScreen(item.getX(), item.getY())));
-            //mousePositionToolTip.yProperty().doubleExpression(((ObservableDoubleValue) display.localToScreen(item.getX(), item.getY())));
-
-
-
-        }
+        labelList.add(label);
+        display.getChildren().addAll(label);
+    }
 
     public void hideNodeKeys() {
-        toolTipList.forEach(Tooltip -> {
-            Tooltip.hide();
+        labelList.forEach(Label -> {
+            Label.setVisible(false);
         });
     }
 
-    public void viewOnSelectedBibTexKey(String bibtexKey) {
-
+    public void viewOnSelectedBibTexKey(String bibtexKey, FxDisplay display, BorderPane root) {
+        Iterator<VisualItem> it = display.getVisualization().items();
+        while (it.hasNext()) {
+            if (it.hasNext()) {
+                VisualItem item = it.next();
+                if (item instanceof NodeItem) {
+                    if (item.get("bibtexkey").toString().matches(bibtexKey)) {
+                        display.setTranslateX(-item.getX());
+                        display.setTranslateY(-item.getY());
+                        display.computeAreaInScreen();
+                    }
+                }
+            }
+        }
     }
-
 
 
 }

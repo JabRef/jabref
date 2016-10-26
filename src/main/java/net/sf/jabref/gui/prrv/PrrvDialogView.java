@@ -41,16 +41,18 @@ public class PrrvDialogView {
     private static final double WIDTH = 600;
     private static final double HEIGHT = 600;
     private static final String GROUP = "graph";
-    private static Stage primaryStage = new Stage();
+    private static Stage primaryStage;
+    private static BorderPane root = new BorderPane();
     private CheckBox keyCB = new CheckBox();
     private Visualization vis = new Visualization();
-    private FxDisplay display;
-    private DisplayControl control = new DisplayControl();
+    public static FxDisplay display;
+    private static DisplayControl control = new DisplayControl();
 
     public void show() {
         // -- 1. setup dialog -----------------------------------------------------
+        primaryStage = new Stage();
         primaryStage.setTitle("PRRV");
-        BorderPane root = new BorderPane();
+
         primaryStage.setScene(new Scene(root, WIDTH, HEIGHT));
         root.getStyleClass().add("display");
         primaryStage.show();
@@ -199,6 +201,10 @@ public class PrrvDialogView {
         } else {
             control.hideNodeKeys();
         }
+    }
+
+    public static void notifyDisplayChange(String bibtexkey) {
+        control.viewOnSelectedBibTexKey(bibtexkey, display, root);
     }
 
 }

@@ -33,6 +33,7 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
+import net.sf.jabref.gui.prrv.PrrvDialogView;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
@@ -139,8 +140,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             }
             //  Show current selected entry on prrv window
-            if(true) {
-                //viewOnSelectedBibTexKey(selected.get(0).getField("bibtexkey").get());
+            if(PrrvDialogView.display != null) {
+                PrrvDialogView.notifyDisplayChange(selected.get(0).getField("bibtexkey").get());
             }
         }
     }
