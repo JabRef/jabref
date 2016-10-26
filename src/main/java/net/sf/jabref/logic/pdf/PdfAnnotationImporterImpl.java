@@ -1,10 +1,12 @@
 package net.sf.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -47,10 +49,16 @@ public class PdfAnnotationImporterImpl implements AnnotationImporterInterface {
             try{
                 document = importPdfFile(path);
             } catch (FileNotFoundException notFound) {
-                String absolutePath = FileUtil.expandFilename(context, path,
-                        JabRefPreferences.getInstance().getFileDirectoryPreferences())
-                        .get().getAbsolutePath();
-                document = importPdfFile(absolutePath);
+                Optional<File> importedFile = FileUtil.expandFilename(context, path,
+                        JabRefPreferences.getInstance().getFileDirectoryPreferences());
+                //Check if the file could be loaded
+                if(importedFile.isPresent()){
+                    String absolutePath = importedFile.get().getAbsolutePath();
+                    document = importPdfFile(absolutePath);
+                } else {
+                    //return empty list to recognize invalid import
+                    return annotationsList;
+                }
             }
 
         } catch (IOException e) {
