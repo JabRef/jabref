@@ -51,7 +51,7 @@ public class InternalBibtexFields {
             FieldName.NAMEADDON, FieldName.ASSIGNEE);
 
     private static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList(FieldName.EDITORTYPE,
-            FieldName.EDITORTYPEA, FieldName.EDITORTYPEB, FieldName.EDITORTYPEC);
+            FieldName.EDITORATYPE, FieldName.EDITORBTYPE, FieldName.EDITORCTYPE);
 
     private static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList(FieldName.PAGINATION,
             FieldName.BOOKPAGINATION);
