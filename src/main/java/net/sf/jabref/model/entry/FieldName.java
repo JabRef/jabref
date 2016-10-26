@@ -46,9 +46,9 @@ public class FieldName {
     public static final String EDITORB = "editorb";
     public static final String EDITORC = "editorc";
     public static final String EDITORTYPE = "editortype";
-    public static final String EDITORTYPEA = "editortypea";
-    public static final String EDITORTYPEB = "editortypeb";
-    public static final String EDITORTYPEC = "editortypec";
+    public static final String EDITORATYPE = "editoratype";
+    public static final String EDITORBTYPE = "editorbtype";
+    public static final String EDITORCTYPE = "editorctype";
     public static final String EID = "eid";
     public static final String ENTRYSET = "entryset";
     public static final String EPRINT = "eprint";
