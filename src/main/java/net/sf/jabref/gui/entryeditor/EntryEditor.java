@@ -236,19 +236,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addRequiredTab(type);
 
         // optional fields
-        List<String> displayedOptionalFields = new ArrayList<>();
         Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
         Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-                displayedOptionalFields.addAll(type.getOptionalFields());
-
                 addOptionalTab(type);
             } else {
-                displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
-                displayedOptionalFields.addAll(type.getSecondaryOptionalFields());
-
                 addOptionalTab(type);
 
                 deprecatedFields.add(FieldName.YEAR);
