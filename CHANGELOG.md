@@ -66,7 +66,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
 - Updated Vietnam translation
 - Added greyed-out suggestion for `year`/`date`/`url` fields
-- [#1908] (https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity
+- [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity CTRL + F8
 
 ### Fixed
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
