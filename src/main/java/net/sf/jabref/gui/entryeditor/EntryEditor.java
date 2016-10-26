@@ -464,22 +464,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
-     * Rebuild the field tabs. This is called e.g. when a new content selector
-     * has been added.
-     */
-    public void rebuildPanels() {
-        // Remove change listener, because the rebuilding causes meaningless
-        // events and trouble:
-        tabbed.removeChangeListener(tabListener);
-
-        setupFieldPanels();
-        // Add the change listener again:
-        tabbed.addChangeListener(tabListener);
-        revalidate();
-        repaint();
-    }
-
-    /**
      * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
      * If the name has an entry, the proper component to be shown is created and
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
@@ -554,7 +538,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
     }
 
-    void removeSearchListeners() {
+    private void removeSearchListeners() {
         for (SearchQueryHighlightListener listener : searchListeners) {
             panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().removeSearchListener(listener);
         }
@@ -581,7 +565,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter
                 .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
@@ -671,17 +655,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
-     * Centers the given row, and highlights it.
-     *
-     * @param row an <code>int</code> value
-     */
-    private void scrollTo(int row) {
-        movingToDifferentEntry = true;
-        panel.getMainTable().setRowSelectionInterval(row, row);
-        panel.getMainTable().ensureVisible(row);
-    }
-
-    /**
      * Makes sure the current edit is stored.
      */
     public void storeCurrentEdit() {
@@ -692,15 +665,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
             getStoreFieldAction().actionPerformed(new ActionEvent(comp, 0, ""));
         }
-    }
-
-    /**
-     * Returns the index of the active (visible) panel.
-     *
-     * @return an <code>int</code> value
-     */
-    public int getVisiblePanel() {
-        return tabbed.getSelectedIndex();
     }
 
     /**
@@ -731,30 +695,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 entryEditorTab.activate();
             }
         }
-    }
-
-    /**
-     * Updates this editor to show the given entry, regardless of type
-     * correspondence.
-     *
-     * @param switchEntry a <code>BibEntry</code> value
-     */
-    public synchronized void switchTo(BibEntry switchEntry) {
-        storeCurrentEdit();
-
-        // Remove this instance as property listener for the entry:
-        this.entry.unregisterListener(this);
-
-        this.entry = switchEntry;
-
-        // Register as property listener for the new entry:
-        this.entry.registerListener(this);
-
-        updateAllFields();
-        validateAllFields();
-        updateSource();
-        panel.newEntryShowing(switchEntry);
-
     }
 
     private boolean storeSource() {
@@ -899,20 +839,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
-     * Removes the "invalid field" color from all text areas.
-     */
-    public void validateAllFields() {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).validateAllFields();
-            }
-        }
-    }
-
-    /**
      * Update the JTextArea when a field has changed.
      */
     @Subscribe
+    @SuppressWarnings("unused")
     public void listen(FieldChangedEvent fieldChangedEvent) {
         String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
         if (SwingUtilities.isEventDispatchThread()) {

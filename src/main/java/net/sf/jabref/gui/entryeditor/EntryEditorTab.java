@@ -349,19 +349,6 @@ class EntryEditorTab {
         return true;
     }
 
-    public void validateAllFields() {
-        for (Map.Entry<String, FieldEditor> stringFieldEditorEntry : editors.entrySet()) {
-            FieldEditor ed = stringFieldEditorEntry.getValue();
-            ed.updateFontColor();
-            ed.setEnabled(true);
-            if (((Component) ed).hasFocus()) {
-                ed.setActiveBackgroundColor();
-            } else {
-                ed.setValidBackgroundColor();
-            }
-        }
-    }
-
     public void setEnabled(boolean enabled) {
         for (FieldEditor editor : editors.values()) {
             editor.setEnabled(enabled);
