@@ -93,10 +93,7 @@ class EntryEditorTab {
 
         setupPanel(frame, panel, addKeyField, compressed, tabTitle);
 
-        /*
-         * The following line makes sure focus cycles inside tab instead of
-         * being lost to other parts of the frame:
-         */
+        // The following line makes sure focus cycles inside tab instead of being lost to other parts of the frame:
         scrollPane.setFocusCycleRoot(true);
     }
 
@@ -262,8 +259,7 @@ class EntryEditorTab {
     }
 
     public void markIfModified(FieldEditor fieldEditor) {
-        // Only mark as changed if not already is and the field was indeed
-        // modified
+        // Only mark as changed if not already is and the field was indeed modified
         if (!updating && !basePanel.isModified() && isFieldModified(fieldEditor)) {
             markBaseChanged();
         }
@@ -300,9 +296,7 @@ class EntryEditorTab {
 
     public void activate() {
         if (activeField != null) {
-            /**
-             * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
-             */
+            // Corrected to fix [ 1594169 ] Entry editor: navigation between panels
             activeField.getTextComponent().requestFocus();
         }
     }
@@ -313,8 +307,6 @@ class EntryEditorTab {
     public void updateAll() {
         setEntry(getEntry());
     }
-
-
 
     public void setEntry(BibEntry entry) {
         try {

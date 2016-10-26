@@ -115,30 +115,31 @@ import org.apache.commons.logging.LogFactory;
 public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
-    // A reference to the entry this object works on.
+    /** A reference to the entry this object works on. */
     private BibEntry entry;
-    // The currently displayed type
+    /** The currently displayed type */
     private final String displayedBibEntryType;
 
-    // The action concerned with closing the window.
-    private final CloseAction closeAction;
-
-    // The action that deletes the current entry, and closes the editor.
+    /** The action concerned with closing the window. */
+    private final CloseAction closeAction = new CloseAction();
+    /** The action that deletes the current entry, and closes the editor. */
     private final DeleteAction deleteAction = new DeleteAction();
 
-    // Actions for switching to next/previous entry.
+    /** The action for switching to the next entry. */
     private final AbstractAction nextEntryAction = new NextEntryAction();
+    /** The action for switching to the previous entry. */
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
-    // The action concerned with storing a field value.
-    private final StoreFieldAction storeFieldAction;
+    /** The action concerned with storing a field value. */
+    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
 
-    // The actions concerned with switching the panels.
+    /** The action for switching to the next tab */
     private final SwitchLeftAction switchLeftAction = new SwitchLeftAction();
+    /** The action for switching to the previous tab */
     private final SwitchRightAction switchRightAction = new SwitchRightAction();
 
-    // The action which generates a bibtexkey for this entry.
-    private final GenerateKeyAction generateKeyAction;
+    /** The action which generates a BibTeX key for this entry. */
+    private final GenerateKeyAction generateKeyAction = new GenerateKeyAction();
 
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     private FileListEditor fileListEditor;
@@ -158,25 +159,33 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final BasePanel panel;
 
-    private boolean updateSource = true; // This can be set to false to stop the source
-    private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
+    /**
+     * This can be set to false to stop the source text area from getting updated. This is used in cases where the
+     * source couldn't be parsed, and the user is given the option to edit it.
+     */
+    private boolean updateSource = true;
+    /** Indicates that we are about to go to the next or previous entry */
+    private boolean movingToDifferentEntry;
     private boolean validEntry = true;
 
     private final List<Object> tabs = new ArrayList<>();
 
-    // text area from getting updated. This is used in cases where the source
-    // couldn't be parsed, and the user is given the option to edit it.
     private boolean lastFieldAccepted = true;
-    private boolean lastSourceAccepted = true; // This indicates whether the last attempt
-    // at parsing the source was successful. It is used to determine whether the
-    // dialog should close; it should stay open if the user received an error
-    // message about the source, whatever he or she chose to do about it.
-    private String lastSourceStringAccepted; // This is used to prevent double fields.
-    // These values can be used to calculate the preferred height for the form.
-    // reqW starts at 1 because it needs room for the bibtex key field.
-    private int sourceIndex = -1; // The index the source panel has in tabbed.
 
-    private final HelpAction helpAction;
+    /**
+     *  This indicates whether the last attempt at parsing the source was successful. It is used to determine whether
+     *  the dialog should close; it should stay open if the user received an error message about the source,
+     *  whatever he or she chose to do about it.
+     */
+    private boolean lastSourceAccepted = true;
+
+    /** This is used to prevent double updates after editing source. */
+    private String lastSourceStringAccepted;
+
+    /** The index the source panel has in tabbed. */
+    private int sourceIndex = -1;
+
+    private final HelpAction helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
 
     private final UndoAction undoAction = new UndoAction();
 
@@ -197,10 +206,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         displayedBibEntryType = entry.getType();
 
-        helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
-        closeAction = new CloseAction();
-        generateKeyAction = new GenerateKeyAction();
-        storeFieldAction = new StoreFieldAction();
         writeXmp = new WriteXMPEntryEditorAction(panel, this);
 
         BorderLayout borderLayout = new BorderLayout();
@@ -328,7 +333,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         srcPanel.setName(panelName);
         tabbed.addTab(panelName, IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel, toolTip);
         tabs.add(srcPanel);
-        sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
+        // Set the sourceIndex variable
+        sourceIndex = tabs.size() - 1;
         srcPanel.setFocusCycleRoot(true);
     }
 
@@ -394,8 +400,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         toolBar.setMargin(new Insets(0, 0, 0, 2));
 
-        // The toolbar carries all the key bindings that are valid for the whole
-        // window.
+        // The toolbar carries all the key bindings that are valid for the whole window.
         ActionMap actionMap = toolBar.getActionMap();
         InputMap inputMap = toolBar.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -563,25 +568,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 source.setText(srcString);
                 lastSourceStringAccepted = srcString;
 
-                //////////////////////////////////////////////////////////
                 // Set the current Entry to be selected.
-                // Fixes the bug of losing selection after, e.g.
-                // an autogeneration of a BibTeX key.
-                // - ILC (16/02/2010) -
-                //////////////////////////////////////////////////////////
-                SwingUtilities.invokeLater(() -> {
-                    final int row = panel.getMainTable().findEntry(entry);
-                    if (row >= 0) {
-                        if (panel.getMainTable().getSelectedRowCount() == 0) {
-                            panel.getMainTable().setRowSelectionInterval(row, row);
-                        }
-                        panel.getMainTable().ensureVisible(row);
-                    }
-                });
+                // Fixes the bug of losing selection after, e.g. an autogeneration of a BibTeX key.
+                SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and "
-                                + "reopen editor to display/edit source."));
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
                 source.setEditable(false);
                 LOGGER.debug("Incorrect entry", ex);
             }
@@ -856,12 +848,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // TODO: does updating work properly after source stored?
             panel.markBaseChanged();
 
-            SwingUtilities.invokeLater(() -> {
-                final int row = panel.getMainTable().findEntry(entry);
-                if (row >= 0) {
-                    panel.getMainTable().ensureVisible(row);
-                }
-            });
+            SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
 
             return true;
         } catch (IllegalStateException | IOException ex) {
@@ -1001,17 +988,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    /**
+     * Focus listener that fires the storeFieldAction when a TextArea loses focus.
+     */
     private class FieldListener extends FocusAdapter {
-
-        /*
-         * Focus listener that fires the storeFieldAction when a TextArea
-         * loses focus.
-         */
-        @Override
-        public void focusGained(FocusEvent e) {
-            // Do nothing
-        }
-
         @Override
         public void focusLost(FocusEvent event) {
             if (!event.isTemporary()) {
@@ -1023,10 +1003,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class TabListener implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent event) {
-            // We tell the editor tab to update all its fields.
-            //  This makes sure they are updated even if the tab we
-            // just left contained one
-            // or more of the same fields as this one:
+            // We tell the editor tab to update all its fields. This makes sure they are updated even if the tab we
+            // just left contained one or more of the same fields as this one:
             SwingUtilities.invokeLater(() -> {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof EntryEditorTab) {
@@ -1088,7 +1066,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
             close();
-
         }
     }
 
@@ -1185,12 +1162,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                             && toSet.equals(entry.getField(fieldEditor.getFieldName()).orElse(null)));
                 }
 
-                if (set) {
+                if (!set) {
+                    // We set the field and label color.
+                    fieldEditor.setValidBackgroundColor();
+                } else {
                     try {
-                        // The following statement attempts to write the
-                        // new contents into a StringWriter, and this will
-                        // cause an IOException if the field is not
-                        // properly formatted. If that happens, the field
+                        // The following statement attempts to write the new contents into a StringWriter, and this will
+                        // cause an IOException if the field is not properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
                             new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()).format(toSet,
@@ -1241,10 +1219,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                             requestFocus();
                         }
                     }
-                } else {
-                    // set == false
-                    // We set the field and label color.
-                    fieldEditor.setValidBackgroundColor();
                 }
                 if (fieldEditor.getTextComponent().hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
@@ -1256,12 +1230,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             if (!movingAway && isShowing()) {
-                SwingUtilities.invokeLater(() -> {
-                    final int row = panel.getMainTable().findEntry(entry);
-                    if (row >= 0) {
-                        panel.getMainTable().ensureVisible(row);
-                    }
-                });
+                SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
             }
         }
     }
@@ -1334,14 +1303,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // 1. get BibEntry for selected index (already have)
             // 2. update label
 
-            // Store the current edit in case this action is called during the
-            // editing of a field:
+            // Store the current edit in case this action is called during the editing of a field:
             storeCurrentEdit();
 
             // This is a partial clone of net.sf.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
 
-            // this updates the table automatically, on close, but not
-            // within the tab
+            // this updates the table automatically, on close, but not within the tab
             Optional<String> oldValue = entry.getCiteKeyOptional();
 
             if (oldValue.isPresent()) {
