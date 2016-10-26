@@ -65,6 +65,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
 - Updated Vietnam translation
+- Added greyed-out suggestion for `year`/`date`/`url` fields
 
 ### Fixed
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
@@ -105,6 +106,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
 - Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl-s</kbd> doesn't trigger parsing error message
 - Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
+- Fixed close action of entry editor not working after parsing error corrected
 
 ### Removed
 - Removed 2nd preview style
