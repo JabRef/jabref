@@ -257,7 +257,7 @@ class EntryEditorTab {
     /**
      * Only sets the activeField variable but does not focus it.
      * <p>
-     * Call activate afterwards.
+     * If you want to focus it call {@link #focus()} afterwards.
      *
      * @param fieldEditor
      */
@@ -279,9 +279,8 @@ class EntryEditorTab {
         return fields;
     }
 
-    public void activate() {
+    public void focus() {
         if (activeField != null) {
-            // Corrected to fix [ 1594169 ] Entry editor: navigation between panels
             activeField.getTextComponent().requestFocus();
         }
     }

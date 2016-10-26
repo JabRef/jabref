@@ -327,7 +327,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         srcPanel.setName(panelName);
         tabbed.addTab(panelName, IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel, toolTip);
         tabs.add(srcPanel);
-        // Set the sourceIndex variable
         sourceIndex = tabs.size() - 1;
         srcPanel.setFocusCycleRoot(true);
     }
@@ -620,7 +619,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Object activeTab = tabs.get(tabbed.getSelectedIndex());
 
         if (activeTab instanceof EntryEditorTab) {
-            ((EntryEditorTab) activeTab).activate();
+            ((EntryEditorTab) activeTab).focus();
         } else {
             source.requestFocus();
         }
@@ -686,7 +685,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 EntryEditorTab entryEditorTab = (EntryEditorTab) tab;
                 setVisiblePanel(entryEditorTab.getTabTitle());
                 entryEditorTab.setActive(fieldName);
-                entryEditorTab.activate();
+                entryEditorTab.focus();
             }
         }
     }
