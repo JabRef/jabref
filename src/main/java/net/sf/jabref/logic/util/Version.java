@@ -103,15 +103,19 @@ public class Version {
             return false;
         }
 
+        // compare the majors
         if (this.getMajor() > otherVersion.getMajor()) {
             return true;
         } else if (this.getMajor() == otherVersion.getMajor()) {
+            // if the majors are equal compare the minors
             if (this.getMinor() > otherVersion.getMinor()) {
                 return true;
             } else if (this.getMinor() == otherVersion.getMinor()) {
+                // if the minors are equal compare the patch numbers
                 if (this.getPatch() > otherVersion.getPatch()) {
                     return true;
                 } else if (this.getPatch() == otherVersion.getPatch()) {
+                    // The higher the ordinal the stabler the version (this is the cause the enum has to be sorted)
                     if (this.developmentStage.ordinal() > otherVersion.developmentStage.ordinal()) {
                         return true;
                     }
