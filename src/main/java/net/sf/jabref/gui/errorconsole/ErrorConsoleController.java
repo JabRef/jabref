@@ -3,12 +3,11 @@ package net.sf.jabref.gui.errorconsole;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.util.ViewModelListCellFactory;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
@@ -59,43 +58,35 @@ public class ErrorConsoleController {
      */
     private void listViewStyle() {
         // Handler for listCell appearance (example for exception Cell)
-        allMessages.setCellFactory(
-                new Callback<ListView<LogEvent>, ListCell<LogEvent>>() {
-                    @Override
-                    public ListCell<LogEvent> call(
-                            ListView<LogEvent> listView) {
-                        return new ListCell<LogEvent>() {
-
-                            @Override
-                            public void updateItem(LogEvent logMessage, boolean empty) {
-                                super.updateItem(logMessage, empty);
-                                if (logMessage != null) {
-                                    setText(logMessage.getMessage().toString());
-
-                                    Level logLevel = logMessage.getLevel();
-                                    switch (logLevel.getStandardLevel()) {
-                                        case ERROR:
-                                            getStyleClass().add("exception");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
-                                            break;
-                                        case WARN:
-                                            getStyleClass().add("output");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
-                                            break;
-                                        case INFO:
-                                            getStyleClass().add("log");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
-                                            break;
-                                        default:
-                                            setText(null);
-                                            setGraphic(null);
-                                            break;
-                                    }
-                                }
-                            }
-                        };
+        allMessages.setCellFactory(new ViewModelListCellFactory<LogEvent>().
+                withGraphic( viewModel -> {
+                    Level logLevel = viewModel.getLevel();
+                    switch (logLevel.getStandardLevel()) {
+                        case ERROR:
+                            return (IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
+                        case WARN:
+                            return (IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
+                        case INFO:
+                            return (IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
+                        default:
+                            return null;
                     }
-                });
+                }).
+                withStyleClass( viewModel -> {
+                    Level logLevel = viewModel.getLevel();
+                    switch (logLevel.getStandardLevel()) {
+                        case ERROR:
+                            return "exception";
+                        case WARN:
+                            return "output";
+                        case INFO:
+                            return "log";
+                        default:
+                            return null;
+                    }
+                }).
+                withText( viewModel -> viewModel.getMessage().getFormattedMessage())
+        );
     }
 
 }
