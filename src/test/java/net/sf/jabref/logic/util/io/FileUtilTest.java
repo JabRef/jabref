@@ -43,6 +43,18 @@ public class FileUtilTest {
     }
 
     @Test
+    public void extensionBakAddedCorrectly() {
+        assertEquals(Paths.get("demo.bib.bak"),
+                FileUtil.addExtension(Paths.get("demo.bib"), ".bak"));
+    }
+
+    @Test
+    public void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
+        assertEquals(Paths.get("tmp", "demo.bib.bak"),
+                FileUtil.addExtension(Paths.get("tmp", "demo.bib"), ".bak"));
+    }
+
+    @Test
     public void testGetLinkedFileNameDefault() {
         // bibkey - title
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";

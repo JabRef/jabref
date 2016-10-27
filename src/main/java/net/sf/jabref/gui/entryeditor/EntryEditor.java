@@ -166,15 +166,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     // text area from getting updated. This is used in cases where the source
     // couldn't be parsed, and the user is given the option to edit it.
-    private boolean lastSourceAccepted = true; // This indicates whether the last
-
-    // attempt
+    private boolean lastFieldAccepted = true;
+    private boolean lastSourceAccepted = true; // This indicates whether the last attempt
     // at parsing the source was successful. It is used to determine whether the
     // dialog should close; it should stay open if the user received an error
     // message about the source, whatever he or she chose to do about it.
-    private String lastSourceStringAccepted; // This is used to prevent double
-
-    // fields.
+    private String lastSourceStringAccepted; // This is used to prevent double fields.
     // These values can be used to calculate the preferred height for the form.
     // reqW starts at 1 because it needs room for the bibtex key field.
     private int sourceIndex = -1; // The index the source panel has in tabbed.
@@ -186,6 +183,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final RedoAction redoAction = new RedoAction();
 
     private final TabListener tabListener = new TabListener();
+
+    private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
 
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
@@ -527,7 +526,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
+        addSearchListener((SearchQueryHighlightListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);
@@ -543,6 +542,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
+    }
+
+    void addSearchListener(SearchQueryHighlightListener listener) {
+        searchListeners.add(listener);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
+    }
+
+    void removeSearchListeners() {
+        for (SearchQueryHighlightListener listener : searchListeners) {
+            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().removeSearchListener(listener);
+        }
     }
 
     public void updateSource() {
@@ -780,7 +790,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
             boolean entryChanged = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
-            entry.setCiteKey(newKey);
+            if (newKey != null) {
+                entry.setCiteKey(newKey);
+            } else {
+                entry.clearCiteKey();
+            }
 
             // First, remove fields that the user has removed.
             for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -927,8 +941,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public void setMovingToDifferentEntry() {
         movingToDifferentEntry = true;
+        unregisterListeners();
     }
 
+    private void unregisterListeners() {
+        entry.unregisterListener(this);
+        removeSearchListeners();
+    }
 
     private class TypeButton extends JButton {
         public TypeButton() {
@@ -1046,9 +1065,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
             updateField(source);
             if (lastSourceAccepted) {
                 panel.entryEditorClosing(EntryEditor.this);
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastSourceAccepted = true;
             }
         } else {
-            panel.entryEditorClosing(EntryEditor.this);
+            if (lastFieldAccepted) {
+                panel.entryEditorClosing(EntryEditor.this);
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
         }
     }
 
@@ -1061,10 +1088,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
             close();
+
         }
     }
 
-    public class StoreFieldAction extends AbstractAction {
+    class StoreFieldAction extends AbstractAction {
 
         public StoreFieldAction() {
             super("Store field value");
@@ -1096,6 +1124,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
+                    lastFieldAccepted = false;
                     textField.setInvalidBackgroundColor();
                     if (!SwingUtilities.isEventDispatchThread()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
@@ -1105,11 +1134,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     return;
                 }
 
-                entry.setCiteKey(newValue);
-
                 if (newValue == null) {
+                    entry.clearCiteKey();
                     warnEmptyBibtexkey();
                 } else {
+                    entry.setCiteKey(newValue);
                     boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
@@ -1164,8 +1193,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
-                                    .format(toSet, fieldEditor.getFieldName());
+                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()).format(toSet,
+                                    fieldEditor.getFieldName());
                         }
 
                         String oldValue = entry.getField(fieldEditor.getFieldName()).orElse(null);
@@ -1185,7 +1214,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
-                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
+                        UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry,
+                                fieldEditor.getFieldName(), oldValue, toSet);
                         if (updateTimeStampIsSet()) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
@@ -1202,10 +1232,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         updateSource();
                         panel.markBaseChanged();
                     } catch (IllegalArgumentException ex) {
+                        lastFieldAccepted = false;
                         fieldEditor.setInvalidBackgroundColor();
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                                    Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                             LOGGER.debug("Error setting field", ex);
                             requestFocus();
                         }
@@ -1218,8 +1249,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (fieldEditor.getTextComponent().hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
-            } else if (source.isEditable()
-                    && !source.getText().equals(lastSourceStringAccepted)) {
+            } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {
                 validEntry = storeSource();
             }
 
