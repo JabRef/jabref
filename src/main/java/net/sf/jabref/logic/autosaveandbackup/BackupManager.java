@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
  * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while making backups and rejects all redundant backup tasks.
- *
  * This class does not manage the .bak file which is created when opening a database.
  */
 public class BackupManager {
@@ -73,7 +72,6 @@ public class BackupManager {
             }
         }
     };
-
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {

@@ -596,9 +596,6 @@ public class BibDatabase {
         return getSharedDatabaseID().isPresent();
     }
 
-    /**
-     * @param sharedDatabaseID use null to unset the id
-     */
     public void setSharedDatabaseID(String sharedDatabaseID) {
         this.sharedDatabaseID = sharedDatabaseID;
     }
