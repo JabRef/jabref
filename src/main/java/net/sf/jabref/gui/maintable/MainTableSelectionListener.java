@@ -140,7 +140,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             }
             //  Show current selected entry on prrv window
-            if(PrrvDialogView.display != null) {
+            if(PrrvDialogView.isStarted) {
+
                 PrrvDialogView.notifyDisplayChange(selected.get(0).getField("bibtexkey").get());
             }
         }

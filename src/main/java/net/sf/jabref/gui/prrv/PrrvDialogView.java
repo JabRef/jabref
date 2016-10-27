@@ -2,6 +2,7 @@ package net.sf.jabref.gui.prrv;
 
 import java.util.Iterator;
 
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
@@ -10,6 +11,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import prefux.Constants;
 import prefux.FxDisplay;
@@ -41,16 +43,19 @@ public class PrrvDialogView {
     private static final double WIDTH = 600;
     private static final double HEIGHT = 600;
     private static final String GROUP = "graph";
-    private static Stage primaryStage;
+    public static boolean isStarted = false;
+    private Stage primaryStage = new Stage();
     private static BorderPane root = new BorderPane();
     private CheckBox keyCB = new CheckBox();
     private Visualization vis = new Visualization();
     public static FxDisplay display;
     private static DisplayControl control = new DisplayControl();
 
+
     public void show() {
         // -- 1. setup dialog -----------------------------------------------------
-        primaryStage = new Stage();
+        root = new BorderPane();
+
         primaryStage.setTitle("PRRV");
 
         primaryStage.setScene(new Scene(root, WIDTH, HEIGHT));
@@ -161,8 +166,19 @@ public class PrrvDialogView {
         vis.run("nodes");
         vis.run("color");
         vis.run("layout");
+        isStarted = true;
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
 
-        // Throw if some cite fields are not accessible
+                keyCB = null;
+                vis = null;
+                control = null;
+                primaryStage = null;
+                root = null;
+                System.out.println("Stage is closing");
+            }
+            // Throw if some cite fields are not accessible
+        });
     }
 
     private Node buildControlPanel(FxDisplay display) {
