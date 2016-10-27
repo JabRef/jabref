@@ -45,17 +45,10 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.exporter.CustomExportList;
 import net.sf.jabref.logic.exporter.ExportComparator;
-import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -76,8 +69,6 @@ import net.sf.jabref.logic.util.io.FileHistory;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
@@ -346,24 +337,6 @@ public class JabRefPreferences {
     public static final String CLEANUP_CONVERT_TO_BIBLATEX = "CleanUpConvertToBiblatex";
     public static final String CLEANUP_FIX_FILE_LINKS = "CleanUpFixFileLinks";
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
-    public static final CleanupPreset CLEANUP_DEFAULT_PRESET;
-    static {
-        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
-                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
-
-        List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
-        FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
-        CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
-    }
 
     public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
     public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
@@ -797,7 +770,7 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_USERNAME, "root");
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
-        insertCleanupPreset(defaults, CLEANUP_DEFAULT_PRESET);
+        insertDefaultCleanupPreset(defaults);
 
         // defaults for DroppedFileHandler UI
         defaults.put(DROPPEDFILEHANDLER_LEAVE, Boolean.FALSE);
@@ -1352,7 +1325,14 @@ public class JabRefPreferences {
         put(DEFAULT_ENCODING, encoding.name());
     }
 
-    private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
+    private static void insertDefaultCleanupPreset(Map<String, Object> storage) {
+        EnumSet<CleanupPreset.CleanupStep> deactivedJobs = EnumSet.of(
+                CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreset.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+
+        CleanupPreset preset = new CleanupPreset(EnumSet.complementOf(deactivedJobs), Cleanups.DEFAULT_SAVE_ACTIONS);
+
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
         storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
         storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());

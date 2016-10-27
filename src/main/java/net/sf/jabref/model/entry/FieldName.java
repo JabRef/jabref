@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +18,9 @@ public class FieldName {
     // fallbacks for a single column (e.g. "author/editor" to use editor where
     // author is not set):
     public static final String FIELD_SEPARATOR = "/";
+
+    public static final String INTERNAL_ALL_FIELD = "all";
+    public static final String INTERNAL_ALL_TEXT_FIELDS_FIELD = "all-text-fields";
 
     // Field name constants
     public static final String ABSTRACT = "abstract";
@@ -181,4 +186,11 @@ public class FieldName {
         }
         return StringUtil.capitalizeFirst(field);
     }
+
+    public static ArrayList getNotTextFieldNames() {
+        ArrayList<String> notTextFieldNames = new ArrayList<>();
+        notTextFieldNames.addAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
+    return notTextFieldNames;
+    }
+
 }
