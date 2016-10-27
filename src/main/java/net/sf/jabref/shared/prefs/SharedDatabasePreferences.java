@@ -31,6 +31,7 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
     private static final String SHARED_DATABASE_PASSWORD = "sharedDatabasePassword";
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
+    private static final String SHARED_DATABASE_SHOW_ASKING_SAVE_DIALOG = "sharedDatabaseShowAskingSaveDialog";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
     private final Preferences internalPrefs;
@@ -72,6 +73,10 @@ public class SharedDatabasePreferences {
         return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
     }
 
+    public boolean getShowAskingSaveDialog() {
+        return internalPrefs.getBoolean(SHARED_DATABASE_SHOW_ASKING_SAVE_DIALOG, true);
+    }
+
     public void setType(String type) {
         internalPrefs.put(SHARED_DATABASE_TYPE, type);
     }
@@ -98,6 +103,10 @@ public class SharedDatabasePreferences {
 
     public void setRememberPassword(boolean rememberPassword) {
         internalPrefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);
+    }
+
+    public void setShowAskingSaveDialog(boolean showDialog) {
+        internalPrefs.putBoolean(SHARED_DATABASE_SHOW_ASKING_SAVE_DIALOG, showDialog);
     }
 
     public void clearPassword() {
