@@ -51,7 +51,7 @@ public class InternalBibtexFields {
             FieldName.NAMEADDON, FieldName.ASSIGNEE);
 
     private static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList(FieldName.EDITORTYPE,
-            FieldName.EDITORTYPEA, FieldName.EDITORTYPEB, FieldName.EDITORTYPEC);
+            FieldName.EDITORATYPE, FieldName.EDITORBTYPE, FieldName.EDITORCTYPE);
 
     private static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList(FieldName.PAGINATION,
             FieldName.BOOKPAGINATION);
@@ -490,6 +490,22 @@ public class InternalBibtexFields {
         Collections.sort(publicFields);
 
         return publicFields;
+    }
+
+    /**
+     * returns a List with all fieldnames incl. internal fieldnames
+     */
+    public static List<String> getAllPublicAndInteralFieldNames() {
+        //add the internal field names to public fields
+        List<String> publicAndInternalFields = new ArrayList<>();
+        publicAndInternalFields.addAll(InternalBibtexFields.getAllPublicFieldNames());
+        publicAndInternalFields.add(FieldName.INTERNAL_ALL_FIELD);
+        publicAndInternalFields.add(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+
+        // sort the entries
+        Collections.sort(publicAndInternalFields);
+
+        return publicAndInternalFields;
     }
 
     public static List<String> getJournalNameFields() {
