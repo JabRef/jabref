@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 public class Version {
 
     private static final Log LOGGER = LogFactory.getLog(Version.class);
+    private static final Version UNKNOWN_VERSION = new Version();
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
 
@@ -36,38 +38,48 @@ public class Version {
     private DevelopmentStage developmentStage = DevelopmentStage.UNKNOWN;
     private boolean isDevelopmentVersion;
 
+    /** Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION}) */
+    private Version() {}
+
     /**
      * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
+     * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
-    public Version(String version) {
+    public static Version parse(String version) {
         if ((version == null) || "".equals(version) || version.equals(BuildInfo.UNKNOWN_VERSION)
                 || "${version}".equals(version)) {
-            return;
+            return UNKNOWN_VERSION;
         }
 
-        this.fullVersion = version;
+        Version parsedVersion= new Version();
+
+        parsedVersion.fullVersion = version;
         Matcher matcher = VERSION_PATTERN.matcher(version);
         if (matcher.find()) {
             try {
-                this.major = Integer.parseInt(matcher.group("major"));
+                parsedVersion.major = Integer.parseInt(matcher.group("major"));
 
                 String minorString = matcher.group("minor");
-                this.minor = minorString == null ? 0 : Integer.parseInt(minorString);
+                parsedVersion.minor = minorString == null ? 0 : Integer.parseInt(minorString);
 
                 String patchString = matcher.group("patch");
-                this.patch = patchString == null ? 0 : Integer.parseInt(patchString);
+                parsedVersion.patch = patchString == null ? 0 : Integer.parseInt(patchString);
 
                 String versionStageString = matcher.group("stage");
-                this.developmentStage = DevelopmentStage.getStage(versionStageString == null ? DevelopmentStage.STABLE.stage : versionStageString);
-                this.isDevelopmentVersion = matcher.group("dev") != null;
+                parsedVersion.developmentStage = DevelopmentStage.parse(versionStageString == null ? DevelopmentStage.STABLE.stage : versionStageString);
+                parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {
                 LOGGER.warn("Invalid version string used: " + version, e);
+                return UNKNOWN_VERSION;
             } catch (IllegalArgumentException e) {
                 LOGGER.warn("Invalid version pattern is used", e);
+                return UNKNOWN_VERSION;
             }
         } else {
             LOGGER.warn("Version could not be recognized by the pattern");
+            return UNKNOWN_VERSION;
         }
+        return parsedVersion;
     }
 
     /**
@@ -84,7 +96,7 @@ public class Version {
         JSONArray objects = new JSONArray(rd.readLine());
         for (int i = 0; i < objects.length(); i++) {
             JSONObject jsonObject = objects.getJSONObject(i);
-            Version version = new Version(jsonObject.getString("tag_name").replaceFirst("v", ""));
+            Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
             versions.add(version);
         }
         return versions;
@@ -115,14 +127,47 @@ public class Version {
                 if (this.getPatch() > otherVersion.getPatch()) {
                     return true;
                 } else if (this.getPatch() == otherVersion.getPatch()) {
-                    // The higher the ordinal the stabler the version (this is the cause the enum has to be sorted)
-                    if (this.developmentStage.ordinal() > otherVersion.developmentStage.ordinal()) {
-                        return true;
-                    }
+                    // if the patch numbers are equal compare the development stages
+                    return this.developmentStage.isMoreStableThan(otherVersion.developmentStage);
                 }
             }
         }
         return false;
+    }
+
+
+    /**
+     * Checks if this version should be updated to one of the given ones.
+     * Ignoring the other Version if this one is Stable and the other one is not.
+     *
+     * @return The version this one should be updated to, or an empty Optional
+     */
+    public Optional<Version> shouldBeUpdatedTo(List<Version> availableVersions ) {
+        Optional<Version> newerVersion = Optional.empty();
+        for (Version version : availableVersions) {
+            if (this.shouldBeUpdatedTo(version)
+                    && (!newerVersion.isPresent() || version.isNewerThan(newerVersion.get()))) {
+                newerVersion = Optional.of(version);
+            }
+        }
+        return newerVersion;
+    }
+
+    /**
+     * Checks if this version should be updated to the given one.
+     * Ignoring the other Version if this one is Stable and the other one is not.
+     *
+     * @return True if this version should be updated to the given one
+     * */
+    public boolean shouldBeUpdatedTo(Version otherVersion) {
+        // ignoring the other version if it is not stable, except if this version itself is not stable
+        if (developmentStage == Version.DevelopmentStage.STABLE
+                && otherVersion.developmentStage != Version.DevelopmentStage.STABLE) {
+            return false;
+        }
+
+        // check if the other version is newer than given one
+        return otherVersion.isNewerThan(this);
     }
 
     public String getFullVersion() {
@@ -198,22 +243,23 @@ public class Version {
 
 
     public enum DevelopmentStage {
-        // needs to be ordered from the unstablest stage to the stablest one
-        UNKNOWN(""),
-        ALPHA("-alpha"),
-        BETA("-beta"),
-        STABLE("");
+        UNKNOWN("", 0),
+        ALPHA("-alpha", 1),
+        BETA("-beta", 2),
+        STABLE("", 3);
 
-
+        /** describes how stable this stage is, the higher the better */
+        private final int stability;
         private final String stage;
 
-        DevelopmentStage(String stage) {
+        DevelopmentStage(String stage, int stability) {
             this.stage = stage;
+            this.stability = stability;
         }
 
-        public static DevelopmentStage getStage(String stage) {
+        public static DevelopmentStage parse(String stage) {
             if (stage == null) {
-                LOGGER.warn("Unknown development stage");
+                LOGGER.warn("The stage cannot be null");
                 return UNKNOWN;
             } else if (stage.equals(STABLE.stage)) {
                 return STABLE;
@@ -222,8 +268,15 @@ public class Version {
             } else if (stage.equals(BETA.stage)) {
                 return BETA;
             }
-            LOGGER.warn("Unknown development stage");
+            LOGGER.warn("Unknown development stage: " + stage);
             return UNKNOWN;
+        }
+
+        /**
+         * @return true if this stage is more stable than the {@code otherStage}
+         */
+        public boolean isMoreStableThan(DevelopmentStage otherStage) {
+            return this.stability > otherStage.stability;
         }
     }
 

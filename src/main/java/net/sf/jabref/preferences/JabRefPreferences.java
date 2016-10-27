@@ -1444,7 +1444,7 @@ public class JabRefPreferences {
     }
 
     public VersionPreferences getVersionPreferences() {
-        Version ignoredVersion = new Version(get(VERSION_IGNORED_UPDATE));
+        Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
         return new VersionPreferences(ignoredVersion);
     }
 

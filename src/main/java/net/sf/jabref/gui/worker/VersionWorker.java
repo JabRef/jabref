@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JOptionPane;
@@ -68,47 +69,49 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
             List<Version> availableVersions = this.get();
 
             // couldn't find any version, connection problems?
-            if (availableVersions.isEmpty()){
-                String couldNotConnect = Localization.lang("Could not connect to the update server.");
-                String tryLater = Localization.lang("Please try again later and/or check your network connection.");
-                if (manualExecution) {
-                    JOptionPane.showMessageDialog(this.mainFrame, couldNotConnect + "\n" + tryLater,
-                            couldNotConnect, JOptionPane.ERROR_MESSAGE);
-                }
-                this.mainFrame.output(couldNotConnect + " " + tryLater);
-                return;
+            if (availableVersions.isEmpty()) {
+                showConnectionError();
+            } else {
+                showUpdateInfo(availableVersions);
             }
-
-            // the newer version, excluding any alpha or beta builds, except if the installed one is one too
-            Version newerVersion = null;
-            for (Version version : availableVersions) {
-                // ignoring any version which is not stable, except if the installed version is not stable itself
-                if (installedVersion.getDevelopmentStage() == Version.DevelopmentStage.STABLE
-                        && version.getDevelopmentStage() != Version.DevelopmentStage.STABLE) {
-                    continue;
-                }
-
-                // check if this version is newer than the installed one and the last found "newer" version
-                if (version.isNewerThan(installedVersion) && (newerVersion == null || version.isNewerThan(newerVersion))) {
-                    newerVersion = version;
-                }
-            }
-
-            // no new version could be found, only respect the ignored version on automated version checks
-            if (newerVersion == null || (newerVersion.equals(toBeIgnored) && !manualExecution)) {
-                String upToDate = Localization.lang("JabRef is up-to-date.");
-                if (manualExecution) {
-                    JOptionPane.showMessageDialog(this.mainFrame, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
-                }
-                this.mainFrame.output(upToDate);
-                return;
-            }
-
-            // notify the user about a newer version
-            new NewVersionDialog(this.mainFrame, installedVersion, newerVersion);
 
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while checking for updates", e);
+        }
+    }
+
+    /**
+     * prints the connection problem to the status bar and shows a dialog if it was executed manually
+     */
+    private void showConnectionError() {
+        String couldNotConnect = Localization.lang("Could not connect to the update server.");
+        String tryLater = Localization.lang("Please try again later and/or check your network connection.");
+        if (manualExecution) {
+            JOptionPane.showMessageDialog(this.mainFrame, couldNotConnect + "\n" + tryLater,
+                    couldNotConnect, JOptionPane.ERROR_MESSAGE);
+        }
+        this.mainFrame.output(couldNotConnect + " " + tryLater);
+    }
+
+    /**
+     * Prints up-to-date to the status bar (and shows a dialog it was executed manually) if there is now new version.
+     * Shows a "New Version" Dialog to the user if there is.
+     */
+    private void showUpdateInfo(List<Version> availableVersions) {
+        // the newer version, excluding any non-stable versions, except if the installed one is unstable too
+        Optional<Version> newerVersion = installedVersion.shouldBeUpdatedTo(availableVersions);
+
+        // no new version could be found, only respect the ignored version on automated version checks
+        if (!newerVersion.isPresent() || (newerVersion.get().equals(toBeIgnored) && !manualExecution)) {
+            String upToDate = Localization.lang("JabRef is up-to-date.");
+            if (manualExecution) {
+                JOptionPane.showMessageDialog(this.mainFrame, upToDate, upToDate, JOptionPane.INFORMATION_MESSAGE);
+            }
+            this.mainFrame.output(upToDate);
+
+        } else {
+            // notify the user about a newer version
+            new NewVersionDialog(this.mainFrame, installedVersion, newerVersion.get());
         }
     }
 
