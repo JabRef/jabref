@@ -1,6 +1,9 @@
 package net.sf.jabref.model.groups;
 
+import java.util.Optional;
+
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.junit.Test;
 
@@ -84,5 +87,38 @@ public class KeywordGroupTest {
         BibEntry entry = new BibEntry().withField("keywords", "Some sentence containing test word");
 
         assertTrue(group.isMatch(entry));
+    }
+
+    @Test
+    public void testGroupStorageEmptyKeywords() throws Exception {
+        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
+                ',');
+        BibEntry entry = new BibEntry();
+
+        group.add(entry);
+
+        assertEquals(Optional.of("test"), entry.getField(FieldName.KEYWORDS));
+    }
+
+    @Test
+    public void testGroupStorageExistingKeywords() throws Exception {
+        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
+                ',');
+        BibEntry entry = new BibEntry().withField(FieldName.KEYWORDS, "bla, blubb");
+
+        group.add(entry);
+
+        assertEquals(Optional.of("bla, blubb, test"), entry.getField(FieldName.KEYWORDS));
+    }
+
+    @Test
+    public void testGroupStorageAlreadyInGroup() throws Exception {
+        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
+                ',');
+        BibEntry entry = new BibEntry().withField(FieldName.KEYWORDS, "test, blubb");
+
+        group.add(entry);
+
+        assertEquals(Optional.of("test, blubb"), entry.getField(FieldName.KEYWORDS));
     }
 }
