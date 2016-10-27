@@ -213,7 +213,14 @@ class EntryEditorTab {
     private String getPrompt(String field) {
         switch (field) {
             case FieldName.AUTHOR:
+            case FieldName.ANNOTATOR:
+            case FieldName.BOOKAUTHOR:
+            case FieldName.COMMENTATOR:
             case FieldName.EDITOR:
+            case FieldName.EDITORA:
+            case FieldName.EDITORB:
+            case FieldName.EDITORC:
+            case FieldName.TRANSLATOR:
                 return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
             case FieldName.YEAR:
                 return "YYYY";
@@ -222,8 +229,12 @@ class EntryEditorTab {
             case FieldName.EVENTDATE:
             case FieldName.ORIGDATE:
                 return "YYYY-MM-DD";
+            case FieldName.MONTH:
+                return "MM";
             case FieldName.URL:
                 return "https://";
+            case FieldName.DOI:
+                return "10.ORGANISATION/ID";
             default:
                 return "";
         }
