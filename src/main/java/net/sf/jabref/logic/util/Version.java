@@ -66,7 +66,7 @@ public class Version {
                 parsedVersion.patch = patchString == null ? 0 : Integer.parseInt(patchString);
 
                 String versionStageString = matcher.group("stage");
-                parsedVersion.developmentStage = DevelopmentStage.parse(versionStageString == null ? DevelopmentStage.STABLE.stage : versionStageString);
+                parsedVersion.developmentStage = versionStageString == null ? DevelopmentStage.STABLE : DevelopmentStage.parse(versionStageString);
                 parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {
                 LOGGER.warn("Invalid version string used: " + version, e);
