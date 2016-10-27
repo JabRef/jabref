@@ -190,10 +190,6 @@ public class Version {
         return isDevelopmentVersion;
     }
 
-    public DevelopmentStage getDevelopmentStage() {
-        return developmentStage;
-    }
-
     /**
      * @return The link to the changelog on GitHub to this specific version
      * (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
