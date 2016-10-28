@@ -13,6 +13,7 @@ public enum KeyBinding {
     BACK("Back", Localization.lang("Back"), "alt LEFT"),
     CLEANUP(
             "Cleanup", Localization.lang("Cleanup entries"), "F8"),
+    CHECK_INTEGRITY("Check integrity", Localization.menuTitle("Check integrity"), "ctrl F8"),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE"),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W"),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE"),
