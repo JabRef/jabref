@@ -18,25 +18,11 @@ import prefux.visual.VisualItem;
 
 
 /**
- * Created by Daniel on 10/13/2016.
+ * Handle actions on prrv runtime environment
  */
-public class DisplayControl extends ControlAdapter implements TableListener {
+public class DisplayControl {
 
     private List<Label> labelList = new ArrayList<>();
-
-
-    @Override
-    public void tableChanged(Table table, int i, int i1, int i2, int i3) {
-
-
-    }
-
-    @Override
-    public void itemEvent(VisualItem item, Event e) {
-
-        System.out.println(item.get("bibtexkey").toString());
-
-    }
 
     public void changes(FxDisplay fdx) {
         Visualization vis = fdx.getVisualization();
@@ -53,12 +39,12 @@ public class DisplayControl extends ControlAdapter implements TableListener {
     public void showNodeKey(VisualItem item, FxDisplay display, BorderPane pane) {
         String msg = item.get("bibtexkey").toString();
         Label label = new Label(msg);
-        label.getStyleClass().add("outline");
-        label.translateXProperty().bind(item.xProperty());
-        label.translateYProperty().bind(item.yProperty());
-        label.setStyle("-fx-fill: lightseagreen;" +
+        label.getStyleClass().add("-fx-fill: lightseagreen;" +
                 "-fx-stroke: firebrick;" +
                 "-fx-stroke-width: 2px;");
+        label.translateXProperty().bind(item.xProperty());
+        label.translateYProperty().bind(item.yProperty());
+        //label.setStyle();
         labelList.add(label);
         display.getChildren().addAll(label);
     }
@@ -77,7 +63,7 @@ public class DisplayControl extends ControlAdapter implements TableListener {
                 if (item instanceof NodeItem) {
                     if (item.get("bibtexkey").toString().matches(bibtexKey)) {
                         display.setTranslateX(-item.getX());
-                        display.setTranslateY(-item.getY());
+                        display.setTranslateY(-item.getY()-50);
                         display.computeAreaInScreen();
                     }
                 }

@@ -232,7 +232,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
     private final AbstractAction prrv = new PrrvAction(Localization.menuTitle("Paper Reference Relationship Visualization"), Localization.lang("Paper Reference Relationship Visualization"),
-            IconTheme.getImage("circle"));
+            IconTheme.JabRefIcon.PICTURE.getSmallIcon());
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,

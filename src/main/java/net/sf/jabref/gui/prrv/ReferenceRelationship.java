@@ -12,7 +12,7 @@ import prefux.data.Edge;
 import prefux.data.Graph;
 
 /**
- * @author Daniel Brühl
+ * Gather cites of each bibtexentry
  */
 public class ReferenceRelationship {
 
@@ -22,13 +22,13 @@ public class ReferenceRelationship {
     public List<prefux.data.Node> externalNodeList = new ArrayList<>();
     private List<prefux.data.Edge> currentEdgeList = new ArrayList<>();
 
-    // Config
+    // Some config
     private String initCitesField = "";
     private boolean allowExternalNodes = false;
     private boolean showNodesWithoutEdges = true;
 
     /**
-     * Generate necessary node for prefux graph reader.
+     * Generate necessary node for prefux
      * For every BibTex entry and reference to external papers generate one node
      */
     public void parseBibTexForReferences(Graph g) {
@@ -130,10 +130,10 @@ public class ReferenceRelationship {
      * Creates a node with necessary attributes
      *
      * @param ID             unique value
-     * @param bibtexkey          should be unique
-     * @param citeCount
-     * @param location
-     * @param graph
+     * @param bibtexkey      should be unique
+     * @param citeCount      define size of note
+     * @param location       intern or extern reference
+     * @param graph          Graph of prrv
      * @return node
      */
     private prefux.data.Node createNode(int ID, String bibtexkey, int citeCount, String location, Graph graph) {

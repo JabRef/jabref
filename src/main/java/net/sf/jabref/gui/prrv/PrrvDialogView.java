@@ -8,8 +8,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -29,6 +31,7 @@ import prefux.data.Table;
 import prefux.data.expression.Predicate;
 import prefux.data.expression.parser.ExpressionParser;
 import prefux.render.DefaultRendererFactory;
+import prefux.render.EdgeRenderer;
 import prefux.render.ShapeRenderer;
 import prefux.util.ColorLib;
 import prefux.util.PrefuseLib;
@@ -36,26 +39,29 @@ import prefux.visual.NodeItem;
 import prefux.visual.VisualItem;
 
 /**
- * @author Daniel Brühl
+ *  Launch PRRV application
  */
 public class PrrvDialogView {
 
     private static final double WIDTH = 600;
     private static final double HEIGHT = 600;
     private static final String GROUP = "graph";
+
     public static boolean isStarted = false;
+
     private Stage primaryStage = new Stage();
     private static BorderPane root = new BorderPane();
-    private CheckBox keyCB = new CheckBox();
-    private Visualization vis = new Visualization();
+
+    private Visualization vis;
     public static FxDisplay display;
+    private CheckBox keyCB = new CheckBox();
     private static DisplayControl control = new DisplayControl();
 
 
     public void show() {
         // -- 1. setup dialog -----------------------------------------------------
         root = new BorderPane();
-
+        vis = new Visualization();
         primaryStage.setTitle("PRRV");
 
         primaryStage.setScene(new Scene(root, WIDTH, HEIGHT));
@@ -154,35 +160,42 @@ public class PrrvDialogView {
         display = new FxDisplay(vis);
         display.addControlListener(new DragControl());
 
+        // Add arrowheads
+        for (Polygon arrowHead:EdgeRenderer.arrowHeadList) {
+            display.getChildren().addAll(arrowHead);
+        }
+
         //Bind pref Witdh and Height to according stage
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
-
+        root.setStyle("-fx-background-color: white");
         root.setCenter(display);
         // Setup zoom box
-        root.setBottom(buildControlPanel(display));
         root.setTop(showKeyCheckBox(display, root));
+        root.setBottom(buildControlPanel(display));
         // -- 7. launch the visualization -------------------------------------
         vis.run("nodes");
         vis.run("color");
         vis.run("layout");
+
+        // Recognize bibentry tablelistener to move position on prrv
         isStarted = true;
+
+        // Deinitialize used lists
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
-
-                keyCB = null;
-                vis = null;
-                control = null;
-                primaryStage = null;
-                root = null;
-                System.out.println("Stage is closing");
+                isStarted = false;
+                display.getChildren().clear();
+                root.getChildren().clear();
+                EdgeRenderer.arrowHeadList.clear();
+                EdgeRenderer.edgeList.clear();
             }
-            // Throw if some cite fields are not accessible
         });
     }
 
     private Node buildControlPanel(FxDisplay display) {
         VBox vbox = new VBox();
+        vbox.setStyle("-fx-background-color: aliceblue");
         Label txt = new Label("Zoom Factor");
         Slider slider = new Slider(0.0, 10.0, 1.0);
         Label txt2 = new Label("");
@@ -194,6 +207,7 @@ public class PrrvDialogView {
     private Node showKeyCheckBox(FxDisplay display, BorderPane pane) {
         // HERE NEXT - most important dude
         VBox vbox = new VBox();
+        vbox.setStyle("-fx-background-color: aliceblue");
         keyCB.setText("Show all keys");
         //attach click-method to all 3 checkboxes
         keyCB.setOnAction(checkBoxEvent -> handleCheckBoxAction(display, pane));
@@ -225,5 +239,3 @@ public class PrrvDialogView {
 
 }
 // TODO Legende für farben
-// TODO Root node ist ausgewählter bibentry (getselectedentry)
-// Selected            //  View in Zentrum von selected bibentry
