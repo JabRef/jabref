@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
@@ -43,17 +42,19 @@ import prefux.visual.VisualItem;
  */
 public class PrrvDialogView {
 
-    private static final double WIDTH = 600;
-    private static final double HEIGHT = 600;
-    private static final String GROUP = "graph";
+    private final double WIDTH = 800;
+    private final double HEIGHT = 600;
+    private final String GROUP = "graph";
 
     public static boolean isStarted = false;
+    private static BorderPane root = new BorderPane();
+    public static FxDisplay fxDisplay;
 
     private Stage primaryStage = new Stage();
-    private static BorderPane root = new BorderPane();
+
 
     private Visualization vis;
-    public static FxDisplay display;
+
     private CheckBox keyCB = new CheckBox();
     private static DisplayControl control = new DisplayControl();
 
@@ -65,7 +66,7 @@ public class PrrvDialogView {
         primaryStage.setTitle("PRRV");
 
         primaryStage.setScene(new Scene(root, WIDTH, HEIGHT));
-        root.getStyleClass().add("display");
+        root.getStyleClass().add("fxDisplay");
         primaryStage.show();
 
         // Create tables for node and edge data, and configure their columns.
@@ -156,36 +157,36 @@ public class PrrvDialogView {
         vis.putAction("nodes", nodeActions);
         vis.putAction("color", color);
 
-        // -- 6. the display and interactive controls -------------------------
-        display = new FxDisplay(vis);
-        display.addControlListener(new DragControl());
+        // -- 6. the fxDisplay and interactive controls -------------------------
+        fxDisplay = new FxDisplay(vis);
+        fxDisplay.addControlListener(new DragControl());
 
         // Add arrowheads
         for (Polygon arrowHead:EdgeRenderer.arrowHeadList) {
-            display.getChildren().addAll(arrowHead);
+            fxDisplay.getChildren().addAll(arrowHead);
         }
 
         //Bind pref Witdh and Height to according stage
         root.prefWidthProperty().bind(primaryStage.widthProperty());
         root.prefHeightProperty().bind(primaryStage.heightProperty());
         root.setStyle("-fx-background-color: white");
-        root.setCenter(display);
+        root.setCenter(fxDisplay);
         // Setup zoom box
-        root.setTop(showKeyCheckBox(display, root));
-        root.setBottom(buildControlPanel(display));
+        root.setTop(showKeyCheckBox(fxDisplay));
+        root.setBottom(buildControlPanel(fxDisplay));
         // -- 7. launch the visualization -------------------------------------
         vis.run("nodes");
         vis.run("color");
         vis.run("layout");
 
-        // Recognize bibentry tablelistener to move position on prrv
+        // Allow bibentry tablelistener to move position on prrv
         isStarted = true;
 
         // Deinitialize used lists
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 isStarted = false;
-                display.getChildren().clear();
+                fxDisplay.getChildren().clear();
                 root.getChildren().clear();
                 EdgeRenderer.arrowHeadList.clear();
                 EdgeRenderer.edgeList.clear();
@@ -193,38 +194,46 @@ public class PrrvDialogView {
         });
     }
 
-    private Node buildControlPanel(FxDisplay display) {
+    /**
+     * Put a zoomslider to control zoom property
+     * @param fxDisplay Target
+     * @return vbox for fxdisplay
+     */
+    private Node buildControlPanel(FxDisplay fxDisplay) {
         VBox vbox = new VBox();
-        vbox.setStyle("-fx-background-color: aliceblue");
+        //vbox.setStyle("-fx-background-color: aliceblue");
         Label txt = new Label("Zoom Factor");
         Slider slider = new Slider(0.0, 10.0, 1.0);
         Label txt2 = new Label("");
-        display.zoomFactorProperty().bind(slider.valueProperty());
+        fxDisplay.zoomFactorProperty().bind(slider.valueProperty());
         vbox.getChildren().addAll(txt, slider, txt2);
         return vbox;
     }
 
-    private Node showKeyCheckBox(FxDisplay display, BorderPane pane) {
-        // HERE NEXT - most important dude
+    /**
+     * Put a checkbox on display
+     * @param fxDisplay Target
+     * @return vbox, which need to be applied on display
+     */
+    private Node showKeyCheckBox(FxDisplay fxDisplay) {
         VBox vbox = new VBox();
-        vbox.setStyle("-fx-background-color: aliceblue");
+        //vbox.setStyle("-fx-background-color: aliceblue");
         keyCB.setText("Show all keys");
-        //attach click-method to all 3 checkboxes
-        keyCB.setOnAction(checkBoxEvent -> handleCheckBoxAction(display, pane));
+        keyCB.setOnAction(checkBoxEvent -> handleCheckBoxAction(fxDisplay));
         vbox.getChildren().addAll(keyCB);
         return vbox;
     }
 
-    private void handleCheckBoxAction(FxDisplay display, BorderPane pane) {
+    private void handleCheckBoxAction(FxDisplay fxDisplay) {
 
         if (keyCB.isSelected()) {
 
-            Iterator<VisualItem> it = display.getVisualization().items();
+            Iterator<VisualItem> it = fxDisplay.getVisualization().items();
             while(it.hasNext()) {
                 if(it.hasNext()) {
                     VisualItem item = it.next();
                     if (item instanceof NodeItem) {
-                        control.showNodeKey(item, display, pane);
+                        control.showNodeKey(item, fxDisplay);
                     }
                 }
             }
@@ -234,7 +243,7 @@ public class PrrvDialogView {
     }
 
     public static void notifyDisplayChange(String bibtexkey) {
-        control.viewOnSelectedBibTexKey(bibtexkey, display, root);
+        control.viewOnSelectedBibTexKey(bibtexkey, fxDisplay, root);
     }
 
 }

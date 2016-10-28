@@ -19,6 +19,7 @@ public class PrrvAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         if(!PrrvDialogView.isStarted)
         Platform.runLater(() -> new PrrvDialogView().show());
     }

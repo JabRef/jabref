@@ -18,13 +18,14 @@ public class ReferenceRelationship {
 
     // List to store the temporary data for graph visualisation
     private List<BibEntry> pureEntryList = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries();
-    public List<prefux.data.Node> entryNodeList = new ArrayList<>();
-    public List<prefux.data.Node> externalNodeList = new ArrayList<>();
+    private List<prefux.data.Node> entryNodeList = new ArrayList<>();
+    private List<prefux.data.Node> externalNodeList = new ArrayList<>();
     private List<prefux.data.Edge> currentEdgeList = new ArrayList<>();
 
-    // Some config
-    private String initCitesField = "";
     private boolean allowExternalNodes = false;
+    // Some config
+    // Set the text of cites when initialized
+    private String initCitesField = "";
     private boolean showNodesWithoutEdges = true;
 
     /**
@@ -99,7 +100,7 @@ public class ReferenceRelationship {
                                     }
                                 }
                                 if (!foundCite && showNodesWithoutEdges) {
-                                    // In prefux it will display nodes if they got edges, even if they target on themself
+                                    // In prefux it will fxDisplay nodes if they got edges, even if they target on themself
                                     addEdge(sourceID, sourceID, g);
                                 }
                             }
@@ -117,7 +118,7 @@ public class ReferenceRelationship {
     }
 
     /**
-     * Creates an edge
+     * Adds an edge to the graph
      *
      * @param sourceID start of the edge
      * @param targetID end of the edge

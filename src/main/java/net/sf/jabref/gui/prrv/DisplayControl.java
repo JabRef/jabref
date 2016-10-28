@@ -4,57 +4,54 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javafx.event.Event;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
 import prefux.FxDisplay;
-import prefux.Visualization;
-import prefux.controls.ControlAdapter;
-import prefux.data.Table;
-import prefux.data.event.TableListener;
 import prefux.visual.NodeItem;
 import prefux.visual.VisualItem;
 
 
 /**
  * Handle actions on prrv runtime environment
+ *
  */
 public class DisplayControl {
 
+    // Stores bibtexkey of each node
     private List<Label> labelList = new ArrayList<>();
 
-    public void changes(FxDisplay fdx) {
-        Visualization vis = fdx.getVisualization();
-        Iterator it = vis.items();
-
-        while (it.hasNext()) {
-            VisualItem item = (VisualItem) it.next();
-            if (item instanceof NodeItem) {
-                System.out.println(item.get("bibtexkey"));
-            }
-        }
-    }
-
-    public void showNodeKey(VisualItem item, FxDisplay display, BorderPane pane) {
+    /**
+     * Displays labels, containing bibtexkey
+     * @param item      Show bibtexkey of item
+     * @param fxDisplay   On fxdisplay
+     */
+    public void showNodeKey(VisualItem item, FxDisplay fxDisplay) {
         String msg = item.get("bibtexkey").toString();
         Label label = new Label(msg);
-        label.getStyleClass().add("-fx-fill: lightseagreen;" +
-                "-fx-stroke: firebrick;" +
-                "-fx-stroke-width: 2px;");
         label.translateXProperty().bind(item.xProperty());
         label.translateYProperty().bind(item.yProperty());
-        //label.setStyle();
+        label.setStyle("-fx-stroke-width: 2px;" +
+                "-fx-stroke-type: outside;");
         labelList.add(label);
-        display.getChildren().addAll(label);
+        fxDisplay.getChildren().addAll(label);
     }
 
+    /**
+     * Hide all labels
+     */
     public void hideNodeKeys() {
         labelList.forEach(Label -> {
             Label.setVisible(false);
         });
     }
 
+    /**
+     * Set position of the window on node of selected bibtexentry
+     * @param bibtexKey
+     * @param display
+     * @param root
+     */
     public void viewOnSelectedBibTexKey(String bibtexKey, FxDisplay display, BorderPane root) {
         Iterator<VisualItem> it = display.getVisualization().items();
         while (it.hasNext()) {
