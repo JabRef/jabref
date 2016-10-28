@@ -230,7 +230,7 @@ class EntryEditorTab {
             case FieldName.ORIGDATE:
                 return "YYYY-MM-DD";
             case FieldName.MONTH:
-                return "MM";
+                return "MM or #mmm#";
             case FieldName.URL:
                 return "https://";
             case FieldName.DOI:
