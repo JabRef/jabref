@@ -5,6 +5,7 @@ import java.util.Optional;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -12,113 +13,98 @@ import static org.junit.Assert.assertTrue;
 
 public class KeywordGroupTest {
 
+    private KeywordGroup keywordTestGroup;
+    private KeywordGroup complexKeywordGroup;
+    private BibEntry emptyEntry;
+
+    @Before
+    public void setUp() {
+        keywordTestGroup = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT, ',');
+        complexKeywordGroup = new KeywordGroup("name", "keywords", "\\H2O", false, false, GroupHierarchyType.INDEPENDENT, ',');
+        emptyEntry = new BibEntry();
+    }
+
     @Test
     public void testToString() {
-        KeywordGroup group = new KeywordGroup("myExplicitGroup", "author", "asdf", true, true,
-                GroupHierarchyType.INDEPENDENT, ',');
-        assertEquals("KeywordGroup:myExplicitGroup;0;author;asdf;1;1;", group.toString());
+        assertEquals("KeywordGroup:name;0;keywords;test;0;0;", keywordTestGroup.toString());
     }
 
     @Test
     public void testToString2() {
-        KeywordGroup group = new KeywordGroup("myExplicitGroup", "author", "asdf", false, true,
+        KeywordGroup anotherGroup = new KeywordGroup("myExplicitGroup", "author", "asdf", false, true,
                 GroupHierarchyType.REFINING, ',');
-        assertEquals("KeywordGroup:myExplicitGroup;1;author;asdf;0;1;", group.toString());
+        assertEquals("KeywordGroup:myExplicitGroup;1;author;asdf;0;1;", anotherGroup.toString());
     }
 
     @Test
     public void containsSimpleWord() {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "test");
+        emptyEntry.setField("keywords", "test");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(keywordTestGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsSimpleWordInSentence() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "Some sentence containing test word");
+        emptyEntry.setField("keywords", "Some sentence containing test word");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(keywordTestGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsSimpleWordCommaSeparated() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "Some,list,containing,test,word");
+        emptyEntry.setField("keywords", "Some,list,containing,test,word");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(keywordTestGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsSimpleWordSemicolonSeparated() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "Some;list;containing;test;word");
+        emptyEntry.setField("keywords", "Some;list;containing;test;word");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(keywordTestGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsComplexWord() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "\\H2O", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "\\H2O");
+        emptyEntry.setField("keywords", "\\H2O");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(complexKeywordGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsComplexWordInSentence() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "\\H2O", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField("keywords", "Some sentence containing \\H2O word");
+        emptyEntry.setField("keywords", "Some sentence containing \\H2O word");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(complexKeywordGroup.isMatch(emptyEntry));
     }
 
     @Test
     public void containsWordWithWhitespaceInSentence() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", "keywords", "test word", false, false,
-                GroupHierarchyType.INDEPENDENT, ',');
-        BibEntry entry = new BibEntry().withField("keywords", "Some sentence containing test word");
+        emptyEntry.setField("keywords", "Some sentence containing test word");
 
-        assertTrue(group.isMatch(entry));
+        assertTrue(keywordTestGroup.isMatch(emptyEntry));
     }
 
     @Test
-    public void testGroupStorageEmptyKeywords() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry();
+    public void addGroupToBibEntrySuccessfullyIfEmptyBefore() throws Exception {
+        keywordTestGroup.add(emptyEntry);
 
-        group.add(entry);
-
-        assertEquals(Optional.of("test"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("test"), emptyEntry.getField(FieldName.KEYWORDS));
     }
 
     @Test
-    public void testGroupStorageExistingKeywords() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField(FieldName.KEYWORDS, "bla, blubb");
+    public void addGroupToBibEntrySuccessfullyIfNotEmptyBefore() throws Exception {
+        emptyEntry.setField(FieldName.KEYWORDS, "bla, blubb");
+        keywordTestGroup.add(emptyEntry);
 
-        group.add(entry);
-
-        assertEquals(Optional.of("bla, blubb, test"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("bla, blubb, test"), emptyEntry.getField(FieldName.KEYWORDS));
     }
 
     @Test
-    public void testGroupStorageAlreadyInGroup() throws Exception {
-        KeywordGroup group = new KeywordGroup("name", FieldName.KEYWORDS, "test", false, false, GroupHierarchyType.INDEPENDENT,
-                ',');
-        BibEntry entry = new BibEntry().withField(FieldName.KEYWORDS, "test, blubb");
+    public void noDuplicateStoredIfAlreadyInGroup() throws Exception {
+        emptyEntry.setField(FieldName.KEYWORDS, "test, blubb");
+        keywordTestGroup.add(emptyEntry);
 
-        group.add(entry);
-
-        assertEquals(Optional.of("test, blubb"), entry.getField(FieldName.KEYWORDS));
+        assertEquals(Optional.of("test, blubb"), emptyEntry.getField(FieldName.KEYWORDS));
     }
 }
