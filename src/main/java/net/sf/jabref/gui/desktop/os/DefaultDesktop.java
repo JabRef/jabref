@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,6 +31,11 @@ public class DefaultDesktop implements NativeDesktop {
     @Override
     public void openConsole(String absolutePath) throws IOException {
         LOGGER.error("This feature is not supported by your Operating System.");
+    }
+
+    @Override
+    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
+        //TODO imlement default
     }
 
     @Override
