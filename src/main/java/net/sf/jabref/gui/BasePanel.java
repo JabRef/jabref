@@ -772,6 +772,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return;
         }
 
+        // select the next entry to stay at the same place as before (or the previous if we're already at the end)
+        if (mainTable.getSelectedRow() != mainTable.getRowCount() -1){
+            selectNextEntry();
+        } else {
+            selectPreviousEntry();
+        }
+
         NamedCompound compound = new NamedCompound(
                 (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
         for (BibEntry entry : entries) {
@@ -784,6 +791,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         markBaseChanged();
         frame.output(formatOutputMessage(Localization.lang("Deleted"), entries.size()));
+
+        // prevent the main table from loosing focus
+        mainTable.requestFocus();
     }
 
     private void paste() {
@@ -827,11 +837,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             output(formatOutputMessage(Localization.lang("Pasted"), bes.size()));
             markBaseChanged();
 
+            highlightEntry(firstBE);
+            mainTable.requestFocus();
+
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 selectionListener.editSignalled(firstBE);
             }
-
-            highlightEntry(firstBE);
         }
     }
 
@@ -1724,7 +1735,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void selectNextEntry() {
         highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
     }
-
 
     public void selectFirstEntry() {
         highlightEntry(0);
