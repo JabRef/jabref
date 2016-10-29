@@ -13,6 +13,11 @@
 .list-cell {
     -fx-background-color: white;
  }
+
+.list-cell:selected {
+	-fx-background-color: blue;
+	-fx-text-fill: white;
+}
  
  .icon {
  	-fx-font-family: 'Material Design Icons';
