@@ -23,7 +23,7 @@
                 </ButtonBar>
             </bottom>
             <center>
-                <ListView fx:id="allMessages" styleClass="list-content" BorderPane.alignment="CENTER" />
+                <ListView fx:id="allMessages" onKeyPressed="#copySelectedLogEntries" styleClass="list-content" BorderPane.alignment="CENTER" />
             </center>
         </BorderPane>
     </content>

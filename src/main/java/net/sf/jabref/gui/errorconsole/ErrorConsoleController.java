@@ -1,12 +1,22 @@
 package net.sf.jabref.gui.errorconsole;
 
+import java.util.stream.Collectors;
+
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.gui.util.ViewModelListCellFactory;
 
 import org.apache.logging.log4j.Level;
@@ -34,7 +44,26 @@ public class ErrorConsoleController {
     private void initialize() {
         listViewStyle();
         allMessages.itemsProperty().bind(errorViewModel.allMessagesDataproperty());
+        allMessages.scrollTo(errorViewModel.allMessagesDataproperty().getSize() - 1);
+        allMessages.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        errorViewModel.allMessagesDataproperty().addListener((ListChangeListener) (change -> {
+            int size = errorViewModel.allMessagesDataproperty().size();
+            if (size > 0) {
+                allMessages.scrollTo(size - 1);
+            }
+        }));
         descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
+    }
+
+    @FXML
+    private void copySelectedLogEntries(KeyEvent event) {
+        KeyBindingPreferences keyPreferences = Globals.getKeyPrefs();
+        if (keyPreferences.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
+            ObservableList<LogEvent> selectedEntries = allMessages.getSelectionModel().getSelectedItems();
+            if (!selectedEntries.isEmpty()) {
+                new ClipBoardManager().setClipboardContents(selectedEntries.stream().map(message -> message.getMessage().getFormattedMessage()).collect(Collectors.joining(System.lineSeparator())));
+            }
+        }
     }
 
     @FXML
