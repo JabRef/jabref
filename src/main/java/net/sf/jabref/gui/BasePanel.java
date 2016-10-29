@@ -750,7 +750,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Removes the selected entries from the database
      * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized
      *            as "deleted".
-     *            If true it will be localized as "cut"
+     *            If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
         List<BibEntry> entries = mainTable.getSelectedEntries();
@@ -769,12 +769,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         NamedCompound compound;
-        if (!cut) {
-            compound = new NamedCompound(
-                    (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
-        } else {
+        if (cut) {
             compound = new NamedCompound(
                     (entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
+        } else {
+            compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
         }
         for (BibEntry entry : entries) {
             compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry, BasePanel.this));
@@ -785,7 +785,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         getUndoManager().addEdit(compound);
 
         markBaseChanged();
-        frame.output(formatOutputMessage(!cut ? Localization.lang("Deleted") : Localization.lang("Cut"), entries.size()));
+        frame.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
 
         // prevent the main table from loosing focus
         mainTable.requestFocus();
