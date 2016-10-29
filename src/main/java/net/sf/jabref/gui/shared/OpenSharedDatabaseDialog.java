@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -59,6 +61,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final GridBagLayout gridBagLayout = new GridBagLayout();
     private final GridBagConstraints gridBagConstraints = new GridBagConstraints();
     private final JPanel connectionPanel = new JPanel();
+    private final JPanel filePanel = new JPanel();
     private final JPanel buttonPanel = new JPanel();
 
     private final JLabel databaseTypeLabel = new JLabel(Localization.lang("Database type") + ":");
@@ -71,15 +74,18 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final JTextField portField = new JTextField(4);
     private final JTextField userField = new JTextField(14);
     private final JTextField databaseField = new JTextField(14);
+    private final JTextField fileLocation = new JTextField(20);
 
     private final JPasswordField passwordField = new JPasswordField(14);
     private final JComboBox<DBMSType> dbmsTypeDropDown = new JComboBox<>();
 
     private final JButton connectButton = new JButton(Localization.lang("Connect"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+    private final JButton browseButton = new JButton(Localization.lang("Browse"));
     private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
     private final JCheckBox rememberPassword = new JCheckBox(Localization.lang("Remember password?"));
+    private final JCheckBox autosaveFile = new JCheckBox(Localization.lang("Autosave the file to"));
 
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
@@ -139,7 +145,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
                 if (answer == 1) {
                     try {
-                        new SaveDatabaseAction(panel).runCommand();
+                        //TODO
+                        new SaveDatabaseAction(panel, Paths.get("/home/admir/tmp3/demo.bib")).runCommand();
                     } catch (Throwable e) {
                         LOGGER.error("Error while saving the database", e);
                     }
@@ -205,6 +212,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
                 "Enter_pressed");
         connectButton.getActionMap().put("Enter_pressed", openAction);
 
+        browseButton.addActionListener(e -> showFileChooser());
     }
 
     /**
@@ -333,15 +341,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
         gridBagConstraints.insets = new Insets(10, 10, 0, 0);
         JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helpPanel.add(helpButton);
-        connectionPanel.add(helpPanel, gridBagConstraints);
-
-        // control buttons
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 2;
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.add(connectButton);
-        buttonPanel.add(cancelButton);
-        connectionPanel.add(buttonPanel, gridBagConstraints);
 
         // add panel
         getContentPane().setLayout(gridBagLayout);
@@ -351,6 +350,41 @@ public class OpenSharedDatabaseDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagLayout.setConstraints(connectionPanel, gridBagConstraints);
         getContentPane().add(connectionPanel);
+
+
+        // filePanel
+        filePanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("File")));
+        filePanel.setLayout(gridBagLayout);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+
+        filePanel.add(autosaveFile, gridBagConstraints);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        filePanel.add(fileLocation, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        filePanel.add(browseButton, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagLayout.setConstraints(filePanel, gridBagConstraints);
+        getContentPane().add(filePanel);
+
+        // buttonPanel
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+
+        buttonPanel.add(connectButton);
+        buttonPanel.add(cancelButton);
+        buttonPanel.add(helpPanel);
+
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagLayout.setConstraints(buttonPanel, gridBagConstraints);
+        getContentPane().add(buttonPanel);
 
         setModal(true); // Owner window should be disabled while this dialog is opened.
     }
@@ -428,5 +462,13 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     this.connectionProperties.equals(context.getDBMSSynchronizer()
                     .getDBProcessor().getDBMSConnectionProperties()));
         });
+    }
+
+    private void showFileChooser() {
+        JFileChooser consoleChooser = new JFileChooser();
+        int answer = consoleChooser.showOpenDialog(this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            fileLocation.setText(consoleChooser.getSelectedFile().getAbsolutePath());
+        }
     }
 }
