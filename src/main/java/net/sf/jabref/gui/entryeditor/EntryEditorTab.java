@@ -211,33 +211,26 @@ class EntryEditorTab {
     }
 
     private String getPrompt(String field) {
+
+        Set<FieldProperty> fieldProperties = InternalBibtexFields.getFieldProperties(field);
+        if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
+            return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
+        } else if (fieldProperties.contains(FieldProperty.DOI)) {
+            return "10.ORGANISATION/ID";
+        } else if (fieldProperties.contains(FieldProperty.DATE)) {
+            return "YYYY-MM-DD";
+        }
+
         switch (field) {
-            case FieldName.AUTHOR:
-            case FieldName.ANNOTATOR:
-            case FieldName.BOOKAUTHOR:
-            case FieldName.COMMENTATOR:
-            case FieldName.EDITOR:
-            case FieldName.EDITORA:
-            case FieldName.EDITORB:
-            case FieldName.EDITORC:
-            case FieldName.TRANSLATOR:
-                return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
             case FieldName.YEAR:
                 return "YYYY";
-            case FieldName.DATE:
-            case FieldName.URLDATE:
-            case FieldName.EVENTDATE:
-            case FieldName.ORIGDATE:
-                return "YYYY-MM-DD";
             case FieldName.MONTH:
                 return "MM or #mmm#";
             case FieldName.URL:
                 return "https://";
-            case FieldName.DOI:
-                return "10.ORGANISATION/ID";
-            default:
-                return "";
         }
+
+        return "";
     }
 
     private BibEntry getEntry() {
