@@ -335,32 +335,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
 
-        //when you modify this action be sure to adjust Actions.DELETE
-        //they are the same except of the Localization, delete confirmation and Actions.COPY call
-        actions.put(Actions.CUT, (BaseAction) () -> {
-            runCommand(Actions.COPY);
-            List<BibEntry> entries = mainTable.getSelectedEntries();
-            if (entries.isEmpty()) {
-                return;
-            }
-
-            NamedCompound compound = new NamedCompound(
-                    (entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
-            for (BibEntry entry : entries) {
-                compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry, BasePanel.this));
-                bibDatabaseContext.getDatabase().removeEntry(entry);
-                ensureNotShowingBottomPanel(entry);
-            }
-            compound.end();
-            getUndoManager().addEdit(compound);
-
-            frame.output(formatOutputMessage(Localization.lang("Cut"), entries.size()));
-            markBaseChanged();
-        });
+        actions.put(Actions.CUT, (BaseAction) this::cut);
 
         //when you modify this action be sure to adjust Actions.CUT,
         //they are the same except of the Localization, delete confirmation and Actions.COPY call
-        actions.put(Actions.DELETE, (BaseAction) () -> delete());
+        actions.put(Actions.DELETE, (BaseAction) () -> delete(false));
 
         // The action for pasting entries or cell contents.
         //  - more robust detection of available content flavors (doesn't only look at first one offered)
@@ -761,19 +740,42 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    //when you modify this action be sure to adjust Actions.CUT,
-    //they are the same except of the Localization, delete confirmation and Actions.COPY call
-    private void delete() {
+    private void cut() {
+        runCommand(Actions.COPY);
+        // cannot call runCommand(Actions.DELETE), b/c it will call delete(false) with the wrong parameter
+        delete(true);
+    }
+
+    /**
+     * Removes the selected entries from the database
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized
+     *            as "deleted".
+     *            If true the action will be localized as "cut"
+     */
+    private void delete(boolean cut) {
         List<BibEntry> entries = mainTable.getSelectedEntries();
         if (entries.isEmpty()) {
             return;
         }
-        if (!showDeleteConfirmationDialog(entries.size())) {
+        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
             return;
         }
 
-        NamedCompound compound = new NamedCompound(
-                (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
+        // select the next entry to stay at the same place as before (or the previous if we're already at the end)
+        if (mainTable.getSelectedRow() != mainTable.getRowCount() -1){
+            selectNextEntry();
+        } else {
+            selectPreviousEntry();
+        }
+
+        NamedCompound compound;
+        if (cut) {
+            compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("cut entries") : Localization.lang("cut entry")));
+        } else {
+            compound = new NamedCompound(
+                    (entries.size() > 1 ? Localization.lang("delete entries") : Localization.lang("delete entry")));
+        }
         for (BibEntry entry : entries) {
             compound.addEdit(new UndoableRemoveEntry(bibDatabaseContext.getDatabase(), entry, BasePanel.this));
             bibDatabaseContext.getDatabase().removeEntry(entry);
@@ -783,7 +785,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         getUndoManager().addEdit(compound);
 
         markBaseChanged();
-        frame.output(formatOutputMessage(Localization.lang("Deleted"), entries.size()));
+        frame.output(formatOutputMessage(cut ? Localization.lang("Cut") : Localization.lang("Deleted"), entries.size()));
+
+        // prevent the main table from loosing focus
+        mainTable.requestFocus();
     }
 
     private void paste() {
@@ -827,11 +832,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             output(formatOutputMessage(Localization.lang("Pasted"), bes.size()));
             markBaseChanged();
 
+            highlightEntry(firstBE);
+            mainTable.requestFocus();
+
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 selectionListener.editSignalled(firstBE);
             }
-
-            highlightEntry(firstBE);
         }
     }
 
@@ -1724,7 +1730,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void selectNextEntry() {
         highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
     }
-
 
     public void selectFirstEntry() {
         highlightEntry(0);

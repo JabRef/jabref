@@ -9,6 +9,7 @@ public enum KeyBinding {
     ACCEPT("Accept", Localization.lang("Accept"), "ctrl ENTER", KeyBindingCategory.EDIT),
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
     BACK("Back", Localization.lang("Back"), "alt LEFT", KeyBindingCategory.VIEW),
+    CHECK_INTEGRITY("Check integrity", Localization.lang("Check integrity"), "ctrl F8", KeyBindingCategory.QUALITY),
     CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "F8", KeyBindingCategory.QUALITY),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W", KeyBindingCategory.FILE),
@@ -59,6 +60,7 @@ public enum KeyBinding {
     OPEN_DATABASE("Open database", Localization.lang("Open database"), "ctrl O", KeyBindingCategory.FILE),
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4", KeyBindingCategory.TOOLS),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O", KeyBindingCategory.TOOLS),
+    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0", KeyBindingCategory.TOOLS),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl shift R", KeyBindingCategory.FILE),
@@ -87,8 +89,7 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z", KeyBindingCategory.EDIT),
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt 4", KeyBindingCategory.SEARCH),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS),
-    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0", KeyBindingCategory.TOOLS);
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS);
 
     private final String key;
     private final String localization;
