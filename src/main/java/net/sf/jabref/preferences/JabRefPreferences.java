@@ -302,7 +302,6 @@ public class JabRefPreferences {
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
-    public static final String SHARED_AUTO_SAVE = "sharedAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
@@ -752,7 +751,6 @@ public class JabRefPreferences {
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        defaults.put(SHARED_AUTO_SAVE, Boolean.TRUE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them

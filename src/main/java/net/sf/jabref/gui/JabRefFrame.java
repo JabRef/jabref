@@ -1699,7 +1699,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+        return (context.getLocation() == DatabaseLocation.SHARED ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
     }
