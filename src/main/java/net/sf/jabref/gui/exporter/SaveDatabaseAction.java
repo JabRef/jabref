@@ -63,6 +63,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean success;
     private boolean canceled;
     private boolean fileLockedError;
+    private Optional<Path> filePath;
 
     private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
@@ -70,6 +71,11 @@ public class SaveDatabaseAction extends AbstractWorker {
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
+    }
+
+    public SaveDatabaseAction(BasePanel panel, Path filePath) {
+        this(panel);
+        this.filePath = Optional.ofNullable(filePath);
     }
 
     @Override
@@ -85,6 +91,8 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             panel.frame().output(Localization.lang("Saving database") + "...");
             panel.setSaving(true);
+        } else if (filePath.isPresent()) {
+            saveAs(filePath.get().toFile());
         } else {
             saveAs();
         }
@@ -294,10 +302,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.updateEnabledState();
     }
 
-    /**
-     * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
-     * still runs synchronously using Spin (the method returns only after completing the operation).
-     */
     public void saveAs() throws Throwable {
         File file = null;
         while (file == null) {
@@ -308,13 +312,19 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             Optional<Path> path = dialog.saveNewFile();
             if (path.isPresent()) {
-                file = path.get().toFile();
+                saveAs(path.get().toFile());
             } else {
                 canceled = true;
                 return;
             }
         }
+    }
 
+    /**
+     * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
+     * still runs synchronously using Spin (the method returns only after completing the operation).
+     */
+    public void saveAs(File file) throws Throwable {
         BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
