@@ -13,7 +13,7 @@ public class DevelopmentStageTest {
         assertTrue(Version.DevelopmentStage.BETA.isMoreStableThan(Version.DevelopmentStage.ALPHA));
         assertTrue(Version.DevelopmentStage.STABLE.isMoreStableThan(Version.DevelopmentStage.BETA));
 
-        assertEquals("It seems that the Development stages has been change, please adjust the test",
+        assertEquals("It seems that the development stages have been changed, please adjust the test",
                 Version.DevelopmentStage.values().length, 4);
     }
 
