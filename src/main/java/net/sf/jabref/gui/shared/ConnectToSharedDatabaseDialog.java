@@ -88,13 +88,11 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
     private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
     private final JCheckBox rememberPassword = new JCheckBox(Localization.lang("Remember password?"));
-    private final JCheckBox autosaveFile = new JCheckBox(Localization.lang("Autosave the file to"));
+    private final JCheckBox autosaveFile = new JCheckBox(Localization.lang("Autosave the database to"));
 
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
-
-    private Path currentFilePath;
 
 
     /**
