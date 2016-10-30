@@ -53,8 +53,8 @@ public class SharedDatabaseUIManager {
 
         if (answer == 0) {
             jabRefFrame.closeCurrentTab();
-            OpenSharedDatabaseDialog openSharedDatabaseDialog = new OpenSharedDatabaseDialog(jabRefFrame);
-            openSharedDatabaseDialog.setVisible(true);
+            ConnectToSharedDatabaseDialog connectToSharedDatabaseDialog = new ConnectToSharedDatabaseDialog(jabRefFrame);
+            connectToSharedDatabaseDialog.setVisible(true);
         } else if (answer == 1) {
             connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
             jabRefFrame.refreshTitleAndTabs();

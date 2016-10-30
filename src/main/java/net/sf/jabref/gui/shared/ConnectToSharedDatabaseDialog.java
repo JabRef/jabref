@@ -49,9 +49,9 @@ import net.sf.jabref.shared.security.Password;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class OpenSharedDatabaseDialog extends JDialog {
+public class ConnectToSharedDatabaseDialog extends JDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(OpenSharedDatabaseDialog.class);
+    private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
@@ -87,8 +87,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * @param frame the JabRef Frame
      */
-    public OpenSharedDatabaseDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Open shared database"));
+    public ConnectToSharedDatabaseDialog(JabRefFrame frame) {
+        super(frame, Localization.lang("Connect to shared database"));
         this.frame = frame;
         initLayout();
         applyPreferences();
@@ -100,7 +100,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
     public void openSharedDatabase() {
 
         if (isSharedDatabaseAlreadyPresent()) {
-            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this,
+            JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this,
                     Localization.lang("You are already connected to a database using entered connection details."),
                     Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
@@ -114,7 +114,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
-            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
+            JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
         } catch (DatabaseNotSupportedException exception) {
             new MigrationHelpDialog(this).setVisible(true);
@@ -144,7 +144,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
                     openSharedDatabase();
                 } catch (JabRefException exception) {
-                    JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
+                    JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
                 }
             }
