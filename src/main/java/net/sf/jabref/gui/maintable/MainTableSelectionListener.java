@@ -186,11 +186,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     public void editSignalled(BibEntry entry) {
         final BasePanelMode mode = panel.getMode();
-        EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(editor);
+            panel.showEntryEditor(panel.getEntryEditor(entry));
         }
-        editor.requestFocus();
+        panel.getCurrentEditor().requestFocus();
     }
 
     @Override

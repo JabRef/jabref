@@ -1,36 +1,62 @@
 package net.sf.jabref.model.groups;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
+import java.util.Optional;
 
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class ExplicitGroupTest {
 
+    private ExplicitGroup group;
+    private ExplicitGroup group2;
+
+    private BibEntry emptyEntry;
+
+    @Before
+    public void setUp() {
+        group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
+        emptyEntry = new BibEntry();
+    }
 
     @Test
      public void testToStringSimple() {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
     public void toStringDoesNotWriteAssignedEntries() {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ',');
-        group.add(makeBibtexEntry());
-        assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
+        group.add(emptyEntry);
+
+        assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
-    private BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
-        e.setField("title", "Marine finfish larviculture in Europe");
-        e.setField("bibtexkey", "shields01");
-        e.setField("year", "2001");
-        e.setField("author", "Kevin Shields");
-        return e;
+    @Test
+    public void addSingleGroupToBibEntrySuccessfullyIfEmptyBefore() {
+        group.add(emptyEntry);
+
+        assertEquals(Optional.of("myExplicitGroup"), emptyEntry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    public void addTwoGroupsToBibEntrySuccessfully() {
+        group.add(emptyEntry);
+        group2.add(emptyEntry);
+
+        assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), emptyEntry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    public void noDuplicateStoredIfAlreadyInGroup() throws Exception {
+        emptyEntry.setField(FieldName.GROUPS, "myExplicitGroup");
+        group.add(emptyEntry);
+
+        assertEquals(Optional.of("myExplicitGroup"), emptyEntry.getField(FieldName.GROUPS));
     }
 
 }

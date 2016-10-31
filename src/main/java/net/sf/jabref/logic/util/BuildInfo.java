@@ -38,7 +38,7 @@ public class BuildInfo {
             // nothing to do -> default already set
         }
 
-        version = new Version(properties.getProperty("version", UNKNOWN_VERSION));
+        version = Version.parse(properties.getProperty("version"));
         authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 
 /**
@@ -24,8 +26,10 @@ public class FieldFormatterCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if ("all".equalsIgnoreCase(field)) {
+        if (FieldName.INTERNAL_ALL_FIELD.equalsIgnoreCase(field)) {
             return cleanupAllFields(entry);
+        } else if (FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD.equalsIgnoreCase(field)) {
+            return cleanupAllTextFields(entry);
         } else {
             return cleanupSingleField(field, entry);
         }
@@ -67,6 +71,17 @@ public class FieldFormatterCleanup implements CleanupJob {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         for (String fieldKey : entry.getFieldNames()) {
+            fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
+        }
+
+        return fieldChanges;
+    }
+
+    private List<FieldChange> cleanupAllTextFields(BibEntry entry) {
+        List<FieldChange> fieldChanges = new ArrayList<>();
+        Set<String> fields = entry.getFieldNames();
+        fields.removeAll(FieldName.getNotTextFieldNames());
+        for (String fieldKey : fields) {
             fieldChanges.addAll(cleanupSingleField(fieldKey, entry));
         }
 
