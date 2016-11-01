@@ -1,7 +1,5 @@
 package net.sf.jabref.gui.errorconsole;
 
-import java.util.stream.Collectors;
-
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,7 +11,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
@@ -61,7 +58,7 @@ public class ErrorConsoleController {
         if (keyPreferences.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
             ObservableList<LogEvent> selectedEntries = allMessages.getSelectionModel().getSelectedItems();
             if (!selectedEntries.isEmpty()) {
-                new ClipBoardManager().setClipboardContents(selectedEntries.stream().map(message -> message.getMessage().getFormattedMessage()).collect(Collectors.joining(System.lineSeparator())));
+                errorViewModel.copyLog(selectedEntries);
             }
         }
     }
