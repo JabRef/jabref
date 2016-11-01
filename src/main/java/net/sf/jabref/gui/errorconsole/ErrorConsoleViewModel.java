@@ -5,8 +5,10 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
+import javafx.collections.ObservableList;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
@@ -35,23 +37,30 @@ public class ErrorConsoleViewModel {
     }
 
     /**
-     * Handler for get of log messages in listview
+     * Concatenates the formatted message of the given LogEvents by using the a new line separator
      *
+     * @param selectedEntries as {@link ObservableList<LogEvent>}
      * @return all messages as String
      */
-    private String getLogMessagesAsString() {
-        StringBuilder logMessagesContent = new StringBuilder();
-        for (LogEvent message : allMessagesDataproperty()) {
-            logMessagesContent.append(message.getMessage().getFormattedMessage() + System.lineSeparator());
-        }
-        return logMessagesContent.toString();
+    private String getLogMessagesAsString(ObservableList<LogEvent> selectedEntries) {
+        String logMessagesContent = selectedEntries.stream().map(message -> message.getMessage().getFormattedMessage()).collect(Collectors.joining(System.lineSeparator()));
+        return logMessagesContent;
     }
 
     /**
-     * Handler for copy of Log Entry in clipboard by click of Copy Log Button
+     * Copies the whole log to the clipboard
      */
     public void copyLog() {
-        new ClipBoardManager().setClipboardContents(getLogMessagesAsString());
+        copyLog(allMessagesData);
+    }
+
+    /**
+     * Copies the selected LogEvents to the Clipboard
+     *
+     * @param selectedEntries as ObservableList of LogEvents
+     */
+    public void copyLog(ObservableList<LogEvent> selectedEntries) {
+        new ClipBoardManager().setClipboardContents(getLogMessagesAsString(selectedEntries));
         JabRefGUI.getMainFrame().output(Localization.lang("Log copied to clipboard."));
     }
 
@@ -73,7 +82,7 @@ public class ErrorConsoleViewModel {
                     .setParameter("title", issueTitle).setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
             // Format the contents of listview in Issue Description
-            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + getLogMessagesAsString() + "\n```\n</details>");
+            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + getLogMessagesAsString(allMessagesData) + "\n```\n</details>");
             new ClipBoardManager().setClipboardContents(issueDetails);
         } catch (IOException e) {
             LOGGER.error(e);
