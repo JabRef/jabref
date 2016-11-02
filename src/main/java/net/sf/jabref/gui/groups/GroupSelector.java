@@ -139,7 +139,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
 
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
-                Localization.menuTitle("Toggle groups interface"),
+                Localization.lang("Toggle groups interface"),
                 Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
                 IconTheme.JabRefIcon.TOGGLE_GROUPS);
 
