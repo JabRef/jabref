@@ -17,6 +17,7 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,11 +46,11 @@ import org.apache.commons.logging.LogFactory;
  * @author Simon Harrer
  */
 public class URLDownload {
-
-    private final URL source;
-
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
+    private static final String USER_AGENT= "JabRef";
+
+    private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
 
     private String postData = "";
@@ -73,9 +74,7 @@ public class URLDownload {
      */
     public URLDownload(URL source) {
         this.source = source;
-
-        addParameters("User-Agent", "JabRef");
-
+        addParameters("User-Agent", USER_AGENT);
     }
 
     public URL getSource() {
@@ -108,7 +107,7 @@ public class URLDownload {
     }
 
     private URLConnection openConnection() throws IOException {
-        URLConnection connection = source.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) source.openConnection();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -119,6 +118,20 @@ public class URLDownload {
             }
 
         }
+
+        // normally, 3xx is redirect
+        int status = connection.getResponseCode();
+        if (status != HttpURLConnection.HTTP_OK) {
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                    || status == HttpURLConnection.HTTP_MOVED_PERM
+                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField("Location");
+                // open the new connnection again
+                connection = (HttpURLConnection) new URLDownload(newUrl).openConnection();
+            }
+        }
+
         // this does network i/o: GET + read returned headers
         connection.connect();
 
