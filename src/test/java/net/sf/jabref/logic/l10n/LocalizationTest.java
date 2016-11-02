@@ -45,7 +45,8 @@ public class LocalizationTest {
         Localization.setLanguage("en");
         String knownKey = "Groups";
         assertEquals(knownKey, Localization.lang(knownKey));
-        assertEquals(knownKey, Localization.menuTitle(knownKey));
+        String knownValueWithMnemonics = "&Groups";
+        assertEquals(knownValueWithMnemonics, Localization.menuTitle(knownKey));
     }
 
     @Test
@@ -53,7 +54,8 @@ public class LocalizationTest {
         Localization.setLanguage("en_US");
         String knownKey = "Groups";
         assertEquals(knownKey, Localization.lang(knownKey));
-        assertEquals(knownKey, Localization.menuTitle(knownKey));
+        String knownValueWithMnemonics = "&Groups";
+        assertEquals(knownValueWithMnemonics, Localization.menuTitle(knownKey));
     }
 
     @Test
@@ -68,7 +70,8 @@ public class LocalizationTest {
     public void testUnsetLanguageTranslation() {
         String knownKey = "Groups";
         assertEquals(knownKey, Localization.lang(knownKey));
-        assertEquals(knownKey, Localization.menuTitle(knownKey));
+        String knownValueWithMnemonics = "&Groups";
+        assertEquals(knownValueWithMnemonics, Localization.menuTitle(knownKey));
     }
 
 }
