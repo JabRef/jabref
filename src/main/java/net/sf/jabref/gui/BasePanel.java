@@ -1614,29 +1614,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         }
 
-        EntryEditor entryEditor;
-        int divLoc = -1;
         String visName = null;
         if ((getShowing() != null) && isShowingEditor()) {
             visName = ((EntryEditor) splitPane.getBottomComponent()).getVisiblePanelName();
         }
-        if (getShowing() != null) {
-            divLoc = splitPane.getDividerLocation();
-        }
 
         // We must instantiate a new editor.
-        entryEditor = new EntryEditor(frame, BasePanel.this, be);
+        EntryEditor entryEditor = new EntryEditor(frame, BasePanel.this, be);
         if (visName != null) {
             entryEditor.setVisiblePanel(visName);
         }
-        splitPane.setBottomComponent(entryEditor);
-
-        if (divLoc > 0) {
-            splitPane.setDividerLocation(divLoc);
-        } else {
-            splitPane.setDividerLocation(
-                    splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
-        }
+        showEntryEditor(entryEditor);
 
         newEntryShowing(be);
         setEntryEditorEnabled(true); // Make sure it is enabled.
@@ -1650,15 +1638,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        EntryEditor entryEditor;
-
-        // We must instantiate a new editor. First make sure the old one
-        // stores its last edit:
+        // We must instantiate a new editor. First make sure the old one stores its last edit:
         storeCurrentEdit();
         // Then start the new one:
-        entryEditor = new EntryEditor(frame, BasePanel.this, entry);
-
-        return entryEditor;
+        return new EntryEditor(frame, BasePanel.this, entry);
     }
 
     public EntryEditor getCurrentEditor() {
@@ -1677,6 +1660,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanelMode.SHOWING_EDITOR;
+        if (currentEditor != null) {
+            currentEditor.setMovingToDifferentEntry();
+        }
         currentEditor = editor;
         splitPane.setBottomComponent(editor);
         if (editor.getEntry() != getShowing()) {
