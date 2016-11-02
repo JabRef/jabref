@@ -708,6 +708,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     @Override
     public void componentOpening() {
         valueChanged(null);
+        Globals.prefs.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
     }
 
     @Override
@@ -721,6 +722,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
         }
         getToggleAction().setSelected(false);
+        Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 
     private void setGroups(GroupTreeNode groupsRoot) {

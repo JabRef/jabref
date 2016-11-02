@@ -1223,6 +1223,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         mb.add(search);
 
         groups.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
+        if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
+            sidePaneManager.register(groupSelector);
+            sidePaneManager.show(GroupSelector.class);
+        }
+
         groups.addSeparator();
         groups.add(addToGroup);
         groups.add(removeFromGroup);
