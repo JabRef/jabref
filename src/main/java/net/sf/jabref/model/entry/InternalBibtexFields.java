@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+
 /**
  * Handling of bibtex fields.
  * All bibtex-field related stuff should be placed here!
@@ -70,17 +72,17 @@ public class InternalBibtexFields {
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
             FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
-
-    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFields.FIELDNAME_PRINTED,
-            SpecialFields.FIELDNAME_PRIORITY, SpecialFields.FIELDNAME_QUALITY, SpecialFields.FIELDNAME_RANKING,
-            SpecialFields.FIELDNAME_READ, SpecialFields.FIELDNAME_RELEVANCE);
+    
+    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
+            SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
+            SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
+            SpecialField.RELEVANCE.getFieldName());
 
     // singleton instance
-    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(
-            SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
+    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(FieldName.TIMESTAMP);
 
 
-    private InternalBibtexFields(boolean serializeSpecialFields, String timeStampFieldName) {
+    private InternalBibtexFields(String timeStampFieldName) {
         fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
@@ -139,11 +141,11 @@ public class InternalBibtexFields {
         // custom fields not displayed at editor, but as columns in the UI
         for (String fieldName : SPECIAL_FIELDS) {
             dummy = new BibtexSingleField(fieldName, false);
-            if (!serializeSpecialFields) {
-                dummy.setPrivate();
-                dummy.setWriteable(false);
-                dummy.setDisplayable(false);
-            }
+
+            dummy.setPrivate();
+            dummy.setWriteable(false);
+            dummy.setDisplayable(false);
+
             add(dummy);
         }
 
