@@ -1294,6 +1294,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         quality.add(resolveDuplicateKeys);
         quality.add(checkIntegrity);
         quality.add(cleanupEntries);
+        quality.add(massSetField);
         quality.add(makeKeyAction);
         quality.addSeparator();
         quality.add(autoSetFile);
