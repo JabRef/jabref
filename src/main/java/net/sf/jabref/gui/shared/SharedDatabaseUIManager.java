@@ -99,7 +99,7 @@ public class SharedDatabaseUIManager {
      * @param raiseTab If <code>true</code> the new tab gets selected.
      * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
-    BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
+    public BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
