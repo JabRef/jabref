@@ -85,7 +85,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class LayoutEntry {
-
+    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
+    
     private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:
@@ -99,10 +100,7 @@ class LayoutEntry {
 
     private final List<String> invalidFormatter = new ArrayList<>();
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
-
     private final LayoutFormatterPreferences prefs;
-
 
     public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
@@ -177,7 +175,6 @@ class LayoutEntry {
         for (LayoutEntry layoutEntry : layoutEntries) {
             invalidFormatter.addAll(layoutEntry.getInvalidFormatters());
         }
-
     }
 
     public void setPostFormatter(LayoutFormatter formatter) {
@@ -407,7 +404,6 @@ class LayoutEntry {
             }
 
         }
-
     }
 
     private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
@@ -618,8 +614,6 @@ class LayoutEntry {
         char[] c = calls.toCharArray();
 
         int i = 0;
-
-
         while (i < c.length) {
 
             int start = i;
@@ -681,7 +675,6 @@ class LayoutEntry {
                             String param = calls.substring(startParam, i);
 
                             result.add(Arrays.asList(method, param));
-
                         }
                     } else {
                         // Incorrectly terminated open brace
