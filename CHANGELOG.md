@@ -110,6 +110,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
 - Fixed close action of entry editor not working after parsing error corrected
 - Fixed [koppor/#128](https://github.com/koppor/jabref/issues/128): Sensible default settings for "Enable save actions" and "Cleanup"
+- Fixed [#2201](https://github.com/JabRef/jabref/issues/#2201) and [#1825](https://github.com/JabRef/jabref/issues/#1825): Status of the Group panel is saved and reused for next startup of JabRef
 
 ### Removed
 - Removed 2nd preview style

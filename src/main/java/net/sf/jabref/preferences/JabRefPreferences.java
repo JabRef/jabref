@@ -313,6 +313,7 @@ public class JabRefPreferences {
     public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
+    public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
@@ -761,6 +762,7 @@ public class JabRefPreferences {
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
