@@ -309,7 +309,7 @@ public class BibEntry implements Cloneable {
         String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
         if (aliasForField != null) {
-            return getField(aliasForField);
+            return getFieldInterface.getValueForField(aliasForField);
         }
 
         // Finally, handle dates
