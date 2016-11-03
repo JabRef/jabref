@@ -130,7 +130,6 @@ public class WrapFileLinksTest {
     @Test
     public void testRelativePath() {
         formatter.setArgument("\\r");
-        assertEquals("test.pdf",
-                formatter.format("Test file:test.pdf:PDF"));
+        assertEquals("test.pdf", formatter.format("Test file:test.pdf:PDF"));
     }
 }
