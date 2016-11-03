@@ -88,7 +88,7 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
     private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
     private final JCheckBox rememberPassword = new JCheckBox(Localization.lang("Remember password?"));
-    private final JCheckBox autosaveFile = new JCheckBox(Localization.lang("Autosave the database to"));
+    private final JCheckBox autosaveFile = new JCheckBox(Localization.lang("Automatically save the database to"));
 
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
@@ -118,8 +118,6 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
             return;
         }
 
-        // TODO begin
-
         if (autosaveFile.isSelected()) {
 
             Path localFilePath = Paths.get(fileLocationField.getText());
@@ -135,8 +133,6 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
             }
         }
 
-        // TODO end
-
         setLoadingConnectButtonText(true);
 
         try {
@@ -144,7 +140,7 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
             setPreferences();
             dispose();
             try {
-                new SaveDatabaseAction(panel, Paths.get("/home/admir/tmp3/demo.bib")).runCommand();
+                new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
             } catch (Throwable e) {
                 LOGGER.error("Error while saving the database", e);
             }
@@ -204,9 +200,7 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
         connectButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                 "Enter_pressed");
         connectButton.getActionMap().put("Enter_pressed", openAction);
-
         browseButton.addActionListener(e -> showFileChooser());
-
         autosaveFile.addActionListener(e -> updateEnableState());
     }
 
@@ -417,20 +411,20 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
     private void checkFields() throws JabRefException {
         if (isEmptyField(hostField)) {
             hostField.requestFocus();
-            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Host")));
+            throw new JabRefException(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Host")));
         }
         if (isEmptyField(portField)) {
             portField.requestFocus();
-            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Port")));
+            throw new JabRefException(Localization.lang("Required field \"%0\" is empty.", Localization.lang("Port")));
         }
         if (isEmptyField(databaseField)) {
             databaseField.requestFocus();
             throw new JabRefException(
-                    Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Database")));
+                    Localization.lang("Required field \"%0\" is empty.", Localization.lang("Database")));
         }
         if (isEmptyField(userField)) {
             userField.requestFocus();
-            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
+            throw new JabRefException(Localization.lang("Required field \"%0\" is empty.", Localization.lang("User")));
         }
         if (autosaveFile.isSelected() && isEmptyField(fileLocationField)) {
             fileLocationField.requestFocus();

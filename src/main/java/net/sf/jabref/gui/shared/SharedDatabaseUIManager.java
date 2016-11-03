@@ -97,6 +97,7 @@ public class SharedDatabaseUIManager {
      *
      * @param dbmsConnectionProperties Connection data
      * @param raiseTab If <code>true</code> the new tab gets selected.
+     * @return BasePanel which also used by {@link SaveDatabaseAction}
      */
     BasePanel openNewSharedDatabaseTab(DBMSConnectionProperties dbmsConnectionProperties)
             throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {

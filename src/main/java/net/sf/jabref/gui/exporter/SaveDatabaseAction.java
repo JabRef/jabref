@@ -73,6 +73,10 @@ public class SaveDatabaseAction extends AbstractWorker {
         this.frame = panel.frame();
     }
 
+    /**
+     * @param panel BasePanel which contains the database to be saved
+     * @param filePath Path to the file the database should be saved to
+     */
     public SaveDatabaseAction(BasePanel panel, Path filePath) {
         this(panel);
         this.filePath = Optional.ofNullable(filePath);
@@ -92,6 +96,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.frame().output(Localization.lang("Saving database") + "...");
             panel.setSaving(true);
         } else if (filePath.isPresent()) {
+            // save as directly if the target file location is known
             saveAs(filePath.get().toFile());
         } else {
             saveAs();

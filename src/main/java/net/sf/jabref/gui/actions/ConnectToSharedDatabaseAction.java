@@ -25,7 +25,6 @@ public class ConnectToSharedDatabaseAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         ConnectToSharedDatabaseDialog connectToSharedDatabaseDialog = new ConnectToSharedDatabaseDialog(jabRefFrame);
         connectToSharedDatabaseDialog.setVisible(true);
     }
