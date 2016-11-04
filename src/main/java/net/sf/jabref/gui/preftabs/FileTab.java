@@ -42,7 +42,6 @@ class FileTab extends JPanel implements PrefsTab {
 
     private final JCheckBox backup;
     private final JCheckBox localAutoSave;
-    private final JCheckBox sharedAutoSave;
     private final JCheckBox openLast;
     private final JComboBox<String> newlineSeparator;
     private final JCheckBox reformatFileOnSaveAndExport;
@@ -83,7 +82,6 @@ class FileTab extends JPanel implements PrefsTab {
         openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
         localAutoSave = new JCheckBox(Localization.lang("Autosave local databases"));
-        sharedAutoSave = new JCheckBox(Localization.lang("Autosave shared databases"));
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -167,8 +165,6 @@ class FileTab extends JPanel implements PrefsTab {
         hPan.add(help, BorderLayout.EAST);
         builder.append(hPan);
         builder.nextLine();
-        builder.append(sharedAutoSave, 1);
-        builder.nextLine();
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -212,7 +208,6 @@ class FileTab extends JPanel implements PrefsTab {
         nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
         localAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
-        sharedAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE));
     }
 
     @Override
@@ -254,7 +249,6 @@ class FileTab extends JPanel implements PrefsTab {
         }
 
         prefs.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, localAutoSave.isSelected());
-        prefs.putBoolean(JabRefPreferences.SHARED_AUTO_SAVE, sharedAutoSave.isSelected());
     }
 
     @Override
