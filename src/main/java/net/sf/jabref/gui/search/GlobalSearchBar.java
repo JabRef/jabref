@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -85,18 +86,33 @@ public class GlobalSearchBar extends JPanel {
         searchField.setColumns(30);
 
         JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setToolTipText(Localization.lang("Search globally"));
-        globalSearch.addActionListener(e -> {
-            searchPreferences.setGlobalSearch(globalSearch.isSelected());
-            if (globalSearch.isSelected()) {
-                openCurrentResultsInDialog.setToolTipText(Localization.lang("Search in all open databases"));
-            } else {
-                openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+        globalSearch.setToolTipText(Localization.lang("Search in all open databases"));
+
+
+        AbstractAction clickAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchPreferences.setGlobalSearch(globalSearch.isSelected());
+                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
             }
-        });
+        };
+
+        AbstractAction shortCutAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                globalSearch.setSelected(true);
+                clickAction.actionPerformed(new ActionEvent(this, 0, "fire click action"));
+                focus();
+            }
+        };
+
+        String searchGlobalByKey = "searchGlobalByKey";
+        globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
+        globalSearch.getActionMap().put(searchGlobalByKey, shortCutAction);
+
+        globalSearch.addActionListener(clickAction);
 
         openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
-        openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(event -> {
             if (globalSearch.isSelected()) {
                 performGlobalSearch();
@@ -105,6 +121,7 @@ public class GlobalSearchBar extends JPanel {
             }
         });
         openCurrentResultsInDialog.setEnabled(false);
+        updateOpenCurrentResultsTooltip(globalSearch.isSelected());
 
         regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(),
                 searchPreferences.isRegularExpression());
@@ -394,6 +411,14 @@ public class GlobalSearchBar extends JPanel {
 
     public void setDontSelectSearchBar(boolean dontSelectSearchBar) {
         this.dontSelectSearchBar = dontSelectSearchBar;
+    }
+
+    private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {
+        if (globalSearchEnabled) {
+            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show global search results in a window"));
+        } else {
+            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+        }
     }
 
 }
