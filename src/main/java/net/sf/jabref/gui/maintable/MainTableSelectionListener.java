@@ -120,12 +120,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (oldEditor != null) {
                     visName = oldEditor.getVisiblePanelName();
                 }
-                // Get an old or new editor for the entry to edit:
+                // Get a new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                if (oldEditor != null) {
-                    oldEditor.setMovingToDifferentEntry();
-                }
 
                 // Show the new editor unless it was already visible:
                 if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
@@ -135,6 +131,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
+                } else {
+                    // if not used destroy the EntryEditor
+                    newEditor.setMovingToDifferentEntry();
                 }
             } else {
                 // Either nothing or a preview was shown. Update the preview.
