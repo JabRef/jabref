@@ -1456,6 +1456,21 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% Encoding: UTF-8").append(OS.NEWLINE)
+                .append("% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+
+        assertEquals(1, entries.size());
+        assertEquals("", entries.get(0).getUserComments());
+    }
+
+    @Test
     public void integrationTestSaveActions() throws IOException {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 
