@@ -354,24 +354,31 @@ public class BibtexParser implements Parser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
+        } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
+            return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
         } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
-            // purge the encoding line if it exists
-            int runningIndex = result.indexOf(SavePreferences.ENCODING_PREFIX);
-            while (runningIndex < indexOfAt) {
-                if (result.charAt(runningIndex) == '\n') {
-                    break;
-                } else if (result.charAt(runningIndex) == '\r') {
-                    if (result.charAt(runningIndex + 1) == '\n') {
-                        runningIndex++;
-                    }
-                    break;
-                }
-                runningIndex++;
-            }
-            return result.substring(runningIndex + 1);
+            return purge(result, SavePreferences.ENCODING_PREFIX);
         } else {
             return result;
         }
+    }
+
+    private String purge(String context, String stringToPurge) {
+        // purge the encoding line if it exists
+        int runningIndex = context.indexOf(stringToPurge);
+        int indexOfAt = context.indexOf("@");
+        while (runningIndex < indexOfAt) {
+            if (context.charAt(runningIndex) == '\n') {
+                break;
+            } else if (context.charAt(runningIndex) == '\r') {
+                if (context.charAt(runningIndex + 1) == '\n') {
+                    runningIndex++;
+                }
+                break;
+            }
+            runningIndex++;
+        }
+        return context.substring(runningIndex + 1);
     }
 
     private String getPureTextFromFile() {
