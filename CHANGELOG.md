@@ -73,11 +73,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [koppor/#97] (https://github.com/koppor/jabref/issues/97): When importing preferences, the explorer will start where the preferences are last exported
 - [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
-- Updated Vietnam translation
+- Updated Vietnamese translation
 - Added greyed-out suggestion for `year`/`date`/`url` fields
 - [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>CTRL</kbd>+<kbd>F8</kbd>
 
 ### Fixed
+- Fixed [#2228](https://github.com/JabRef/jabref/issues/2228): Fixed Medline fetcher no longer working. The fetcher now uses `https` for fetching 
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
@@ -118,6 +119,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
 - Fixed close action of entry editor not working after parsing error corrected
 - Fixed [koppor/#128](https://github.com/koppor/jabref/issues/128): Sensible default settings for "Enable save actions" and "Cleanup"
+- Fixed [#2201](https://github.com/JabRef/jabref/issues/#2201) and [#1825](https://github.com/JabRef/jabref/issues/#1825): Status of the Group panel is saved and reused for next startup of JabRef
+- Fixed [#2200](https://github.com/JabRef/jabref/issues/#2200): Sorting now uses the same unicode representation that is also used for showing the content in the maintable
 
 ### Removed
 - Removed 2nd preview style

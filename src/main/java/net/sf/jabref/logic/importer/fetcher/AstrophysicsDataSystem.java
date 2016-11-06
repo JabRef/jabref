@@ -1,8 +1,13 @@
 package net.sf.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -13,14 +18,17 @@ import net.sf.jabref.logic.importer.EntryBasedParserFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedParserFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.SearchBasedParserFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.helper.StringUtil;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (http://www.adsabs.harvard.edu/)
@@ -110,6 +118,33 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     @Override
     public Parser getParser() {
         return new BibtexParser(preferences);
+    }
+
+    @Override
+    public List<BibEntry> performSearch(String query) throws FetcherException {
+        if (StringUtil.isBlank(query)) {
+            return Collections.emptyList();
+        }
+
+        try {
+            URLConnection connection = getURLForQuery(query).openConnection();
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+            try(InputStream stream = connection.getInputStream()) {
+                List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
+
+                // Post-cleanup
+                fetchedEntries.forEach(this::doPostCleanup);
+                return fetchedEntries;
+            } catch (IOException e) {
+                throw new FetcherException("An I/O exception occurred", e);
+            }
+        } catch (URISyntaxException | MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("An I/O exception occurred", e);
+        } catch (ParseException e) {
+            throw new FetcherException("Error occurred when parsing entry", Localization.lang("Error occurred when parsing entry"), e);
+        }
     }
 
     @Override

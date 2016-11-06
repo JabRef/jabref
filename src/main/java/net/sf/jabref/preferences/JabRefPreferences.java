@@ -73,7 +73,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.model.strings.StringUtil;
@@ -302,7 +301,6 @@ public class JabRefPreferences {
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
-    public static final String SHARED_AUTO_SAVE = "sharedAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
@@ -314,6 +312,7 @@ public class JabRefPreferences {
     public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
+    public static final String GROUP_SIDEPANE_VISIBLE = "groupSidepaneVisible";
     public static final String ALLOW_FILE_AUTO_OPEN_BROWSE = "allowFileAutoOpenBrowse";
     public static final String CUSTOM_TAB_NAME = "customTabName_";
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
@@ -699,15 +698,15 @@ public class JabRefPreferences {
         defaults.put(STYLES_SIZE_X, 600);
         defaults.put(STYLES_SIZE_Y, 400);
 
-        defaults.put(SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
-        defaults.put(SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
-        defaults.put(SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
-        defaults.put(SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
-        defaults.put(SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
-        defaults.put(SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
-        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
-        defaults.put(SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+        defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_PRIORITY, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_QUALITY, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_RANKING, Boolean.TRUE);
+        defaults.put(SHOWCOLUMN_RELEVANCE, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_PRINTED, Boolean.FALSE);
+        defaults.put(SHOWCOLUMN_READ, Boolean.FALSE);
+        defaults.put(AUTOSYNCSPECIALFIELDSTOKEYWORDS, Boolean.TRUE);
+        defaults.put(SERIALIZESPECIALFIELDS, Boolean.FALSE);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -752,7 +751,6 @@ public class JabRefPreferences {
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
-        defaults.put(SHARED_AUTO_SAVE, Boolean.TRUE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
@@ -762,6 +760,7 @@ public class JabRefPreferences {
         defaults.put(OPEN_FOLDERS_OF_ATTACHED_FILES, Boolean.FALSE);
         defaults.put(ALLOW_FILE_AUTO_OPEN_BROWSE, Boolean.TRUE);
         defaults.put(WEB_SEARCH_VISIBLE, Boolean.FALSE);
+        defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(BIB_LOC_AS_PRIMARY_DIR, Boolean.FALSE);
         defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
@@ -1424,7 +1423,7 @@ public class JabRefPreferences {
     }
 
     public VersionPreferences getVersionPreferences() {
-        Version ignoredVersion = new Version(get(VERSION_IGNORED_UPDATE));
+        Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
         return new VersionPreferences(ignoredVersion);
     }
 
