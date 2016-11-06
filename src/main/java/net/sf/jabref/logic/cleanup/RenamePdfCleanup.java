@@ -156,21 +156,22 @@ public class RenamePdfCleanup implements CleanupJob {
                     unsuccessfulRenames++;
                 }
             }
+        }
 
-            //TODO: Checken: Der macht das return wenn change = true, aber wenn noch ein nicht change dahinter kommt?`
+        //TODO: Checken: Der macht das return wenn change = true, aber wenn noch ein nicht change dahinter kommt?`
 
-            if (changed) {
-                Optional<FieldChange> change = typedEntry.setFiles(newFileList);
-                //we put an undo of the field content here
-                //the file is not being renamed back, which leads to inconsistencies
-                //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-                if (change.isPresent()) {
-                    return Collections.singletonList(change.get());
-                } else {
-                    return Collections.emptyList();
-                }
+        if (changed) {
+            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            //we put an undo of the field content here
+            //the file is not being renamed back, which leads to inconsistencies
+            //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
+            if (change.isPresent()) {
+                return Collections.singletonList(change.get());
+            } else {
+                return Collections.emptyList();
             }
         }
+
         return Collections.emptyList();
 
     }
