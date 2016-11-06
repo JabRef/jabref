@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
  * sidePane.
  */
 public class SidePaneManager {
-
     private static final Log LOGGER = LogFactory.getLog(SidePaneManager.class);
 
     private final JabRefFrame frame;
@@ -33,7 +32,6 @@ public class SidePaneManager {
     private final Map<Class<? extends SidePaneComponent>, SidePaneComponent> components = new LinkedHashMap<>();
 
     private final List<SidePaneComponent> visible = new LinkedList<>();
-
 
     public SidePaneManager(JabRefFrame frame) {
         this.frame = frame;

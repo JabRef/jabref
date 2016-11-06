@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import java.awt.event.ActionEvent;
 
@@ -12,8 +12,8 @@ public class SpecialFieldMenuAction extends AbstractAction {
     private final String actionName;
 
 
-    public SpecialFieldMenuAction(SpecialFieldValue val, JabRefFrame frame) {
-        super(val.getMenuString(), val.getIcon());
+    public SpecialFieldMenuAction(SpecialFieldValueViewModel val, JabRefFrame frame) {
+        super(val.getMenuString(), val.getSpecialFieldValueIcon());
         this.frame = frame;
         this.actionName = val.getActionName();
     }

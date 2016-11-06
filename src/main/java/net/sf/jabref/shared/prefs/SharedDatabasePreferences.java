@@ -7,7 +7,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.gui.shared.OpenSharedDatabaseDialog;
+import net.sf.jabref.gui.shared.ConnectToSharedDatabaseDialog;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.security.Password;
 
@@ -15,7 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Stores and reads persistent data for {@link OpenSharedDatabaseDialog}.
+ * Stores and reads persistent data for {@link ConnectToSharedDatabaseDialog}.
  */
 public class SharedDatabasePreferences {
 

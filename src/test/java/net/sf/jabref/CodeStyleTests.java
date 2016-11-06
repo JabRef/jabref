@@ -10,7 +10,7 @@ import net.sf.jabref.model.strings.StringUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ArchitectureTest {
+public class CodeStyleTests {
 
     @Test
     public void StringUtilClassIsSmall() throws Exception {

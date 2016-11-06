@@ -35,7 +35,7 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
-version = "3.7dev"
+version = "3.7-dev"
 project.ext.threeDotVersion = "3.6.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
@@ -95,8 +95,8 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
 
-    // VersionEye states that 6.0.4 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.39'
+    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
+    compile 'mysql:mysql-connector-java:5.1.40'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.6'
 
@@ -107,11 +107,11 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.commons:commons-lang3:3.5'
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.18'
+    compile 'info.debatty:java-string-similarity:0.19'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.7'
     compile 'org.apache.logging.log4j:log4j-api:2.7'
@@ -125,8 +125,8 @@ dependencies {
     compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.12'
+    testCompile 'org.mockito:mockito-core:2.2.7'
+    testCompile 'com.github.tomakehurst:wiremock:2.2.2'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
