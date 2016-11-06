@@ -195,23 +195,27 @@ public class Version {
      * (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
      */
     public String getChangelogUrl() {
-        StringBuilder changelogLink = new StringBuilder()
-                .append("https://github.com/JabRef/jabref/blob/v")
-                .append(this.getMajor())
-                .append(".")
-                .append(this.getMinor());
-
-        if (this.getPatch() != 0) {
-            changelogLink
+        if (isDevelopmentVersion) {
+            return "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased";
+        } else {
+            StringBuilder changelogLink = new StringBuilder()
+                    .append("https://github.com/JabRef/jabref/blob/v")
+                    .append(this.getMajor())
                     .append(".")
-                    .append(this.getPatch());
+                    .append(this.getMinor());
+
+            if (this.getPatch() != 0) {
+                changelogLink
+                        .append(".")
+                        .append(this.getPatch());
+            }
+
+            changelogLink
+                    .append(this.developmentStage.stage)
+                    .append("/CHANGELOG.md");
+
+            return changelogLink.toString();
         }
-
-        changelogLink
-                .append(this.developmentStage.stage)
-                .append("/CHANGELOG.md");
-
-        return changelogLink.toString();
     }
 
     @Override

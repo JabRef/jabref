@@ -189,6 +189,18 @@ public class VersionTest {
     }
 
     @Test
+    public void changelogOfDevelopmentVersionWithDash() {
+        Version version = Version.parse("4.0-dev");
+        assertEquals("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased", version.getChangelogUrl());
+    }
+
+    @Test
+    public void changelogOfDevelopmentVersionWithoutDash() {
+        Version version = Version.parse("3.7dev");
+        assertEquals("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased", version.getChangelogUrl());
+    }
+
+    @Test
     public void changelogWithTwoDigits() {
         Version version = Version.parse("3.4");
         assertEquals("https://github.com/JabRef/jabref/blob/v3.4/CHANGELOG.md", version.getChangelogUrl());
