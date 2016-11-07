@@ -54,20 +54,21 @@ import org.apache.commons.logging.LogFactory;
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
+    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
     private boolean success;
     private boolean canceled;
     private boolean fileLockedError;
-    private Optional<Path> filePath;
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+    private Optional<Path> filePath;
 
 
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
+        this.filePath = Optional.empty();
     }
 
     /**
