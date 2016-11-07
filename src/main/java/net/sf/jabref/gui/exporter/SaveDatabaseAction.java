@@ -306,20 +306,17 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     public void saveAs() throws Throwable {
-        File file = null;
-        while (file == null) {
-            // configure file dialog
-            FileDialog dialog = new FileDialog(frame);
-            dialog.withExtension(FileExtensions.BIBTEX_DB);
-            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+        // configure file dialog
+        FileDialog dialog = new FileDialog(frame);
+        dialog.withExtension(FileExtensions.BIBTEX_DB);
+        dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
 
-            Optional<Path> path = dialog.saveNewFile();
-            if (path.isPresent()) {
-                saveAs(path.get().toFile());
-            } else {
-                canceled = true;
-                return;
-            }
+        Optional<Path> path = dialog.saveNewFile();
+        if (path.isPresent()) {
+            saveAs(path.get().toFile());
+        } else {
+            canceled = true;
+            return;
         }
     }
 
