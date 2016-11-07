@@ -25,13 +25,16 @@ import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.Formatter;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -48,6 +51,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private JTextArea descriptionAreaText;
     private JButton removeButton;
     private JButton resetButton;
+    private JButton recommendButton;
 
     private final FieldFormatterCleanups defaultFormatters;
 
@@ -60,7 +64,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
         Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
-        setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
+        setValues(saveActions.orElse(Cleanups.DEFAULT_SAVE_ACTIONS));
     }
 
     public void setValues(FieldFormatterCleanups formatterCleanups) {
@@ -130,12 +134,26 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
 
+        BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
+
+        recommendButton = new JButton(Localization.lang("Recommended for %0", databaseContext.getMode().getFormattedName()));
+        boolean isBibLaTeX = databaseContext.isBiblatexMode();
+
+        recommendButton.addActionListener(e -> {
+            if (isBibLaTeX) {
+                ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBLATEX_ACTIONS);
+            } else {
+                ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBTEX_ACTIONS);
+            }
+        });
+
         removeButton = new JButton(Localization.lang("Remove selected"));
         removeButton.addActionListener(
                 e -> ((CleanupActionsListModel) actionsList.getModel()).removeAtIndex(actionsList.getSelectedIndex()));
 
         builder.add(removeButton).xy(7, 11);
         builder.add(resetButton).xy(3, 11);
+        builder.add(recommendButton).xy(5, 11);
         builder.add(getSelectorPanel()).xyw(3, 15, 5);
 
         makeDescriptionTextAreaLikeJLabel();
@@ -191,9 +209,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, pref:grow, 4dlu, right:pref",
                         "pref, 2dlu, pref:grow, 2dlu"));
 
-        List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
+        List<String> fieldNames = InternalBibtexFields.getAllPublicAndInteralFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
-        fieldNames.add("all");
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
 
@@ -201,9 +218,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox).xy(1, 1);
 
-        List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream()
+        List<String> formatterNames = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getName).collect(Collectors.toList());
-        List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream()
+        List<String> formatterDescriptions = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getDescription).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
         formattersCombobox.setRenderer(new DefaultListCellRenderer() {
@@ -260,7 +277,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     public boolean isDefaultSaveActions() {
-        return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
+        return Cleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
     }
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
@@ -274,7 +291,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
         String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
-        for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
+        for (Formatter formatter : Cleanups.getAvailableFormatters()) {
             if (formatter.getName().equals(selectedFormatterName)) {
                 selectedFormatter = formatter;
                 break;
@@ -304,6 +321,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             addButton.setEnabled(status);
             removeButton.setEnabled(status);
             resetButton.setEnabled(status);
+            recommendButton.setEnabled(status);
 
         }
     }

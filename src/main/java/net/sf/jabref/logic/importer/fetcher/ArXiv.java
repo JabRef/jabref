@@ -21,18 +21,18 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.strings.StringUtil;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
@@ -52,10 +52,14 @@ import org.xml.sax.SAXException;
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
-    private static final String API_URL = "http://export.arxiv.org/api/query";
 
+    private static final String API_URL = "http://export.arxiv.org/api/query";
+    private final ImportFormatPreferences importFormatPreferences;
+
+    public ArXiv(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -149,11 +153,11 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         try {
             URIBuilder uriBuilder = new URIBuilder(API_URL);
             // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
-            if (StringUtils.isNotBlank(searchQuery)) {
-                uriBuilder.addParameter("search_query", StringUtils.stripAccents(searchQuery));
+            if (StringUtil.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
             }
             if (!ids.isEmpty()) {
-                uriBuilder.addParameter("id_list", StringUtils.join(ids, ','));
+                uriBuilder.addParameter("id_list", String.join(",", ids));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -209,12 +213,14 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(ArXivEntry::toBibEntry).collect(Collectors.toList());
+        return searchForEntries(query).stream().map(
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator())).collect(Collectors.toList());
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
+        return searchForEntryById(identifier).map(
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
 
 
@@ -327,12 +333,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             });
         }
 
-        public BibEntry toBibEntry() {
+        public BibEntry toBibEntry(Character keywordDelimiter) {
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
             bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
-            bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
-            bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
+            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
+            bibEntry.addKeywords(categories, keywordDelimiter);
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
             title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
             doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));

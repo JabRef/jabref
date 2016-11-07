@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.transform.TransformerException;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
@@ -57,8 +59,10 @@ public class XMPSchemaBibtex extends XMPSchema {
      *
      * @param e
      *            The existing XML element.
+     * @param namespace
+     *            The name space considered. Must currently be there for compatibility reasons despite being unused.
      */
-    public XMPSchemaBibtex(Element e, String namespace) {
+    public XMPSchemaBibtex(Element e, @SuppressWarnings("unused") String namespace) {
         super(e, XMPSchemaBibtex.KEY);
     }
 
@@ -273,7 +277,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
+        if ((xmpPreferences != null) && xmpPreferences.isUseXMPPrivacyFilter()) {
             Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
@@ -286,16 +290,16 @@ public class XMPSchemaBibtex extends XMPSchema {
                 setTextProperty(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextProperty(BibEntry.TYPE_HEADER, entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
+        String type = getTextProperty(BibEntry.TYPE_HEADER);
         BibEntry e = new BibEntry(IdGenerator.next(), type);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
-        text.remove("entrytype");
+        text.remove(BibEntry.TYPE_HEADER);
         e.setField(text);
         return e;
     }

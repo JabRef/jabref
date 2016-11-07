@@ -202,7 +202,7 @@ public class XMPUtilTest {
         e.setField("year", "1982");
         e.setField("month", "#jul#");
         e.setField("abstract",
-                "The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
+                "The success of the Linux operating system has demonstrated the viability of an alternative form of software development—open source software—that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
         return e;
     }
 
@@ -221,7 +221,7 @@ public class XMPUtilTest {
                 + "<bibtex:keywords>peanut, butter, jelly</bibtex:keywords>"
                 + "<bibtex:entrytype>Inproceedings</bibtex:entrytype>" + "<bibtex:year>1982</bibtex:year>"
                 + "<bibtex:month>#jul#</bibtex:month>"
-                + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
+                + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development—open source software—that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
     }
 
     /**
@@ -1258,7 +1258,6 @@ public class XMPUtilTest {
      * @throws TransformerException
      */
     @Test
-    @Ignore
     public void testCommandLineSeveral() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");

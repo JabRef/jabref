@@ -279,4 +279,13 @@ public class AutoCompleteSupport<E> {
     public void setAutoCompleter(AutoCompleter<E> autoCompleter) {
         this.autoCompleter = autoCompleter;
     }
+
+    public void setVisible(boolean visible){
+        popup.setVisible(visible);
+    }
+
+    public boolean isVisible() {
+        return popup.isVisible();
+    }
+
 }

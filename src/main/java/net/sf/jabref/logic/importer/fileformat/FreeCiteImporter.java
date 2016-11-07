@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -38,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * This importer parses text format citations using the online API of FreeCite -
  * Open Source Citation Parser http://freecite.library.brown.edu/
  */
-public class FreeCiteImporter extends ImportFormat {
+public class FreeCiteImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
@@ -203,7 +204,8 @@ public class FreeCiteImporter extends ImportFormat {
 
                     // autogenerate label (BibTeX key)
                     BibtexKeyPatternUtil.makeLabel(
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData()
+                                    .getCiteKeyPattern(importFormatPreferences.getBibtexKeyPatternPreferences().getKeyPattern()),
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
                             importFormatPreferences.getBibtexKeyPatternPreferences());
 
@@ -221,7 +223,7 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "text citations";
     }
 

@@ -1,6 +1,6 @@
 package net.sf.jabref.shared.event;
 
-import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**

@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
-[![Donation](https://img.shields.io/badge/donate-paypal-orange.svg)](https://www.paypal.com/cgi-bin/webscr?item_name=JabRef+Bibliography+Manager&cmd=_donations&lc=US&currency_code=EUR&business=donations%40jabref.org)
+[![Donation](https://img.shields.io/badge/donate-something-orange.svg)](https://donations.jabref.org)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 
@@ -104,9 +104,7 @@ Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A ful
 
 ## License
 
-We are currently in transition from [GPL](https://tldrlegal.com/license/gnu-general-public-license-v2) to the [MIT license](https://tldrlegal.com/license/mit-license).
-Thus, all new contributions are considered being made under MIT license.
-
+Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
 JabRef also uses libraries distributed by other parties.

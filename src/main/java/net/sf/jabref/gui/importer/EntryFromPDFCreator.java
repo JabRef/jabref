@@ -11,9 +11,9 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
@@ -96,7 +96,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-                        String date = LocalDate.of(creationDate.YEAR, creationDate.MONTH + 1, creationDate.DAY_OF_MONTH)
+                        String date = LocalDate.of(Calendar.YEAR, Calendar.MONTH + 1, Calendar.DAY_OF_MONTH)
                                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
                         appendToField(entry, Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), date);
                     }

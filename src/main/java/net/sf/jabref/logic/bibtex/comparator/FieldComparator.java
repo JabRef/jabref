@@ -8,14 +8,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * A comparator for BibEntry fields
@@ -75,7 +75,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private String getField(BibEntry entry) {
         for (String aField : field) {
-            Optional<String> o = entry.getFieldOrAlias(aField);
+            Optional<String> o = entry.getFieldOrAliasLatexFree(aField);
             if (o.isPresent()) {
                 return o.get();
             }
@@ -108,7 +108,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             return -multiplier;
         }
 
-        // Now we now that both f1 and f2 are != null
+        // Now we know that both f1 and f2 are != null
         if (fieldType == FieldType.NAME) {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);

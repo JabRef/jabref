@@ -1,9 +1,8 @@
 package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -13,14 +12,11 @@ import net.sf.jabref.model.entry.BibEntry;
 public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
 
     private final BibEntry entry;
-    private final BibDatabase base;
     private final String oldValue;
     private final String newValue;
 
 
-    public UndoableKeyChange(BibDatabase base, BibEntry entry,
-            String oldValue, String newValue) {
-        this.base = base;
+    public UndoableKeyChange(BibEntry entry, String oldValue, String newValue) {
         this.entry = entry;
         this.oldValue = oldValue;
         this.newValue = newValue;
@@ -31,27 +27,18 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
         return Localization.lang("change key from %0 to %1",
                 StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
                 StringUtil.boldHTML(newValue, Localization.lang("undefined")));
-
     }
 
     @Override
     public void undo() {
         super.undo();
-
-        // Revert the change.
-        set(oldValue);
+        entry.setCiteKey(oldValue);
     }
 
     @Override
     public void redo() {
         super.redo();
-
-        // Redo the change.
-        set(newValue);
-    }
-
-    private void set(String to) {
-        base.setCiteKeyForEntry(entry, to);
+        entry.setCiteKey(newValue);
     }
 
 }

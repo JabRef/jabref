@@ -48,6 +48,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -90,13 +91,13 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
- *
+ * <p>
  * TODO
- *   - change colors and fonts
- *   - delete selected text
- *   - make textarea editable
- *   - create several bibtex entries in dialog
- *   - if the dialog works with an existing entry (right click menu item), the cancel option doesn't work well
+ * - change colors and fonts
+ * - delete selected text
+ * - make textarea editable
+ * - create several bibtex entries in dialog
+ * - if the dialog works with an existing entry (right click menu item), the cancel option doesn't work well
  */
 public class TextInputDialog extends JDialog {
 
@@ -163,7 +164,7 @@ public class TextInputDialog extends JDialog {
         JTabbedPane tabbed = new JTabbedPane();
 
         tabbed.add(rawPanel, Localization.lang("Raw source"));
-        tabbed.add(sourcePanel, Localization.lang("BibTeX source"));
+        tabbed.add(sourcePanel, Localization.lang("%0 source", frame.getCurrentBasePanel().getBibDatabaseContext().getMode().getFormattedName()));
 
         // Panel Layout
         panel1.setLayout(new BorderLayout());
@@ -241,7 +242,7 @@ public class TextInputDialog extends JDialog {
 
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("Plain text import") + "</h3><p>"
                 + Localization.lang("This is a simple copy and paste dialog. First load or paste some text into "
-                        + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
+                + "the text input area.<br>After that, you can mark text and assign it to a BibTeX field.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -267,7 +268,7 @@ public class TextInputDialog extends JDialog {
         inputPanel.setMinimumSize(new Dimension(10, 10));
 
         JScrollPane fieldScroller = new JScrollPane(fieldList);
-        fieldScroller.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        fieldScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         // insert buttons
         insertButton.addActionListener(event -> insertTextForTag(override.isSelected()));
@@ -369,7 +370,7 @@ public class TextInputDialog extends JDialog {
         sourcePreview.setEditable(false);
         sourcePreview.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         JScrollPane paneScrollPane = new JScrollPane(sourcePreview);
-        paneScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        paneScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         paneScrollPane.setPreferredSize(new Dimension(500, 255));
         paneScrollPane.setMinimumSize(new Dimension(10, 10));
 
@@ -430,7 +431,7 @@ public class TextInputDialog extends JDialog {
                             entry.setField(fieldName, old.get() + " and " + txt);
                         } else if (FieldName.KEYWORDS.equals(fieldName)) {
                             // Add keyword
-                            entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            entry.addKeyword(txt, Globals.prefs.getKeywordDelimiter());
                         } else {
                             entry.setField(fieldName, old.get() + txt);
                         }
@@ -451,6 +452,7 @@ public class TextInputDialog extends JDialog {
 
     /**
      * tries to parse the pasted reference with freecite
+     *
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
@@ -634,9 +636,9 @@ public class TextInputDialog extends JDialog {
          */
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, // value to display
-                int index, // cell index
-                boolean iss, // is the cell selected
-                boolean chf) // the list and the cell have the focus
+                                                      int index, // cell index
+                                                      boolean iss, // is the cell selected
+                                                      boolean chf) // the list and the cell have the focus
         {
             /* The DefaultListCellRenderer class will take care of
              * the JLabels text property, it's foreground and background

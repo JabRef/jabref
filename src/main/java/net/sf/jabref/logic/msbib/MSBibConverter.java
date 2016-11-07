@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.logic.mods.PageNumbers;
-import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -26,7 +23,7 @@ public class MSBibConverter {
 
         for (String field : entry.getFieldNames()) {
             // clean field
-            String unicodeField = removeLaTeX(entry.getField(field).orElse(""));
+            String unicodeField = entry.getLatexFreeField(field).orElse("");
 
             if (MSBibMapping.getMSBibField(field) != null) {
                 result.fields.put(MSBibMapping.getMSBibField(field), unicodeField);
@@ -48,8 +45,13 @@ public class MSBibConverter {
             result.broadcastTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
+        if (!entry.getField(FieldName.ISSUE).isPresent()) {
+            result.number = entry.getField(FieldName.NUMBER).orElse(null);
+        }
+
         if ("Patent".equalsIgnoreCase(entry.getType())) {
             result.patentNumber = entry.getField(FieldName.NUMBER).orElse(null);
+            result.number = null;
         }
 
         result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
@@ -59,9 +61,6 @@ public class MSBibConverter {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
 
-        if (!entry.getField(FieldName.ISSUE).isPresent()) {
-            result.number = entry.getField(FieldName.NUMBER).orElse(null);
-        }
         // Value must be converted
         //Currently only english is supported
         entry.getField(FieldName.LANGUAGE)
@@ -104,8 +103,8 @@ public class MSBibConverter {
             result.publicationTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getLatexFreeField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
 
         return result;
     }
@@ -113,20 +112,15 @@ public class MSBibConverter {
     private static List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new ArrayList<>();
 
-        String cleanAuthors = removeLaTeX(authors);
-
-        if (cleanAuthors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
-            String[] names = cleanAuthors.split(" (?i)and ");
+        if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
+            String[] names = authors.split(" (?i)and ");
             for (String name : names) {
                 result.add(new PersonName(name));
             }
         } else {
-            result.add(new PersonName(cleanAuthors));
+            result.add(new PersonName(authors));
         }
         return result;
     }
 
-    private static String removeLaTeX(String text) {
-        return new LatexToUnicodeFormatter().format(text);
-    }
 }

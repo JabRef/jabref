@@ -2,6 +2,8 @@ package net.sf.jabref.logic.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class BuildInfo {
@@ -18,6 +20,7 @@ public class BuildInfo {
     private final String developers;
     private final String year;
 
+
     public BuildInfo() {
         this("/build.properties");
     }
@@ -25,15 +28,17 @@ public class BuildInfo {
     public BuildInfo(String path) {
         Properties properties = new Properties();
 
-        try (InputStream stream = getClass().getResourceAsStream(path)) {
-            if(stream != null) {
-                properties.load(stream);
+        try (InputStream stream = BuildInfo.class.getResourceAsStream(path)) {
+            if (stream != null) {
+                try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                }
             }
         } catch (IOException ignored) {
             // nothing to do -> default already set
         }
 
-        version = new Version(properties.getProperty("version", UNKNOWN_VERSION));
+        version = Version.parse(properties.getProperty("version"));
         authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");

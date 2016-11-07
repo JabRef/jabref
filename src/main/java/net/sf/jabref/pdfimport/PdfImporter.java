@@ -12,15 +12,15 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.EntryTypeDialog;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -102,9 +102,8 @@ public class PdfImporter {
         // other files: variable noPdfFiles
         List<String> files = new ArrayList<>(fileNames);
         List<String> noPdfFiles = new ArrayList<>();
-        PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
-            if (!pdfFilter.accept(file)) {
+            if (!PdfFileFilter.accept(file)) {
                 noPdfFiles.add(file);
             }
         }
@@ -237,7 +236,8 @@ public class PdfImporter {
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+                .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
@@ -245,7 +245,6 @@ public class PdfImporter {
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             EntryEditor editor = panel.getEntryEditor(entry);
             panel.showEntryEditor(editor);
-            panel.adjustSplitter();
         }
         res.add(entry);
     }

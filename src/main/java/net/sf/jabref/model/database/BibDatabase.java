@@ -1,5 +1,7 @@
 package net.sf.jabref.model.database;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,20 +15,21 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -37,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -59,11 +63,13 @@ public class BibDatabase {
      */
     private final Set<String> internalIDs = new HashSet<>();
 
-
     private final EventBus eventBus = new EventBus();
+
+    private String sharedDatabaseID;
 
 
     public BibDatabase() {
+        this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
     }
 
@@ -100,22 +106,19 @@ public class BibDatabase {
         return Collections.unmodifiableList(entries);
     }
 
+    /**
+     * Returns a set of Strings, that contains all field names that are visible. This means that the fields
+     * are not internal fields. Internal fields are fields, that are starting with "_".
+     *
+     * @return set of fieldnames, that are visible
+     */
     public Set<String> getAllVisibleFields() {
         Set<String> allFields = new TreeSet<>();
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        Set<String> toberemoved = new TreeSet<>();
-        for (String field : allFields) {
-            if (InternalBibtexFields.isInternalField(field)) {
-                toberemoved.add(field);
-            }
-        }
-
-        for (String field : toberemoved) {
-            allFields.remove(field);
-        }
-        return allFields;
+        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -130,6 +133,13 @@ public class BibDatabase {
         return Optional.empty();
     }
 
+    /**
+     * Collects entries having the specified BibTeX key and returns these entries as list.
+     * The order of the entries is the order they appear in the database.
+     *
+     * @param key
+     * @return list of entries that contains the given key
+     */
     public synchronized List<BibEntry> getEntriesByKey(String key) {
         List<BibEntry> result = new ArrayList<>();
 
@@ -163,8 +173,7 @@ public class BibDatabase {
      * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource)
-            throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -177,7 +186,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
+        return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
     /**
@@ -192,32 +201,18 @@ public class BibDatabase {
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
     public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
             eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
         }
-    }
-
-    public int getNumberOfKeyOccurrences(String key) {
-        return duplicationChecker.getNumberOfKeyOccurrences(key);
-    }
-
-    public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKeyOptional().orElse(null);
-        if (key == null) {
-            entry.clearField(BibEntry.KEY_FIELD);
-        } else {
-            entry.setCiteKey(key);
-        }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
@@ -229,22 +224,26 @@ public class BibDatabase {
 
     /**
      * Returns the database's preamble.
+     * If the preamble text consists only of whitespace, then also an empty optional is returned.
      */
     public synchronized Optional<String> getPreamble() {
-        return Optional.ofNullable(preamble);
+        if (StringUtil.isBlank(preamble)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(preamble);
+        }
     }
 
     /**
      * Inserts a Bibtex String.
      */
-    public synchronized void addString(BibtexString string)
-            throws KeyCollisionException {
+    public synchronized void addString(BibtexString string) throws KeyCollisionException {
         if (hasStringLabel(string.getName())) {
             throw new KeyCollisionException("A string with that label already exists");
         }
 
         if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibTeXString id.");
+            throw new KeyCollisionException("Duplicate BibTeX string id.");
         }
 
         bibtexStrings.put(string.getId(), string);
@@ -428,7 +427,9 @@ public class BibDatabase {
         }
     }
 
+
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
 
     private String resolveContent(String result, Set<String> usedIds) {
         String res = result;
@@ -478,8 +479,6 @@ public class BibDatabase {
         return res;
     }
 
-
-
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -503,7 +502,7 @@ public class BibDatabase {
             if (entryType.isPresent()) {
                 return Optional.of(entryType.get().getName());
             } else {
-                return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+                return Optional.of(StringUtil.capitalizeFirst(entry.getType()));
             }
         }
 
@@ -511,9 +510,9 @@ public class BibDatabase {
             return entry.getCiteKeyOptional();
         }
 
-        // TODO: Changed this to also consider alias fields, which is the expected
+        // Changed this to also consider alias fields, which is the expected
         // behavior for the preview layout and for the check whatever all fields are present.
-        // But there might be unwanted side-effects?!
+        // TODO: But there might be unwanted side-effects?!
         Optional<String> result = entry.getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
@@ -534,12 +533,15 @@ public class BibDatabase {
     }
 
     /**
+     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
+     *
      * Returns a text with references resolved according to an optionally given database.
      *
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      */
+    @Deprecated
     public static String getText(String toResolve, BibDatabase database) {
         if ((toResolve != null) && (database != null)) {
             return database.resolveForStrings(toResolve);
@@ -580,5 +582,39 @@ public class BibDatabase {
     @Subscribe
     private void relayEntryChangeEvent(FieldChangedEvent event) {
         eventBus.post(event);
+    }
+
+    public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
+        return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+    }
+
+    public Optional<String> getSharedDatabaseID() {
+        return Optional.ofNullable(this.sharedDatabaseID);
+    }
+
+    public boolean isShared() {
+        return getSharedDatabaseID().isPresent();
+    }
+
+    public void setSharedDatabaseID(String sharedDatabaseID) {
+        this.sharedDatabaseID = sharedDatabaseID;
+    }
+
+    public void clearSharedDatabaseID() {
+        this.sharedDatabaseID = null;
+    }
+
+    /**
+     * Generates and sets a random ID which is globally unique.
+     *
+     * @return The generated sharedDatabaseID
+     */
+    public String generateSharedDatabaseID() {
+        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);
+        return this.sharedDatabaseID;
+    }
+
+    public DuplicationChecker getDuplicationChecker() {
+        return duplicationChecker;
     }
 }

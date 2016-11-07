@@ -20,6 +20,9 @@ services:
   - postgresql
   - mysql
 
+env:
+  - GRADLE_OPTS=-Dorg.gradle.daemon=false
+
 # skip installation as this is also done during the script step
 install: true
 
@@ -30,8 +33,7 @@ before_script:
 script:
   - ./gradlew check
   - ./gradlew databaseTest
-  # Integration tests currently often fail with "Process 'Gradle Test Executor 1' finished with non-zero exit value 137"
-  # They should run, but the result is ignored
+  # Prepare integration tests
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
@@ -49,12 +51,17 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  - ./gradlew integrationTest --info || true
+  # Integratation tests run in a timeout. Just start them and kill them after 60s
+  - timeout 60 ./gradlew integrationTest --info || true
 
 after_script:
   # enable codecov report
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  # show test results if build fails
+  - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
@@ -64,8 +71,3 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
-
-# enable slack notifications
-notifications:
-  slack:
-    secure: B5LGefXS1Jt+d7tUzzmakoz+/ZnFUzmmmYuBXaikTUPDuxXacIrVTv4Vx+tcagxDrPQ3A20oi3+0t6p8xagytjLI9u3abACyWwO3+CbywuJDLBzxADVhg/+mKssfTmemRlZoBUrBlHZVk69LIJvqXFR5l5zAiBtDL1dWPeMEEvI=

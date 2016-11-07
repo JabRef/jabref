@@ -13,8 +13,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
@@ -39,21 +37,16 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final JRadioButton firstNameModeFull;
     private final JRadioButton firstNameModeAbbr;
     private final JRadioButton firstNameModeBoth;
-    private boolean oldAutoCompFF;
-    private boolean oldAutoCompLF;
-    private boolean oldAutoCompFModeAbbr;
-    private boolean oldAutoCompFModeFull;
     private final JSpinner shortestToComplete;
 
     private final JTextField autoCompFields;
     private final JabRefPreferences prefs;
     private final AutoCompletePreferences autoCompletePreferences;
-    private final JabRefFrame frame;
 
-    public EntryEditorPrefsTab(JabRefFrame frame, JabRefPreferences prefs) {
+
+    public EntryEditorPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         autoCompletePreferences = new AutoCompletePreferences(prefs);
-        this.frame = frame;
         setLayout(new BorderLayout());
 
         autoOpenForm = new JCheckBox(Localization.lang("Open editor when a new entry is created"));
@@ -175,8 +168,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         } else {
             autoCompBoth.setSelected(true);
         }
-        oldAutoCompFF = autoCompFF.isSelected();
-        oldAutoCompLF = autoCompLF.isSelected();
 
         switch (autoCompletePreferences.getFirstnameMode()) {
         case ONLY_ABBREVIATED:
@@ -189,9 +180,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             firstNameModeBoth.setSelected(true);
             break;
         }
-        // one field less than the option is enough. If one filed changes, another one also changes.
-        oldAutoCompFModeAbbr = firstNameModeAbbr.isSelected();
-        oldAutoCompFModeFull = firstNameModeFull.isSelected();
 
         // similar for emacs CTRL-a and emacs mode
         emacsRebindCtrlA.setEnabled(emacsMode.isSelected());
@@ -225,9 +213,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 EmacsKeyBindings.load();
             }
         }
-        // We want to know if the following settings have been modified:
-        boolean oldAutoComplete = prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE);
-        String oldAutoCompFields = autoCompletePreferences.getCompleteNamesAsString();
         autoCompletePreferences.setShortestLengthToComplete((Integer) shortestToComplete.getValue());
         prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
         autoCompletePreferences.setCompleteNames(autoCompFields.getText());
@@ -249,18 +234,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         } else {
             autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.BOTH);
-        }
-
-        // We need to remove all entry editors from cache if the source panel setting
-        // or the autocompletion settings have been changed:
-        if ((oldAutoComplete != autoComplete.isSelected())
-                || !oldAutoCompFields.equals(autoCompFields.getText()) ||
-                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
-                (oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected()) ||
-                (oldAutoCompFModeFull != firstNameModeFull.isSelected())) {
-            for (BasePanel panel : frame.getBasePanelList()) {
-                panel.getEntryEditors().clear();
-            }
         }
     }
 

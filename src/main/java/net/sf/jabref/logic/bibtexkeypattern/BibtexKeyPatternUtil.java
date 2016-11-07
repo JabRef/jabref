@@ -6,18 +6,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -369,11 +373,12 @@ public class BibtexKeyPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
+     * @param citeKeyPattern
      * @param dBase a <code>BibDatabase</code>
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase dBase, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         database = dBase;
         String key;
@@ -382,8 +387,7 @@ public class BibtexKeyPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(
-                    metaData.getBibtexKeyPattern(bibtexKeyPatternPreferences.getKeyPattern()).getValue(entryType));
+            List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
@@ -397,7 +401,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0));
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter());
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -425,7 +429,7 @@ public class BibtexKeyPatternUtil {
         }
 
         String oldKey = entry.getCiteKeyOptional().orElse(null);
-        int occurrences = database.getNumberOfKeyOccurrences(key);
+        int occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -435,48 +439,24 @@ public class BibtexKeyPatternUtil {
         boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
-            // No dupes found, so we can just go ahead.
-            if (!key.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, key);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(key);
-                }
-            }
-
+            entry.setCiteKey(key);
         } else {
             // The key is already in use, so we must modify it.
-            int number = 0;
-            if (!alwaysAddLetter && !firstLetterA) {
-                number = 1;
-            }
+            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            String moddedKey;
 
-            String moddedKey = key + getAddition(number);
-            occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-
-            if (Objects.equals(oldKey, moddedKey)) {
-                occurrences--;
-            }
-
-            while (occurrences > 0) {
-                number++;
+            do {
                 moddedKey = key + getAddition(number);
+                number++;
 
-                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
+                // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
-            }
+            } while (occurrences > 0);
 
-            if (!moddedKey.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, moddedKey);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(moddedKey);
-                }
-            }
+            entry.setCiteKey(moddedKey);
         }
     }
 
@@ -487,17 +467,13 @@ public class BibtexKeyPatternUtil {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(String label, List<String> parts, int offset) {
+    public static String applyModifiers(final String label, final List<String> parts, final int offset) {
         String resultingLabel = label;
         if (parts.size() > offset) {
             for (int j = offset; j < parts.size(); j++) {
                 String modifier = parts.get(j);
 
-                if ("lower".equals(modifier)) {
-                    resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
-                } else if ("upper".equals(modifier)) {
-                    resultingLabel = resultingLabel.toUpperCase(Locale.ENGLISH);
-                } else if ("abbr".equals(modifier)) {
+                if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
@@ -507,25 +483,32 @@ public class BibtexKeyPatternUtil {
                             abbreviateSB.append(word.charAt(0));
                         }
                     }
-                    resultingLabel = abbreviateSB.toString();
-
-                } else if (!modifier.isEmpty() && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
-                    // Alternate text modifier in parentheses. Should be inserted if
-                    // the label is empty:
-                    if (resultingLabel.isEmpty() && (modifier.length() > 2)) {
-                        return modifier.substring(1, modifier.length() - 1);
-                    }
-
+                    resultingLabel =  abbreviateSB.toString();
                 } else {
-                    LOGGER.info("Key generator warning: unknown modifier '"
-                            + modifier + "'.");
+                    Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
+                    if (formatter.isPresent()) {
+                        resultingLabel = formatter.get().format(label);
+                    } else if (!modifier.isEmpty() && modifier.length()>= 2 && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                        // Alternate text modifier in parentheses. Should be inserted if
+                        // the label is empty:
+                        if (label.isEmpty() && (modifier.length() > 2)) {
+                            resultingLabel = modifier.substring(1, modifier.length() - 1);
+                        } else {
+                            resultingLabel = label;
+                        }
+                    } else {
+                        LOGGER.info("Key generator warning: unknown modifier '"
+                                + modifier + "'.");
+                        resultingLabel = label;
+                    }
                 }
             }
         }
+
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -676,13 +659,13 @@ public class BibtexKeyPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return new ArrayList<>(separatedKeywords).get(num-1);
+                    return separatedKeywords.get(num-1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -692,13 +675,12 @@ public class BibtexKeyPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                for (String keyword : separatedKeywords) {
+                for (Keyword keyword : separatedKeywords) {
                     // remove all spaces
-                    keyword = keyword.replaceAll("\\s+", "");
-                    sb.append(keyword);
+                    sb.append(keyword.toString().replaceAll("\\s+", ""));
 
                     i++;
                     if (i >= num) {
@@ -742,7 +724,7 @@ public class BibtexKeyPatternUtil {
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        String ss = new RemoveLatexCommands().format(title);
+        String ss = new RemoveLatexCommandsFormatter().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
         int piv = 0;

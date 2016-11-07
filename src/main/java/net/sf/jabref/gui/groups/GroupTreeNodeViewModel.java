@@ -22,15 +22,24 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.MoveGroupChange;
+import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.MoveGroupChange;
+import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
+
+    private static final Log LOGGER = LogFactory.getLog(GroupTreeNodeViewModel.class);
 
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
@@ -43,9 +52,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         DataFlavor df = null;
         try {
             df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=net.sf.jabref.logic.groups.GroupTreeNode");
+                    + ";class="+GroupTreeNode.class.getCanonicalName());
         } catch (ClassNotFoundException e) {
-            // never happens
+            LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
         }
         FLAVOR = df;
         FLAVORS = new DataFlavor[] {GroupTreeNodeViewModel.FLAVOR};
@@ -187,9 +196,19 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public String getDescription() {
-        return "<html>"
-                + node.getGroup().getShortDescription(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC))
-                + "</html>";
+        AbstractGroup group = node.getGroup();
+        String shortDescription = "";
+        boolean showDynamic = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC);
+        if (group instanceof ExplicitGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup((ExplicitGroup) group);
+        } else if (group instanceof KeywordGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup((KeywordGroup) group, showDynamic);
+        } else if (group instanceof SearchGroup) {
+            shortDescription = GroupDescriptions.getShortDescription((SearchGroup) group, showDynamic);
+        } else {
+            shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
+        }
+        return "<html>" + shortDescription + "</html>";
     }
 
     public Icon getIcon() {

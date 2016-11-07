@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.BasicEventList;

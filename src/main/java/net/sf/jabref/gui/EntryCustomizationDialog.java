@@ -26,21 +26,22 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -222,7 +223,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                     optComp2.setFields(new ArrayList<>());
                     optComp2.setEnabled(true);
                 }
-                new FocusRequester(reqComp);
+                reqComp.requestFocus();
             }
         } else {
             reqComp.setFields(rl);
@@ -260,10 +261,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
-                String nm = EntryUtil.capitalizeFirst(stringListEntry.getKey());
+                String nm = StringUtil.capitalizeFirst(stringListEntry.getKey());
                 EntryTypes.removeType(nm, bibDatabaseMode);
 
-                updateTypesForEntries(nm);
+                updateTypesForEntries();
                 continue;
             }
 
@@ -285,11 +286,11 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
             if (changesMade) {
                 CustomEntryType typ = biblatexMode ?
-                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
-                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 EntryTypes.addOrModifyCustomEntryType(typ);
-                updateTypesForEntries(typ.getName());
+                updateTypesForEntries();
             }
         }
 
@@ -320,14 +321,14 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                                         + "type will be declared "
                                         + "typeless. Continue?"),
                                 Localization.lang("Delete custom format") +
-                                        " '" + EntryUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
+                                        " '" + StringUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {
                     return;
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateTypesForEntries(EntryUtil.capitalizeFirst(name));
+            updateTypesForEntries();
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);
@@ -377,22 +378,17 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
      * a valid type, that no obsolete entry editors are around, and that
      * the right-click menus' change type menu is up-to-date.
      */
-    private void updateTypesForEntries(String typeName) {
+    private void updateTypesForEntries() {
         for (BasePanel bp : frame.getBasePanelList()) {
-
-            // Invalidate associated cached entry editor
-            bp.getEntryEditors().remove(typeName);
-
             for (BibEntry entry : bp.getDatabase().getEntries()) {
                 EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
             }
         }
-
     }
 
     private void updateTables() {
         for (BasePanel basePanel : frame.getBasePanelList()) {
-            ((javax.swing.table.AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
+            ((AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
         }
     }
 
@@ -437,17 +433,17 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     class DataListener implements ListDataListener {
 
         @Override
-        public void intervalAdded(javax.swing.event.ListDataEvent e) {
+        public void intervalAdded(ListDataEvent e) {
             record();
         }
 
         @Override
-        public void intervalRemoved(javax.swing.event.ListDataEvent e) {
+        public void intervalRemoved(ListDataEvent e) {
             record();
         }
 
         @Override
-        public void contentsChanged(javax.swing.event.ListDataEvent e) {
+        public void contentsChanged(ListDataEvent e) {
             record();
         }
 

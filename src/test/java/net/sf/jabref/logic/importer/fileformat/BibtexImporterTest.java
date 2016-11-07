@@ -105,7 +105,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("BibTeX", importer.getFormatName());
+        assertEquals("BibTeX", importer.getName());
     }
 
     @Test
@@ -120,5 +120,12 @@ public class BibtexImporterTest {
                         + "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n"
                         + "The metadata is not required to be read here, as this class is NOT called at --import.",
                 importer.getDescription());
+    }
+
+    @Test
+    public void testRecognizesDatabaseID() throws Exception {
+        Path file = Paths.get(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
+        String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
+        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
 }

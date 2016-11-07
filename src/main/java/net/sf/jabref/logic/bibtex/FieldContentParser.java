@@ -1,11 +1,13 @@
 package net.sf.jabref.logic.bibtex;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -21,6 +23,8 @@ public class FieldContentParser {
 
 
     public FieldContentParser(FieldContentParserPreferences prefs) {
+        Objects.requireNonNull(prefs);
+
         multiLineFields = new HashSet<>();
         // the following two are also coded in net.sf.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add(FieldName.ABSTRACT);
@@ -40,7 +44,7 @@ public class FieldContentParser {
 
         if (multiLineFields.contains(bibtexField)) {
             // Unify line breaks
-            return StringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent);
+            return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
         }
 
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");

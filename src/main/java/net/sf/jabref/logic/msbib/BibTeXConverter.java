@@ -7,8 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.mods.PersonName;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -19,13 +18,18 @@ public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";
 
 
+    /**
+     * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
+     * @param entry The MsBibEntry to convert
+     * @return The bib entry
+     */
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
 
         String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
+            result = new BibEntry(Importer.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
 
         } else {
             // TODO: the cite key should not be the ID?!
@@ -72,7 +76,7 @@ public class BibTeXConverter {
         parseStandardNumber(entry.standardNumber, fieldValues);
 
         if (entry.address != null) {
-            fieldValues.put(FieldName.ADDRESS, entry.address);
+            fieldValues.put(FieldName.LOCATION, entry.address);
         }
         // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
         if (entry.conferenceName != null) {

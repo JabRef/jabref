@@ -3,11 +3,9 @@ package net.sf.jabref.logic.layout;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -85,21 +83,17 @@ public class Layout {
         }
     }
 
-    public String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, Optional.empty());
-    }
-
     /**
      * Returns the processed bibtex entry. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
-            String fieldText = layoutEntry.doLayout(bibtex, database, highlightPattern);
+            String fieldText = layoutEntry.doLayout(bibtex, database);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the

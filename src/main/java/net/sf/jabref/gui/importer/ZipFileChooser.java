@@ -2,7 +2,6 @@ package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,13 +23,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -62,8 +60,8 @@ class ZipFileChooser extends JDialog {
         cm.getColumn(0).setPreferredWidth(200);
         cm.getColumn(1).setPreferredWidth(150);
         cm.getColumn(2).setPreferredWidth(100);
-        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setPreferredScrollableViewportSize(new Dimension(500, 150));
         if (table.getRowCount() > 0) {
@@ -83,21 +81,17 @@ class ZipFileChooser extends JDialog {
             } else {
                 ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
                 ZipEntry tempZipEntry = model.getZipEntry(row);
-                CustomImporter importer = new CustomImporter();
-                importer.setBasePath(model.getZipFile().getName());
-                String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.'))
-                        .replace("/", ".");
-                importer.setClassName(className);
+                String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replace(
+                        "/", ".");
+
                 try {
-                    ImportFormat importFormat = importer.getInstance();
-                    importer.setName(importFormat.getFormatName());
-                    importer.setCliId(importFormat.getId());
+                    CustomImporter importer = new CustomImporter(model.getZipFile().getName(), className);
                     importCustomizationDialog.addOrReplaceImporter(importer);
                     dispose();
-                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
-                    LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
+                } catch (ClassNotFoundException exc) {
+                    LOGGER.warn("Could not instantiate importer: " + className, exc);
                     JOptionPane.showMessageDialog(this, Localization.lang("Could not instantiate %0 %1",
-                            importer.getName() + ":\n", exc.getMessage()));
+                            className + ":\n", exc.getMessage()));
                 }
             }
         });
@@ -122,7 +116,7 @@ class ZipFileChooser extends JDialog {
         this.setSize(getSize());
         pack();
         this.setLocationRelativeTo(importCustomizationDialog);
-        new FocusRequester(table);
+        table.requestFocus();
     }
 
     /**

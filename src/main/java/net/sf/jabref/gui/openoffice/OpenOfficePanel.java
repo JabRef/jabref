@@ -31,8 +31,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
@@ -54,7 +52,9 @@ import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -82,7 +82,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    private OOPanel comp;
+    private OpenOfficeSidePanel sidePane;
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -101,7 +101,6 @@ public class OpenOfficePanel extends AbstractWorker {
             HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
-    private SidePaneManager manager;
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
@@ -111,10 +110,8 @@ public class OpenOfficePanel extends AbstractWorker {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    private static OpenOfficePanel instance;
 
-
-    private OpenOfficePanel() {
+    public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         connect = new JButton(connectImage);
@@ -134,36 +131,11 @@ public class OpenOfficePanel extends AbstractWorker {
         loader = new StyleLoader(preferences,
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
-    }
 
-    public static OpenOfficePanel getInstance() {
-        if (OpenOfficePanel.instance == null) {
-            OpenOfficePanel.instance = new OpenOfficePanel();
-        }
-        return OpenOfficePanel.instance;
-    }
-
-    public SidePaneComponent getSidePaneComponent() {
-        return comp;
-    }
-
-    public void init(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         this.frame = jabRefFrame;
-        this.manager = spManager;
-        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
+        sidePane = new OpenOfficeSidePanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", preferences);
         initPanel();
-        spManager.register(getName(), comp);
-    }
-
-    public JMenuItem getMenuItem() {
-        if (preferences.showPanel()) {
-            manager.show(getName());
-        }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
-                IconTheme.getImage("openoffice"));
-        item.addActionListener(event -> manager.show(getName()));
-        item.setAccelerator(Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION));
-        return item;
+        spManager.register(sidePane);
     }
 
     private void initPanel() {
@@ -326,7 +298,7 @@ public class OpenOfficePanel extends AbstractWorker {
         mainBuilder.add(settingsB).xy(1, 10);
 
         JPanel content = new JPanel();
-        comp.setContentContainer(content);
+        sidePane.setContentContainer(content);
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
@@ -533,6 +505,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
+
+        // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getOOPath());
@@ -575,9 +549,9 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.add(browseOOJars).xy(5, 3);
         }
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("OK"));
-        JButton cancel = new JButton(Localization.lang("Cancel"));
+
+        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
+
         ActionListener tfListener = e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
@@ -586,22 +560,28 @@ public class OpenOfficePanel extends AbstractWorker {
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
+
+        // Buttons
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+
         ok.addActionListener(e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
-
         cancel.addActionListener(e -> cDiag.dispose());
 
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addRelatedGap();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
         bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+
+        // Finish and show dialog
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);
@@ -620,15 +600,15 @@ public class OpenOfficePanel extends AbstractWorker {
         Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
-            AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
-            acd.showDialog();
-            if (acd.canceled()) {
+            AdvancedCiteDialog citeDialog = new AdvancedCiteDialog(frame);
+            citeDialog.showDialog();
+            if (citeDialog.canceled()) {
                 return;
             }
-            if (!acd.getPageInfo().isEmpty()) {
-                pageInfo = acd.getPageInfo();
+            if (!citeDialog.getPageInfo().isEmpty()) {
+                pageInfo = citeDialog.getPageInfo();
             }
-            inParenthesis = acd.isInParenthesisCite();
+            inParenthesis = citeDialog.isInParenthesisCite();
 
         }
 
@@ -705,11 +685,13 @@ public class OpenOfficePanel extends AbstractWorker {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
                     BibtexKeyPatternUtil
-                            .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                            .makeLabel(
+                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
+                                    panel.getDatabase(), entry,
                             prefs);
                     // Add undo change
                     undoCompound.addEdit(
-                            new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKeyOptional().get()));
+                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
                 }
             }
             undoCompound.end();
@@ -796,40 +778,8 @@ public class OpenOfficePanel extends AbstractWorker {
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 
-    public String getName() {
-        return "OpenOffice/LibreOffice";
-    }
-
-
-    private class OOPanel extends SidePaneComponent {
-
-        private final OpenOfficePanel openOfficePanel;
-
-
-        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
-            super(sidePaneManager, url, s);
-            openOfficePanel = panel;
-        }
-
-        @Override
-        public String getName() {
-            return openOfficePanel.getName();
-        }
-
-        @Override
-        public void componentClosing() {
-            preferences.setShowPanel(false);
-        }
-
-        @Override
-        public void componentOpening() {
-            preferences.setShowPanel(true);
-        }
-
-        @Override
-        public int getRescalingWeight() {
-            return 0;
-        }
+    public SidePaneComponent.ToggleAction getToggleAction() {
+        return sidePane.getToggleAction();
     }
 
 }

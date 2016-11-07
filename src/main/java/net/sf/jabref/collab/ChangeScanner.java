@@ -3,10 +3,8 @@ package net.sf.jabref.collab;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -15,11 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
@@ -29,18 +24,21 @@ import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -156,7 +154,7 @@ public class ChangeScanner implements Runnable {
 
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+                BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
@@ -165,36 +163,15 @@ public class ChangeScanner implements Runnable {
         });
     }
 
-    private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
-        MetaDataChange metadataChange = new MetaDataChange(inMem1, inTemp1);
-        List<String> handledOnDisk = new ArrayList<>();
-        // Loop through the metadata entries of the "tmp" database, looking for
-        // matches
-        for (String key : inTemp1) {
-            // See if the key is missing in the disk database:
-            List<String> vod = onDisk.getData(key);
-            if (vod == null) {
-                metadataChange.insertMetaDataRemoval(key);
-            } else {
-                // Both exist. Check if they are different:
-                List<String> vit = inTemp1.getData(key);
-                if (!vod.equals(vit)) {
-                    metadataChange.insertMetaDataChange(key, vod);
-                }
-                // Remember that we've handled this one:
-                handledOnDisk.add(key);
+    private void scanMetaData(MetaData inMemory, MetaData onTmp, MetaData onDisk) {
+        if (!onTmp.isEmpty()) {
+            if (!inMemory.equals(onDisk)) {
+                changes.add(new MetaDataChange(inMemory, onDisk));
             }
-        }
-
-        // See if there are unhandled keys in the disk database:
-        for (String key : onDisk) {
-            if (!handledOnDisk.contains(key)) {
-                metadataChange.insertMetaDataAddition(key, onDisk.getData(key));
+        } else {
+            if (!onDisk.isEmpty() || !onTmp.equals(onDisk)) {
+                changes.add(new MetaDataChange(inMemory, onDisk));
             }
-        }
-
-        if (metadataChange.getChangeCount() > 0) {
-            changes.add(metadataChange);
         }
     }
 
@@ -346,7 +323,7 @@ public class ChangeScanner implements Runnable {
         Optional<String> tmp = onTmp.getPreamble();
         Optional<String> disk = onDisk.getPreamble();
         if (!tmp.isPresent()) {
-            disk.filter(diskContent -> !diskContent.isEmpty()).ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
+            disk.ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
         } else {
             if (!disk.isPresent() || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(mem, disk.orElse(null)));

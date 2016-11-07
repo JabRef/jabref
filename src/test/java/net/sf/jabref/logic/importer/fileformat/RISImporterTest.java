@@ -24,7 +24,7 @@ public class RISImporterTest {
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals(importer.getFormatName(), "RIS");
+        Assert.assertEquals(importer.getName(), "RIS");
     }
 
     @Test

@@ -17,23 +17,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.bibtex.comparator.IdComparator;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 
 public abstract class BibDatabaseWriter<E extends SaveSession> {
 
@@ -156,6 +158,12 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         session = saveSessionFactory.createSaveSession(preferences.getEncodingOrDefault(), preferences.getMakeBackup());
 
+        Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
+
+        if (sharedDatabaseIDOptional.isPresent()) {
+            writeDatabaseID(sharedDatabaseIDOptional.get());
+        }
+
         // Map to collect entry type definitions that we must save along with entries using them.
         Map<String, EntryType> typesToWrite = new TreeMap<>();
 
@@ -193,7 +201,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -220,10 +228,11 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData) throws SaveException {
+    protected void writeMetaData(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) throws SaveException {
         Objects.requireNonNull(metaData);
 
-        Map<String, String> serializedMetaData = metaData.getAsStringMap();
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+                globalCiteKeyPattern);
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
@@ -233,6 +242,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException;
 
     protected abstract void writePreamble(String preamble) throws SaveException;
+
+    protected abstract void writeDatabaseID(String sharedDatabaseID) throws SaveException;
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for

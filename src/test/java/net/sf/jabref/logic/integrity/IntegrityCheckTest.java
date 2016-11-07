@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Rule;
@@ -45,9 +45,81 @@ public class IntegrityCheckTest {
     public void testYearChecks() {
         assertCorrect(createContext("year", "2014"));
         assertCorrect(createContext("year", "1986"));
+        assertCorrect(createContext("year", "around 1986"));
+        assertCorrect(createContext("year", "(around 1986)"));
+        assertCorrect(createContext("year", "1986,"));
+        assertCorrect(createContext("year", "1986}%"));
+        assertCorrect(createContext("year", "1986(){},.;!?<>%&$"));
         assertWrong(createContext("year", "abc"));
         assertWrong(createContext("year", "86"));
         assertWrong(createContext("year", "204"));
+        assertWrong(createContext("year", "1986a"));
+        assertWrong(createContext("year", "(1986a)"));
+        assertWrong(createContext("year", "1986a,"));
+        assertWrong(createContext("year", "1986}a%"));
+        assertWrong(createContext("year", "1986a(){},.;!?<>%&$"));
+    }
+
+    @Test
+    public void testEditionChecks() {
+        assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(
+                withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testNoteChecks() {
+        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("note", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testHowpublishedChecks() {
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testMonthChecks() {
+        assertCorrect(withMode(createContext("month", "#mar#"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "#dec#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "#bla#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Dec"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "December"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "10"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "1"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "#jan#"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "jan"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "january"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "January"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testJournaltitleChecks() {
+        assertCorrect(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void testBibtexkeyChecks() {
+        assertCorrect(createContext("bibtexkey", "Knuth2014"));
     }
 
     @Test
@@ -182,6 +254,7 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("title", "Not a single {HTML} character"));
         assertCorrect(createContext("month", "#jan#"));
         assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertCorrect(createContext("url", "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
         assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
         assertWrong(createContext("author", "Lenhard, J&#227;rg"));
         assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));

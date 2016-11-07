@@ -31,7 +31,7 @@ public class OvidImporterTest {
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals("Ovid", importer.getFormatName());
+        Assert.assertEquals("Ovid", importer.getName());
     }
 
     @Test

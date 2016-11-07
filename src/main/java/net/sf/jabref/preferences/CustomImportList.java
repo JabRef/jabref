@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  * Collection of user defined custom import formats.
  *
  * <p>The collection can be stored and retrieved from Preferences. It is sorted by the default
- * order of {@link ImportFormat}.</p>
+ * order of {@link Importer}.</p>
  */
 public class CustomImportList extends TreeSet<CustomImporter> {
 
@@ -34,7 +34,13 @@ public class CustomImportList extends TreeSet<CustomImporter> {
         List<String> s;
         while (!((s = prefs.getStringList(JabRefPreferences.CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
             try {
-                super.add(new CustomImporter(s));
+                if (s.size() == 2) {
+                    // New format: basePath, className
+                    super.add(new CustomImporter(s.get(0), s.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    super.add(new CustomImporter(s.get(3), s.get(2)));
+                }
             } catch (Exception e) {
                 LOGGER.warn("Could not load " + s.get(0) + " from preferences. Will ignore.", e);
             }

@@ -15,8 +15,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -43,7 +43,7 @@ class MSBibExportFormat extends ExportFormat {
 
         try (VerifyingWriter ps = session.getWriter()) {
             try {
-                DOMSource source = new DOMSource(msBibDatabase.getDOM());
+                DOMSource source = new DOMSource(msBibDatabase.getDomForExport());
                 StreamResult result = new StreamResult(ps);
                 Transformer trans = TransformerFactory.newInstance().newTransformer();
                 trans.setOutputProperty(OutputKeys.INDENT, "yes");

@@ -24,6 +24,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
@@ -167,8 +168,8 @@ public class MergeEntries {
 
 
         // Create and add scrollpane
-        scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane = new JScrollPane(mergePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         updateTextPanes(allFields);
         mainPanel.add(scrollPane, CELL_CONSTRAINTS.xyw(1, 4, 11));
@@ -179,7 +180,7 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, mergedEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        entryPreview = new PreviewPanel(null, mergedEntry, null);
         mainPanel.add(entryPreview, CELL_CONSTRAINTS.xyw(1, 8, 6));
 
         mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));

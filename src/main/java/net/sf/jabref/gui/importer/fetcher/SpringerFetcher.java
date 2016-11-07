@@ -1,26 +1,27 @@
 package net.sf.jabref.gui.importer.fetcher;
 
-    import java.io.UnsupportedEncodingException;
-    import java.net.URLEncoder;
+import java.io.IOException;
+import java.net.URLEncoder;
 
-    import javax.swing.JOptionPane;
-    import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.util.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-    import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
-    import com.mashape.unirest.http.HttpResponse;
-    import com.mashape.unirest.http.JsonNode;
-    import com.mashape.unirest.http.Unirest;
-    import com.mashape.unirest.http.exceptions.UnirestException;
-    import org.apache.commons.logging.Log;
-    import org.apache.commons.logging.LogFactory;
-    import org.json.JSONArray;
-    import org.json.JSONObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SpringerFetcher implements EntryFetcher {
 
@@ -47,16 +48,12 @@ public class SpringerFetcher implements EntryFetcher {
                     .header("accept", "application/json")
                     .asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
-            int hits = jo.getJSONArray("result").getJSONObject(0).getInt("total");
-            int numberToFetch = 0;
-            if (hits > 0) {
-                if (hits > MAX_PER_PAGE) {
-                    while (true) {
-                        String strCount = JOptionPane
-                                .showInputDialog(
-                                        Localization.lang("References found") + ": " + hits + "  "
-                                                + Localization.lang("Number of references to fetch?"),
-                                        Integer.toString(hits));
+            int numberToFetch = jo.getJSONArray("result").getJSONObject(0).getInt("total");
+            if (numberToFetch > 0) {
+                if (numberToFetch > MAX_PER_PAGE) {
+                    boolean numberEntered = false;
+                    do {
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("%0 references found. Number of references to fetch?", String.valueOf(numberToFetch)));
 
                         if (strCount == null) {
                             status.setStatus(Localization.lang("%0 import canceled", getTitle()));
@@ -65,13 +62,11 @@ public class SpringerFetcher implements EntryFetcher {
 
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
-                            break;
+                            numberEntered = true;
                         } catch (NumberFormatException ex) {
                             status.showMessage(Localization.lang("Please enter a valid number"));
                         }
-                    }
-                } else {
-                    numberToFetch = hits;
+                    } while (!numberEntered);
                 }
 
                 int fetched = 0; // Keep track of number of items fetched for the progress bar
@@ -102,10 +97,9 @@ public class SpringerFetcher implements EntryFetcher {
                         Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-        } catch (UnirestException e) {
-            LOGGER.warn("Problem searching Springer", e);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Cannot encode query", e);
+        } catch (IOException | UnirestException e) {
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;
 

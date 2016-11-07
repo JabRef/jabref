@@ -28,21 +28,20 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.KeywordGroup;
-import net.sf.jabref.logic.groups.SearchGroup;
-import net.sf.jabref.logic.importer.util.ParseException;
+import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.StringUtil;
+
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -111,7 +110,7 @@ class GroupDialog extends JDialog {
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
+    public GroupDialog(JabRefFrame jabrefFrame,
             AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
 
@@ -143,7 +142,6 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(keywordGroupSearchTerm);
-        builderKG.append(new FieldContentSelector(jabrefFrame, basePanel, this, keywordGroupSearchTerm, null, true, ", "));
         builderKG.nextLine();
         builderKG.append(keywordGroupCaseSensitive, 3);
         builderKG.nextLine();
@@ -266,14 +264,14 @@ class GroupDialog extends JDialog {
             try {
                 if (explicitRadioButton.isSelected()) {
                     resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
-                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            Globals.prefs.getKeywordDelimiter());
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     resultingGroup = new KeywordGroup(nameField.getText().trim(),
                             keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                             keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
-                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            Globals.prefs.getKeywordDelimiter());
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
@@ -286,7 +284,7 @@ class GroupDialog extends JDialog {
                     }
                 }
                 dispose();
-            } catch (ParseException exception) {
+            } catch (IllegalArgumentException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });
@@ -368,14 +366,14 @@ class GroupDialog extends JDialog {
                 if (keywordGroupRegExp.isSelected()) {
                     try {
                         Pattern.compile(s2);
-                        setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
+                        setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
                                 keywordGroupRegExp.isSelected()));
                     } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s2, e));
                     }
                 } else {
-                    setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
+                    setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
                             keywordGroupRegExp.isSelected()));
                 }
             } else {
@@ -406,7 +404,7 @@ class GroupDialog extends JDialog {
             }
             setNameFontItalic(true);
         } else if (explicitRadioButton.isSelected()) {
-            setDescription(ExplicitGroup.getDescriptionForPreview());
+            setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
         okButton.setEnabled(okEnabled);

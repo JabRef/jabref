@@ -1,9 +1,9 @@
 package net.sf.jabref.gui.maintable;
 
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
 
 import ca.odell.glazedlists.EventList;
 import com.google.common.eventbus.Subscribe;
@@ -40,12 +40,12 @@ public class ListSynchronizer {
     public void listen(EntryChangedEvent entryChangedEvent) {
         lock();
         try {
-            int index = list.indexOf(entryChangedEvent.getBibEntry());
-            if (index != -1) {
-                // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
-                // DatabaseChangeEvent.ADDED_ENTRY
-                // thus,
-                list.set(index, entryChangedEvent.getBibEntry());
+            // cannot use list#indexOf b/c it won't distinguish between duplicates
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) == entryChangedEvent.getBibEntry()) {
+                    list.set(i, entryChangedEvent.getBibEntry());
+                    break;
+                }
             }
         } finally {
             unlock();

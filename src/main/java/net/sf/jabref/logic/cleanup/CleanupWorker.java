@@ -1,16 +1,15 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 public class CleanupWorker {
 
@@ -21,12 +20,11 @@ public class CleanupWorker {
     private int unsuccessfulRenames;
 
 
-    public CleanupWorker(BibDatabaseContext databaseContext, String fileNamePattern, LayoutFormatterPreferences prefs,
-            FileDirectoryPreferences fileDirectoryPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
         this.databaseContext = databaseContext;
-        this.fileNamePattern = fileNamePattern;
-        this.prefs = prefs;
-        this.fileDirectoryPreferences = fileDirectoryPreferences;
+        this.fileNamePattern = cleanupPreferences.getFileNamePattern();
+        this.prefs = cleanupPreferences.getLayoutFormatterPreferences();
+        this.fileDirectoryPreferences = cleanupPreferences.getFileDirectoryPreferences();
     }
 
     public int getUnsuccessfulRenames() {
@@ -51,7 +49,7 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList(FieldName.PDF, FieldName.PS)));
+            jobs.add(new UpgradePdfPsToFileCleanup());
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());

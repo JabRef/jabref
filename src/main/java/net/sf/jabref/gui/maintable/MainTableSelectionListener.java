@@ -20,26 +20,29 @@ import javax.swing.Timer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.actions.CopyDoiUrlAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
-import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
+import net.sf.jabref.preferences.PreviewPreferences;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -54,14 +57,12 @@ import org.apache.commons.logging.LogFactory;
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private final PreviewPanel[] previewPanel;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibEntry> tableRows;
 
-    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
+    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
     private boolean workingOnPreview;
 
     private boolean enabled = true;
@@ -79,25 +80,17 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
-                        Globals.prefs.get(JabRefPreferences.PREVIEW_0)),
-                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
-                        Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
-
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
-
-        this.preview = previewPanel[activePreview];
+        PreviewPanel previewPanel = panel.getPreviewPanel();
+        if (previewPanel != null){
+            preview = previewPanel;
+        } else {
+            preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
+            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
+        }
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public void updatePreviews() {
-        previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-        previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
     }
 
     @Override
@@ -112,6 +105,12 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         final BibEntry newSelected = selected.get(0);
+        if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
+                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
+            // entry already selected and currently editing it, do not steal the focus from the selected textfield
+            return;
+        }
+
         if (newSelected != null) {
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
@@ -121,12 +120,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (oldEditor != null) {
                     visName = oldEditor.getVisiblePanelName();
                 }
-                // Get an old or new editor for the entry to edit:
+                // Get a new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                if (oldEditor != null) {
-                    oldEditor.setMovingToDifferentEntry();
-                }
 
                 // Show the new editor unless it was already visible:
                 if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
@@ -136,6 +131,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
+                } else {
+                    // if not used destroy the EntryEditor
+                    newEditor.setMovingToDifferentEntry();
                 }
             } else {
                 // Either nothing or a preview was shown. Update the preview.
@@ -187,12 +185,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     public void editSignalled(BibEntry entry) {
         final BasePanelMode mode = panel.getMode();
-        EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(editor);
-            panel.adjustSplitter();
+            panel.showEntryEditor(panel.getEntryEditor(entry));
         }
-        new FocusRequester(editor);
+        panel.getCurrentEditor().requestFocus();
     }
 
     @Override
@@ -248,7 +244,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if (modelColumn.isIconColumn() && (SpecialFieldsUtils.isSpecialField(modelColumn.getColumnName()))) {
+        if (modelColumn.isIconColumn() && (SpecialField.isSpecialField(modelColumn.getColumnName()))) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -318,6 +314,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             tableRows.get(row).getField(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
+        panel.frame().updateEnabledState();
     }
 
     /**
@@ -329,15 +326,15 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
         if ((e.getClickCount() == 1)) {
-            SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
+            SpecialField.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
                 // special field found
                 if (field.isSingleValueField()) {
                     // directly execute toggle action instead of showing a menu with one action
-                    field.getValues().get(0).getAction(panel.frame()).action();
+                    new SpecialFieldViewModel(field).getSpecialFieldAction(field.getValues().get(0), panel.frame()).action();
                 } else {
                     JPopupMenu menu = new JPopupMenu();
                     for (SpecialFieldValue val : field.getValues()) {
-                        menu.add(val.getMenuAction(panel.frame()));
+                        menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), panel.frame()));
                     }
                     menu.show(table, e.getX(), e.getY());
                 }
@@ -398,7 +395,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         showDefaultPopup = false;
                     }
                 } else {
-                    if (SpecialFieldsUtils.isSpecialField(column.getColumnName())) {
+                    if (SpecialField.isSpecialField(column.getColumnName())) {
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {
@@ -413,6 +410,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content.get(), content.get(), icon,
                                     panel.getBibDatabaseContext(), field));
+                            if (field.equals(FieldName.DOI)) {
+                                menu.add(new CopyDoiUrlAction(content.get()));
+                            }
                             showDefaultPopup = false;
                         }
                     }
@@ -434,7 +434,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             panel.hideBottomComponent();
         }
         panel.adjustSplitter();
-        new FocusRequester(table);
+        table.requestFocus();
     }
 
     @Override
@@ -458,19 +458,26 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
     }
 
-    public void switchPreview() {
-        if (activePreview < (previewPanel.length - 1)) {
-            activePreview++;
-        } else {
-            activePreview = 0;
-        }
-        Globals.prefs.putInt(JabRefPreferences.ACTIVE_PREVIEW, activePreview);
-        if (previewActive) {
-            this.preview = previewPanel[activePreview];
+    public void nextPreviewStyle(){
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+    }
 
-            if (!table.getSelected().isEmpty()) {
-                updatePreview(table.getSelected().get(0), true);
-            }
+    public void previousPreviewStyle(){
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
+    }
+
+    private void cyclePreview(int newPosition) {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
+
+        preview.updateLayout();
+        preview.update();
+        panel.showPreview(preview);
+        if (!table.getSelected().isEmpty()) {
+            updatePreview(table.getSelected().get(0), true);
         }
     }
 
@@ -529,6 +536,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
             lastPressedCount = 0;
         }
+        panel.frame().updateEnabledState();
     }
 
     @Override

@@ -5,17 +5,17 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Map;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWriter<E> {
 
@@ -23,6 +23,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
+    public static final String DATABASE_ID_PREFIX = "DBID:";
 
     public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory) {
         super(saveSessionFactory);
@@ -137,6 +138,22 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
             getWriter().write("% ");
             getWriter().write(SavePreferences.ENCODING_PREFIX + encoding);
             getWriter().write(OS.NEWLINE);
+
+        } catch (IOException e) {
+            throw new SaveException(e);
+        }
+    }
+
+    @Override
+    protected void writeDatabaseID(String sharedDatabaseID) throws SaveException {
+        try {
+            StringBuilder stringBuilder = new StringBuilder()
+                    .append("% ")
+                    .append(DATABASE_ID_PREFIX)
+                    .append(" ")
+                    .append(sharedDatabaseID)
+                    .append(OS.NEWLINE);
+            getWriter().write(stringBuilder.toString());
         } catch (IOException e) {
             throw new SaveException(e);
         }

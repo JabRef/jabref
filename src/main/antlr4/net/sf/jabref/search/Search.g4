@@ -41,7 +41,9 @@ expression:
     ;
 
 comparison:
-    left=name operator=(CONTAINS | MATCHES | EQUAL | EEQUAL | NEQUAL) right=name; // example: author != miller
+    left=name operator=(CONTAINS | MATCHES | EQUAL | EEQUAL | NEQUAL) right=name // example: author != miller
+    | right=name                                                                 // example: miller (search all fields)
+    ;
 
 name:
     STRING // example: "miller"
