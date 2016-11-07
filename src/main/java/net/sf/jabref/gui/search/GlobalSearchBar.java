@@ -88,8 +88,8 @@ public class GlobalSearchBar extends JPanel {
         JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search in all open databases"));
 
-
-        AbstractAction clickAction = new AbstractAction() {
+        // default action to be performed for toggling globalSearch
+        AbstractAction globalSearchStandardAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 searchPreferences.setGlobalSearch(globalSearch.isSelected());
@@ -97,20 +97,21 @@ public class GlobalSearchBar extends JPanel {
             }
         };
 
-        AbstractAction shortCutAction = new AbstractAction() {
+        // additional action for global search shortcut
+        AbstractAction globalSearchShortCutAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 globalSearch.setSelected(true);
-                clickAction.actionPerformed(new ActionEvent(this, 0, "fire click action"));
+                globalSearchStandardAction.actionPerformed(new ActionEvent(this, 0, "fire standard action"));
                 focus();
             }
         };
 
         String searchGlobalByKey = "searchGlobalByKey";
         globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
-        globalSearch.getActionMap().put(searchGlobalByKey, shortCutAction);
+        globalSearch.getActionMap().put(searchGlobalByKey, globalSearchShortCutAction);
 
-        globalSearch.addActionListener(clickAction);
+        globalSearch.addActionListener(globalSearchStandardAction);
 
         openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
         openCurrentResultsInDialog.addActionListener(event -> {
