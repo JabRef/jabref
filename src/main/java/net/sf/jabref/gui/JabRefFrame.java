@@ -301,11 +301,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
-    private final AbstractAction globalSearch = new GeneralAction(Actions.GLOBAL_SEARCH,
-            Localization.menuTitle("Global Search"),
-            Localization.lang("Search globally"),
-            Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH),
-            IconTheme.JabRefIcon.SEARCH.getIcon());
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
@@ -1497,7 +1492,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, globalSearch,
+        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
