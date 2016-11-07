@@ -83,7 +83,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class LayoutEntry {
-
+    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
+    
     private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:
@@ -97,10 +98,7 @@ class LayoutEntry {
 
     private final List<String> invalidFormatter = new ArrayList<>();
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
-
     private final LayoutFormatterPreferences prefs;
-
 
     public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
@@ -175,7 +173,6 @@ class LayoutEntry {
         for (LayoutEntry layoutEntry : layoutEntries) {
             invalidFormatter.addAll(layoutEntry.getInvalidFormatters());
         }
-
     }
 
     public void setPostFormatter(LayoutFormatter formatter) {
@@ -391,7 +388,6 @@ class LayoutEntry {
             }
 
         }
-
     }
 
     private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
@@ -602,7 +598,6 @@ class LayoutEntry {
         char[] c = calls.toCharArray();
 
         int i = 0;
-
         while (i < c.length) {
 
             int start = i;
@@ -617,6 +612,7 @@ class LayoutEntry {
 
                     // Skip the brace
                     i++;
+                    int bracelevel = 0;
 
                     if (i < c.length) {
                         if (c[i] == '"') {
@@ -628,9 +624,14 @@ class LayoutEntry {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (((i + 1) < c.length) && !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
+                            while (((i + 1) < c.length)
+                                    && !(!escaped && (c[i] == '"') && (c[i + 1] == ')') && (bracelevel == 0))) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
+                                } else if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
                                 } else {
                                     escaped = false;
                                 }
@@ -646,14 +647,18 @@ class LayoutEntry {
 
                             int startParam = i;
 
-                            while ((i < c.length) && (c[i] != ')')) {
+                            while ((i < c.length) && (!((c[i] == ')') && (bracelevel == 0)))) {
+                                if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
+                                }
                                 i++;
                             }
 
                             String param = calls.substring(startParam, i);
 
                             result.add(Arrays.asList(method, param));
-
                         }
                     } else {
                         // Incorrectly terminated open brace
