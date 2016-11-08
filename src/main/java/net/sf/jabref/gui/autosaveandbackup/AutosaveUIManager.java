@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.autosave;
+package net.sf.jabref.gui.autosaveandbackup;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.exporter.SaveDatabaseAction;

@@ -2,11 +2,9 @@ package net.sf.jabref.gui.exporter;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.security.SecureRandom;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -20,7 +18,7 @@ import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.autosave.AutosaveUIManager;
+import net.sf.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
@@ -41,7 +39,6 @@ import net.sf.jabref.model.database.event.ChangePropagation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.DBMSProcessor;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -57,20 +54,21 @@ import org.apache.commons.logging.LogFactory;
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
+    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
     private boolean success;
     private boolean canceled;
     private boolean fileLockedError;
-    private Optional<Path> filePath;
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+    private Optional<Path> filePath;
 
 
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
+        this.filePath = Optional.empty();
     }
 
     /**
@@ -308,20 +306,17 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     public void saveAs() throws Throwable {
-        File file = null;
-        while (file == null) {
-            // configure file dialog
-            FileDialog dialog = new FileDialog(frame);
-            dialog.withExtension(FileExtensions.BIBTEX_DB);
-            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+        // configure file dialog
+        FileDialog dialog = new FileDialog(frame);
+        dialog.withExtension(FileExtensions.BIBTEX_DB);
+        dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
 
-            Optional<Path> path = dialog.saveNewFile();
-            if (path.isPresent()) {
-                saveAs(path.get().toFile());
-            } else {
-                canceled = true;
-                return;
-            }
+        Optional<Path> path = dialog.saveNewFile();
+        if (path.isPresent()) {
+            saveAs(path.get().toFile());
+        } else {
+            canceled = true;
+            return;
         }
     }
 
@@ -333,13 +328,9 @@ public class SaveDatabaseAction extends AbstractWorker {
         BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
-            // Generate an ID when saving a shared database
-            String databaseID = new BigInteger(128, new SecureRandom()).toString(32);
-            context.getDatabase().setDatabaseID(databaseID);
-            DBMSProcessor dbmsProcessor = context.getDBMSSynchronizer().getDBProcessor();
-            DBMSConnectionProperties properties = dbmsProcessor.getDBMSConnectionProperties();
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(databaseID).putAllDBMSConnectionProperties(properties);
+            DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor().getDBMSConnectionProperties();
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID()).putAllDBMSConnectionProperties(properties);
         }
 
         context.setDatabaseFile(file);
@@ -347,7 +338,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
-            context.setDatabaseFile(context.getDatabaseFile().orElse(null));
             return;
         }
         // Register so we get notifications about outside changes to the file.

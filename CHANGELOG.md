@@ -78,6 +78,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>CTRL</kbd>+<kbd>F8</kbd>
 
 ### Fixed
+- Fixed problem where closing brackets could not be used as texts in layout arguments
+- Fixed NullPointerException when opening search result window for an untitled database
 - Fixed [#2228](https://github.com/JabRef/jabref/issues/2228): Fixed Medline fetcher no longer working. The fetcher now uses `https` for fetching 
 - Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field

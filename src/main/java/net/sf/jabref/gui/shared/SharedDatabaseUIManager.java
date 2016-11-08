@@ -2,6 +2,7 @@ package net.sf.jabref.gui.shared;
 
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -25,6 +26,7 @@ import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import net.sf.jabref.shared.exception.NotASharedDatabaseException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -114,16 +116,24 @@ public class SharedDatabaseUIManager {
     }
 
     public void openSharedDatabaseFromParserResult(ParserResult parserResult)
-            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
-        String databaseID = parserResult.getDatabase().getDatabaseID();
-        DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(databaseID));
+            throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException,
+            NotASharedDatabaseException {
+
+        Optional<String> sharedDatabaseIDOptional = parserResult.getDatabase().getSharedDatabaseID();
+
+        if (!sharedDatabaseIDOptional.isPresent()) {
+            throw new NotASharedDatabaseException();
+        }
+
+        String sharedDatabaseID = sharedDatabaseIDOptional.get();
+        DBMSConnectionProperties dbmsConnectionProperties = new DBMSConnectionProperties(new SharedDatabasePreferences(sharedDatabaseID));
 
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
                 Globals.prefs.getKeywordDelimiter(), Globals.prefs.getKeyPattern());
 
-        bibDatabaseContext.getDatabase().setDatabaseID(databaseID);
+        bibDatabaseContext.getDatabase().setSharedDatabaseID(sharedDatabaseID);
         bibDatabaseContext.setDatabaseFile(parserResult.getDatabaseContext().getDatabaseFile().orElse(null));
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
