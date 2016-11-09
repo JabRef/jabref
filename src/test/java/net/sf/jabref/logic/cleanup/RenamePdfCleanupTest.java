@@ -18,7 +18,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -67,7 +66,6 @@ public class RenamePdfCleanupTest {
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
-    @Ignore("TODO: Will be fixed later")
     @Test
     public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
         String fileNamePattern = "\\bibtexkey - \\title";
