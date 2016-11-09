@@ -33,14 +33,17 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.prrv.PrrvDialogView;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.PreviewPreferences;
-import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
@@ -103,8 +106,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         final BibEntry newSelected = selected.get(0);
-        if (Objects.nonNull(panel.getCurrentEditor()) && (newSelected == panel.getCurrentEditor().getEntry())) {
-            // is already selected
+        if ((panel.getMode() == BasePanelMode.SHOWING_EDITOR || panel.getMode() == BasePanelMode.WILL_SHOW_EDITOR)
+                && panel.getCurrentEditor() != null && newSelected == panel.getCurrentEditor().getEntry()) {
+            // entry already selected and currently editing it, do not steal the focus from the selected textfield
             return;
         }
 
@@ -117,12 +121,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (oldEditor != null) {
                     visName = oldEditor.getVisiblePanelName();
                 }
-                // Get an old or new editor for the entry to edit:
+                // Get a new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(newSelected);
-
-                if (oldEditor != null) {
-                    oldEditor.setMovingToDifferentEntry();
-                }
 
                 // Show the new editor unless it was already visible:
                 if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
@@ -132,6 +132,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
+                } else {
+                    // if not used destroy the EntryEditor
+                    newEditor.setMovingToDifferentEntry();
                 }
             } else {
                 // Either nothing or a preview was shown. Update the preview.
@@ -188,11 +191,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
     public void editSignalled(BibEntry entry) {
         final BasePanelMode mode = panel.getMode();
-        EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanelMode.SHOWING_EDITOR) {
-            panel.showEntryEditor(editor);
+            panel.showEntryEditor(panel.getEntryEditor(entry));
         }
-        editor.requestFocus();
+        panel.getCurrentEditor().requestFocus();
     }
 
     @Override
@@ -248,7 +250,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         // Check if the clicked colum is a specialfield column
-        if (modelColumn.isIconColumn() && (SpecialFieldsUtils.isSpecialField(modelColumn.getColumnName()))) {
+        if (modelColumn.isIconColumn() && (SpecialField.isSpecialField(modelColumn.getColumnName()))) {
             // handle specialfield
             handleSpecialFieldLeftClick(e, modelColumn.getColumnName());
         } else if (modelColumn.isIconColumn()) { // left click on icon field
@@ -330,15 +332,15 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
         if ((e.getClickCount() == 1)) {
-            SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
+            SpecialField.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
                 // special field found
                 if (field.isSingleValueField()) {
                     // directly execute toggle action instead of showing a menu with one action
-                    field.getValues().get(0).getAction(panel.frame()).action();
+                    new SpecialFieldViewModel(field).getSpecialFieldAction(field.getValues().get(0), panel.frame()).action();
                 } else {
                     JPopupMenu menu = new JPopupMenu();
                     for (SpecialFieldValue val : field.getValues()) {
-                        menu.add(val.getMenuAction(panel.frame()));
+                        menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), panel.frame()));
                     }
                     menu.show(table, e.getX(), e.getY());
                 }
@@ -399,7 +401,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         showDefaultPopup = false;
                     }
                 } else {
-                    if (SpecialFieldsUtils.isSpecialField(column.getColumnName())) {
+                    if (SpecialField.isSpecialField(column.getColumnName())) {
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {

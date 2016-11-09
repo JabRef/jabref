@@ -55,10 +55,18 @@ public class BibDatabaseContext {
         this(database, metaData, new Defaults());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults, DatabaseLocation location) {
         this(database, metaData, defaults);
-
+        Objects.requireNonNull(location);
         this.setDatabaseFile(file);
+
+        if (location == DatabaseLocation.LOCAL) {
+            convertToLocalDatabase();
+        }
+    }
+
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults) {
+        this(database, metaData, file, defaults, DatabaseLocation.LOCAL);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
@@ -103,6 +111,10 @@ public class BibDatabaseContext {
 
     public void setDatabaseFile(File file) {
         this.file = file;
+    }
+
+    public void clearDatabaseFile() {
+        this.file = null;
     }
 
     public BibDatabase getDatabase() {
@@ -217,7 +229,7 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if ((this.location == DatabaseLocation.SHARED)) {
+        if (Objects.nonNull(dbmsSynchronizer) && (location == DatabaseLocation.SHARED)) {
             this.database.unregisterListener(dbmsSynchronizer);
             this.metaData.unregisterListener(dbmsSynchronizer);
         }

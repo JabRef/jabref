@@ -178,6 +178,42 @@ public class BibEntryTests {
         assertEquals(Optional.of("3"), emptyEntry.getFieldOrAlias("month"));
     }
 
+    @Test
+    public void getFieldOrAliasLatexFreeAlreadyFreeValueIsUnchanged() {
+        emptyEntry.setField("title", "A Title Without any LaTeX commands");
+        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree("title"));
+    }
+
+    @Test
+    public void getFieldOrAliasLatexFreeAlreadyFreeAliasValueIsUnchanged() {
+        emptyEntry.setField("journal", "A Title Without any LaTeX commands");
+        assertEquals(Optional.of("A Title Without any LaTeX commands"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+    }
+
+    @Test
+    public void getFieldOrAliasLatexFreeBracesAreRemoved() {
+        emptyEntry.setField("title", "{A Title with some {B}ra{C}es}");
+        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree("title"));
+    }
+
+    @Test
+    public void getFieldOrAliasLatexFreeBracesAreRemovedFromAlias() {
+        emptyEntry.setField("journal", "{A Title with some {B}ra{C}es}");
+        assertEquals(Optional.of("A Title with some BraCes"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+    }
+
+    @Test
+    public void getFieldOrAliasLatexFreeComplexConversionInAlias() {
+        emptyEntry.setField("journal", "A 32~{mA} {$\\Sigma\\Delta$}-modulator");
+        assertEquals(Optional.of("A 32\u00A0mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+    }
+
+    @Test
+    public void getFieldOrAliasLatexFreeDoesNotChangeDateSemantics() {
+        emptyEntry.setField("date", "2003-03-30");
+        assertEquals(Optional.of("3"), emptyEntry.getFieldOrAliasLatexFree("month"));
+    }
+
     @Test(expected = NullPointerException.class)
     public void setNullField() {
         emptyEntry.setField(null);

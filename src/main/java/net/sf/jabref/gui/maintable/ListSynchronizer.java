@@ -40,12 +40,12 @@ public class ListSynchronizer {
     public void listen(EntryChangedEvent entryChangedEvent) {
         lock();
         try {
-            int index = list.indexOf(entryChangedEvent.getBibEntry());
-            if (index != -1) {
-                // SpecialFieldUtils.syncSpecialFieldsFromKeywords update an entry during
-                // DatabaseChangeEvent.ADDED_ENTRY
-                // thus,
-                list.set(index, entryChangedEvent.getBibEntry());
+            // cannot use list#indexOf b/c it won't distinguish between duplicates
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) == entryChangedEvent.getBibEntry()) {
+                    list.set(i, entryChangedEvent.getBibEntry());
+                    break;
+                }
             }
         } finally {
             unlock();

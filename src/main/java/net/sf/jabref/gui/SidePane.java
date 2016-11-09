@@ -11,6 +11,7 @@ import java.util.Collection;
 import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 /**
  * The side pane is displayed at the left side of JabRef and shows instances of
@@ -43,10 +44,10 @@ public class SidePane extends JPanel {
         constraint.weightx = 1;
 
         /*
-         * Added Scrollpane to fix: 
+         * Added Scrollpane to fix:
          */
-        JScrollPane sp = new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane sp = new JScrollPane(mainPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setBorder(null);
 
         // To remove the scroll panel just change sp to mainPanel and comment

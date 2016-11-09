@@ -1,5 +1,7 @@
 package net.sf.jabref.model.database;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -63,8 +65,11 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
+    private String sharedDatabaseID;
+
 
     public BibDatabase() {
+        this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
     }
 
@@ -181,7 +186,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
     /**
@@ -206,29 +211,8 @@ public class BibDatabase {
         boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
             eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
         }
-    }
-
-    public int getNumberOfKeyOccurrences(String key) {
-        return duplicationChecker.getNumberOfKeyOccurrences(key);
-    }
-
-    /**
-     * Sets the given key to the given entry.
-     * If the key is null, the entry field will be cleared.
-     *
-     * @return true, if the entry contains the key, false if not
-     */
-    public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKey();
-        if (key == null) {
-            entry.clearCiteKey();
-        } else {
-            entry.setCiteKey(key);
-        }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
@@ -602,5 +586,35 @@ public class BibDatabase {
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+    }
+
+    public Optional<String> getSharedDatabaseID() {
+        return Optional.ofNullable(this.sharedDatabaseID);
+    }
+
+    public boolean isShared() {
+        return getSharedDatabaseID().isPresent();
+    }
+
+    public void setSharedDatabaseID(String sharedDatabaseID) {
+        this.sharedDatabaseID = sharedDatabaseID;
+    }
+
+    public void clearSharedDatabaseID() {
+        this.sharedDatabaseID = null;
+    }
+
+    /**
+     * Generates and sets a random ID which is globally unique.
+     *
+     * @return The generated sharedDatabaseID
+     */
+    public String generateSharedDatabaseID() {
+        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);
+        return this.sharedDatabaseID;
+    }
+
+    public DuplicationChecker getDuplicationChecker() {
+        return duplicationChecker;
     }
 }

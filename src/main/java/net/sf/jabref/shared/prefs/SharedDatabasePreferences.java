@@ -1,17 +1,28 @@
 package net.sf.jabref.shared.prefs;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.gui.shared.OpenSharedDatabaseDialog;
+import net.sf.jabref.gui.shared.ConnectToSharedDatabaseDialog;
+import net.sf.jabref.shared.DBMSConnectionProperties;
+import net.sf.jabref.shared.security.Password;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Stores and reads persistent data for {@link OpenSharedDatabaseDialog}.
+ * Stores and reads persistent data for {@link ConnectToSharedDatabaseDialog}.
  */
 public class SharedDatabasePreferences {
+
+    private static final Log LOGGER = LogFactory.getLog(SharedDatabasePreferences.class);
+
+    private static final String DEFAULT_NODE = "default";
+    private static final String PARENT_NODE = "jabref-shared";
 
     private static final String SHARED_DATABASE_TYPE = "sharedDatabaseType";
     private static final String SHARED_DATABASE_HOST = "sharedDatabaseHost";
@@ -22,55 +33,63 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
-    private final Preferences internalPrefs = Preferences.userNodeForPackage(JabRefMain.class).parent().node("jabref-pwdstorage");
+    private final Preferences internalPrefs;
 
+
+    public SharedDatabasePreferences() {
+        this(DEFAULT_NODE);
+    }
+
+    public SharedDatabasePreferences(String sharedDatabaseID) {
+        internalPrefs = Preferences.userNodeForPackage(JabRefMain.class).parent().node(PARENT_NODE).node(sharedDatabaseID);
+    }
 
     public Optional<String> getType() {
-        return Globals.prefs.getAsOptional(SHARED_DATABASE_TYPE);
+        return getOptionalValue(SHARED_DATABASE_TYPE);
     }
 
     public Optional<String> getHost() {
-        return Globals.prefs.getAsOptional(SHARED_DATABASE_HOST);
+        return getOptionalValue(SHARED_DATABASE_HOST);
     }
 
     public Optional<String> getPort() {
-        return Globals.prefs.getAsOptional(SHARED_DATABASE_PORT);
+        return getOptionalValue(SHARED_DATABASE_PORT);
     }
 
     public Optional<String> getName() {
-        return Globals.prefs.getAsOptional(SHARED_DATABASE_NAME);
+        return getOptionalValue(SHARED_DATABASE_NAME);
     }
 
     public Optional<String> getUser() {
-        return Globals.prefs.getAsOptional(SHARED_DATABASE_USER);
+        return getOptionalValue(SHARED_DATABASE_USER);
     }
 
     public Optional<String> getPassword() {
-        return Optional.ofNullable(internalPrefs.get(SHARED_DATABASE_PASSWORD, null));
+        return getOptionalValue(SHARED_DATABASE_PASSWORD);
     }
 
     public boolean getRememberPassword() {
-        return Globals.prefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
+        return internalPrefs.getBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, false);
     }
 
     public void setType(String type) {
-        Globals.prefs.put(SHARED_DATABASE_TYPE, type);
+        internalPrefs.put(SHARED_DATABASE_TYPE, type);
     }
 
     public void setHost(String host) {
-        Globals.prefs.put(SHARED_DATABASE_HOST, host);
+        internalPrefs.put(SHARED_DATABASE_HOST, host);
     }
 
     public void setPort(String port) {
-        Globals.prefs.put(SHARED_DATABASE_PORT, port);
+        internalPrefs.put(SHARED_DATABASE_PORT, port);
     }
 
     public void setName(String name) {
-        Globals.prefs.put(SHARED_DATABASE_NAME, name);
+        internalPrefs.put(SHARED_DATABASE_NAME, name);
     }
 
     public void setUser(String user) {
-        Globals.prefs.put(SHARED_DATABASE_USER, user);
+        internalPrefs.put(SHARED_DATABASE_USER, user);
     }
 
     public void setPassword(String password) {
@@ -78,7 +97,7 @@ public class SharedDatabasePreferences {
     }
 
     public void setRememberPassword(boolean rememberPassword) {
-        Globals.prefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);
+        internalPrefs.putBoolean(SHARED_DATABASE_REMEMBER_PASSWORD, rememberPassword);
     }
 
     public void clearPassword() {
@@ -89,4 +108,27 @@ public class SharedDatabasePreferences {
         internalPrefs.clear();
     }
 
+    private Optional<String> getOptionalValue(String key) {
+        return Optional.ofNullable(internalPrefs.get(key, null));
+    }
+
+    public static void clearAll() throws BackingStoreException {
+        Preferences.userNodeForPackage(JabRefMain.class).parent().node(PARENT_NODE).clear();
+    }
+
+    public void putAllDBMSConnectionProperties(DBMSConnectionProperties properties) {
+        assert (properties.isValid());
+
+        setType(properties.getType().toString());
+        setHost(properties.getHost());
+        setPort(String.valueOf(properties.getPort()));
+        setName(properties.getDatabase());
+        setUser(properties.getUser());
+
+        try {
+            setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+            LOGGER.error("Could not store the password due to encryption problems.", e);
+        }
+    }
 }

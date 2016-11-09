@@ -1,12 +1,17 @@
 package net.sf.jabref.logic.layout;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
+import java.util.Collections;
 
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -111,6 +116,20 @@ JabRefPreferences.getInstance().getImportFormatPreferences());
 
         Assert.assertEquals(
                 "<font face=\"arial\"><BR><BR><b>Abstract: </b> &ntilde; &ntilde; &iacute; &imath; &imath;</font>",
+                layoutText);
+    }
+
+    @Test
+    // Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
+    public void testWrapFileLinksLayout() throws IOException {
+        prefs = new LayoutFormatterPreferences(mock(NameFormatterPreferences.class),
+                mock(JournalAbbreviationPreferences.class),
+                new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")),
+                mock(JournalAbbreviationLoader.class));
+        String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
+                "@other{bla, file={Test file:encrypted.pdf:PDF}}");
+        Assert.assertEquals(
+                "1. Test file (" + new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() + ")",
                 layoutText);
     }
 }

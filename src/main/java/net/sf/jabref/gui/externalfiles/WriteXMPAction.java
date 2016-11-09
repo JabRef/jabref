@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
@@ -232,7 +233,7 @@ public class WriteXMPAction extends AbstractWorker {
             progressArea = new JTextArea(15, 60);
 
             JScrollPane scrollPane = new JScrollPane(progressArea,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             Dimension d = progressArea.getPreferredSize();
             d.height += scrollPane.getHorizontalScrollBar().getHeight() + 15;
             d.width += scrollPane.getVerticalScrollBar().getWidth() + 15;

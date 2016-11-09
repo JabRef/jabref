@@ -23,6 +23,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
+    public static final String DATABASE_ID_PREFIX = "DBID:";
 
     public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory) {
         super(saveSessionFactory);
@@ -137,6 +138,22 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
             getWriter().write("% ");
             getWriter().write(SavePreferences.ENCODING_PREFIX + encoding);
             getWriter().write(OS.NEWLINE);
+
+        } catch (IOException e) {
+            throw new SaveException(e);
+        }
+    }
+
+    @Override
+    protected void writeDatabaseID(String sharedDatabaseID) throws SaveException {
+        try {
+            StringBuilder stringBuilder = new StringBuilder()
+                    .append("% ")
+                    .append(DATABASE_ID_PREFIX)
+                    .append(" ")
+                    .append(sharedDatabaseID)
+                    .append(OS.NEWLINE);
+            getWriter().write(stringBuilder.toString());
         } catch (IOException e) {
             throw new SaveException(e);
         }

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+
 /**
  * Handling of bibtex fields.
  * All bibtex-field related stuff should be placed here!
@@ -41,16 +43,17 @@ public class InternalBibtexFields {
             FieldName.CTLUSE_PAPER, FieldName.CTLUSE_URL, FieldName.CTLUSE_FORCED_ETAL, FieldName.CTLUSE_ALT_SPACING,
             FieldName.CTLDASH_REPEATED_NAMES);
 
-    private static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate",
-            FieldName.URLDATE);
+    private static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, FieldName.EVENTDATE,
+            FieldName.ORIGDATE, FieldName.URLDATE);
 
     private static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR,
-            "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction",
-            "foreword", "afterword", FieldName.BOOKAUTHOR, FieldName.HOLDER, "shortauthor", "shorteditor", "sortname",
-            "nameaddon", FieldName.ASSIGNEE);
+            FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC, FieldName.TRANSLATOR, FieldName.ANNOTATOR,
+            FieldName.COMMENTATOR, FieldName.INTRODUCTION, FieldName.FOREWORD, FieldName.AFTERWORD,
+            FieldName.BOOKAUTHOR, FieldName.HOLDER, FieldName.SHORTAUTHOR, FieldName.SHORTEDITOR, FieldName.SORTNAME,
+            FieldName.NAMEADDON, FieldName.ASSIGNEE);
 
-    private static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList("editortype", "editoratype",
-            "editorbtype", "editorctype");
+    private static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList(FieldName.EDITORTYPE,
+            FieldName.EDITORATYPE, FieldName.EDITORBTYPE, FieldName.EDITORCTYPE);
 
     private static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList(FieldName.PAGINATION,
             FieldName.BOOKPAGINATION);
@@ -71,18 +74,17 @@ public class InternalBibtexFields {
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
             FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
-
-    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFields.FIELDNAME_PRINTED,
-            SpecialFields.FIELDNAME_PRIORITY, SpecialFields.FIELDNAME_QUALITY,
-            SpecialFields.FIELDNAME_RANKING, SpecialFields.FIELDNAME_READ,
-            SpecialFields.FIELDNAME_RELEVANCE);
+    
+    private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
+            SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
+            SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
+            SpecialField.RELEVANCE.getFieldName());
 
     // singleton instance
-    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(
-            SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
+    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(FieldName.TIMESTAMP);
 
 
-    private InternalBibtexFields(boolean serializeSpecialFields, String timeStampFieldName) {
+    private InternalBibtexFields(String timeStampFieldName) {
         fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
@@ -141,11 +143,11 @@ public class InternalBibtexFields {
         // custom fields not displayed at editor, but as columns in the UI
         for (String fieldName : SPECIAL_FIELDS) {
             dummy = new BibtexSingleField(fieldName, false);
-            if (!serializeSpecialFields) {
-                dummy.setPrivate();
-                dummy.setWriteable(false);
-                dummy.setDisplayable(false);
-            }
+
+            dummy.setPrivate();
+            dummy.setWriteable(false);
+            dummy.setDisplayable(false);
+
             add(dummy);
         }
 
@@ -502,6 +504,22 @@ public class InternalBibtexFields {
         Collections.sort(publicFields);
 
         return publicFields;
+    }
+
+    /**
+     * returns a List with all fieldnames incl. internal fieldnames
+     */
+    public static List<String> getAllPublicAndInteralFieldNames() {
+        //add the internal field names to public fields
+        List<String> publicAndInternalFields = new ArrayList<>();
+        publicAndInternalFields.addAll(InternalBibtexFields.getAllPublicFieldNames());
+        publicAndInternalFields.add(FieldName.INTERNAL_ALL_FIELD);
+        publicAndInternalFields.add(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD);
+
+        // sort the entries
+        Collections.sort(publicAndInternalFields);
+
+        return publicAndInternalFields;
     }
 
     public static List<String> getJournalNameFields() {

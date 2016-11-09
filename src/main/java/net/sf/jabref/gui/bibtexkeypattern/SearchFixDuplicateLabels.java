@@ -97,7 +97,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                         panel.getDatabase(), entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
-                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKeyOptional().get()));
+                ce.addEdit(new UndoableKeyChange(entry, oldKey, entry.getCiteKeyOptional().get()));
             }
             ce.end();
             panel.getUndoManager().addEdit(ce);

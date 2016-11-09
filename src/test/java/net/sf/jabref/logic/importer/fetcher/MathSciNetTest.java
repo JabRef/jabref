@@ -33,7 +33,7 @@ public class MathSciNetTest {
         ratiuEntry.setType(BibtexEntryTypes.ARTICLE);
         ratiuEntry.setCiteKey("MR3537908");
         ratiuEntry.setField("author", "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
-        ratiuEntry.setField("title", "Existence and {U}niqueness {T}heorems for the {T}wo-{D}imensional {E}ricksen--{L}eslie {S}ystem");
+        ratiuEntry.setField("title", "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");
         ratiuEntry.setField("journal", "Journal of Mathematical Fluid Mechanics");
         ratiuEntry.setField("volume", "18");
         ratiuEntry.setField("year", "2016");

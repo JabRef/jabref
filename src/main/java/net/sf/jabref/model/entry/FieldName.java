@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,12 +19,17 @@ public class FieldName {
     // author is not set):
     public static final String FIELD_SEPARATOR = "/";
 
+    public static final String INTERNAL_ALL_FIELD = "all";
+    public static final String INTERNAL_ALL_TEXT_FIELDS_FIELD = "all-text-fields";
+
     // Field name constants
     public static final String ABSTRACT = "abstract";
     public static final String ADDENDUM = "addendum";
     public static final String ADDRESS = "address";
+    public static final String AFTERWORD = "afterword";
     public static final String ANNOTE = "annote";
     public static final String ANNOTATION = "annotation";
+    public static final String ANNOTATOR = "annotator";
     public static final String ASSIGNEE = "assignee";
     public static final String AUTHOR = "author";
     public static final String BOOKAUTHOR = "bookauthor";
@@ -32,6 +39,7 @@ public class FieldName {
     public static final String BOOKTITLEADDON = "booktitleaddon";
     public static final String CHAPTER = "chapter";
     public static final String CITES = "cites";
+    public static final String COMMENTATOR = "commentator";
     public static final String COMMENTS = "comments";
     public static final String CROSSREF = "crossref";
     public static final String DATE = "date";
@@ -40,18 +48,29 @@ public class FieldName {
     public static final String DOI = "doi";
     public static final String EDITION = "edition";
     public static final String EDITOR = "editor";
+    public static final String EDITORA = "editora";
+    public static final String EDITORB = "editorb";
+    public static final String EDITORC = "editorc";
+    public static final String EDITORTYPE = "editortype";
+    public static final String EDITORATYPE = "editoratype";
+    public static final String EDITORBTYPE = "editorbtype";
+    public static final String EDITORCTYPE = "editorctype";
     public static final String EID = "eid";
     public static final String ENTRYSET = "entryset";
     public static final String EPRINT = "eprint";
     public static final String EPRINTCLASS = "eprintclass";
     public static final String EPRINTTYPE = "eprinttype";
+    public static final String EVENTDATE = "eventdate";
     public static final String EVENTTITLE = "eventtitle";
+    public static final String EVENTTITLEADDON = "eventtitleaddon";
     public static final String FILE = "file";
+    public static final String FOREWORD = "foreword";
     public static final String FOLDER = "folder";
     public static final String GENDER = "gender";
     public static final String HOLDER = "holder";
     public static final String HOWPUBLISHED = "howpublished";
     public static final String INSTITUTION = "institution";
+    public static final String INTRODUCTION = "introduction";
     public static final String ISBN = "isbn";
     public static final String ISRN = "isrn";
     public static final String ISSN = "issn";
@@ -70,10 +89,12 @@ public class FieldName {
     public static final String MAINTITLEADDON = "maintitleaddon";
     public static final String MONTH = "month";
     public static final String MONTHFILED = "monthfiled";
+    public static final String NAMEADDON = "nameaddon";
     public static final String NATIONALITY = "nationality";
     public static final String NOTE = "note";
     public static final String NUMBER = "number";
     public static final String ORGANIZATION = "organization";
+    public static final String ORIGDATE = "origdate";
     public static final String ORIGLANGUAGE = "origlanguage";
     public static final String PAGES = "pages";
     public static final String PAGETOTAL = "pagetotal";
@@ -90,6 +111,9 @@ public class FieldName {
     public static final String REVISION = "revision";
     public static final String SCHOOL = "school";
     public static final String SERIES = "series";
+    public static final String SHORTAUTHOR = "shortauthor";
+    public static final String SHORTEDITOR = "shorteditor";
+    public static final String SORTNAME = "sortname";
     public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";
     public static final String TITLEADDON = "titleaddon";
@@ -98,6 +122,7 @@ public class FieldName {
     public static final String URI = "uri";
     public static final String URL = "url";
     public static final String URLDATE = "urldate";
+    public static final String VENUE = "venue";
     public static final String VERSION = "version";
     public static final String VOLUME = "volume";
     public static final String VOLUMES = "volumes";
@@ -162,4 +187,11 @@ public class FieldName {
         }
         return StringUtil.capitalizeFirst(field);
     }
+
+    public static ArrayList getNotTextFieldNames() {
+        ArrayList<String> notTextFieldNames = new ArrayList<>();
+        notTextFieldNames.addAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
+    return notTextFieldNames;
+    }
+
 }
