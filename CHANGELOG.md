@@ -131,9 +131,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
 - Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
 
-
-
-
+### Feature
+- Reimplemented [Paper Reference Relationship Visualization](https://sourceforge.net/projects/jabrefprrvp/) using JavaFX technology for a  force based graph.
 
 
 
