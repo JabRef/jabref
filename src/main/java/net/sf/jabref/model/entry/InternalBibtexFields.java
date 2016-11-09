@@ -112,6 +112,8 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.ISBN));
         add(dummy);
 
+        add(new BibtexSingleField(FieldName.ISSN, true, BibtexSingleField.SMALL_W));
+
         dummy = new BibtexSingleField(FieldName.JOURNAL, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperty.JOURNAL_NAME));
         add(dummy);
