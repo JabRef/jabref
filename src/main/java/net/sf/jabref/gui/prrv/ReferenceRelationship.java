@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.FXDialogs;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import prefux.data.Edge;
@@ -35,7 +33,7 @@ public class ReferenceRelationship {
     public void parseBibTexForReferences(Graph g) {
 
         if (JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getDatabase().getEntries().isEmpty()) {
-            FXDialogs.showInformationDialogAndWait(Localization.lang("No_references_found"), "Please load a database");
+
         } else {
             // Init - Create nodes for each bibtex entries
             for (int sourceID = 0; pureEntryList.size() > sourceID; sourceID++) {
