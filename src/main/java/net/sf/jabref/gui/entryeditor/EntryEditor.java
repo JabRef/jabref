@@ -263,8 +263,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // Get all optional fields which are deprecated
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
-                // Get deprecated parts of the date field
-                usedOptionalFieldsDeprecated.add(FieldName.YEAR);
+                // Get other deprecated fields
                 usedOptionalFieldsDeprecated.add(FieldName.MONTH);
 
                 // Add tabs
