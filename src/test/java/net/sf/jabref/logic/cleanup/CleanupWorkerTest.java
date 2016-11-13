@@ -66,7 +66,6 @@ public class CleanupWorkerTest {
                         prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                         prefs.getFileDirectoryPreferences()));
 
-
     }
 
     @Test(expected = NullPointerException.class)
@@ -248,8 +247,6 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
-
-
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
