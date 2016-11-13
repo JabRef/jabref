@@ -4,15 +4,13 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
 
-    ABBREVIATE(
-            "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
+    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
     ACCEPT("Accept", Localization.lang("Accept"), "ctrl ENTER"),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G"),
-    AUTOMATICALLY_LINK_FILES(
-            "Automatically link files", Localization.lang("Automatically set file links"), "F7"),
+    AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7"),
     BACK("Back", Localization.lang("Back"), "alt LEFT"),
-    CLEANUP(
-            "Cleanup", Localization.lang("Cleanup entries"), "F8"),
+    CHECK_INTEGRITY("Check integrity", Localization.menuTitle("Check integrity"), "ctrl F8"),
+    CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "F8"),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE"),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W"),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE"),
@@ -62,6 +60,7 @@ public enum KeyBinding {
     OPEN_DATABASE("Open database", Localization.lang("Open database"), "ctrl O"),
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4"),
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O"),
+    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0"),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3"),
     PASTE("Paste", Localization.lang("Paste"), "ctrl V"),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl shift R"),
@@ -71,14 +70,12 @@ public enum KeyBinding {
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl L"),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl Q"),
     REDO("Redo", Localization.lang("Redo"), "ctrl Y"),
-    REFRESH_OO(
-            "Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O"),
+    REFRESH_OO("Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O"),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl R"),
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D"),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S"),
     SAVE_DATABASE("Save database", Localization.lang("Save database"), "ctrl S"),
-    SAVE_DATABASE_AS(
-            "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
+    SAVE_DATABASE_AS("Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
     SELECT_FIRST_ENTRY("Select first entry", Localization.lang("Select first entry"), "HOME"),
@@ -92,8 +89,7 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z"),
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M"),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt 4"),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6"),
-    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0"),;
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6");
 
     private final String key;
     private final String localization;

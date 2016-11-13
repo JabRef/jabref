@@ -68,6 +68,19 @@ public class FileUtil {
     }
 
     /**
+     * Adds an extension to the given file name. The original extension is not replaced. That means,
+     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     *
+     * @param path the path to add the extension to
+     * @param extension the extension to add
+     * @return the with the modified file name
+     */
+    public static Path addExtension(Path path, String extension) {
+        Path fileName = path.getFileName();
+        return path.resolveSibling(fileName + extension);
+    }
+
+    /**
      * Creates the minimal unique path substring for each file among multiple file paths.
      *
      * @param paths the file paths

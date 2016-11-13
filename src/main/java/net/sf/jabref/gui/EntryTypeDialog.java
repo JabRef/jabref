@@ -234,6 +234,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
 
+        SwingUtilities.invokeLater(() -> idTextField.requestFocus());
+
         return jPanel;
     }
 

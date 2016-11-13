@@ -118,6 +118,10 @@ public class BibDatabaseContext {
         this.file = file;
     }
 
+    public void clearDatabaseFile() {
+        this.file = null;
+    }
+
     public BibDatabase getDatabase() {
         return database;
     }

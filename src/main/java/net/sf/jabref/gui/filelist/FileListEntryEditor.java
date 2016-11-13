@@ -343,7 +343,7 @@ public class FileListEntryEditor {
         if (file.isPresent()) {
             workingDir = file.get().getPath();
         } else {
-            workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
+            workingDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
         Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
@@ -351,7 +351,7 @@ public class FileListEntryEditor {
         path.ifPresent(selection -> {
             File newFile = selection.toFile();
             // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
 
             // If the file is below the file directory, make the path relative:
             List<String> fileDirs = this.databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());

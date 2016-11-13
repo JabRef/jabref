@@ -235,6 +235,38 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseReallyUnknownType() throws Exception {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
+    public void parseOtherTypeTest() throws Exception {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
     public void parseRecognizesEntryWithVeryLongType() throws IOException {
 
         ParserResult result = BibtexParser.parse(
@@ -1406,7 +1438,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseRecognizesDatabaseID() throws IOException {
+    public void parseRecognizesDatabaseID() throws Exception {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 
         String expectedDatabaseID = "q1w2e3r4t5z6";
@@ -1418,9 +1450,24 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
 
-        String actualDatabaseID = parserResult.getDatabase().getDatabaseID();
+        String actualDatabaseID = parserResult.getDatabase().getSharedDatabaseID().get();
 
         assertEquals(expectedDatabaseID, actualDatabaseID);
+    }
+
+    @Test
+    public void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% Encoding: UTF-8").append(OS.NEWLINE)
+                .append("% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+
+        assertEquals(1, entries.size());
+        assertEquals("", entries.get(0).getUserComments());
     }
 
     @Test

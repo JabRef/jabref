@@ -1,5 +1,7 @@
 package net.sf.jabref.model.database;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -63,7 +65,7 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
-    private String databaseID;
+    private String sharedDatabaseID;
 
 
     public BibDatabase() {
@@ -586,15 +588,30 @@ public class BibDatabase {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
     }
 
-    public String getDatabaseID() {
-        return this.databaseID;
+    public Optional<String> getSharedDatabaseID() {
+        return Optional.ofNullable(this.sharedDatabaseID);
+    }
+
+    public boolean isShared() {
+        return getSharedDatabaseID().isPresent();
+    }
+
+    public void setSharedDatabaseID(String sharedDatabaseID) {
+        this.sharedDatabaseID = sharedDatabaseID;
+    }
+
+    public void clearSharedDatabaseID() {
+        this.sharedDatabaseID = null;
     }
 
     /**
-     * @param databaseID use null to unset the id
+     * Generates and sets a random ID which is globally unique.
+     *
+     * @return The generated sharedDatabaseID
      */
-    public void setDatabaseID(String databaseID) {
-        this.databaseID = databaseID;
+    public String generateSharedDatabaseID() {
+        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);
+        return this.sharedDatabaseID;
     }
 
     public DuplicationChecker getDuplicationChecker() {
