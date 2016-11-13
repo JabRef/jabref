@@ -67,6 +67,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Updated Vietnamese translation
 - Added greyed-out suggestion for `year`/`date`/`url` fields
 - [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>CTRL</kbd>+<kbd>F8</kbd>
+- When creatig an entry based on an ISBN, but the ISBN is not available on ebook.de, the error message is now more clear.
 
 ### Fixed
 - Fixed problem where closing brackets could not be used as texts in layout arguments
