@@ -58,11 +58,15 @@ public class CleanupWorkerTest {
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, true);
+        prefs.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, "");
+
         worker = new CleanupWorker(context,
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
                         prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN),
                         prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                         prefs.getFileDirectoryPreferences()));
+
+
     }
 
     @Test(expected = NullPointerException.class)
@@ -244,6 +248,8 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
+
+
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
