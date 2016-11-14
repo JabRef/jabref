@@ -21,6 +21,104 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
 
 ### Changed
+
+### Fixed
+
+### Removed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## [3.7] - 2016-11-14
+
+### Changed
 - Implementation of eventbased autosave and backup functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
 - Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
 - [koppor#171](https://github.com/koppor/jabref/issues/171): Add Shortcuts to context menu
@@ -76,53 +174,54 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Updated Vietnamese translation
 - Added greyed-out suggestion for `year`/`date`/`url` fields
 - [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>CTRL</kbd>+<kbd>F8</kbd>
+- When creatig an entry based on an ISBN, but the ISBN is not available on ebook.de, the error message is now more clear.
 
 ### Fixed
 - Fixed problem where closing brackets could not be used as texts in layout arguments
 - Fixed NullPointerException when opening search result window for an untitled database
-- Fixed [#2228](https://github.com/JabRef/jabref/issues/2228): Fixed Medline fetcher no longer working. The fetcher now uses `https` for fetching 
-- Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
-- Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
-- Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
-- Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
-- Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
-- Fixed [#1542](https://github.com/JabRef/jabref/issues/1542): Improved error messages when using fetcher
 - Fixed selecting an entry out of multiple duplicates
-- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
 - Suggestions in the autocomplete will be shown correctly (Latex to Unicode)
-- Fixed: When searching the first match will be selected if the current selection is no match
 - Selecting an entry in the search result Window will now select the correct entry in the bib file
-- Entries in the SearchResultDialog are now converted to Unicode
 - Suggestions in the autocomplete (search) are now in Unicode
+- Entries in the SearchResultDialog are now converted to Unicode
 - Fixed NullPointerException when opening search result window for an untitled database
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
-- Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
-- Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
-- Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
-- Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
-- Fixed [#1235](https://github.com/JabRef/jabref/issues/1235): Modified Key bindings do not work correctly
-- Fixed field `key` field is not exported to MS-Office 2008 xml format
-- Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
-- Fixed download files failed silently when an invalid directory is selected
-- Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
-- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
+- Fixed: When searching the first match will be selected if the current selection is no match
+- Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
+- Fixed [koppor/#128](https://github.com/koppor/jabref/issues/128): Sensible default settings for "Enable save actions" and "Cleanup"
 - Fixed loop when pulling changes (shared database) when current selected field has changed
-- Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
-- Fixed [#1808](https://github.com/JabRef/jabref/issues/1808): Font preference dialog now keeps changes
-- Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
-- Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
+- Fixed field `key` field is not exported to MS-Office 2008 xml format
+- Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
+- Fixed close action of entry editor not working after parsing error corrected
+- Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
+- Fixed download files failed silently when an invalid directory is selected
+- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 - Fixed file menu displays wrong hotkey in the German translation
-- Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
+- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
+- Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
+- Fixed [#1235](https://github.com/JabRef/jabref/issues/1235): Modified Key bindings do not work correctly
+- Fixed [#1542](https://github.com/JabRef/jabref/issues/1542): Improved error messages when using fetcher
+- Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
+- Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
+- Fixed [#1808](https://github.com/JabRef/jabref/issues/1808): Font preference dialog now keeps changes
+- Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
+- Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
+- Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
+- Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
+- Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [#2021](https://github.com/JabRef/jabref/issues/2021): All filetypes can be selected on MacOS again
+- Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
+- Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
 - Fixed [#2064](https://github.com/JabRef/jabref/issues/2064): Not all `other fields` are shown on entry change of same type
+- Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
+- Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
+- Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
 - Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl</kbd>-<kbd>S</kbd> doesn't trigger parsing error message
-- Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
-- Fixed close action of entry editor not working after parsing error corrected
-- Fixed [koppor/#128](https://github.com/koppor/jabref/issues/128): Sensible default settings for "Enable save actions" and "Cleanup"
-- Fixed [#2201](https://github.com/JabRef/jabref/issues/#2201) and [#1825](https://github.com/JabRef/jabref/issues/#1825): Status of the Group panel is saved and reused for next startup of JabRef
 - Fixed [#2200](https://github.com/JabRef/jabref/issues/#2200): Sorting now uses the same unicode representation that is also used for showing the content in the maintable
+- Fixed [#2201](https://github.com/JabRef/jabref/issues/#2201) and [#1825](https://github.com/JabRef/jabref/issues/#1825): Status of the Group panel is saved and reused for next startup of JabRef
+- Fixed [#2228](https://github.com/JabRef/jabref/issues/2228): Fixed Medline fetcher no longer working. The fetcher now uses `https` for fetching
 
 ### Removed
 - Removed 2nd preview style
@@ -130,85 +229,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Automatic migration for the `evastar_pdf` field is removed.
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
 - Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ## [3.6] - 2016-08-26
@@ -692,7 +712,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v3.6...HEAD
+[Unreleased]: https://github.com/JabRef/jabref/compare/v3.7...HEAD
+[3.7]: https://github.com/JabRef/jabref/compare/v3.6...v3.7
 [3.6]: https://github.com/JabRef/jabref/compare/v3.5...v3.6
 [3.5]: https://github.com/JabRef/jabref/compare/v3.4...v3.5
 [3.4]: https://github.com/JabRef/jabref/compare/v3.3...v3.4
