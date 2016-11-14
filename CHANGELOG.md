@@ -122,12 +122,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improved search:
   - Search queries consisting of a normal query and a field-based query are now supported (for example, `JabRef AND author == you`)
   - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
-  - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
+  - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>f</kbd>, if the searchfield is empty it will be focused instead)
   - The search result Window will now show which entry belongs to which bib file
   - The search result Window will now remember its location
   - The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
-  - The user can jump from the searchbar to the maintable  with `ctrl+enter`
-  - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
+  - The user can jump from the searchbar to the maintable  with <kbd>ctrl</kbd>+<kbd>enter</kbd>
+  - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with <kbd>ctrl</kbd>+<kbd>w</kbd>
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
