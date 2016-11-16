@@ -207,9 +207,19 @@ public class URLDownload {
         }
     }
 
+    /**
+     * Downloads the web resource to a temporary file.
+     *
+     * @return the path to the downloaded file.
+     */
     public Path downloadToTemporaryFile() throws IOException {
+        // Determine file name and extension from source url
         String sourcePath = source.getPath();
+
+        // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+
+        // View the last '.' as separator between the name and the extension
         int dotPosition = fileNameWithExtension.lastIndexOf('.');
         String fileName;
         String extension;
@@ -221,6 +231,7 @@ public class URLDownload {
             extension = ".tmp";
         }
 
+        // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
         downloadToFile(file);
         return file;
