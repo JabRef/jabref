@@ -20,7 +20,7 @@ import net.sf.jabref.logic.importer.MrDLibFetcher;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Tihs Component is displaying the recommendations received from Mr. DLib.
+ * This Component is displaying the recommendations received from Mr. DLib.
  *
  */
 public class EntryEditorTabRelatedArticles extends JEditorPane {
@@ -29,7 +29,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     private final BibEntry selectedEntry;
 
     //The Fetcher delivers the recommendatinos
-    private MrDLibFetcher mdlFetcher;
+    private MrDLibFetcherWorker mdlFetcher;
 
     private static final String RECOMMENDATION_SEPERATOR = "<br>";
 
@@ -83,7 +83,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
         htmlContent.append("Loading Recommendations for ");
         htmlContent.append(formatTitleFromBibEntry(selectedEntry));
-        //htmlContent.append("<img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
+        htmlContent.append("<img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
         htmlContent.append("</font></body></html>");
         this.setText(htmlContent.toString());
     }
@@ -123,7 +123,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      */
     private void requestRecommendations(BibEntry selectedEntry) {
         try {
-            mdlFetcher = new MrDLibFetcher(selectedEntry);
+            mdlFetcher = new MrDLibFetcherWorker(selectedEntry);
             mdlFetcher.execute();
             mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -131,7 +131,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
 
-                        setHtmlText(mdlFetcher.getRecommendationsAsHTML());
+                        setHtmlText(mdlFetcher.getRecommendationsAsHtml());
 
                     }
 
@@ -142,6 +142,35 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         } catch (Exception e) {
             //some logging?
         }
+    }
+
+    public BibEntry getSelectedEntry() {
+        return selectedEntry;
+    }
+
+
+    public class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
+
+
+        private final MrDLibFetcher fetcher;
+        private List<String> recommendationsAsHtml;
+
+
+        public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
+            fetcher = new MrDLibFetcher(selectedEntry);
+        }
+
+        @Override
+        protected List<BibEntry> doInBackground() throws Exception {
+            fetcher.performSearch("");
+            recommendationsAsHtml = fetcher.getRecommendationsAsHTML();
+            return fetcher.getRecommendationsAsBibEntryList();
+        }
+
+        public List<String> getRecommendationsAsHtml() {
+            return recommendationsAsHtml;
+        }
+
     }
 
 

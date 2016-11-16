@@ -374,7 +374,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addRelatedArticlesTab(String title) {
         // Still not updated the localization file
         relatedArticlePanel.setName(Localization.lang("Related articles"));
-        relatedArticlePanel.add(new EntryEditorTabRelatedArticles(entry));
+        EntryEditorTabRelatedArticles relatedArticlesTab = new EntryEditorTabRelatedArticles(entry);
+        relatedArticlePanel.add(relatedArticlesTab);
         tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"), relatedArticlePanel,
                 Localization.lang("Show/edit Related articles"));
         tabs.add(relatedArticlePanel);
@@ -1053,6 +1054,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class TabListener implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent event) {
+            System.out.println("event: " + ((JTabbedPane) event.getSource()).getTitleAt(6));
             // We tell the editor tab to update all its fields.
             //  This makes sure they are updated even if the tab we
             // just left contained one

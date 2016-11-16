@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
-import javax.swing.SwingWorker;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -39,7 +38,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  *
  */
-public class MrDLibFetcher extends SwingWorker<List<BibEntry>, Void> implements SearchBasedFetcher {
+public class MrDLibFetcher implements SearchBasedFetcher {
 
     private static final String NAME = "Mr. DLib Fetcher";
     private List<BibEntry> bibEntryList;
@@ -51,14 +50,6 @@ public class MrDLibFetcher extends SwingWorker<List<BibEntry>, Void> implements 
         this.selectedEntry = selectedEntry;
     }
 
-    /**
-     * This represents the background thread
-     */
-    @Override
-    protected List<BibEntry> doInBackground() throws Exception {
-        return performSearch(formatTitleFromBibEntry(selectedEntry));
-    }
-
     @Override
     public String getName() {
         return NAME;
@@ -66,7 +57,7 @@ public class MrDLibFetcher extends SwingWorker<List<BibEntry>, Void> implements 
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        String response = makeServerRequest(query);
+        String response = makeServerRequest(formatTitleFromBibEntry(selectedEntry));
         bibEntryList = convertToBibEntry(response);
         htmlSnippets = convertToHtml(response);
         return bibEntryList;
