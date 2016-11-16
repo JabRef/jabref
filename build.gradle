@@ -144,7 +144,10 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
 
-    compile getV8Dependency()
+    // if available, use platform specific build of V8
+    if (getV8Dependency() != null) {
+        compile getV8Dependency()
+    }
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.2.9'
