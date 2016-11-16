@@ -1,6 +1,7 @@
 package net.sf.jabref.cli;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
@@ -537,11 +539,24 @@ public class ArgumentProcessor {
     private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
 
+        String address = data[0];
         Path file;
-        if (OS.WINDOWS) {
-            file = Paths.get(data[0]);
+        if (address.startsWith("http://") || address.startsWith("https://")) {
+            // Download web resource to temporary file
+            try {
+                file = new URLDownload(address).downloadToTemporaryFile();
+            } catch (IOException e) {
+                System.err.println(
+                        Localization.lang("Problem downloading from %1", address) +
+                        e.getLocalizedMessage());
+                return Optional.empty();
+            }
         } else {
-            file = Paths.get(data[0].replace("~", System.getProperty("user.home")));
+            if (OS.WINDOWS) {
+                file = Paths.get(address);
+            } else {
+                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+            }
         }
 
         String importFormat;

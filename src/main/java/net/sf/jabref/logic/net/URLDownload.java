@@ -23,6 +23,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -186,15 +188,42 @@ public class URLDownload {
         }
     }
 
+    /**
+     * @deprecated use {@link #downloadToFile(Path)}
+     */
+    @Deprecated
     public void downloadToFile(File destination) throws IOException {
+        downloadToFile(destination.toPath());
+    }
+
+    public void downloadToFile(Path destination) throws IOException {
 
         try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
-             OutputStream output = new BufferedOutputStream(new FileOutputStream(destination))) {
+                OutputStream output = new BufferedOutputStream(new FileOutputStream(destination.toFile()))) {
             copy(input, output);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
             throw e;
         }
+    }
+
+    public Path downloadToTemporaryFile() throws IOException {
+        String sourcePath = source.getPath();
+        String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+        int dotPosition = fileNameWithExtension.lastIndexOf('.');
+        String fileName;
+        String extension;
+        if (dotPosition >= 0) {
+            fileName = fileNameWithExtension.substring(0, dotPosition);
+            extension = fileNameWithExtension.substring(dotPosition);
+        } else {
+            fileName = fileNameWithExtension;
+            extension = ".tmp";
+        }
+
+        Path file = Files.createTempFile(fileName, extension);
+        downloadToFile(file);
+        return file;
     }
 
     private void copy(InputStream in, OutputStream out) throws IOException {

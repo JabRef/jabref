@@ -50,4 +50,20 @@ public class URLDownloadTest {
         Assert.assertTrue(dl.determineMimeType().startsWith("text/html"));
     }
 
+    @Test
+    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
+        URLDownload google = new URLDownload(new URL("http://www.google.com"));
+
+        String path = google.downloadToTemporaryFile().toString();
+        Assert.assertTrue(path, path.endsWith(".tmp"));
+    }
+
+    @Test
+    public void downloadToTemporaryFileKeepsName() throws IOException {
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
+
+        String path = google.downloadToTemporaryFile().toString();
+        Assert.assertTrue(path, path.contains("LICENSE") && path.endsWith(".md"));
+    }
+
 }
