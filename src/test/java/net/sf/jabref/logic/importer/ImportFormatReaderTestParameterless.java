@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.importer;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -24,21 +22,21 @@ public class ImportFormatReaderTestParameterless {
                 JabRefPreferences.getInstance().getXMPPreferences());
     }
 
-    @Test
-    public void testImportUnknownFormatNotWorking() throws URISyntaxException {
+    @Test(expected = ImportException.class)
+    public void importUnknownFormatThrowsExceptionIfNoMatchingImporterWasFound() throws Exception {
         Path file = Paths.get(ImportFormatReaderTestParameterless.class.getResource("fileformat/emptyFile.xml").toURI());
-        ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
-        assertNull(unknownFormat);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNullImportUnknownFormat() {
-        reader.importUnknownFormat((Path)null);
+        reader.importUnknownFormat(file);
         fail();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testImportFromFileUnknownFormat() throws IOException {
+    @Test(expected = NullPointerException.class)
+    public void testNullImportUnknownFormat() throws Exception {
+        reader.importUnknownFormat(null);
+        fail();
+    }
+
+    @Test(expected = ImportException.class)
+    public void importFromFileWithUnknownFormatThrowsException() throws Exception {
         reader.importFromFile("someunknownformat", Paths.get("somepath"));
         fail();
     }

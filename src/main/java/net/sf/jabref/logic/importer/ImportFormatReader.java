@@ -2,7 +2,6 @@ package net.sf.jabref.logic.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,16 +27,13 @@ import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
 import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ImportFormatReader {
-    private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
@@ -74,9 +70,7 @@ public class ImportFormatReader {
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
 
-        /**
-         * Get custom import formats
-         */
+        // Get custom import formats
         for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
             formats.add(importer);
         }
@@ -100,15 +94,18 @@ public class ImportFormatReader {
         return Optional.empty();
     }
 
-    public ParserResult importFromFile(String format, Path file)
-            throws IOException {
+    public ParserResult importFromFile(String format, Path file) throws ImportException {
         Optional<Importer> importer = getByCliId(format);
 
         if (!importer.isPresent()) {
-            throw new IllegalArgumentException("Unknown import format: " + format);
+            throw new ImportException(Localization.lang("Unknown import format") + ": " + format);
         }
 
-        return importer.get().importDatabase(file, importFormatPreferences.getEncoding());
+        try {
+            return importer.get().importDatabase(file, importFormatPreferences.getEncoding());
+        } catch (IOException e) {
+            throw new ImportException(e);
+        }
     }
 
     /**
@@ -161,19 +158,15 @@ public class ImportFormatReader {
         }
     }
 
-    public UnknownFormatImport importUnknownFormat(String filename) {
-        return importUnknownFormat(Paths.get(filename));
-    }
-
     /**
      * Tries to import a file by iterating through the available import filters,
      * and keeping the import that seems most promising.
      * <p/>
      * If all fails this method attempts to read this file as bibtex.
      *
-     * @throws IOException
+     * @throws ImportException if the import fails (for example, if no suitable importer is found)
      */
-    public UnknownFormatImport importUnknownFormat(Path filePath) {
+    public UnknownFormatImport importUnknownFormat(Path filePath) throws ImportException {
         Objects.requireNonNull(filePath);
 
         // First, see if it is a BibTeX file:
@@ -221,6 +214,6 @@ public class ImportFormatReader {
             return new UnknownFormatImport(bestFormatName, parserResult);
         }
 
-        return null;
+        throw new ImportException(Localization.lang("Could not find a suitable import format."));
     }
 }
