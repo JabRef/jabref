@@ -211,6 +211,7 @@ public class ImportFormatReader {
         if (bestResult != null) {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
+            parserResult.setFile(filePath.toFile());
             return new UnknownFormatImport(bestFormatName, parserResult);
         }
 
