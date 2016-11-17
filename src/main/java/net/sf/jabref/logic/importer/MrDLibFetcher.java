@@ -68,7 +68,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
     }
 
     private String formatTitleFromBibEntry(BibEntry selectedEntry) {
-        return selectedEntry.getField("title").toString().replaceAll("\\{|\\[|\\]|\\}|(Optional)", "");
+        return selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
     }
 
     /**

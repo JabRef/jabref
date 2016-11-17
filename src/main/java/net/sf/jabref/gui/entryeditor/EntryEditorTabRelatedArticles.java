@@ -59,8 +59,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                 htmlContent.append(RECOMMENDATION_SEPERATOR);
             }
         }
-        // loading animation
-        //        htmlContent.append("<img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
         htmlContent.append("</font></body></html>");
         this.setText(htmlContent.toString());
     }
@@ -115,7 +113,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * @return
      */
     private String formatTitleFromBibEntry(BibEntry selectedEntry) {
-        return selectedEntry.getField("title").toString().replaceAll("\\{|\\[|\\]|\\}|(Optional)", "");
+        return selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
     }
 
     /**
