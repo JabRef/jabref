@@ -35,8 +35,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
-version = "3.7dev"
-project.ext.threeDotVersion = "3.6.0.1"
+version = "3.8-dev"
+project.ext.threeDotVersion = "3.7.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -95,46 +95,38 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
 
-    // VersionEye states that 6.0.4 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.39'
+    // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
+    compile 'mysql:mysql-connector-java:5.1.40'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.6'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:19.0'
+    compile 'com.google.guava:guava:20.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.apache.commons:commons-lang3:3.5'
 
-    compile 'org.jsoup:jsoup:1.9.2'
+    compile 'org.jsoup:jsoup:1.10.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.18'
+    compile 'info.debatty:java-string-similarity:0.19'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.7'
     compile 'org.apache.logging.log4j:log4j-api:2.7'
     compile 'org.apache.logging.log4j:log4j-core:2.7'
-    compile 'org.xmlunit:xmlunit-core:2.2.1'
-    compile 'org.xmlunit:xmlunit-matchers:2.2.1'
+    compile 'org.xmlunit:xmlunit-core:2.3.0'
+    compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
-    compile 'de.undercouch:citeproc-java:0.6'
-	
-    // in Java 8 Rhino was replaced by Nashorn, but 'de.undercouch:citeproc-java:0.6' depends on Rhino
-    compile 'org.mozilla:rhino:1.7.7.1'
-	
-	// communication with Mr. DLib
-	compile 'org.glassfish.jersey.core:jersey-client:2.23.2'
     compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
 
-
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.12'
+    testCompile 'org.mockito:mockito-core:2.2.9'
+    testCompile 'com.github.tomakehurst:wiremock:2.2.2'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
