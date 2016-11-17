@@ -108,7 +108,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             init(query);
             return true;
         } catch (ParseCancellationException e) {
-            LOGGER.warn("Search query invalid", e);
+            LOGGER.debug("Search query invalid", e);
             return false;
         }
     }

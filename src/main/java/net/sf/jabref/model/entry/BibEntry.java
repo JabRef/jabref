@@ -289,28 +289,17 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field or its alias as an Optional
-     * <p>
-     * The following aliases are considered (old bibtex <-> new biblatex) based
-     * on the BibLatex documentation, chapter 2.2.5:<br>
-     * address      <-> location <br>
-     * annote           <-> annotation <br>
-     * archiveprefix    <-> eprinttype <br>
-     * journal      <-> journaltitle <br>
-     * key              <-> sortkey <br>
-     * pdf          <-> file <br
-     * primaryclass     <-> eprintclass <br>
-     * school           <-> institution <br>
-     * These work bidirectional. <br>
-     * <p>
-     * Special attention is paid to dates: (see the BibLatex documentation,
-     * chapter 2.3.8)
-     * The fields 'year' and 'month' are used if the 'date'
-     * field is empty. Conversely, getFieldOrAlias("year") also tries to
-     * extract the year from the 'date' field (analogously for 'month').
+     * Internal method used to get the content of a field (or its alias)
+     *
+     * Used by {@link #getFieldOrAlias(String)} and {@link #getFieldOrAliasLatexFree(String)}
+     *
+     * @param name name of the field
+     * @param getFieldInterface
+     *
+     * @return determined field value
      */
-    public Optional<String> getFieldOrAlias(String name) {
-        Optional<String> fieldValue = getField(toLowerCase(name));
+    private Optional<String> genericGetFieldOrAlias(String name, GetFieldInterface getFieldInterface) {
+        Optional<String> fieldValue = getFieldInterface.getValueForField(toLowerCase(name));
 
         if (fieldValue.isPresent() && !fieldValue.get().isEmpty()) {
             return fieldValue;
@@ -320,14 +309,14 @@ public class BibEntry implements Cloneable {
         String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
         if (aliasForField != null) {
-            return getField(aliasForField);
+            return getFieldInterface.getValueForField(aliasForField);
         }
 
         // Finally, handle dates
         if (FieldName.DATE.equals(name)) {
-            Optional<String> year = getField(FieldName.YEAR);
+            Optional<String> year = getFieldInterface.getValueForField(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getField(FieldName.MONTH).orElse(""));
+                MonthUtil.Month month = MonthUtil.getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -336,7 +325,7 @@ public class BibEntry implements Cloneable {
             }
         }
         if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
-            Optional<String> date = getField(FieldName.DATE);
+            Optional<String> date = getFieldInterface.getValueForField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
             }
@@ -392,6 +381,47 @@ public class BibEntry implements Cloneable {
             }
         }
         return Optional.empty();
+    }
+
+    private interface GetFieldInterface {
+        Optional<String> getValueForField(String fieldName);
+    }
+
+    /**
+     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     *
+     * For details see also {@link #getFieldOrAlias(String)}
+     *
+     * @param name the name of the field
+     * @return  the stored latex-free content of the field (or its alias)
+     */
+    public Optional<String> getFieldOrAliasLatexFree(String name) {
+        return genericGetFieldOrAlias(name, this::getLatexFreeField);
+    }
+
+    /**
+     * Returns the contents of the given field or its alias as an Optional
+     * <p>
+     * The following aliases are considered (old bibtex <-> new biblatex) based
+     * on the BibLatex documentation, chapter 2.2.5:<br>
+     * address      <-> location <br>
+     * annote           <-> annotation <br>
+     * archiveprefix    <-> eprinttype <br>
+     * journal      <-> journaltitle <br>
+     * key              <-> sortkey <br>
+     * pdf          <-> file <br
+     * primaryclass     <-> eprintclass <br>
+     * school           <-> institution <br>
+     * These work bidirectional. <br>
+     * <p>
+     * Special attention is paid to dates: (see the BibLatex documentation,
+     * chapter 2.3.8)
+     * The fields 'year' and 'month' are used if the 'date'
+     * field is empty. Conversely, getFieldOrAlias("year") also tries to
+     * extract the year from the 'date' field (analogously for 'month').
+     */
+    public Optional<String> getFieldOrAlias(String name) {
+        return genericGetFieldOrAlias(name, this::getField);
     }
 
     /**

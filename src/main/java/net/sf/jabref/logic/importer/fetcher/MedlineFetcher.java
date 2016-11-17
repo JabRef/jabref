@@ -42,8 +42,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
+    private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
+    private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
     private int numberOfResultsFound;
+
 
     /**
      * Replaces all commas in a given string with " AND "
@@ -72,37 +75,36 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             XMLInputFactory inputFactory = XMLInputFactory.newFactory();
             XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());
 
-            fetchLoop:
-            while (streamReader.hasNext()) {
+            fetchLoop: while (streamReader.hasNext()) {
                 int event = streamReader.getEventType();
 
                 switch (event) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        if (streamReader.getName().toString().equals("Count")) {
-                            firstOccurrenceOfCount = true;
-                        }
+                case XMLStreamConstants.START_ELEMENT:
+                    if (streamReader.getName().toString().equals("Count")) {
+                        firstOccurrenceOfCount = true;
+                    }
 
-                        if (streamReader.getName().toString().equals("IdList")) {
-                            fetchIDs = true;
-                        }
-                        break;
+                    if (streamReader.getName().toString().equals("IdList")) {
+                        fetchIDs = true;
+                    }
+                    break;
 
-                    case XMLStreamConstants.CHARACTERS:
-                        if (firstOccurrenceOfCount) {
-                            numberOfResultsFound = Integer.parseInt(streamReader.getText());
-                            firstOccurrenceOfCount = false;
-                        }
+                case XMLStreamConstants.CHARACTERS:
+                    if (firstOccurrenceOfCount) {
+                        numberOfResultsFound = Integer.parseInt(streamReader.getText());
+                        firstOccurrenceOfCount = false;
+                    }
 
-                        if (fetchIDs) {
-                            idList.add(streamReader.getText());
-                        }
-                        break;
+                    if (fetchIDs) {
+                        idList.add(streamReader.getText());
+                    }
+                    break;
 
-                    case XMLStreamConstants.END_ELEMENT:
-                        //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
-                        if (streamReader.getName().toString().equals("IdList")) {
-                            break fetchLoop;
-                        }
+                case XMLStreamConstants.END_ELEMENT:
+                    //Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+                    if (streamReader.getName().toString().equals("IdList")) {
+                        break fetchLoop;
+                    }
                 }
                 streamReader.next();
             }
@@ -111,7 +113,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } catch (IOException | URISyntaxException e) {
             throw new FetcherException("Unable to get PubMed IDs", Localization.lang("Unable to get PubMed IDs"), e);
         } catch (XMLStreamException e) {
-            throw new FetcherException("Error while parsing ID list", Localization.lang("Error while parsing ID list"), e);
+            throw new FetcherException("Error while parsing ID list", Localization.lang("Error while parsing ID list"),
+                    e);
         }
     }
 
@@ -127,7 +130,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi");
+        URIBuilder uriBuilder = new URIBuilder(ID_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("retmode", "xml");
         uriBuilder.addParameter("id", identifier);
@@ -163,7 +166,8 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 return Collections.emptyList();
             }
             if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info(numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
+                LOGGER.info(
+                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
             //pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
@@ -175,7 +179,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     private URL createSearchUrl(String term) throws URISyntaxException, MalformedURLException {
         term = replaceCommaWithAND(term);
-        URIBuilder uriBuilder = new URIBuilder("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi");
+        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
@@ -204,9 +208,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             resultList.forEach(this::doPostCleanup);
             return resultList;
         } catch (URISyntaxException | MalformedURLException e) {
-            throw new FetcherException("Error while generating fetch URL", Localization.lang("Error while generating fetch URL"), e);
+            throw new FetcherException("Error while generating fetch URL",
+                    Localization.lang("Error while generating fetch URL"), e);
         } catch (IOException e) {
-            throw new FetcherException("Error while fetching from Medline", Localization.lang("Error while fetching from %0", "Medline"), e);
+            throw new FetcherException("Error while fetching from Medline",
+                    Localization.lang("Error while fetching from %0", "Medline"), e);
         }
     }
 

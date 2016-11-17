@@ -6,7 +6,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 
-import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -14,6 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+
+import net.sf.jabref.gui.actions.MnemonicAwareAction;
 
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.painter.MattePainter;
@@ -112,17 +113,18 @@ public abstract class SidePaneComponent extends JXTitledPanel {
     public abstract ToggleAction getToggleAction();
 
 
-    public class ToggleAction extends AbstractAction {
+    public class ToggleAction extends MnemonicAwareAction {
 
         public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon){
-            super(text, icon.getSmallIcon());
+            super(icon.getIcon());
+            putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
-            putValue(Action.LARGE_ICON_KEY, icon.getIcon());
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
         public ToggleAction(String text, String description, KeyStroke key, Icon icon){
-            super(text, icon);
+            super(icon);
+            putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
             putValue(Action.SHORT_DESCRIPTION, description);
         }

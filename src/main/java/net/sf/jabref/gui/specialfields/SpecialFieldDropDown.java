@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -12,16 +12,20 @@ import javax.swing.JPopupMenu;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+
 
 public class SpecialFieldDropDown {
 
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
-        JButton button = new JButton(field.getRepresentingIcon());
-        button.setToolTipText(field.getToolTip());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        JButton button = new JButton(viewModel.getRepresentingIcon());
+        button.setToolTipText(viewModel.getLocalization());
         button.setPreferredSize(buttonDim);
         if (!OS.OS_X) {
             button.setMargin(new Insets(1, 0, 2, 0));
@@ -61,10 +65,11 @@ public class SpecialFieldDropDown {
             if (popup == null) {
                 popup = new JPopupMenu();
                 for (SpecialFieldValue val : field.getValues()) {
-                    JMenuItem item = new JMenuItem(val.getIcon());
-                    item.setText(val.getMenuString());
-                    item.setToolTipText(val.getToolTipText());
-                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), val.getActionName()));
+                    SpecialFieldValueViewModel viewModel = new SpecialFieldValueViewModel(val);
+                    JMenuItem item = new JMenuItem(viewModel.getSpecialFieldValueIcon());
+                    item.setText(viewModel.getMenuString());
+                    item.setToolTipText(viewModel.getToolTipText());
+                    item.addActionListener(new PopupitemActionListener(frame.getCurrentBasePanel(), new SpecialFieldValueViewModel(val).getActionName()));
                     item.setMargin(new Insets(0, 0, 0, 0));
                     popup.add(item);
                 }
