@@ -8,7 +8,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class ImportFormatReaderTestParameterless {
