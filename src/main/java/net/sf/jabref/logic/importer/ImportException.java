@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.importer;
 
-public class ImportException extends Exception {
+import net.sf.jabref.JabRefException;
+
+public class ImportException extends JabRefException {
 
 
     public ImportException(String errorMessage, Exception cause) {
