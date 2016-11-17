@@ -154,6 +154,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final JPanel relatedArticlePanel = new JPanel();
 
+    private EntryEditorTabRelatedArticles relatedArticlesTab;
+
     private JTextArea source;
 
     private final JTabbedPane tabbed = new JTabbedPane();
@@ -317,7 +319,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // source tab
         addSourceTab();
         //related articles
-        addRelatedArticlesTab("example title");
+        addRelatedArticlesTab();
     }
 
     private void addGeneralTabs() {
@@ -371,16 +373,31 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Creates the related Article Tab
      */
-    private void addRelatedArticlesTab(String title) {
+    private void addRelatedArticlesTab() {
         // Still not updated the localization file
         relatedArticlePanel.setName(Localization.lang("Related articles"));
-        EntryEditorTabRelatedArticles relatedArticlesTab = new EntryEditorTabRelatedArticles(entry);
-        relatedArticlePanel.add(relatedArticlesTab);
+        relatedArticlePanel.setLayout(new BorderLayout());
+
+        relatedArticlesTab = new EntryEditorTabRelatedArticles(entry);
+
+        JScrollPane relatedArticleScrollPane = new JScrollPane(relatedArticlesTab,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        relatedArticlePanel.add(relatedArticleScrollPane, BorderLayout.CENTER);
+
+
         tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"), relatedArticlePanel,
                 Localization.lang("Show/edit Related articles"));
         tabs.add(relatedArticlePanel);
+        System.out.println("i added the tab.");
         // Still no clue why I need this. TODO check what this is doing
         relatedArticlePanel.setFocusCycleRoot(true);
+
+        //source = new JTextAreaWithHighlighting();
+        //JScrollPane scrollPane = new JScrollPane(source, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        //srcPanel.setLayout(new BorderLayout());
+        //srcPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void addOptionalTab(EntryType type) {
@@ -1054,7 +1071,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private class TabListener implements ChangeListener {
         @Override
         public void stateChanged(ChangeEvent event) {
-            System.out.println("event: " + ((JTabbedPane) event.getSource()).getTitleAt(6));
             // We tell the editor tab to update all its fields.
             //  This makes sure they are updated even if the tab we
             // just left contained one
@@ -1064,6 +1080,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
+                }
+
+                // When the tab "Related articles" gets selected, the request to get the recommendations is started.
+                if (((JTabbedPane) event.getSource()).getTitleAt(tabbed.getSelectedIndex()) == "Related articles") {
+                    System.out.println("now i started the request");
+                    relatedArticlesTab.requestRecommendations();
                 }
             });
         }

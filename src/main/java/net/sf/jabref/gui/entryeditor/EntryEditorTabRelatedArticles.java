@@ -44,7 +44,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         this.setEditable(false);
         registerHyperlinkListener();
         setDefaultContent();
-        requestRecommendations(selectedEntry);
     }
 
     /**
@@ -80,10 +79,10 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         //concrete example
         //File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         URL url = getClass().getResource("loading_animation.gif");
-        htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
+        htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
         htmlContent.append("Loading Recommendations for ");
         htmlContent.append(formatTitleFromBibEntry(selectedEntry));
-        htmlContent.append("<img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
+        htmlContent.append("<br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
         htmlContent.append("</font></body></html>");
         this.setText(htmlContent.toString());
     }
@@ -98,7 +97,9 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        new JabRefDesktop().openBrowser(e.getURL().toString());
+                        if (e.getURL() != null) {
+                            new JabRefDesktop().openBrowser(e.getURL().toString());
+                        }
                     } catch (IOException e1) {
                         // TODO Auto-generated catch block
                         e1.printStackTrace();
@@ -121,16 +122,17 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Starts a Fetcher getting the recommendations form Mr. DLib
      * @param selectedEntry
      */
-    private void requestRecommendations(BibEntry selectedEntry) {
+    public void requestRecommendations() {
+        System.out.println("trying to request recommendations");
         try {
             mdlFetcher = new MrDLibFetcherWorker(selectedEntry);
             mdlFetcher.execute();
+            System.out.println("executed the thread");
             mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-
                         setHtmlText(mdlFetcher.getRecommendationsAsHtml());
 
                     }
@@ -153,22 +155,21 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
 
         private final MrDLibFetcher fetcher;
-        private List<String> recommendationsAsHtml;
-
 
         public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
+            System.out.println("constructing a new fetecherWorker");
             fetcher = new MrDLibFetcher(selectedEntry);
         }
 
         @Override
         protected List<BibEntry> doInBackground() throws Exception {
             fetcher.performSearch("");
-            recommendationsAsHtml = fetcher.getRecommendationsAsHTML();
+            System.out.println("search is done. i am back in the doInBackground. ");
             return fetcher.getRecommendationsAsBibEntryList();
         }
 
         public List<String> getRecommendationsAsHtml() {
-            return recommendationsAsHtml;
+            return fetcher.getRecommendationsAsHTML();
         }
 
     }

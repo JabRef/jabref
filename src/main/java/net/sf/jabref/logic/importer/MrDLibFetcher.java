@@ -47,6 +47,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
 
 
     public MrDLibFetcher(BibEntry selectedEntry) throws Exception {
+        System.out.println("constructing a new Fetcher");
         this.selectedEntry = selectedEntry;
     }
 
@@ -57,8 +58,11 @@ public class MrDLibFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
+        System.out.println("performing search");
         String response = makeServerRequest(formatTitleFromBibEntry(selectedEntry));
+        System.out.println("response: " + response);
         bibEntryList = convertToBibEntry(response);
+        System.out.println("convertToHtml(response): " + convertToHtml(response));
         htmlSnippets = convertToHtml(response);
         return bibEntryList;
     }
@@ -252,6 +256,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      * @return The recommendations as HTML elements, sorted by descending score.
      */
     public List<String> getRecommendationsAsHTML() {
+
         return htmlSnippets;
     }
 
