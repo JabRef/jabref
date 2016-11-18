@@ -23,8 +23,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -759,6 +761,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
+        Globals.stopBackgroundTasks();
+
         JabRefExecutorService.INSTANCE.shutdownEverything();
 
         dispose();
@@ -1687,6 +1691,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (readyForBackup(context)) {
             BackupManager.start(context);
         }
+
+        // Track opening
+        trackOpenNewDatabase(basePanel);
+    }
+
+    private void trackOpenNewDatabase(BasePanel basePanel) {
+
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
+
+        Globals.getTelemetryClient().trackEvent("OpenNewDatabase", properties, measurements);
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {

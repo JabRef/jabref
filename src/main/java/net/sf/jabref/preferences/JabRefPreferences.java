@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -396,6 +397,9 @@ public class JabRefPreferences {
 
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+
+    // User
+    private static final String USER_ID = "userId";
 
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -1556,5 +1560,16 @@ public class JabRefPreferences {
 
     public Character getKeywordDelimiter() {
         return get(KEYWORD_SEPARATOR).charAt(0);
+    }
+
+    public String getOrCreateUserId() {
+        Optional<String> userId = getAsOptional(USER_ID);
+        if (userId.isPresent()) {
+            return userId.get();
+        } else {
+            String newUserId = UUID.randomUUID().toString();
+            put(USER_ID, newUserId);
+            return newUserId;
+        }
     }
 }

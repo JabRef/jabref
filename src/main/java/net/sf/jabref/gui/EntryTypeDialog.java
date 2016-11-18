@@ -48,7 +48,7 @@ import org.jdesktop.swingx.VerticalLayout;
  * Dialog that prompts the user to choose a type for an entry.
  * Returns null if canceled.
  */
-public class EntryTypeDialog extends JDialog implements ActionListener {
+public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
 
@@ -86,7 +86,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(frame, true);
+        super(frame, true, EntryTypeDialog.class);
 
         this.frame = frame;
 

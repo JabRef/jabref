@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsights xmlns="http://schemas.microsoft.com/ApplicationInsights/2013/Settings" schemaVersion="2014-05-30">
+ 
+  <!-- The key from the Azure portal: -->
+  <InstrumentationKey>c2435fd3-cb59-423c-846b-04898b101cc1</InstrumentationKey>
+ 
+  <!-- OS Performance counters should be sucked in by default unless you set "UseBuiltIn" to False -->
+  <!-- <performancecounters> -->
+     <!-- a couple JMX counters as an example of Java specific monitoring
+     <jmx>
+       <add objectName="java.lang:type=ClassLoading"
+         attribute="TotalLoadedClassCount" displayName="Loaded Class Count"/>
+       <add objectName="java.lang:type=Memory"
+         attribute="HeapMemoryUsage.used" displayName="Heap Memory Usage-used" type="composite"/>
+       <add objectName="java.lang:type=Threading"
+         attribute="ThreadCount" displayName="Thread Count" />
+  -->
+      <!-- note the modified syntax for attributes deeper in the hierarchy
+      <add objectName="java.lang:type=GarbageCollector,name=PS MarkSweep"
+        attribute="CollectionCount" displayName="GC MarkSweep Count" />
+      <add objectName="java.lang:type=GarbageCollector,name=PS Scavenge"
+        attribute="CollectionCount" displayName="GC Scavange Count" />
+ 
+    </Jmx>
+    -->
+  <!--</PerformanceCounters>  -->
+   
+  <!-- This turns on diagnostic level logging -->
+  <SDKLogger />
+
+  <Channel>
+    <!--
+      Setting DeveloperMode to true will enable immediate transmission of the telemetry events, which can be helpful during the development process.
+      Make sure to turn this off on production servers due to performance considerations.
+    -->
+    <DeveloperMode>true</DeveloperMode>
+  </Channel>
+  <DisableTelemetry>false</DisableTelemetry>
+
+</ApplicationInsights>

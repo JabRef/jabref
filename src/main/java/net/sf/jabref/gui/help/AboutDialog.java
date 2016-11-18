@@ -22,13 +22,14 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.JabRefDialog;
 import net.sf.jabref.gui.actions.CopyVersionToClipboardAction;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class AboutDialog extends JDialog {
+public class AboutDialog extends JabRefDialog {
 
     public AboutDialog(Frame owner) {
-        super(Objects.requireNonNull(owner), Localization.lang("About JabRef"), true);
+        super(Objects.requireNonNull(owner), Localization.lang("About JabRef"), true, AboutDialog.class);
         setSize(new Dimension(750, 600));
         setLocationRelativeTo(owner);
 
