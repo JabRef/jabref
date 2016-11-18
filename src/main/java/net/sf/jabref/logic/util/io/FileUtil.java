@@ -42,6 +42,7 @@ public class FileUtil {
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -141,7 +142,8 @@ public class FileUtil {
             return false;
         }
         try {
-            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.COPY_ATTRIBUTES) != null;
         } catch (IOException e) {
             LOGGER.error("Copying Files failed.", e);
             return false;
@@ -314,8 +316,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
-            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -390,8 +392,8 @@ public class FileUtil {
      * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            String fileNamePattern, LayoutFormatterPreferences prefs) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
