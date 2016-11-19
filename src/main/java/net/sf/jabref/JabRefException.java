@@ -27,6 +27,10 @@ public class JabRefException extends Exception {
         this.localizedMessage = localizedMessage;
     }
 
+    public JabRefException(Throwable cause) {
+        super(cause);
+    }
+
     @Override
     public String getLocalizedMessage() {
         if (localizedMessage == null) {

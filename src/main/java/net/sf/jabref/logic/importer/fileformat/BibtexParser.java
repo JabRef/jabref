@@ -275,7 +275,7 @@ public class BibtexParser implements Parser {
                         + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
         } catch (IOException ex) {
-            LOGGER.warn("Could not parse entry", ex);
+            LOGGER.debug("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + Localization.lang("Skipped entry."));
 

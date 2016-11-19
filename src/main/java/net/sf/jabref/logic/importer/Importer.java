@@ -78,11 +78,11 @@ public abstract class Importer implements Comparable<Importer> {
         }
     }
 
-    public static BufferedReader getUTF8Reader(Path filePath) throws IOException {
+    protected static BufferedReader getUTF8Reader(Path filePath) throws IOException {
         return getReader(filePath, StandardCharsets.UTF_8);
     }
 
-    public static BufferedReader getUTF16Reader(Path filePath) throws IOException {
+    protected static BufferedReader getUTF16Reader(Path filePath) throws IOException {
         return getReader(filePath, StandardCharsets.UTF_16);
     }
 

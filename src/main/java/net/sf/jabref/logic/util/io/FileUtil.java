@@ -53,17 +53,29 @@ public class FileUtil {
     }
 
     /**
-     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
      * @param fileName
-     * @return The extension, trimmed and in lowercase.
+     * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int pos = fileName.lastIndexOf('.');
-        if ((pos > 0) && (pos < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
         } else {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getFileName(String fileNameWithExtension) {
+        int dotPosition = fileNameWithExtension.lastIndexOf('.');
+        if (dotPosition >= 0) {
+            return fileNameWithExtension.substring(0, dotPosition);
+        } else {
+            return fileNameWithExtension;
         }
     }
 
