@@ -141,9 +141,10 @@ public class LocalizationParser {
         return result;
     }
 
+    /**
+     * Loads the fxml file and returns all used language resources.
+     */
     private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundle type) {
-        // Load the fxml file and register all used language resources
-
         List<String> result = new LinkedList<>();
 
         // Record which keys are requested; we pretend that we have all keys
@@ -169,7 +170,6 @@ public class LocalizationParser {
         try {
             PlatformImpl.startup(() -> {});
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
-            //loader.setBuilderFactory();
             loader.load();
         } catch (IOException ignore) {
             ignore.printStackTrace();
