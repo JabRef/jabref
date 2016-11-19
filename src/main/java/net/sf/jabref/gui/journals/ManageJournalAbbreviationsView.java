@@ -19,7 +19,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 
-import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.gui.FXDialog;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
@@ -36,7 +36,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     }
 
     public void showAndWait() {
-        FXAlert journalAbbreviationsDialog = new FXAlert(AlertType.INFORMATION,
+        FXDialog journalAbbreviationsDialog = new FXDialog(AlertType.INFORMATION,
                 Localization.lang("Journal abbreviations"));
         journalAbbreviationsDialog.setResizable(true);
         journalAbbreviationsDialog.setDialogPane((DialogPane) this.getView());

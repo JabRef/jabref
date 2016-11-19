@@ -22,6 +22,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
 import org.apache.commons.logging.Log;
@@ -271,6 +272,22 @@ public class IconTheme {
     public static ImageIcon getImage(String name) {
         return new ImageIcon(getIconUrl(name));
     }
+
+    public static Image getJabRefImageFX() {
+        return getImageFX("jabrefIcon48");
+    }
+
+    /**
+     * Constructs an {@link Image} for the image representing the given function, in the resource
+     * file listing images.
+     *
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The {@link Image} for the function.
+     */
+    public static Image getImageFX(String name) {
+        return new Image(getIconUrl(name).toString());
+    }
+
 
     /**
      * Looks up the URL for the image representing the given function, in the resource
