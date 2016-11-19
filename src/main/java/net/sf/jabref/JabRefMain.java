@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.gui.util.FallbackExceptionHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
@@ -40,6 +41,8 @@ public class JabRefMain {
     }
 
     private static void start(String[] args) {
+        FallbackExceptionHandler.installExceptionHandler();
+
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
         ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
