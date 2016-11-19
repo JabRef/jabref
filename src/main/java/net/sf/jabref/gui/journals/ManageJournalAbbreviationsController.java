@@ -23,7 +23,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.gui.FXDialogs;
+import net.sf.jabref.gui.DialogService;
+import net.sf.jabref.gui.FXDialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.ValueTableCellFactory;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
@@ -223,7 +224,8 @@ public class ManageJournalAbbreviationsController{
     }
 
     private void showErrorDialog(JabRefException e) {
-        FXDialogs.showErrorDialogAndWait(Localization.lang("An error occurred"), Localization.lang(e.getMessage()));
+        DialogService dialogService = new FXDialogService();
+        dialogService.showErrorDialogAndWait(Localization.lang("An error occurred"), Localization.lang(e.getMessage()));
     }
 
     @FXML

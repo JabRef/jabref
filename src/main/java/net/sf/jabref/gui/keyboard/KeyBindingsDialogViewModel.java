@@ -30,7 +30,8 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
-import net.sf.jabref.gui.FXDialogs;
+import net.sf.jabref.gui.DialogService;
+import net.sf.jabref.gui.FXDialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
 import net.sf.jabref.logic.l10n.Localization;
@@ -132,7 +133,8 @@ public class KeyBindingsDialogViewModel {
         String title = Localization.lang("Key bindings changed");
         String content = Localization.lang("Your new key bindings have been stored.") + '\n'
                 + Localization.lang("You must restart JabRef for the new key bindings to work properly.");
-        FXDialogs.showInformationDialogAndWait(title, content);
+        DialogService dialogService = new FXDialogService();
+        dialogService.showInformationDialogAndWait(title, content);
         closeDialog();
     }
 
@@ -141,7 +143,8 @@ public class KeyBindingsDialogViewModel {
         String title = Localization.lang("Resetting all key bindings");
         String content = Localization.lang("All key bindings will be reset to their defaults.");
         ButtonType resetButtonType = new ButtonType("Reset", ButtonData.OK_DONE);
-        FXDialogs.showCustomButtonDialogAndWait(AlertType.INFORMATION, title, content, resetButtonType,
+        DialogService dialogService = new FXDialogService();
+        dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
                     if (response == resetButtonType) {
                         resetKeyBindingsToDefault();
