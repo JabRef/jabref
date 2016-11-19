@@ -11,7 +11,8 @@ import javafx.beans.property.ListProperty;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.FXDialogs;
+import net.sf.jabref.gui.DialogService;
+import net.sf.jabref.gui.FXDialogService;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.LogMessages;
@@ -63,7 +64,8 @@ public class ErrorConsoleViewModel {
             String issueBody = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", Globals.BUILD_INFO.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             JabRefGUI.getMainFrame().output(Localization.lang("Issue on GitHub successfully reported."));
-            FXDialogs.showInformationDialogAndWait(Localization.lang("Issue report successful"),
+            DialogService dialogService = new FXDialogService();
+            dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
                     Localization.lang("Your issue was reported in your browser.") + "\n\n" +
                             Localization.lang("The log and exception information was copied to your clipboard.") + "\n\n" +
                             Localization.lang("Please paste this information (with Ctrl+V) in the issue description."));
