@@ -401,6 +401,9 @@ public class JabRefPreferences {
     // User
     private static final String USER_ID = "userId";
 
+    // Telemetry collection
+    private static final String COLLECT_TELEMETRY = "collectTelemetry";
+
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
     public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
@@ -771,6 +774,7 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_HOSTNAME, "localhost");
         defaults.put(DB_CONNECT_DATABASE, "jabref");
         defaults.put(DB_CONNECT_USERNAME, "root");
+        defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertDefaultCleanupPreset(defaults);
@@ -1571,5 +1575,13 @@ public class JabRefPreferences {
             put(USER_ID, newUserId);
             return newUserId;
         }
+    }
+
+    public Boolean shouldCollectTelemetry() {
+        return getBoolean(COLLECT_TELEMETRY);
+    }
+
+    public void setShouldCollectTelemetry(boolean value) {
+        putBoolean(COLLECT_TELEMETRY, value);
     }
 }

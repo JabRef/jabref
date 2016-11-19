@@ -10,14 +10,12 @@
         <ApplicationInsightsAppender name="applicationInsightsAppender" />
     </Appenders>
     <Loggers>
-        <Logger name="net.sf.jabref" level="INFO">
+        <Logger name="net.sf.jabref" level="INFO" additivity="true">
             <AppenderRef ref="GuiLogger"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
-        </Root>
-        <Root level="ERROR">
-            <AppenderRef ref="applicationInsightsAppender"/>
+            <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
         </Root>
     </Loggers>
 </Configuration>

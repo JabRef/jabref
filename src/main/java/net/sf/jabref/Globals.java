@@ -15,6 +15,7 @@ import net.sf.jabref.logic.util.BuildInfo;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.SessionState;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -81,7 +82,9 @@ public class Globals {
     }
 
     private static void startTelemetryClient() {
-        telemetryClient = new TelemetryClient();
+        TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
+        telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
+        telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.getVersion().toString());
         telemetryClient.getContext().getProperties().put("Java version", SystemUtils.JAVA_RUNTIME_VERSION);
         telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
