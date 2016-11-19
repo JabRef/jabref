@@ -25,13 +25,13 @@ import javafx.scene.control.DialogPane;
  * This class provides static methods to create default
  * JavaFX dialogs which will also work on top of swing
  * windows. The created dialogs are instances of the
- * {@link FXAlert} class. The available dialogs in this class
+ * {@link FXDialog} class. The available dialogs in this class
  * are useful for displaying small information graphic dialogs
  * rather than complex windows. For more complex dialogs it is
- * advised to rather create a new sub class of {@link FXAlert}.
+ * advised to rather create a new sub class of {@link FXDialog}.
  *
  */
-public abstract class FXDialogs {
+public class FXDialogs {
 
     /**
      * This will create and display a new information dialog.
@@ -43,7 +43,7 @@ public abstract class FXDialogs {
      * @param content as String
      */
     public static void showInformationDialogAndWait(String title, String content) {
-        FXAlert alert = createDialog(AlertType.INFORMATION, title, content);
+        FXDialog alert = createDialog(AlertType.INFORMATION, title, content);
         alert.showAndWait();
     }
 
@@ -57,7 +57,7 @@ public abstract class FXDialogs {
      * @param content as String
      */
     public static void showWarningDialogAndWait(String title, String content) {
-        FXAlert alert = createDialog(AlertType.WARNING, title, content);
+        FXDialog alert = createDialog(AlertType.WARNING, title, content);
         alert.showAndWait();
     }
 
@@ -71,7 +71,7 @@ public abstract class FXDialogs {
      * @param content as String
      */
     public static void showErrorDialogAndWait(String title, String content) {
-        FXAlert alert = createDialog(AlertType.ERROR, title, content);
+        FXDialog alert = createDialog(AlertType.ERROR, title, content);
         alert.showAndWait();
     }
 
@@ -86,7 +86,7 @@ public abstract class FXDialogs {
      * @return Optional with the pressed Button as ButtonType
      */
     public static Optional<ButtonType> showConfirmationDialogAndWait(String title, String content) {
-        FXAlert alert = createDialog(AlertType.CONFIRMATION, title, content);
+        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         return alert.showAndWait();
     }
 
@@ -103,7 +103,7 @@ public abstract class FXDialogs {
      */
     public static Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
             ButtonType... buttonTypes) {
-        FXAlert alert = createDialog(type, title, content);
+        FXDialog alert = createDialog(type, title, content);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
     }
@@ -119,14 +119,14 @@ public abstract class FXDialogs {
      */
     public static Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
             ButtonType... buttonTypes) {
-        FXAlert alert = new FXAlert(AlertType.NONE, title);
+        FXDialog alert = new FXDialog(AlertType.NONE, title);
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
     }
 
-    private static FXAlert createDialog(AlertType type, String title, String content) {
-        FXAlert alert = new FXAlert(type, title, true);
+    private static FXDialog createDialog(AlertType type, String title, String content) {
+        FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert;

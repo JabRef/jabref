@@ -4,7 +4,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 
-import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.gui.FXDialog;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
@@ -17,7 +17,7 @@ public class KeyBindingsDialogView extends FXMLView {
     }
 
     public void show(KeyBindingPreferences keyBindingPreferences) {
-        FXAlert keyBindingsDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("Key bindings"));
+        FXDialog keyBindingsDialog = new FXDialog(AlertType.INFORMATION, Localization.lang("Key bindings"));
         keyBindingsDialog.setDialogPane((DialogPane) this.getView());
         KeyBindingsDialogViewModel controller = (KeyBindingsDialogViewModel) fxmlLoader.getController();
         controller.setKeyBindingPreferences(keyBindingPreferences);

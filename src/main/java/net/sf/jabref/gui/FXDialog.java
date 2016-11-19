@@ -1,18 +1,3 @@
-/*  Copyright (C) 2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Window;
@@ -22,6 +7,8 @@ import java.awt.event.WindowEvent;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -32,23 +19,25 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 
 /**
- * This class shall provide a super class for future dialogs implemented in java fx.
- * It mimics the behavior of a swing JDialog which means once a object of this class
- * is shown all swing windows will be blocked and stay in the background. Since this
- * class extends from a java fx Alert it behaves as a normal dialog towards all
- * windows in the java fx thread.
- * <p>To create a custom java fx dialog one should extend this class and set a dialog
- * pane through the inherited {@link setDialogPane(DialogPane)} method in the constructor.
- * The layout of the pane should be define in an external fxml file and loaded it via the
- * {@link FXMLLoader}.
+ * This class provides a super class for all dialogs implemented in JavaFX.
+ * It mimics the behavior of a Swing JDialog which means once a object of this class
+ * is shown all Swing windows will be blocked and stay in the background. Since this
+ * class extends from a JavaFX {@link Alert} it behaves as a normal dialog towards all
+ * windows in the JavaFX thread.
+ * <p>
+ * To create a custom JavaFX dialog one should create an instance of this class and set a dialog
+ * pane through the inherited {@link Dialog#setDialogPane(DialogPane)} method.
+ * The dialog can be shown via {@link Dialog#show()} or {@link Dialog#showAndWait()}.
  *
+ * The layout of the pane should be defined in an external fxml file and loaded it via the
+ * {@link FXMLLoader}.
  */
-public class FXAlert extends Alert {
+public class FXDialog extends Alert {
 
     /**
-     * The WindowAdapter will be added to all swing windows once an instance
+     * The WindowAdapter will be added to all Swing windows once an instance
      * of this class is shown and redirects the focus towards this instance.
-     * It will be removed once the instance of this class gets hidden.
+     * The WindowAdapter will be removed once the instance of this class gets hidden.
      *
      */
     private final WindowAdapter fxOverSwingHelper = new WindowAdapter() {
@@ -72,61 +61,56 @@ public class FXAlert extends Alert {
         }
     };
 
-    public FXAlert(AlertType type, String title, Image image, boolean isModal) {
+    public FXDialog(AlertType type, String title, Image image, boolean isModal) {
         this(type, title, isModal);
         setDialogIcon(image);
     }
 
-    public FXAlert(AlertType type, String title, Image image) {
+    public FXDialog(AlertType type, String title, Image image) {
         this(type, title, true);
         setDialogIcon(image);
     }
 
-    public FXAlert(AlertType type, String title, boolean isModal) {
+    public FXDialog(AlertType type, String title, boolean isModal) {
         this(type, isModal);
         setTitle(title);
     }
 
-    public FXAlert(AlertType type, String title) {
+    public FXDialog(AlertType type, String title) {
         this(type);
         setTitle(title);
     }
 
-    public FXAlert(AlertType type, boolean isModal) {
+    public FXDialog(AlertType type, boolean isModal) {
         super(type);
 
-        Image image = new Image(IconTheme.getIconUrl("jabrefIcon48").toString());
-        setDialogIcon(image);
+        setDialogIcon(IconTheme.getJabRefImageFX());
 
-        Stage fxDialogWindow = getDialogWindow();
-        fxDialogWindow.setOnCloseRequest(evt -> this.close());
+        Stage dialogWindow = getDialogWindow();
+        dialogWindow.setOnCloseRequest(evt -> this.close());
         if (isModal) {
             initModality(Modality.APPLICATION_MODAL);
         } else {
             initModality(Modality.NONE);
         }
-        fxDialogWindow.setOnShown(evt -> {
+        dialogWindow.setOnShown(evt -> {
             setSwingWindowsEnabledAndFocusable(!isModal);
             setLocationRelativeToMainWindow();
         });
-        fxDialogWindow.setOnHiding(evt -> setSwingWindowsEnabledAndFocusable(true));
+        dialogWindow.setOnHiding(evt -> setSwingWindowsEnabledAndFocusable(true));
 
-        fxDialogWindow.setOnCloseRequest(evt -> this.close());
+        dialogWindow.setOnCloseRequest(evt -> this.close());
 
-        fxDialogWindow.getScene().setOnKeyPressed(evt -> {
+        dialogWindow.getScene().setOnKeyPressed(evt -> {
             KeyBindingPreferences keyPreferences = Globals.getKeyPrefs();
             if (keyPreferences.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, evt)) {
-                fxDialogWindow.close();
+                dialogWindow.close();
             }
         });
     }
 
-    public FXAlert(AlertType type) {
+    public FXDialog(AlertType type) {
         this(type, true);
-    }
-
-    public void setDialogStyle(String pathToStyleSheet) {
-        getDialogPane().getScene().getStylesheets().add(pathToStyleSheet);
     }
 
     public void setDialogIcon(Image image) {
