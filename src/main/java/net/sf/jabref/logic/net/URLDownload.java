@@ -1,15 +1,12 @@
 package net.sf.jabref.logic.net;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -25,10 +22,13 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.sf.jabref.logic.util.io.FileUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -198,9 +198,8 @@ public class URLDownload {
 
     public void downloadToFile(Path destination) throws IOException {
 
-        try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
-                OutputStream output = new BufferedOutputStream(new FileOutputStream(destination.toFile()))) {
-            copy(input, output);
+        try (InputStream input = monitorInputStream(new BufferedInputStream(openConnection().getInputStream()))) {
+            Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
             throw e;
@@ -218,36 +217,13 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-
-        // View the last '.' as separator between the name and the extension
-        int dotPosition = fileNameWithExtension.lastIndexOf('.');
-        String fileName;
-        String extension;
-        if (dotPosition >= 0) {
-            fileName = fileNameWithExtension.substring(0, dotPosition);
-            extension = fileNameWithExtension.substring(dotPosition);
-        } else {
-            fileName = fileNameWithExtension;
-            extension = ".tmp";
-        }
+        String fileName = FileUtil.getFileName(fileNameWithExtension);
+        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
         downloadToFile(file);
         return file;
-    }
-
-    private void copy(InputStream in, OutputStream out) throws IOException {
-        try (InputStream monitorInputStream = monitorInputStream(in)) {
-            byte[] buffer = new byte[512];
-            while (true) {
-                int bytesRead = monitorInputStream.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                out.write(buffer, 0, bytesRead);
-            }
-        }
     }
 
     protected InputStream monitorInputStream(InputStream in) {
