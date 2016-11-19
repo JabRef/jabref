@@ -541,7 +541,7 @@ public class ArgumentProcessor {
 
         String address = data[0];
         Path file;
-        if (address.startsWith("http://") || address.startsWith("https://")) {
+        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
             // Download web resource to temporary file
             try {
                 file = new URLDownload(address).downloadToTemporaryFile();
