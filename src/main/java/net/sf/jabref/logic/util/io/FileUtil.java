@@ -3,6 +3,7 @@ package net.sf.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,6 +42,9 @@ public class FileUtil {
 
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
+
+    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
+            "posix");
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
