@@ -57,11 +57,8 @@ public class JabRefGUI {
         this.isBlank = isBlank;
 
         // passed file (we take the first one) should be focused
-        if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
-        } else {
-            focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
-        }
+        focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
+                .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow();
         JabRefGUI.checkForNewVersion(false);

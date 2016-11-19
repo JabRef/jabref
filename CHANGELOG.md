@@ -4,7 +4,7 @@ This project **does not** adhere to [Semantic Versioning](http://semver.org/).
 This file tries to follow the conventions proposed by [keepachangelog.com](http://keepachangelog.com/).
 Here, the categories "Changed" for added and changed functionality,
 "Fixed" for fixed functionality, and
-"Removed" for removed functionality is used.
+"Removed" for removed functionality are used.
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
@@ -21,8 +21,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
 
 ### Changed
+- URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
 
 ### Fixed
+- We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
+- We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
 
 ### Removed
 
@@ -131,12 +134,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improved search:
   - Search queries consisting of a normal query and a field-based query are now supported (for example, `JabRef AND author == you`)
   - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
-  - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
+  - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>F</kbd>, if the searchfield is empty it will be focused instead)
   - The search result Window will now show which entry belongs to which bib file
   - The search result Window will now remember its location
   - The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
-  - The user can jump from the searchbar to the maintable  with `ctrl+enter`
-  - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
+  - The user can jump from the searchbar to the maintable  with <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
+  - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with <kbd>Ctrl</kbd> + <kbd>W</kbd>
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
@@ -153,8 +156,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
 - Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
-- <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
-- <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
+- <kbd>Pos1</kbd> / <kbd>Home</kbd> now select the first/last entry in the main table and the search result frame.
+- <kbd>Up</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Importer for MODS format added
 - [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
@@ -173,7 +176,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [koppor#61](https://github.com/koppor/jabref/issues/61) Display gray background text in "Author" and "Editor" field to assist newcomers
 - Updated Vietnamese translation
 - Added greyed-out suggestion for `year`/`date`/`url` fields
-- [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>CTRL</kbd>+<kbd>F8</kbd>
+- [#1908](https://github.com/JabRef/jabref/issues/1908) Add a shortcut for check integrity <kbd>Ctrl</kbd> + <kbd>F8</kbd>
 - When creatig an entry based on an ISBN, but the ISBN is not available on ebook.de, the error message is now more clear.
 
 ### Fixed
@@ -196,7 +199,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed close action of entry editor not working after parsing error corrected
 - Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
 - Fixed download files failed silently when an invalid directory is selected
-- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
+- Fixed InvalidBackgroundColor flickering with <kbd>Ctrl</kbd> + <kbd>S</kbd> and File > Save database
 - Fixed file menu displays wrong hotkey in the German translation
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
@@ -218,7 +221,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
-- Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl</kbd>-<kbd>S</kbd> doesn't trigger parsing error message
+- Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl</kbd> + <kbd>S</kbd> doesn't trigger parsing error message
 - Fixed [#2200](https://github.com/JabRef/jabref/issues/#2200): Sorting now uses the same unicode representation that is also used for showing the content in the maintable
 - Fixed [#2201](https://github.com/JabRef/jabref/issues/#2201) and [#1825](https://github.com/JabRef/jabref/issues/#1825): Status of the Group panel is saved and reused for next startup of JabRef
 - Fixed [#2228](https://github.com/JabRef/jabref/issues/2228): Fixed Medline fetcher no longer working. The fetcher now uses `https` for fetching

@@ -3,8 +3,8 @@ apply plugin: "eclipse"
 // ensure that source code is generated, otherwise class `BstLexer` cannot be found
 tasks.eclipseClasspath.dependsOn "generateSource"
 
-// workaround until https://issues.gradle.org/browse/GRADLE-2274 is resolved
-eclipseJdt << {
+// workaround until https://github.com/gradle/gradle/issues/898 is resolved
+eclipseJdt.doLast {
     File f = file('.settings/org.eclipse.core.resources.prefs')
     f.write('eclipse.preferences.version=1\n')
     f.append('encoding/<project>=UTF-8')

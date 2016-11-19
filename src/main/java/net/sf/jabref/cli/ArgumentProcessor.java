@@ -29,6 +29,7 @@ import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.importer.ImportException;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -36,6 +37,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
@@ -536,54 +538,65 @@ public class ArgumentProcessor {
 
     private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
-        OutputPrinter printer = new SystemOutputPrinter();
 
+        String address = data[0];
+        Path file;
+        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
+            // Download web resource to temporary file
+            try {
+                file = new URLDownload(address).downloadToTemporaryFile();
+            } catch (IOException e) {
+                System.err.println(
+                        Localization.lang("Problem downloading from %1", address) +
+                        e.getLocalizedMessage());
+                return Optional.empty();
+            }
+        } else {
+            if (OS.WINDOWS) {
+                file = Paths.get(address);
+            } else {
+                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+            }
+        }
+
+        String importFormat;
+        if (data.length > 1) {
+            importFormat = data[1];
+        } else {
+            importFormat = "*";
+        }
+
+        Optional<ParserResult> importResult = importFile(file, importFormat);
+        importResult.ifPresent(result -> {
+            OutputPrinter printer = new SystemOutputPrinter();
+            if(result.hasWarnings()) {
+                printer.showMessage(result.getErrorMessage());
+            }
+        });
+        return importResult;
+    }
+
+    private static Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
-            if ((data.length > 1) && !"*".equals(data[1])) {
-                System.out.println(Localization.lang("Importing") + ": " + data[0]);
-                try {
-                    Path file;
-                    if (OS.WINDOWS) {
-                        file = Paths.get(data[0]);
-                    } else {
-                        file = Paths.get(data[0].replace("~", System.getProperty("user.home")));
-                    }
-                    ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
-
-                    if(result.hasWarnings()) {
-                        printer.showMessage(result.getErrorMessage());
-                    }
-
-                    return Optional.of(result);
-                } catch (IllegalArgumentException ex) {
-                    System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
-                    return Optional.empty();
-                }
+            if (!"*".equals(importFormat)) {
+                System.out.println(Localization.lang("Importing") + ": " + file);
+                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                return Optional.of(result);
             } else {
                 // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + data[0]);
+                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
                 ImportFormatReader.UnknownFormatImport importResult;
-                if (OS.WINDOWS) {
-                    importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(data[0]);
-                } else {
-                    importResult = Globals.IMPORT_FORMAT_READER
-                            .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
-                }
+                importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
 
-                if (importResult == null) {
-                    System.out.println(Localization.lang("Could not find a suitable import format."));
-                } else {
-                    System.out.println(Localization.lang("Format used") + ": " + importResult.format);
-
-                    return Optional.of(importResult.parserResult);
-                }
+                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
+                return Optional.of(importResult.parserResult);
             }
-        } catch (IOException ex) {
+        } catch (ImportException ex) {
             System.err.println(
-                    Localization.lang("Error opening file") + " '" + data[0] + "': " + ex.getLocalizedMessage());
+                    Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     public boolean shouldShutDown() {
