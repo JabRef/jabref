@@ -139,10 +139,12 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
             BasePanel panel = new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
             dispose();
-            try {
-                new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
-            } catch (Throwable e) {
-                LOGGER.error("Error while saving the database", e);
+            if (!fileLocationField.getText().isEmpty()) {
+                try {
+                    new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
+                } catch (Throwable e) {
+                    LOGGER.error("Error while saving the database", e);
+                }
             }
 
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
