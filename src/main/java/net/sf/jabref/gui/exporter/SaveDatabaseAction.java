@@ -334,7 +334,9 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         context.setDatabaseFile(file);
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+        if (file.getParent() != null) {
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+        }
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
