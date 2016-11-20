@@ -29,6 +29,10 @@ public class DBMSConnection {
 
         try {
             DriverManager.setLoginTimeout(3);
+            // ensure that all SQL drivers are loaded - source: http://stackoverflow.com/a/22384826/873282
+            // we use the side effect of getAvailableDBMSTypes() - it loads all available drivers
+            DBMSConnection.getAvailableDBMSTypes();
+
             this.connection = DriverManager.getConnection(
                     properties.getType().getUrl(properties.getHost(), properties.getPort(), properties.getDatabase()),
                     properties.getUser(), properties.getPassword());
