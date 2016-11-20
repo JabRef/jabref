@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,6 +19,8 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FieldContentSelector;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
@@ -54,10 +57,16 @@ public class FieldExtraComponents {
      * @param storeFieldAction
      * @return
      */
-    public static Optional<JComponent> getJournalExtraComponent(BasePanel panel, FieldEditor editor, BibEntry entry,
-            StoreFieldAction storeFieldAction) {
+    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
+            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
+                    ", ");
+            contentSelectors.add(ws);
+            controls.add(ws, BorderLayout.NORTH);
+        }
 
         // Button to toggle abbreviated/full journal names
         JButton button = new JButton(Localization.lang("Toggle abbreviation"));

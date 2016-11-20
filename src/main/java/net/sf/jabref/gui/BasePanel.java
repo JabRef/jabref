@@ -684,6 +684,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
+        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
+            ContentSelectorDialog2 csd = new ContentSelectorDialog2(frame, frame, BasePanel.this, false, null);
+            csd.setLocationRelativeTo(frame);
+            csd.setVisible(true);
+        });
+
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -754,7 +760,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        if (mainTable.getSelectedRow() != mainTable.getRowCount() -1){
+        if (mainTable.getSelectedRow() != (mainTable.getRowCount() -1)){
             selectNextEntry();
         } else {
             selectPreviousEntry();
@@ -2363,6 +2369,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+
+    /**
+     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
+     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
+     * after the user has made changes in the Manage dialog.
+     */
+    public void updateAllContentSelectors() {
+        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
+            EntryEditor ed = stringEntryEditorEntry.getValue();
+            ed.updateAllContentSelectors();
+        }
+    }
 
     /**
      * Set the preview active state for all BasePanel instances.

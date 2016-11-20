@@ -28,13 +28,13 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -142,9 +142,12 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(keywordGroupSearchTerm);
+        builderKG.append(
+                new FieldContentSelector(jabrefFrame, basePanel, this, keywordGroupSearchTerm, null, true, ", "));
         builderKG.nextLine();
         builderKG.append(keywordGroupCaseSensitive, 3);
         builderKG.nextLine();
+
         builderKG.append(keywordGroupRegExp, 3);
         optionsPanel.add(builderKG.getPanel(), String.valueOf(GroupDialog.INDEX_KEYWORD_GROUP));
         // ... for search group

@@ -33,10 +33,7 @@ public class MetaDataParser {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             List<String> value = getAsList(entry.getValue());
 
-            if (entry.getKey().startsWith("selector_")) {
-                // Ignore old content selector metadata
-                continue;
-            }
+
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));

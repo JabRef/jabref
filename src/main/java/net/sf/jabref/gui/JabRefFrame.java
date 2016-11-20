@@ -301,6 +301,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
+    private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
+            Localization.menuTitle("Manage content selectors"));
+
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
@@ -1697,13 +1700,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.SHARED ||
+        return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
     }
 
     private boolean readyForBackup(BibDatabaseContext context) {
-        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
+        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabaseFile().isPresent();
     }
 
     /**

@@ -51,6 +51,7 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
+import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -116,7 +117,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /** A reference to the entry this object works on. */
-    private BibEntry entry;
+    private final BibEntry entry;
     /** The currently displayed type */
     private final String displayedBibEntryType;
 
@@ -158,6 +159,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final JabRefFrame frame;
 
     private final BasePanel panel;
+    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
 
     /**
      * This can be set to false to stop the source text area from getting updated. This is used in cases where the
@@ -484,7 +486,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
-            return FieldExtraComponents.getJournalExtraComponent(panel, editor, entry, getStoreFieldAction());
+
+            // If this field also has a FieldContentSelector, we need to combine these.
+            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
+                    getStoreFieldAction());
+        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
+            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
+                    getStoreFieldAction());
+
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
@@ -900,6 +909,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     }
                 }
 
+                public void updateAllContentSelectors() {
+                    if (!contentSelectors.isEmpty()) {
+                        for (FieldContentSelector contentSelector : contentSelectors) {
+                            contentSelector.rebuildComboBox();
+                        }
+                    }
+                }
                 private void handleTypeChange() {
                     showChangeEntryTypePopupMenu();
                 }

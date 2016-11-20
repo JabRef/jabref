@@ -39,6 +39,8 @@ public class MergeDialog extends JDialog {
     private final JCheckBox strings = new JCheckBox();
     private final GridBagLayout gridBagLayout1 = new GridBagLayout();
     private final JCheckBox groups = new JCheckBox();
+    private final JCheckBox selector = new JCheckBox();
+
 
     private boolean okPressed;
 
@@ -68,6 +70,8 @@ public class MergeDialog extends JDialog {
         strings.setSelected(true);
         strings.setText(Localization.lang("Import strings"));
         groups.setText(Localization.lang("Import group definitions"));
+        selector.setText(Localization.lang("Import word selector definitions"));
+
         this.setModal(true);
         this.setResizable(false);
         getContentPane().add(panel1);
@@ -81,6 +85,8 @@ public class MergeDialog extends JDialog {
                 , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
         jPanel1.add(groups, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
                 , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
+        jPanel1.add(selector, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.WEST,
+                GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 0, 0));
 
         // Key bindings:
         ActionMap am = jPanel1.getActionMap();
@@ -107,5 +113,10 @@ public class MergeDialog extends JDialog {
     public boolean importStrings() {
         return strings.isSelected();
     }
+
+    public boolean importSelectorWords() {
+        return selector.isSelected();
+    }
 }
+
 
