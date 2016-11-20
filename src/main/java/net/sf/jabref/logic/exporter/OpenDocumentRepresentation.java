@@ -199,7 +199,7 @@ class OpenDocumentRepresentation {
     }
 
     private String getField(BibEntry e, String field) {
-        return BibDatabase.getResolvedField(field, e, database).orElse("");
+        return e.getResolvedFieldOrAlias(field, database).orElse("");
     }
 
     private void addTableCell(Document doc, Element parent, String content) {
