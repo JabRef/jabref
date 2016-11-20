@@ -154,9 +154,9 @@ public class DBMSSynchronizer {
             }
         }
 
+        dbmsProcessor.startNotificationListener(this);
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
-        dbmsProcessor.startNotificationListener(this);
     }
 
     /**
