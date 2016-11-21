@@ -28,7 +28,12 @@ public class JabRefExecutorService implements Executor {
         thread.setName("JabRef CachedThreadPool");
         return thread;
     });
-    private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
+
+    private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef LowPriorityCachedThreadPool");
+        return thread;
+    });
 
     private final Timer timer = new Timer("timer", true);
 
@@ -85,56 +90,39 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    public void executeWithLowPriorityInOwnThread(final Runnable runnable, String name) {
-        AutoCleanupRunnable target = new AutoCleanupRunnable(runnable, startedThreads);
-        final Thread thread = new Thread(target);
-        target.thread = thread;
-        thread.setName("JabRef - " + name + " - low prio");
-        startedThreads.add(thread);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
+    public void executeInterruptableTask(final Runnable runnable) {
+        this.lowPriorityExecutorService.execute(runnable);
     }
 
-    public void executeInOwnThread(Thread thread) {
-        // this is a special case method for Threads that cannot be interrupted so easily
-        // this method should normally not be used
-        startedThreads.add(thread);
-        // TODO memory leak when thread is finished
-        thread.start();
-    }
+    public void executeInterruptableTaskAndWait(Runnable runnable) {
+        if(runnable == null) {
+            //TODO logger
+            return;
+        }
 
-    public void executeWithLowPriorityInOwnThreadAndWait(Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setName("JabRef low prio");
-        startedThreads.add(thread);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
-
-        waitForThreadToFinish(thread);
-    }
-
-    private void waitForThreadToFinish(Thread thread) {
+        Future<?> future = lowPriorityExecutorService.submit(runnable);
         while(true) {
             try {
-                thread.join();
-                startedThreads.remove(thread);
+                future.get();
                 return;
             } catch (InterruptedException ignored) {
                 // Ignored
+            } catch (ExecutionException e) {
+                LOGGER.error("Problem executing command", e);
             }
         }
     }
+
 
     public void submit(TimerTask timerTask, long millisecondsDelay) {
         timer.schedule(timerTask, millisecondsDelay);
     }
 
     public void shutdownEverything() {
+        // those threads will be allowed to finish
         this.executorService.shutdown();
-        for(Thread thread : startedThreads) {
-            thread.interrupt();
-        }
-        startedThreads.clear();
+        //those threads will be interrupted in their current task
+        this.lowPriorityExecutorService.shutdownNow();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 

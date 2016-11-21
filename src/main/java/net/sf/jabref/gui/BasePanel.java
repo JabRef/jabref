@@ -2094,7 +2094,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return;
         }
 
-        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+        JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
 
         // Adding the sidepane component is Swing work, so we must do this in the Swing
         // thread:
