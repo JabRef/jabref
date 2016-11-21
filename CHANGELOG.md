@@ -13,11 +13,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
+- Bibliographic information from web resources can now be used to complete existing entries. This functionality can be accessed via a new button in the entry editor.
 
 ### Fixed
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
-- We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
+- We fixed an issue when JabRef restored its session and a shared database was used: The error message "No suitable driver found" will not appear.
 
 ### Removed
 
