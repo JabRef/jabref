@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.gui.util.FallbackExceptionHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

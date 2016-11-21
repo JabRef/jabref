@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.util;
+package net.sf.jabref;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
