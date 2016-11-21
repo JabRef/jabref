@@ -401,7 +401,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (optionalPanel.fileListEditor != null) {
             fileListEditor = optionalPanel.fileListEditor;
         }
-        // name tab
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                 optionalPanel
                 .getPane(), Localization.lang("Show optional fields"));
