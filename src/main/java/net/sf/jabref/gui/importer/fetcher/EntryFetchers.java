@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
@@ -55,6 +56,14 @@ public class EntryFetchers {
         list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
         list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));
         list.add(new MedlineFetcher());
+        list.sort((fetcher1, fetcher2) -> fetcher1.getName().compareTo(fetcher2.getName()));
+        return list;
+    }
+
+    public static ArrayList<EntryBasedFetcher> getEntryBasedFetchers() {
+        ArrayList<EntryBasedFetcher> list = new ArrayList<>();
+        list.add(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences()));
+        list.add(new MathSciNet(Globals.prefs.getImportFormatPreferences()));
         list.sort((fetcher1, fetcher2) -> fetcher1.getName().compareTo(fetcher2.getName()));
         return list;
     }
