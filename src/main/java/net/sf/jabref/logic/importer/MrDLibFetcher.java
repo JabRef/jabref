@@ -122,6 +122,8 @@ public class MrDLibFetcher implements SearchBasedFetcher {
 
                 boolean authors;
                 boolean published_in;
+                boolean title;
+                boolean year;
                 BibEntry currentEntry;
 
 
@@ -137,6 +139,12 @@ public class MrDLibFetcher implements SearchBasedFetcher {
                     }
                     if (qName.equalsIgnoreCase("published_in")) {
                         published_in = true;
+                    }
+                    if (qName.equalsIgnoreCase("title")) {
+                        title = true;
+                    }
+                    if (qName.equalsIgnoreCase("year")) {
+                        year = true;
                     }
 
                 }
@@ -159,6 +167,14 @@ public class MrDLibFetcher implements SearchBasedFetcher {
                     if (published_in) {
                         currentEntry.setField("journal", new String(ch, start, length));
                         published_in = false;
+                    }
+                    if (title) {
+                        currentEntry.setField("title", new String(ch, start, length));
+                        title = false;
+                    }
+                    if (year) {
+                        currentEntry.setField("year", new String(ch, start, length));
+                        year = false;
                     }
 
 
