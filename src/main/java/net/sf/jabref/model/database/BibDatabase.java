@@ -17,12 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
