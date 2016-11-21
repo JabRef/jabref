@@ -14,9 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -25,6 +23,8 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -44,10 +44,10 @@ public class MrDLibFetcher implements SearchBasedFetcher {
     private List<BibEntry> bibEntryList;
     private final BibEntry selectedEntry;
     private List<String> htmlSnippets;
+    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
 
 
     public MrDLibFetcher(BibEntry selectedEntry) throws Exception {
-        System.out.println("constructing a new Fetcher");
         this.selectedEntry = selectedEntry;
     }
 
@@ -58,17 +58,10 @@ public class MrDLibFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        System.out.println("performing search");
-        String response = makeServerRequest(formatTitleFromBibEntry(selectedEntry));
-        System.out.println("response: " + response);
+        String response = makeServerRequest();
         bibEntryList = convertToBibEntry(response);
-        System.out.println("convertToHtml(response): " + convertToHtml(response));
         htmlSnippets = convertToHtml(response);
         return bibEntryList;
-    }
-
-    private String formatTitleFromBibEntry(BibEntry selectedEntry) {
-        return selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
     }
 
     /**
@@ -76,28 +69,17 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      * @param query
      * @return
      */
-    private String makeServerRequest(String query) {
+    private String makeServerRequest() {
         String response = "";
         //Makes a request to the RESTful MDL-API. Example document.
         //Servers-side functionality in implementation.
-
-        //Returns true, accepts all certificates. To change.
-        HostnameVerifier allHostsValid = new HostnameVerifier() {
-
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                // TODO Auto-generated method stub
-                return true;
-            }
-        };
 
         SSLContext sslcontext = null;
 
         try {
             sslcontext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            LOGGER.error(e1.getMessage(), e1);
         }
 
 
@@ -110,16 +92,14 @@ public class MrDLibFetcher implements SearchBasedFetcher {
                         .get("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000000300/related_documents/")
                     .asString().getBody();
         } catch (UnirestException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
         }
 
         //Conversion. Server delivers false format, conversion here, TODO to fix
         response = response.replaceAll("&gt;", ">");
         response = response.replaceAll("&lt;", "<");
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            LOGGER.error(e1.getMessage(), e1);
         }
         return response;
     }
@@ -129,7 +109,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      * @param xmlDocument
      * @return
      */
-    private List<BibEntry> convertToBibEntry(String xmlDocument) {
+    private List<BibEntry> convertToBibEntry(String reccomendations) {
         // Parser stuff goes here todo
         bibEntryList = null;
         return bibEntryList;
@@ -148,12 +128,10 @@ public class MrDLibFetcher implements SearchBasedFetcher {
             SAXParser saxParser = factory.newSAXParser();
             DefaultHandler handler = new DefaultHandler() {
 
-                int position = 1;
 
-                boolean snippet = false;
-                boolean rank = false;
-                boolean start = false;
-                String htmlSnippetSingle = null;
+                boolean snippet;
+                boolean rank;
+                String htmlSnippetSingle;
                 int htmlSnippetSingleRank = -1;
 
 
@@ -204,8 +182,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
                 InputStream stream = new ByteArrayInputStream(xmlDocument.getBytes());
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
             rankedHtmlSnippet.sort(new Comparator<RankedHtmlSnippet>() {
 
@@ -216,12 +193,9 @@ public class MrDLibFetcher implements SearchBasedFetcher {
             });
             htmlSnippets = rankedHtmlSnippet.stream().map(e -> e.snippet).collect(Collectors.toList());
         } catch (ParserConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            LOGGER.error(e.getMessage(), e);        }
         return htmlSnippets;
     }
 

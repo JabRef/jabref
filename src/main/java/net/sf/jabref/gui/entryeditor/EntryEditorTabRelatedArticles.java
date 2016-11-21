@@ -14,10 +14,14 @@ import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.MrDLibFetcher;
 import net.sf.jabref.model.entry.BibEntry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This Component is displaying the recommendations received from Mr. DLib.
@@ -33,6 +37,10 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     private static final String RECOMMENDATION_SEPERATOR = "<br>";
 
+    private static final String NAME = "Related articles2";
+
+    private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
+
 
     /**
      * Takes the selected entry, runs a request to Mr. DLib and returns the recommendations as a JEditorPane
@@ -45,6 +53,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         registerHyperlinkListener();
         setDefaultContent();
     }
+
 
     /**
      * Takes a List of html snippets and sets it in the JEditorPane
@@ -70,16 +79,11 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     private void setDefaultContent() {
         StringBuffer htmlContent = new StringBuffer();
 
-        //todo
         //What is the best way to include that gif?
-        //AuxCommandLineTest.class.getResource("paper.aux");
-        //File f = Paths.get(url.toUri()).toFile();
-        //concrete example
-        //File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
-        URL url = getClass().getResource("loading_animation.gif");
+        URL url = IconTheme.getIconUrl("mdlloading");
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
         htmlContent.append("Loading Recommendations for ");
-        htmlContent.append(formatTitleFromBibEntry(selectedEntry));
+        htmlContent.append(selectedEntry.getField("title").get().replaceAll("\\{|\\}", ""));
         htmlContent.append("<br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
         htmlContent.append("</font></body></html>");
         this.setText(htmlContent.toString());
@@ -99,22 +103,13 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                             new JabRefDesktop().openBrowser(e.getURL().toString());
                         }
                     } catch (IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
+                        LOGGER.error(e1.getMessage(), e1);
                     }
                 }
             }
         });
     }
 
-    /**
-     * Extracts the title of the Bibentry. Isn't there a Method available?
-     * @param selectedEntry
-     * @return
-     */
-    private String formatTitleFromBibEntry(BibEntry selectedEntry) {
-        return selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
-    }
 
     /**
      * Starts a Fetcher getting the recommendations form Mr. DLib
@@ -138,9 +133,9 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                 }
             });
         } catch (FetcherException e) {
-            //some logging?
+            LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
-            //some logging?
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

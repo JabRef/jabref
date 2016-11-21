@@ -118,7 +118,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /** A reference to the entry this object works on. */
-    private BibEntry entry;
+    private final BibEntry entry;
     /** The currently displayed type */
     private final String displayedBibEntryType;
 
@@ -385,18 +385,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         relatedArticlePanel.add(relatedArticleScrollPane, BorderLayout.CENTER);
 
-
-        tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"), relatedArticlePanel,
-                Localization.lang("Show/edit Related articles"));
+        tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
+                relatedArticlePanel,
+                Localization.lang("Related articles"));
         tabs.add(relatedArticlePanel);
         System.out.println("i added the tab.");
         // Still no clue why I need this. TODO check what this is doing
         relatedArticlePanel.setFocusCycleRoot(true);
-
-        //source = new JTextAreaWithHighlighting();
-        //JScrollPane scrollPane = new JScrollPane(source, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        //srcPanel.setLayout(new BorderLayout());
-        //srcPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     private void addOptionalTab(EntryType type) {
@@ -984,7 +979,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
-                if (((JTabbedPane) event.getSource()).getTitleAt(tabbed.getSelectedIndex()) == "Related articles") {
+                // Is it affected when changed to another language?
+                if (((JTabbedPane) event.getSource()).getSelectedComponent().getName().equals("Related articles")) {
                     System.out.println("now i started the request");
                     relatedArticlesTab.requestRecommendations();
                 }
