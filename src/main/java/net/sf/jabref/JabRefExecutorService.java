@@ -26,6 +26,7 @@ public class JabRefExecutorService implements Executor {
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
@@ -90,6 +91,7 @@ public class JabRefExecutorService implements Executor {
         final Thread thread = new Thread(target);
         target.thread = thread;
         thread.setName("JabRef - " + name + " - low prio");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
@@ -106,6 +108,7 @@ public class JabRefExecutorService implements Executor {
     public void executeWithLowPriorityInOwnThreadAndWait(Runnable runnable) {
         Thread thread = new Thread(runnable);
         thread.setName("JabRef low prio");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         startedThreads.add(thread);
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
