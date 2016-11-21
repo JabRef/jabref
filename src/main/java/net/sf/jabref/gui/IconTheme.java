@@ -95,7 +95,6 @@ public class IconTheme {
         LEFT("\uf04e") /* css; arrow-left-bold */,
         RIGHT("\uf055") /*css: arrow-right-bold */,
         SOURCE("\uf169") /*css: code-braces*/,
-        MDL("\uf169") /*css: code-braces*/,
         MAKE_KEY("\uf30b") /*css: key-variant */,
         CLEANUP_ENTRIES("\uf0e2") /*css: broom */,
         PRIORITY("\uf23b") /*css: flag */,

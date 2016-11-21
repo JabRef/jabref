@@ -88,7 +88,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
         try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build()) {
         Unirest.setHttpClient(httpclient);
 
-            String query = selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
+            String query = selectedEntry.getLatexFreeField("title").get();
         try {
             response = Unirest
                         .get("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000000300/related_documents/")
@@ -111,9 +111,73 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      * @param xmlDocument
      * @return
      */
-    private List<BibEntry> convertToBibEntry(String reccomendations) {
-        // Parser stuff goes here todo
-        bibEntryList = null;
+    private List<BibEntry> convertToBibEntry(String recomendations) {
+
+        bibEntryList = new ArrayList<>();
+        //Parsing the response with a SAX parser
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser saxParser = factory.newSAXParser();
+            DefaultHandler handler = new DefaultHandler() {
+
+                boolean authors;
+                boolean published_in;
+                BibEntry currentEntry;
+
+
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes attributes)
+                        throws SAXException {
+
+                    if (qName.equalsIgnoreCase("related_article")) {
+                        currentEntry = new BibEntry();
+                    }
+                    if (qName.equalsIgnoreCase("authors")) {
+                        authors = true;
+                    }
+                    if (qName.equalsIgnoreCase("published_in")) {
+                        published_in = true;
+                    }
+
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                    if (qName.equalsIgnoreCase("related_article")) {
+                        bibEntryList.add(currentEntry);
+                        currentEntry = new BibEntry();
+                    }
+                }
+
+                @Override
+                public void characters(char ch[], int start, int length) throws SAXException {
+
+                    if (authors) {
+                        currentEntry.setField("author", new String(ch, start, length));
+                        authors = false;
+                    }
+                    if (published_in) {
+                        currentEntry.setField("journal", new String(ch, start, length));
+                        published_in = false;
+                    }
+
+
+                }
+
+            };
+
+            try {
+                InputStream stream = new ByteArrayInputStream(recomendations.getBytes());
+                saxParser.parse(stream, handler);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        } catch (ParserConfigurationException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (SAXException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
         return bibEntryList;
     }
 
@@ -122,7 +186,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      * @param xmlDocument
      * @return
      */
-    private List<String> convertToHtml(String xmlDocument) {
+    private List<String> convertToHtml(String recommendations) {
         ArrayList<RankedHtmlSnippet> rankedHtmlSnippet = new ArrayList<>();
         //Parsing the response with a SAX parser
         try {
@@ -180,7 +244,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
             };
 
             try {
-                InputStream stream = new ByteArrayInputStream(xmlDocument.getBytes());
+                InputStream stream = new ByteArrayInputStream(recommendations.getBytes());
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);

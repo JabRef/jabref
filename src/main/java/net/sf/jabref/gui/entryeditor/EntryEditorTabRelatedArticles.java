@@ -81,7 +81,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         URL url = IconTheme.getIconUrl("mdlloading");
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
         htmlContent.append("Loading Recommendations for ");
-        htmlContent.append(selectedEntry.getField("title").get().replaceAll("\\{|\\}", ""));
+        htmlContent.append(selectedEntry.getLatexFreeField("title").get());
         htmlContent.append("<br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
         htmlContent.append("</font></body></html>");
         this.setText(htmlContent.toString());
@@ -114,11 +114,9 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * @param selectedEntry
      */
     public void requestRecommendations() {
-        System.out.println("trying to request recommendations");
         try {
             mdlFetcher = new MrDLibFetcherWorker(selectedEntry);
             mdlFetcher.execute();
-            System.out.println("executed the thread");
             mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
 
                 @Override
@@ -148,14 +146,12 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         private final MrDLibFetcher fetcher;
 
         public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
-            System.out.println("constructing a new fetecherWorker");
             fetcher = new MrDLibFetcher(selectedEntry);
         }
 
         @Override
         protected List<BibEntry> doInBackground() throws Exception {
             fetcher.performSearch("");
-            System.out.println("search is done. i am back in the doInBackground. ");
             return fetcher.getRecommendationsAsBibEntryList();
         }
 

@@ -389,7 +389,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 relatedArticlePanel,
                 Localization.lang("Related articles"));
         tabs.add(relatedArticlePanel);
-        System.out.println("i added the tab.");
         // Still no clue why I need this. TODO check what this is doing
         relatedArticlePanel.setFocusCycleRoot(true);
     }
@@ -980,7 +979,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
                 // Is it affected when changed to another language?
                 if (((JTabbedPane) event.getSource()).getSelectedComponent().getName().equals("Related articles")) {
-                    System.out.println("now i started the request");
                     relatedArticlesTab.requestRecommendations();
                 }
             });
