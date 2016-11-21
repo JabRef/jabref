@@ -144,10 +144,9 @@ public class MrDLibFetcher implements SearchBasedFetcher {
                         htmlSnippetSingleRank = -1;
                     }
 
-                    if (qName.equalsIgnoreCase("snippet")) {
-                        if (attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
+                    if (qName.equalsIgnoreCase("snippet")
+                            && attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
                             snippet = true;
-                        }
                     }
                     if (qName.equalsIgnoreCase("suggested_rank")) {
                         rank = true;
