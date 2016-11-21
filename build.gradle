@@ -125,8 +125,8 @@ dependencies {
     compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.9'
-    testCompile 'com.github.tomakehurst:wiremock:2.2.2'
+    testCompile 'org.mockito:mockito-core:2.2.15'
+    testCompile 'com.github.tomakehurst:wiremock:2.3.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
@@ -380,17 +380,6 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
     }
-}
-
-// fetch all dependencies to speedup CircleCI build
-// this is necessary until https://discuss.circleci.com/t/effective-caching-for-gradle/540 is resolved
-// see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
-// better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
-task getdeps(type: Copy) {
-    from(configurations.compile + configurations.antlr3 + configurations.antlr4 + configurations.testCompile) {
-        include "*.jar"
-    }
-    into 'build/tmp/alldeps/'
 }
 
 jmh {

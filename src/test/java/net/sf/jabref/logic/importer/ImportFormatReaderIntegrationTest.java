@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.importer;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,13 +40,13 @@ public class ImportFormatReaderIntegrationTest {
     }
 
     @Test
-    public void testImportUnknownFormat() {
+    public void testImportUnknownFormat() throws Exception {
         ImportFormatReader.UnknownFormatImport unknownFormat = reader.importUnknownFormat(file);
         assertEquals(count, unknownFormat.parserResult.getDatabase().getEntryCount());
     }
 
     @Test
-    public void testImportFormatFromFile() throws IOException {
+    public void testImportFormatFromFile() throws Exception {
         assertEquals(count, reader.importFromFile(format, file).getDatabase().getEntries().size());
     }
 
