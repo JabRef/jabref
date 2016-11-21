@@ -37,8 +37,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     private static final String RECOMMENDATION_SEPERATOR = "<br>";
 
-    private static final String NAME = "Related articles2";
-
     private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
 
 

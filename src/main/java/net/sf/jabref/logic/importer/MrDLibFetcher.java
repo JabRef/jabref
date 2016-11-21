@@ -71,6 +71,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
      */
     private String makeServerRequest() {
         String response = "";
+
         //Makes a request to the RESTful MDL-API. Example document.
         //Servers-side functionality in implementation.
 
@@ -87,6 +88,7 @@ public class MrDLibFetcher implements SearchBasedFetcher {
         try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build()) {
         Unirest.setHttpClient(httpclient);
 
+            String query = selectedEntry.getField("title").get().replaceAll("\\{|\\}", "");
         try {
             response = Unirest
                         .get("https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000000300/related_documents/")
