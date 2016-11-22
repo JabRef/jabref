@@ -144,7 +144,7 @@ import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bibsonomy.plugin.jabref.BibSonomySidePaneComponent;
+import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import osx.macadapter.MacAdapter;
 
 /**
