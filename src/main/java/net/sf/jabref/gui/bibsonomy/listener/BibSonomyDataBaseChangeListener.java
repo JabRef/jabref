@@ -4,14 +4,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
+import net.sf.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
-import net.sf.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 
 /**
  * {@link BibSonomyDataBaseChangeListener} runs the {@link DownloadDocumentsWorker} as soon as a new entry was added to the database.

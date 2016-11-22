@@ -4,11 +4,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
 import net.sf.jabref.gui.worker.AbstractWorker;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
 
 /**
  * {@link AbstractBibSonomyAction} is the base class for all actions.

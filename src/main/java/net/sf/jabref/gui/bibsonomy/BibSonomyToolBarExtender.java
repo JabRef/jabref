@@ -8,10 +8,9 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
 
-import net.sf.jabref.gui.JabRefFrame;
-
 import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
 import net.sf.jabref.gui.actions.bibsonomy.ExportSelectedEntriesAction;
 import net.sf.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;

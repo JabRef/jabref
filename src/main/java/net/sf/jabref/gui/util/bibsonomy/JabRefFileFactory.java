@@ -2,9 +2,9 @@ package net.sf.jabref.gui.util.bibsonomy;
 
 import java.util.Optional;
 
+import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 
-import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import org.bibsonomy.rest.client.util.MultiDirectoryFileFactory;
 
 public class JabRefFileFactory extends MultiDirectoryFileFactory {

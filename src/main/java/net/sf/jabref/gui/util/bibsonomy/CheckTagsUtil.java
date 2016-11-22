@@ -4,10 +4,9 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.model.entry.BibEntry;
-
-import net.sf.jabref.bibsonomy.BibSonomyProperties;
 
 import static org.bibsonomy.util.ValidationUtils.present;
 

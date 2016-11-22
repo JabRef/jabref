@@ -1,11 +1,11 @@
 package net.sf.jabref.gui.worker.bibsonomy;
 
+import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.JabRefFileFactory;
 import net.sf.jabref.gui.worker.AbstractWorker;
 
 import org.bibsonomy.model.logic.LogicInterface;
-import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.util.bibsonomy.JabRefFileFactory;
 import org.bibsonomy.rest.client.RestLogicFactory;
 import org.bibsonomy.rest.client.util.FileFactory;
 

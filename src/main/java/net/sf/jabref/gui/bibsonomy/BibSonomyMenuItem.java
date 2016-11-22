@@ -3,8 +3,6 @@ package net.sf.jabref.gui.bibsonomy;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import net.sf.jabref.logic.l10n.Localization;
-
 import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import net.sf.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
@@ -14,6 +12,7 @@ import net.sf.jabref.gui.actions.bibsonomy.ImportAllMyPostsAction;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.actions.bibsonomy.SynchronizeAction;
 import net.sf.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * {@link BibSonomyMenuItem} is the plugins menu item

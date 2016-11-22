@@ -5,12 +5,11 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 
+import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneManager;
-import net.sf.jabref.logic.l10n.Localization;
-
-import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import net.sf.jabref.gui.bibsonomy.BibSonomySidePanel;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Display or hide the {@link BibSonomySidePanel}

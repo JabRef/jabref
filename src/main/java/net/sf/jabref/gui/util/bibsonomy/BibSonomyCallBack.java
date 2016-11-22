@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-
 import net.sf.jabref.gui.worker.bibsonomy.AbstractBibSonomyWorker;
 
 /**

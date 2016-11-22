@@ -8,14 +8,13 @@ import javax.swing.JMenuItem;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
-import net.sf.jabref.logic.l10n.Localization;
-
 import net.sf.jabref.gui.bibsonomy.BibSonomyMenuItem;
 import net.sf.jabref.gui.bibsonomy.BibSonomySidePanel;
 import net.sf.jabref.gui.bibsonomy.BibSonomyToolBarExtender;
 import net.sf.jabref.gui.bibsonomy.EntryEditorTabExtender;
 import net.sf.jabref.gui.bibsonomy.listener.BibSonomyDataBaseChangeListener;
 import net.sf.jabref.gui.bibsonomy.listener.TabbedPaneChangeListener;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * {@link BibSonomySidePaneComponent} holds the dimension of the {@link BibSonomySidePanel}.

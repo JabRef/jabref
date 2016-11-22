@@ -7,7 +7,6 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 import net.sf.jabref.gui.JabRefFrame;
-
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.bibsonomy.SearchType;
 import net.sf.jabref.gui.bibsonomy.SearchTypeComboBoxItem;

@@ -6,10 +6,9 @@ import java.util.Collection;
 import javax.swing.ImageIcon;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-
-import net.sf.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 
 /**
  * {@link DownloadDocumentsAction} collects all entries of a the {@link net.sf.jabref.model.database.BibDatabase BibDatabase} and fetches all documents available for the post.

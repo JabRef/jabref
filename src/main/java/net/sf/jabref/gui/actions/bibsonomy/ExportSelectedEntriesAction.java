@@ -7,13 +7,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.CheckTagsUtil;
+import net.sf.jabref.gui.worker.bibsonomy.ExportWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import net.sf.jabref.gui.util.bibsonomy.CheckTagsUtil;
-import net.sf.jabref.gui.worker.bibsonomy.ExportWorker;
 
 /**
  * {@link ExportSelectedEntriesAction} checks for entries without keywords and does

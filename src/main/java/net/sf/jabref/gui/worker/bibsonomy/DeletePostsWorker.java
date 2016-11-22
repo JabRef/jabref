@@ -3,6 +3,7 @@ package net.sf.jabref.gui.worker.bibsonomy;
 import java.util.Collections;
 import java.util.Optional;
 
+import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -10,7 +11,6 @@ import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import net.sf.jabref.bibsonomy.BibSonomyProperties;
 
 /**
  * Delete a Post from the service

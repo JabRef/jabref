@@ -60,6 +60,7 @@ import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -144,7 +145,6 @@ import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
 import osx.macadapter.MacAdapter;
 
 /**
