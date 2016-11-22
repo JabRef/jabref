@@ -26,12 +26,14 @@ public class JabRefExecutorService implements Executor {
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
 
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef LowPriorityCachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
 
