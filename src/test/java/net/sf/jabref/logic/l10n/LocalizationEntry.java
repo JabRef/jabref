@@ -38,11 +38,7 @@ class LocalizationEntry implements Comparable<LocalizationEntry>{
 
         LocalizationEntry that = (LocalizationEntry) o;
 
-        if (key != null ? !key.equals(that.key) : that.key != null) {
-            return false;
-        }
-        return bundle == that.bundle;
-
+        return Objects.equals(key, that.key) && Objects.equals(bundle, that.bundle);
     }
 
     @Override

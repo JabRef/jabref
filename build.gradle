@@ -241,8 +241,8 @@ javadoc {
 
 test {
     testLogging {
-        events "failed"
-        exceptionFormat "full"
+        showStandardStreams = true
+        exceptionFormat = 'full'
     }
 }
 
