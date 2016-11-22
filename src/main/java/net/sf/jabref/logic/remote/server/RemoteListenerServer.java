@@ -21,8 +21,6 @@ public class RemoteListenerServer implements Runnable {
     private final MessageHandler messageHandler;
     private final ServerSocket serverSocket;
 
-    private volatile boolean stop = false;
-
 
     public RemoteListenerServer(MessageHandler messageHandler, int port) throws IOException {
         this.serverSocket = new ServerSocket(port, BACKLOG, InetAddress.getByName("localhost"));
@@ -32,7 +30,7 @@ public class RemoteListenerServer implements Runnable {
     @Override
     public void run() {
         try {
-            while (!stop) {
+            while (!Thread.interrupted()) {
                 try (Socket socket = serverSocket.accept()) {
                     socket.setSoTimeout(ONE_SECOND_TIMEOUT);
 
@@ -54,10 +52,6 @@ public class RemoteListenerServer implements Runnable {
         } finally {
             closeServerSocket();
         }
-    }
-
-    public void stopServer(){
-        this.stop = true;
     }
 
     public void closeServerSocket() {

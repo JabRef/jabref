@@ -18,14 +18,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerRunnable remoteListenerServerRunnable;
+    private RemoteListenerServerThread remoteListenerServerThread;
 
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 
     public void stop() {
         if (isOpen()) {
-            remoteListenerServerRunnable.stopServer();
-            remoteListenerServerRunnable = null;
+            remoteListenerServerThread.interrupt();
+            remoteListenerServerThread = null;
         }
     }
 
@@ -37,27 +37,32 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
             return;
         }
 
-        RemoteListenerServerRunnable result;
+        RemoteListenerServerThread result;
         try {
-            result = new RemoteListenerServerRunnable(messageHandler, port);
+            result = new RemoteListenerServerThread(messageHandler, port);
         } catch (BindException e) {
             LOGGER.warn("Port is blocked", e);
-            throw new IllegalStateException(e);
+            result = null;
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            result = null;
         }
-        remoteListenerServerRunnable = result;
+        remoteListenerServerThread = result;
     }
 
     public boolean isOpen() {
-        return remoteListenerServerRunnable != null;
+        return remoteListenerServerThread != null;
     }
 
     public void start() {
-        if (isOpen()) {
+        if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerRunnable, remoteListenerServerRunnable.getName());
+            JabRefExecutorService.INSTANCE.manageRemoteThread(remoteListenerServerThread);
         }
+    }
+
+    public boolean isNotStartedBefore() {
+        // threads can only be started when in state NEW
+        return (remoteListenerServerThread == null) || (remoteListenerServerThread.getState() == Thread.State.NEW);
     }
 
     public void openAndStart(MessageHandler messageHandler, int port) {

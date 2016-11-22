@@ -37,20 +37,25 @@ public class RemoteTest {
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             Assert.assertFalse(server.isOpen());
+            Assert.assertTrue(server.isNotStartedBefore());
             server.stop();
             Assert.assertFalse(server.isOpen());
+            Assert.assertTrue(server.isNotStartedBefore());
             server.open(msg -> Assert.assertEquals(message, msg), port);
             Assert.assertTrue(server.isOpen());
+            Assert.assertTrue(server.isNotStartedBefore());
             server.start();
             Assert.assertTrue(server.isOpen());
+            Assert.assertFalse(server.isNotStartedBefore());
 
             Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
             server.stop();
             Assert.assertFalse(server.isOpen());
+            Assert.assertTrue(server.isNotStartedBefore());
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testPortAlreadyInUse() throws IOException {
         final int port = 34567;
 
@@ -60,6 +65,9 @@ public class RemoteTest {
             try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
                 Assert.assertFalse(server.isOpen());
                 server.openAndStart(msg -> Assert.fail("should not happen"), port);
+                Assert.assertFalse(server.isOpen());
+            } catch (Exception e) {
+                Assert.fail("Exception: " + e.getMessage());
             }
         }
     }

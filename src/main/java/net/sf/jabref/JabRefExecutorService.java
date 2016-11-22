@@ -22,6 +22,8 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
+    private Thread remoteThread;
+
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
@@ -119,6 +121,14 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
+    public void manageRemoteThread(Thread thread) {
+        if(this.remoteThread != null){
+            throw new IllegalStateException("Remote thread is already attached");
+        } else {
+            this.remoteThread = thread;
+            remoteThread.start();
+        }
+    }
 
     public void submit(TimerTask timerTask, long millisecondsDelay) {
         timer.schedule(timerTask, millisecondsDelay);
@@ -129,6 +139,10 @@ public class JabRefExecutorService implements Executor {
         this.executorService.shutdown();
         //those threads will be interrupted in their current task
         this.lowPriorityExecutorService.shutdownNow();
+        // kill the remote thread
+        if(remoteThread != null) {
+            remoteThread.interrupt();
+        }
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 
