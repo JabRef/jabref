@@ -1,8 +1,13 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
+
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -25,7 +30,11 @@ public class SpecialFieldDatabaseChangeListener {
             final BibEntry entry = event.getBibEntry();
             // NamedCompount code similar to SpecialFieldUpdateListener
             NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));
-            SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
+            List<FieldChange> changes = SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
+            for(FieldChange change: changes) {
+                nc.addEdit(new UndoableFieldChange(change));
+            }
+
             // Don't insert the compound into the undoManager,
             // it would be added before the component which undoes the insertion of the entry and creates heavy problems
             // (which prohibits the undo the deleting multiple entries)

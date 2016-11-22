@@ -11,16 +11,15 @@ import static org.junit.Assert.assertEquals;
 public class CitationStyleGeneratorTest {
 
     @Test
-    public void testCarriageReturn() {
+    public void testIgnoreCarriageReturn() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.AUTHOR, "Doe, John and\rDoe, Jane");
+        entry.setField(FieldName.AUTHOR, "Doe, John and \rDoe, Jane");
 
         // if the default citation style changes this has to be modified
         String expected = "  <div class=\"csl-entry\">\n" +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">J. Doe and J. Doe, .</div>\n" +
                 "  </div>\n";
         String citation = CitationStyleGenerator.generateCitation(entry, CitationStyle.getDefault());
-
         assertEquals(expected, citation);
     }
 

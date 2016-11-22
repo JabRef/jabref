@@ -31,6 +31,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.cleanup.Formatter;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.metadata.MetaData;
@@ -133,18 +134,12 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         resetButton = new JButton(Localization.lang("Reset"));
         resetButton.addActionListener(e -> ((CleanupActionsListModel) actionsList.getModel()).reset(defaultFormatters));
 
-        boolean isBibLaTeX = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext().isBiblatexMode();
-        String mode;
+        BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
 
-        if (isBibLaTeX) {
-            mode = "BibLaTeX";
-        } else {
-            mode = "BibTeX";
-        }
+        recommendButton = new JButton(Localization.lang("Recommended for %0", databaseContext.getMode().getFormattedName()));
+        boolean isBibLaTeX = databaseContext.isBiblatexMode();
 
-        recommendButton = new JButton(Localization.lang("Recommended for %0", mode));
         recommendButton.addActionListener(e -> {
-
             if (isBibLaTeX) {
                 ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBLATEX_ACTIONS);
             } else {

@@ -2,11 +2,9 @@ package net.sf.jabref.gui.exporter;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.security.SecureRandom;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -20,7 +18,7 @@ import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.autosave.AutosaveUIManager;
+import net.sf.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
@@ -41,7 +39,6 @@ import net.sf.jabref.model.database.event.ChangePropagation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.DBMSProcessor;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -57,6 +54,7 @@ import org.apache.commons.logging.LogFactory;
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
 public class SaveDatabaseAction extends AbstractWorker {
+    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -64,12 +62,22 @@ public class SaveDatabaseAction extends AbstractWorker {
     private boolean canceled;
     private boolean fileLockedError;
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
+    private Optional<Path> filePath;
 
 
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
+        this.filePath = Optional.empty();
+    }
+
+    /**
+     * @param panel BasePanel which contains the database to be saved
+     * @param filePath Path to the file the database should be saved to
+     */
+    public SaveDatabaseAction(BasePanel panel, Path filePath) {
+        this(panel);
+        this.filePath = Optional.ofNullable(filePath);
     }
 
     @Override
@@ -85,6 +93,9 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             panel.frame().output(Localization.lang("Saving database") + "...");
             panel.setSaving(true);
+        } else if (filePath.isPresent()) {
+            // save as directly if the target file location is known
+            saveAs(filePath.get().toFile());
         } else {
             saveAs();
         }
@@ -294,45 +305,41 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.updateEnabledState();
     }
 
+    public void saveAs() throws Throwable {
+        // configure file dialog
+        FileDialog dialog = new FileDialog(frame);
+        dialog.withExtension(FileExtensions.BIBTEX_DB);
+        dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+
+        Optional<Path> path = dialog.saveNewFile();
+        if (path.isPresent()) {
+            saveAs(path.get().toFile());
+        } else {
+            canceled = true;
+            return;
+        }
+    }
+
     /**
      * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
-    public void saveAs() throws Throwable {
-        File file = null;
-        while (file == null) {
-            // configure file dialog
-            FileDialog dialog = new FileDialog(frame);
-            dialog.withExtension(FileExtensions.BIBTEX_DB);
-            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
-
-            Optional<Path> path = dialog.saveNewFile();
-            if (path.isPresent()) {
-                file = path.get().toFile();
-            } else {
-                canceled = true;
-                return;
-            }
-        }
-
+    public void saveAs(File file) throws Throwable {
         BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
-            // Generate an ID when saving a shared database
-            String databaseID = new BigInteger(128, new SecureRandom()).toString(32);
-            context.getDatabase().setDatabaseID(databaseID);
-            DBMSProcessor dbmsProcessor = context.getDBMSSynchronizer().getDBProcessor();
-            DBMSConnectionProperties properties = dbmsProcessor.getDBMSConnectionProperties();
             // Save all properties dependent on the ID. This makes it possible to restore them.
-            new SharedDatabasePreferences(databaseID).putAllDBMSConnectionProperties(properties);
+            DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor().getDBMSConnectionProperties();
+            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID()).putAllDBMSConnectionProperties(properties);
         }
 
         context.setDatabaseFile(file);
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+        if (file.getParent() != null) {
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+        }
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
-            context.setDatabaseFile(context.getDatabaseFile().orElse(null));
             return;
         }
         // Register so we get notifications about outside changes to the file.
@@ -358,7 +365,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+        return (context.getLocation() == DatabaseLocation.SHARED ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
     }

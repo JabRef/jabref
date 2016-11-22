@@ -163,7 +163,7 @@ public class ParserResult {
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        if (Objects.isNull(this.bibDatabaseContext)) {
+        if (this.bibDatabaseContext == null) {
             this.bibDatabaseContext = new BibDatabaseContext(base, metaData, file);
         }
         return this.bibDatabaseContext;

@@ -9,6 +9,7 @@ import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
@@ -95,9 +96,9 @@ public class KeywordGroup extends AbstractGroup {
             for (BibEntry entry : entriesToAdd) {
                 if (!contains(entry)) {
                     String oldContent = entry.getField(searchField).orElse(null);
-                    String newContent = (oldContent == null ? "" : oldContent
-                            + keywordSeparator)
-                            + searchExpression;
+                    KeywordList wordlist = KeywordList.parse(oldContent, keywordSeparator);
+                    wordlist.add(searchExpression);
+                    String newContent = wordlist.getAsString(keywordSeparator);
                     entry.setField(searchField, newContent);
 
                     // Store change information.

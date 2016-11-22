@@ -1,15 +1,12 @@
 package net.sf.jabref.logic.net;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -17,15 +14,21 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.HttpCookie;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.sf.jabref.logic.util.io.FileUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,11 +48,11 @@ import org.apache.commons.logging.LogFactory;
  * @author Simon Harrer
  */
 public class URLDownload {
-
-    private final URL source;
-
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
+    private static final String USER_AGENT= "JabRef";
+
+    private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
 
     private String postData = "";
@@ -73,9 +76,7 @@ public class URLDownload {
      */
     public URLDownload(URL source) {
         this.source = source;
-
-        addParameters("User-Agent", "JabRef");
-
+        addParameters("User-Agent", USER_AGENT);
     }
 
     public URL getSource() {
@@ -108,7 +109,7 @@ public class URLDownload {
     }
 
     private URLConnection openConnection() throws IOException {
-        URLConnection connection = source.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) source.openConnection();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -119,6 +120,20 @@ public class URLDownload {
             }
 
         }
+
+        // normally, 3xx is redirect
+        int status = connection.getResponseCode();
+        if (status != HttpURLConnection.HTTP_OK) {
+            if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                    || status == HttpURLConnection.HTTP_MOVED_PERM
+                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField("Location");
+                // open the new connnection again
+                connection = (HttpURLConnection) new URLDownload(newUrl).openConnection();
+            }
+        }
+
         // this does network i/o: GET + read returned headers
         connection.connect();
 
@@ -173,28 +188,42 @@ public class URLDownload {
         }
     }
 
+    /**
+     * @deprecated use {@link #downloadToFile(Path)}
+     */
+    @Deprecated
     public void downloadToFile(File destination) throws IOException {
+        downloadToFile(destination.toPath());
+    }
 
-        try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
-             OutputStream output = new BufferedOutputStream(new FileOutputStream(destination))) {
-            copy(input, output);
+    public void downloadToFile(Path destination) throws IOException {
+
+        try (InputStream input = monitorInputStream(new BufferedInputStream(openConnection().getInputStream()))) {
+            Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
             throw e;
         }
     }
 
-    private void copy(InputStream in, OutputStream out) throws IOException {
-        try (InputStream monitorInputStream = monitorInputStream(in)) {
-            byte[] buffer = new byte[512];
-            while (true) {
-                int bytesRead = monitorInputStream.read(buffer);
-                if (bytesRead == -1) {
-                    break;
-                }
-                out.write(buffer, 0, bytesRead);
-            }
-        }
+    /**
+     * Downloads the web resource to a temporary file.
+     *
+     * @return the path to the downloaded file.
+     */
+    public Path downloadToTemporaryFile() throws IOException {
+        // Determine file name and extension from source url
+        String sourcePath = source.getPath();
+
+        // Take everything after the last '/' as name + extension
+        String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
+        String fileName = FileUtil.getFileName(fileNameWithExtension);
+        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
+
+        // Create temporary file and download to it
+        Path file = Files.createTempFile(fileName, extension);
+        downloadToFile(file);
+        return file;
     }
 
     protected InputStream monitorInputStream(InputStream in) {

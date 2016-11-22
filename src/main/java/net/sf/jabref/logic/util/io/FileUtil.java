@@ -3,6 +3,7 @@ package net.sf.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,6 +43,9 @@ public class FileUtil {
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
+    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
+            "posix");
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -53,17 +57,29 @@ public class FileUtil {
     }
 
     /**
-     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
      * @param fileName
-     * @return The extension, trimmed and in lowercase.
+     * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int pos = fileName.lastIndexOf('.');
-        if ((pos > 0) && (pos < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
         } else {
             return Optional.empty();
+        }
+    }
+
+    /**
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getFileName(String fileNameWithExtension) {
+        int dotPosition = fileNameWithExtension.lastIndexOf('.');
+        if (dotPosition >= 0) {
+            return fileNameWithExtension.substring(0, dotPosition);
+        } else {
+            return fileNameWithExtension;
         }
     }
 
