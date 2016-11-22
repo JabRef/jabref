@@ -54,15 +54,10 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
     }
 
     public void start() {
-        if (isOpen() && isNotStartedBefore()) {
+        if (isOpen()) {
             // threads can only be started when in state NEW
             JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerThread);
         }
-    }
-
-    public boolean isNotStartedBefore() {
-        // threads can only be started when in state NEW
-        return (remoteListenerServerThread == null) || (remoteListenerServerThread.getState() == Thread.State.NEW);
     }
 
     public void openAndStart(MessageHandler messageHandler, int port) {

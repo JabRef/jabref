@@ -37,21 +37,16 @@ public class RemoteTest {
 
         try (RemoteListenerServerLifecycle server = new RemoteListenerServerLifecycle()) {
             Assert.assertFalse(server.isOpen());
-            Assert.assertTrue(server.isNotStartedBefore());
             server.stop();
             Assert.assertFalse(server.isOpen());
-            Assert.assertTrue(server.isNotStartedBefore());
             server.open(msg -> Assert.assertEquals(message, msg), port);
             Assert.assertTrue(server.isOpen());
-            Assert.assertTrue(server.isNotStartedBefore());
             server.start();
             Assert.assertTrue(server.isOpen());
-            Assert.assertFalse(server.isNotStartedBefore());
 
             Assert.assertTrue(RemoteListenerClient.sendToActiveJabRefInstance(new String[]{message}, port));
             server.stop();
             Assert.assertFalse(server.isOpen());
-            Assert.assertTrue(server.isNotStartedBefore());
         }
     }
 
