@@ -90,16 +90,20 @@ public class JabRefMain {
         // Check for running JabRef
         RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
 
-            if (!Globals.REMOTE_LISTENER.isOpen()) {
-                // we are not alone, there is already a server out there, try to contact already running JabRef:
-                if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
-                    // We have successfully sent our command line options through the socket to another JabRef instance.
-                    // So we assume it's all taken care of, and quit.
-                    LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                    JabRefExecutorService.INSTANCE.shutdownEverything();
-                    return;
+            try {
+                Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
+            } catch (IllegalStateException e) {
+
+                if (!Globals.REMOTE_LISTENER.isOpen()) {
+                    // we are not alone, there is already a server out there, try to contact already running JabRef:
+                    if (RemoteListenerClient.sendToActiveJabRefInstance(args, remotePreferences.getPort())) {
+                        // We have successfully sent our command line options through the socket to another JabRef instance.
+                        // So we assume it's all taken care of, and quit.
+                        LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
+                        JabRefExecutorService.INSTANCE.shutdownEverything();
+                        return;
+                    }
                 }
             }
             // we are alone, we start the server
