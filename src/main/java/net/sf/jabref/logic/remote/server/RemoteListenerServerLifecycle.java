@@ -18,14 +18,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerRunnable remoteListenerServerStop;
+    private RemoteListenerServerRunnable remoteListenerServerRunnable;
 
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 
     public void stop() {
         if (isOpen()) {
-            remoteListenerServerStop.stopServer();
-            remoteListenerServerStop = null;
+            remoteListenerServerRunnable.stopServer();
+            remoteListenerServerRunnable = null;
         }
     }
 
@@ -46,17 +46,17 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         } catch (IOException e) {
             result = null;
         }
-        remoteListenerServerStop = result;
+        remoteListenerServerRunnable = result;
     }
 
     public boolean isOpen() {
-        return remoteListenerServerStop != null;
+        return remoteListenerServerRunnable != null;
     }
 
     public void start() {
         if (isOpen()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerStop);
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerRunnable, remoteListenerServerRunnable.getName());
         }
     }
 

@@ -61,7 +61,7 @@ public class Globals {
         Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
 
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor);
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
     }
 
     public static GlobalFocusListener getFocusListener() {

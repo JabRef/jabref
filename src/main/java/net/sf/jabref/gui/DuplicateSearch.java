@@ -42,7 +42,7 @@ public class DuplicateSearch implements Runnable {
         }
 
         SearcherRunnable st = new SearcherRunnable();
-        JabRefExecutorService.INSTANCE.executeInterruptableTask(st);
+        JabRefExecutorService.INSTANCE.executeInterruptableTask(st, "DuplicateSearcher");
         int current = 0;
 
         final List<BibEntry> toRemove = new ArrayList<>();

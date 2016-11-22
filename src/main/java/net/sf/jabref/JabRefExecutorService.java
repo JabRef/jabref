@@ -70,30 +70,35 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    private static class AutoCleanupRunnable implements Runnable {
+    public void executeInterruptableTask(final Runnable runnable) {
+        this.lowPriorityExecutorService.execute(runnable);
+    }
 
-        private final Runnable runnable;
-        private final ConcurrentLinkedQueue<Thread> startedThreads;
+    public void executeInterruptableTask(final Runnable runnable, String taskName) {
+        this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
+    }
 
-        public Thread thread;
+    class NamedRunnable implements Runnable {
 
-        private AutoCleanupRunnable(Runnable runnable, ConcurrentLinkedQueue<Thread> startedThreads) {
-            this.runnable = runnable;
-            this.startedThreads = startedThreads;
+        private String name;
+
+        private Runnable task;
+
+        public NamedRunnable(String name, Runnable runnable){
+            this.name = name;
+            this.task = runnable;
         }
 
         @Override
         public void run() {
+            final String orgName = Thread.currentThread().getName();
+            Thread.currentThread().setName(name);
             try {
-                runnable.run();
+                task.run();
             } finally {
-                startedThreads.remove(thread);
+                Thread.currentThread().setName(orgName);
             }
         }
-    }
-
-    public void executeInterruptableTask(final Runnable runnable) {
-        this.lowPriorityExecutorService.execute(runnable);
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
