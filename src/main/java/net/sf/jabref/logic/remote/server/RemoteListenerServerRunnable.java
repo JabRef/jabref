@@ -2,15 +2,10 @@ package net.sf.jabref.logic.remote.server;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This thread wrapper is required to be able to interrupt the remote listener while listening on a port.
  */
 public class RemoteListenerServerRunnable implements Runnable {
-
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerRunnable.class);
 
     private final RemoteListenerServer server;
 
@@ -32,6 +27,7 @@ public class RemoteListenerServerRunnable implements Runnable {
 
     public void stopServer(){
         server.stopServer();
+        server.closeServerSocket();
     }
 
 }
