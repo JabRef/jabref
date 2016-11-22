@@ -1,70 +1,47 @@
-/**
- *  
- *  JabRef Bibsonomy Plug-in - Plugin for the reference management 
- * 		software JabRef (http://jabref.sourceforge.net/) 
- * 		to fetch, store and delete entries from BibSonomy.
- *   
- *  Copyright (C) 2008 - 2011 Knowledge & Data Engineering Group, 
- *                            University of Kassel, Germany
- *                            http://www.kde.cs.uni-kassel.de/
- *  
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 package org.bibsonomy.plugin.jabref.worker;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bibsonomy.plugin.jabref.PluginProperties;
+import org.bibsonomy.plugin.jabref.BibSonomyProperties;
 
 /**
  * Delete a Post from the service
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  *
+ * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
-public class DeletePostsWorker extends AbstractPluginWorker {
+public class DeletePostsWorker extends AbstractBibSonomyWorker {
 
-	private static final Log LOG = LogFactory.getLog(DeletePostsWorker.class);
-	
-	private BibtexEntry[] entries;
+	private static final Log LOGGER = LogFactory.getLog(DeletePostsWorker.class);
+
+	private BibEntry[] entries;
 
 	public void run() {
-		for (BibtexEntry entry : entries) {
-			final String intrahash = entry.getField("intrahash");
-			final String username = entry.getField("username");
-			if ((intrahash == null) || ("".equals(intrahash)) || ((intrahash != null) && !(PluginProperties.getUsername().equals(username)))) {
-				continue;
-			}
-			
-			try {
-				getLogic().deletePosts(PluginProperties.getUsername(), Arrays.asList(intrahash));
-				jabRefFrame.output("Deleting post " + intrahash);
-				entry.clearField("intrahash");
-			} catch (Exception ex) {
-				LOG.error("Failed deleting post " + intrahash);
+		for (BibEntry entry : entries) {
+			final Optional<String> intrahashOpt = entry.getField(FieldName.INTRAHASH);
+			final Optional<String> usernameOpt = entry.getField(FieldName.USERNAME);
+
+			if ((intrahashOpt.isPresent()) || intrahashOpt.get().isEmpty() || (usernameOpt.isPresent() && !intrahashOpt.isPresent() && !(BibSonomyProperties.getUsername().equals(usernameOpt.get())))) {
+				try {
+					getLogic().deletePosts(BibSonomyProperties.getUsername(), Collections.singletonList(intrahashOpt.get()));
+					jabRefFrame.output(Localization.lang("Deleting post %0", intrahashOpt.get()));
+					entry.clearField(FieldName.INTRAHASH);
+				} catch (Exception ex) {
+					LOGGER.error(Localization.lang("Failed deleting post %0", intrahashOpt.get()));
+				}
 			}
 		}
-		jabRefFrame.output("Done.");
+		jabRefFrame.output(Localization.lang("Done"));
 	}
 
-	public DeletePostsWorker(JabRefFrame jabRefFrame, BibtexEntry[] entries) {
+	public DeletePostsWorker(JabRefFrame jabRefFrame, BibEntry[] entries) {
 		super(jabRefFrame);
 		this.entries = entries;
 	}

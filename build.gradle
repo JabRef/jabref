@@ -52,7 +52,12 @@ repositories {
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
     }
+
+    maven {
+        url "http://dev.bibsonomy.org/maven2/"
+    }
 }
+
 
 configurations {
     antlr3
@@ -66,6 +71,8 @@ configurations {
 }
 
 dependencies {
+    compile 'org.bibsonomy:bibsonomy-rest-client:3.6.3'
+
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'

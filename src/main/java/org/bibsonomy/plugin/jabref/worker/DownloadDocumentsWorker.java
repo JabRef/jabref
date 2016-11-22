@@ -1,127 +1,105 @@
-/**
- *  
- *  JabRef Bibsonomy Plug-in - Plugin for the reference management 
- * 		software JabRef (http://jabref.sourceforge.net/) 
- * 		to fetch, store and delete entries from BibSonomy.
- *   
- *  Copyright (C) 2008 - 2011 Knowledge & Data Engineering Group, 
- *                            University of Kassel, Germany
- *                            http://www.kde.cs.uni-kassel.de/
- *  
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 package org.bibsonomy.plugin.jabref.worker;
 
 import java.net.URLEncoder;
+import java.util.Optional;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.JabRefFrame;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
+import ca.odell.glazedlists.BasicEventList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Document;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
-import org.bibsonomy.plugin.jabref.PluginProperties;
+import org.bibsonomy.plugin.jabref.BibSonomyProperties;
 import org.bibsonomy.plugin.jabref.action.ShowSettingsDialogAction;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 import org.bibsonomy.util.file.FileUtil;
 
-import ca.odell.glazedlists.BasicEventList;
-
 /**
  * Download all private documents of a post from the service
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  *
+ * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
-public class DownloadDocumentsWorker extends AbstractPluginWorker {
+public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 
-	private static final Log LOG = LogFactory.getLog(DownloadDocumentsWorker.class);
-	
+	private static final Log LOGGER = LogFactory.getLog(DownloadDocumentsWorker.class);
+
 	private static final String BIBTEX_FILE_FIELD = "file";
-	
-	
-	private BibtexEntry entry;
+
+	private BibEntry entry;
 	private boolean isImport;
-	
-	public DownloadDocumentsWorker(JabRefFrame jabRefFrame, BibtexEntry entry, boolean isImport) {
+
+	public DownloadDocumentsWorker(JabRefFrame jabRefFrame, BibEntry entry, boolean isImport) {
 		super(jabRefFrame);
 		this.entry = entry;
 		this.isImport = isImport;
 	}
 
 	public void run() {
-		
-		if (isImport && !PluginProperties.getDownloadDocumentsOnImport()) {
+
+		if (isImport && !BibSonomyProperties.getDownloadDocumentsOnImport()) {
 			return;
 		}
 
-		
-		String intrahash = entry.getField("intrahash");
-		if (intrahash != null && !"".equals(intrahash)) {
+		Optional<String> intrahashOpt = entry.getField(FieldName.INTRAHASH);
+		if (intrahashOpt.isPresent() && !intrahashOpt.get().isEmpty()) {
 			final Post<? extends Resource> post;
 			try {
-				post = getLogic().getPostDetails(intrahash, PluginProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);
+				post = getLogic().getPostDetails(intrahashOpt.get(), BibSonomyProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);
 			} catch (AuthenticationException e) {
 				(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
 				return;
 			} catch (Exception e) {
-				LOG.error("Failed getting details for post " + intrahash, e);
-				jabRefFrame.output("Failed getting details for post.");
+				LOGGER.error("Failed getting details for post " + intrahashOpt.get(), e);
+				jabRefFrame.output(Localization.lang("Failed getting details for post."));
 				return;
 			}
 			Resource r = post.getResource();
 			if (!(r instanceof BibTex)) {
-				LOG.warn("requested resource with intrahash '" + intrahash + "' is not bibtex");
-				jabRefFrame.output("Error: Invalid Resourcetype.");
+				LOGGER.warn("requested resource with intrahash '" + intrahashOpt.get() + "' is not bibtex");
+				jabRefFrame.output(Localization.lang("Error: Invalid Resourcetype."));
 				return;
 			}
 			for (Document document : ((BibTex) r).getDocuments()) {
-				jabRefFrame.output("Downloading: " + document.getFileName());
+				jabRefFrame.output(Localization.lang("Downloading: %0", document.getFileName()));
 				try {
-					getLogic().getDocument(PluginProperties.getUsername(), intrahash, URLEncoder.encode(document.getFileName(), "UTF-8"));
+					getLogic().getDocument(BibSonomyProperties.getUsername(), intrahashOpt.get(), URLEncoder.encode(document.getFileName(), "UTF-8"));
 				} catch (Exception ex) {
-					LOG.error("Failed downloading file: " + document.getFileName(), ex);
+					LOGGER.error("Failed downloading file: " + document.getFileName(), ex);
 				}
-				
+
+				Optional<String> citeKeyOpt = entry.getCiteKeyOptional();
 				try {
-					BasicEventList<BibtexEntry> list = new BasicEventList<BibtexEntry>();
+					BasicEventList<BibEntry> list = new BasicEventList<>();
 					String downloadedFileBibTex = ":" + document.getFileName() + ":" + FileUtil.getFileExtension(document.getFileName()).toUpperCase();
-					
-					String entryFileValue = entry.getField(BIBTEX_FILE_FIELD);
-					
+
+					Optional<String> entryFileValueOpt = entry.getField(BIBTEX_FILE_FIELD);
+
 					list.getReadWriteLock().writeLock().lock();
 					list.add(entry);
-					if(entryFileValue != null && !"".equals(entryFileValue)) {
-						
-						if(!entryFileValue.contains(downloadedFileBibTex))
-							entry.setField(BIBTEX_FILE_FIELD, entryFileValue + ";" + downloadedFileBibTex);
+					if (entryFileValueOpt.isPresent() && !entryFileValueOpt.get().isEmpty()) {
+
+						if (!entryFileValueOpt.get().contains(downloadedFileBibTex))
+							entry.setField(BIBTEX_FILE_FIELD, entryFileValueOpt.get() + ";" + downloadedFileBibTex);
 					} else entry.setField(BIBTEX_FILE_FIELD, downloadedFileBibTex);
 					list.getReadWriteLock().writeLock().lock();
-					
+
 				} catch (AuthenticationException e) {
 					(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
 				} catch (Exception e) {
-					LOG.error("Failed adding file to entry " + entry.getCiteKey(), e);
+					if (citeKeyOpt.isPresent()) {
+						LOGGER.error("Failed adding file to entry " + citeKeyOpt.get(), e);
+					} else {
+						LOGGER.error("Failed adding file to entry", e);
+					}
 				}
-				
 			}
 		}
-		
-		jabRefFrame.output("Done.");
+		jabRefFrame.output(Localization.lang("Done"));
 	}
 }

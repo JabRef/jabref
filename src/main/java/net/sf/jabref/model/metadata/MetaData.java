@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Vector;
 
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
@@ -42,6 +43,7 @@ public class MetaData {
     private SaveOrderConfig saveOrderConfig;
     private Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private Map<String, Vector<String>> bibsonomyData = new HashMap<>();
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
@@ -53,6 +55,14 @@ public class MetaData {
      */
     public MetaData() {
         // Do nothing
+    }
+
+    public void addBibsonomyData(String key, Vector<String> value){
+        bibsonomyData.put(key,value);
+    }
+
+    public Vector<String> getBibsonomyData(String key){
+        return bibsonomyData.get(key);
     }
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {

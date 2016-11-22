@@ -1,5 +1,6 @@
 package net.sf.jabref.model.strings;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -704,5 +705,19 @@ public class StringUtil {
      */
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
+    }
+
+    /**
+     * Encodes a string to UTF8
+     * @param s the string which should be encoded
+     * @return the encoded string or null
+     */
+    public static String toUTF8(String s) {
+        if(s != null) {
+            try {
+                return new String(s.getBytes("UTF8"));
+            } catch (UnsupportedEncodingException e) {}
+        }
+        return null;
     }
 }

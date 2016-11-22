@@ -1,40 +1,18 @@
-/**
- *  
- *  JabRef Bibsonomy Plug-in - Plugin for the reference management 
- * 		software JabRef (http://jabref.sourceforge.net/) 
- * 		to fetch, store and delete entries from BibSonomy.
- *   
- *  Copyright (C) 2008 - 2011 Knowledge & Data Engineering Group, 
- *                            University of Kassel, Germany
- *                            http://www.kde.cs.uni-kassel.de/
- *  
- *  This program is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU General Public License
- *  as published by the Free Software Foundation; either version 2
- *  of the License, or (at your option) any later version.
- * 
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- */
-
 package org.bibsonomy.plugin.jabref.worker;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibtexEntry;
-import net.sf.jabref.BibtexFields;
-import net.sf.jabref.JabRefFrame;
-import net.sf.jabref.gui.ImportInspectionDialog;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,22 +20,21 @@ import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
-import org.bibsonomy.plugin.jabref.PluginProperties;
+import org.bibsonomy.plugin.jabref.BibSonomyProperties;
 import org.bibsonomy.plugin.jabref.action.ShowSettingsDialogAction;
 import org.bibsonomy.plugin.jabref.gui.SearchType;
+import org.bibsonomy.plugin.jabref.util.BibSonomyCallBack;
 import org.bibsonomy.plugin.jabref.util.JabRefModelConverter;
-import org.bibsonomy.plugin.jabref.util.PluginCallBack;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
  * Import a posts from the service
- * 
+ *
  * @author Waldemar Biller <biller@cs.uni-kassel.de>
- * 
  */
-public class ImportPostsByCriteriaWorker extends AbstractPluginWorker {
+public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 
-	private static final Log LOG = LogFactory.getLog(ImportPostsByCriteriaWorker.class);
+	private static final Log LOGGER = LogFactory.getLog(ImportPostsByCriteriaWorker.class);
 
 	private SearchType type;
 
@@ -77,12 +54,13 @@ public class ImportPostsByCriteriaWorker extends AbstractPluginWorker {
 		this.type = type;
 		this.grouping = grouping;
 		this.groupingValue = groupingValue;
-		this.dialog = new ImportInspectionDialog(jabRefFrame, jabRefFrame.basePanel(), BibtexFields.DEFAULT_INSPECTION_FIELDS, "Import from BibSonomy", false);
+
+		this.dialog = new ImportInspectionDialog(jabRefFrame, jabRefFrame.getCurrentBasePanel(), Localization.lang("Import from BibSonomy"), false);
 
 		this.ignoreRequestSize = ignoreRequestSize;
 
 		dialog.setLocationRelativeTo(jabRefFrame);
-		dialog.addCallBack(new PluginCallBack(this));
+		dialog.addCallBack(new BibSonomyCallBack(this));
 	}
 
 	public void run() {
@@ -90,64 +68,66 @@ public class ImportPostsByCriteriaWorker extends AbstractPluginWorker {
 		dialog.setVisible(true);
 		dialog.setProgress(0, 0);
 
-		int numberOfPosts = 0, start = 0, end = PluginProperties.getNumberOfPostsPerRequest(), cycle = 0, numberOfPostsPerRequest = PluginProperties.getNumberOfPostsPerRequest();
+		int numberOfPosts = 0, start = 0, end = BibSonomyProperties.getNumberOfPostsPerRequest(), cycle = 0, numberOfPostsPerRequest = BibSonomyProperties.getNumberOfPostsPerRequest();
 		boolean continueFetching = false;
 		do {
-			numberOfPosts = 0;
-
 			List<String> tags = null;
 			String search = null;
 			switch (type) {
-			case TAGS:
-				if (criteria.contains(" ")) {
-					tags = Arrays.asList(criteria.split("\\s"));
-				} else {
-					tags = Arrays.asList(new String[] { criteria });
-				}
-				break;
-			case FULL_TEXT:
-				search = criteria;
-				break;
+				case TAGS:
+					if (criteria.contains(" ")) {
+						tags = Arrays.asList(criteria.split("\\s"));
+					} else {
+						tags = Collections.singletonList(criteria);
+					}
+					break;
+				case FULL_TEXT:
+					search = criteria;
+					break;
 			}
 
 			try {
 
-				final Collection<Post<BibTex>> result = getLogic().getPosts(BibTex.class, grouping, groupingValue, tags, null, search, null, null, null, null, start, end);
+				final Collection<Post<BibTex>> result = getLogic().getPosts(BibTex.class, grouping, groupingValue, tags, null, search, null, null, null, null, null, start, end);
 				for (Post<? extends Resource> post : result) {
 					dialog.setProgress(numberOfPosts++, numberOfPostsPerRequest);
-					BibtexEntry entry = JabRefModelConverter.convertPost(post);
+					Optional<BibEntry> entry = JabRefModelConverter.convertPostOptional(post);
 
-					// clear fields if the fetched posts does not belong to the
-					// user
-					if (!PluginProperties.getUsername().equals(entry.getField("username"))) {
-						entry.clearField("intrahash");
-						entry.clearField("interhash");
-						entry.clearField("file");
-						entry.clearField("owner");
+					if(entry.isPresent()){
+						BibEntry bibEntry = entry.get();
+						// clear fields if the fetched posts does not belong to the user
+						Optional<String> optUserName = bibEntry.getField(FieldName.USERNAME);
+						if (optUserName.isPresent()) {
+							if (!BibSonomyProperties.getUsername().equals(optUserName.get())) {
+								bibEntry.clearField(FieldName.INTRAHASH);
+								bibEntry.clearField(FieldName.FILE);
+								bibEntry.clearField(FieldName.OWNER);
+							}
+						}
+						dialog.addEntry(bibEntry);
 					}
-					dialog.addEntry(entry);
 				}
 
 				if (!continueFetching) {
 					if (!ignoreRequestSize) {
 
-						if (!PluginProperties.getIgnoreMorePostsWarning()) {
+						if (!BibSonomyProperties.getIgnoreMorePostsWarning()) {
 
 							if (numberOfPosts == numberOfPostsPerRequest) {
-								int status = JOptionPane.showOptionDialog(dialog, "<html>There are probably more than " + PluginProperties.getNumberOfPostsPerRequest()
-										+ " posts available. Continue importing?<br>You can stop importing entries by hitting the Stop button on the import dialog.", "More posts available",
+								int status = JOptionPane.showOptionDialog(dialog, "<html>There are probably more than " + BibSonomyProperties.getNumberOfPostsPerRequest()
+												+ " posts available. Continue importing?<br>You can stop importing entries by hitting the Stop button on the import dialog.", "More posts available",
 										JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, JOptionPane.YES_OPTION);
 
 								switch (status) {
-								case JOptionPane.YES_OPTION:
-									continueFetching = true;
-									break;
+									case JOptionPane.YES_OPTION:
+										continueFetching = true;
+										break;
 
-								case JOptionPane.NO_OPTION:
-									this.stopFetching();
-									break;
-								default:
-									break;
+									case JOptionPane.NO_OPTION:
+										this.stopFetching();
+										break;
+									default:
+										break;
 								}
 							}
 						}
@@ -158,9 +138,8 @@ public class ImportPostsByCriteriaWorker extends AbstractPluginWorker {
 
 				cycle++;
 			} catch (AuthenticationException ex) {
+				LOGGER.warn(ex.getLocalizedMessage(), ex);
 				(new ShowSettingsDialogAction((JabRefFrame) dialog.getOwner())).actionPerformed(null);
-			} catch (Exception ex) {
-				LOG.error("Failed to import posts", ex);
 			}
 		} while (fetchNext() && numberOfPosts >= numberOfPostsPerRequest);
 

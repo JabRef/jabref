@@ -128,6 +128,12 @@ public class FieldName {
     public static final String YEAR = "year";
     public static final String YEARFILED = "yearfiled";
 
+    // Additional BibSonomy fields
+    public static final String DESCRIPTION = "description";
+    public static final String INTERHASH = "interhash";
+    public static final String INTRAHASH = "intrahash";
+    public static final String USERNAME = "username";
+
     // IEEE BSTctl fields
     public static final String CTLALT_STRETCH_FACTOR = "ctlalt_stretch_factor";
     public static final String CTLDASH_REPEATED_NAMES = "ctldash_repeated_names";

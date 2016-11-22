@@ -144,6 +144,7 @@ import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bibsonomy.plugin.jabref.BibSonomySidePaneComponent;
 import osx.macadapter.MacAdapter;
 
 /**
@@ -475,6 +476,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private GeneralFetcher generalFetcher;
     private OpenOfficePanel openOfficePanel;
     private GroupSelector groupSelector;
+    private BibSonomySidePaneComponent bibsonomySidePaneComponent;
 
     private int previousTabCount = -1;
 
@@ -721,6 +723,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
         sidePaneManager.register(groupSelector);
+
+        bibsonomySidePaneComponent = new BibSonomySidePaneComponent(sidePaneManager, this);
+        sidePaneManager.register( bibsonomySidePaneComponent);
     }
 
     /**
@@ -1319,6 +1324,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(abbreviateMedline);
         tools.add(unabbreviate);
         mb.add(tools);
+
+        mb.add(bibsonomySidePaneComponent.getMenuItem());
 
         options.add(showPrefs);
 
