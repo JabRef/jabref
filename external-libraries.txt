@@ -177,6 +177,6 @@ Licence: Apache License, Version 2.0
 Id:      com.eclipse.j2v8
 Project: J2V8
 URL:     https://github.com/eclipsesource/J2V8
-Licence: EPL- 1.0
+Licence: EPL-1.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
