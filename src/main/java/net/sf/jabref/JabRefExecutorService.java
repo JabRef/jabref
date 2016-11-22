@@ -130,6 +130,13 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
+    public void stopRemoteThread() {
+        if(remoteThread != null) {
+            remoteThread.interrupt();
+            remoteThread = null;
+        }
+    }
+
     public void submit(TimerTask timerTask, long millisecondsDelay) {
         timer.schedule(timerTask, millisecondsDelay);
     }
@@ -140,9 +147,7 @@ public class JabRefExecutorService implements Executor {
         //those threads will be interrupted in their current task
         this.lowPriorityExecutorService.shutdownNow();
         // kill the remote thread
-        if(remoteThread != null) {
-            remoteThread.interrupt();
-        }
+        stopRemoteThread();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 
