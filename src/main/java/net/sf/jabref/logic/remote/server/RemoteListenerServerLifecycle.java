@@ -18,14 +18,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerThread remoteListenerServerThread;
+    private RemoteListenerServerRunnable remoteListenerServerStop;
 
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 
     public void stop() {
         if (isOpen()) {
-            remoteListenerServerThread.interrupt();
-            remoteListenerServerThread = null;
+            remoteListenerServerStop.stopServer();
+            remoteListenerServerStop = null;
         }
     }
 
@@ -37,26 +37,26 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
             return;
         }
 
-        RemoteListenerServerThread result;
+        RemoteListenerServerRunnable result;
         try {
-            result = new RemoteListenerServerThread(messageHandler, port);
+            result = new RemoteListenerServerRunnable(messageHandler, port);
         } catch (BindException e) {
             LOGGER.warn("Port is blocked", e);
             result = null;
         } catch (IOException e) {
             result = null;
         }
-        remoteListenerServerThread = result;
+        remoteListenerServerStop = result;
     }
 
     public boolean isOpen() {
-        return remoteListenerServerThread != null;
+        return remoteListenerServerStop != null;
     }
 
     public void start() {
         if (isOpen()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerThread);
+            JabRefExecutorService.INSTANCE.executeInterruptableTask(remoteListenerServerStop);
         }
     }
 
