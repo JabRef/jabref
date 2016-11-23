@@ -81,7 +81,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     @Override
-    public void init() throws Throwable {
+    public void init() throws Exception {
         success = false;
         canceled = false;
         fileLockedError = false;
@@ -280,7 +280,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      * Run the "Save" operation. This method offloads the actual save operation to a background thread, but
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
-    public void runCommand() throws Throwable {
+    public void runCommand() throws Exception {
         // This part uses Spin's features:
         Worker worker = getWorker();
         // The Worker returned by getWorker() has been wrapped
@@ -300,12 +300,12 @@ public class SaveDatabaseAction extends AbstractWorker {
         callback.update(); // Runs the update() method on the EDT.
     }
 
-    public void save() throws Throwable {
+    public void save() throws Exception {
         runCommand();
         frame.updateEnabledState();
     }
 
-    public void saveAs() throws Throwable {
+    public void saveAs() throws Exception {
         // configure file dialog
         FileDialog dialog = new FileDialog(frame);
         dialog.withExtension(FileExtensions.BIBTEX_DB);
@@ -324,7 +324,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      * Run the "Save as" operation. This method offloads the actual save operation to a background thread, but
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
-    public void saveAs(File file) throws Throwable {
+    public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
 
         if (context.getLocation() == DatabaseLocation.SHARED) {

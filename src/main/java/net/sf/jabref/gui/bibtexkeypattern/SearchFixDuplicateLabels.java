@@ -64,7 +64,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
     }
 
     @Override
-    public void init() throws Throwable {
+    public void init() throws Exception {
         panel.output(Localization.lang("Resolving duplicate BibTeX keys..."));
 
     }
