@@ -23,7 +23,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
 
     }
 
-    public void init() throws Throwable {
+    public void init() throws Exception {
         // Do nothing
     }
 
