@@ -141,6 +141,7 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
+            srcDir file('src/databaseTest/java')
         }
     }
     integrationTest {
