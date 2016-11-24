@@ -20,7 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
-- Fixed: [#2298](https://github.com/JabRef/jabref/issues/2298): dev-Tag is now considered by the Version check
+- Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 
 ### Removed
 
