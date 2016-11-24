@@ -6,6 +6,10 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
+import net.sf.jabref.JabRefGUI;
+
+import org.controlsfx.dialog.ExceptionDialog;
+
 /**
  * This class provides methods to create default
  * JavaFX dialogs which will also work on top of Swing
@@ -43,6 +47,13 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public void showErrorDialogAndWait(String message, Throwable exception) {
+        ExceptionDialog exceptionDialog = new ExceptionDialog(exception);
+        exceptionDialog.setHeaderText(message);
+        exceptionDialog.showAndWait();
+    }
+
+    @Override
     public Optional<ButtonType> showConfirmationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         return alert.showAndWait();
@@ -63,5 +74,10 @@ public class FXDialogService implements DialogService {
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();
+    }
+
+    @Override
+    public void notify(String message) {
+        JabRefGUI.getMainFrame().output(message);
     }
 }
