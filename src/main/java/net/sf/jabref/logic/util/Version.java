@@ -128,7 +128,12 @@ public class Version {
                     return true;
                 } else if (this.getPatch() == otherVersion.getPatch()) {
                     // if the patch numbers are equal compare the development stages
-                    return this.developmentStage.isMoreStableThan(otherVersion.developmentStage);
+                    if (this.developmentStage.isMoreStableThan(otherVersion.developmentStage)) {
+                        return true;
+                    } else if (this.developmentStage == otherVersion.developmentStage) {
+                        // if the stage is equal check if this version is in development and the other is not
+                        return !this.isDevelopmentVersion && otherVersion.isDevelopmentVersion;
+                    }
                 }
             }
         }
