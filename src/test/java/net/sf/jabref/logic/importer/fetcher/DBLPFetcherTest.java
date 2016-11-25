@@ -25,19 +25,24 @@ public class DBLPFetcherTest {
     @Before
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
-                mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentParserPreferences())
+                .thenReturn(mock(FieldContentParserPreferences.class));
         dblpFetcher = new DBLPFetcher(importFormatPreferences);
         entry = new BibEntry();
 
         entry.setType(BibtexEntryTypes.ARTICLE.getName());
         entry.setCiteKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(FieldName.TITLE, "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
+        entry.setField(FieldName.TITLE,
+                "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
         entry.setField(FieldName.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
         entry.setField(FieldName.JOURNAL, "Softwaretechnik-Trends");
         entry.setField(FieldName.VOLUME, "36");
         entry.setField(FieldName.NUMBER, "2");
         entry.setField(FieldName.YEAR, "2016");
+        entry.setField(FieldName.URL,
+                "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
+        entry.setField("biburl", "http://dblp.dagstuhl.de/rec/bib/journals/stt/GeigerHL16");
+        entry.setField("bibsource", "dblp computer science bibliography, http://dblp.org");
 
     }
 
