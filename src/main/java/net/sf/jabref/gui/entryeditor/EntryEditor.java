@@ -462,6 +462,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
+     * Rebuild the field tabs. This is called e.g. when a new content selector
+     * has been added.
+     */
+    public void rebuildPanels() {
+        // Remove change listener, because the rebuilding causes meaningless
+        // events and trouble:
+        tabbed.removeChangeListener(tabListener);
+
+        setupFieldPanels();
+        // Add the change listener again:
+        tabbed.addChangeListener(tabListener);
+        revalidate();
+        repaint();
+    }
+
+    /**
      * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
      * If the name has an entry, the proper component to be shown is created and
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
@@ -843,6 +859,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    public void updateAllContentSelectors() {
+        if (!contentSelectors.isEmpty()) {
+            for (FieldContentSelector contentSelector : contentSelectors) {
+                contentSelector.rebuildComboBox();
+            }
+        }
+    }
+
     /**
      * Update the JTextArea when a field has changed.
      */
@@ -909,18 +933,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     }
                 }
 
-                public void updateAllContentSelectors() {
-                    if (!contentSelectors.isEmpty()) {
-                        for (FieldContentSelector contentSelector : contentSelectors) {
-                            contentSelector.rebuildComboBox();
-                        }
-                    }
-                }
+
                 private void handleTypeChange() {
                     showChangeEntryTypePopupMenu();
                 }
             });
         }
+
 
         @Override
         public void paintComponent(Graphics g) {

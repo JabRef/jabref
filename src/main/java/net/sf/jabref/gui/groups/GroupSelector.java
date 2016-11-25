@@ -128,7 +128,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final AddToGroupAction moveToGroup = new AddToGroupAction(true);
     private final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
 
-    private ToggleAction toggleAction;
+    private final ToggleAction toggleAction;
 
 
     /**
@@ -253,7 +253,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         helpButton.setMargin(butIns);
         openSettings.setMargin(butIns);
         newButton.addActionListener(e -> {
-            GroupDialog gd = new GroupDialog(frame, null);
+            GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.setVisible(true);
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -787,7 +787,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNodeViewModel node = getNodeToUse();
             final AbstractGroup oldGroup = node.getNode().getGroup();
-            final GroupDialog gd = new GroupDialog(frame, oldGroup);
+            final GroupDialog gd = new GroupDialog(frame, panel, oldGroup);
             gd.setVisible(true);
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -834,7 +834,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final GroupDialog gd = new GroupDialog(frame, null);
+            final GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.setVisible(true);
             if (!gd.okPressed()) {
                 return; // ignore
@@ -865,7 +865,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final GroupDialog gd = new GroupDialog(frame, null);
+            final GroupDialog gd = new GroupDialog(frame, panel, null);
             gd.setVisible(true);
             if (!gd.okPressed()) {
                 return; // ignore

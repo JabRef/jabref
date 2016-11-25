@@ -321,7 +321,7 @@ class ContentSelectorDialog2 extends JDialog {
     private void setupFieldSelector() {
         fieldListModel.clear();
         SortedSet<String> contents = new TreeSet<>();
-        for (String s : metaData) {
+        for (String s : metaData.) {
             if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 contents.add(s.substring(MetaData.SELECTOR_META_PREFIX.length()));
             }

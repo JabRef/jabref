@@ -63,6 +63,7 @@ public class FieldContentSelector extends JComponent {
     public FieldContentSelector(JabRefFrame frame, final BasePanel panel, Window owner, final FieldEditor editor,
             final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
+
         this.editor = editor;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.action = action;

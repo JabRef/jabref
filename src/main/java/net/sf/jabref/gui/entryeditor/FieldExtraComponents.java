@@ -36,6 +36,8 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperty;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -67,6 +69,7 @@ public class FieldExtraComponents {
             contentSelectors.add(ws);
             controls.add(ws, BorderLayout.NORTH);
         }
+
 
         // Button to toggle abbreviated/full journal names
         JButton button = new JButton(Localization.lang("Toggle abbreviation"));
@@ -387,6 +390,25 @@ public class FieldExtraComponents {
         });
         return Optional.of(button);
 
+    }
+
+    /**
+     * Return a button opening a content selector for fields where one exists
+     *
+     * @param frame
+     * @param panel
+     * @param editor
+     * @param contentSelectors
+     * @param storeFieldAction
+     * @return
+     */
+    public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
+            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
+                InternalBibtexFields.getFieldProperties(editor.getFieldName())
+                        .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
+        contentSelectors.add(ws);
+        return Optional.of(ws);
     }
 
     /**

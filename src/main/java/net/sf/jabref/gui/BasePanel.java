@@ -130,6 +130,7 @@ import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
@@ -192,6 +193,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
+
+    private final Map<String, EntryEditor> entryEditors = new HashMap<>();
 
     // in switching between entries.
     private PreambleEditor preambleEditor;
@@ -1522,7 +1525,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
+                    autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
@@ -1800,6 +1804,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markNonUndoableBaseChanged() {
         nonUndoableChange = true;
         markBaseChanged();
+    }
+
+    public void rebuildAllEntryEditors() {
+        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
+            EntryEditor ed = stringEntryEditorEntry.getValue();
+            ed.rebuildPanels();
+        }
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -2367,6 +2378,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             return Optional.empty();
         }
+    }
+
+
+    public Map<String, EntryEditor> getEntryEditors() {
+        return entryEditors;
     }
 
 

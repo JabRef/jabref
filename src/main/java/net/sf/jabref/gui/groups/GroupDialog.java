@@ -28,6 +28,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
@@ -111,7 +112,7 @@ class GroupDialog extends JDialog {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame,
-            AbstractGroup editedGroup) {
+            BasePanel basePanel, AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
 
         // set default values (overwritten if editedGroup != null)
