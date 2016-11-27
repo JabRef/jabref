@@ -92,6 +92,7 @@ public class RenamePdfCleanupTest {
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
         String fileNamePattern = "\\bibtexkey - \\title";
         String fileDirPattern = "";
+
         File tempFile = testFolder.newFile("Toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
@@ -124,8 +125,7 @@ public class RenamePdfCleanupTest {
     }
 
     @Test
-    public void cleanUpRenamePdfRenameFileDirectoryPattern() throws IOException
-    {
+    public void cleanUpRenamePdfRenameFileDirectoryPattern() throws IOException {
 
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         String fileDirPattern = "\\EntryType";
@@ -139,7 +139,11 @@ public class RenamePdfCleanupTest {
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
-        ParsedFileField newFileField = new ParsedFileField("", "Misc\\Toot - test title.pdf", "PDF");
+
+        Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
+        String relativeFile = parent.relativize(parent.resolve("Misc/Toot - test title.pdf")).toString();
+
+        ParsedFileField newFileField = new ParsedFileField("", relativeFile, "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -152,18 +156,19 @@ public class RenamePdfCleanupTest {
         File subFolder = testFolder.newFolder("subbfolder");
         Path file = Files.createTempFile(subFolder.toPath(), "Toot", "pdf");
 
-
-
         ParsedFileField fileField = new ParsedFileField("", file.toString(), "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
-
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
-        ParsedFileField newFileField = new ParsedFileField("", "Misc\\Toot - test title.pdf", "PDF");
+
+        Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
+        String relativeFile = parent.relativize(parent.resolve("Misc/Toot - test title.pdf")).toString();
+
+        ParsedFileField newFileField = new ParsedFileField("", relativeFile, "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -183,7 +188,11 @@ public class RenamePdfCleanupTest {
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
-        ParsedFileField newFileField = new ParsedFileField("", "Toot - test title\\Toot - test title.pdf", "PDF");
+
+        Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
+        String relativeFile = parent.relativize(parent.resolve("Toot - test title/Toot - test title.pdf")).toString();
+
+        ParsedFileField newFileField = new ParsedFileField("", relativeFile, "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -203,7 +212,11 @@ public class RenamePdfCleanupTest {
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
-        ParsedFileField newFileField = new ParsedFileField("", "Toot - test title\\Toot.pdf", "PDF");
+
+        Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
+        String relativeFile = parent.relativize(parent.resolve("Toot - test title/Toot.pdf")).toString();
+
+        ParsedFileField newFileField = new ParsedFileField("", relativeFile, "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 

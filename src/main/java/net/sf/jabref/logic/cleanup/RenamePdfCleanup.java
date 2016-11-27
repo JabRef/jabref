@@ -72,9 +72,6 @@ public class RenamePdfCleanup implements CleanupJob {
                 targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
                         prefs);
             }
-            System.out.println("FileDirPrefs " + fileDirPattern);
-
-            System.out.println("TARGET DIR " + targetDirName);
 
             //Add extension to newFilename
             targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
@@ -84,7 +81,6 @@ public class RenamePdfCleanup implements CleanupJob {
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
                     databaseContext.getFileDirectories(fileDirectoryPreferences));
 
-            expandedOldFile.ifPresent(f -> System.out.println("Expanded old file " + f));
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 newFileList.add(flEntry);
@@ -93,12 +89,8 @@ public class RenamePdfCleanup implements CleanupJob {
             Path newPath = null;
             Optional<Path> dir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
             if (dir.isPresent()) {
-                System.out.println("Dir from setting " + dir.get());
 
                 newPath = dir.get().resolve(targetDirName).resolve(targetFileName.toString());
-
-                System.out.println("New Path 2 " + newPath);
-                //            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
 
                 String expandedOldFilePath = expandedOldFile.get().toString();
                 boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
@@ -133,21 +125,15 @@ public class RenamePdfCleanup implements CleanupJob {
 
                     Optional<Path> settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
                     if (settingsDir.isPresent()) {
-                        System.out.println("Dir from setting " + settingsDir);
 
                         Path parent = settingsDir.get();
-                        System.out.println("oldDir " + parent);
-
                         String newFileEntryFileName;
                         if ((parent == null)
                                 || databaseContext.getFileDirectories(fileDirectoryPreferences).contains(parent)) {
                             newFileEntryFileName = targetFileName.toString();
 
                         } else {
-
-                            String par = parent.relativize(newPath).toString();
-                            System.out.println("NewEntryFileName " + par);
-                            newFileEntryFileName = par;
+                            newFileEntryFileName = parent.relativize(newPath).toString();
                         }
 
                         newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
