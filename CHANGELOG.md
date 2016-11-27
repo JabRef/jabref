@@ -13,7 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
-
+- Files can now be moved to subfolders named by a custom format pattern, e.g. based on `entrytype`. The pattern can be specfified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 ### Fixed
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
 - We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
