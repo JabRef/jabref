@@ -154,9 +154,9 @@ public class DBMSSynchronizer {
             }
         }
 
+        dbmsProcessor.startNotificationListener(this);
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
-        dbmsProcessor.startNotificationListener(this);
     }
 
     /**
@@ -261,7 +261,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData = MetaDataParser.parse(dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }

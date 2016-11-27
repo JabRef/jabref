@@ -35,8 +35,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
-version = "3.7-dev"
-project.ext.threeDotVersion = "3.6.0.1"
+version = "3.8-dev"
+project.ext.threeDotVersion = "3.7.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -87,7 +87,7 @@ dependencies {
     compile 'org.openoffice:ridl:4.1.2'
     compile 'org.openoffice:unoil:4.1.2'
 
-    compile 'com.googlecode.java-diff-utils:diffutils:1.3.0'
+    compile 'com.github.bkromhout:java-diff-utils:2.1.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -116,17 +116,17 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jcl:2.7'
     compile 'org.apache.logging.log4j:log4j-api:2.7'
     compile 'org.apache.logging.log4j:log4j-core:2.7'
-    compile 'org.xmlunit:xmlunit-core:2.2.1'
-    compile 'org.xmlunit:xmlunit-matchers:2.2.1'
+    compile 'org.xmlunit:xmlunit-core:2.3.0'
+    compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
-    compile 'de.undercouch:citeproc-java:1.0.0-SNAPSHOT'
+    compile 'de.undercouch:citeproc-java:1.0.1'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.9'
-    testCompile 'com.github.tomakehurst:wiremock:2.2.2'
+    testCompile 'org.mockito:mockito-core:2.2.15'
+    testCompile 'com.github.tomakehurst:wiremock:2.3.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
@@ -141,6 +141,7 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
+            srcDir file('src/databaseTest/java')
         }
     }
     integrationTest {
@@ -380,17 +381,6 @@ task releaseJar(dependsOn: "shadowJar") {
             }
         }
     }
-}
-
-// fetch all dependencies to speedup CircleCI build
-// this is necessary until https://discuss.circleci.com/t/effective-caching-for-gradle/540 is resolved
-// see http://stackoverflow.com/a/27455099/873282 for an inspiration of this task
-// better solution: https://discuss.gradle.org/t/how-to-download-maven-dependencies-into-project-local-directory-and-set-eclipse-classpath/9851
-task getdeps(type: Copy) {
-    from(configurations.compile + configurations.antlr3 + configurations.antlr4 + configurations.testCompile) {
-        include "*.jar"
-    }
-    into 'build/tmp/alldeps/'
 }
 
 jmh {

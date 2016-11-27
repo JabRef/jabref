@@ -1897,7 +1897,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), bes.getCiteKeyOptional().get()));
+                    bes.getCiteKeyOptional().ifPresent(
+                            newKey -> ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), newKey)));
                 }
             }
 

@@ -19,6 +19,7 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.importer.ImportException;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -38,7 +39,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final Importer importer;
-    private IOException importError;
+    private Exception importError;
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -111,14 +112,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // Unknown format:
                         frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
-                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
+                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(file));
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer.getName(), pr));
                     }
-                } catch (IOException e) {
+                } catch (ImportException | IOException e) {
                     // This indicates that a specific importer was specified, and that
                     // this importer has thrown an IOException. We store the exception,
                     // so a relevant error message can be displayed.

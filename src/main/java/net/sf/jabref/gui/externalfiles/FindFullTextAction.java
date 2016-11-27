@@ -40,7 +40,7 @@ public class FindFullTextAction extends AbstractWorker {
     }
 
     @Override
-    public void init() throws Throwable {
+    public void init() throws Exception {
         basePanel.output(Localization.lang("Looking for full text document..."));
     }
 

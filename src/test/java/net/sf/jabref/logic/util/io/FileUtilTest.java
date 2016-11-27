@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -148,28 +149,38 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetFileExtensionSimpleString() {
+    public void getFileExtensionWithSimpleString() {
         assertEquals("pdf", FileUtil.getFileExtension("test.pdf").get());
     }
 
     @Test
-    public void testGetFileExtensionLowerCaseAndTrimmingString() {
+    public void getFileExtensionTrimsAndReturnsInLowercase() {
         assertEquals("pdf", FileUtil.getFileExtension("test.PdF  ").get());
     }
 
     @Test
-    public void testGetFileExtensionMultipleDotsString() {
+    public void getFileExtensionWithMultipleDotsString() {
         assertEquals("pdf", FileUtil.getFileExtension("te.st.PdF  ").get());
     }
 
     @Test
-    public void testGetFileExtensionNoExtensionString() {
-        assertFalse(FileUtil.getFileExtension("JustTextNotASingleDot").isPresent());
+    public void getFileExtensionWithNoDotReturnsEmptyExtension() {
+        assertEquals(Optional.empty(), FileUtil.getFileExtension("JustTextNotASingleDot"));
     }
 
     @Test
-    public void testGetFileExtensionNoExtension2String() {
-        assertFalse(FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension").isPresent());
+    public void getFileExtensionWithDotAtStartReturnsEmptyExtension() {
+        assertEquals(Optional.empty(), FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension"));
+    }
+
+    @Test
+    public void getFileNameWithSimpleString() {
+        assertEquals("test", FileUtil.getFileName("test.pdf"));
+    }
+
+    @Test
+    public void getFileNameWithMultipleDotsString() {
+        assertEquals("te.st", FileUtil.getFileName("te.st.PdF  "));
     }
 
     @Test
