@@ -112,7 +112,7 @@ public class VersionTest {
     }
 
     @Test
-    public void unknownVersionIsNotNewerThanvalidVersion() {
+    public void unknownVersionIsNotNewerThanValidVersion() {
         Version unknownVersion = Version.parse(BuildInfo.UNKNOWN_VERSION);
         Version validVersion = Version.parse("4.2");
         assertFalse(unknownVersion.isNewerThan(validVersion));
@@ -144,6 +144,14 @@ public class VersionTest {
         Version older = Version.parse("4.2");
         Version newer = Version.parse("4.3dev");
         assertTrue(newer.isNewerThan(older));
+    }
+
+    @Test
+    public void versionNewerThanDevVersion() {
+        Version older = Version.parse("1.2dev");
+        Version newer = Version.parse("1.2");
+        assertTrue(newer.isNewerThan(older));
+        assertFalse(older.isNewerThan(newer));
     }
 
     @Test
