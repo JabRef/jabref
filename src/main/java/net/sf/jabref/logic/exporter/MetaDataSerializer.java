@@ -39,6 +39,8 @@ public class MetaDataSerializer {
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
+        metaData.getContentSelectors().ifPresent(
+                contentSelectors -> stringyMetaData.put(MetaData.SELECTOR_META_PREFIX, contentSelectors.getAsStringList()));
 
         Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
 
