@@ -3,11 +3,13 @@ package net.sf.jabref.model.metadata;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class ContentSelectors {
 
-    private HashMap<String, List<String>> contentSelectors;
+    private final Map<String, List<String>> contentSelectors;
+
 
     public ContentSelectors() {
         contentSelectors = new HashMap<>();
@@ -23,7 +25,7 @@ public class ContentSelectors {
     public List<String> getSelectorsForField(String fieldName) {
         List<String> result = contentSelectors.get(fieldName);
 
-        if(result == null){
+        if (result == null) {
             result = Collections.emptyList();
         }
 
@@ -46,7 +48,7 @@ public class ContentSelectors {
         return null;
     }
 
-    public HashMap<String, List<String>> getSelectorData() {
+    public Map<String, List<String>> getSelectorData() {
         return contentSelectors;
     }
 }
