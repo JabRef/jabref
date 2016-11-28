@@ -17,7 +17,7 @@ import javax.swing.event.HyperlinkListener;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.MrDLibFetcher;
+import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -119,10 +119,11 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
             mdlFetcher.execute();
             mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
 
+                // todo
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-                        setHtmlText(mdlFetcher.getRecommendationsAsHtml());
+                        //setHtmlText(mdlFetcher.getRecommendationsAsHtml());
 
                     }
 
@@ -140,24 +141,22 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     }
 
 
-    public class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
+    class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
 
 
         private final MrDLibFetcher fetcher;
+        BibEntry selectedEntry;
 
         public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
-            fetcher = new MrDLibFetcher(selectedEntry);
+            this.selectedEntry = selectedEntry;
+            fetcher = new MrDLibFetcher();
         }
 
         @Override
         protected List<BibEntry> doInBackground() throws Exception {
-            fetcher.performSearch("");
-            return fetcher.getRecommendationsAsBibEntryList();
+            return fetcher.performSearch(selectedEntry);
         }
 
-        public List<String> getRecommendationsAsHtml() {
-            return fetcher.getRecommendationsAsHTML();
-        }
 
     }
 
