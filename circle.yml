@@ -10,7 +10,7 @@ dependencies:
     - install4j6/bin/install4jc --verbose --license=$INSTALL4J_KEY
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
-    - ./gradlew getdeps
+    - ./gradlew compileJava
   cache_directories:
     - "~/.install4j6"
     - "~/downloads"

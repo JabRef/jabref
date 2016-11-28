@@ -56,7 +56,7 @@ public class GroupAddRemoveDialog implements BaseAction {
     }
 
     @Override
-    public void action() throws Throwable {
+    public void action() throws Exception {
         Optional<GroupTreeNode> groups = panel.getBibDatabaseContext().getMetaData().getGroups();
         if (!groups.isPresent()) {
             return;

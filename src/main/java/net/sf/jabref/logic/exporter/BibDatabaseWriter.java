@@ -75,15 +75,15 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
         Optional<SaveOrderConfig> saveOrder = getSaveOrder(preferences, metaData);
 
+        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
+        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
+        comparators.add(new CrossRefEntryComparator());
+
         if (! saveOrder.isPresent()) {
-            // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
-            // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
-            // utilizing the fact that IDs used for entries are increasing, sortable numbers.
-            comparators.add(new CrossRefEntryComparator());
+            // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
-            comparators.add(new CrossRefEntryComparator());
-
+            // use configured sorting strategy
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[0]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[1]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[2]));

@@ -25,9 +25,18 @@ public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
 
-    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        MetaData metaData = new MetaData();
 
+    /**
+     * Parses the given data map and returns a new resulting {@link MetaData} instance.
+     */
+    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator);
+    }
+
+    /**
+     * Parses the data map and changes the given {@link MetaData} instance respectively.
+     */
+    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
