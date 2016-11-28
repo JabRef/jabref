@@ -45,4 +45,8 @@ public class ContentSelectors {
 
         return null;
     }
+
+    public HashMap<String, List<String>> getSelectorData() {
+        return contentSelectors;
+    }
 }

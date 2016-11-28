@@ -34,6 +34,7 @@ import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.ContentSelectors;
 import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -293,7 +294,9 @@ class ContentSelectorDialog2 extends JDialog {
                 changedFieldSet = true;
             }
 
-            metaData.setContentSelectors(entry.getKey(), new ArrayList<>(data));
+            ContentSelectors contentSelectors = new ContentSelectors();
+            contentSelectors.addContentSelector(entry.getKey(), new ArrayList<>(data));
+            metaData.setContentSelectors(contentSelectors);
         }
 
         // Update all selectors in the current BasePanel.
@@ -321,10 +324,9 @@ class ContentSelectorDialog2 extends JDialog {
     private void setupFieldSelector() {
         fieldListModel.clear();
         SortedSet<String> contents = new TreeSet<>();
-        for (String s : metaData.) {
-            if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                contents.add(s.substring(MetaData.SELECTOR_META_PREFIX.length()));
-            }
+        ContentSelectors selectors = metaData.getContentSelectors().orElse(new ContentSelectors());
+        for (String s : selectors.getSelectorData().keySet()) {
+            contents.add(s);
         }
         if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
