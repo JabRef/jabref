@@ -155,13 +155,16 @@ public class AppendDatabaseAction implements BaseAction {
                 frame.getGroupSelector().addGroups(newGroups, ce);
             });
         }
+        /*
+        FIXME: import selectors
         if (importSelectorWords) {
+
             for (String s : meta) {
                 if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
                     panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
                 }
             }
-        }
+        }*/
         ce.end();
         panel.getUndoManager().addEdit(ce);
         panel.markBaseChanged();
