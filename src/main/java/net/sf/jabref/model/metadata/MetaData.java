@@ -48,6 +48,7 @@ public class MetaData {
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
+    private ContentSelectors contentSelectors;
 
     /**
      * Constructs an empty metadata.
@@ -148,21 +149,21 @@ public class MetaData {
         return isProtected;
     }
 
-    public void setContentSelectors(String fieldName, List<String> contentSelectors) {
-        putData(SELECTOR_META_PREFIX + fieldName, contentSelectors);
+    public Optional<ContentSelectors> getContentSelectors() {
+        return Optional.ofNullable(contentSelectors);
+    }
+
+    public void setContentSelectors(ContentSelectors contentSelectors) {
+        this.contentSelectors = Objects.requireNonNull(contentSelectors);
+        postChange();
     }
 
     public void clearContentSelectors(String fieldName) {
-        remove(SELECTOR_META_PREFIX + fieldName);
+        contentSelectors.removeSelector(fieldName);
     }
 
     public List<String> getContentSelectors(String fieldName) {
-        List<String> contentSelectors = getData(SELECTOR_META_PREFIX + fieldName);
-        if (contentSelectors == null) {
-            return Collections.emptyList();
-        } else {
-            return contentSelectors;
-        }
+        return contentSelectors.getSelectorsForField(fieldName);
     }
 
     public Optional<String> getDefaultFileDirectory() {

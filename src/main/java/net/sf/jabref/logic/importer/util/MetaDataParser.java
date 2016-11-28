@@ -14,6 +14,7 @@ import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.metadata.ContentSelectors;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 
@@ -80,6 +81,9 @@ public class MetaDataParser {
                 break;
             case MetaData.SAVE_ORDER_CONFIG:
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+                break;
+            case MetaData.SELECTOR_META_PREFIX:
+                metaData.setContentSelectors(ContentSelectors.parse(value));
                 break;
             case "groupsversion":
             case "groups":
