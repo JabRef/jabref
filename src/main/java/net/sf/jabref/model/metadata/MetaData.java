@@ -22,6 +22,7 @@ import net.sf.jabref.model.metadata.event.MetaDataChangedEvent;
 import com.google.common.eventbus.EventBus;
 
 public class MetaData {
+
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
     public static final String SAVE_ACTIONS = "saveActions";
@@ -48,7 +49,8 @@ public class MetaData {
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
-    private ContentSelectors contentSelectors;
+    private ContentSelectors contentSelectors = new ContentSelectors();
+
 
     /**
      * Constructs an empty metadata.
@@ -271,12 +273,14 @@ public class MetaData {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return (isProtected == metaData.isProtected) && Objects.equals(groupsRoot, metaData.groupsRoot) && Objects.equals(
-                encoding, metaData.encoding) && Objects.equals(saveOrderConfig, metaData.saveOrderConfig) && Objects
-                .equals(citeKeyPatterns, metaData.citeKeyPatterns) && Objects.equals(userFileDirectory,
-                metaData.userFileDirectory) && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode) && Objects.equals(
-                defaultFileDirectory, metaData.defaultFileDirectory);
+        return (isProtected == metaData.isProtected) && Objects.equals(groupsRoot, metaData.groupsRoot)
+                && Objects.equals(encoding, metaData.encoding)
+                && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
+                && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
+                && Objects.equals(userFileDirectory, metaData.userFileDirectory)
+                && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
+                && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
+                && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory);
     }
 
     @Override
