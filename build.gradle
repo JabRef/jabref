@@ -125,7 +125,7 @@ dependencies {
     compile 'de.undercouch:citeproc-java:1.0.1'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.15'
+    testCompile 'org.mockito:mockito-core:2.2.21'
     testCompile 'com.github.tomakehurst:wiremock:2.3.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
