@@ -183,8 +183,8 @@ public class ExportFormat implements IExportFormat {
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
-        Objects.requireNonNull(databaseContext, "Database Context must not be null!");
-        Objects.requireNonNull(entries, "Entries must not be null!");
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }

@@ -23,7 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
 - Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 - Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
-- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui modus is now working again.
+- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
 
 ### Removed
 
