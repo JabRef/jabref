@@ -42,7 +42,7 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
         if(metaData.getContentSelectors().isPresent()){
             for(ContentSelector selector: metaData.getContentSelectors().get().getContentSelectors()){
-                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + "_" + selector.getFieldName(), selector.getValues());
+                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
             }
         }
 
