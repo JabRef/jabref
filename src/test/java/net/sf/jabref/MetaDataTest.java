@@ -61,7 +61,7 @@ public class MetaDataTest {
         metaData.addContentSelector(new ContentSelector("status", values));
 
         Map<String, String> expectedSerialization = new TreeMap<>();
-        expectedSerialization.put(MetaData.SELECTOR_META_PREFIX + "_status",
+        expectedSerialization.put(MetaData.SELECTOR_META_PREFIX + "status",
                 "approved;captured;received;status;");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
