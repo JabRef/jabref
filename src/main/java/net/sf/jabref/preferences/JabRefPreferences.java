@@ -96,7 +96,6 @@ public class JabRefPreferences {
     public static final String BIBSONOMY_PROPERTIES = "bibsonomyProperties";
     public static final String EMACS_PATH = "emacsPath";
     public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    public static final String EMACS_23 = "emacsUseV23InsertString";
     public static final String LATEX_EDITOR_PATH = "latexEditorPath";
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
@@ -476,28 +475,21 @@ public class JabRefPreferences {
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
         if (OS.OS_X) {
-            defaults.put(EMACS_PATH, "emacsclient");
-            defaults.put(EMACS_23, true);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "SansSerif");
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
-
+            defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
+            defaults.put(FONT_FAMILY, "Arial");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
-            defaults.put(EMACS_23, Boolean.TRUE);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-            defaults.put(FONT_FAMILY, "Arial");
-
         } else {
             // Linux
-            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
             defaults.put(FONT_FAMILY, "SansSerif");
-
-            defaults.put(EMACS_PATH, "gnuclient");
-            defaults.put(EMACS_23, Boolean.FALSE);
-            defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
+            defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.plaf.plastic.Plastic3DLookAndFeel");
+            defaults.put(EMACS_PATH, "emacsclient");
         }
+        defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
+
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
         defaults.put(RECENT_DATABASES, "");

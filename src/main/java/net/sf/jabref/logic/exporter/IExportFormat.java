@@ -31,8 +31,8 @@ public interface IExportFormat {
      * @param encoding
      *            The encoding to use.
      * @param entries
-     *            (may be null) A list containing all entries that
-     *            should be exported. If null, all entries will be exported.
+     *             A list containing all entries that
+     *            should be exported. The list of entries must be non null
      * @throws Exception
      */
     void performExport(BibDatabaseContext databaseContext, String file, Charset encoding, List<BibEntry> entries)
@@ -45,8 +45,8 @@ public interface IExportFormat {
      * @param databaseContext the database to export from.
      * @param file  the Path to the file to write to.The path should be an java.nio.Path
      * @param encoding  The encoding to use.
-     * @param entries (may be null) A list containing all entries that
-     * should be exported. If null, all entries will be exported.
+     * @param entries  A list containing all entries that
+     * should be exported. The list of entries must be non null
      * @throws Exception
      */
     void performExport(BibDatabaseContext databaseContext, Path file, Charset encoding, List<BibEntry> entries)

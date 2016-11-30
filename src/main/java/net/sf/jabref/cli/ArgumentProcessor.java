@@ -52,16 +52,19 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
+
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
+
     public enum Mode {
-        INITIAL_START,
-        REMOTE_START
+        INITIAL_START, REMOTE_START
     }
+
 
     private final JabRefCLI cli;
 
@@ -70,6 +73,7 @@ public class ArgumentProcessor {
     private final Mode startupMode;
 
     private boolean noGUINeeded;
+
 
     public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
@@ -170,8 +174,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
-        SearchQuery query = new SearchQuery(searchTerm,
-                searchPreferences.isCaseSensitive(),
+        SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
@@ -208,7 +211,7 @@ public class ArgumentProcessor {
                             matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                            + ex.getMessage());
+                            + ExceptionUtils.getStackTrace(ex));
                 }
             }
         } else {
@@ -244,8 +247,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = ParserResult.getNullResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver,
-                            Globals.prefs.getImportFormatPreferences());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
                 }
 
                 if (!bibExtension || (pr.isNullResult())) {
@@ -296,12 +298,10 @@ public class ArgumentProcessor {
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
                     SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
-                            FileSaveSession::new);
+                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                     Defaults defaults = new Defaults(BibDatabaseMode
                             .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
-                            prefs);
+                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
 
                     // Show just a warning message if encoding did not work for all characters:
                     if (!session.getWriter().couldEncodeAll()) {
@@ -313,8 +313,7 @@ public class ArgumentProcessor {
                     }
                     session.commit(subName);
                 } catch (SaveException ex) {
-                    System.err.println(
-                            Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                    System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                 }
 
                 notSavedMsg = true;
@@ -339,8 +338,8 @@ public class ArgumentProcessor {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
                         SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
-                                Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                        Defaults defaults = new Defaults(BibDatabaseMode
+                                .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
                         SaveSession session = databaseWriter.saveDatabase(
@@ -356,8 +355,7 @@ public class ArgumentProcessor {
                         }
                         session.commit(data[0]);
                     } catch (SaveException ex) {
-                        System.err.println(
-                                Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                        System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                     }
                 }
             } else {
@@ -389,10 +387,11 @@ public class ArgumentProcessor {
                     format.performExport(pr.getDatabaseContext(), data[0],
                             pr.getDatabaseContext().getMetaData().getEncoding()
                                     .orElse(Globals.prefs.getDefaultEncoding()),
-                            null);
+                            pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
+
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                            + ex.getMessage());
+                            + ExceptionUtils.getStackTrace(ex));
                 }
             }
 
@@ -456,8 +455,7 @@ public class ArgumentProcessor {
                     // try to make a new label
                     BibtexKeyPatternUtil.makeLabel(
                             metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            database, entry,
-                            Globals.prefs.getBibtexKeyPatternPreferences());
+                            database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
@@ -546,9 +544,7 @@ public class ArgumentProcessor {
             try {
                 file = new URLDownload(address).downloadToTemporaryFile();
             } catch (IOException e) {
-                System.err.println(
-                        Localization.lang("Problem downloading from %1", address) +
-                        e.getLocalizedMessage());
+                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
                 return Optional.empty();
             }
         } else {
@@ -569,7 +565,7 @@ public class ArgumentProcessor {
         Optional<ParserResult> importResult = importFile(file, importFormat);
         importResult.ifPresent(result -> {
             OutputPrinter printer = new SystemOutputPrinter();
-            if(result.hasWarnings()) {
+            if (result.hasWarnings()) {
                 printer.showMessage(result.getErrorMessage());
             }
         });
@@ -593,8 +589,8 @@ public class ArgumentProcessor {
                 return Optional.of(importResult.parserResult);
             }
         } catch (ImportException ex) {
-            System.err.println(
-                    Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            System.err
+                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
             return Optional.empty();
         }
     }

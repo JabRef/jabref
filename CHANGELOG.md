@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
+- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`. [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
 
 ### Fixed
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
@@ -22,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
 - Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 - Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
+- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
 
 ### Removed
 
