@@ -34,6 +34,7 @@ import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.ContentSelectors;
 import net.sf.jabref.model.metadata.MetaData;
 
@@ -294,9 +295,7 @@ class ContentSelectorDialog2 extends JDialog {
                 changedFieldSet = true;
             }
 
-            ContentSelectors contentSelectors = new ContentSelectors();
-            contentSelectors.addContentSelector(entry.getKey(), new ArrayList<>(data));
-            metaData.setContentSelectors(contentSelectors);
+            metaData.addContentSelector(new ContentSelector(entry.getKey(), new ArrayList<>(data)));
         }
 
         // Update all selectors in the current BasePanel.

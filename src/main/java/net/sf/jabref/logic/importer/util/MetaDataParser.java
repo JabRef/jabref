@@ -48,11 +48,13 @@ public class MetaDataParser {
                 String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
                 continue;
-            }
-            if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
+            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name comes directly after "FILE_DIRECTORY-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
+                continue;
+            } else if(entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)){
+                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), entry.getValue()));
                 continue;
             }
 
@@ -81,9 +83,6 @@ public class MetaDataParser {
                 break;
             case MetaData.SAVE_ORDER_CONFIG:
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
-                break;
-            case MetaData.SELECTOR_META_PREFIX:
-                metaData.setContentSelectors(ContentSelectors.parse(value));
                 break;
             case "groupsversion":
             case "groups":

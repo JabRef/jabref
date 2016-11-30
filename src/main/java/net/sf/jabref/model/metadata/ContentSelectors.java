@@ -1,5 +1,7 @@
 package net.sf.jabref.model.metadata;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -8,38 +10,40 @@ import java.util.Objects;
 
 public class ContentSelectors {
 
-    private final Map<String, List<String>> contentSelectors;
+    private final List<ContentSelector> contentSelectors;
 
 
     public ContentSelectors() {
-        contentSelectors = new HashMap<>();
+        contentSelectors = new ArrayList<>();
     }
 
-    public void addContentSelector(String fieldName, List<String> selectors) {
-        Objects.requireNonNull(fieldName);
-        Objects.requireNonNull(selectors);
+    public void addContentSelector(ContentSelector contentSelector) {
+        Objects.requireNonNull(contentSelector);
 
-        this.contentSelectors.put(fieldName, selectors);
+        this.contentSelectors.add(contentSelector);
     }
 
-    public List<String> getSelectorsForField(String fieldName) {
-        List<String> result = contentSelectors.get(fieldName);
-
-        if (result == null) {
-            result = Collections.emptyList();
+    public List<String> getSelectorValuesForField(String fieldName) {
+        for(ContentSelector selector: contentSelectors) {
+            if(selector.getFieldName().equals(fieldName)){
+                return selector.getValues();
+            }
         }
 
-        return result;
+        return Collections.emptyList();
     }
 
     public void removeSelector(String fieldName) {
         contentSelectors.remove(fieldName);
     }
 
-    public static ContentSelectors parse(List<String> selectors) {
-        //fixme: do the actual parsing
+    public static ContentSelector parse(String key, String values) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(values);
 
-        return null;
+        List<String> valueList = Arrays.asList(values.split(";"));
+
+        return new ContentSelector(key, valueList);
     }
 
     public List<String> getAsStringList() {
@@ -49,6 +53,12 @@ public class ContentSelectors {
     }
 
     public Map<String, List<String>> getSelectorData() {
-        return contentSelectors;
+        Map<String, List<String>> result = new HashMap<>();
+
+        for(ContentSelector selector: contentSelectors) {
+            result.put(selector.getFieldName(), selector.getValues());
+        }
+
+        return result;
     }
 }

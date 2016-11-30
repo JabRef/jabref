@@ -155,8 +155,8 @@ public class MetaData {
         return Optional.ofNullable(contentSelectors);
     }
 
-    public void setContentSelectors(ContentSelectors contentSelectors) {
-        this.contentSelectors = Objects.requireNonNull(contentSelectors);
+    public void addContentSelector(ContentSelector contentSelector) {
+        this.contentSelectors.addContentSelector(contentSelector);
         postChange();
     }
 
@@ -165,7 +165,7 @@ public class MetaData {
     }
 
     public List<String> getContentSelectors(String fieldName) {
-        return contentSelectors.getSelectorsForField(fieldName);
+        return contentSelectors.getSelectorValuesForField(fieldName);
     }
 
     public Optional<String> getDefaultFileDirectory() {
