@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.model.metadata;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +14,6 @@ import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.model.metadata.ContentSelector;
-import net.sf.jabref.model.metadata.MetaData;
 
 import org.junit.Before;
 import org.junit.Test;
