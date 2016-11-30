@@ -12,6 +12,7 @@ import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
@@ -39,8 +40,11 @@ public class MetaDataSerializer {
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
-        metaData.getContentSelectors().ifPresent(
-                contentSelectors -> stringyMetaData.put(MetaData.SELECTOR_META_PREFIX, contentSelectors.getAsStringList()));
+        if(metaData.getContentSelectors().isPresent()){
+            for(ContentSelector selector: metaData.getContentSelectors().get().getContentSelectors()){
+                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + "_" + selector.getFieldName(), selector.getValues());
+            }
+        }
 
         Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
 

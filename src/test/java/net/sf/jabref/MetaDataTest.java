@@ -1,6 +1,8 @@
 package net.sf.jabref;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -12,6 +14,7 @@ import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.MetaData;
 
 import org.junit.Before;
@@ -44,6 +47,22 @@ public class MetaDataTest {
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
                 "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+    }
+
+    @Test
+    public void serializeSingleContentSelectors() {
+        List<String> values = new ArrayList(4);
+        values.add("approved");
+        values.add("captured");
+        values.add("received");
+        values.add("status");
+
+        metaData.addContentSelector(new ContentSelector("status", values));
+
+        Map<String, String> expectedSerialization = new TreeMap<>();
+        expectedSerialization.put(MetaData.SELECTOR_META_PREFIX + "_status",
+                "approved;captured;received;status;");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 

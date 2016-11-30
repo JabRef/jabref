@@ -37,6 +37,10 @@ public class ContentSelectors {
         contentSelectors.remove(fieldName);
     }
 
+    public List<ContentSelector> getContentSelectors(){
+        return Collections.unmodifiableList(contentSelectors);
+    }
+
     public static ContentSelector parse(String key, String values) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(values);
@@ -44,12 +48,6 @@ public class ContentSelectors {
         List<String> valueList = Arrays.asList(values.split(";"));
 
         return new ContentSelector(key, valueList);
-    }
-
-    public List<String> getAsStringList() {
-        // fixme: do the actual serialization
-
-        return null;
     }
 
     public Map<String, List<String>> getSelectorData() {
