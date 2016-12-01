@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -14,10 +15,15 @@ public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
+    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
 
-    public IntegrityCheck(BibDatabaseContext bibDatabaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+    public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
+            FileDirectoryPreferences fileDirectoryPreferences,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences
+    ) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
+        this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -71,7 +77,7 @@ public class IntegrityCheck {
         result.addAll(new ISSNChecker().check(entry));
         result.addAll(new ISBNChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
-        result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext).check(entry));
+        result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences).check(entry));
 
         return result;
     }

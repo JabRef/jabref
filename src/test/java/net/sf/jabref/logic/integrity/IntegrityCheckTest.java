@@ -309,14 +309,16 @@ public class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                JabRefPreferences.getInstance().getBibtexKeyPatternPreferences())
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences()).checkBibtexDatabase();
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                JabRefPreferences.getInstance().getBibtexKeyPatternPreferences()).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -14,9 +15,11 @@ import net.sf.jabref.model.entry.BibEntry;
 public class BibtexkeyDeviationChecker implements Checker {
 
     private final BibDatabaseContext bibDatabaseContext;
+    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
 
-    public BibtexkeyDeviationChecker(BibDatabaseContext bibDatabaseContext) {
+    public BibtexkeyDeviationChecker(BibDatabaseContext bibDatabaseContext, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
     }
 
     @Override
@@ -29,7 +32,7 @@ public class BibtexkeyDeviationChecker implements Checker {
         String key = valuekey.get();
 
         // generate new key
-        String generatedKey = BibtexKeyPatternUtil.generateNewCityKey(bibDatabaseContext, entry);
+        String generatedKey = BibtexKeyPatternUtil.generateNewCityKey(bibDatabaseContext, entry, bibtexKeyPatternPreferences);
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
