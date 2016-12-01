@@ -3,9 +3,7 @@ package net.sf.jabref.model.metadata;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class ContentSelectors {
@@ -50,11 +48,11 @@ public class ContentSelectors {
         return new ContentSelector(key, valueList);
     }
 
-    public Map<String, List<String>> getSelectorData() {
-        Map<String, List<String>> result = new HashMap<>();
+    public List<String> getFieldNamesWithSelectors() {
+        List<String> result = new ArrayList<>(contentSelectors.size());
 
         for(ContentSelector selector: contentSelectors) {
-            result.put(selector.getFieldName(), selector.getValues());
+            result.add(selector.getFieldName());
         }
 
         return result;

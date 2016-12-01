@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.contentselector;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -29,6 +29,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.logic.help.HelpFile;
@@ -42,7 +44,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class ContentSelectorDialog2 extends JDialog {
+public class ContentSelectorDialog extends JDialog {
 
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
@@ -77,7 +79,7 @@ class ContentSelectorDialog2 extends JDialog {
     private final Map<String, DefaultListModel<String>> wordListModels = new HashMap<>();
     private final List<String> removedFields = new ArrayList<>();
 
-    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog2.class);
+    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
 
 
     /**
@@ -88,7 +90,7 @@ class ContentSelectorDialog2 extends JDialog {
      * @param modal should this dialog be modal?
      * @param fieldName the field this selector is initialized for. May be null.
      */
-    public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, String fieldName) {
+    public ContentSelectorDialog(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, String fieldName) {
         super(owner, Localization.lang("Manage content selectors"));
         this.setModal(modal);
         this.metaData = panel.getBibDatabaseContext().getMetaData();
@@ -286,12 +288,12 @@ class ContentSelectorDialog2 extends JDialog {
             }
 
             // Check if any words have been added
-            if (!data.equals(new HashSet<>(metaData.getContentSelectors(entry.getKey())))) {
+            if (!data.equals(new HashSet<>(metaData.getContentSelectorValuesForField(entry.getKey())))) {
                 anythingChanged = true;
             }
 
             // Check if there are words to be added and previously there were no content selector for the field
-            if (!data.isEmpty() && metaData.getContentSelectors(entry.getKey()).isEmpty()) {
+            if (!data.isEmpty() && metaData.getContentSelectorValuesForField(entry.getKey()).isEmpty()) {
                 changedFieldSet = true;
             }
 
@@ -323,8 +325,8 @@ class ContentSelectorDialog2 extends JDialog {
     private void setupFieldSelector() {
         fieldListModel.clear();
         SortedSet<String> contents = new TreeSet<>();
-        ContentSelectors selectors = metaData.getContentSelectors().orElse(new ContentSelectors());
-        for (String s : selectors.getSelectorData().keySet()) {
+        ContentSelectors selectors = metaData.getContentSelectors();
+        for (String s : selectors.getFieldNamesWithSelectors()) {
             contents.add(s);
         }
         if (contents.isEmpty()) {
@@ -364,7 +366,7 @@ class ContentSelectorDialog2 extends JDialog {
             wordListModels.put(currentField, wordListModel);
 
             int index = 0;
-            for (String s : metaData.getContentSelectors(currentField)) {
+            for (String s : metaData.getContentSelectorValuesForField(currentField)) {
                 wordListModel.add(index, s);
                 index++;
             }

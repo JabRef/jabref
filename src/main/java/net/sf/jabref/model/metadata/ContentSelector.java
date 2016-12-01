@@ -9,9 +9,9 @@ public class ContentSelector {
 
     private final List<String> values;
 
-    public ContentSelector(String fieldName, List<String> keys) {
+    public ContentSelector(String fieldName, List<String> values) {
         this.fieldName = fieldName;
-        this.values = keys;
+        this.values = values;
     }
 
     public String getFieldName() {

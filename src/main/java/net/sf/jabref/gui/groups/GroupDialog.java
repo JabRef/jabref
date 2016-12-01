@@ -29,8 +29,8 @@ import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;

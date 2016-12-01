@@ -49,6 +49,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.contentselector.ContentSelectorDialog;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.exporter.ExportToClipboardAction;
@@ -687,7 +688,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
         actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(frame, frame, BasePanel.this, false, null);
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
             csd.setLocationRelativeTo(frame);
             csd.setVisible(true);
         });
@@ -2378,12 +2379,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             return Optional.empty();
         }
     }
-
-
-    public Map<String, EntryEditor> getEntryEditors() {
-        return entryEditors;
-    }
-
 
     /**
      * This method iterates through all existing entry editors in this BasePanel, telling each to update all its

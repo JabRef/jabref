@@ -30,6 +30,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -155,16 +156,13 @@ public class AppendDatabaseAction implements BaseAction {
                 frame.getGroupSelector().addGroups(newGroups, ce);
             });
         }
-        /*
-        FIXME: import selectors
+
         if (importSelectorWords) {
 
-            for (String s : meta) {
-                if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                    panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
-                }
+            for(ContentSelector selector: meta.getContentSelectorList()) {
+                panel.getBibDatabaseContext().getMetaData().addContentSelector(selector);
             }
-        }*/
+        }
         ce.end();
         panel.getUndoManager().addEdit(ce);
         panel.markBaseChanged();

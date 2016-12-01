@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.contentselector;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -13,6 +13,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.metadata.MetaData;
@@ -61,7 +63,7 @@ public class FieldContentSelector extends JComponent {
      *            button.
      */
     public FieldContentSelector(JabRefFrame frame, final BasePanel panel, Window owner, final FieldEditor editor,
-            final AbstractAction action, boolean horizontalLayout, String delimiter) {
+                                final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
 
         this.editor = editor;
@@ -135,7 +137,7 @@ public class FieldContentSelector extends JComponent {
         add(manage);
 
         manage.addActionListener(e -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, editor.getFieldName());
+            ContentSelectorDialog csd = new ContentSelectorDialog(owner, frame, panel, true, editor.getFieldName());
             csd.setLocationRelativeTo(frame);
 
             // Calling setVisible(true) will open the modal dialog and block
@@ -189,38 +191,9 @@ public class FieldContentSelector extends JComponent {
 
         // TODO: CO - What for?
         comboBox.addItem("");
-        for (String item : metaData.getContentSelectors(editor.getFieldName())) {
+        for (String item : metaData.getContentSelectorValuesForField(editor.getFieldName())) {
             comboBox.addItem(item);
         }
     }
-    // Not used since the comboBox is not editable
 
-    //  /**
-    //   * Adds a word to the selector (to the JList and to the MetaData), unless it
-    //   * is already there
-    //   *
-    //   * @param newWord
-    //   *            String Word to add
-    //   */
-    //  public void addWord(String newWord) {
-    //
-    //      Vector items = metaData.getData(Globals.SELECTOR_META_PREFIX + editor.getFieldName());
-    //      boolean exists = false;
-    //      int pos = -1;
-    //      for (int i = 0; i < items.size(); i++) {
-    //          String s = (String) items.elementAt(i);
-    //          if (s.equals(newWord)) {
-    //              exists = true;
-    //              break;
-    //          }
-    //          if (s.toLowerCase().compareTo(newWord.toLowerCase()) < 0)
-    //              pos = i + 1;
-    //      }
-    //      if (!exists) {
-    //          items.add(Math.max(0, pos), newWord);
-    //          // TODO CO: Why is this non-undoable?
-    //          panel.markNonUndoableBaseChanged();
-    //          panel.updateAllContentSelectors();
-    //      }
-    //  }
 }

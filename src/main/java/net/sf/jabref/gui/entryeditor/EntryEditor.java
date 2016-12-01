@@ -51,12 +51,12 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
@@ -502,11 +502,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
-
-            // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     getStoreFieldAction());
-        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
+        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     getStoreFieldAction());
 

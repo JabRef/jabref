@@ -151,8 +151,12 @@ public class MetaData {
         return isProtected;
     }
 
-    public Optional<ContentSelectors> getContentSelectors() {
-        return Optional.ofNullable(contentSelectors);
+    public ContentSelectors getContentSelectors() {
+        return contentSelectors;
+    }
+
+    public List<ContentSelector> getContentSelectorList() {
+        return contentSelectors.getContentSelectors();
     }
 
     public void addContentSelector(ContentSelector contentSelector) {
@@ -164,7 +168,7 @@ public class MetaData {
         contentSelectors.removeSelector(fieldName);
     }
 
-    public List<String> getContentSelectors(String fieldName) {
+    public List<String> getContentSelectorValuesForField(String fieldName) {
         return contentSelectors.getSelectorValuesForField(fieldName);
     }
 

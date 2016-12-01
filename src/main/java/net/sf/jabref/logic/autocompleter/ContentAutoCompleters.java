@@ -35,7 +35,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addContentSelectorValuesToAutoCompleters(MetaData metaData) {
         for (Map.Entry<String, AutoCompleter<String>> entry : this.autoCompleters.entrySet()) {
             AutoCompleter<String> ac = entry.getValue();
-            metaData.getContentSelectors(entry.getKey()).forEach(ac::addItemToIndex);
+            metaData.getContentSelectorValuesForField(entry.getKey()).forEach(ac::addItemToIndex);
         }
     }
 }

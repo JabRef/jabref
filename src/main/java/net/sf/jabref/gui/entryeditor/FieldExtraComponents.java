@@ -19,8 +19,8 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
@@ -63,7 +63,7 @@ public class FieldExtraComponents {
             BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
             FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
                     ", ");
             contentSelectors.add(ws);
