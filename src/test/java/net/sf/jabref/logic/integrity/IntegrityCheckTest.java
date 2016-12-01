@@ -121,10 +121,15 @@ public class IntegrityCheckTest {
 
     @Test
     public void testBibtexkeyChecks() {
-        final BibDatabaseContext context = createContext("bibtexkey", "Knuth2014");
-        context.getDatabase().getEntries().get(0).setField("author","Knuth");
-        context.getDatabase().getEntries().get(0).setField("year","2014");
-        assertCorrect(context);
+        final BibDatabaseContext correctContext = createContext("bibtexkey", "Knuth2014");
+        correctContext.getDatabase().getEntries().get(0).setField("author","Knuth");
+        correctContext.getDatabase().getEntries().get(0).setField("year","2014");
+        assertCorrect(correctContext);
+
+        final BibDatabaseContext wrongContext = createContext("bibtexkey", "Knuth2014a");
+        wrongContext.getDatabase().getEntries().get(0).setField("author","Knuth");
+        wrongContext.getDatabase().getEntries().get(0).setField("year","2014");
+        assertWrong(wrongContext);
     }
 
     @Test
