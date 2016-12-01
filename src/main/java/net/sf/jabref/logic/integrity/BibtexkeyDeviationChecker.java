@@ -32,7 +32,7 @@ public class BibtexkeyDeviationChecker implements Checker {
         String key = valuekey.get();
 
         // generate new key
-        String generatedKey = BibtexKeyPatternUtil.generateNewCityKey(bibDatabaseContext, entry, bibtexKeyPatternPreferences);
+        String generatedKey = BibtexKeyPatternUtil.makeLabel(bibDatabaseContext, entry, bibtexKeyPatternPreferences);
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(

@@ -324,7 +324,7 @@ public class RegExpFileSearch {
 
         // If no field value was found, try to interpret it as a key generator field marker:
         String fieldValue = entry.getResolvedFieldOrAlias(beforeColon, database)
-                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon, keywordDelimiter, database));
+                .orElse(BibtexKeyPatternUtil.makeAndSetLabel(entry, beforeColon, keywordDelimiter, database));
 
         if (fieldValue == null) {
             return "";

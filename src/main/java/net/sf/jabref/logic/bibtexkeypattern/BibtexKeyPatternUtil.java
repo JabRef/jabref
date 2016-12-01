@@ -368,8 +368,13 @@ public class BibtexKeyPatternUtil {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
+    public static void makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+        String newKey = makeLabel(citeKeyPattern, database, entry, bibtexKeyPatternPreferences);
+        entry.setCiteKey(newKey);
+    }
+
+    private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         String key;
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -390,7 +395,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
+                    String label = makeAndSetLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -427,8 +432,9 @@ public class BibtexKeyPatternUtil {
         boolean alwaysAddLetter = bibtexKeyPatternPreferences.isAlwaysAddLetter();
         boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
+        String newKey;
         if (!alwaysAddLetter && (occurrences == 0)) {
-            entry.setCiteKey(key);
+            newKey = key;
         } else {
             // The key is already in use, so we must modify it.
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
@@ -445,8 +451,9 @@ public class BibtexKeyPatternUtil {
                 }
             } while (occurrences > 0);
 
-            entry.setCiteKey(moddedKey);
+            newKey = moddedKey;
         }
+        return newKey;
     }
 
     /**
@@ -497,7 +504,7 @@ public class BibtexKeyPatternUtil {
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
+    public static String makeAndSetLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -1293,12 +1300,10 @@ public class BibtexKeyPatternUtil {
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
-    public static String generateNewCityKey(BibDatabaseContext bibDatabaseContext, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        // clone as new city key is always set during generation; avoids side effects in database
-        BibEntry clonedEntry = (BibEntry) entry.clone();
-
+    public static String makeLabel(BibDatabaseContext bibDatabaseContext,
+            BibEntry entry,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData().getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern());
-        makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(), clonedEntry, bibtexKeyPatternPreferences);
-        return clonedEntry.getCiteKeyOptional().orElse("");
+        return makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(), entry, bibtexKeyPatternPreferences);
     }
 }
