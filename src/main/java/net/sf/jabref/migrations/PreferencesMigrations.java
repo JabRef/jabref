@@ -7,7 +7,6 @@ import java.util.prefs.Preferences;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
