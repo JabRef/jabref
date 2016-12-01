@@ -64,7 +64,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                     Class.forName(l);
                     lookAndFeels.add(l);
                 } catch (ClassNotFoundException|IllegalAccessError ignored) {
-                    // LookAndFeel class does not exists or we don't have rights to access it
+                    // LookAndFeel class does not exist or we don't have rights to access it
                     // Ignore it
                 }
             }
