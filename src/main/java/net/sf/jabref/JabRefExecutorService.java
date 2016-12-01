@@ -81,9 +81,9 @@ public class JabRefExecutorService implements Executor {
 
     class NamedRunnable implements Runnable {
 
-        private String name;
+        private final String name;
 
-        private Runnable task;
+        private final Runnable task;
 
         public NamedRunnable(String name, Runnable runnable){
             this.name = name;
