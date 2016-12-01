@@ -395,7 +395,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeAndSetLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -504,7 +504,7 @@ public class BibtexKeyPatternUtil {
         return resultingLabel;
     }
 
-    public static String makeAndSetLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
