@@ -71,6 +71,7 @@ public class IntegrityCheck {
         result.addAll(new ISSNChecker().check(entry));
         result.addAll(new ISBNChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
+        result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext).check(entry));
 
         return result;
     }

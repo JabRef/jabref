@@ -40,7 +40,6 @@ public class BibtexKeyPatternUtilTest {
 
     private static ImportFormatPreferences importFormatPreferences;
 
-
     @Before
     public void setUp() {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();

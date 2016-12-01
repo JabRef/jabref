@@ -10,12 +10,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -1304,4 +1306,13 @@ public class BibtexKeyPatternUtil {
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
+    public static String generateNewCityKey(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
+        // clone as new city key is always set during generation; avoids side effects in database
+        BibEntry clonedEntry = (BibEntry) entry.clone();
+
+        final BibtexKeyPatternPreferences keyPatterns = Globals.prefs.getBibtexKeyPatternPreferences();
+        AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData().getCiteKeyPattern(keyPatterns.getKeyPattern());
+        makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(), clonedEntry, keyPatterns);
+        return clonedEntry.getCiteKeyOptional().orElse("");
+    }
 }
