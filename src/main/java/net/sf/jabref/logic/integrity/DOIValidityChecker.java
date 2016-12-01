@@ -2,7 +2,6 @@ package net.sf.jabref.logic.integrity;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -14,18 +13,10 @@ public class DOIValidityChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        String field = FieldName.DOI;
-        Optional<String> value = entry.getField(field);
-        if (!value.isPresent()) {
-            return Collections.emptyList();
-        }
-
-        final boolean isDOIValid = value.flatMap(v -> DOI.build(v)).isPresent();
-        if (!isDOIValid) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("DOI %0 is invalid", value.orElse("")), entry, field));
-        }
-
-        return Collections.emptyList();
+        final String field = FieldName.DOI;
+        return entry.getField(field)
+                .filter(d -> !DOI.isValid(d))
+                .map(d -> Collections.singletonList(new IntegrityMessage(Localization.lang("DOI %0 is invalid", d), entry, field)))
+                .orElse(Collections.emptyList());
     }
 }
