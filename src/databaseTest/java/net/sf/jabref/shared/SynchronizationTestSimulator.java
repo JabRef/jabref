@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
