@@ -43,17 +43,6 @@ public class BibtexKeyPatternUtil {
 
     private static final int CHARS_OF_FIRST = 5;
 
-    private static BibDatabase database;
-
-    /**
-     * Required for LabelPatternUtilTest
-     *
-     * @param db the DB to use as global database
-     */
-    public static void setDataBase(BibDatabase db) {
-        database = db;
-    }
-
     private static String normalize(String content) {
         List<String> tokens = new ArrayList<>();
         int b = 0;
@@ -375,13 +364,12 @@ public class BibtexKeyPatternUtil {
      * The given database is used to avoid duplicate keys.
      *
      * @param citeKeyPattern
-     * @param dBase a <code>BibDatabase</code>
+     * @param database a <code>BibDatabase</code>
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase dBase, BibEntry entry,
+    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -402,7 +390,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter());
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -509,7 +497,7 @@ public class BibtexKeyPatternUtil {
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
