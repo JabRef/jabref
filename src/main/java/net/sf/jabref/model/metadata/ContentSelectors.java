@@ -10,7 +10,6 @@ public class ContentSelectors {
 
     private final List<ContentSelector> contentSelectors;
 
-
     public ContentSelectors() {
         contentSelectors = new ArrayList<>();
     }
@@ -56,5 +55,18 @@ public class ContentSelectors {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ContentSelectors that = (ContentSelectors) o;
+        return Objects.equals(contentSelectors, that.contentSelectors);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(contentSelectors);
     }
 }

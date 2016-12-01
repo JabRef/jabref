@@ -194,8 +194,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
 
-    private final Map<String, EntryEditor> entryEditors = new HashMap<>();
-
     // in switching between entries.
     private PreambleEditor preambleEditor;
 
@@ -1807,10 +1805,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void rebuildAllEntryEditors() {
-        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
-            EntryEditor ed = stringEntryEditorEntry.getValue();
-            ed.rebuildPanels();
-        }
+        currentEditor.rebuildPanels();
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -2386,10 +2381,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * after the user has made changes in the Manage dialog.
      */
     public void updateAllContentSelectors() {
-        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
-            EntryEditor ed = stringEntryEditorEntry.getValue();
-            ed.updateAllContentSelectors();
-        }
+        currentEditor.updateAllContentSelectors();
     }
 
     /**

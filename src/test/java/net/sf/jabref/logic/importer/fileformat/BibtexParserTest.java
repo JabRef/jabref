@@ -1580,7 +1580,7 @@ public class BibtexParserTest {
         values.add("received");
         values.add("status");
 
-        assertEquals(values, result.getMetaData().getContentSelectors("status"));
+        assertEquals(values, result.getMetaData().getContentSelectorValuesForField("status"));
     }
 
     @Test
