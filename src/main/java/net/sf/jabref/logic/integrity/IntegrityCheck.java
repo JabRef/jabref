@@ -70,6 +70,7 @@ public class IntegrityCheck {
         result.addAll(new BooktitleChecker().check(entry));
         result.addAll(new ISSNChecker().check(entry));
         result.addAll(new ISBNChecker().check(entry));
+        result.addAll(new DOIValidityChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
 
         return result;
