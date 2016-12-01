@@ -30,7 +30,7 @@ public class MakeLabelWithDatabaseTest {
         entry.setField("year", "2016");
         entry.setField("title", "An awesome paper on JabRef");
         database.insertEntry(entry);
-        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern, ',');
     }

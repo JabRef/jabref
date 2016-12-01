@@ -131,8 +131,9 @@ public class PreferencesMigrations {
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
-        GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern
-                .split(prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
+        );
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }

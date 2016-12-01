@@ -40,7 +40,7 @@ public class SynchronizationTestSimulator {
     public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
-        GlobalBibtexKeyPattern pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        GlobalBibtexKeyPattern pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
         clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',',
                 pattern);
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);

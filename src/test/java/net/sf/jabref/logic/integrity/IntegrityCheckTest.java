@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -119,7 +121,10 @@ public class IntegrityCheckTest {
 
     @Test
     public void testBibtexkeyChecks() {
-        assertCorrect(createContext("bibtexkey", "Knuth2014"));
+        final BibDatabaseContext context = createContext("bibtexkey", "Knuth2014");
+        context.getDatabase().getEntries().get(0).setField("author","Knuth");
+        context.getDatabase().getEntries().get(0).setField("year","2014");
+        assertCorrect(context);
     }
 
     @Test
@@ -316,9 +321,18 @@ public class IntegrityCheckTest {
     }
 
     private void assertCorrect(BibDatabaseContext context) {
+        final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+        final BibtexKeyPatternPreferences bibtexKeyPatternPreferences = new BibtexKeyPatternPreferences(
+                "",
+                "",
+                false,
+                false,
+                false,
+                keyPattern,
+                ',');
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                JabRefPreferences.getInstance().getBibtexKeyPatternPreferences()).checkBibtexDatabase();
+                bibtexKeyPatternPreferences).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

@@ -27,7 +27,7 @@ public class MetaDataTest {
     @Before
     public void setUp() {
         metaData = new MetaData();
-        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
     }
 
     @Test

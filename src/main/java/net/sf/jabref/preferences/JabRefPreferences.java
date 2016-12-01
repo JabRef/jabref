@@ -1078,7 +1078,7 @@ public class JabRefPreferences {
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
     public GlobalBibtexKeyPattern getKeyPattern() {
-        keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split(get(DEFAULT_BIBTEX_KEY_PATTERN)));
+        keyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
         Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();

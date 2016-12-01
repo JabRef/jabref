@@ -53,7 +53,7 @@ public class DBMSSynchronizerTest {
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
-        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern);
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
