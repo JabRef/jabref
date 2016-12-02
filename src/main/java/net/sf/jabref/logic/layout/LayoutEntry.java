@@ -184,7 +184,7 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = BibDatabase.getResolvedField(text, bibtex, database).orElse("");
+            String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
 
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
@@ -203,7 +203,7 @@ class LayoutEntry {
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
             // on a field called "encoding". We simply return this field instead:
-            return BibDatabase.getResolvedField("encoding", bibtex, database).orElse(null);
+            return bibtex.getResolvedFieldOrAlias("encoding", database).orElse(null);
         default:
             return "";
         }
@@ -222,8 +222,8 @@ class LayoutEntry {
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            fieldEntry = text.startsWith("\\") ? BibDatabase
-                    .getResolvedField(text.substring(1), bibtex, database)
+            fieldEntry = text.startsWith("\\") ? bibtex
+                    .getResolvedFieldOrAlias(text.substring(1), database)
                     .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
@@ -245,13 +245,13 @@ class LayoutEntry {
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
-            field = BibDatabase.getResolvedField(text, bibtex, database);
+            field = bibtex.getResolvedFieldOrAlias(text, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = BibDatabase.getResolvedField(part, bibtex, database);
+                field = bibtex.getResolvedFieldOrAlias(part, database);
                 if (!field.isPresent()) {
                     break;
                 }
@@ -261,7 +261,7 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = BibDatabase.getResolvedField(part, bibtex, database);
+                field = bibtex.getResolvedFieldOrAlias(part, database);
                 if (field.isPresent()) {
                     break;
                 }

@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import net.sf.jabref.logic.importer.fetcher.DBLPFetcher;
 import net.sf.jabref.logic.importer.fetcher.DiVA;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.importer.fetcher.GoogleScholar;
@@ -26,7 +27,7 @@ public class EntryFetchers {
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
         entryFetchers.add(new CiteSeerXFetcher());
-        entryFetchers.add(new DBLPFetcher());
+        entryFetchers.add(new SearchBasedEntryFetcher(new DBLPFetcher(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below

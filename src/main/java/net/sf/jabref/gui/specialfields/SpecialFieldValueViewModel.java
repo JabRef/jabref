@@ -5,7 +5,6 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
