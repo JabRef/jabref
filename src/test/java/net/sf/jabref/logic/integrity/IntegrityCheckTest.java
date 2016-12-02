@@ -320,14 +320,21 @@ public class IntegrityCheckTest {
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                JabRefPreferences.getInstance().getBibtexKeyPatternPreferences())
+                createBibtexKeyPatternPreferences())
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                createBibtexKeyPatternPreferences()).checkBibtexDatabase();
+        assertEquals(Collections.emptyList(), messages);
+    }
+
+    private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
         final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
-        final BibtexKeyPatternPreferences bibtexKeyPatternPreferences = new BibtexKeyPatternPreferences(
+        return new BibtexKeyPatternPreferences(
                 "",
                 "",
                 false,
@@ -335,10 +342,6 @@ public class IntegrityCheckTest {
                 false,
                 keyPattern,
                 ',');
-        List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                bibtexKeyPatternPreferences).checkBibtexDatabase();
-        assertEquals(Collections.emptyList(), messages);
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
