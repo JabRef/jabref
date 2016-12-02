@@ -79,7 +79,6 @@ public class DroppedFileHandler {
 
     private final JPanel optionsPanel = new JPanel();
 
-
     public DroppedFileHandler(JabRefFrame frame, BasePanel panel) {
 
         this.frame = frame;
@@ -351,8 +350,6 @@ public class DroppedFileHandler {
         moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
-        //TODO: here to check for
-
         LayoutFormatterPreferences layoutPrefs = Globals.prefs
                 .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
 
@@ -367,14 +364,9 @@ public class DroppedFileHandler {
             targetDirName = FileUtil.createFileNameFromPattern(database, entry, fileDirPattern, layoutPrefs);
         }
 
-        System.out.println("TARGET Filename " + targetName); //fileNam pattern, e.g bibtexkey
-        System.out.println("TARGET FileDir " + targetDirName); //e.g. inBook
-
         if (targetDirName.isEmpty()) {
-
             renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
         } else {
-
             renameToTextBox
                     .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
         }
@@ -505,8 +497,7 @@ public class DroppedFileHandler {
                     Files.createDirectories(destFile);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                LOGGER.error("Problem creating target direcotires", e);
+                LOGGER.error("Problem creating target directories", e);
             }
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
@@ -550,7 +541,6 @@ public class DroppedFileHandler {
         }
 
         Path destFile = Paths.get(dirs.get(found)).resolve(toFile);
-        System.out.println("COpy Handler dest " + destFile);
         if (destFile.toString().equals(fileName)) {
             // File is already in the correct position. Don't override!
             return true;
@@ -574,7 +564,6 @@ public class DroppedFileHandler {
             LOGGER.error("Problem copying file", e);
             return false;
         }
-
         return true;
     }
 

@@ -34,9 +34,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final String fileDirPattern;
     private final LayoutFormatterPreferences prefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
-
     private int unsuccessfulRenames;
-
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             String fileDirPattern, LayoutFormatterPreferences prefs,
@@ -108,7 +106,6 @@ public class RenamePdfCleanup implements CleanupJob {
                 try {
                     if (!Files.exists(newPath)) {
                         Files.createDirectories(newPath);
-
                     }
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -143,9 +140,6 @@ public class RenamePdfCleanup implements CleanupJob {
                 }
             }
         }
-
-        //TODO: Checken: Der macht das return wenn change = true, aber wenn noch ein nicht change dahinter kommt?`
-
         if (changed) {
             Optional<FieldChange> change = typedEntry.setFiles(newFileList);
             //we put an undo of the field content here
@@ -157,9 +151,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 return Collections.emptyList();
             }
         }
-
         return Collections.emptyList();
-
     }
 
     public int getUnsuccessfulRenames() {
