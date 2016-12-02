@@ -44,11 +44,9 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
@@ -299,8 +297,7 @@ public class ArgumentProcessor {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
                     SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                     BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
-                    Defaults defaults = new Defaults(BibDatabaseMode
-                            .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                    Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
 
                     // Show just a warning message if encoding did not work for all characters:
@@ -338,8 +335,7 @@ public class ArgumentProcessor {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
                         SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                        Defaults defaults = new Defaults(BibDatabaseMode
-                                .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                        Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
                         SaveSession session = databaseWriter.saveDatabase(

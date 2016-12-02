@@ -88,7 +88,6 @@ import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -705,8 +704,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         private void addSelectedEntries(NamedCompound ce, final List<BibEntry> selected) {
             if (newDatabase) {
                 // Create a new BasePanel for the entries:
-                Defaults defaults = new Defaults(BibDatabaseMode
-                        .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                 panel = new BasePanel(frame, new BibDatabaseContext(defaults));
             }
 

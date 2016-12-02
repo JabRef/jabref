@@ -15,7 +15,6 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This action checks whether any new custom entry types were loaded from this

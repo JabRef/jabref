@@ -35,19 +35,6 @@ public enum BibDatabaseMode {
     }
 
     /**
-     * Returns the {@link BibDatabaseMode} from a given boolean.
-     *
-     * @return BIBLATEX if isBibLatex is true, else BIBTEX
-     */
-    public static BibDatabaseMode fromPreference(boolean isBibLatex) {
-        if (isBibLatex) {
-            return BIBLATEX;
-        } else {
-            return BIBTEX;
-        }
-    }
-
-    /**
      * Returns the {@link BibDatabaseMode} that equals the given string. The use of capital and small letters
      * in the string doesn't matter.If neither "bibtex" nor "biblatex" is the given string, then an
      * {@link IllegalArgumentException} will be thrown.
