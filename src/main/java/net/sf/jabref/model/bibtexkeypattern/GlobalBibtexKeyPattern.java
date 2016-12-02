@@ -10,6 +10,10 @@ public class GlobalBibtexKeyPattern extends AbstractBibtexKeyPattern {
         defaultBibtexKeyPattern = bibtexKeyPattern;
     }
 
+    public static GlobalBibtexKeyPattern fromPattern(String pattern) {
+        return new GlobalBibtexKeyPattern(split(pattern));
+    }
+
     @Override
     public List<String> getLastLevelBibtexKeyPattern(String key) {
         return defaultBibtexKeyPattern;

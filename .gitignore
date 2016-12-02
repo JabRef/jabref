@@ -52,3 +52,6 @@ install4j6/
 
 # ignore the generated markdown file if the user forgets to delete it
 status.md
+
+# private data
+/buildres/jabref-cert-2016.p12
