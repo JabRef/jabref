@@ -64,12 +64,6 @@ repositories {
 configurations {
     antlr3
     antlr4
-
-    databaseTestCompile.extendsFrom testCompile
-    databaseTestRuntime.extendsFrom testRuntime
-
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -145,21 +139,6 @@ sourceSets {
             // remove "src/oracleMock" if ojdbc.jar is available
             srcDirs = ["src/main/java", "src/main/gen", "src/oracleMock"]
         }
-    }
-    databaseTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/databaseTest/java')
-        }
-    }
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integrationTest/java')
-        }
-        resources.srcDir file('src/integrationTest/resources')
     }
 }
 
@@ -258,16 +237,6 @@ task copyTestResources(type: Copy) {
     into "${buildDir}/classes/test"
 }
 processTestResources.dependsOn copyTestResources
-
-task databaseTest(type: Test) {
-    testClassesDir = sourceSets.databaseTest.output.classesDir
-    classpath = sourceSets.databaseTest.runtimeClasspath
-}
-
-task integrationTest(type: Test) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
