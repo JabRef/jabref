@@ -44,8 +44,8 @@ public class JabRefExecutorService implements Executor {
 
     @Override
     public void execute(Runnable command) {
-        if(command == null) {
-            //TODO logger
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
             return;
         }
 
@@ -53,13 +53,13 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void executeAndWait(Runnable command) {
-        if(command == null) {
-            //TODO logger
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
             return;
         }
 
         Future<?> future = executorService.submit(command);
-        while(true) {
+        while (true) {
             try {
                 future.get();
                 return;
@@ -104,12 +104,12 @@ public class JabRefExecutorService implements Executor {
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
         if(runnable == null) {
-            //TODO logger
+            LOGGER.debug("Received null as command for execution");
             return;
         }
 
         Future<?> future = lowPriorityExecutorService.submit(runnable);
-        while(true) {
+        while (true) {
             try {
                 future.get();
                 return;
@@ -122,7 +122,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void manageRemoteThread(Thread thread) {
-        if(this.remoteThread != null){
+        if (this.remoteThread != null){
             throw new IllegalStateException("Remote thread is already attached");
         } else {
             this.remoteThread = thread;
@@ -131,7 +131,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void stopRemoteThread() {
-        if(remoteThread != null) {
+        if (remoteThread != null) {
             remoteThread.interrupt();
             remoteThread = null;
         }
