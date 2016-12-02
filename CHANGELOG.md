@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
+- Windows and OSX binaries are now signed with a certificate.
 - The default emacs executable name on linux changed from `gnuclient` to `emacsclient`. [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
 - Adds integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
 - Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
