@@ -25,7 +25,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult pr) {
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
         BibDatabaseMode mode = new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults).getMode();
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
@@ -58,7 +58,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         if (answer == JOptionPane.YES_OPTION) {
             // Import
             for (EntryType typ : pr.getEntryTypes().values()) {
-                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ);
+                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ, Globals.prefs.getDefaultBibDatabaseMode());
             }
         }
     }

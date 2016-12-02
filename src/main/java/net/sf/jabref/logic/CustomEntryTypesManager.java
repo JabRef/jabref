@@ -22,7 +22,7 @@ public class CustomEntryTypesManager {
         int number = 0;
         Optional<CustomEntryType> type;
         while ((type = prefs.getCustomEntryType(number)).isPresent()) {
-            EntryTypes.addOrModifyCustomEntryType(type.get());
+            EntryTypes.addOrModifyCustomEntryType(type.get(), prefs.getDefaultBibDatabaseMode());
             ALL.add(type.get());
             number++;
         }

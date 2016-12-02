@@ -289,7 +289,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                         new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
                         new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
-                EntryTypes.addOrModifyCustomEntryType(typ);
+                EntryTypes.addOrModifyCustomEntryType(typ, bibDatabaseMode);
                 updateTypesForEntries();
             }
         }

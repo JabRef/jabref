@@ -129,13 +129,12 @@ public class EntryTypes {
         return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
     }
 
-    public static void addOrModifyCustomEntryType(CustomEntryType customEntryType) {
-        addOrModifyEntryType(customEntryType);
-    }
-
-    private static void addOrModifyEntryType(EntryType name) {
-        BIBLATEX.addOrModifyEntryType(name);
-        BIBTEX.addOrModifyEntryType(name);
+    public static void addOrModifyCustomEntryType(CustomEntryType customEntryType, BibDatabaseMode mode) {
+        if(BibDatabaseMode.BIBLATEX == mode) {
+            BIBLATEX.addOrModifyEntryType(customEntryType);
+        } else if (BibDatabaseMode.BIBTEX == mode) {
+            BIBTEX.addOrModifyEntryType(customEntryType);
+        }
     }
 
     public static Set<String> getAllTypes(BibDatabaseMode type) {

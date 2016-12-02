@@ -34,7 +34,7 @@ public class EntryTypesTestBibtex {
         CustomEntryType newArticle = new CustomEntryType("article", requiredFields,
                 BibtexEntryTypes.ARTICLE.getOptionalFields());
 
-        EntryTypes.addOrModifyCustomEntryType(newArticle);
+        EntryTypes.addOrModifyCustomEntryType(newArticle, BibDatabaseMode.BIBTEX);
         // Should not be the same any more
         assertNotEquals(BibtexEntryTypes.ARTICLE, EntryTypes.getType("article", BibDatabaseMode.BIBTEX).get());
 

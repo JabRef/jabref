@@ -244,7 +244,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
         try {
-            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
+            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
             database.insertEntry(entry);
