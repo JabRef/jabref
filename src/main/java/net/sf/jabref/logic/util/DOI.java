@@ -107,6 +107,16 @@ public class DOI {
     }
 
     /**
+     * Determines whether a DOI is valid or not
+     *
+     * @param doi the DOI string
+     * @return true if DOI is valid, false otherwise
+     */
+    public static boolean isValid(String doi ){
+        return build(doi).isPresent();
+    }
+
+    /**
      * Tries to find a DOI inside the given text.
      *
      * @param text the Text which might contain a DOI

@@ -290,6 +290,14 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testDOIChecks() {
+        assertCorrect(createContext("doi", "10.1023/A:1022883727209"));
+        assertCorrect(createContext("doi", "10.17487/rfc1436"));
+        assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
+        assertWrong(createContext("doi", "asdf"));
+    }
+
+    @Test
     public void testASCIIChecks() {
         assertCorrect(createContext("title", "Only ascii characters!'@12"));
         assertWrong(createContext("month", "Umlauts are nöt ällowed"));
