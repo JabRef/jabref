@@ -454,7 +454,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }));
         }
         JButton fetcherButton = new JButton(IconTheme.JabRefIcon.REFRESH.getIcon());
-        fetcherButton.setToolTipText(Localization.lang("Update with bibliographic information from the web."));
+        fetcherButton.setToolTipText(Localization.lang("Update with bibliographic information from the web"));
         fetcherButton.addMouseListener(new MouseAdapter() {
 
             @Override
