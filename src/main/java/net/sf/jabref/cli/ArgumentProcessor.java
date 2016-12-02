@@ -453,7 +453,7 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    BibtexKeyPatternUtil.makeLabel(
+                    BibtexKeyPatternUtil.makeAndSetLabel(
                             metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
                 }
