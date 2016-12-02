@@ -10,7 +10,6 @@ import java.util.Map;
 
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
@@ -53,7 +52,7 @@ public class DBMSSynchronizerTest {
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
-        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
 
         dbmsSynchronizer = new DBMSSynchronizer(context, ',', pattern);
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);

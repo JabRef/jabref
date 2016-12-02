@@ -433,7 +433,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
                 for (BibEntry entry : entries) {
                     String oldCiteKey = entry.getCiteKeyOptional().orElse("");
-                    BibtexKeyPatternUtil.makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
+                    BibtexKeyPatternUtil.makeAndSetLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
                             entry, Globals.prefs.getBibtexKeyPatternPreferences());
                     String newCiteKey = entry.getCiteKeyOptional().orElse("");
                     if (!oldCiteKey.equals(newCiteKey)) {
@@ -1893,7 +1893,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData()
+                    BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
                             .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());

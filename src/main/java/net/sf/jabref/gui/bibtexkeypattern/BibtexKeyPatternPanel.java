@@ -224,8 +224,9 @@ public class BibtexKeyPatternPanel extends JPanel {
     }
 
     protected GlobalBibtexKeyPattern getKeyPatternAsGlobalBibtexKeyPattern() {
-        GlobalBibtexKeyPattern res = new GlobalBibtexKeyPattern(
-                AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        GlobalBibtexKeyPattern res = GlobalBibtexKeyPattern.fromPattern(
+                JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
+        );
         fillPatternUsingPanelData(res);
         return res;
     }
