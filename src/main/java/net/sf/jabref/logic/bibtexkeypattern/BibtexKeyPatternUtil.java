@@ -16,6 +16,7 @@ import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -41,17 +42,6 @@ public class BibtexKeyPatternUtil {
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
     private static final int CHARS_OF_FIRST = 5;
-
-    private static BibDatabase database;
-
-    /**
-     * Required for LabelPatternUtilTest
-     *
-     * @param db the DB to use as global database
-     */
-    public static void setDataBase(BibDatabase db) {
-        database = db;
-    }
 
     private static String normalize(String content) {
         List<String> tokens = new ArrayList<>();
@@ -374,13 +364,17 @@ public class BibtexKeyPatternUtil {
      * The given database is used to avoid duplicate keys.
      *
      * @param citeKeyPattern
-     * @param dBase a <code>BibDatabase</code>
+     * @param database a <code>BibDatabase</code>
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase dBase, BibEntry entry,
+    public static void makeAndSetLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        database = dBase;
+        String newKey = makeLabel(citeKeyPattern, database, entry, bibtexKeyPatternPreferences);
+        entry.setCiteKey(newKey);
+    }
+
+    private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         String key;
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -401,7 +395,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter());
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -438,8 +432,9 @@ public class BibtexKeyPatternUtil {
         boolean alwaysAddLetter = bibtexKeyPatternPreferences.isAlwaysAddLetter();
         boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
+        String newKey;
         if (!alwaysAddLetter && (occurrences == 0)) {
-            entry.setCiteKey(key);
+            newKey = key;
         } else {
             // The key is already in use, so we must modify it.
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
@@ -456,8 +451,9 @@ public class BibtexKeyPatternUtil {
                 }
             } while (occurrences > 0);
 
-            entry.setCiteKey(moddedKey);
+            newKey = moddedKey;
         }
+        return newKey;
     }
 
     /**
@@ -508,7 +504,7 @@ public class BibtexKeyPatternUtil {
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -1304,4 +1300,10 @@ public class BibtexKeyPatternUtil {
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
+    public static String makeLabel(BibDatabaseContext bibDatabaseContext,
+            BibEntry entry,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+        AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData().getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern());
+        return makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(), entry, bibtexKeyPatternPreferences);
+    }
 }

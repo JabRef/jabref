@@ -462,7 +462,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database.insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeLabel(
+            BibtexKeyPatternUtil.makeAndSetLabel(
                     localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     database, entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
@@ -506,7 +506,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeLabel(
+                BibtexKeyPatternUtil.makeAndSetLabel(
                         localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                         database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
