@@ -33,6 +33,7 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -63,8 +64,10 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
+import net.sf.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import net.sf.jabref.gui.specialfields.SpecialFieldUpdateListener;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -79,6 +82,7 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -438,6 +442,27 @@ public class EntryEditor extends JPanel implements EntryContainer {
         toolBar.add(autoLinkAction);
 
         toolBar.add(writeXmp);
+
+        JPopupMenu fetcherPopup = new JPopupMenu();
+        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers()) {
+            fetcherPopup.add(new JMenuItem(new AbstractAction(fetcher.getName()) {
+
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    new EntryFetchAndMergeWorker(panel, getEntry(), fetcher).execute();
+                }
+            }));
+        }
+        JButton fetcherButton = new JButton(IconTheme.JabRefIcon.REFRESH.getIcon());
+        fetcherButton.setToolTipText(Localization.lang("Update with bibliographic information from the web"));
+        fetcherButton.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                fetcherPopup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
+        toolBar.add(fetcherButton);
 
         toolBar.addSeparator();
 
@@ -1256,7 +1281,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+            BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
                     .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
