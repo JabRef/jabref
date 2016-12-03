@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Bibliographic information from web resources can now be used to complete existing entries. This functionality can be accessed via a new button in the entry editor.
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
 - Windows and OSX binaries are now signed with a certificate.
 - The default emacs executable name on linux changed from `gnuclient` to `emacsclient`. [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
@@ -29,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 - Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
 - Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
+- We fixed an issue when JabRef restored its session and a shared database was used: The error message "No suitable driver found" will not appear.
 
 ### Removed
 

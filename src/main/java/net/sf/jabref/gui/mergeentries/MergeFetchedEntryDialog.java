@@ -28,7 +28,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
 
 /**
- * Dialog for merging Bibtex entry with data fetched from DOI
+ * Dialog for merging Bibtex entry with fetched data
  */
 public class MergeFetchedEntryDialog extends JDialog {
 
