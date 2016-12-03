@@ -31,7 +31,6 @@ public class BibDatabaseContext {
     private DBMSSynchronizer dbmsSynchronizer;
     private DatabaseLocation location;
 
-
     public BibDatabaseContext() {
         this(new Defaults());
     }
@@ -198,7 +197,7 @@ public class BibDatabaseContext {
                 fileDirs.add(parentDir);
             }
         });
-        return  fileDirs;
+        return fileDirs;
     }
 
     private String getFileDirectoryPath(String directoryName) {
