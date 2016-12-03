@@ -125,8 +125,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
                         Path parent = settingsDir.get();
                         String newFileEntryFileName;
-                        if ((parent == null)
-                                || databaseContext.getFileDirectories(fileDirectoryPreferences).contains(parent)) {
+                        if ((parent == null)) {
                             newFileEntryFileName = targetFileName.toString();
 
                         } else {

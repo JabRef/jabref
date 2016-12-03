@@ -30,7 +30,6 @@ import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.support.DevEnvironment;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -49,7 +48,6 @@ public class CleanupWorkerTest {
     private CleanupWorker worker;
     private File pdfFolder;
 
-
     @Before
     public void setUp() throws IOException {
         pdfFolder = bibFolder.newFolder();
@@ -59,8 +57,6 @@ public class CleanupWorkerTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
-        prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, true);
-
 
         worker = new CleanupWorker(context,
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
@@ -333,9 +329,4 @@ public class CleanupWorkerTest {
         Assert.assertEquals(Optional.of("01"), entry.getField("month"));
     }
 
-    @After
-    public void tearDown() {
-        JabRefPreferences.getInstance().putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, false);
-
-    }
 }

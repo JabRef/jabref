@@ -18,7 +18,6 @@ import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,15 +34,12 @@ public class RenamePdfCleanupTest {
     private BibEntry entry;
     private JabRefPreferences prefs;
 
-
     @Before
     public void setUp() throws Exception {
         prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
-
-        prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, true);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -220,9 +216,4 @@ public class RenamePdfCleanupTest {
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
-    @After
-    public void tearDown() {
-        JabRefPreferences.getInstance().putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, false);
-
-    }
 }
