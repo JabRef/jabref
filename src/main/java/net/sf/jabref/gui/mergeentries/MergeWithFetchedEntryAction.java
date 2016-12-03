@@ -17,7 +17,7 @@ public class MergeWithFetchedEntryAction implements BaseAction {
     }
 
     @Override
-    public void action() throws Throwable {
+    public void action() {
         if (basePanel.getMainTable().getSelectedEntries().size() == 1) {
             BibEntry originalEntry = basePanel.getMainTable().getSelectedEntries().get(0);
             new FetchAndMergeEntry(originalEntry, basePanel, FetchAndMergeEntry.SUPPORTED_FIELDS);
