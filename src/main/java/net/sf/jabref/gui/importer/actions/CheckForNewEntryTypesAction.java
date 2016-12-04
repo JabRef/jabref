@@ -9,9 +9,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
@@ -24,8 +22,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult pr) {
-        Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-        BibDatabaseMode mode = new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults).getMode();
+        BibDatabaseMode mode = pr.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
         // See if any custom entry types were imported, but disregard those we already know:
         for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
             String typeName = i.next().toLowerCase();
@@ -57,7 +54,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         if (answer == JOptionPane.YES_OPTION) {
             // Import
             for (EntryType typ : pr.getEntryTypes().values()) {
-                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ, Globals.prefs.getDefaultBibDatabaseMode());
+                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ, pr.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode()));
             }
         }
     }
