@@ -2,6 +2,7 @@ package net.sf.jabref.model.groups;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabase;
@@ -27,7 +28,7 @@ public abstract class AbstractGroup implements SearchMatcher {
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;
-        setHierarchicalContext(context);
+        this.context = Objects.requireNonNull(context);
     }
 
     public GroupHierarchyType getContext() {
@@ -133,17 +134,6 @@ public abstract class AbstractGroup implements SearchMatcher {
      */
     public GroupHierarchyType getHierarchicalContext() {
         return context;
-    }
-
-    /**
-     * Sets the groups's hierarchical context. If context is not a valid
-     * value, the call is ignored.
-     */
-    public void setHierarchicalContext(GroupHierarchyType context) {
-        if (context == null) {
-            return;
-        }
-        this.context = context;
     }
 
     /**

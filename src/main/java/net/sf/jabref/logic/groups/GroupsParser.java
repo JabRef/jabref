@@ -107,7 +107,7 @@ public class GroupsParser {
         return new KeywordGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
                 StringUtil.unquote(field, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
                 StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumber(context), keywordSeparator);
+                GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
     }
 
     public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
@@ -119,7 +119,7 @@ public class GroupsParser {
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
-        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context), keywordSeparator);
+        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
         GroupsParser.addLegacyEntryKeys(tok, newGroup);
         return newGroup;
     }
@@ -166,6 +166,6 @@ public class GroupsParser {
         // fields; these are ignored now, all fields are always searched
         return new SearchGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
                 StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumber(context));
+                GroupHierarchyType.getByNumberOrDefault(context));
     }
 }
