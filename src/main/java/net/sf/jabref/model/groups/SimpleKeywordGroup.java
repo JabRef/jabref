@@ -45,20 +45,7 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
     }
 
     @Override
-    public boolean supportsAdd() {
-        return !regExp;
-    }
-
-    @Override
-    public boolean supportsRemove() {
-        return !regExp;
-    }
-
-    @Override
     public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
-        if (!supportsAdd()) {
-            return Optional.empty();
-        }
         if ((entriesToAdd != null) && !(entriesToAdd.isEmpty())) {
             List<FieldChange> changes = new ArrayList<>();
             boolean modified = false;
@@ -84,10 +71,6 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
 
     @Override
     public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
-        if (!supportsRemove()) {
-            return Optional.empty();
-        }
-
         if ((entriesToRemove != null) && (!entriesToRemove.isEmpty())) {
             List<FieldChange> changes = new ArrayList<>();
             boolean modified = false;

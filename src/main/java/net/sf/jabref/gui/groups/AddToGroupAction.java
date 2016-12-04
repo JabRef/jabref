@@ -11,8 +11,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupEntryChanger;
 import net.sf.jabref.model.groups.GroupTreeNode;
 
 public class AddToGroupAction extends AbstractAction {
@@ -74,7 +74,7 @@ public class AddToGroupAction extends AbstractAction {
                 node.getNode().getRoot().getContainingGroups(entries, false).stream().filter(node -> node.getGroup().supportsRemove()).collect(
                         Collectors.toList());
 
-        List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
+        List<GroupEntryChanger> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
                 Collectors.toList());
         affectedGroups.add(node.getNode().getGroup());
         if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(affectedGroups, panel.frame())) {

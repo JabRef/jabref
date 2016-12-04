@@ -61,26 +61,6 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean supportsAdd() {
-        return false;
-    }
-
-    @Override
-    public boolean supportsRemove() {
-        return false;
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
-        throw new UnsupportedOperationException("Search group does not support adding entries.");
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
-        throw new UnsupportedOperationException("Search group does not support removing entries.");
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

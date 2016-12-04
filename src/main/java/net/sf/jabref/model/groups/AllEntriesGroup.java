@@ -18,28 +18,6 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean supportsAdd() {
-        return false;
-    }
-
-    @Override
-    public boolean supportsRemove() {
-        return false;
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
-        // not supported -> ignore
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
-        // not supported -> ignore
-        return Optional.empty();
-    }
-
-    @Override
     public AbstractGroup deepCopy() {
         return new AllEntriesGroup(getName());
     }
