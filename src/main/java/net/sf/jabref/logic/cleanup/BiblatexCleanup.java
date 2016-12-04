@@ -35,22 +35,26 @@ public class BiblatexCleanup implements CleanupJob {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getField(FieldName.DATE).ifPresent(date -> {
-            if (date.isEmpty()) {
-                entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getField(FieldName.YEAR);
-                    Optional<String> oldMonth = entry.getField(FieldName.MONTH);
+        // If there already exists a value for the field date, it is not overwritten
+        String date = "";
+        if (entry.getField(FieldName.DATE).isPresent()) {
+            date = entry.getField(FieldName.DATE).get();
+        }
+        if (date.isEmpty()) {
+            entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
+                Optional<String> oldYear = entry.getField(FieldName.YEAR);
+                Optional<String> oldMonth = entry.getField(FieldName.MONTH);
 
-                    entry.setField(FieldName.DATE, newDate);
-                    entry.clearField(FieldName.YEAR);
-                    entry.clearField(FieldName.MONTH);
+                entry.setField(FieldName.DATE, newDate);
+                entry.clearField(FieldName.YEAR);
+                entry.clearField(FieldName.MONTH);
 
-                    changes.add(new FieldChange(entry, FieldName.DATE, null, newDate));
-                    changes.add(new FieldChange(entry, FieldName.YEAR, oldYear.orElse(null), null));
-                    changes.add(new FieldChange(entry, FieldName.MONTH, oldMonth.orElse(null), null));
-                });
-            }
-        });
+                changes.add(new FieldChange(entry, FieldName.DATE, null, newDate));
+                changes.add(new FieldChange(entry, FieldName.YEAR, oldYear.orElse(null), null));
+                changes.add(new FieldChange(entry, FieldName.MONTH, oldMonth.orElse(null), null));
+            });
+        }
         return changes;
     }
+
 }

@@ -48,7 +48,6 @@ public class CleanupWorkerTest {
     private CleanupWorker worker;
     private File pdfFolder;
 
-
     @Before
     public void setUp() throws IOException {
         pdfFolder = bibFolder.newFolder();
@@ -288,7 +287,8 @@ public class CleanupWorkerTest {
                         Collections.emptyList(), Collections.emptyList()));
         Assert.assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
+                Collections.singletonList(
+                        new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
@@ -305,17 +305,6 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         Assert.assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
-    }
-
-    @Test
-    public void convertToBiblatexMovesJournalToJournalTitle() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
-        BibEntry entry = new BibEntry();
-        entry.setField("journal", "test");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.empty(), entry.getField("journal"));
-        Assert.assertEquals(Optional.of("test"), entry.getField("journaltitle"));
     }
 
     @Test
