@@ -14,15 +14,6 @@ import net.sf.jabref.model.search.SearchMatcher;
 public abstract class AbstractGroup implements SearchMatcher {
 
     /**
-     * Character used for quoting in the string representation.
-     */
-    public static final char QUOTE_CHAR = '\\';
-    /**
-     * For separating units (e.g. name, which every group has) in the string
-     * representation
-     */
-    public static final String SEPARATOR = ";";
-    /**
      * The group's name (every type of group has one).
      */
     private String name;

@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
@@ -61,16 +62,16 @@ public class ExplicitGroup extends KeywordGroup {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(ExplicitGroup.ID).append(
-                StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
-                append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
+                StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)).
+                append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR).append(getContext().ordinal()).append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
 
         // write legacy entry keys in well-defined order for CVS compatibility
         Set<String> sortedKeys = new TreeSet<>();
         sortedKeys.addAll(legacyEntryKeys);
 
         for (String sortedKey : sortedKeys) {
-            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
-                    AbstractGroup.SEPARATOR);
+            sb.append(StringUtil.quote(sortedKey, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)).append(
+                    MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         }
         return sb.toString();
     }

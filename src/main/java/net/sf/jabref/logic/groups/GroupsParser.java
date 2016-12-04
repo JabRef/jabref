@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
@@ -95,7 +96,7 @@ public class GroupsParser {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
-                .length()), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+                .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
@@ -103,9 +104,9 @@ public class GroupsParser {
         String expression = tok.nextToken();
         boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-        return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
-                StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
-                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+        return new KeywordGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
+                StringUtil.unquote(field, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
+                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
                 GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
@@ -114,7 +115,7 @@ public class GroupsParser {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID.length()),
-                AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
@@ -131,7 +132,7 @@ public class GroupsParser {
      */
     private static void addLegacyEntryKeys(QuotedStringTokenizer tok, ExplicitGroup group) {
         while (tok.hasMoreTokens()) {
-            String key = StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR);
+            String key = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
             group.addLegacyEntryKey(key);
         }
     }
@@ -154,7 +155,7 @@ public class GroupsParser {
             throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID.length()),
-                AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR);
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
@@ -163,8 +164,8 @@ public class GroupsParser {
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
-        return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
-                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+        return new SearchGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
+                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
                 GroupHierarchyType.getByNumber(context));
     }
 }

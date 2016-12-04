@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.KeywordList;
@@ -66,13 +67,13 @@ public class KeywordGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
-                AbstractGroup.SEPARATOR
-                + getContext().ordinal() + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
-                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
+        return KeywordGroup.ID + StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR) +
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
+                + getContext().ordinal() + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
+                + StringUtil.quote(searchField, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR) + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
+                + StringUtil.quote(searchExpression, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
+                + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
+                + StringUtil.booleanToBinaryString(regExp) + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR;
     }
 
     @Override
