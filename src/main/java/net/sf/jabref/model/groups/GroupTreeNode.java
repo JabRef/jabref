@@ -113,7 +113,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     @Deprecated
     public void refreshGroupsForNewDatabase(BibDatabase db) {
         for (GroupTreeNode node : getChildren()) {
-            node.group.refreshForNewDatabase(db);
             node.refreshGroupsForNewDatabase(db);
         }
     }

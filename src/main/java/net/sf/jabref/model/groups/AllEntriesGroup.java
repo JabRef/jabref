@@ -1,6 +1,7 @@
 package net.sf.jabref.model.groups;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -9,8 +10,6 @@ import net.sf.jabref.model.entry.BibEntry;
  * This group contains all entries. Always. At any time!
  */
 public class AllEntriesGroup extends AbstractGroup {
-
-    public static final String ID = "AllEntriesGroup:";
 
 
     public AllEntriesGroup(String name) {
@@ -24,12 +23,7 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof AllEntriesGroup;
-    }
-
-    @Override
-    public String toString() {
-        return AllEntriesGroup.ID;
+        return o instanceof AllEntriesGroup && Objects.equals(((AllEntriesGroup) o).getName(), getName());
     }
 
     @Override
@@ -45,7 +39,6 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        return getName().hashCode();
     }
 }

@@ -73,7 +73,7 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return GroupsParser.keywordGroupFromString(s, keywordSeparator);
         }
-        if (s.startsWith(AllEntriesGroup.ID)) {
+        if (s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             return GroupsParser.allEntriesGroupFromString(s);
         }
         if (s.startsWith(SearchGroup.ID)) {
@@ -139,7 +139,7 @@ public class GroupsParser {
     }
 
     public static AbstractGroup allEntriesGroupFromString(String s) {
-        if (!s.startsWith(AllEntriesGroup.ID)) {
+        if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
         return new AllEntriesGroup(Localization.lang("All entries"));

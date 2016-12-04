@@ -18,6 +18,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      * The group's name.
      */
     private final String name;
+
     /**
      * The hierarchical context of the group.
      */
@@ -28,6 +29,9 @@ public abstract class AbstractGroup implements SearchMatcher {
         this.context = Objects.requireNonNull(context);
     }
 
+    /**
+     * Returns the way this group relates to its sub- or supergroup.
+     */
     public GroupHierarchyType getContext() {
         return context;
     }
@@ -50,8 +54,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     /**
-     * @return true if this group contains any of the specified entries, false
-     * otherwise.
+     * @return true if this group contains any of the specified entries, false otherwise.
      */
     public boolean containsAny(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
@@ -63,8 +66,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     /**
-     * @return true if this group contains all of the specified entries, false
-     * otherwise.
+     * @return true if this group contains all of the specified entries, false otherwise.
      */
     public boolean containsAll(List<BibEntry> entries) {
         for (BibEntry entry : entries) {
@@ -94,22 +96,4 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @return A deep copy of this object.
      */
     public abstract AbstractGroup deepCopy();
-
-    // by general AbstractGroup contract, toString() must return
-    // something from which this object can be reconstructed
-    // using fromString(String).
-
-    // by general AbstractGroup contract, equals() must be implemented
-
-    /**
-     * Update the group, if necessary, to handle the situation where the group
-     * is applied to a different BibDatabase than it was created for. This
-     * is for instance used when updating the group tree due to an external change.
-     *
-     * @param db The database to refresh for.
-     */
-    public void refreshForNewDatabase(BibDatabase db) {
-        // Default is to do nothing. Group types that are affected by a change
-        // of database must override this method.
-    }
 }

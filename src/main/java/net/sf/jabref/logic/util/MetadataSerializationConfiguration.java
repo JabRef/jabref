@@ -1,5 +1,8 @@
 package net.sf.jabref.logic.util;
 
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
+
 /**
  * Specifies how metadata is read and written.
  */
@@ -15,7 +18,12 @@ public class MetadataSerializationConfiguration {
     public static final String GROUP_UNIT_SEPARATOR = ";";
 
     /**
-     * Identifier for {@link net.sf.jabref.model.groups.SimpleKeywordGroup}.
+     * Identifier for {@link SimpleKeywordGroup}.
      */
     public static final String KEYWORD_GROUP_ID = "KeywordGroup:";
+
+    /**
+     * Identifier for {@link AllEntriesGroup}.
+     */
+    public static final String ALL_ENTRIES_GROUP_ID = "AllEntriesGroup:";
 }
