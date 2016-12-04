@@ -287,11 +287,6 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public String getTypeId() {
-        return KeywordGroup.ID;
-    }
-
-    @Override
     public int hashCode() {
         // TODO Auto-generated method stub
         return super.hashCode();

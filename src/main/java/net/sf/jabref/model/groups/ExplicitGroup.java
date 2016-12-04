@@ -88,11 +88,6 @@ public class ExplicitGroup extends KeywordGroup {
     }
 
     @Override
-    public String getTypeId() {
-        return ExplicitGroup.ID;
-    }
-
-    @Override
     public int hashCode() {
         return super.hashCode();
     }

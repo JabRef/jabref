@@ -35,8 +35,6 @@ public abstract class AbstractGroup implements SearchMatcher {
         return context;
     }
 
-    public abstract String getTypeId();
-
     /**
      * Returns this group's name, e.g. for display in a list/tree.
      */

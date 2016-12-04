@@ -66,11 +66,6 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public String getTypeId() {
-        return AllEntriesGroup.ID;
-    }
-
-    @Override
     public int hashCode() {
         // TODO Auto-generated method stub
         return super.hashCode();

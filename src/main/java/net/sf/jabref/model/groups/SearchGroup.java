@@ -43,11 +43,6 @@ public class SearchGroup extends AbstractGroup {
         this.query = new GroupSearchQuery(searchExpression, caseSensitive, regExp);
     }
 
-    @Override
-    public String getTypeId() {
-        return SearchGroup.ID;
-    }
-
     /**
      * Returns a String representation of this object that can be used to
      * reconstruct it.
