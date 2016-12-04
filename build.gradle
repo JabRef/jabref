@@ -128,8 +128,8 @@ dependencies {
     compile 'de.undercouch:citeproc-java:1.0.1'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.15'
-    testCompile 'com.github.tomakehurst:wiremock:2.3.1'
+    testCompile 'org.mockito:mockito-core:2.2.26'
+    testCompile 'com.github.tomakehurst:wiremock:2.4.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
@@ -345,6 +345,8 @@ if (hasProperty('dev')) {
 task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
     release = project.version
+    winKeystorePassword = System.getenv('CERTIFICATE_PW')
+    macKeystorePassword = System.getenv('CERTIFICATE_PW')
     variables = [
             versionFourDots: project.ext.threeDotVersion,
             buildFileName  : jar.archiveName,

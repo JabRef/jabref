@@ -21,7 +21,18 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
 
 ### Changed
+- Bibliographic information from web resources can now be used to complete existing entries. This functionality can be accessed via a new button in the entry editor.
 - URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
+- Windows and OSX binaries are now signed with a certificate.
+- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`. [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
+- Adds integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
+- Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
+- Replaces manual thread management with cached thread pool
+
+
+
+
+
 
 ### Fixed
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
@@ -29,8 +40,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
+- We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 - Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 - Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
+- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
+- We fixed an issue when JabRef restored its session and a shared database was used: The error message "No suitable driver found" will not appear.
 
 ### Removed
 
@@ -155,7 +169,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
 - [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
-- The dialog for choosing new entries additionally supports ID-based entry generation
+- The dialog for choosing new entries additionally supports ID-based entry generation. For instance, when searching for a DOI or ISBN, you have to press <kbd>Ctrl</kbd> + <kbd>N</kbd> instead of using the web search (<kbd>Alt</kbd> + <kbd>4</kbd>).
 - `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field

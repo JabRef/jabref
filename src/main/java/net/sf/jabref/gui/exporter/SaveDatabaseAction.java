@@ -427,7 +427,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                     ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
                             panel.getBibDatabaseContext().getDatabaseFile().get());
-                    JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
+                    JabRefExecutorService.INSTANCE.executeInterruptableTaskAndWait(scanner);
                     if (scanner.changesFound()) {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
