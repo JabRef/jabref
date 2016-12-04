@@ -70,7 +70,7 @@ public class GroupsParser {
      */
     public static AbstractGroup fromString(String s, Character keywordSeparator)
             throws ParseException {
-        if (s.startsWith(KeywordGroup.ID)) {
+        if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return GroupsParser.keywordGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(AllEntriesGroup.ID)) {
@@ -93,9 +93,10 @@ public class GroupsParser {
      */
     public static AbstractGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
+        if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(KeywordGroup.ID
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.KEYWORD_GROUP_ID
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
@@ -104,10 +105,10 @@ public class GroupsParser {
         String expression = tok.nextToken();
         boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-        return new KeywordGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                StringUtil.unquote(field, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
+        return new SimpleKeywordGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
+                GroupHierarchyType.getByNumberOrDefault(context), StringUtil.unquote(field, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
+                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, keywordSeparator, regExp
+        );
     }
 
     public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {

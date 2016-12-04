@@ -8,8 +8,14 @@ public class MetadataSerializationConfiguration {
      * Character used for quoting in the string representation.
      */
     public static final char GROUP_QUOTE_CHAR = '\\';
+
     /**
      * For separating units (e.g. name and hierarchic context) in the string representation
      */
     public static final String GROUP_UNIT_SEPARATOR = ";";
+
+    /**
+     * Identifier for {@link net.sf.jabref.model.groups.SimpleKeywordGroup}.
+     */
+    public static final String KEYWORD_GROUP_ID = "KeywordGroup:";
 }

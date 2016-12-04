@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.FieldChange;
@@ -16,12 +14,10 @@ import net.sf.jabref.model.strings.StringUtil;
 /**
  * Matches entries if a given field contains a specified word.
  */
-public class SimpleKeywordGroup extends KeywordGroup {
-
-    public static final String ID = "KeywordGroup:";
+public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     private final List<String> searchWords;
-    protected final Character keywordSeparator;
+    private final Character keywordSeparator;
 
     public SimpleKeywordGroup(String name, GroupHierarchyType context, String searchField,
                               String searchExpression, boolean caseSensitive, Character keywordSeparator) {
@@ -39,7 +35,7 @@ public class SimpleKeywordGroup extends KeywordGroup {
      */
     @Override
     public String toString() {
-        return SimpleKeywordGroup.ID + StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR) +
+        return MetadataSerializationConfiguration.KEYWORD_GROUP_ID + StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR) +
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
                 + getContext().ordinal() + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
                 + StringUtil.quote(searchField, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR) + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
