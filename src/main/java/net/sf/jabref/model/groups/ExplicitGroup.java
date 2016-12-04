@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jzieren
  */
-public class ExplicitGroup extends KeywordGroup {
+public class ExplicitGroup extends SimpleKeywordGroup {
 
     public static final String ID = "ExplicitGroup:";
 
@@ -28,7 +28,7 @@ public class ExplicitGroup extends KeywordGroup {
 
 
     public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
-        super(name, FieldName.GROUPS, name, true, false, context, keywordSeparator);
+        super(name, context, FieldName.GROUPS, name, true, keywordSeparator);
     }
 
     public void addLegacyEntryKey(String key) {

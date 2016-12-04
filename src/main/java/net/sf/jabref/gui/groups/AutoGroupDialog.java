@@ -34,11 +34,11 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.GroupsUtil;
-import net.sf.jabref.model.groups.KeywordGroup;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector containing group information.
@@ -106,8 +106,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
 
                 for (String keyword : keywords) {
-                    KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
-                            GroupHierarchyType.INDEPENDENT, Globals.prefs.getKeywordDelimiter());
+                    SimpleKeywordGroup group = new SimpleKeywordGroup(formatter.format(keyword), GroupHierarchyType.INDEPENDENT, fieldText, keyword, false, Globals.prefs.getKeywordDelimiter(), false
+                    );
                     autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                 }
 

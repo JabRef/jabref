@@ -38,8 +38,8 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
-import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -267,10 +267,10 @@ class GroupDialog extends JDialog {
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    resultingGroup = new KeywordGroup(nameField.getText().trim(),
-                            keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
-                            keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
-                            Globals.prefs.getKeywordDelimiter());
+                    resultingGroup = new SimpleKeywordGroup(nameField.getText().trim(),
+                            getContext(), keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                            keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), keywordGroupRegExp.isSelected()
+                    );
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
@@ -301,8 +301,8 @@ class GroupDialog extends JDialog {
         searchGroupCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
-        if ((editedGroup != null) && (editedGroup.getClass() == KeywordGroup.class)) {
-            KeywordGroup group = (KeywordGroup) editedGroup;
+        if ((editedGroup != null) && (editedGroup.getClass() == SimpleKeywordGroup.class)) {
+            SimpleKeywordGroup group = (SimpleKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());

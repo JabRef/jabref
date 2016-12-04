@@ -13,14 +13,14 @@ import static org.junit.Assert.assertTrue;
 
 public class KeywordGroupTest {
 
-    private KeywordGroup keywordTestGroup;
+    private SimpleKeywordGroup keywordTestGroup;
     private KeywordGroup complexKeywordGroup;
     private BibEntry emptyEntry;
 
     @Before
     public void setUp() {
-        keywordTestGroup = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT, ',');
-        complexKeywordGroup = new KeywordGroup("name", "keywords", "\\H2O", false, false, GroupHierarchyType.INDEPENDENT, ',');
+        keywordTestGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
+        complexKeywordGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',', false);
         emptyEntry = new BibEntry();
     }
 
@@ -31,8 +31,8 @@ public class KeywordGroupTest {
 
     @Test
     public void testToString2() {
-        KeywordGroup anotherGroup = new KeywordGroup("myExplicitGroup", "author", "asdf", false, true,
-                GroupHierarchyType.REFINING, ',');
+        KeywordGroup anotherGroup = new SimpleKeywordGroup("myExplicitGroup", GroupHierarchyType.REFINING, "author", "asdf", false, ',', true
+        );
         assertEquals("KeywordGroup:myExplicitGroup;1;author;asdf;0;1;", anotherGroup.toString());
     }
 
