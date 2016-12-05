@@ -171,7 +171,6 @@ public class FileUtil {
      * @return True if the rename was successful, false if an exception occurred
      */
     public static boolean renameFile(Path fromFile, Path toFile) {
-
         return renameFile(fromFile, toFile, false);
     }
 
@@ -185,7 +184,6 @@ public class FileUtil {
      *
      */
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
-
         try {
             if (replaceExisting) {
                 return Files.move(fromFile, fromFile.resolveSibling(toFile),

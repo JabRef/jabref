@@ -176,7 +176,7 @@ public class BibDatabaseContext {
     * @return The default directory for this field type.
     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
-        List<String> fileDirs = new ArrayList<>(4);
+        List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
         Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());

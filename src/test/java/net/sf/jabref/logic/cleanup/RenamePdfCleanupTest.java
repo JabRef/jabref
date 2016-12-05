@@ -122,7 +122,6 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanUpRenamePdfRenameFileDirectoryPattern() throws IOException {
-
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         String fileDirPattern = "\\EntryType";
 
@@ -145,7 +144,6 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanUpRenamePdfRenameFileDirectoryPatternSubDirectory() throws IOException {
-
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         String fileDirPattern = "\\EntryType";
 
@@ -170,7 +168,6 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanUpRenamePdfRenameFileDirectoryPatternSameAsFilePattern() throws IOException {
-
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         String fileDirPattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
 
@@ -194,7 +191,6 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanUpRenamePdfRenameFileDirectoryPatternEmptyFileName() throws IOException {
-
         String fileNamePattern = "";
         String fileDirPattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
 

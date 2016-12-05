@@ -58,7 +58,7 @@ public class CleanupWorkerTest {
 
         worker = new CleanupWorker(context,
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                        "",
+                        "", //empty fileDirPattern for backwards compatibility
                         prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                         prefs.getFileDirectoryPreferences()));
 
@@ -243,6 +243,7 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
+
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
