@@ -30,7 +30,7 @@ script:
   # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
   - sudo service postgresql stop
   # following services identified by "sudo service --status-all" do not need to run, too
-  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unkonwn instance" error)
+  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unknown instance" error)
   - sudo service acpid stop
   - sudo service atd stop
   - sudo service cron stop
