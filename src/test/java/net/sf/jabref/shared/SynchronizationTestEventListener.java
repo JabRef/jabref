@@ -2,9 +2,12 @@ package net.sf.jabref.shared;
 
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
+import net.sf.jabref.testutils.category.DatabaseTests;
 
 import com.google.common.eventbus.Subscribe;
+import org.junit.experimental.categories.Category;
 
+@Category(DatabaseTests.class)
 public class SynchronizationTestEventListener {
 
     private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;
