@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>net.sf.jabref.model.groups.AbstractGroup</OriginalElement>
+  <nodes>
+    <node x="126.5" y="0.0">java.lang.FunctionalInterface</node>
+    <node x="41.0" y="714.0">net.sf.jabref.model.groups.AllEntriesGroup</node>
+    <node x="0.0" y="243.0">net.sf.jabref.model.groups.AbstractGroup</node>
+    <node x="82.5" y="101.0">net.sf.jabref.model.search.SearchMatcher</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="net.sf.jabref.model.search.SearchMatcher" target="java.lang.FunctionalInterface">
+      <point x="0.0" y="-46.0" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.AbstractGroup" target="net.sf.jabref.model.search.SearchMatcher">
+      <point x="0.0" y="-210.5" />
+      <point x="0.0" y="46.0" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.AllEntriesGroup" target="net.sf.jabref.model.groups.AbstractGroup">
+      <point x="0.0" y="-128.5" />
+      <point x="0.0" y="210.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="243.5" y="485.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+    <Category>Inner Classes</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
