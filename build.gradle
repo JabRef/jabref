@@ -64,29 +64,19 @@ repositories {
 configurations {
     antlr3
     antlr4
-}
 
-def getV8Dependency() {
-    def arch = System.getProperty('os.arch')
-    def dep = null
-    if (OperatingSystem.current().isWindows()) {
-        dep = 'win32_x86'
-        if (arch.equals('amd64')) {
-            dep += '_64'
-        }
-    } else if (OperatingSystem.current().isMacOsX() && (arch.equals('amd64') || arch.equals('x86_64'))) {
-        dep = 'macosx_x86_64'
-    } else if (OperatingSystem.current().isLinux() && arch.equals('amd64')) {
-        dep = 'linux_x86_64'
-    }
-    if (dep == null) {
-        logger.error("Could not find V8 runtime compatible to this system")
-        return null
-    }
-    return 'com.eclipsesource.j2v8:j2v8_' + dep + ':4.5.0'
+    linux_x86_64Compile.extendsFrom compile
+    macosx_x86_64Compile.extendsFrom compile
+    win32_x86Compile.extendsFrom compile
+    win32_x86_64Compile.extendsFrom compile
 }
 
 dependencies {
+    compile configuration: 'linux_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_linux_x86_x64', version: '4.5.0'
+    compile configuration: 'macosx_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_macosx_x86_x64', version: '4.5.0'
+    compile configuration: 'win32_x86', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86', version: '4.5.0'
+    compile configuration: 'win32_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86_x64', version: '4.5.0'
+
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
@@ -162,11 +152,6 @@ dependencies {
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
-
-    // if available, use platform specific build of V8
-    if (getV8Dependency() != null) {
-        compile getV8Dependency()
-    }
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.7.22'
@@ -418,7 +403,7 @@ checkstyle {
     toolVersion = '6.17'
 }
 
-task release(dependsOn: ["media", "releaseJar"]) {
+task release(dependsOn: ["media"]) {
     group = 'JabRef - Release'
     description 'Creates a release for all target platforms.'
 }
