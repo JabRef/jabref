@@ -146,7 +146,6 @@ URL:     https://swingx.java.net/
 License: LGPL-3.0
 
 Id:      com.github.lgooddatepicker:LGoodDatePicker
-Path:    lib/LGoodDatePicker-8.2.2.jar
 Project: LGoodDatePicker
 URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
 License: MIT

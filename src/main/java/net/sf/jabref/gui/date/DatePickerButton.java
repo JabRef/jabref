@@ -32,7 +32,7 @@ public class DatePickerButton implements DateChangeListener {
 
     public DatePickerButton(FieldEditor pEditor, Boolean isoFormat) {
         this.isoFormat = isoFormat;
-        // Create a date picker: With Hidden text field (Showing button only).
+        // Create a date picker with hidden text field (showing button only).
         DatePickerSettings dateSettings = new DatePickerSettings();
         dateSettings.setVisibleDateTextField(false);
         dateSettings.setGapBeforeButtonPixels(0);
