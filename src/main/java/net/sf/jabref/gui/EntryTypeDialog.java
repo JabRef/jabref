@@ -32,9 +32,9 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
@@ -59,10 +59,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private JComboBox<String> comboBox;
     private final JabRefFrame frame;
     private static final int COLUMN = 3;
-    private final boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
-    private final BibDatabaseContext bibDatabaseContext;
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
 
@@ -90,10 +88,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         this.frame = frame;
 
-        bibDatabaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
-        biblatexMode = bibDatabaseContext.isBiblatexMode();
-
-
         setTitle(Localization.lang("Select entry type"));
 
         addWindowListener(new WindowAdapter() {
@@ -115,14 +109,25 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel panel = new JPanel();
         panel.setLayout(new VerticalLayout());
 
-        if (biblatexMode) {
-            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(bibDatabaseContext.getMode())));
+        if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+            panel.add(createEntryGroupPanel("BibLateX", BibLatexEntryTypes.ALL));
+
+            if (CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.containsKey(BibDatabaseMode.BIBLATEX) &&
+                    !CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBLATEX).isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP
+                        .get(
+                        BibDatabaseMode.BIBLATEX)));
+            }
+
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
 
-            if (!CustomEntryTypesManager.ALL.isEmpty()) {
-                panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
+            if (CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.containsKey(BibDatabaseMode.BIBTEX) &&
+                    !CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX).isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP
+                        .get(
+                        BibDatabaseMode.BIBTEX)));
             }
         }
         panel.add(createIdFetcherPanel());
@@ -146,7 +151,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return buttons;
     }
 
-    private JPanel createEntryGroupPanel(String groupTitle, Collection<EntryType> entries) {
+    private JPanel createEntryGroupPanel(String groupTitle, Collection<? extends EntryType> entries) {
         JPanel panel = new JPanel();
         GridBagLayout bagLayout = new GridBagLayout();
         panel.setLayout(bagLayout);

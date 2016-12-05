@@ -57,19 +57,26 @@ public class ChangeEntryTypeMenu {
             for (EntryType type : EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX)) {
                 menu.add(new ChangeTypeAction(type, panel));
             }
+            if (!CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBLATEX).isEmpty()) {
+                menu.addSeparator();
+                // custom types
+                createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX));
+            }
         } else {
             // Bibtex
             createEntryTypeSection(panel, menu, "BibTeX Entries", BibtexEntryTypes.ALL);
             menu.addSeparator();
             // ieeetran
             createEntryTypeSection(panel, menu, "IEEETran Entries", IEEETranEntryTypes.ALL);
-            menu.addSeparator();
-            // custom types
-            createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.ALL);
+            if (!CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX).isEmpty()) {
+                menu.addSeparator();
+                // custom types
+                createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX));
+            }
         }
     }
 
-    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<EntryType> types) {
+    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<? extends EntryType> types) {
         // bibtex
         JMenuItem header = new JMenuItem(title);
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
