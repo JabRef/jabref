@@ -6,7 +6,6 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +14,6 @@ public class EntryTypesTestBibLatex {
 
 
     @Test
-    @Ignore("This fails of unknown reasons - will be fixed with https://github.com/JabRef/jabref/pull/2331")
     public void testBibLatexMode() {
         // BibLatex mode
         assertEquals(BibLatexEntryTypes.ARTICLE, EntryTypes.getType("article", BibDatabaseMode.BIBLATEX).get());
