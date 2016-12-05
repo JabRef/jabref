@@ -14,11 +14,18 @@ buildscript {
 }
 
 plugins {
+    id 'com.gradle.build-scan' version '1.3'
     id "com.install4j.gradle" version "6.1.3"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     // If this is updated to 0.0.9, check configurations.errorprone
     id "net.ltgt.errorprone" version "0.0.8"
     id 'me.champeau.gradle.jmh' version '0.3.1'
+}
+
+// use the gradle build scan feature: https://scans.gradle.com/get-started
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }
 
 apply plugin: "java"
@@ -123,6 +130,8 @@ dependencies {
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
+    
+    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.2.2'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.2.26'
