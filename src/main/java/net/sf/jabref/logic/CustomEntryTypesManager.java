@@ -1,31 +1,34 @@
 package net.sf.jabref.logic;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 
-    public static final List<EntryType> ALL = new ArrayList<>();
+    public static final Map<BibDatabaseMode, List<CustomEntryType>> CUSTOM_TYPES_BY_MODE_MAP = new HashMap<>();
     /**
      * Load all custom entry types from preferences. This method is
      * called from JabRef when the program starts.
      */
     public static void loadCustomEntryTypes(JabRefPreferences prefs) {
-        int number = 0;
-        Optional<CustomEntryType> type;
-        while ((type = prefs.getCustomEntryType(number)).isPresent()) {
-            EntryTypes.addOrModifyCustomEntryType(type.get(), prefs.getDefaultBibDatabaseMode());
-            ALL.add(type.get());
-            number++;
+        List<CustomEntryType> customBibtexTypes = prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX);
+        for(CustomEntryType type : customBibtexTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
         }
+        CUSTOM_TYPES_BY_MODE_MAP.put(BibDatabaseMode.BIBTEX, customBibtexTypes);
+
+        List<CustomEntryType> customBiblatexTypes = prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX);
+        for(CustomEntryType type :customBiblatexTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
+        }
+        CUSTOM_TYPES_BY_MODE_MAP.put(BibDatabaseMode.BIBLATEX, customBiblatexTypes);
     }
 
     /**
@@ -34,21 +37,17 @@ public class CustomEntryTypesManager {
      * JabRefFrame when the program closes.
      */
     public static void saveCustomEntryTypes(JabRefPreferences prefs) {
-        Iterator<EntryType> iterator = EntryTypes.getAllValues(BibDatabaseMode.BIBTEX).iterator();
-        int number = 0;
+        saveCustomEntryTypes(prefs, BibDatabaseMode.BIBTEX);
+        saveCustomEntryTypes(prefs, BibDatabaseMode.BIBLATEX);
 
-        while (iterator.hasNext()) {
-            EntryType entryType = iterator.next();
-            if (entryType instanceof CustomEntryType) {
-                // Store this entry type.
-                prefs.storeCustomEntryType((CustomEntryType) entryType, number);
-                number++;
-            }
-        }
-        // Then, if there are more 'old' custom types defined, remove these
-        // from preferences. This is necessary if the number of custom types
-        // has decreased.
-        prefs.purgeCustomEntryTypes(number);
+    }
+
+    private static void saveCustomEntryTypes(JabRefPreferences prefs, BibDatabaseMode mode) {
+        List<CustomEntryType> customBiblatexTypes = EntryTypes.getAllValues(mode).stream()
+                .filter(type -> type instanceof CustomEntryType)
+                .map(entryType -> (CustomEntryType) entryType).collect(Collectors.toList());
+
+        prefs.storeCustomEntryTypes(customBiblatexTypes, mode);
     }
 
 }
