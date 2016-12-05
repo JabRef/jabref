@@ -24,6 +24,7 @@ import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.MetaData;
@@ -305,6 +306,17 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         Assert.assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
+    }
+
+    @Test
+    public void convertToBiblatexMovesJournalToJournalTitle() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.JOURNAL, "test");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals(Optional.empty(), entry.getField(FieldName.JOURNAL));
+        Assert.assertEquals(Optional.of("test"), entry.getField(FieldName.JOURNALTITLE));
     }
 
     @Test
