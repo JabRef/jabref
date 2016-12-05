@@ -26,22 +26,22 @@ public class BiblatexCleanup implements CleanupJob {
             entry.getField(oldFieldName).ifPresent(oldValue -> {
                 if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
-                    changes.add(entry.setField(newFieldName, oldValue).orElse(null));
-                    changes.add(entry.clearField(oldFieldName).orElse(null));
+                    entry.setField(newFieldName, oldValue).ifPresent(changes::add);
+                    entry.clearField(oldFieldName).ifPresent(changes::add);
                 }
             });
         }
         // Dates: create date out of year and month, save it and delete old fields
-        // If there already exists a value for the field date, it is not overwritten
+        // If there already exists a non blank/empty value for the field date, it is not overwritten
         String date = "";
         if (entry.getField(FieldName.DATE).isPresent()) {
             date = entry.getField(FieldName.DATE).get();
         }
         if (StringUtils.isBlank(date)) {
             entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                changes.add(entry.setField(FieldName.DATE, newDate).orElse(null));
-                changes.add(entry.clearField(FieldName.YEAR).orElse(null));
-                changes.add(entry.clearField(FieldName.MONTH).orElse(null));
+                entry.setField(FieldName.DATE, newDate).ifPresent(changes::add);
+                entry.clearField(FieldName.YEAR).ifPresent(changes::add);
+                entry.clearField(FieldName.MONTH).ifPresent(changes::add);
             });
         }
         return changes;
