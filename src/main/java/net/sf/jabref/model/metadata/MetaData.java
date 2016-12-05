@@ -166,6 +166,7 @@ public class MetaData {
 
     public void clearContentSelectors(String fieldName) {
         contentSelectors.removeSelector(fieldName);
+        postChange();
     }
 
     public List<String> getContentSelectorValuesForField(String fieldName) {
