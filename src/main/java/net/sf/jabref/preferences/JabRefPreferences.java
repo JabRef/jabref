@@ -82,6 +82,8 @@ import org.apache.commons.logging.LogFactory;
 public class JabRefPreferences {
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
+    private static final Class PREFS_BASE_CLASS = JabRefMain.class;
+
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -392,6 +394,10 @@ public class JabRefPreferences {
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
 
+    // Prefs node for customized entry types
+    public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
+    public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
+
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
 
@@ -461,7 +467,7 @@ public class JabRefPreferences {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(JabRefMain.class);
+        prefs = Preferences.userNodeForPackage(PREFS_BASE_CLASS);
 
         SearchPreferences.putDefaults(defaults);
 
@@ -1078,7 +1084,7 @@ public class JabRefPreferences {
      */
     public GlobalBibtexKeyPattern getKeyPattern() {
         keyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1101,7 +1107,7 @@ public class JabRefPreferences {
         keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1117,6 +1123,47 @@ public class JabRefPreferences {
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }
+    }
+
+    public void storeCustomEntryTypes(List<CustomEntryType> customEntryTypes, BibDatabaseMode bibDatabaseMode) {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+
+        try {
+            // clear old custom types
+            prefsNode.clear();
+
+            // store current custom types
+            customEntryTypes.forEach(type -> prefsNode.put(type.getName(), type.getAsString()));
+
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    public List<CustomEntryType> loadCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<CustomEntryType> storedEntryTypes = new ArrayList<>();
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        try {
+            Arrays.stream(prefsNode.keys())
+                    .map(key -> prefsNode.get(key, null))
+                    .filter(Objects::nonNull)
+                    .forEach(typeString -> CustomEntryType.parse(typeString).ifPresent(storedEntryTypes::add));
+        } catch (BackingStoreException e) {
+            LOGGER.info("Parsing customized entry types failed.", e);
+        }
+        return storedEntryTypes;
+    }
+
+    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+        if (mode == BibDatabaseMode.BIBLATEX) {
+            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBLATEX_TYPES);
+        }
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBTEX_TYPES);
+        }
+
+        throw new IllegalArgumentException("Unknown BibDatabaseMode: " + mode);
     }
 
     public Map<String, Object> getPreferences() {
