@@ -28,10 +28,8 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.support.DevEnvironment;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -244,9 +242,6 @@ public class CleanupWorkerTest {
 
     @Test
     public void cleanupRenamePdfRenamesRelativeFile() throws IOException {
-        // Test currently fails on Travis
-        Assume.assumeFalse(DevEnvironment.isCIServer());
-
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.RENAME_PDF);
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
