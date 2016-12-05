@@ -12,6 +12,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +31,11 @@ public class EntryTypesTestBibtex {
         newRequiredFields.add("additional");
         overwrittenStandardType = new CustomEntryType(BibtexEntryTypes.ARTICLE.getName(), newRequiredFields,
                 Collections.singletonList("optional"));
+    }
+
+    @After
+    public void tearDown() {
+        EntryTypes.removeAllCustomEntryTypes();
     }
 
     @Test
@@ -105,8 +111,4 @@ public class EntryTypesTestBibtex {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, BibDatabaseMode.BIBTEX);
         assertFalse(EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX).contains(overwrittenStandardType));
     }
-
-
-
-
 }
