@@ -1684,9 +1684,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             autosaver.registerListener(new AutosaveUIManager(basePanel));
         }
 
-        if (readyForBackup(context)) {
-            BackupManager.start(context);
-        }
+        BackupManager.start(context);
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -1702,9 +1700,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 context.getDatabaseFile().isPresent();
     }
 
-    private boolean readyForBackup(BibDatabaseContext context) {
-        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
-    }
 
     /**
      * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.

@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Replaces manual thread management with cached thread pool
 - Files can now be moved to subfolders named by a custom format pattern, e.g. based on `entrytype`. The pattern can be specfified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 ### Fixed
+- We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
 - We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).

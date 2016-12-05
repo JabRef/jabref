@@ -108,9 +108,15 @@ public class BibDatabaseContext {
      * Get the file where this database was last saved to or loaded from, if any.
      *
      * @return Optional of the relevant File, or Optional.empty() if none is defined.
+     * @deprecated use {@link #getDatabasePath()} instead
      */
+    @Deprecated
     public Optional<File> getDatabaseFile() {
         return Optional.ofNullable(file);
+    }
+
+    public Optional<Path> getDatabasePath() {
+        return Optional.ofNullable(file).map(File::toPath);
     }
 
     public void setDatabaseFile(File file) {
