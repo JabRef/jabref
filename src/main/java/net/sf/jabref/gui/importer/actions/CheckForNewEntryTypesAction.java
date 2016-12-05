@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
@@ -56,6 +57,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
             for (EntryType typ : pr.getEntryTypes().values()) {
                 EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ, pr.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode()));
             }
+            CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
         }
     }
 }

@@ -1051,6 +1051,8 @@ public class JabRefPreferences {
      * @throws BackingStoreException
      */
     public void clear() throws BackingStoreException {
+        clearAllCustomEntryTypes();
+        clearKeyPatterns();
         prefs.clear();
     }
 
@@ -1125,12 +1127,17 @@ public class JabRefPreferences {
         }
     }
 
+    private void clearKeyPatterns() throws BackingStoreException {
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        pre.clear();
+    }
+
     public void storeCustomEntryTypes(List<CustomEntryType> customEntryTypes, BibDatabaseMode bibDatabaseMode) {
         Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
 
         try {
             // clear old custom types
-            prefsNode.clear();
+            clearCustomEntryTypes(bibDatabaseMode);
 
             // store current custom types
             customEntryTypes.forEach(type -> prefsNode.put(type.getName(), type.getAsString()));
@@ -1153,6 +1160,17 @@ public class JabRefPreferences {
             LOGGER.info("Parsing customized entry types failed.", e);
         }
         return storedEntryTypes;
+    }
+
+    private void clearAllCustomEntryTypes() throws BackingStoreException {
+        for(BibDatabaseMode mode :BibDatabaseMode.values()) {
+            clearCustomEntryTypes(mode);
+        }
+    }
+
+    private void clearCustomEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+        prefsNode.clear();
     }
 
     private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {

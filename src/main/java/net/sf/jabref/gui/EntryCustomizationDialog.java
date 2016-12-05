@@ -34,6 +34,7 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -309,6 +310,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
 
         updateTables();
+        CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
     }
 
     private void typeDeletion(String name) {
