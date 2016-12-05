@@ -2,7 +2,7 @@ language: java
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
-# This environment is continuosly updated as described in https://docs.travis-ci.com/user/build-environment-updates/
+# This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
 dist: trusty
 sudo: required
 
@@ -40,7 +40,7 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  # Integratation tests run in a timeout. Just start them and kill them after 60s
+  # Integration tests run in a timeout. Just start them and kill them after 60s.
   - timeout 60 ./gradlew integrationTest -Dscan --info || true
 
 after_script:
