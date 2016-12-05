@@ -20,8 +20,8 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check
-  - ./gradlew databaseTest
+  - ./gradlew check -Dscan
+  - ./gradlew databaseTest -Dscan
   # Prepare integration tests
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
@@ -41,7 +41,7 @@ script:
   - sudo service sshguard stop
   - sudo service ssh stop
   # Integratation tests run in a timeout. Just start them and kill them after 60s
-  - timeout 60 ./gradlew integrationTest --info || true
+  - timeout 60 ./gradlew integrationTest -Dscan --info || true
 
 after_script:
   # enable codecov report
