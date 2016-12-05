@@ -1,8 +1,7 @@
-package net.sf.jabref.logic.bibtex;
+package net.sf.jabref.model;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 
