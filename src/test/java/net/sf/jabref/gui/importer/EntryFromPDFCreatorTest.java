@@ -9,14 +9,17 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.importer.ImportDataTest;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.mockito.Mockito.mock;
 
+@Category(GUITests.class)
 public class EntryFromPDFCreatorTest {
 
     private EntryFromPDFCreator entryCreator;

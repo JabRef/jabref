@@ -1,8 +1,12 @@
 package net.sf.jabref.shared;
 
+import net.sf.jabref.testutils.category.DatabaseTests;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(DatabaseTests.class)
 public class DBMSTypeTest {
 
     @Test

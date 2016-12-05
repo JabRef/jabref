@@ -4,13 +4,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.sf.jabref.model.strings.StringUtil;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.fixture.JTableFixture;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
+@Category(GUITests.class)
 public class ParameterizedMenuNewEntryTest extends AbstractUITest {
 
     private final String databaseMode;
