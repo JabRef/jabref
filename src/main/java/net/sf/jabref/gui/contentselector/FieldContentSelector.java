@@ -189,7 +189,7 @@ public class FieldContentSelector extends JComponent {
     public void rebuildComboBox() {
         comboBox.removeAllItems();
 
-        // TODO: CO - What for?
+        // To have an empty field as the default for the combobox
         comboBox.addItem("");
         for (String item : metaData.getContentSelectorValuesForField(editor.getFieldName())) {
             comboBox.addItem(item);
