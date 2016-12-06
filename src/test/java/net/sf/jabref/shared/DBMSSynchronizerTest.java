@@ -22,17 +22,20 @@ import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
+import net.sf.jabref.testutils.category.DatabaseTests;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
+@Category(DatabaseTests.class)
 public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;

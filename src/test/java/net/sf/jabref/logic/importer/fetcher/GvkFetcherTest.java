@@ -9,13 +9,16 @@ import java.util.List;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Category(FetcherTests.class)
 public class GvkFetcherTest {
 
     private GvkFetcher fetcher;

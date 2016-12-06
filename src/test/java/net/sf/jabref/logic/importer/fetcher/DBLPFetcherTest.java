@@ -9,14 +9,17 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;

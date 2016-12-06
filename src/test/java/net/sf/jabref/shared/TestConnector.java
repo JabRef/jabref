@@ -3,7 +3,11 @@ package net.sf.jabref.shared;
 import java.sql.SQLException;
 
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import net.sf.jabref.testutils.category.DatabaseTests;
 
+import org.junit.experimental.categories.Category;
+
+@Category(DatabaseTests.class)
 public class TestConnector {
 
     public static DBMSType currentConnectionType;
