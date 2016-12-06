@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.SwingUtilities;
 
 /**
- * Can catch any exceptions occuring on the EDT thread for assertion.
+ * Can catch any exceptions occurring on the EDT thread for assertion.
  */
 public class AWTExceptionHandler {
 

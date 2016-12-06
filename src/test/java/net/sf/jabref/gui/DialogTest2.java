@@ -4,15 +4,19 @@ package net.sf.jabref.gui;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
+import net.sf.jabref.testutils.category.GUITests;
+
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
 /**
  * Split of DialogTest, since the test cases were only running separately
  */
+@Category(GUITests.class)
 public class DialogTest2 extends AbstractUITest {
     @Test
     public void testCloseStyleSelectDialog() {

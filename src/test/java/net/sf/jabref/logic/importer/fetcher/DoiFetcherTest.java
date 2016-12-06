@@ -6,13 +6,16 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+@Category(FetcherTests.class)
 public class DoiFetcherTest {
 
     private DoiFetcher fetcher;
