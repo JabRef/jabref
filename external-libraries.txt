@@ -5,11 +5,9 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 ## License
 
- * GPLv2+ means "GPLv2 or later"
- * GPLv2! means "exactly version 2.0 of GPL"
- * GPLv2  means, we haven't checked whether later options are allowed
- * similar for LGPL and other version of GPL
-
+We follow the [SPDX license identifiers](https://spdx.org/licenses/).
+In case you add a library, please use these identifiers.
+For instance, "BSD" is not exactg enough, there are numerous variants out there: BSD-2-Clouse,  	BSD-3-Clause-No-Nuclear-Warranty, ...
 
 # Fonts and Icons
 
@@ -40,17 +38,17 @@ License: BSD
 Id:      commons-cli:commons-cli
 Project: Apache Commons CLI
 URL:     http://commons.apache.org/cli/
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
-License: Apache 2.0
+License: Apache-2.0
 
-Id:      com.googlecode.java-diff-utils
+Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
-URL:     http://code.google.com/p/java-diff-utils/
-License: Apache 2.0
+URL:     https://github.com/bkromhout/java-diff-utils
+License: Apache-2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
@@ -85,32 +83,32 @@ License: MIT
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
-License: GPLv2! and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
+License: GPL-2.0 and Oracle's FOSS License Exception (http://www.mysql.com/about/legal/licensing/foss-exception/) allowing GPLv3
 
 Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
-License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
+License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL-2.0
 
 Id:      org.apache.logging.log4j
 Project: Apache Log2j 2
 URL:     http://logging.apache.org/log4j/2.x/
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.apache.pdfbox:jempbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.apache.pdfbox:pdfbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
-License: Apache 2.0
+License: Apache-2.0
 
 Id:      org.bouncycastle:bcprov-jdk15on
 Project: The Legion of the Bouncy Castle
@@ -130,34 +128,33 @@ License: LGPL 3.0
 Id:      org.openoffice:jurt
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
-License: LGPL 3.0
+License: Apache-2.0
 
 Id:      org.openoffice:ridl
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
-License: LGPL 3.0
+License: Apache-2.0
 
 Id:      org.openoffice:unoil
 Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
-License: LGPL 3.0
+License: Apache-2.0
 
 Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/
-License: LGPL 3.0
+License: LGPL-3.0
 
-Id:      microba
-Path:    lib/microba.jar
-Project: Microba
-URL:     https://github.com/tdbear/microba
-License: BSD
+Id:      com.github.lgooddatepicker:LGoodDatePicker
+Project: LGoodDatePicker
+URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
+License: MIT
 
 Id:      spin
 Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
-License: LGPL 2.1+
+License: LGPL-2.1+
 
 Id:      org.citationstyles.styles
 Project: CSL Styles
@@ -167,11 +164,11 @@ Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
 Id:      org.citationstyles.locales
 Project: CSL Locales
 URL:     https://github.com/citation-style-language/locales
-Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
+Licence: CC-BY-SA-3.0
 
 Id:      de.undercouch.citeproc-java
 Project: Citeproc-Java
 URL:     http://michel-kraemer.github.io/citeproc-java/
-Licence: Apache License, Version 2.0
+Licence: Apache-2.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

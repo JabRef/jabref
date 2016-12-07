@@ -47,7 +47,8 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                Globals.prefs.getFileDirectoryPreferences());
+                Globals.prefs.getFileDirectoryPreferences(),
+                Globals.prefs.getBibtexKeyPatternPreferences());
         List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
         if (messages.isEmpty()) {

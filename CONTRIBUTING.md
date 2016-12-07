@@ -29,6 +29,17 @@ Add a line with your changes in the appropriate section.
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
 
 
+#### Key format
+Example: `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`
+
+In case you add keys to the changelog, please follow these rules:
+
+- `<kbd>` tag for each key
+- First letter of key capitalized
+- Combined keys separated by `+`
+- Spaces before and after separator `+`
+
+
 ### Author credits
 You will be given credit in the `AUTHORS` file in the root of the repository and the 'About' pages inside the main application.
 We will periodically update the contributors list inside `AUTHORS`.

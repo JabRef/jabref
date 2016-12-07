@@ -203,7 +203,7 @@ public class FreeCiteImporter extends Importer {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    BibtexKeyPatternUtil.makeLabel(
+                    BibtexKeyPatternUtil.makeAndSetLabel(
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData()
                                     .getCiteKeyPattern(importFormatPreferences.getBibtexKeyPatternPreferences().getKeyPattern()),
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,

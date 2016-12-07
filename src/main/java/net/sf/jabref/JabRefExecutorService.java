@@ -2,7 +2,6 @@ package net.sf.jabref;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -23,12 +22,21 @@ public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
+    private Thread remoteThread;
+
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
-    private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
+
+    private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
+        Thread thread = new Thread(r);
+        thread.setName("JabRef LowPriorityCachedThreadPool");
+        thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
+        return thread;
+    });
 
     private final Timer timer = new Timer("timer", true);
 
@@ -36,8 +44,8 @@ public class JabRefExecutorService implements Executor {
 
     @Override
     public void execute(Runnable command) {
-        if(command == null) {
-            //TODO logger
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
             return;
         }
 
@@ -45,13 +53,13 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void executeAndWait(Runnable command) {
-        if(command == null) {
-            //TODO logger
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
             return;
         }
 
         Future<?> future = executorService.submit(command);
-        while(true) {
+        while (true) {
             try {
                 future.get();
                 return;
@@ -63,65 +71,69 @@ public class JabRefExecutorService implements Executor {
         }
     }
 
-    private static class AutoCleanupRunnable implements Runnable {
+    public void executeInterruptableTask(final Runnable runnable) {
+        this.lowPriorityExecutorService.execute(runnable);
+    }
 
-        private final Runnable runnable;
-        private final ConcurrentLinkedQueue<Thread> startedThreads;
+    public void executeInterruptableTask(final Runnable runnable, String taskName) {
+        this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
+    }
 
-        public Thread thread;
+    class NamedRunnable implements Runnable {
 
-        private AutoCleanupRunnable(Runnable runnable, ConcurrentLinkedQueue<Thread> startedThreads) {
-            this.runnable = runnable;
-            this.startedThreads = startedThreads;
+        private final String name;
+
+        private final Runnable task;
+
+        public NamedRunnable(String name, Runnable runnable){
+            this.name = name;
+            this.task = runnable;
         }
 
         @Override
         public void run() {
+            final String orgName = Thread.currentThread().getName();
+            Thread.currentThread().setName(name);
             try {
-                runnable.run();
+                task.run();
             } finally {
-                startedThreads.remove(thread);
+                Thread.currentThread().setName(orgName);
             }
         }
     }
 
-    public void executeWithLowPriorityInOwnThread(final Runnable runnable, String name) {
-        AutoCleanupRunnable target = new AutoCleanupRunnable(runnable, startedThreads);
-        final Thread thread = new Thread(target);
-        target.thread = thread;
-        thread.setName("JabRef - " + name + " - low prio");
-        startedThreads.add(thread);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
-    }
+    public void executeInterruptableTaskAndWait(Runnable runnable) {
+        if(runnable == null) {
+            LOGGER.debug("Received null as command for execution");
+            return;
+        }
 
-    public void executeInOwnThread(Thread thread) {
-        // this is a special case method for Threads that cannot be interrupted so easily
-        // this method should normally not be used
-        startedThreads.add(thread);
-        // TODO memory leak when thread is finished
-        thread.start();
-    }
-
-    public void executeWithLowPriorityInOwnThreadAndWait(Runnable runnable) {
-        Thread thread = new Thread(runnable);
-        thread.setName("JabRef low prio");
-        startedThreads.add(thread);
-        thread.setPriority(Thread.MIN_PRIORITY);
-        thread.start();
-
-        waitForThreadToFinish(thread);
-    }
-
-    private void waitForThreadToFinish(Thread thread) {
-        while(true) {
+        Future<?> future = lowPriorityExecutorService.submit(runnable);
+        while (true) {
             try {
-                thread.join();
-                startedThreads.remove(thread);
+                future.get();
                 return;
             } catch (InterruptedException ignored) {
                 // Ignored
+            } catch (ExecutionException e) {
+                LOGGER.error("Problem executing command", e);
             }
+        }
+    }
+
+    public void manageRemoteThread(Thread thread) {
+        if (this.remoteThread != null){
+            throw new IllegalStateException("Remote thread is already attached");
+        } else {
+            this.remoteThread = thread;
+            remoteThread.start();
+        }
+    }
+
+    public void stopRemoteThread() {
+        if (remoteThread != null) {
+            remoteThread.interrupt();
+            remoteThread = null;
         }
     }
 
@@ -130,11 +142,12 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void shutdownEverything() {
+        // those threads will be allowed to finish
         this.executorService.shutdown();
-        for(Thread thread : startedThreads) {
-            thread.interrupt();
-        }
-        startedThreads.clear();
+        //those threads will be interrupted in their current task
+        this.lowPriorityExecutorService.shutdownNow();
+        // kill the remote thread
+        stopRemoteThread();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 

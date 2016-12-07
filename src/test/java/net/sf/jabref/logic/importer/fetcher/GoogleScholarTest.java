@@ -13,15 +13,18 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.support.DevEnvironment;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class GoogleScholarTest {
 
     private GoogleScholar finder;
@@ -50,7 +53,7 @@ public class GoogleScholarTest {
     @Test
     public void linkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCircleCI());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         entry.setField("title", "Towards Application Portability in Platform as a Service");
 
@@ -63,7 +66,7 @@ public class GoogleScholarTest {
     @Test
     public void noLinkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCircleCI());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
@@ -73,7 +76,7 @@ public class GoogleScholarTest {
     @Test
     public void findSingleEntry() throws FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCircleCI());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
         entry.setCiteKey("geiger2013detecting");
@@ -91,7 +94,7 @@ public class GoogleScholarTest {
     @Test
     public void find20Entries() throws FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCircleCI());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
