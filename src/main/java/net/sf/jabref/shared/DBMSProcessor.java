@@ -524,8 +524,7 @@ public abstract class DBMSProcessor {
     /**
      * Clears and sets all shared meta data.
      *
-     * @param metaData JabRef meta data.
-     * @throws SQLException
+     * @param data JabRef meta data as map
      */
     public void setSharedMetaData(Map<String, String> data) throws SQLException {
         connection.createStatement().executeUpdate("TRUNCATE TABLE " + escape("METADATA")); // delete data all data from table

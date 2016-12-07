@@ -12,7 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnector}.
+ * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.
  */
 public class DBMSConnectionProperties {
 
