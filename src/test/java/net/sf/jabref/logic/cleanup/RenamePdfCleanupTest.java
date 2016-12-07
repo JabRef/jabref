@@ -15,6 +15,7 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -25,6 +26,7 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RenamePdfCleanupTest {
 
@@ -34,12 +36,17 @@ public class RenamePdfCleanupTest {
     private BibEntry entry;
     private JabRefPreferences prefs;
 
+    private FileDirectoryPreferences fileDirPrefs;
+
     @Before
     public void setUp() throws Exception {
         prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
+
+        fileDirPrefs = mock(FileDirectoryPreferences.class);
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -57,7 +64,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
-                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
+                mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
@@ -75,7 +82,7 @@ public class RenamePdfCleanupTest {
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("", "", ""))));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
-                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
+                mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
         assertEquals(
@@ -95,7 +102,7 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
-                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
+                mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
@@ -113,7 +120,7 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                prefs.getFileDirectoryPreferences());
+                fileDirPrefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
@@ -132,7 +139,7 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                prefs.getFileDirectoryPreferences());
+                fileDirPrefs);
         cleanup.cleanup(entry);
 
         Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
@@ -156,7 +163,7 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                prefs.getFileDirectoryPreferences());
+                fileDirPrefs);
         cleanup.cleanup(entry);
 
         Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
@@ -179,7 +186,7 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                prefs.getFileDirectoryPreferences());
+                fileDirPrefs);
         cleanup.cleanup(entry);
 
         Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
@@ -202,7 +209,7 @@ public class RenamePdfCleanupTest {
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                prefs.getFileDirectoryPreferences());
+                fileDirPrefs);
         cleanup.cleanup(entry);
 
         Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
