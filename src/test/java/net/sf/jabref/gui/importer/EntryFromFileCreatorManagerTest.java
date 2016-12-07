@@ -16,15 +16,15 @@ import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
-/**
- * @version 11.11.2008 | 21:51:54
- */
+@Category(GUITests.class)
 public class EntryFromFileCreatorManagerTest {
 
     // Needed to initialize ExternalFileTypes

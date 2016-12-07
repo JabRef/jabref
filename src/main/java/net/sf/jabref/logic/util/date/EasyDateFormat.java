@@ -1,9 +1,7 @@
 package net.sf.jabref.logic.util.date;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class EasyDateFormat {
 
@@ -30,16 +28,6 @@ public class EasyDateFormat {
      */
     public String getCurrentDate() {
         return getDateAt(ZonedDateTime.now());
-    }
-
-    /**
-     * Creates a readable Date string from the parameter date. The format is set
-     * in preferences under the key "timeStampFormat".
-     *
-     * @return The formatted date string.
-     */
-    public String getDateAt(Date date) {
-        return getDateAt(date.toInstant().atZone(ZoneId.systemDefault()));
     }
 
     /**

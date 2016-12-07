@@ -296,7 +296,7 @@ public class FileListEntryEditor {
         String fileLink = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            List<String> dirs = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 fileLink = this.link.getText().trim();
             } else {
@@ -354,7 +354,7 @@ public class FileListEntryEditor {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
 
             // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            List<String> fileDirs = this.databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
             link.setText(newFile.getPath());

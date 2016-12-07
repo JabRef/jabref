@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -171,11 +170,27 @@ public class FileUtil {
      * @param toFile   The target fileName
      * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fromFile, String toFile) {
+    public static boolean renameFile(Path fromFile, Path toFile) {
+        return renameFile(fromFile, toFile, false);
+    }
 
+    /**
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @param replaceExisting Wether to replace existing files or not
+     * @return True if the rename was successful, false if an exception occurred
+     *
+     */
+    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
-            Path src = Paths.get(fromFile);
-            return Files.move(src, src.resolveSibling(toFile)) != null;
+            if (replaceExisting) {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                        StandardCopyOption.REPLACE_EXISTING) != null;
+            } else {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+            }
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;
@@ -199,9 +214,9 @@ public class FileUtil {
             FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null), fileDirectoryPreferences);
+        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory(fileDirectoryPreferences);
+        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -330,8 +345,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
-            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -406,8 +421,8 @@ public class FileUtil {
      * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            String fileNamePattern, LayoutFormatterPreferences prefs) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
@@ -428,5 +443,4 @@ public class FileUtil {
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
-
 }

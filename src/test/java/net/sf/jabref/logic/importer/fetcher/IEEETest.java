@@ -6,13 +6,16 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(FetcherTests.class)
 public class IEEETest {
     private IEEE finder;
     private BibEntry entry;

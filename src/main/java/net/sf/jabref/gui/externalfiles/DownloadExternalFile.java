@@ -43,6 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * If the download is canceled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
+
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
@@ -77,8 +78,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
-                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"),
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -106,9 +107,8 @@ public class DownloadExternalFile {
             // TODO: stop editor dialog if this results in an error:
             mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
-                    + ex.getMessage(), Localization.lang("Download file"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
+                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             LOGGER.info("Error while downloading " + "'" + res + "'", ex);
             return;
         }
@@ -151,7 +151,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+        List<String> fDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;
@@ -337,12 +337,14 @@ public class DownloadExternalFile {
 
     }
 
+
     /**
      * Callback interface that users of this class must implement in order to receive
      * notification when download is complete.
      */
     @FunctionalInterface
     public interface DownloadCallback {
+
         void downloadComplete(FileListEntry file);
     }
 }

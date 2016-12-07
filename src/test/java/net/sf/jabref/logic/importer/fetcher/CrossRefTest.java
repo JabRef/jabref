@@ -4,11 +4,14 @@ import java.util.Locale;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 
+@Category(FetcherTests.class)
 public class CrossRefTest {
     @Test
     public void findExactData() {
