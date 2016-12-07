@@ -439,7 +439,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
-            Localization.lang("Follow DOI or URL link and try to locate PDF full text document"));
+            Localization.lang("Look up full text documents"));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
