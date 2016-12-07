@@ -47,11 +47,6 @@ Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
 License: Apache-2.0
 
-Id:      com.github.bkromhout:java-diff-utils
-Project: java-diff-utils
-URL:     https://github.com/bkromhout/java-diff-utils
-License: Apache-2.0
-
 Id:      com.jgoodies:jgoodies-common
 Project: JGoodies Common
 URL:     http://www.jgoodies.com/downloads/libraries/

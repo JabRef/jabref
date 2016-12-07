@@ -34,7 +34,6 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.DiffHighlighting;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -272,7 +271,7 @@ public class MergeEntries {
         mergePanel.add(boldFontLabel(Localization.lang("Entry type")), CELL_CONSTRAINTS.xy(1, 1));
 
         JTextPane leftTypeDisplay = new DiffHighlightingTextPane();
-        leftTypeDisplay.setText(DiffHighlighting.HTML_START + leftEntry.getType() + DiffHighlighting.HTML_END);
+        leftTypeDisplay.setText(leftEntry.getType());
         mergePanel.add(leftTypeDisplay, CELL_CONSTRAINTS.xy(3, 1));
         if (leftEntry.getType().equals(rightEntry.getType())) {
             identicalTypes = true;
@@ -290,13 +289,14 @@ public class MergeEntries {
             typeRadioButtons.get(0).setSelected(true);
         }
         JTextPane rightTypeDisplay = new DiffHighlightingTextPane();
-        rightTypeDisplay.setText(DiffHighlighting.HTML_START + rightEntry.getType() + DiffHighlighting.HTML_END);
+        rightTypeDisplay.setText(rightEntry.getType());
         mergePanel.add(rightTypeDisplay, CELL_CONSTRAINTS.xy(11, 1));
     }
 
     private void setupHeadingRows() {
         mainPanel.add(boldFontLabel(Localization.lang("Use")), CELL_CONSTRAINTS.xyw(4, 1, 7, "center, bottom"));
         mainPanel.add(diffMode, CELL_CONSTRAINTS.xy(11, 1, "right, bottom"));
+        diffMode.setVisible(false);
 
         // Set headings
         for (int i = 0; i < 6; i++) {
@@ -362,33 +362,11 @@ public class MergeEntries {
         for (String field : fields) {
             String leftString = leftEntry.getField(field).orElse("");
             String rightString = rightEntry.getField(field).orElse("");
-            switch (diffMode.getSelectedIndex()) {
-            case 0: // Plain text
-                break;
-            case 1: // Latexdiff style - word
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
-                break;
-            case 2: // Latexdiff style - character
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
-                break;
-            case 3: // Symmetric style - word
-                String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
-                leftString = tmpLeftString;
-                break;
-            case 4: // Symmetric style - character
-                tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
-                leftString = tmpLeftString;
-                break;
-            default: // Shouldn't happen
-                break;
-            }
             if ((leftString != null) && leftTextPanes.containsKey(field)) {
-                leftTextPanes.get(field).setText(DiffHighlighting.HTML_START + leftString + DiffHighlighting.HTML_END);
+                leftTextPanes.get(field).setText(leftString);
             }
             if ((rightString != null) && rightTextPanes.containsKey(field)) {
-                rightTextPanes.get(field).setText(DiffHighlighting.HTML_START + rightString + DiffHighlighting.HTML_END);
+                rightTextPanes.get(field).setText(rightString);
             }
         }
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
