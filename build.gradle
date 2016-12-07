@@ -128,7 +128,7 @@ dependencies {
     compile 'com.github.lgooddatepicker:LGoodDatePicker:8.2.2'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.26'
+    testCompile 'org.mockito:mockito-core:2.2.28'
     testCompile 'com.github.tomakehurst:wiremock:2.4.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
