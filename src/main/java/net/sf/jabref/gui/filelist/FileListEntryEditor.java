@@ -115,11 +115,13 @@ public class FileListEntryEditor {
             }
         });
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-                "left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        FormLayout fileDialog = new FormLayout(
+                "left:pref, 4dlu, fill:400dlu, 4dlu, fill:pref, 4dlu, fill:pref",
+                "p, 8dlu, p, 8dlu, p"
+        );
+        FormBuilder builder = FormBuilder.create().layout(fileDialog);
         builder.add(Localization.lang("Link")).xy(1, 1);
         builder.add(link).xy(3, 1);
-        //final BrowseListener browse = new BrowseListener(frame, link); //TODO: Maybe use browse action
 
         final JButton browseBut = new JButton(Localization.lang("Browse"));
         browseBut.addActionListener(browsePressed);
@@ -129,10 +131,10 @@ public class FileListEntryEditor {
             builder.add(open).xy(7, 1);
         }
         builder.add(Localization.lang("Description")).xy(1, 3);
-        builder.add(description).xyw(3, 3, 3);
+        builder.add(description).xyw(3, 3, 5);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.add(Localization.lang("File type")).xy(1, 5);
-        builder.add(types).xyw(3, 5, 3);
+        builder.add(types).xyw(3, 5, 5);
         if (showProgressBar) {
             builder.appendRows("2dlu, p");
             builder.add(downloadLabel).xy(1, 7);
@@ -156,7 +158,6 @@ public class FileListEntryEditor {
         open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -331,7 +332,6 @@ public class FileListEntryEditor {
 
     public boolean okPressed() {
         return okPressed;
-
     }
 
     private final ActionListener browsePressed = e -> {
