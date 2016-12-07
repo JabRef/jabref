@@ -52,11 +52,6 @@ Project: java-diff-utils
 URL:     https://github.com/bkromhout/java-diff-utils
 License: Apache-2.0
 
-Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
-Project: pgjdbc-ng
-URL:     http://impossibl.github.io/pgjdbc-ng
-License: BSD
-
 Id:      com.jgoodies:jgoodies-common
 Project: JGoodies Common
 URL:     http://www.jgoodies.com/downloads/libraries/

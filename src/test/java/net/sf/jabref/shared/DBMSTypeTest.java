@@ -20,7 +20,7 @@ public class DBMSTypeTest {
     public void testGetDriverClassPath() {
         Assert.assertEquals("com.mysql.jdbc.Driver", DBMSType.MYSQL.getDriverClassPath());
         Assert.assertEquals("oracle.jdbc.driver.OracleDriver", DBMSType.ORACLE.getDriverClassPath());
-        Assert.assertEquals("com.impossibl.postgres.jdbc.PGDriver", DBMSType.POSTGRESQL.getDriverClassPath());
+        Assert.assertEquals("org.postgresql.Driver", DBMSType.POSTGRESQL.getDriverClassPath());
     }
 
     @Test
@@ -35,7 +35,7 @@ public class DBMSTypeTest {
     public void testGetUrl() {
         Assert.assertEquals("jdbc:mysql://localhost:3306/xe", DBMSType.MYSQL.getUrl("localhost", 3306, "xe"));
         Assert.assertEquals("jdbc:oracle:thin:@localhost:1521:xe", DBMSType.ORACLE.getUrl("localhost", 1521, "xe"));
-        Assert.assertEquals("jdbc:pgsql://localhost:5432/xe", DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe"));
+        Assert.assertEquals("jdbc:postgresql://localhost:5432/xe", DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe"));
     }
 
     @Test
