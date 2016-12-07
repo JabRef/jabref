@@ -31,8 +31,6 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.CitationStyleWorker;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
@@ -79,7 +77,6 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     private final CopyPreviewAction copyPreviewAction = new CopyPreviewAction();
 
     private Optional<Pattern> highlightPattern = Optional.empty();
-    private Optional<CitationStyleWorker> citationStyleWorker = Optional.empty();
 
     /**
      * @param databaseContext
@@ -202,21 +199,10 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
 
-        if (CitationStyle.isCitationStyleFile(style)) {
-            if (basePanel.isPresent()) {
-                layout = Optional.empty();
-                CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style);
-                if (citationStyle != null) {
-                    basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
-                    basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
-                }
-            }
-        } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle());
             if (basePanel.isPresent()) {
                 basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
             }
-        }
 
         update();
     }
@@ -264,21 +250,12 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     public void update() {
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
-        if (citationStyleWorker.isPresent()){
-            citationStyleWorker.get().cancel(true);
-            citationStyleWorker = Optional.empty();
-        }
-
         if (layout.isPresent()){
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
                     .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
             markHighlights();
-        }
-        else if (basePanel.isPresent()){
-            citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
-            citationStyleWorker.get().execute();
         }
 
     }
@@ -316,18 +293,12 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     /**
      * this fixes the Layout, the user cannot change it anymore. Useful for testing the styles in the settings
-     * @param parameter should be either a {@link String} (for the old PreviewStyle) or a {@link CitationStyle}.
      */
-    public PreviewPanel setFixedLayout(Object parameter) {
+    public PreviewPanel setFixedLayout(String parameter) {
         this.fixedLayout = true;
 
         if (parameter instanceof String) {
             updatePreviewLayout((String) parameter);
-        } else if (parameter instanceof CitationStyle) {
-            layout = Optional.empty();
-            if (basePanel.isPresent()){
-                basePanel.get().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
-            }
         } else {
             LOGGER.error("unknown style type");
         }

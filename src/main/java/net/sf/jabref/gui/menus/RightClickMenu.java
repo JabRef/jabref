@@ -29,7 +29,6 @@ import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -73,17 +72,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         // the submenu will behave dependent on what style is currently selected (citation/preview)
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
-        if (CitationStyle.isCitationStyleFile(style)) {
-            copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy citation") + " (HTML)", KeyBinding.COPY_PREVIEW));
-            JMenu copyCitationMenu = new JMenu(Localization.menuTitle("Copy citation") + "...");
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_TEXT, "Text"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_RTF, "RTF"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_ASCII_DOC, "AsciiDoc"));
-            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_XSLFO, "XSL-FO"));
-            copySpecialMenu.add(copyCitationMenu);
-        } else {
             copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW));
-        }
 
         copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
                 IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
