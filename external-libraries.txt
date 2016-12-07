@@ -145,11 +145,10 @@ Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL-3.0
 
-Id:      microba
-Path:    lib/microba.jar
-Project: Microba
-URL:     https://github.com/tdbear/microba
-License: BSD
+Id:      com.github.lgooddatepicker:LGoodDatePicker
+Project: LGoodDatePicker
+URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
+License: MIT
 
 Id:      spin
 Path:    lib/spin.jar

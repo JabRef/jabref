@@ -1688,9 +1688,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             autosaver.registerListener(new AutosaveUIManager(basePanel));
         }
 
-        if (readyForBackup(context)) {
-            BackupManager.start(context);
-        }
+        BackupManager.start(context);
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -1704,10 +1702,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
-    }
-
-    private boolean readyForBackup(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.LOCAL) && context.getDatabaseFile().isPresent();
     }
 
     /**

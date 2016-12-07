@@ -3,6 +3,7 @@ package net.sf.jabref.logic.layout.format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -165,6 +166,7 @@ public class NameFormatter implements LayoutFormatter {
     }
 
     public static Map<String, String> getNameFormatters(NameFormatterPreferences prefs) {
+        Objects.requireNonNull(prefs);
 
         Map<String, String> result = new HashMap<>();
 
