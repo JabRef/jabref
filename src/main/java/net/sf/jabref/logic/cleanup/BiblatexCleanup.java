@@ -9,8 +9,7 @@ import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.FieldName;
-
-import org.apache.commons.lang3.StringUtils;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Converts the entry to BibLatex format.
@@ -33,11 +32,7 @@ public class BiblatexCleanup implements CleanupJob {
         }
         // Dates: create date out of year and month, save it and delete old fields
         // If there already exists a non blank/empty value for the field date, it is not overwritten
-        String date = "";
-        if (entry.getField(FieldName.DATE).isPresent()) {
-            date = entry.getField(FieldName.DATE).get();
-        }
-        if (StringUtils.isBlank(date)) {
+        if (StringUtil.isBlank(entry.getField(FieldName.DATE))) {
             entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
                 entry.setField(FieldName.DATE, newDate).ifPresent(changes::add);
                 entry.clearField(FieldName.YEAR).ifPresent(changes::add);
