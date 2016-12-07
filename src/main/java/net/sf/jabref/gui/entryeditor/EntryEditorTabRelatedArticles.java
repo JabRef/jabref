@@ -8,6 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
@@ -39,6 +40,16 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
 
+    private List<BibEntry> relatedArticles;
+
+
+    /**
+     * Access related acticles delivered by Mr. DLib.
+     * @return the list of BibEntries, representing the related articles deliverd by MR. DLib
+     */
+    public List<BibEntry> getRelatedArticles() {
+        return relatedArticles;
+    }
 
     /**
      * Takes the selected entry, runs a request to Mr. DLib and returns the recommendations as a JEditorPane
@@ -57,12 +68,12 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Takes a List of html snippets and sets it in the JEditorPane
      * @param list
      */
-    public void setHtmlText(List<String> list) {
+    public void setHtmlText(List<BibEntry> list) {
         StringBuffer htmlContent = new StringBuffer();
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
-        for (String snippet : list) {
-            if (snippet != null) {
-                htmlContent.append(snippet);
+        for (BibEntry bibEntry : list) {
+            if (bibEntry != null) {
+                htmlContent.append(bibEntry.getLatexFreeField("html_representation").get());
                 htmlContent.append(RECOMMENDATION_SEPERATOR);
             }
         }
@@ -76,8 +87,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      */
     private void setDefaultContent() {
         StringBuffer htmlContent = new StringBuffer();
-
-        //What is the best way to include that gif?
         URL url = IconTheme.getIconUrl("mdlloading");
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
         htmlContent.append("Loading Recommendations for ");
@@ -123,8 +132,16 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-                        //setHtmlText(mdlFetcher.getRecommendationsAsHtml());
-
+                        try {
+                            relatedArticles = mdlFetcher.get();
+                            setHtmlText(relatedArticles);
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (ExecutionException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                     }
 
                 }
@@ -134,10 +151,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-    }
-
-    public BibEntry getSelectedEntry() {
-        return selectedEntry;
     }
 
 

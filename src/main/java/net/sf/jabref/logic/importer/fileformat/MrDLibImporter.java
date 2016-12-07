@@ -42,12 +42,13 @@ public class MrDLibImporter extends Importer {
     public MrDLibImporter() {
     }
 
-    /*
+    /**
+     *
      * @see net.sf.jabref.logic.importer.Importer#isRecognizedFormat(java.io.BufferedReader)
      */
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        String recommendationsAsString = convertToString(input);
+        String recommendationsAsString = BufferedReaderToParsableString(input);
         // check for valid format
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -73,14 +74,18 @@ public class MrDLibImporter extends Importer {
         return true;
     }
 
-    private String convertToString(BufferedReader input) throws IOException {
+    private String BufferedReaderToParsableString(BufferedReader input) throws IOException {
         String line;
-        BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
+        try {
+            while ((line = input.readLine()) != null) {
+                sb.append(line);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return sb.toString();
+
     }
 
     /*
@@ -91,7 +96,7 @@ public class MrDLibImporter extends Importer {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse
-        String recommendations = convertToString(input);
+        String recommendations = BufferedReaderToParsableString(input);
         // The list ob BibEntries with its associated rank
         ArrayList<RankedBibEntry> rankedBibEntries = new ArrayList<>();
         // The sorted BibEntries gets stored here later

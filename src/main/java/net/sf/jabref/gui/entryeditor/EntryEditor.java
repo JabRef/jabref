@@ -157,6 +157,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private EntryEditorTabRelatedArticles relatedArticlesTab;
 
+    private boolean relatedAcrticlesTabNeedsRecommendations = true;
+
     private JTextArea source;
 
     private final JTabbedPane tabbed = new JTabbedPane();
@@ -373,7 +375,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Creates the related Article Tab
      */
     private void addRelatedArticlesTab() {
-        // Still not updated the localization file
         relatedArticlePanel.setName(Localization.lang("Related articles"));
         relatedArticlePanel.setLayout(new BorderLayout());
 
@@ -979,7 +980,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
                 // Is it affected when changed to another language?
                 if (((JTabbedPane) event.getSource()).getSelectedComponent().getName().equals("Related articles")) {
-                    relatedArticlesTab.requestRecommendations();
+                    if (relatedAcrticlesTabNeedsRecommendations) {
+                        relatedArticlesTab.requestRecommendations();
+                        relatedAcrticlesTabNeedsRecommendations = false;
+                    }
+
                 }
             });
         }

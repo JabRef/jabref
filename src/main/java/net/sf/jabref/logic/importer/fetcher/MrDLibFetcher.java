@@ -13,10 +13,9 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.MrDLibImporter;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.logging.Log;
@@ -33,7 +32,7 @@ import org.apache.http.ssl.SSLContexts;
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
 
-    private static final String NAME = "Mr. DLib Fetcher";
+    private static final String NAME = "MDL_FETCHER";
     private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
 
 
@@ -48,18 +47,18 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        BufferedReader response = makeServerRequest(entry.getLatexFreeField("title").get());
+        String response = makeServerRequest(entry.getLatexFreeField("title").get());
         MrDLibImporter importer = new MrDLibImporter();
-        BibDatabase bibDatabase = new BibDatabase();
+        ParserResult parserResult = new ParserResult();
         try {
-            if (importer.isRecognizedFormat(response)) {
-                importer.importDatabase(response);
+            if (importer.isRecognizedFormat(new BufferedReader(new StringReader(response)))) {
+                parserResult = importer.importDatabase(new BufferedReader(new StringReader(response)));
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return bibDatabase.getEntries();
+        return parserResult.getDatabase().getEntries();
     }
 
     /**
@@ -67,7 +66,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @param query
      * @return
      */
-    private BufferedReader makeServerRequest(String query) {
+    private String makeServerRequest(String query) {
         query = constructQuery(query);
         String response = "";
 
@@ -98,18 +97,20 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         } catch (IOException e1) {
             LOGGER.error(e1.getMessage(), e1);
         }
-        return new BufferedReader(new StringReader(response));
+        return response;
     }
 
     private String constructQuery(String query) {
         StringBuffer queryBuffer = new StringBuffer();
         queryBuffer.append("https://api-dev.mr-dlib.org/v1/documents/");
         queryBuffer.append(query);
-        queryBuffer.append("/related_documents/");
-        queryBuffer.append("version");
-        System.out.println("querybuffer: " + queryBuffer.toString());
+        queryBuffer.append("/related_documents?");
+        queryBuffer.append("partner_id=jabref");
+        queryBuffer.append("&app_id=jabref_desktop");
+        queryBuffer.append("&app_version=" + "42.3.1415");//todo: where to find
+        queryBuffer.append("&app_lang=" + "selectedLanguage");//todo: where to find
         //return queryBuffer.toString();
-        return "https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000003284/related_documents/";
+        return "https://api-dev.mr-dlib.org/v1/documents/gesis-smarth-0000009273/related_documents/";
     }
 
 
