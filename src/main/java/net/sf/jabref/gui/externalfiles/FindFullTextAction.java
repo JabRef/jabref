@@ -44,8 +44,8 @@ public class FindFullTextAction extends AbstractWorker {
         if (basePanel.getSelectedEntries().size() == 0) {
             JOptionPane.showMessageDialog(
                     basePanel,
-                    "Select at least one entry to perform this operation",
-                    "No entry selected",
+                    Localization.lang("Select at least one entry to perform this operation"),
+                    Localization.lang("No entry selected"),
                     JOptionPane.ERROR_MESSAGE);
             return;
         }
