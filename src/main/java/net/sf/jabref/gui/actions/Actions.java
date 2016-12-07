@@ -18,7 +18,6 @@ public class Actions {
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
     public static final String CUT = "cut";
-    public static final String DB_CONNECT = "dbConnect";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
