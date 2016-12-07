@@ -74,7 +74,7 @@ public class FindFullTextAction extends AbstractWorker {
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
                 List<String> dirs = basePanel.getBibDatabaseContext()
-                        .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                 if (dirs.isEmpty()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")

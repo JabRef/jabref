@@ -80,6 +80,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JabRefPreferences {
+
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
@@ -338,6 +339,7 @@ public class JabRefPreferences {
     public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
     public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
+    public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
 
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
@@ -670,8 +672,7 @@ public class JabRefPreferences {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH
                     + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE);
-            defaults.put(OO_JARS_PATH,
-                    OpenOfficePreferences.DEFAULT_OSX_PATH + OpenOfficePreferences.OSX_JARS_SUBPATH);
+            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH + OpenOfficePreferences.OSX_JARS_SUBPATH);
         } else { // Linux
             defaults.put(OO_PATH, "/opt/openoffice.org3");
             defaults.put(OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
@@ -681,8 +682,7 @@ public class JabRefPreferences {
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
         defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
-        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE,
-                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
         defaults.put(STYLES_POS_X, 0);
         defaults.put(STYLES_POS_Y, 0);
@@ -773,6 +773,8 @@ public class JabRefPreferences {
 
         // use BibTeX key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        //Default empty String to be backwards compatible
+        defaults.put(IMPORT_FILEDIRPATTERN, "");
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
@@ -836,11 +838,11 @@ public class JabRefPreferences {
         List<String> customFields = new ArrayList<>();
 
         int defNumber = 0;
-        while(true) {
+        while (true) {
             // saved as CUSTOMTABNAME_def{number} and ; separated
             String fields = (String) defaults.get(CUSTOM_TAB_FIELDS + "_def" + defNumber);
 
-            if((fields == null) || fields.isEmpty()) {
+            if ((fields == null) || fields.isEmpty()) {
                 break;
             }
 
@@ -853,8 +855,7 @@ public class JabRefPreferences {
     public void setLanguageDependentDefaultValues() {
         // Entry editor tab 0:
         defaults.put(CUSTOM_TAB_NAME + "_def0", Localization.lang("General"));
-        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;"
-                + "comment;owner;timestamp");
+        defaults.put(CUSTOM_TAB_FIELDS + "_def0", "crossref;keywords;file;doi;url;" + "comment;owner;timestamp");
 
         // Entry editor tab 1:
         defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT);
@@ -1122,7 +1123,7 @@ public class JabRefPreferences {
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
         try {
-            for(String key : this.prefs.keys()){
+            for (String key : this.prefs.keys()) {
                 Object value = getObject(key);
                 result.put(key, value);
             }
@@ -1143,7 +1144,6 @@ public class JabRefPreferences {
             }
         }
     }
-
 
     private static Optional<String> getNextUnit(Reader data) throws IOException {
         // character last read
@@ -1224,7 +1224,6 @@ public class JabRefPreferences {
 
     }
 
-
     /**
      * Removes all information about custom entry types with tags of
      *
@@ -1271,7 +1270,8 @@ public class JabRefPreferences {
         try (OutputStream os = new FileOutputStream(f)) {
             prefs.exportSubtree(os);
         } catch (BackingStoreException | IOException ex) {
-            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"), ex);
+            throw new JabRefException("Could not export preferences", Localization.lang("Could not export preferences"),
+                    ex);
         }
     }
 
@@ -1345,12 +1345,11 @@ public class JabRefPreferences {
         }
     }
 
-
     public FileDirectoryPreferences getFileDirectoryPreferences() {
         List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
         Map<String, String> fieldDirectories = new HashMap<>();
-        fields.stream()
-                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileDirectoryPreferences.DIR_SUFFIX)));
+        fields.stream().forEach(
+                fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileDirectoryPreferences.DIR_SUFFIX)));
         return new FileDirectoryPreferences(getUser(), fieldDirectories,
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
     }
@@ -1404,7 +1403,8 @@ public class JabRefPreferences {
     }
 
     public FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
+        return new FileLinkPreferences(
+                Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
                 fileDirForDatabase);
     }
 
@@ -1457,15 +1457,14 @@ public class JabRefPreferences {
     }
 
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(
-                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL), getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL), getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+        return new ProtectedTermsPreferences(getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL), getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return new JournalAbbreviationPreferences(
-                getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST), getBoolean(USE_IEEE_ABRV),
-                getDefaultEncoding());
+        return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST),
+                getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
     }
 
     public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
@@ -1498,7 +1497,7 @@ public class JabRefPreferences {
     }
 
     public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
-        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN),
+        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN), get(IMPORT_FILEDIRPATTERN),
                 getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
     }
 
