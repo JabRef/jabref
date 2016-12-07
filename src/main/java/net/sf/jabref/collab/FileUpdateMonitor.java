@@ -180,8 +180,8 @@ public class FileUpdateMonitor implements Runnable {
 
         public boolean copy() {
 
-            boolean res = FileUtil.copyFile(file, tmpFile, true);
-            return res;
+          return FileUtil.copyFile(file, tmpFile, true);
+          
         }
 
         /**

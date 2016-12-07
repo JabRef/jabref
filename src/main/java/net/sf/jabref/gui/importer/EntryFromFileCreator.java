@@ -142,7 +142,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
         List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
