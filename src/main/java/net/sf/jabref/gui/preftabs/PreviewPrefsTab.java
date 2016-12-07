@@ -22,7 +22,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.TestEntry;
 import net.sf.jabref.preferences.PreviewPreferences;
@@ -37,8 +36,6 @@ import org.apache.commons.logging.LogFactory;
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
-
-    private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
     private final DefaultListModel<Object> availableModel = new DefaultListModel<>();
     private final DefaultListModel<Object> chosenModel = new DefaultListModel<>();
@@ -171,16 +168,12 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         chosenModel.clear();
         boolean isPreviewChosen = false;
         for (String style : previewPreferences.getPreviewCycle()) {
-            if (CitationStyle.isCitationStyleFile(style)) {
-                chosenModel.addElement(CitationStyle.createCitationStyleFromFile(style));
-            } else {
                 if (isPreviewChosen) {
                     LOGGER.error("Preview is already in the list, something went wrong");
                     continue;
                 }
                 isPreviewChosen = true;
                 chosenModel.addElement(Localization.lang("Preview"));
-            }
         }
 
         availableModel.clear();
@@ -193,35 +186,6 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnUp.setEnabled(!chosen.isSelectionEmpty());
         btnDown.setEnabled(!chosen.isSelectionEmpty());
 
-        if (discoverCitationStyleWorker != null){
-            discoverCitationStyleWorker.cancel(true);
-        }
-
-        discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
-            @Override
-            protected List<CitationStyle> doInBackground() throws Exception {
-                return CitationStyle.discoverCitationStyles();
-            }
-
-            @Override
-            public void done(){
-                if (this.isCancelled()) {
-                    return;
-                }
-                try {
-                    get().stream()
-                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilepath()))
-                            .sorted((style0, style1) -> style0.getTitle().compareTo(style1.getTitle()))
-                            .forEach(availableModel::addElement);
-
-                    btnRight.setEnabled(!availableModel.isEmpty());
-                } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ");
-                }
-            }
-        };
-        discoverCitationStyleWorker.execute();
-
         layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
 
@@ -231,11 +195,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         Enumeration<Object> elements = chosenModel.elements();
         while (elements.hasMoreElements()) {
             Object obj = elements.nextElement();
-            if (obj instanceof CitationStyle) {
-                styles.add(((CitationStyle) obj).getFilepath());
-            } else if (obj instanceof String) {
-                styles.add("Preview");
-            }
+            styles.add("Preview");
         }
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
                 .getBuilder()

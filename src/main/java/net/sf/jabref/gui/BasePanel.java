@@ -98,7 +98,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.citationstyle.CitationStyleCache;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -150,8 +149,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
-
-    private final CitationStyleCache citationStyleCache;
 
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
@@ -218,8 +215,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
-
-        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
 
         setupMainPanel();
 
@@ -2380,10 +2375,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
         this.currentSearchQuery = currentSearchQuery;
-    }
-
-    public CitationStyleCache getCitationStyleCache() {
-        return citationStyleCache;
     }
 
     public PreviewPanel getPreviewPanel() {

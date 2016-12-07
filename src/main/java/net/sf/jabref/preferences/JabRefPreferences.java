@@ -42,7 +42,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.Cleanups;
@@ -799,7 +798,7 @@ public class JabRefPreferences {
         defaults.put(VERSION_IGNORED_UPDATE, "");
 
         // preview
-        defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
+        defaults.put(CYCLE_PREVIEW, "Preview");
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
