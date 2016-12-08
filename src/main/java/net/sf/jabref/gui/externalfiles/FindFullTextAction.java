@@ -41,8 +41,10 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void init() throws Exception {
-        if (basePanel.getSelectedEntries().size() > 0) {
+        if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
+        } else {
+            LOGGER.debug("No entry selected for fulltext download.");
         }
     }
 

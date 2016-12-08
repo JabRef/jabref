@@ -495,7 +495,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> oneEntryWithFileOnlyActions = new LinkedList<>();
     private final List<Object> oneEntryWithURLorDOIOnlyActions = new LinkedList<>();
     private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
-    private final List<Object> oneOrMoreEntriesActions = new LinkedList<>();
+    private final List<Object> atLeastOneEntryActions = new LinkedList<>();
 
     private class EditModeAction extends AbstractAction {
 
@@ -1528,8 +1528,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.clear();
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
-        oneOrMoreEntriesActions.clear();
-        oneOrMoreEntriesActions.addAll(Arrays.asList(downloadFullText));
+        atLeastOneEntryActions.clear();
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1595,8 +1595,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             boolean twoEntriesSelected = current.getSelectedEntries().size() == 2;
             setEnabled(twoEntriesOnlyActions, twoEntriesSelected);
 
-            boolean oneOrMoreEntriesSelected = current.getSelectedEntries().size() >= 1;
-            setEnabled(oneOrMoreEntriesActions, oneOrMoreEntriesSelected);
+            boolean atLeastOneEntrySelected = !current.getSelectedEntries().isEmpty();
+            setEnabled(atLeastOneEntryActions, atLeastOneEntrySelected);
         }
     }
 
