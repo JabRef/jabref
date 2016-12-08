@@ -46,6 +46,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
 - We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
 - We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
+
 ### Removed
 
 

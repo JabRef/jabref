@@ -439,8 +439,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
 
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
-            Localization.menuTitle("Look up full text document"),
-            Localization.lang("Follow DOI or URL link and try to locate PDF full text document"));
+            Localization.menuTitle("Look up full text documents"),
+            Localization.lang("Look up full text documents"));
+
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
@@ -495,7 +496,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> oneEntryWithFileOnlyActions = new LinkedList<>();
     private final List<Object> oneEntryWithURLorDOIOnlyActions = new LinkedList<>();
     private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
-
+    private final List<Object> atLeastOneEntryActions = new LinkedList<>();
 
     private class EditModeAction extends AbstractAction {
 
@@ -537,7 +538,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public JabRefFrame() {
         init();
         updateEnabledState();
-
     }
 
     private List<NewEntryAction> getNewEntryActions() {
@@ -1529,6 +1529,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.clear();
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
+        atLeastOneEntryActions.clear();
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
+
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
     }
@@ -1573,12 +1576,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             getForwardAction().setEnabled(false);
             setEnabled(openAndSavedDatabasesOnlyActions, false);
             setEnabled(sharedDatabaseOnlyActions, false);
+            setEnabled(oneEntryOnlyActions, false);
         }
-
 
         if (tabCount > 0) {
             BasePanel current = getCurrentBasePanel();
-            boolean saved = current.getBibDatabaseContext().getDatabaseFile().isPresent();
+            boolean saved = current.getBibDatabaseContext().getDatabasePath().isPresent();
             setEnabled(openAndSavedDatabasesOnlyActions, saved);
 
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
@@ -1592,6 +1595,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             boolean twoEntriesSelected = current.getSelectedEntries().size() == 2;
             setEnabled(twoEntriesOnlyActions, twoEntriesSelected);
+
+            boolean atLeastOneEntrySelected = !current.getSelectedEntries().isEmpty();
+            setEnabled(atLeastOneEntryActions, atLeastOneEntrySelected);
         }
     }
 
