@@ -176,7 +176,6 @@ public class BibDatabaseContext {
     * @return The default directory for this field type.
     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
-        // TODO: all of these folder will be also searched for local PDFs. If this includes large folders like user.home this might take forever.
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
