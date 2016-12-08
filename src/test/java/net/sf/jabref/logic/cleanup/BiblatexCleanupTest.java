@@ -7,14 +7,9 @@ import net.sf.jabref.model.entry.FieldName;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class BiblatexCleanupTest {
-
-    @Rule
-    public TemporaryFolder bibFolder = new TemporaryFolder();
 
     private BiblatexCleanup worker;
 
@@ -26,8 +21,8 @@ public class BiblatexCleanupTest {
     @Test
     public void convertToBiblatexMovesYearMonthToDate() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.YEAR, "2011");
-        entry.setField(FieldName.MONTH, "#jan#");
+        entry.setField("year", "2011");
+        entry.setField("month", "#jan#");
 
         worker.cleanup(entry);
         Assert.assertEquals(Optional.empty(), entry.getField(FieldName.YEAR));
@@ -38,9 +33,9 @@ public class BiblatexCleanupTest {
     @Test
     public void convertToBiblatexDateAlreadyPresent() {
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.YEAR, "2011");
-        entry.setField(FieldName.MONTH, "#jan#");
-        entry.setField(FieldName.DATE, "2012");
+        entry.setField("year", "2011");
+        entry.setField("month", "#jan#");
+        entry.setField("date", "2012");
 
         worker.cleanup(entry);
         Assert.assertEquals(Optional.of("2011"), entry.getField(FieldName.YEAR));

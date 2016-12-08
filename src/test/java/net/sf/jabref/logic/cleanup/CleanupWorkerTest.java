@@ -308,7 +308,7 @@ public class CleanupWorkerTest {
     public void convertToBiblatexMovesJournalToJournalTitle() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         BibEntry entry = new BibEntry();
-        entry.setField(FieldName.JOURNAL, "test");
+        entry.setField("journal", "test");
 
         worker.cleanup(preset, entry);
         Assert.assertEquals(Optional.empty(), entry.getField(FieldName.JOURNAL));
