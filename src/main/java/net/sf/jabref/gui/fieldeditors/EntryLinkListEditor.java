@@ -49,9 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class EntryLinkListEditor extends JTable implements FieldEditor {
-
     private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
 
     private final FieldNameLabel label;
@@ -90,13 +88,14 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         add.addActionListener(e -> addEntry());
         remove.addActionListener(e -> removeEntries());
 
-        FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("fill:pref:grow,1dlu,fill:pref:grow",
-                        "fill:pref,fill:pref,1dlu,fill:pref"));
+        FormLayout layout = new FormLayout(
+                "fill:pref:grow,1dlu,fill:pref:grow",
+                "fill:pref,fill:pref,1dlu,fill:pref"
+        );
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
         if (!singleEntry) {
             JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-
             JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
             up.setMargin(new Insets(0, 0, 0, 0));
             down.setMargin(new Insets(0, 0, 0, 0));
