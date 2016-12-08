@@ -32,7 +32,6 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -74,8 +73,6 @@ public class ImportCustomizationDialog extends JDialog {
         if (customImporterTable.getRowCount() > 0) {
             customImporterTable.setRowSelectionInterval(0, 0);
         }
-
-        GUIUtil.correctRowHeight(customImporterTable);
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
