@@ -158,7 +158,6 @@ public class IconTheme {
         FACEBOOK("\uf20c"), /* css: facebook */
         BLOG("\uf46b"), /* css: rss */
         GLOBAL_SEARCH("\uF1E7"), /* css: earth */
-        DATE_PICKER("\uF0ED;"), /* css: calendar */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 

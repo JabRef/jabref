@@ -121,9 +121,6 @@ dependencies {
     compile 'org.xmlunit:xmlunit-core:2.3.0'
     compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
-
-    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.3.0'
-
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.3.0'
     testCompile 'com.github.tomakehurst:wiremock:2.4.1'
