@@ -1,20 +1,21 @@
 package net.sf.jabref.model.metadata;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.FieldName;
 
 public class FileDirectoryPreferences {
+    public static final String DIR_SUFFIX = "Directory";
 
     private final String user;
     private final Map<String, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
-    public static final String DIR_SUFFIX = "Directory";
 
-
-    public FileDirectoryPreferences(String user, Map<String, String> fieldFileDirectories,
-            boolean bibLocationAsPrimary) {
+    public FileDirectoryPreferences(String user, Map<String, String> fieldFileDirectories, boolean bibLocationAsPrimary) {
         this.user = user;
         this.fieldFileDirectories = fieldFileDirectories;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
@@ -24,11 +25,21 @@ public class FileDirectoryPreferences {
         return user;
     }
 
-    public Optional<String> getFileDirectory(String field) {
-        return Optional.ofNullable(fieldFileDirectories.get(field));
+    public Optional<Path> getFileDirectory(String field) {
+        try {
+            String value = fieldFileDirectories.get(field);
+            // filter empty paths
+            if (!value.isEmpty()) {
+                Path path = Paths.get(value);
+                return Optional.of(path);
+            }
+            return Optional.empty();
+        } catch(InvalidPathException ex) {
+            return Optional.empty();
+        }
     }
 
-    public Optional<String> getFileDirectory() {
+    public Optional<Path> getFileDirectory() {
         return getFileDirectory(FieldName.FILE);
     }
 

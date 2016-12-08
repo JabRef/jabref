@@ -176,6 +176,7 @@ public class BibDatabaseContext {
     * @return The default directory for this field type.
     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
+        // TODO: all of these folder will be also searched for local PDFs. If this includes large folders like user.home this might take forever.
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
@@ -191,11 +192,13 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(fileDirs::add);
+        preferences.getFileDirectory(fieldName).ifPresent(path ->
+            fileDirs.add(path.toAbsolutePath().toString())
+        );
 
         // 4. BIB file directory
-        getDatabaseFile().ifPresent(databaseFile -> {
-            String parentDir = databaseFile.getParent();
+        getDatabasePath().ifPresent(dbPath -> {
+            String parentDir = dbPath.getParent().toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
@@ -203,6 +206,7 @@ public class BibDatabaseContext {
                 fileDirs.add(parentDir);
             }
         });
+
         return fileDirs;
     }
 
