@@ -107,7 +107,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         builder.add(add).xy(3, 1);
         builder.add(remove).xy(3, 2);
         JButton button = new JButton(Localization.lang("Jump to entry"));
-        button.addActionListener(e -> selectEntry());
+        button.addActionListener(e -> jumpToEntry());
         builder.add(button).xyw(1, 4, 3);
 
         panel = new JPanel();
@@ -164,7 +164,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
         JMenuItem openLink = new JMenuItem(Localization.lang("Jump to entry"));
         menu.add(openLink);
-        openLink.addActionListener(e -> selectEntry());
+        openLink.addActionListener(e -> jumpToEntry());
 
         // Set table row height
         FontMetrics metrics = getFontMetrics(getFont());
@@ -174,14 +174,27 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     }
 
 
-    private void selectEntry() {
-        int selectedRow = getSelectedRow();
+    private void jumpToEntry() {
+        String entryKey = null;
 
-        if (selectedRow != -1) {
-            String crossref = tableModel.getEntry(selectedRow).getKey();
+        if(singleEntry) {
+            ParsedEntryLink firstEntry = tableModel.getEntry(0);
 
-            frame.getCurrentBasePanel().getDatabase().getEntryByKey(crossref)
-                    .ifPresent(entry -> frame.getCurrentBasePanel().highlightEntry(entry));
+            if (firstEntry != null) {
+                entryKey = firstEntry.getKey();
+            }
+        } else {
+            int selectedRow = getSelectedRow();
+
+            if (selectedRow != -1) {
+                entryKey = tableModel.getEntry(selectedRow).getKey();
+            }
+        }
+
+        if (entryKey != null) {
+            frame.getCurrentBasePanel().getDatabase().getEntryByKey(entryKey).ifPresent(
+                    e -> frame.getCurrentBasePanel().highlightEntry(e)
+            );
         }
     }
 
