@@ -311,8 +311,8 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.empty(), entry.getField(FieldName.JOURNAL));
-        Assert.assertEquals(Optional.of("test"), entry.getField(FieldName.JOURNALTITLE));
+        Assert.assertEquals(Optional.empty(), entry.getField("journal"));
+        Assert.assertEquals(Optional.of("test"), entry.getField("journaltitle"));
     }
 
     @Test
