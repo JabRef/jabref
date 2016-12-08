@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -81,9 +82,9 @@ class EntryEditorTab {
     public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
             boolean addKeyField, boolean compressed, String tabTitle) {
         if (fields == null) {
-            this.fields = Collections.emptyList();
+            this.fields = new ArrayList<>();
         } else {
-            this.fields = fields;
+            this.fields = new ArrayList<>(fields);
         }
 
         this.parent = parent;
@@ -197,6 +198,7 @@ class EntryEditorTab {
             setupJTextComponent(textField, null);
 
             editors.put(BibEntry.KEY_FIELD, textField);
+            fields.add(BibEntry.KEY_FIELD);
             /*
              * If the key field is the only field, we should have only one
              * editor, and this one should be set as active initially:
@@ -280,7 +282,7 @@ class EntryEditorTab {
     }
 
     public List<String> getFields() {
-        return fields;
+        return Collections.unmodifiableList(fields);
     }
 
     public void focus() {
