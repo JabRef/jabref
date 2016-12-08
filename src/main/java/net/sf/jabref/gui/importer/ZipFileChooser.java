@@ -27,7 +27,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -67,7 +66,6 @@ class ZipFileChooser extends JDialog {
         if (table.getRowCount() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
-        GUIUtil.correctRowHeight(table);
 
         // cancel: no entry is selected
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
