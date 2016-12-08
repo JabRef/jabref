@@ -33,7 +33,6 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
@@ -81,8 +80,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @param groupSelector the parent UI component
      */
     public GroupsTree(GroupSelector groupSelector) {
-        GUIUtil.correctRowHeight(this);
-
         this.groupSelector = groupSelector;
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
                 .createDefaultDragGestureRecognizer(this,
