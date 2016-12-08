@@ -29,7 +29,7 @@ public class FileDirectoryPreferences {
         try {
             String value = fieldFileDirectories.get(field);
             // filter empty paths
-            if (!value.isEmpty()) {
+            if (value != null && !value.isEmpty()) {
                 Path path = Paths.get(value);
                 return Optional.of(path);
             }
