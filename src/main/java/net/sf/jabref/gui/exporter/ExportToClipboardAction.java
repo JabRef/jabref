@@ -28,13 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Dec 12, 2006
- * Time: 6:22:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExportToClipboardAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);

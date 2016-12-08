@@ -17,6 +17,7 @@ public class Actions {
     public static final String COPY_CITE_KEY = "copyCiteKey";
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
+    public static final String COPY_PREVIEW_OF_SELECTED_ENTRIES_TO_CLIPBOARD = "copyPreviewOfSelectedEntriesToClipboard";
     public static final String CUT = "cut";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
