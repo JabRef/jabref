@@ -13,21 +13,17 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.citationstyle.CitationStyleCache;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 
 public class CopyPreviewOfSelectedEntriesToClipboardAction extends AbstractWorker {
-
-    private static final Log LOGGER = LogFactory.getLog(CopyPreviewOfSelectedEntriesToClipboardAction.class);
 
     private JabRefFrame frame;
 
     /**
      * written by run() and read by update()
      */
-    private String message = null;
+    private String message;
 
 
     public CopyPreviewOfSelectedEntriesToClipboardAction(JabRefFrame frame) {
