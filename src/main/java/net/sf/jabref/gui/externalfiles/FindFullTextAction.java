@@ -41,26 +41,14 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void init() throws Exception {
-        if (basePanel.getSelectedEntries().size() == 0) {
-            JOptionPane.showMessageDialog(
-                    basePanel,
-                    Localization.lang("Select at least one entry to perform this operation"),
-                    Localization.lang("No entry selected"),
-                    JOptionPane.ERROR_MESSAGE);
-            return;
+        if (basePanel.getSelectedEntries().size() > 0) {
+            basePanel.output(Localization.lang("Looking for full text document..."));
         }
-        basePanel.output(Localization.lang("Looking for full text document..."));
     }
 
     @Override
     public void run() {
-        int numberOfSelectedEntries = basePanel.getSelectedEntries().size();
-
-        if (numberOfSelectedEntries == 0) {
-            return;
-        }
-
-        if (numberOfSelectedEntries >= warningLimit) {
+        if (basePanel.getSelectedEntries().size() >= warningLimit) {
             String[] options = new String[]{Localization.lang("Look up full text documents"), Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(basePanel.frame(),
                     Localization.lang(
