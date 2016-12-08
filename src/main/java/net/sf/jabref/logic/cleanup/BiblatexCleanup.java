@@ -3,13 +3,13 @@ package net.sf.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Converts the entry to BibLatex format.
@@ -25,32 +25,21 @@ public class BiblatexCleanup implements CleanupJob {
             entry.getField(oldFieldName).ifPresent(oldValue -> {
                 if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
-                    entry.setField(newFieldName, oldValue);
-                    changes.add(new FieldChange(entry, newFieldName, null, oldValue));
-
-                    entry.clearField(oldFieldName);
-                    changes.add(new FieldChange(entry, oldFieldName, oldValue, null));
+                    entry.setField(newFieldName, oldValue).ifPresent(changes::add);
+                    entry.clearField(oldFieldName).ifPresent(changes::add);
                 }
             });
         }
-
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getField(FieldName.DATE).ifPresent(date -> {
-            if (date.isEmpty()) {
-                entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getField(FieldName.YEAR);
-                    Optional<String> oldMonth = entry.getField(FieldName.MONTH);
-
-                    entry.setField(FieldName.DATE, newDate);
-                    entry.clearField(FieldName.YEAR);
-                    entry.clearField(FieldName.MONTH);
-
-                    changes.add(new FieldChange(entry, FieldName.DATE, null, newDate));
-                    changes.add(new FieldChange(entry, FieldName.YEAR, oldYear.orElse(null), null));
-                    changes.add(new FieldChange(entry, FieldName.MONTH, oldMonth.orElse(null), null));
-                });
-            }
-        });
+        // If there already exists a non blank/empty value for the field date, it is not overwritten
+        if (StringUtil.isBlank(entry.getField(FieldName.DATE))) {
+            entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
+                entry.setField(FieldName.DATE, newDate).ifPresent(changes::add);
+                entry.clearField(FieldName.YEAR).ifPresent(changes::add);
+                entry.clearField(FieldName.MONTH).ifPresent(changes::add);
+            });
+        }
         return changes;
     }
+
 }
