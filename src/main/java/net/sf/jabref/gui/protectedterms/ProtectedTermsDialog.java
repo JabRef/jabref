@@ -43,7 +43,6 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
@@ -179,7 +178,6 @@ public class ProtectedTermsDialog {
     }
 
     private void setupTable() {
-
         tableModel = new TermTableModel();
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
@@ -187,7 +185,6 @@ public class ProtectedTermsDialog {
         cm.getColumn(0).setMaxWidth((cm.getColumn(0).getPreferredWidth() * 11) / 10);
         cm.getColumn(1).setPreferredWidth(100);
         cm.getColumn(2).setPreferredWidth(100);
-        GUIUtil.correctRowHeight(table);
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {

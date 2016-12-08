@@ -23,7 +23,6 @@ import javax.swing.table.TableRowSorter;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
@@ -99,9 +98,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                     }
                 }
             });
-
-            GUIUtil.correctRowHeight(table);
-
+            
             // BibTeX key
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             // field name

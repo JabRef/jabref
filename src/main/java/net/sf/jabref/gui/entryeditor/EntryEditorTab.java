@@ -34,7 +34,6 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -139,7 +138,6 @@ class EntryEditorTab {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
 
                 fileListEditor = (FileListEditor) fieldEditor;
-                GUIUtil.correctRowHeight(fileListEditor);
 
                 defaultHeight = 0;
             } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
