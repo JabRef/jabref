@@ -106,7 +106,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
         builder.add(add).xy(3, 1);
         builder.add(remove).xy(3, 2);
-        JButton button = new JButton(Localization.lang("Select"));
+        JButton button = new JButton(Localization.lang("Jump to entry"));
         button.addActionListener(e -> selectEntry());
         builder.add(button).xyw(1, 4, 3);
 
@@ -162,7 +162,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         });
 
-        JMenuItem openLink = new JMenuItem(Localization.lang("Select"));
+        JMenuItem openLink = new JMenuItem(Localization.lang("Jump to entry"));
         menu.add(openLink);
         openLink.addActionListener(e -> selectEntry());
 
