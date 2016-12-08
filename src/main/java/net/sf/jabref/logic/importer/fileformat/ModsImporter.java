@@ -196,6 +196,7 @@ public class ModsImporter extends Importer {
     private void parseTitle(Map<String, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
         for (Object object : titleOrSubTitleOrPartNumber) {
             if (object instanceof JAXBElement) {
+                @SuppressWarnings("unchecked")
                 JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
                 if ("title".equals(element.getName().getLocalPart())) {
                     StringPlusLanguage title = element.getValue();
@@ -321,6 +322,7 @@ public class ModsImporter extends Importer {
                 List<Object> titleOrSubTitleOrPartNumber = titleInfo.getTitleOrSubTitleOrPartNumber();
                 for (Object object : titleOrSubTitleOrPartNumber) {
                     if (object instanceof JAXBElement) {
+                        @SuppressWarnings("unchecked")
                         JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
                         if ("title".equals(element.getName().getLocalPart())) {
                             StringPlusLanguage journal = element.getValue();

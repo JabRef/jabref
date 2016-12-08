@@ -21,32 +21,31 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
 
 ### Changed
-- Bibliographic information from web resources can now be used to complete existing entries. This functionality can be accessed via a new button in the entry editor.
-- URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options. The referenced file is downloaded and then imported as usual.
+- Bibliographic information from web resources can now be used to complete existing entries.
+  This functionality can be accessed via a new button in the entry editor.
+- URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options.
+  The referenced file is downloaded and then imported as usual.
 - Windows and OSX binaries are now signed with a certificate.
-- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`. [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
+- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`.
+  [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
 - Adds integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
 - Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
 - Replaces manual thread management with cached thread pool
-
-
-
-
-
+- Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
+  The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 
 ### Fixed
 - We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
-- We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
-- We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
-- We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
 - We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 - Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
 - Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
 - Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
-- We fixed an issue when JabRef restored its session and a shared database was used: The error message "No suitable driver found" will not appear.
-
+- We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
+- We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
+- We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
+- We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
 ### Removed
 
 

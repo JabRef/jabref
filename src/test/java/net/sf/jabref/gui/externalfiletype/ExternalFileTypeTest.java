@@ -1,9 +1,13 @@
 package net.sf.jabref.gui.externalfiletype;
 
+import net.sf.jabref.testutils.category.GUITests;
+
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertNotNull;
 
+@Category(GUITests.class)
 public class ExternalFileTypeTest {
 
     @Test

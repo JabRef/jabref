@@ -2,7 +2,7 @@ language: java
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
-# This environment is continuosly updated as described in https://docs.travis-ci.com/user/build-environment-updates/
+# This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
 dist: trusty
 sudo: required
 
@@ -27,12 +27,13 @@ before_script:
 
 script:
   - ./gradlew check -Dscan
+  - ./gradlew fetcherTest -Dscan
   - ./gradlew databaseTest -Dscan
   # no need for databases for the integrationTest -> save memory
   # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
   - sudo service postgresql stop
   # following services identified by "sudo service --status-all" do not need to run, too
-  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unkonwn instance" error)
+  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unknown instance" error)
   - sudo service acpid stop
   - sudo service atd stop
   - sudo service cron stop
@@ -42,8 +43,8 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  # Integratation tests run in a timeout. Just start them and kill them after 60s
-  - timeout 60 ./gradlew integrationTest -Dscan --info || true
+  # Integration tests run in a timeout. Just start them and kill them after 60s.
+  - timeout 60 ./gradlew guiTest -Dscan --info || true
 
 after_script:
   # enable codecov report

@@ -6,6 +6,7 @@ import java.util.Optional;
 import net.sf.jabref.model.entry.FieldName;
 
 public class FileDirectoryPreferences {
+
     private final String user;
     private final Map<String, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
