@@ -30,7 +30,6 @@ import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
-import net.sf.jabref.model.groups.MoveGroupChange;
 import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.preferences.JabRefPreferences;
 

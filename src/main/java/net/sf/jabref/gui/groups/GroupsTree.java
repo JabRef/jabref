@@ -37,7 +37,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.MoveGroupChange;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
