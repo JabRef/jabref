@@ -129,12 +129,16 @@ public class KeywordList implements Iterable<Keyword> {
         return keywords.isEmpty();
     }
 
-    public boolean contains(Object o) {
+    public boolean contains(Keyword o) {
         return keywords.contains(o);
     }
 
-    public boolean remove(Object o) {
+    public boolean remove(Keyword o) {
         return keywords.remove(o);
+    }
+
+    public boolean remove(String keywordsString) {
+        return keywords.remove(new Keyword(keywordsString));
     }
 
     public void addAll(KeywordList keywordsToAdd) {

@@ -130,11 +130,6 @@ public class Benchmarks {
         return group.containsAll(database.getEntries());
     }
 
-    @Benchmark
-    public boolean keywordGroupContainsWord() {
-        return SimpleKeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
-    }
-
     public static void main(String[] args) throws IOException, RunnerException {
         Main.main(args);
     }

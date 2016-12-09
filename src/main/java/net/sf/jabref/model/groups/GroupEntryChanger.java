@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -18,9 +19,9 @@ public interface GroupEntryChanger {
      * @return If this group or one or more entries was/were modified as a
      * result of this operation, a list of changes is returned.
      */
-    Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd);
+    List<FieldChange> add(List<BibEntry> entriesToAdd);
 
-    default Optional<EntriesGroupChange> add(BibEntry entryToAdd) {
+    default List<FieldChange> add(BibEntry entryToAdd) {
         return add(Collections.singletonList(entryToAdd));
     }
 
@@ -30,5 +31,5 @@ public interface GroupEntryChanger {
      * @return If this group or one or more entries was/were modified as a
      * result of this operation, a list of changes is returned.
      */
-    Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove);
+    List<FieldChange> remove(List<BibEntry> entriesToRemove);
 }

@@ -2,6 +2,7 @@ package net.sf.jabref.logic.util;
 
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 
 /**
@@ -19,7 +20,7 @@ public class MetadataSerializationConfiguration {
     public static final String GROUP_UNIT_SEPARATOR = ";";
 
     /**
-     * Identifier for {@link SimpleKeywordGroup}.
+     * Identifier for {@link SimpleKeywordGroup} and {@link RegexKeywordGroup}.
      */
     public static final String KEYWORD_GROUP_ID = "KeywordGroup:";
 
