@@ -61,7 +61,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.event.GroupUpdatedEvent;
 import net.sf.jabref.model.metadata.MetaData;
@@ -579,7 +578,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
         for(GroupTreeNodeViewModel node : getLeafsOfSelection()) {
-            SearchMatcher searchRule = node.getNode().getSearchRule();
+            SearchMatcher searchRule = node.getNode().getSearchMatcher();
             searchRules.addRule(searchRule);
         }
         SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;

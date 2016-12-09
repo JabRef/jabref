@@ -172,7 +172,7 @@ public class GroupTreeNodeTest {
     public void getSearchRuleForIndependentGroupReturnsGroupAsMatcher() {
         GroupTreeNode node = GroupTreeNode
                 .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT, ','));
-        assertEquals(node.getGroup(), node.getSearchRule());
+        assertEquals(node.getGroup(), node.getSearchMatcher());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class GroupTreeNodeTest {
         AndMatcher matcher = new AndMatcher();
         matcher.addRule(node.getGroup());
         matcher.addRule(parent.getGroup());
-        assertEquals(matcher, node.getSearchRule());
+        assertEquals(matcher, node.getSearchMatcher());
     }
 
     @Test
@@ -197,12 +197,12 @@ public class GroupTreeNodeTest {
         OrMatcher matcher = new OrMatcher();
         matcher.addRule(node.getGroup());
         matcher.addRule(child.getGroup());
-        assertEquals(matcher, node.getSearchRule());
+        assertEquals(matcher, node.getSearchMatcher());
     }
 
     @Test
     public void numberOfHitsReturnsZeroForEmptyList() throws Exception {
-        assertEquals(0, getNodeInSimpleTree().numberOfHits(Collections.emptyList()));
+        assertEquals(0, getNodeInSimpleTree().numberOfMatches(Collections.emptyList()));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT, ','));
-        assertEquals(1, node.numberOfHits(entries));
+        assertEquals(1, node.numberOfMatches(entries));
     }
 
     @Test
@@ -218,7 +218,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT, ','));
-        assertEquals(2, node.numberOfHits(entries));
+        assertEquals(2, node.numberOfMatches(entries));
     }
 
     @Test
@@ -228,7 +228,7 @@ public class GroupTreeNodeTest {
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT, ','));
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.REFINING, ','));
-        assertEquals(1, node.numberOfHits(entries));
+        assertEquals(1, node.numberOfMatches(entries));
     }
 
     @Test
@@ -238,7 +238,7 @@ public class GroupTreeNodeTest {
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT, ','));
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT, ','));
-        assertEquals(2, node.numberOfHits(entries));
+        assertEquals(2, node.numberOfMatches(entries));
     }
 
     @Test

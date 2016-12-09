@@ -1,10 +1,13 @@
 package net.sf.jabref.logic.exporter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
@@ -62,4 +65,34 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         return sb.toString();
     }
+
+
+    /**
+     * Returns a textual representation of this node and its children. This
+     * representation contains both the tree structure and the textual
+     * representations of the group associated with each node.
+     * Every node is one entry in the list of strings.
+     *
+     * @return a representation of the tree based at this node as a list of strings
+     */
+    public List<String> getTreeAsString() {
+
+        List<String> representation = new ArrayList<>();
+
+        // Append myself
+        representation.add(this.toString());
+
+        // Append children
+        for(GroupTreeNode child : getChildren()) {
+            representation.addAll(child.getTreeAsString());
+        }
+
+        return representation;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.getLevel()) + ' ' + group.toString();
+    }
+
 }
