@@ -31,7 +31,18 @@ public class ContentSelectors {
     }
 
     public void removeSelector(String fieldName) {
-        contentSelectors.remove(fieldName);
+        ContentSelector toRemove = null;
+
+        for (ContentSelector selector: contentSelectors) {
+            if (selector.getFieldName().equals(fieldName)) {
+                toRemove = selector;
+                break;
+            }
+        }
+
+        if(toRemove != null){
+            contentSelectors.remove(toRemove);
+        }
     }
 
     public List<ContentSelector> getContentSelectors(){
