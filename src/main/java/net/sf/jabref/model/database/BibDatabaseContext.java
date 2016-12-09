@@ -191,11 +191,13 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(fileDirs::add);
+        preferences.getFileDirectory(fieldName).ifPresent(path ->
+            fileDirs.add(path.toAbsolutePath().toString())
+        );
 
         // 4. BIB file directory
-        getDatabaseFile().ifPresent(databaseFile -> {
-            String parentDir = databaseFile.getParent();
+        getDatabasePath().ifPresent(dbPath -> {
+            String parentDir = dbPath.getParent().toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
@@ -203,6 +205,7 @@ public class BibDatabaseContext {
                 fileDirs.add(parentDir);
             }
         });
+
         return fileDirs;
     }
 
