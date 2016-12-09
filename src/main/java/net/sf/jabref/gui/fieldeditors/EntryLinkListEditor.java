@@ -177,7 +177,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private void jumpToEntry() {
         String entryKey = null;
 
-        if(singleEntry) {
+        if (singleEntry) {
             ParsedEntryLink firstEntry = tableModel.getEntry(0);
 
             if (firstEntry != null) {
