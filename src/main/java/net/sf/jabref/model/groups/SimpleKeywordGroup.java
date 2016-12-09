@@ -15,8 +15,8 @@ import net.sf.jabref.model.strings.StringUtil;
  */
 public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
-    private final List<String> searchWords;
     protected final Character keywordSeparator;
+    private final List<String> searchWords;
 
     public SimpleKeywordGroup(String name, GroupHierarchyType context, String searchField,
                               String searchExpression, boolean caseSensitive, Character keywordSeparator) {
@@ -24,6 +24,24 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
 
         this.keywordSeparator = keywordSeparator;
         this.searchWords = StringUtil.getStringAsWords(searchExpression);
+    }
+
+    private static boolean containsCaseInsensitive(Set<String> searchIn, List<String> searchFor) {
+        for (String searchWord : searchFor) {
+            if (!containsCaseInsensitive(searchIn, searchWord)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean containsCaseInsensitive(Set<String> searchIn, String searchFor) {
+        for (String word : searchIn) {
+            if (word.equalsIgnoreCase(searchFor)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -90,33 +108,10 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
         return entry.getFieldAsWords(searchField);
     }
 
-    private static boolean containsCaseInsensitive(Set<String> searchIn, List<String> searchFor) {
-        for (String searchWord : searchFor) {
-            if (!containsCaseInsensitive(searchIn, searchWord)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean containsCaseInsensitive(Set<String> searchIn, String searchFor) {
-        for (String word : searchIn) {
-            if (word.equalsIgnoreCase(searchFor)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public AbstractGroup deepCopy() {
         return new SimpleKeywordGroup(getName(), getContext(), searchField, searchExpression,
                 caseSensitive, keywordSeparator);
-    }
-
-    @Override
-    public boolean isDynamic() {
-        return true;
     }
 
     @Override

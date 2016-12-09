@@ -1,5 +1,6 @@
 package net.sf.jabref.model.groups;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -12,19 +13,54 @@ import net.sf.jabref.model.entry.BibEntry;
 public class RegexKeywordGroup extends KeywordGroup {
     private Pattern pattern;
 
-    private static Pattern compilePattern(String searchExpression, boolean caseSensitive) throws IllegalArgumentException {
-        try {
-            return caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
-                    "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
-        } catch (PatternSyntaxException exception) {
-            throw new IllegalArgumentException("Syntax error in regular-expression pattern: " + searchExpression);
-        }
+    public RegexKeywordGroup(String name, GroupHierarchyType context, String searchField,
+                             String searchExpression, boolean caseSensitive) {
+        super(name, context, searchField, searchExpression, caseSensitive);
+        this.pattern = compilePattern(searchExpression, caseSensitive);
+    }
+
+    private static Pattern compilePattern(String searchExpression, boolean caseSensitive) {
+
+        return caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
+                "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
+
     }
 
     @Override
     public boolean contains(BibEntry entry) {
 
-            Optional<String> content = entry.getField(searchField);
-            return content.map(value -> pattern.matcher(value).find()).orElse(false);
+        Optional<String> content = entry.getField(searchField);
+        return content.map(value -> pattern.matcher(value).find()).orElse(false);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
+        if (!(o instanceof SimpleKeywordGroup)) {
+            return false;
+        }
+        SimpleKeywordGroup other = (SimpleKeywordGroup) o;
+        return getName().equals(other.getName())
+                && (getHierarchicalContext() == other.getHierarchicalContext())
+                && searchField.equals(other.searchField)
+                && searchExpression.equals(other.searchExpression)
+                && (caseSensitive == other.caseSensitive);
+    }
+
+    @Override
+    public AbstractGroup deepCopy() {
+        return new RegexKeywordGroup(getName(), getContext(), searchField, searchExpression,
+                caseSensitive);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(),
+                getHierarchicalContext(),
+                searchField,
+                searchExpression,
+                caseSensitive);
+    }
 }

@@ -27,4 +27,9 @@ public abstract class KeywordGroup extends AbstractGroup {
     public String getSearchField() {
         return searchField;
     }
+
+    @Override
+    public boolean isDynamic() {
+        return true;
+    }
 }
