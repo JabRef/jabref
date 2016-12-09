@@ -95,7 +95,7 @@ public class GroupTreeNodeTest {
     }
 
     private AbstractGroup getSearchGroup(String name) {
-        return new SearchGroup(name, "searchExpression", true, false, GroupHierarchyType.INCLUDING);
+        return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", true, false);
     }
 
     private AbstractGroup getExplict(String name) {
@@ -292,7 +292,7 @@ public class GroupTreeNodeTest {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT, ',');
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
-        AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT);
+        AbstractGroup newGroup = new SearchGroup("NewGroup", GroupHierarchyType.INDEPENDENT, "test", false, false);
 
         node.setGroup(newGroup, true, entries);
 

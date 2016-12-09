@@ -76,7 +76,7 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             return GroupsParser.allEntriesGroupFromString(s);
         }
-        if (s.startsWith(SearchGroup.ID)) {
+        if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             return GroupsParser.searchGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
@@ -152,10 +152,10 @@ public class GroupsParser {
      *          SearchGroup.toString(), or null if incompatible
      */
     public static AbstractGroup searchGroupFromString(String s) {
-        if (!s.startsWith(SearchGroup.ID)) {
+        if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(SearchGroup.ID.length()),
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.SEARCH_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
@@ -166,7 +166,7 @@ public class GroupsParser {
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
         return new SearchGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumberOrDefault(context));
+                GroupHierarchyType.getByNumberOrDefault(context), StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp
+        );
     }
 }

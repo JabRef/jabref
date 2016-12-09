@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.util;
 
 import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.model.groups.SimpleKeywordGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -33,4 +34,9 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link ExplicitGroup}.
      */
     public static final String EXPLICIT_GROUP_ID = "ExplicitGroup:";
+
+    /**
+     * Identifier for {@link SearchGroup}.
+     */
+    public static final String SEARCH_GROUP_ID = "SearchGroup:";
 }

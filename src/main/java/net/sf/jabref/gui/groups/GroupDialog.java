@@ -276,8 +276,8 @@ class GroupDialog extends JDialog {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(nameField.getText().trim(), searchGroupSearchExpression.getText().trim(),
-                                isCaseSensitive(), isRegex(), getContext());
+                        resultingGroup = new SearchGroup(nameField.getText().trim(), getContext(), searchGroupSearchExpression.getText().trim(),
+                                isCaseSensitive(), isRegex());
                     } catch (Exception e1) {
                         // should never happen
                     }
@@ -315,7 +315,7 @@ class GroupDialog extends JDialog {
             nameField.setText(group.getName());
             searchGroupSearchExpression.setText(group.getSearchExpression());
             searchGroupCaseSensitive.setSelected(group.isCaseSensitive());
-            searchGroupRegExp.setSelected(group.isRegExp());
+            searchGroupRegExp.setSelected(group.isRegularExpression());
             searchRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == ExplicitGroup.class)) {

@@ -10,6 +10,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
+import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.model.strings.StringUtil;
 
 /**
@@ -23,8 +24,7 @@ public class GroupSerializer {
     public String serializeExplicitGroup(ExplicitGroup group) {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID);
-        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(group.getContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -34,8 +34,7 @@ public class GroupSerializer {
         sortedKeys.addAll(group.getLegacyEntryKeys());
 
         for (String sortedKey : sortedKeys) {
-            sb.append(StringUtil.quote(sortedKey, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
-                    MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+            sb.append(StringUtil.quote(sortedKey, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
             sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         }
         return sb.toString();
@@ -45,23 +44,33 @@ public class GroupSerializer {
         Boolean isRegex = group instanceof RegexKeywordGroup;
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.KEYWORD_GROUP_ID);
-        sb.append(StringUtil.quote(group.getName(),
-                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(group.getContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.quote(group.getSearchField(),
-                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getSearchField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.quote(group.getSearchExpression(),
-                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR,
-                MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(group.isCaseSensitive()));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(isRegex));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        return sb.toString();
+    }
+
+    public String serializeSearchGroup(SearchGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.SEARCH_GROUP_ID);
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(group.getContext().ordinal());
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.booleanToBinaryString(group.isCaseSensitive()));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.booleanToBinaryString(group.isRegularExpression()));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         return sb.toString();
     }

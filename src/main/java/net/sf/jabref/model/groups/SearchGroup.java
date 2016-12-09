@@ -1,63 +1,30 @@
 package net.sf.jabref.model.groups;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
-import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.GroupSearchQuery;
-import net.sf.jabref.model.search.rules.SearchRule;
-import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Internally, it consists of a search pattern.
- *
- * @author jzieren
+ * This group matches entries by a complex search pattern, which might include conditions about the values of
+ * multiple fields.
  */
 public class SearchGroup extends AbstractGroup {
 
-    public static final String ID = "SearchGroup:";
-
+    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
     private final GroupSearchQuery query;
 
-    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
-
-    private final String searchExpression;
-    private final boolean caseSensitive;
-    private final boolean regExp;
-
-
-    /**
-     * Creates a SearchGroup with the specified properties.
-     */
-    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp,
-            GroupHierarchyType context) {
+    public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,
+                       boolean isRegEx) {
         super(name, context);
-
-        this.searchExpression = searchExpression;
-        this.caseSensitive = caseSensitive;
-        this.regExp = regExp;
-        this.query = new GroupSearchQuery(searchExpression, caseSensitive, regExp);
-    }
-
-    /**
-     * Returns a String representation of this object that can be used to
-     * reconstruct it.
-     */
-    @Override
-    public String toString() {
-        return SearchGroup.ID + StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
-                + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR + getContext().ordinal() + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR
-                + StringUtil.quote(getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)
-                + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive())
-                + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR + StringUtil.booleanToBinaryString(isRegExp()) + MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR;
+        this.query = new GroupSearchQuery(searchExpression, caseSensitive, isRegEx);
     }
 
     public String getSearchExpression() {
-        return searchExpression;
+        return query.getSearchExpression();
     }
 
     @Override
@@ -70,22 +37,22 @@ public class SearchGroup extends AbstractGroup {
         }
         SearchGroup other = (SearchGroup) o;
         return getName().equals(other.getName())
-                && this.getSearchExpression().equals(other.getSearchExpression())
-                && (this.isCaseSensitive() == other.isCaseSensitive())
-                && (isRegExp() == other.isRegExp())
+                && getSearchExpression().equals(other.getSearchExpression())
+                && (isCaseSensitive() == other.isCaseSensitive())
+                && (isRegularExpression() == other.isRegularExpression())
                 && (getHierarchicalContext() == other.getHierarchicalContext());
     }
 
     @Override
     public boolean contains(BibEntry entry) {
-        return this.query.isMatch(entry);
+        return query.isMatch(entry);
     }
 
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new SearchGroup(getName(), getSearchExpression(), isCaseSensitive(),
-                    isRegExp(), getHierarchicalContext());
+            return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(),
+                    isRegularExpression());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -96,11 +63,11 @@ public class SearchGroup extends AbstractGroup {
     }
 
     public boolean isCaseSensitive() {
-        return caseSensitive;
+        return query.isCaseSensitive();
     }
 
-    public boolean isRegExp() {
-        return regExp;
+    public boolean isRegularExpression() {
+        return query.isRegularExpression();
     }
 
     @Override
@@ -110,12 +77,6 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        return Objects.hash(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(), isRegularExpression());
     }
-
-    public SearchRule getSearchRule() {
-        return query.getRule();
-    }
-
 }
