@@ -597,7 +597,7 @@ public class JabRefPreferences {
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE, Boolean.TRUE);
+        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
         AutoCompletePreferences.putDefaults(defaults);
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
