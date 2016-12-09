@@ -20,9 +20,6 @@ public class BibTeXEntryTypeChecker implements Checker {
     private static final List<EntryType> BIBLATEX = BibLatexEntryTypes.ALL;
     private static final List<String> EXCLUSIVE_BIBLATEX = filterEntryTypesNames(BIBLATEX, isNotIncludedIn(BIBTEX));
 
-    public BibTeXEntryTypeChecker() {
-    }
-
     /**
      * Will check if the current library uses any entry types from another mode.
      * For example it will warn the user if he uses entry types defined for Biblatex inside a BibTeX library.
