@@ -35,7 +35,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 
 public class GroupsTree extends JTree implements DragSourceListener,

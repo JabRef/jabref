@@ -95,7 +95,6 @@ import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
