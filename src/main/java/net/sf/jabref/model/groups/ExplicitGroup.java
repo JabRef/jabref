@@ -1,6 +1,7 @@
 package net.sf.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -10,22 +11,19 @@ import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
- * Select explicit bibtex entries. It is also known as static group.
- *
- * @author jzieren
+ * This group contains entries, which were manually assigned to it.
+ * Assignments are stored in the {@link FieldName#GROUPS} field.
+ * Thus, internally, we represent {@link ExplicitGroup} as a special {@link SimpleKeywordGroup} operating on
+ * {@link FieldName#GROUPS}.
  */
 public class ExplicitGroup extends SimpleKeywordGroup {
 
-    public static final String ID = "ExplicitGroup:";
-
+    /**
+     * Previous versions of JabRef stored the linked entries directly in the "jabref-meta" comment at the end of the
+     * file. These keys are still parsed and stored in this field.
+     */
     private final List<String> legacyEntryKeys = new ArrayList<>();
-
-    private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
-
 
     public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
         super(name, context, FieldName.GROUPS, name, true, keywordSeparator);
@@ -55,41 +53,17 @@ public class ExplicitGroup extends SimpleKeywordGroup {
                 other.getHierarchicalContext()) && Objects.equals(getLegacyEntryKeys(), other.getLegacyEntryKeys());
     }
 
-    /**
-     * Returns a String representation of this group and its entries.
-     */
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ExplicitGroup.ID).append(
-                StringUtil.quote(getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)).
-                append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR).append(getContext().ordinal()).append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-
-        // write legacy entry keys in well-defined order for CVS compatibility
-        Set<String> sortedKeys = new TreeSet<>();
-        sortedKeys.addAll(legacyEntryKeys);
-
-        for (String sortedKey : sortedKeys) {
-            sb.append(StringUtil.quote(sortedKey, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR)).append(
-                    MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Remove all stored cite keys, resulting in an empty group.
-     */
     public void clearLegacyEntryKeys() {
         legacyEntryKeys.clear();
     }
 
     public List<String> getLegacyEntryKeys() {
-        return legacyEntryKeys;
+        return Collections.unmodifiableList(legacyEntryKeys);
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(name, context, legacyEntryKeys);
     }
 
     @Override

@@ -2,6 +2,7 @@ package net.sf.jabref.logic.util;
 
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
 
 /**
  * Specifies how metadata is read and written.
@@ -26,4 +27,9 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link AllEntriesGroup}.
      */
     public static final String ALL_ENTRIES_GROUP_ID = "AllEntriesGroup:";
+
+    /**
+     * Identifier for {@link ExplicitGroup}.
+     */
+    public static final String EXPLICIT_GROUP_ID = "ExplicitGroup:";
 }

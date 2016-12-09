@@ -17,12 +17,12 @@ public abstract class AbstractGroup implements SearchMatcher {
     /**
      * The group's name.
      */
-    private final String name;
+    protected final String name;
 
     /**
      * The hierarchical context of the group.
      */
-    private final GroupHierarchyType context;
+    protected final GroupHierarchyType context;
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;

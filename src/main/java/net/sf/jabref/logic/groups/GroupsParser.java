@@ -79,7 +79,7 @@ public class GroupsParser {
         if (s.startsWith(SearchGroup.ID)) {
             return GroupsParser.searchGroupFromString(s);
         }
-        if (s.startsWith(ExplicitGroup.ID)) {
+        if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             return GroupsParser.explicitGroupFromString(s, keywordSeparator);
         }
         return null; // unknown group
@@ -112,10 +112,10 @@ public class GroupsParser {
     }
 
     public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
-        if (!s.startsWith(ExplicitGroup.ID)) {
+        if (!s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(ExplicitGroup.ID.length()),
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
