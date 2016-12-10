@@ -43,6 +43,14 @@ public class GroupSerializerTest {
     }
 
     @Test
+    // For https://github.com/JabRef/jabref/issues/1681
+    public void serializeSingleExplicitGroupWithEscapedSlash() {
+        ExplicitGroup group = new ExplicitGroup("B{\\\"{o}}hmer", GroupHierarchyType.INDEPENDENT, ',');
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 ExplicitGroup:B{\\\\\"{o}}hmer;0;"), serialization);
+    }
+
+    @Test
     public void serializeSingleSimpleKeywordGroup() {
         SimpleKeywordGroup group = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
