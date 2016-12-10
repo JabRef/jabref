@@ -27,6 +27,7 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -147,6 +148,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         entry.clearField("journal-abbreviation");
         entry.clearField("status");
         entry.clearField("copyright");
+        entry.getField("month").ifPresent(month -> entry.setField("month", MonthUtil.getMonth(month).bibtexFormat));
     }
 
     @Override
