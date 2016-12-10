@@ -37,10 +37,10 @@ public class RegexKeywordGroup extends KeywordGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SimpleKeywordGroup)) {
+        if (!(o instanceof RegexKeywordGroup)) {
             return false;
         }
-        SimpleKeywordGroup other = (SimpleKeywordGroup) o;
+        RegexKeywordGroup other = (RegexKeywordGroup) o;
         return getName().equals(other.getName())
                 && (getHierarchicalContext() == other.getHierarchicalContext())
                 && searchField.equals(other.searchField)

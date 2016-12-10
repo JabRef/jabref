@@ -1,8 +1,6 @@
 package net.sf.jabref.model.groups;
 
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 

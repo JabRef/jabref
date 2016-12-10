@@ -1,11 +1,9 @@
 package net.sf.jabref.model.groups;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.logic.exporter.GroupSerializer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.matchers.AndMatcher;
 import net.sf.jabref.model.search.matchers.OrMatcher;
@@ -39,7 +37,7 @@ public class GroupTreeNodeTest {
      *      A ExplicitParent, Independent (= parent)
      *          B ExplicitNode, Refining (<-- this)
      */
-    private GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) {
+    public static GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) {
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode parent = root
                 .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT, ','));
@@ -69,7 +67,7 @@ public class GroupTreeNodeTest {
      *          B KeywordB
      *      A KeywordA
      */
-    private GroupTreeNode getNodeInComplexTree(GroupTreeNode root) {
+    public static GroupTreeNode getNodeInComplexTree(GroupTreeNode root) {
         root.addSubgroup(getSearchGroup("SearchA"));
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode grandParent = root
@@ -90,15 +88,15 @@ public class GroupTreeNodeTest {
         return node;
     }
 
-    private AbstractGroup getKeywordGroup(String name) {
+    private static AbstractGroup getKeywordGroup(String name) {
         return new SimpleKeywordGroup(name, GroupHierarchyType.INDEPENDENT, "searchField", "searchExpression", true,',');
     }
 
-    private AbstractGroup getSearchGroup(String name) {
+    private static AbstractGroup getSearchGroup(String name) {
         return new SearchGroup(name, GroupHierarchyType.INCLUDING, "searchExpression", true, false);
     }
 
-    private AbstractGroup getExplict(String name) {
+    private static AbstractGroup getExplict(String name) {
         return new ExplicitGroup(name, GroupHierarchyType.REFINING, ',');
     }
 
@@ -126,46 +124,8 @@ public class GroupTreeNodeTest {
         return node;
     }
     */
-    private GroupTreeNode getRoot() {
+    public static GroupTreeNode getRoot() {
         return GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
-    }
-
-    @Test
-    public void getTreeAsStringInSimpleTree() throws Exception {
-        GroupTreeNode root = getRoot();
-        getNodeInSimpleTree(root);
-
-        List<String> expected = Arrays.asList(
-                "0 AllEntriesGroup:",
-                "1 ExplicitGroup:ExplicitA;2;",
-                "1 ExplicitGroup:ExplicitParent;0;",
-                "2 ExplicitGroup:ExplicitNode;1;"
-        );
-        assertEquals(expected, new GroupSerializer().serializeTree(root));
-    }
-
-    @Test
-    public void getTreeAsStringInComplexTree() throws Exception {
-        GroupTreeNode root = getRoot();
-        getNodeInComplexTree(root);
-
-        List<String> expected = Arrays.asList(
-                "0 AllEntriesGroup:",
-                "1 SearchGroup:SearchA;2;searchExpression;1;0;",
-                "1 ExplicitGroup:ExplicitA;2;",
-                "1 ExplicitGroup:ExplicitGrandParent;0;",
-                "2 ExplicitGroup:ExplicitB;1;",
-                "2 KeywordGroup:KeywordParent;0;searchField;searchExpression;1;0;",
-                "3 KeywordGroup:KeywordNode;0;searchField;searchExpression;1;0;",
-                "4 ExplicitGroup:ExplicitChild;1;",
-                "3 SearchGroup:SearchC;2;searchExpression;1;0;",
-                "3 ExplicitGroup:ExplicitC;1;",
-                "3 KeywordGroup:KeywordC;0;searchField;searchExpression;1;0;",
-                "2 SearchGroup:SearchB;2;searchExpression;1;0;",
-                "2 KeywordGroup:KeywordB;0;searchField;searchExpression;1;0;",
-                "1 KeywordGroup:KeywordA;0;searchField;searchExpression;1;0;"
-        );
-        assertEquals(expected, new GroupSerializer().serializeTree(root));
     }
 
     @Test

@@ -2,7 +2,6 @@ package net.sf.jabref.gui.groups;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;

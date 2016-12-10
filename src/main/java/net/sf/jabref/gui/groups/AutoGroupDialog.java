@@ -41,12 +41,12 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
-import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Dialog for creating or modifying groups. Operates directly on the Vector containing group information.

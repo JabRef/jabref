@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.util;
 
 import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.model.groups.SimpleKeywordGroup;
-import net.sf.jabref.model.groups.RegexKeywordGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
 
 /**
  * Specifies how metadata is read and written.

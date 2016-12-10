@@ -88,7 +88,7 @@ public class GroupSerializer {
         List<String> representation = new ArrayList<>();
 
         // Append current node
-        representation.add(String.valueOf(node.getLevel() + ' ' + serializeGroup(node.getGroup())));
+        representation.add(String.valueOf(node.getLevel()) + ' ' + serializeGroup(node.getGroup()));
 
         // Append children
         for(GroupTreeNode child : node.getChildren()) {

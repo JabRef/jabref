@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import net.sf.jabref.model.TreeNode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

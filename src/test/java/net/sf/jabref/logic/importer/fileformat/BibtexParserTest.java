@@ -1550,13 +1550,13 @@ public class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(new AllEntriesGroup(""), root.getGroup());
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
-                new SimpleKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, "keywords", "FrechetSpace", false, ','),
+                new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, "keywords", "FrechetSpace", false),
                 root.getChildren().get(0).getGroup());
         assertEquals(
-                new RegexKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, "keywords", "GIT", false),
+                new SimpleKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, "keywords", "GIT", false, ','),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());

@@ -1,7 +1,5 @@
 package net.sf.jabref.model.groups;
 
-import java.util.Optional;
-
 public enum GroupHierarchyType {
 
     /**
