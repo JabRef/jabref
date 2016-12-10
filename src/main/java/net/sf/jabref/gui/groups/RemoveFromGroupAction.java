@@ -1,12 +1,14 @@
 package net.sf.jabref.gui.groups;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
@@ -39,12 +41,12 @@ public class RemoveFromGroupAction extends AbstractAction {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undo = mNode.removeEntriesFromGroup(mPanel.getSelectedEntries());
-        if (! undo.isPresent()) {
+        List<FieldChange> undo = mNode.removeEntriesFromGroup(mPanel.getSelectedEntries());
+        if (undo.isEmpty()) {
             return; // no changed made
         }
 
-        mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo.get()));
+        mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
         mPanel.markBaseChanged();
         mPanel.updateEntryEditorIfShowing();
         mPanel.getGroupSelector().valueChanged(null);

@@ -3,7 +3,6 @@ package net.sf.jabref.model.groups;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -51,7 +50,7 @@ public class RegexKeywordGroup extends KeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new RegexKeywordGroup(getName(), getContext(), searchField, searchExpression,
+        return new RegexKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
                 caseSensitive);
     }
 

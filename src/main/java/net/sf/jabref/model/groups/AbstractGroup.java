@@ -32,7 +32,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     /**
      * Returns the way this group relates to its sub- or supergroup.
      */
-    public GroupHierarchyType getContext() {
+    public GroupHierarchyType getHierarchicalContext() {
         return context;
     }
 
@@ -84,13 +84,6 @@ public abstract class AbstractGroup implements SearchMatcher {
      * explicitly added to it.
      */
     public abstract boolean isDynamic();
-
-    /**
-     * Returns the group's hierarchical context.
-     */
-    public GroupHierarchyType getHierarchicalContext() {
-        return context;
-    }
 
     /**
      * @return A deep copy of this object.

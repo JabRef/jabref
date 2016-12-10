@@ -5,6 +5,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
@@ -23,10 +24,12 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.logic.groups.GroupDescriptions;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupEntryChanger;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
@@ -230,11 +233,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public boolean canAddEntries(List<BibEntry> entries) {
-        return getNode().getGroup().supportsAdd() && !getNode().getGroup().containsAll(entries);
+        return getNode().getGroup() instanceof GroupEntryChanger && !getNode().getGroup().containsAll(entries);
     }
 
     public boolean canRemoveEntries(List<BibEntry> entries) {
-        return getNode().getGroup().supportsRemove() && getNode().getGroup().containsAny(entries);
+        return getNode().getGroup() instanceof GroupEntryChanger && getNode().getGroup().containsAny(entries);
     }
 
     public void sortChildrenByName(boolean recursive) {
@@ -292,8 +295,8 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
         AbstractGroup group = node.getGroup();
-        Optional<EntriesGroupChange> changesRemove = Optional.empty();
-        Optional<EntriesGroupChange> changesAdd = Optional.empty();
+        List<FieldChange> changesRemove = new ArrayList<>();
+        List<FieldChange> changesAdd = new ArrayList<>();
 
         // Sort entries into current members and non-members of the group
         // Current members will be removed
@@ -320,15 +323,15 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
 
         // Remember undo information
-        if (changesRemove.isPresent()) {
-            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove.get());
-            if (changesAdd.isPresent() && (undoRemove != null)) {
+        if (!changesRemove.isEmpty()) {
+            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);
+            if (!changesAdd.isEmpty() && (undoRemove != null)) {
                 // we removed and added entries
-                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
             }
             undoManager.addEdit(undoRemove);
-        } else if (changesAdd.isPresent()) {
-            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+        } else if (!changesAdd.isEmpty()) {
+            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
         }
     }
 
@@ -396,24 +399,24 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     /**
      * Adds the given entries to this node's group.
      */
-    public Optional<EntriesGroupChange> addEntriesToGroup(List<BibEntry> entries) {
-        if(node.getGroup().supportsAdd()) {
-            return node.getGroup().add(entries);
+    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+        if(node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger)node.getGroup()).add(entries);
         }
         else {
-            return Optional.empty();
+            return Collections.emptyList();
         }
     }
 
     /**
      * Removes the given entries from this node's group.
      */
-    public Optional<EntriesGroupChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if(node.getGroup().supportsRemove()) {
-            return node.getGroup().remove(entries);
+    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
+        if(node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger)node.getGroup()).remove(entries);
         }
         else {
-            return Optional.empty();
+            return Collections.emptyList();
         }
     }
 

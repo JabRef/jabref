@@ -19,8 +19,8 @@ public class KeywordGroupTest {
 
     @Before
     public void setUp() {
-        keywordTestGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
-        complexKeywordGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',', false);
+        keywordTestGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',');
+        complexKeywordGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',');
         emptyEntry = new BibEntry();
     }
 

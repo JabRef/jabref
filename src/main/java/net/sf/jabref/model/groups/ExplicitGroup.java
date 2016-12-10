@@ -4,12 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
-import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This group contains entries, which were manually assigned to it.
@@ -35,7 +31,7 @@ public class ExplicitGroup extends SimpleKeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), keywordSeparator);
+        ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), keywordSeparator);
         copy.legacyEntryKeys.addAll(legacyEntryKeys);
         return copy;
     }

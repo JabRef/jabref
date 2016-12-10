@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
@@ -13,20 +15,17 @@ import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.model.strings.StringUtil;
 
-/**
- * Created by Tobias on 12/5/2016.
- */
 public class GroupSerializer {
-    public static String serializeAllEntriesGroup() {
+    private static String serializeAllEntriesGroup(AllEntriesGroup group) {
         return MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID;
     }
 
-    public String serializeExplicitGroup(ExplicitGroup group) {
+    private String serializeExplicitGroup(ExplicitGroup group) {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID);
         sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getContext().ordinal());
+        sb.append(group.getHierarchicalContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
 
         // write legacy entry keys in well-defined order for CVS compatibility
@@ -40,13 +39,13 @@ public class GroupSerializer {
         return sb.toString();
     }
 
-    public String serializeKeywordGroup(KeywordGroup group) {
+    private String serializeKeywordGroup(KeywordGroup group) {
         Boolean isRegex = group instanceof RegexKeywordGroup;
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.KEYWORD_GROUP_ID);
         sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getContext().ordinal());
+        sb.append(group.getHierarchicalContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getSearchField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -59,12 +58,12 @@ public class GroupSerializer {
         return sb.toString();
     }
 
-    public String serializeSearchGroup(SearchGroup group) {
+    private String serializeSearchGroup(SearchGroup group) {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.SEARCH_GROUP_ID);
         sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getContext().ordinal());
+        sb.append(group.getHierarchicalContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -84,24 +83,32 @@ public class GroupSerializer {
      *
      * @return a representation of the tree based at this node as a list of strings
      */
-    public List<String> getTreeAsString() {
+    public List<String> serializeTree(GroupTreeNode node) {
 
         List<String> representation = new ArrayList<>();
 
-        // Append myself
-        representation.add(this.toString());
+        // Append current node
+        representation.add(String.valueOf(node.getLevel() + ' ' + serializeGroup(node.getGroup())));
 
         // Append children
-        for(GroupTreeNode child : getChildren()) {
-            representation.addAll(child.getTreeAsString());
+        for(GroupTreeNode child : node.getChildren()) {
+            representation.addAll(serializeTree(child));
         }
 
         return representation;
     }
 
-    @Override
-    public String toString() {
-        return String.valueOf(this.getLevel()) + ' ' + group.toString();
+    private String serializeGroup(AbstractGroup group) {
+        if (group instanceof AllEntriesGroup) {
+            return serializeAllEntriesGroup((AllEntriesGroup)group);
+        } else if (group instanceof ExplicitGroup) {
+            return serializeExplicitGroup((ExplicitGroup)group);
+        } else if (group instanceof KeywordGroup) {
+            return serializeKeywordGroup((KeywordGroup)group);
+        } else if (group instanceof SearchGroup) {
+            return serializeSearchGroup((SearchGroup)group);
+        } else {
+            throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
+        }
     }
-
 }

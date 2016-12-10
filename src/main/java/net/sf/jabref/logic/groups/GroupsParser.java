@@ -12,7 +12,9 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 
 /**
@@ -91,24 +93,24 @@ public class GroupsParser {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
-        if (!s.startsWith(KeywordGroup.ID)) {
+    private static KeywordGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.KEYWORD_GROUP_ID
                 .length()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
-        String name = tok.nextToken();
-        int context = Integer.parseInt(tok.nextToken());
-        String field = tok.nextToken();
-        String expression = tok.nextToken();
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
+        String field = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        String expression = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-        return new SimpleKeywordGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                GroupHierarchyType.getByNumberOrDefault(context), StringUtil.unquote(field, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
-                StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, keywordSeparator, regExp
-        );
+        if (regExp) {
+            return new RegexKeywordGroup(name, context, field, expression, caseSensitive);
+        } else {
+            return new SimpleKeywordGroup(name, context, field, expression, caseSensitive, keywordSeparator);
+        }
     }
 
     public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {

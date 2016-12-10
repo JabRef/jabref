@@ -110,7 +110,7 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
 
     @Override
     public AbstractGroup deepCopy() {
-        return new SimpleKeywordGroup(getName(), getContext(), searchField, searchExpression,
+        return new SimpleKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
                 caseSensitive, keywordSeparator);
     }
 
