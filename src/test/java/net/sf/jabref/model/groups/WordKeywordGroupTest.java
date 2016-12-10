@@ -12,18 +12,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SimpleKeywordGroupTest {
+public class WordKeywordGroupTest {
 
-    private SimpleKeywordGroup testGroup;
-    private SimpleKeywordGroup testCaseSensitiveGroup;
-    private SimpleKeywordGroup waterGroup;
+    private WordKeywordGroup testGroup;
+    private WordKeywordGroup testCaseSensitiveGroup;
+    private WordKeywordGroup waterGroup;
     private BibEntry entry;
 
     @Before
     public void setUp() {
-        testGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
-        testCaseSensitiveGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", true, ',', false);
-        waterGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',', false);
+        testGroup = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
+        testCaseSensitiveGroup = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", true, ',', false);
+        waterGroup = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',', false);
         entry = new BibEntry();
     }
 

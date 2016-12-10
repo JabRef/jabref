@@ -12,7 +12,7 @@ import net.sf.jabref.model.groups.GroupTreeNodeTest;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +52,7 @@ public class GroupSerializerTest {
 
     @Test
     public void serializeSingleSimpleKeywordGroup() {
-        SimpleKeywordGroup group = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
+        WordKeywordGroup group = new WordKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 KeywordGroup:name;0;keywords;test;0;0;"), serialization);
     }

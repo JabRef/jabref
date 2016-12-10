@@ -41,7 +41,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -114,7 +114,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
 
                 for (String keyword : keywords) {
-                    SimpleKeywordGroup group = new SimpleKeywordGroup(
+                    WordKeywordGroup group = new WordKeywordGroup(
                             formatter.format(keyword), GroupHierarchyType.INDEPENDENT, fieldText, keyword, false, Globals.prefs.getKeywordDelimiter(), false);
                     autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                 }

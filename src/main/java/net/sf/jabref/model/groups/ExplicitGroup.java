@@ -10,10 +10,10 @@ import net.sf.jabref.model.entry.FieldName;
 /**
  * This group contains entries, which were manually assigned to it.
  * Assignments are stored in the {@link FieldName#GROUPS} field.
- * Thus, internally, we represent {@link ExplicitGroup} as a special {@link SimpleKeywordGroup} operating on
+ * Thus, internally, we represent {@link ExplicitGroup} as a special {@link WordKeywordGroup} operating on
  * {@link FieldName#GROUPS}.
  */
-public class ExplicitGroup extends SimpleKeywordGroup {
+public class ExplicitGroup extends WordKeywordGroup {
 
     /**
      * Previous versions of JabRef stored the linked entries directly in the "jabref-meta" comment at the end of the

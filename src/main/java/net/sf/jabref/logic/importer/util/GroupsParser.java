@@ -14,7 +14,7 @@ import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 
 /**
@@ -109,7 +109,7 @@ public class GroupsParser {
         if (regExp) {
             return new RegexKeywordGroup(name, context, field, expression, caseSensitive);
         } else {
-            return new SimpleKeywordGroup(name, context, field, expression, caseSensitive, keywordSeparator, false);
+            return new WordKeywordGroup(name, context, field, expression, caseSensitive, keywordSeparator, false);
         }
     }
 

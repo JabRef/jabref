@@ -39,7 +39,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -270,7 +270,7 @@ class GroupDialog extends JDialog {
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected());
                     } else {
-                        resultingGroup = new SimpleKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new WordKeywordGroup(nameField.getText().trim(), getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                     }
@@ -304,8 +304,8 @@ class GroupDialog extends JDialog {
         searchGroupCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
-        if ((editedGroup != null) && (editedGroup.getClass() == SimpleKeywordGroup.class)) {
-            SimpleKeywordGroup group = (SimpleKeywordGroup) editedGroup;
+        if ((editedGroup != null) && (editedGroup.getClass() == WordKeywordGroup.class)) {
+            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());
@@ -314,7 +314,7 @@ class GroupDialog extends JDialog {
             keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == RegexKeywordGroup.class)) {
-            SimpleKeywordGroup group = (SimpleKeywordGroup) editedGroup;
+            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());

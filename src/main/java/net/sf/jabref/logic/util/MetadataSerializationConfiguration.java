@@ -4,7 +4,7 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.groups.SimpleKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 
 /**
  * Specifies how metadata is read and written.
@@ -21,7 +21,7 @@ public class MetadataSerializationConfiguration {
     public static final String GROUP_UNIT_SEPARATOR = ";";
 
     /**
-     * Identifier for {@link SimpleKeywordGroup} and {@link RegexKeywordGroup}.
+     * Identifier for {@link WordKeywordGroup} and {@link RegexKeywordGroup}.
      */
     public static final String KEYWORD_GROUP_ID = "KeywordGroup:";
 

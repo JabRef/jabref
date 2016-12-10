@@ -87,7 +87,7 @@ public class GroupTreeNodeTest {
     }
 
     private static AbstractGroup getKeywordGroup(String name) {
-        return new SimpleKeywordGroup(name, GroupHierarchyType.INDEPENDENT, "searchField", "searchExpression", true,',', false);
+        return new WordKeywordGroup(name, GroupHierarchyType.INDEPENDENT, "searchField", "searchExpression", true,',', false);
     }
 
     private static AbstractGroup getSearchGroup(String name) {
@@ -167,7 +167,7 @@ public class GroupTreeNodeTest {
     public void numberOfHitsMatchesOneEntry() throws Exception {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
         assertEquals(1, node.numberOfMatches(entries));
     }
 
@@ -175,7 +175,7 @@ public class GroupTreeNodeTest {
     public void numberOfHitsMatchesMultipleEntries() throws Exception {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
         assertEquals(2, node.numberOfMatches(entries));
     }
 
@@ -183,9 +183,9 @@ public class GroupTreeNodeTest {
     public void numberOfHitsWorksForRefiningGroups() throws Exception {
         GroupTreeNode grandParent = getNodeInSimpleTree();
         GroupTreeNode parent = grandParent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
         GroupTreeNode node = parent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.REFINING, "author", "author1", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.REFINING, "author", "author1", true, ',', false));
         assertEquals(1, node.numberOfMatches(entries));
     }
 
@@ -193,9 +193,9 @@ public class GroupTreeNodeTest {
     public void numberOfHitsWorksForHierarchyOfIndependentGroups() throws Exception {
         GroupTreeNode grandParent = getNodeInSimpleTree();
         GroupTreeNode parent = grandParent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
         GroupTreeNode node = parent.addSubgroup(
-                new SimpleKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
+                new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
         assertEquals(2, node.numberOfMatches(entries));
     }
 

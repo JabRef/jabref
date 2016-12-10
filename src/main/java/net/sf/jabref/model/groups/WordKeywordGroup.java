@@ -14,15 +14,15 @@ import net.sf.jabref.model.strings.StringUtil;
 /**
  * Matches entries if a given field contains a specified word.
  */
-public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChanger {
+public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
     private final List<String> searchWords;
     private final boolean onlySplitWordsAtSeparator;
 
-    public SimpleKeywordGroup(String name, GroupHierarchyType context, String searchField,
-                              String searchExpression, boolean caseSensitive, Character keywordSeparator,
-                              boolean onlySplitWordsAtSeparator) {
+    public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
+                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                            boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
@@ -86,10 +86,10 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
         if (this == o) {
             return true;
         }
-        if (!(o instanceof SimpleKeywordGroup)) {
+        if (!(o instanceof WordKeywordGroup)) {
             return false;
         }
-        SimpleKeywordGroup other = (SimpleKeywordGroup) o;
+        WordKeywordGroup other = (WordKeywordGroup) o;
         return getName().equals(other.getName())
                 && (getHierarchicalContext() == other.getHierarchicalContext())
                 && searchField.equals(other.searchField)
@@ -121,7 +121,7 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
 
     @Override
     public AbstractGroup deepCopy() {
-        return new SimpleKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
+        return new WordKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
                 caseSensitive, keywordSeparator, onlySplitWordsAtSeparator);
     }
 
