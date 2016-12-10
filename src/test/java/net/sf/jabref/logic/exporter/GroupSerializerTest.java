@@ -1,16 +1,75 @@
 package net.sf.jabref.logic.exporter;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.GroupTreeNodeTest;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
+import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.groups.SimpleKeywordGroup;
 
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class GroupSerializerTest {
+
+    private GroupSerializer groupSerializer;
+
+    @Before
+    public void setUp() throws Exception {
+        groupSerializer = new GroupSerializer();
+    }
+
+    @Test
+    public void serializeSingleAllEntriesGroup() {
+        AllEntriesGroup group = new AllEntriesGroup("");
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 AllEntriesGroup:"), serialization);
+    }
+
+    @Test
+    public void serializeSingleExplicitGroup() {
+        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 ExplicitGroup:myExplicitGroup;0;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleSimpleKeywordGroup() {
+        SimpleKeywordGroup group = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',');
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 KeywordGroup:name;0;keywords;test;0;0;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleRegexKeywordGroup() {
+        KeywordGroup group = new RegexKeywordGroup("myExplicitGroup", GroupHierarchyType.REFINING, "author", "asdf", false);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 KeywordGroup:myExplicitGroup;1;author;asdf;0;1;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleSearchGroup() {
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, "author=harrer", true, true);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 SearchGroup:myExplicitGroup;0;author=harrer;1;1;"), serialization);
+    }
+
+    @Test
+    public void serializeSingleSearchGroupWithRegex() {
+        SearchGroup group = new SearchGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, "author=\"harrer\"", true, false);
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(Collections.singletonList("0 SearchGroup:myExplicitGroup;2;author=\"harrer\";1;0;"), serialization);
+    }
 
     @Test
     public void getTreeAsStringInSimpleTree() throws Exception {
@@ -23,7 +82,7 @@ public class GroupSerializerTest {
                 "1 ExplicitGroup:ExplicitParent;0;",
                 "2 ExplicitGroup:ExplicitNode;1;"
         );
-        assertEquals(expected, new GroupSerializer().serializeTree(root));
+        assertEquals(expected, groupSerializer.serializeTree(root));
     }
 
     @Test
@@ -47,7 +106,7 @@ public class GroupSerializerTest {
                 "2 KeywordGroup:KeywordB;0;searchField;searchExpression;1;0;",
                 "1 KeywordGroup:KeywordA;0;searchField;searchExpression;1;0;"
         );
-        assertEquals(expected, new GroupSerializer().serializeTree(root));
+        assertEquals(expected, groupSerializer.serializeTree(root));
     }
 
 }

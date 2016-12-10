@@ -41,9 +41,7 @@ public class GroupTreeNodeTest {
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, ','));
         GroupTreeNode parent = root
                 .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT, ','));
-        GroupTreeNode node = parent
-                .addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
-        return node;
+        return parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
     }
 
     private GroupTreeNode getNodeInSimpleTree() {

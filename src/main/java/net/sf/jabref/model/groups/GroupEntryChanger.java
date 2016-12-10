@@ -31,4 +31,8 @@ public interface GroupEntryChanger {
      * result of this operation, a list of changes is returned.
      */
     List<FieldChange> remove(List<BibEntry> entriesToRemove);
+
+    default List<FieldChange> remove(BibEntry entryToAdd) {
+        return remove(Collections.singletonList(entryToAdd));
+    }
 }
