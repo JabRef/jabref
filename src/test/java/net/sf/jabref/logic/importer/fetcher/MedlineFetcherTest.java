@@ -38,7 +38,7 @@ public class MedlineFetcherTest {
         entryWijedasa.setField("issn-linking", "1354-1013");
         entryWijedasa.setField("journal", "Global change biology");
         entryWijedasa.setField("keywords", "Acacia; Agriculture; Emissions; Subsidence; Sustainability; Tropical peatlands; oil palm");
-        entryWijedasa.setField("month", "Sep");
+        entryWijedasa.setField("month", "#sep#");
         entryWijedasa.setField("nlm-id", "9888746");
         entryWijedasa.setField("owner", "NLM");
         entryWijedasa.setField("pmid", "27670948");
@@ -65,7 +65,7 @@ public class MedlineFetcherTest {
         entryEndharti.setField("nlm-id", "101088661");
         entryEndharti.setField("owner", "NLM");
         entryEndharti.setField("pages", "374");
-        entryEndharti.setField("month", "Sep");
+        entryEndharti.setField("month", "#sep#");
         entryEndharti.setField("pmid", "27670445");
         entryEndharti.setField("pubmodel", "Electronic");
         entryEndharti.setField("pubstatus", "epublish");
@@ -89,7 +89,7 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField("issue", "6");
         bibEntryIchikawa.setField("journal", "Parasitology international");
         bibEntryIchikawa.setField("keywords", "Animals; Antibodies, Protozoan, blood; Antigens, Protozoan, immunology; Cattle, parasitology; Cattle Diseases, epidemiology, parasitology; Enzyme-Linked Immunosorbent Assay, veterinary; Geography; Humans; Indonesia, epidemiology; Livestock, immunology, parasitology; Meat, parasitology; Protozoan Proteins, immunology; Seroepidemiologic Studies; Swine, parasitology; Swine Diseases, epidemiology, parasitology; Toxoplasma, immunology; Toxoplasmosis, Animal, epidemiology, immunology, parasitology; Cattle; ELISA; Indonesia; Pig; TgGRA7; Toxoplasma gondii");
-        bibEntryIchikawa.setField("month", "Dec");
+        bibEntryIchikawa.setField("month", "#dec#");
         bibEntryIchikawa.setField("nlm-id", "9708549");
         bibEntryIchikawa.setField("owner", "NLM");
         bibEntryIchikawa.setField("pages", "484--486");
@@ -113,7 +113,7 @@ public class MedlineFetcherTest {
         bibEntrySari.setField("issue", "6");
         bibEntrySari.setField("journal", "The Southeast Asian journal of tropical medicine and public health");
         bibEntrySari.setField("keywords", "Antibodies, Protozoan; Antibodies, Viral, immunology; Coinfection, epidemiology, immunology; Female; HIV Infections, epidemiology; HTLV-I Antibodies, immunology; HTLV-I Infections, epidemiology, immunology; HTLV-II Antibodies, immunology; HTLV-II Infections, epidemiology, immunology; Hepatitis Antibodies, immunology; Hepatitis B Antibodies, immunology; Hepatitis C Antibodies, immunology; Hepatitis Delta Virus, immunology; Hepatitis, Viral, Human, epidemiology, immunology; Humans; Immunoglobulin G, immunology; Immunoglobulin M, immunology; Indonesia, epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma, immunology; Toxoplasmosis, epidemiology, immunology");
-        bibEntrySari.setField("month", "Nov");
+        bibEntrySari.setField("month", "#nov#");
         bibEntrySari.setField("pubstatus", "ppublish");
         bibEntrySari.setField("revised", "2016-02-12");
         bibEntrySari.setField("nlm-id", "0266303");
