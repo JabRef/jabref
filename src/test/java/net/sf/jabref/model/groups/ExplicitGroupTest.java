@@ -55,4 +55,21 @@ public class ExplicitGroupTest {
         assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsPart() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup_alternative");
+        group.remove(entry);
+
+        assertEquals(Optional.of("myExplicitGroup_alternative"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsWord() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup alternative");
+        group.remove(entry);
+
+        assertEquals(Optional.of("myExplicitGroup alternative"), entry.getField(FieldName.GROUPS));
+    }
 }
