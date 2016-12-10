@@ -23,7 +23,6 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
-import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;

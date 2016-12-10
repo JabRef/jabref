@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import net.sf.jabref.logic.cleanup.Cleanups;
-import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.metadata.MetaData;

@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.groups;
+package net.sf.jabref.logic.importer.util;
 
 import java.util.List;
 
