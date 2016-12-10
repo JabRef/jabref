@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -164,6 +165,10 @@ public class KeywordList implements Iterable<Keyword> {
     @Override
     public String toString() {
         return getAsString(',');
+    }
+
+    public Set<String> toStringList() {
+        return keywords.stream().map(Keyword::toString).collect(Collectors.toSet());
     }
 
     @Override

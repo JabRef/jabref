@@ -115,7 +115,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 for (String keyword : keywords) {
                     SimpleKeywordGroup group = new SimpleKeywordGroup(
-                            formatter.format(keyword), GroupHierarchyType.INDEPENDENT, fieldText, keyword, false, Globals.prefs.getKeywordDelimiter());
+                            formatter.format(keyword), GroupHierarchyType.INDEPENDENT, fieldText, keyword, false, Globals.prefs.getKeywordDelimiter(), false);
                     autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                 }
 

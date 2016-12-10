@@ -21,9 +21,9 @@ public class SimpleKeywordGroupTest {
 
     @Before
     public void setUp() {
-        testGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',');
-        testCaseSensitiveGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", true, ',');
-        waterGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',');
+        testGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", false, ',', false);
+        testCaseSensitiveGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "test", true, ',', false);
+        waterGroup = new SimpleKeywordGroup("name", GroupHierarchyType.INDEPENDENT, "keywords", "\\H2O", false, ',', false);
         entry = new BibEntry();
     }
 

@@ -109,7 +109,7 @@ public class GroupsParser {
         if (regExp) {
             return new RegexKeywordGroup(name, context, field, expression, caseSensitive);
         } else {
-            return new SimpleKeywordGroup(name, context, field, expression, caseSensitive, keywordSeparator);
+            return new SimpleKeywordGroup(name, context, field, expression, caseSensitive, keywordSeparator, false);
         }
     }
 

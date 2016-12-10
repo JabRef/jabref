@@ -272,7 +272,7 @@ class GroupDialog extends JDialog {
                     } else {
                         resultingGroup = new SimpleKeywordGroup(nameField.getText().trim(), getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
-                                keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter());
+                                keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                     }
                 } else if (searchRadioButton.isSelected()) {
                     try {

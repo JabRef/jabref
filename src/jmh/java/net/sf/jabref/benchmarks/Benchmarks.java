@@ -125,7 +125,7 @@ public class Benchmarks {
 
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
-        KeywordGroup group = new SimpleKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, "keyword", "testkeyword", false, ',');
+        KeywordGroup group = new SimpleKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, "keyword", "testkeyword", false, ',', false);
         return group.containsAll(database.getEntries());
     }
 

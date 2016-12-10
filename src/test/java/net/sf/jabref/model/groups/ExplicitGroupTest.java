@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ExplicitGroupTest {
 
@@ -71,5 +72,21 @@ public class ExplicitGroupTest {
         group.remove(entry);
 
         assertEquals(Optional.of("myExplicitGroup alternative"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithWhitespace() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup b");
+
+        assertFalse(group.contains(entry));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithSlash() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup/b");
+
+        assertFalse(group.contains(entry));
     }
 }

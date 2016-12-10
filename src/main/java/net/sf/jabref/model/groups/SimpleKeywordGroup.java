@@ -1,6 +1,7 @@
 package net.sf.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,13 +18,16 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
 
     protected final Character keywordSeparator;
     private final List<String> searchWords;
+    private final boolean onlySplitWordsAtSeparator;
 
     public SimpleKeywordGroup(String name, GroupHierarchyType context, String searchField,
-                              String searchExpression, boolean caseSensitive, Character keywordSeparator) {
+                              String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                              boolean onlySplitWordsAtSeparator) {
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
         this.searchWords = StringUtil.getStringAsWords(searchExpression);
+        this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
     }
 
     private static boolean containsCaseInsensitive(Set<String> searchIn, List<String> searchFor) {
@@ -91,7 +95,8 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
                 && searchField.equals(other.searchField)
                 && searchExpression.equals(other.searchExpression)
                 && (caseSensitive == other.caseSensitive)
-                && keywordSeparator == other.keywordSeparator;
+                && keywordSeparator == other.keywordSeparator
+                && onlySplitWordsAtSeparator == other.onlySplitWordsAtSeparator;
     }
 
     @Override
@@ -105,13 +110,19 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
     }
 
     private Set<String> getFieldContentAsWords(BibEntry entry) {
-        return entry.getFieldAsWords(searchField);
+        if (onlySplitWordsAtSeparator) {
+            return entry.getField(searchField)
+                    .map(content -> KeywordList.parse(content, keywordSeparator).toStringList())
+                    .orElse(Collections.emptySet());
+        } else {
+            return entry.getFieldAsWords(searchField);
+        }
     }
 
     @Override
     public AbstractGroup deepCopy() {
         return new SimpleKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
-                caseSensitive, keywordSeparator);
+                caseSensitive, keywordSeparator, onlySplitWordsAtSeparator);
     }
 
     @Override
@@ -121,6 +132,7 @@ public class SimpleKeywordGroup extends KeywordGroup implements GroupEntryChange
                 searchField,
                 searchExpression,
                 caseSensitive,
-                keywordSeparator);
+                keywordSeparator,
+                onlySplitWordsAtSeparator);
     }
 }

@@ -1556,7 +1556,7 @@ public class BibtexParserTest {
                 new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, "keywords", "FrechetSpace", false),
                 root.getChildren().get(0).getGroup());
         assertEquals(
-                new SimpleKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, "keywords", "GIT", false, ','),
+                new SimpleKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, "keywords", "GIT", false, ',', false),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());

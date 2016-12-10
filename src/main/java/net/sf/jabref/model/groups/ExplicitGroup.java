@@ -22,7 +22,7 @@ public class ExplicitGroup extends SimpleKeywordGroup {
     private final List<String> legacyEntryKeys = new ArrayList<>();
 
     public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
-        super(name, context, FieldName.GROUPS, name, true, keywordSeparator);
+        super(name, context, FieldName.GROUPS, name, true, keywordSeparator, true);
     }
 
     public void addLegacyEntryKey(String key) {
