@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -35,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -709,9 +711,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
         EventList<BibEntry> selectedEntries = mainTable.getSelected();
         String style = citationStyleCache.getCitationStyle().getSource();
+        new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+                return CitationStyleGenerator.generateCitations(selectedEntries, style, outputFormat);
+            }
 
-        String citation = CitationStyleGenerator.generateCitations(selectedEntries, style, outputFormat);
-        new ClipBoardManager().setClipboardContents(citation);
+            @Override
+            public void done() {
+                try {
+                    new ClipBoardManager().setClipboardContents(get());
+                    frame.setStatus(Localization.lang("Copied citations to the clipboard!"));
+                } catch (InterruptedException | ExecutionException e) {
+                    LOGGER.error("Error while copying citations to the clipboard", e);
+                }
+            }
+        }.execute();
     }
 
     private void copy() {
