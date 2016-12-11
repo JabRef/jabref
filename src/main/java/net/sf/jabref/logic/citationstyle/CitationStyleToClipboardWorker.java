@@ -3,6 +3,7 @@ package net.sf.jabref.logic.citationstyle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.ClipboardOwner;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
-public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
+public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
@@ -51,7 +52,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
     }
 
     @Override
-    protected String doInBackground() throws Exception {
+    protected List<String> doInBackground() throws Exception {
         if (CitationStyle.isCitationStyleFile(style)) {
             return CitationStyleGenerator.generateCitations(selectedEntries, style, outputFormat);
         } else {
@@ -59,19 +60,20 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
             LayoutFormatterPreferences layoutFormatterPreferences = Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             Layout layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
 
-            StringBuilder sb = new StringBuilder();
+            List<String> citations = new ArrayList<>(selectedEntries.size());
             for (BibEntry entry : selectedEntries) {
-                sb.append(layout.doLayout(entry, basePanel.getDatabase()));
+                citations.add(layout.doLayout(entry, basePanel.getDatabase()));
             }
-            return sb.toString();
+            return citations;
         }
     }
 
     @Override
     public void done() {
         try {
+            List<String> citations = get();
             if (CitationStyle.isCitationStyleFile(style)) {
-                String result;
+                String result = "";
                 switch (outputFormat) {
                     case XSLFO:
                         result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
@@ -82,11 +84,13 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
                                 "      </fo:simple-page-master>" + OS.NEWLINE +
                                 "   </fo:layout-master-set>" + OS.NEWLINE +
                                 "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
-                                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE +
+                                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
 
-                                OS.NEWLINE + get() + OS.NEWLINE +
+                        for (String citation : citations) {
+                            result += citation + OS.NEWLINE;
+                        }
 
-                                "      </fo:flow>" + OS.NEWLINE +
+                        result +="      </fo:flow>" + OS.NEWLINE +
                                 "   </fo:page-sequence>" + OS.NEWLINE +
                                 "</fo:root>" + OS.NEWLINE;
                         break;
@@ -96,25 +100,34 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
                                 "   <head>" + OS.NEWLINE +
                                 "      <meta charset=\\\"utf-8\\\">" + OS.NEWLINE +
                                 "   </head>" + OS.NEWLINE +
-                                "   <body>" + OS.NEWLINE +
+                                "   <body>" + OS.NEWLINE + OS.NEWLINE;
 
-                                OS.NEWLINE + get() + get() + OS.NEWLINE +
+                        for (String citation : citations) {
+                            result += citation + OS.NEWLINE;
+                        }
 
-                                "   </body>" + OS.NEWLINE +
+                        result +="   </body>" + OS.NEWLINE +
                                 "</html>" + OS.NEWLINE;
                         break;
                     default:
-                        result = get();
+                        for (String citation : citations) {
+                            result = citation + OS.NEWLINE;
+                        }
                         break;
                 }
 
                 new ClipBoardManager().setClipboardContents(result);
 
             } else {
-                String html = get();
-                String plain = WHITESPACE.matcher(html).replaceAll("");
-                plain = REMOVE_HTML.matcher(plain).replaceAll("");
-                plain = HTML_NEWLINE.matcher(plain).replaceAll("\n");
+                String html = "";
+                String plain = "";
+                for (String citation : citations) {
+                    html += citation;
+
+                    String tmp = WHITESPACE.matcher(citation).replaceAll("");
+                    tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
+                    plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
+                }
 
                 ClipboardOwner owner = (clipboard, content) -> {};
                 HtmlTransferable transferable = new HtmlTransferable(html, plain);
