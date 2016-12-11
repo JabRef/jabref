@@ -119,7 +119,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 String html = "";
                 String plain = "";
                 for (String citation : citations) {
-                    html += citation;
+                    html += citation + "<br>";
 
                     String tmp = WHITESPACE.matcher(citation).replaceAll("");
                     tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
