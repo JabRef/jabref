@@ -13,6 +13,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.PreviewPreferences;
 
@@ -62,25 +63,37 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
     @Override
     public void done() {
         try {
-            String result;
+            String result = get();
             switch (outputFormat) {
                 case FO:
-                    result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                            "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">\n" +
-                            "   <fo:layout-master-set>\n" +
-                            "      <fo:simple-page-master master-name=\"citations\">\n" +
-                            "         <fo:region-body/>\n" +
-                            "      </fo:simple-page-master>\n" +
-                            "   </fo:layout-master-set>\n" +
-                            "   <fo:page-sequence master-reference=\"citations\">\n" +
-                            "      <fo:flow flow-name=\"xsl-region-body\">\n" +
-                            get() + "\n" +
-                            "      </fo:flow>\n" +
-                            "   </fo:page-sequence>\n" +
-                            "</fo:root>";
+                    result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
+                            "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
+                            "   <fo:layout-master-set>" + OS.NEWLINE +
+                            "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
+                            "         <fo:region-body/>" + OS.NEWLINE +
+                            "      </fo:simple-page-master>" + OS.NEWLINE +
+                            "   </fo:layout-master-set>" + OS.NEWLINE +
+                            "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
+                            "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE +
+
+                            OS.NEWLINE + result + OS.NEWLINE +
+
+                            "      </fo:flow>" + OS.NEWLINE +
+                            "   </fo:page-sequence>" + OS.NEWLINE +
+                            "</fo:root>" + OS.NEWLINE;
                     break;
-                default:
-                    result = get();
+                case HTML:
+                    result = "<!DOCTYPE html>" + OS.NEWLINE +
+                            "<html>" + OS.NEWLINE +
+                            "   <head>" + OS.NEWLINE +
+                            "      <meta charset=\\\"utf-8\\\">" + OS.NEWLINE +
+                            "   </head>" + OS.NEWLINE +
+                            "   <body>" + OS.NEWLINE +
+
+                            OS.NEWLINE + result + get() + OS.NEWLINE +
+
+                            "   </body>" + OS.NEWLINE +
+                            "</html>" + OS.NEWLINE;
                     break;
             }
 

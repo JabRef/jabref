@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 
 import de.undercouch.citeproc.CSL;
@@ -63,7 +64,7 @@ public class CitationStyleGenerator {
                 cslItemData[i] = bibEntryToCSLItemData(bibEntries.get(i));
             }
             Bibliography bibliography = CSL.makeAdhocBibliography(style, outputFormat.getFormat(), cslItemData);
-            return String.join("\n", bibliography.getEntries());
+            return String.join(OS.NEWLINE, bibliography.getEntries());
 
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry citation", e);
