@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  Based on http://newsgroups.derkeiler.com/Archive/De/de.comp.lang.java/2010-04/msg00203.html
  */
-class HtmlTransferable implements Transferable {
+public class HtmlTransferable implements Transferable {
 
     private static final int HTML = 0;
     private static final int STRING = 1;

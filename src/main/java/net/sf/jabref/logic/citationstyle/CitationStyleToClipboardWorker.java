@@ -1,15 +1,18 @@
 package net.sf.jabref.logic.citationstyle;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.ClipboardOwner;
 import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
-import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
+import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -25,6 +28,9 @@ import org.apache.commons.logging.LogFactory;
 public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
+    private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
+    private static final Pattern WHITESPACE  = Pattern.compile("\\v+");
+    private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
@@ -65,7 +71,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
     public void done() {
         try {
             if (CitationStyle.isCitationStyleFile(style)) {
-                String result = get();
+                String result;
                 switch (outputFormat) {
                     case FO:
                         result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
@@ -78,7 +84,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
                                 "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
                                 "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE +
 
-                                OS.NEWLINE + result + OS.NEWLINE +
+                                OS.NEWLINE + get() + OS.NEWLINE +
 
                                 "      </fo:flow>" + OS.NEWLINE +
                                 "   </fo:page-sequence>" + OS.NEWLINE +
@@ -92,21 +98,27 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
                                 "   </head>" + OS.NEWLINE +
                                 "   <body>" + OS.NEWLINE +
 
-                                OS.NEWLINE + result + get() + OS.NEWLINE +
+                                OS.NEWLINE + get() + get() + OS.NEWLINE +
 
                                 "   </body>" + OS.NEWLINE +
                                 "</html>" + OS.NEWLINE;
+                        break;
+                    default:
+                        result = get();
                         break;
                 }
 
                 new ClipBoardManager().setClipboardContents(result);
 
             } else {
-                JEditorPane jEditorPane = new JEditorPane();
-                jEditorPane.setContentType("text/html");
-                jEditorPane.setText(get());
-                jEditorPane.selectAll();
-                jEditorPane.copy();
+                String html = get();
+                String plain = WHITESPACE.matcher(html).replaceAll("");
+                plain = REMOVE_HTML.matcher(plain).replaceAll("");
+                plain = HTML_NEWLINE.matcher(plain).replaceAll("\n");
+
+                ClipboardOwner owner = (clipboard, content) -> {};
+                HtmlTransferable transferable = new HtmlTransferable(html, plain);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transferable, owner);
             }
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while copying citations to the clipboard", e);
