@@ -1,8 +1,6 @@
 package net.sf.jabref.logic;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.EntryTypes;
@@ -12,7 +10,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 
-    public static final Map<BibDatabaseMode, List<CustomEntryType>> CUSTOM_TYPES_BY_MODE_MAP = new HashMap<>();
     /**
      * Load all custom entry types from preferences. This method is
      * called from JabRef when the program starts.
@@ -22,13 +19,11 @@ public class CustomEntryTypesManager {
         for(CustomEntryType type : customBibtexTypes) {
             EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
         }
-        CUSTOM_TYPES_BY_MODE_MAP.put(BibDatabaseMode.BIBTEX, customBibtexTypes);
 
         List<CustomEntryType> customBiblatexTypes = prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX);
         for(CustomEntryType type :customBiblatexTypes) {
             EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
         }
-        CUSTOM_TYPES_BY_MODE_MAP.put(BibDatabaseMode.BIBLATEX, customBiblatexTypes);
     }
 
     /**

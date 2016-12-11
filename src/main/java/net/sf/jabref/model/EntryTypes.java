@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
@@ -143,6 +144,25 @@ public class EntryTypes {
 
     public static Collection<EntryType> getAllValues(BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllValues() : BIBTEX.getAllValues();
+    }
+
+    /**
+     * Determine all CustomTypes which are not overwritten standard types but real custom types for a given BibDatabaseMode
+     *
+     * I.e., a modified "article" type will not be included in the list, but an EntryType like "MyCustomType" will be included.
+     *
+     * @param mode the BibDatabaseMode to be checked
+     * @return  the list of all found custom types
+     */
+    public static List<EntryType> getAllCustomTypes(BibDatabaseMode mode) {
+        Collection<EntryType> allTypes = getAllValues(mode);
+        if(mode == BibDatabaseMode.BIBTEX) {
+            return allTypes.stream().filter(entryType -> !BibtexEntryTypes.getType(entryType.getName()).isPresent())
+                    .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
+                    .collect(Collectors.toList());
+        } else {
+            return allTypes.stream().filter(entryType -> !BibLatexEntryTypes.getType(entryType.getName()).isPresent()).collect(Collectors.toList());
+        }
     }
 
     /**

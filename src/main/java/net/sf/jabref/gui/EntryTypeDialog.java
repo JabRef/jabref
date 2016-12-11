@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -28,10 +29,10 @@ import javax.swing.SwingWorker;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
@@ -112,22 +113,18 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
             panel.add(createEntryGroupPanel("BibLateX", BibLatexEntryTypes.ALL));
 
-            if (CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.containsKey(BibDatabaseMode.BIBLATEX) &&
-                    !CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBLATEX).isEmpty()) {
-                panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP
-                        .get(
-                        BibDatabaseMode.BIBLATEX)));
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            if (!customTypes.isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
             }
 
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
 
-            if (CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.containsKey(BibDatabaseMode.BIBTEX) &&
-                    !CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX).isEmpty()) {
-                panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP
-                        .get(
-                        BibDatabaseMode.BIBTEX)));
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            if (!customTypes.isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
             }
         }
         panel.add(createIdFetcherPanel());

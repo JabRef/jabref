@@ -2,6 +2,7 @@ package net.sf.jabref.gui.menus;
 
 import java.awt.Font;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenu;
@@ -13,7 +14,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -57,10 +57,12 @@ public class ChangeEntryTypeMenu {
             for (EntryType type : EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX)) {
                 menu.add(new ChangeTypeAction(type, panel));
             }
-            if (!CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBLATEX).isEmpty()) {
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            if (!customTypes.isEmpty()) {
                 menu.addSeparator();
                 // custom types
-                createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX));
+                createEntryTypeSection(panel, menu, "Custom Entries", customTypes);
             }
         } else {
             // Bibtex
@@ -68,10 +70,13 @@ public class ChangeEntryTypeMenu {
             menu.addSeparator();
             // ieeetran
             createEntryTypeSection(panel, menu, "IEEETran Entries", IEEETranEntryTypes.ALL);
-            if (!CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX).isEmpty()) {
+
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            if (!customTypes.isEmpty()) {
                 menu.addSeparator();
                 // custom types
-                createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.CUSTOM_TYPES_BY_MODE_MAP.get(BibDatabaseMode.BIBTEX));
+                createEntryTypeSection(panel, menu, "Custom Entries", customTypes);
             }
         }
     }
