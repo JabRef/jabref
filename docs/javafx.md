@@ -64,6 +64,19 @@ private void openJabrefWebsite() {
 ````
 
 ### View:
+- 
+````java
+public class AboutDialogView extends AbstractDialogView
+````
+- 
+````java
+@Override
+public void show() {
+    FXDialog aboutDialog = new FXDialog(AlertType.INFORMATION, Localization.lang("About JabRef"));
+    aboutDialog.setDialogPane((DialogPane) this.getView());
+    aboutDialog.show();
+}
+````
 
 # Resources:
 - [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
