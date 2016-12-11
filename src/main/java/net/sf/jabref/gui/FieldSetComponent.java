@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -40,7 +39,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 /**
  * @author alver
  */
-class FieldSetComponent extends JPanel implements ActionListener {
+class FieldSetComponent extends JPanel {
 
     private final Set<ActionListener> additionListeners = new HashSet<>();
     protected final JList<String> list;
@@ -94,8 +93,16 @@ class FieldSetComponent extends JPanel implements ActionListener {
         list = new JList<>(listModel);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         // Set up GUI:
-        add.addActionListener(this);
-        remove.addActionListener(this);
+        add.addActionListener(e -> {
+            // Selection has been made, or add button pressed:
+            if ((sel != null) && (sel.getSelectedItem() != null)) {
+                String s = sel.getSelectedItem().toString();
+                addField(s);
+            } else if ((input != null) && !"".equals(input.getText())) {
+                addField(input.getText());
+            }
+        });
+        remove.addActionListener(e -> removeSelected()); // Remove button pressed
 
         setLayout(gbl);
         con.insets = new Insets(1, 1, 1, 1);
@@ -118,8 +125,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
             con.weightx = 0;
             up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
             down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
-            up.addActionListener(this);
-            down.addActionListener(this);
+            up.addActionListener(e -> move(-1));
+            down.addActionListener(e -> move(1));
             up.setToolTipText(Localization.lang("Move up"));
             down.setToolTipText(Localization.lang("Move down"));
             gbl.setConstraints(up, con);
@@ -149,13 +156,23 @@ class FieldSetComponent extends JPanel implements ActionListener {
         con.weightx = 1;
         if (preset == null) {
             input = new JTextField(20);
-            input.addActionListener(this);
+            input.addActionListener(e -> addField(input.getText()));
             gbl.setConstraints(input, con);
             add(input);
         } else {
             sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
-            //sel.addActionListener(this);
+//            sel.addActionListener(e -> {
+//                if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
+//                    // These conditions signify arrow key navigation in the dropdown list, so we should
+//                    // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
+//                    // everywhere.
+//                    return;
+//                }
+//                String s = sel.getSelectedItem().toString();
+//                addField(s);
+//                sel.getEditor().selectAll();
+//            });
             gbl.setConstraints(sel, con);
             add(sel);
         }
@@ -319,39 +336,6 @@ class FieldSetComponent extends JPanel implements ActionListener {
         list.setSelectedIndex(newInd);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Object src = e.getSource();
-
-        if (Objects.equals(src, add)) {
-            // Selection has been made, or add button pressed:
-            if ((sel != null) && (sel.getSelectedItem() != null)) {
-                String s = sel.getSelectedItem().toString();
-                addField(s);
-            } else if ((input != null) && !"".equals(input.getText())) {
-                addField(input.getText());
-            }
-        } else if (Objects.equals(src, input)) {
-            addField(input.getText());
-        } else if (Objects.equals(src, remove)) {
-            // Remove button pressed:
-            removeSelected();
-        } else if (Objects.equals(src, sel)) {
-            if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
-                // These conditions signify arrow key navigation in the dropdown list, so we should
-                // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
-                // everywhere.
-                return;
-            }
-            String s = sel.getSelectedItem().toString();
-            addField(s);
-            sel.getEditor().selectAll();
-        } else if (Objects.equals(src, up)) {
-            move(-1);
-        } else if (Objects.equals(src, down)) {
-            move(1);
-        }
-    }
 
     /**
      * FocusListener to select the first entry in the list of fields when they are focused
