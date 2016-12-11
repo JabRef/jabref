@@ -302,6 +302,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
 
+    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy citations..."),
+            Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
+
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
     private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle(
@@ -1152,6 +1155,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
         edit.add(copyKeyAndLink);
+        edit.add(copyPreview);
         edit.add(exportToClipboard);
         edit.add(sendAsEmail);
 
@@ -1492,7 +1496,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save,
+        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,

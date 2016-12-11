@@ -65,7 +65,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         JMenu copyCitationMenu = new JMenu(Localization.menuTitle("Copy citation..."));
         copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_ASCII_DOC, "AsciiDoc"));
         copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_FO, "FO"));
-        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, "HTML"));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, "HTML", KeyBinding.COPY_PREVIEW));
         copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_RTF, "RTF"));
         copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_TEXT, "Text"));
 
