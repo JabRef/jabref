@@ -47,12 +47,21 @@ public class ClipBoardManager implements ClipboardOwner {
         CLIPBOARD.setContents(stringSelection, this);
     }
 
+    /**
+     * Places the String on the clipboard in two flavours:
+     * @param html good for copying the text to WYSIWYG Editors
+     * @param text for plain text editors
+     */
     public void setTransferableClipboardContents(String html, String text){
         CLIPBOARD.setContents(new HtmlTransferable(html, text), this);
     }
 
-    public void setTransferableClipboardContents(String value){
-        setTransferableClipboardContents(value, value);
+    /**
+     * Places the String on the clipboard in two flavours: html and plain text
+     * @param string interprets it for both the html and plain text flavour
+     */
+    public void setTransferableClipboardContents(String string){
+        setTransferableClipboardContents(string, string);
     }
 
     /**
