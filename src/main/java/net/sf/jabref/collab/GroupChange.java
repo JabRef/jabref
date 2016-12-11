@@ -41,10 +41,6 @@ class GroupChange extends Change {
             for (GroupTreeNode child : changedGroups.getChildren()) {
                 child.copySubtree().moveTo(root);
             }
-            // the group tree is now appled to a different BibDatabase than it was created
-            // for, which affects groups such as ExplicitGroup (which links to BibEntry objects).
-            // We must traverse the tree and refresh all groups:
-            root.refreshGroupsForNewDatabase(panel.getDatabase());
         }
 
         undoEdit.addEdit(undo);
@@ -58,7 +54,6 @@ class GroupChange extends Change {
                 child.copySubtree().moveTo(tmpGroupRoot);
             }
         }
-        tmpGroupRoot.refreshGroupsForNewDatabase(secondary);
         return true;
     }
 

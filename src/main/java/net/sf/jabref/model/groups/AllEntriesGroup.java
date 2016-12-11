@@ -1,7 +1,6 @@
 package net.sf.jabref.model.groups;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -10,33 +9,9 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class AllEntriesGroup extends AbstractGroup {
 
-    public static final String ID = "AllEntriesGroup:";
-
 
     public AllEntriesGroup(String name) {
         super(name, GroupHierarchyType.INDEPENDENT);
-    }
-
-    @Override
-    public boolean supportsAdd() {
-        return false;
-    }
-
-    @Override
-    public boolean supportsRemove() {
-        return false;
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
-        // not supported -> ignore
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
-        // not supported -> ignore
-        return Optional.empty();
     }
 
     @Override
@@ -46,12 +21,7 @@ public class AllEntriesGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof AllEntriesGroup;
-    }
-
-    @Override
-    public String toString() {
-        return AllEntriesGroup.ID;
+        return o instanceof AllEntriesGroup && Objects.equals(((AllEntriesGroup) o).getName(), getName());
     }
 
     @Override
@@ -66,13 +36,7 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public String getTypeId() {
-        return AllEntriesGroup.ID;
-    }
-
-    @Override
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        return getName().hashCode();
     }
 }

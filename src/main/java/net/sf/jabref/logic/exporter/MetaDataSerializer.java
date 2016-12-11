@@ -96,7 +96,7 @@ public class MetaDataSerializer {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(OS.NEWLINE);
 
-        for (String groupNode : root.getTreeAsString()) {
+        for (String groupNode : new GroupSerializer().serializeTree(root)) {
             stringBuilder.append(StringUtil.quote(groupNode, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER));
             stringBuilder.append(MetaData.SEPARATOR_STRING);
             stringBuilder.append(OS.NEWLINE);
