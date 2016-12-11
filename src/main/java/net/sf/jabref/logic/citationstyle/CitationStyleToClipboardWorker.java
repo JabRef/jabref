@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.citationstyle;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.ClipboardOwner;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,6 @@ import javax.swing.SwingWorker;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -116,7 +113,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         break;
                 }
 
-                new ClipBoardManager().setClipboardContents(result);
+                new ClipBoardManager().setTransferableClipboardContents(result);
 
             } else {
                 String html = "";
@@ -129,9 +126,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                     plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
                 }
 
-                ClipboardOwner owner = (clipboard, content) -> {};
-                HtmlTransferable transferable = new HtmlTransferable(html, plain);
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(transferable, owner);
+                new ClipBoardManager().setTransferableClipboardContents(html, plain);
             }
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while copying citations to the clipboard", e);

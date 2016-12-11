@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -44,6 +45,14 @@ public class ClipBoardManager implements ClipboardOwner {
     public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
         CLIPBOARD.setContents(stringSelection, this);
+    }
+
+    public void setTransferableClipboardContents(String html, String text){
+        CLIPBOARD.setContents(new HtmlTransferable(html, text), this);
+    }
+
+    public void setTransferableClipboardContents(String value){
+        setTransferableClipboardContents(value, value);
     }
 
     /**
