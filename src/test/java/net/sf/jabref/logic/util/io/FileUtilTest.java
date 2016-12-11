@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -40,6 +41,18 @@ public class FileUtilTest {
         existingTestFile = createTemporaryTestFile("existingTestFile.txt");
         otherExistingTestFile = createTemporaryTestFile("otherExistingTestFile.txt");
         otherTemporaryFolder.create();
+    }
+
+    @Test
+    public void extensionBakAddedCorrectly() {
+        assertEquals(Paths.get("demo.bib.bak"),
+                FileUtil.addExtension(Paths.get("demo.bib"), ".bak"));
+    }
+
+    @Test
+    public void extensionBakAddedCorrectlyToAFileContainedInTmpDirectory() {
+        assertEquals(Paths.get("tmp", "demo.bib.bak"),
+                FileUtil.addExtension(Paths.get("tmp", "demo.bib"), ".bak"));
     }
 
     @Test
@@ -136,28 +149,38 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetFileExtensionSimpleString() {
+    public void getFileExtensionWithSimpleString() {
         assertEquals("pdf", FileUtil.getFileExtension("test.pdf").get());
     }
 
     @Test
-    public void testGetFileExtensionLowerCaseAndTrimmingString() {
+    public void getFileExtensionTrimsAndReturnsInLowercase() {
         assertEquals("pdf", FileUtil.getFileExtension("test.PdF  ").get());
     }
 
     @Test
-    public void testGetFileExtensionMultipleDotsString() {
+    public void getFileExtensionWithMultipleDotsString() {
         assertEquals("pdf", FileUtil.getFileExtension("te.st.PdF  ").get());
     }
 
     @Test
-    public void testGetFileExtensionNoExtensionString() {
-        assertFalse(FileUtil.getFileExtension("JustTextNotASingleDot").isPresent());
+    public void getFileExtensionWithNoDotReturnsEmptyExtension() {
+        assertEquals(Optional.empty(), FileUtil.getFileExtension("JustTextNotASingleDot"));
     }
 
     @Test
-    public void testGetFileExtensionNoExtension2String() {
-        assertFalse(FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension").isPresent());
+    public void getFileExtensionWithDotAtStartReturnsEmptyExtension() {
+        assertEquals(Optional.empty(), FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension"));
+    }
+
+    @Test
+    public void getFileNameWithSimpleString() {
+        assertEquals("test", FileUtil.getFileName("test.pdf"));
+    }
+
+    @Test
+    public void getFileNameWithMultipleDotsString() {
+        assertEquals("te.st", FileUtil.getFileName("te.st.PdF  "));
     }
 
     @Test
@@ -236,44 +259,45 @@ public class FileUtilTest {
 
     @Test (expected = NullPointerException.class)
     public void testRenameFileWithFromFileExistAndToFileIsNull() {
-        FileUtil.renameFile(existingTestFile.toString(),null);
+        FileUtil.renameFile(existingTestFile, null);
     }
 
     @Test (expected = NullPointerException.class)
     public void testRenameFileWithFromFileIsNullAndToFileExist() {
-        FileUtil.renameFile(null, existingTestFile.toString());
+        FileUtil.renameFile(null, existingTestFile);
     }
 
     @Test
     public void testRenameFileWithFromFileNotExistAndToFileNotExist(){
-        assertFalse(FileUtil.renameFile(nonExistingTestPath.toString(), nonExistingTestPath.toString()));
+        assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
     }
 
     @Test
     public void testRenameFileWithFromFileNotExistAndToFileExist(){
-        assertFalse(FileUtil.renameFile(nonExistingTestPath.toString(), existingTestFile.toString()));
+        assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndToFileNotExist(){
-        assertTrue(FileUtil.renameFile(existingTestFile.toString(), nonExistingTestPath.toString()));
+        assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndToFileExist(){
-        assertTrue(FileUtil.renameFile(existingTestFile.toString(), existingTestFile.toString()));
+        assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndOtherToFileExist(){
-        assertFalse(FileUtil.renameFile(existingTestFile.toString(), otherExistingTestFile.toString()));
+        assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
     }
 
     @Test
-    public void testRenameFileSuccessful () throws IOException {
-        String temp = otherTemporaryFolder.toString();
+    public void testRenameFileSuccessful() {
+        Path temp = Paths.get(otherTemporaryFolder.toString());
+
         System.out.println(temp);
-        FileUtil.renameFile(existingTestFile.toString(), temp);
+        FileUtil.renameFile(existingTestFile, temp);
         assertFalse(Files.exists(existingTestFile));
     }
 

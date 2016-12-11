@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.FieldName;
@@ -68,7 +69,7 @@ public class CleanupPresetPanel {
                 "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
         cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
-                JabRefPreferences.CLEANUP_DEFAULT_PRESET.getFormatterCleanups());
+                Cleanups.DEFAULT_SAVE_ACTIONS);
 
         updateDisplay(cleanupPreset);
 

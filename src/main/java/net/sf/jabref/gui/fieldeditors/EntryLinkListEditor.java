@@ -49,9 +49,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class EntryLinkListEditor extends JTable implements FieldEditor {
-
     private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
 
     private final FieldNameLabel label;
@@ -90,13 +88,14 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         add.addActionListener(e -> addEntry());
         remove.addActionListener(e -> removeEntries());
 
-        FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("fill:pref:grow,1dlu,fill:pref:grow",
-                        "fill:pref,fill:pref,1dlu,fill:pref"));
+        FormLayout layout = new FormLayout(
+                "fill:pref:grow,1dlu,fill:pref:grow",
+                "fill:pref,fill:pref,1dlu,fill:pref"
+        );
+        FormBuilder builder = FormBuilder.create().layout(layout);
 
         if (!singleEntry) {
             JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-
             JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
             up.setMargin(new Insets(0, 0, 0, 0));
             down.setMargin(new Insets(0, 0, 0, 0));
@@ -107,8 +106,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
         builder.add(add).xy(3, 1);
         builder.add(remove).xy(3, 2);
-        JButton button = new JButton(Localization.lang("Select"));
-        button.addActionListener(e -> selectEntry());
+        JButton button = new JButton(Localization.lang("Jump to entry"));
+        button.addActionListener(e -> jumpToEntry());
         builder.add(button).xyw(1, 4, 3);
 
         panel = new JPanel();
@@ -163,9 +162,9 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         });
 
-        JMenuItem openLink = new JMenuItem(Localization.lang("Select"));
+        JMenuItem openLink = new JMenuItem(Localization.lang("Jump to entry"));
         menu.add(openLink);
-        openLink.addActionListener(e -> selectEntry());
+        openLink.addActionListener(e -> jumpToEntry());
 
         // Set table row height
         FontMetrics metrics = getFontMetrics(getFont());
@@ -175,14 +174,27 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     }
 
 
-    private void selectEntry() {
-        int selectedRow = getSelectedRow();
+    private void jumpToEntry() {
+        String entryKey = null;
 
-        if (selectedRow != -1) {
-            String crossref = tableModel.getEntry(selectedRow).getKey();
+        if (singleEntry) {
+            ParsedEntryLink firstEntry = tableModel.getEntry(0);
 
-            frame.getCurrentBasePanel().getDatabase().getEntryByKey(crossref)
-                    .ifPresent(entry -> frame.getCurrentBasePanel().highlightEntry(entry));
+            if (firstEntry != null) {
+                entryKey = firstEntry.getKey();
+            }
+        } else {
+            int selectedRow = getSelectedRow();
+
+            if (selectedRow != -1) {
+                entryKey = tableModel.getEntry(selectedRow).getKey();
+            }
+        }
+
+        if (entryKey != null) {
+            frame.getCurrentBasePanel().getDatabase().getEntryByKey(entryKey).ifPresent(
+                    e -> frame.getCurrentBasePanel().highlightEntry(e)
+            );
         }
     }
 

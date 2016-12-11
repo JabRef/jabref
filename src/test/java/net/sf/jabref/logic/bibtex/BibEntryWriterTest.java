@@ -62,6 +62,44 @@ public class BibEntryWriterTest {
     }
 
     @Test
+    public void writeOtherTypeTest() throws Exception {
+        String expected = OS.NEWLINE + "@Other{test," + OS.NEWLINE +
+                "  comment = {testentry}," + OS.NEWLINE +
+                "}"+ OS.NEWLINE;
+
+        BibEntry entry = new BibEntry();
+        entry.setType("other");
+        entry.setField("Comment","testentry");
+        entry.setCiteKey("test");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void writeReallyunknownTypeTest() throws Exception {
+        String expected = OS.NEWLINE + "@Reallyunknowntype{test," + OS.NEWLINE +
+                "  comment = {testentry}," + OS.NEWLINE +
+                "}"+ OS.NEWLINE;
+
+        BibEntry entry = new BibEntry();
+        entry.setType("ReallyUnknownType");
+        entry.setField("Comment","testentry");
+        entry.setCiteKey("test");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void roundTripTest() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +

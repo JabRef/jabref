@@ -34,19 +34,13 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.strings.StringUtil;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -290,7 +284,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         if (Globals.prefs.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
-            synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
+            SpecialFieldsUtils.synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
         }
 
         NamedCompound ce = updateKeywords(bp.getSelectedEntries(), keywordsToAdd, keywordsToRemove);
@@ -315,62 +309,11 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
 
             if (Globals.prefs.isKeywordSyncEnabled()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
             }
         }
         ce.end();
         return ce;
-    }
-
-    private void synchronizeSpecialFields(KeywordList keywordsToAdd, KeywordList keywordsToRemove) {
-        // we need to check whether a special field is added
-        // for each field:
-        //   check if something is added
-        //   if yes, add all keywords of that special fields to the keywords to be removed
-
-        KeywordList clone;
-
-        // Priority
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(Priority.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
-        }
-
-        // Quality
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(Quality.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
-        }
-
-        // Rank
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(Rank.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
-        }
-
-        // Relevance
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(Relevance.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
-        }
-
-        // Read status
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(ReadStatus.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
-        }
-
-        // Printed
-        clone = keywordsToAdd.createClone();
-        clone.retainAll(Printed.getInstance().getKeyWords());
-        if (!clone.isEmpty()) {
-            keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
-        }
     }
 
     private void fillKeyWordList() {

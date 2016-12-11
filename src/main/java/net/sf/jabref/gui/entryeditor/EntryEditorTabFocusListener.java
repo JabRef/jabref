@@ -13,16 +13,19 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 
-/*
- * Focus listener that fires the storeFieldAction when a TextArea loses
- * focus.
+
+/**
+ * Focus listener that fires the storeFieldAction when a TextArea loses focus.
  */
 class EntryEditorTabFocusListener implements FocusListener {
 
+    /** The component this DocumentListener is currently tied to */
     private JTextComponent textComponent;
 
+    /** The listener which gets tied to each TextComponent (and removed) */
     private DocumentListener documentListener;
 
+    /** The EntryEditorTab this FocusListener is currently tied to */
     private final EntryEditorTab entryEditorTab;
 
 
@@ -32,7 +35,6 @@ class EntryEditorTabFocusListener implements FocusListener {
 
     @Override
     public void focusGained(FocusEvent event) {
-
         synchronized (this) {
             if (textComponent != null) {
                 textComponent.getDocument().removeDocumentListener(documentListener);
@@ -41,15 +43,9 @@ class EntryEditorTabFocusListener implements FocusListener {
             }
 
             if (event.getSource() instanceof JTextComponent) {
-
                 textComponent = (JTextComponent) event.getSource();
-                /**
-                 * [ 1553552 ] Not properly detecting changes to flag as
-                 * changed
-                 */
                 documentListener = new DocumentListener() {
-
-                    void fire() {
+                    private void fire() {
                         if (textComponent.isFocusOwner()) {
                             entryEditorTab.markIfModified((FieldEditor) textComponent);
                         }
@@ -72,16 +68,14 @@ class EntryEditorTabFocusListener implements FocusListener {
                 };
                 textComponent.getDocument().addDocumentListener(documentListener);
 
-                /**
-                 * Makes the vertical scroll panel view follow the focus
-                 */
-                Component scrollPane = textComponent.getParent().getParent();
-                if (scrollPane instanceof JScrollPane) {
-                    JScrollPane componentPane = (JScrollPane) scrollPane;
-                    Component cPane = componentPane.getParent();
-                    if (cPane instanceof JPanel) {
-                        JPanel panel = (JPanel) cPane;
-                        Rectangle bounds = componentPane.getBounds();
+                // Makes the vertical scroll panel view follow the focus
+                Component component = textComponent.getParent().getParent();
+                if (component instanceof JScrollPane) {
+                    JScrollPane scrollPane = (JScrollPane) component;
+                    Component scrollPaneParent = scrollPane.getParent();
+                    if (scrollPaneParent instanceof JPanel) {
+                        JPanel panel = (JPanel) scrollPaneParent;
+                        Rectangle bounds = scrollPane.getBounds();
                         panel.scrollRectToVisible(bounds);
                     }
                 }
@@ -90,7 +84,6 @@ class EntryEditorTabFocusListener implements FocusListener {
         }
 
         entryEditorTab.setActive((FieldEditor) event.getSource());
-
     }
 
     @Override
@@ -106,4 +99,5 @@ class EntryEditorTabFocusListener implements FocusListener {
             entryEditorTab.getParent().updateField(event.getSource());
         }
     }
+
 }

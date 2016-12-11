@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.importer;
 
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -80,6 +81,9 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
+        } catch (FileNotFoundException e) {
+            LOGGER.debug("Id not found");
+            return Optional.empty();
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             throw new FetcherException("An I/O exception occurred", e);

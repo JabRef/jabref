@@ -40,6 +40,8 @@ public class JabRefMain {
     }
 
     private static void start(String[] args) {
+        FallbackExceptionHandler.installExceptionHandler();
+
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
         ProxyPreferences proxyPreferences = preferences.getProxyPreferences();

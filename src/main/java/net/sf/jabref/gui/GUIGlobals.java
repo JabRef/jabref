@@ -11,16 +11,11 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -115,33 +110,39 @@ public class GUIGlobals {
             GUIGlobals.TABLE_ICONS.put(fileType.getName(), label);
         }
 
-        label = new JLabel(Relevance.getInstance().getRepresentingIcon());
-        label.setToolTipText(Relevance.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RELEVANCE, label);
+        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE);
+        label = new JLabel(relevanceViewModel.getRepresentingIcon());
+        label.setToolTipText(relevanceViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.RELEVANCE.getFieldName(), label);
 
-        label = new JLabel(Quality.getInstance().getRepresentingIcon());
-        label.setToolTipText(Quality.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_QUALITY, label);
+        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY);
+        label = new JLabel(qualityViewModel.getRepresentingIcon());
+        label.setToolTipText(qualityViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.QUALITY.getFieldName(), label);
 
         // Ranking item in the menu uses one star
-        label = new JLabel(Rank.getInstance().getRepresentingIcon());
-        label.setToolTipText(Rank.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RANKING, label);
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING);
+        label = new JLabel(rankViewModel.getRepresentingIcon());
+        label.setToolTipText(rankViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.RANKING.getFieldName(), label);
 
         // Priority icon used for the menu
-        label = new JLabel(Priority.getInstance().getRepresentingIcon());
-        label.setToolTipText(Priority.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRIORITY, label);
+        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY);
+        label = new JLabel(priorityViewModel.getRepresentingIcon());
+        label.setToolTipText(priorityViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.PRIORITY.getFieldName(), label);
 
         // Read icon used for menu
-        label = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
-        label.setToolTipText(ReadStatus.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_READ, label);
+        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS);
+        label = new JLabel(readViewModel.getRepresentingIcon());
+        label.setToolTipText(readViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.READ_STATUS.getFieldName(), label);
 
         // Print icon used for menu
-        label = new JLabel(Printed.getInstance().getRepresentingIcon());
-        label.setToolTipText(Printed.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRINTED, label);
+        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED);
+        label = new JLabel(printedViewModel.getRepresentingIcon());
+        label.setToolTipText(printedViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.PRINTED.getFieldName(), label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             EmacsKeyBindings.load();

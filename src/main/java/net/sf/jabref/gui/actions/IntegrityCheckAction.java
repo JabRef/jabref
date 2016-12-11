@@ -21,7 +21,7 @@ import javax.swing.table.TableRowSorter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.util.GUIUtil;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
@@ -40,12 +40,14 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
     public IntegrityCheckAction(JabRefFrame frame) {
         this.frame = frame;
         putValue(Action.NAME, Localization.menuTitle("Check integrity") + ELLIPSES);
+        putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CHECK_INTEGRITY));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                Globals.prefs.getFileDirectoryPreferences());
+                Globals.prefs.getFileDirectoryPreferences(),
+                Globals.prefs.getBibtexKeyPatternPreferences());
         List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
         if (messages.isEmpty()) {
@@ -95,8 +97,6 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                     }
                 }
             });
-
-            GUIUtil.correctRowHeight(table);
 
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             table.getColumnModel().getColumn(1).setPreferredWidth(60);

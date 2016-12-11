@@ -23,7 +23,7 @@ command="cd www/\n"
 # then, "snapshot" is extracted
 if [ "snapshot" != "$branch" ] ; then
   # change into dir and delete old snapshots
-  command="${command}mkdir $branch\ncd $branch\nrm *\n"
+  command="${command}mkdir $branch\ncd $branch\nrm *.dmg\nrm *.jar\nrm *.exe\n"
 fi
 
 #only upload [Jr]ab[Rr]ef*, not md5sums, updates.xml, etc.

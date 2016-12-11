@@ -75,15 +75,15 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
         Optional<SaveOrderConfig> saveOrder = getSaveOrder(preferences, metaData);
 
+        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
+        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
+        comparators.add(new CrossRefEntryComparator());
+
         if (! saveOrder.isPresent()) {
-            // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
-            // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
-            // utilizing the fact that IDs used for entries are increasing, sortable numbers.
-            comparators.add(new CrossRefEntryComparator());
+            // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
-            comparators.add(new CrossRefEntryComparator());
-
+            // use configured sorting strategy
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[0]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[1]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[2]));
@@ -157,6 +157,12 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
             List<BibEntry> entries, SavePreferences preferences) throws SaveException {
 
         session = saveSessionFactory.createSaveSession(preferences.getEncodingOrDefault(), preferences.getMakeBackup());
+
+        Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
+
+        if (sharedDatabaseIDOptional.isPresent()) {
+            writeDatabaseID(sharedDatabaseIDOptional.get());
+        }
 
         // Map to collect entry type definitions that we must save along with entries using them.
         Map<String, EntryType> typesToWrite = new TreeMap<>();
@@ -236,6 +242,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException;
 
     protected abstract void writePreamble(String preamble) throws SaveException;
+
+    protected abstract void writeDatabaseID(String sharedDatabaseID) throws SaveException;
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for

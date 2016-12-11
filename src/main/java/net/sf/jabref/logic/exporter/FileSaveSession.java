@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.EnumSet;
+import java.util.Set;
 
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -67,8 +70,7 @@ public class FileSaveSession extends SaveSession {
             return;
         }
         if (backup && Files.exists(file)) {
-            Path fileName = file.getFileName();
-            Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
+            Path backupFile = FileUtil.addExtension(file, BACKUP_EXTENSION);
             FileUtil.copyFile(file, backupFile, true);
         }
         try {
@@ -84,7 +86,26 @@ public class FileSaveSession extends SaveSession {
                 LOGGER.error("Error when creating lock file.", ex);
             }
 
+            // Try to save file permissions to restore them later (by default: allow everything)
+            Set<PosixFilePermission> oldFilePermissions = EnumSet.allOf(PosixFilePermission.class);
+            if (FileUtil.isPosixCompilant && Files.exists(file)) {
+                try {
+                    oldFilePermissions = Files.getPosixFilePermissions(file);
+                } catch (IOException exception) {
+                    LOGGER.warn("Error getting file permissions.", exception);
+                }
+            }
+
             FileUtil.copyFile(temporaryFile, file, true);
+
+            // Restore file permissions
+            if (FileUtil.isPosixCompilant) {
+                try {
+                    Files.setPosixFilePermissions(file, oldFilePermissions);
+                } catch (IOException exception) {
+                    throw new SaveException(exception);
+                }
+            }
         } finally {
             FileBasedLock.deleteLockFile(file);
         }

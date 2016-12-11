@@ -115,11 +115,13 @@ public class FileListEntryEditor {
             }
         });
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout(
-                "left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p"));
+        FormLayout fileDialog = new FormLayout(
+                "left:pref, 4dlu, fill:400dlu, 4dlu, fill:pref, 4dlu, fill:pref",
+                "p, 8dlu, p, 8dlu, p"
+        );
+        FormBuilder builder = FormBuilder.create().layout(fileDialog);
         builder.add(Localization.lang("Link")).xy(1, 1);
         builder.add(link).xy(3, 1);
-        //final BrowseListener browse = new BrowseListener(frame, link); //TODO: Maybe use browse action
 
         final JButton browseBut = new JButton(Localization.lang("Browse"));
         browseBut.addActionListener(browsePressed);
@@ -129,10 +131,10 @@ public class FileListEntryEditor {
             builder.add(open).xy(7, 1);
         }
         builder.add(Localization.lang("Description")).xy(1, 3);
-        builder.add(description).xyw(3, 3, 3);
+        builder.add(description).xyw(3, 3, 5);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         builder.add(Localization.lang("File type")).xy(1, 5);
-        builder.add(types).xyw(3, 5, 3);
+        builder.add(types).xyw(3, 5, 5);
         if (showProgressBar) {
             builder.appendRows("2dlu, p");
             builder.add(downloadLabel).xy(1, 7);
@@ -156,7 +158,6 @@ public class FileListEntryEditor {
         open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -296,7 +297,7 @@ public class FileListEntryEditor {
         String fileLink = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            List<String> dirs = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 fileLink = this.link.getText().trim();
             } else {
@@ -331,7 +332,6 @@ public class FileListEntryEditor {
 
     public boolean okPressed() {
         return okPressed;
-
     }
 
     private final ActionListener browsePressed = e -> {
@@ -343,7 +343,7 @@ public class FileListEntryEditor {
         if (file.isPresent()) {
             workingDir = file.get().getPath();
         } else {
-            workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
+            workingDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
         Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
@@ -351,10 +351,10 @@ public class FileListEntryEditor {
         path.ifPresent(selection -> {
             File newFile = selection.toFile();
             // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
 
             // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            List<String> fileDirs = this.databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
             link.setText(newFile.getPath());

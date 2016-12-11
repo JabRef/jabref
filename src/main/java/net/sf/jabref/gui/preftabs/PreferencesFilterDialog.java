@@ -2,6 +2,7 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,6 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.gui.WrapLayout;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
 
@@ -39,7 +39,7 @@ class PreferencesFilterDialog extends JDialog {
         panel.setLayout(new BorderLayout());
 
         JPanel northPanel = new JPanel();
-        northPanel.setLayout(new WrapLayout(WrapLayout.LEFT));
+        northPanel.setLayout(new WrapLayout(FlowLayout.LEFT));
         showOnlyDeviatingPreferenceOptions = new JCheckBox(Localization.lang("Show only preferences deviating from their default value"), false);
         showOnlyDeviatingPreferenceOptions.addChangeListener(x -> updateModel());
         northPanel.add(showOnlyDeviatingPreferenceOptions);
@@ -49,7 +49,6 @@ class PreferencesFilterDialog extends JDialog {
 
         table = new JTable();
         table.setAutoCreateRowSorter(true);
-        GUIUtil.correctRowHeight(table);
 
         updateModel();
         panel.add(new JScrollPane(table), BorderLayout.CENTER);

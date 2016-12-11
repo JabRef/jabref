@@ -5,11 +5,14 @@ import java.net.URL;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(FetcherTests.class)
 public class SpringerLinkTest {
 
     private SpringerLink finder;
@@ -34,8 +37,6 @@ public class SpringerLinkTest {
 
     @Test
     public void findByDOI() throws IOException {
-
-
         entry.setField("doi", "10.1186/s13677-015-0042-8");
 
         Assert.assertEquals(

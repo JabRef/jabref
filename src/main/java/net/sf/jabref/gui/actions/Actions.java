@@ -18,7 +18,6 @@ public class Actions {
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
     public static final String CUT = "cut";
-    public static final String DB_CONNECT = "dbConnect";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
@@ -60,7 +59,6 @@ public class Actions {
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE = "toggleHighlightGroupsMatchingDisable";
     public static final String TOGGLE_GROUPS = "toggleGroups";
     public static final String TOGGLE_PREVIEW = "togglePreview";
-    public static final String TOGGLE_TOOLBAR = "toggleToolbar";
     public static final String UNABBREVIATE = "unabbreviate";
     public static final String UNDO = "undo";
     public static final String UNMARK_ALL = "unmarkAll";

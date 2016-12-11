@@ -3,9 +3,9 @@ package net.sf.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +42,9 @@ public class FileUtil {
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
+    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
+            "posix");
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -53,18 +56,43 @@ public class FileUtil {
     }
 
     /**
-     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
      * @param fileName
-     * @return The extension, trimmed and in lowercase.
+     * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int pos = fileName.lastIndexOf('.');
-        if ((pos > 0) && (pos < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getFileName(String fileNameWithExtension) {
+        int dotPosition = fileNameWithExtension.lastIndexOf('.');
+        if (dotPosition >= 0) {
+            return fileNameWithExtension.substring(0, dotPosition);
+        } else {
+            return fileNameWithExtension;
+        }
+    }
+
+    /**
+     * Adds an extension to the given file name. The original extension is not replaced. That means,
+     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     *
+     * @param path the path to add the extension to
+     * @param extension the extension to add
+     * @return the with the modified file name
+     */
+    public static Path addExtension(Path path, String extension) {
+        Path fileName = path.getFileName();
+        return path.resolveSibling(fileName + extension);
     }
 
     /**
@@ -142,11 +170,27 @@ public class FileUtil {
      * @param toFile   The target fileName
      * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fromFile, String toFile) {
+    public static boolean renameFile(Path fromFile, Path toFile) {
+        return renameFile(fromFile, toFile, false);
+    }
 
+    /**
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @param replaceExisting Wether to replace existing files or not
+     * @return True if the rename was successful, false if an exception occurred
+     *
+     */
+    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
-            Path src = Paths.get(fromFile);
-            return Files.move(src, src.resolveSibling(toFile)) != null;
+            if (replaceExisting) {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                        StandardCopyOption.REPLACE_EXISTING) != null;
+            } else {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+            }
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;
@@ -170,9 +214,9 @@ public class FileUtil {
             FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null), fileDirectoryPreferences);
+        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory(fileDirectoryPreferences);
+        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -301,8 +345,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
-            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -377,8 +421,8 @@ public class FileUtil {
      * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            String fileNamePattern, LayoutFormatterPreferences prefs) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
@@ -399,5 +443,4 @@ public class FileUtil {
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
-
 }

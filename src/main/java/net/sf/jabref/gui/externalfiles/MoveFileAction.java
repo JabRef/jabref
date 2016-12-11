@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -70,7 +69,7 @@ public class MoveFileAction extends AbstractAction {
 
         // Get an absolute path representation:
         List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -145,7 +144,7 @@ public class MoveFileAction extends AbstractAction {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {
-                        success = FileUtil.copyFile(Paths.get(file.toURI()), Paths.get(newFile.toURI()), true);
+                        success = FileUtil.copyFile(file.toPath(), newFile.toPath(), true);
                     }
                     if (success) {
                         // Remove the original file:

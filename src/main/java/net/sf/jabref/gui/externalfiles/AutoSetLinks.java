@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
@@ -78,7 +79,7 @@ public class AutoSetLinks {
             final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
         if (diag != null) {
-            final JProgressBar prog = new JProgressBar(JProgressBar.HORIZONTAL, 0, types.size() - 1);
+            final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL, 0, types.size() - 1);
             final JLabel label = new JLabel(Localization.lang("Searching for files"));
             prog.setIndeterminate(true);
             prog.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -96,7 +97,7 @@ public class AutoSetLinks {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                List<String> dirsS = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                 dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
 
                 // determine extensions

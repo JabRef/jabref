@@ -23,10 +23,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -59,14 +59,13 @@ class ZipFileChooser extends JDialog {
         cm.getColumn(0).setPreferredWidth(200);
         cm.getColumn(1).setPreferredWidth(150);
         cm.getColumn(2).setPreferredWidth(100);
-        JScrollPane sp = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane sp = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setPreferredScrollableViewportSize(new Dimension(500, 150));
         if (table.getRowCount() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
-        GUIUtil.correctRowHeight(table);
 
         // cancel: no entry is selected
         JButton cancelButton = new JButton(Localization.lang("Cancel"));

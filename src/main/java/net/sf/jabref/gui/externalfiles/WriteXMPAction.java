@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
@@ -123,12 +124,12 @@ public class WriteXMPAction extends AbstractWorker {
                     .ifPresent(
                             pdf -> FileUtil
                                     .expandFilename(pdf,
-                                            panel.getBibDatabaseContext().getFileDirectory(FieldName.PDF,
+                                            panel.getBibDatabaseContext().getFileDirectories(FieldName.PDF,
                                                     Globals.prefs.getFileDirectoryPreferences()))
                             .ifPresent(files::add));
             // Then check the "file" field:
             List<String> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
                 entry.getField(FieldName.FILE).ifPresent(tm::setContent);
@@ -232,7 +233,7 @@ public class WriteXMPAction extends AbstractWorker {
             progressArea = new JTextArea(15, 60);
 
             JScrollPane scrollPane = new JScrollPane(progressArea,
-                    JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             Dimension d = progressArea.getPreferredSize();
             d.height += scrollPane.getHorizontalScrollBar().getHeight() + 15;
             d.width += scrollPane.getVerticalScrollBar().getWidth() + 15;

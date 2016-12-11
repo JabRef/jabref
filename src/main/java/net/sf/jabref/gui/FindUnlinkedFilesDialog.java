@@ -53,6 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
@@ -73,7 +74,6 @@ import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -741,14 +741,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
         labelFilesDescription = new JLabel(Localization.lang("These files are not linked in the active database."));
         labelEntryTypeDescription = new JLabel(Localization.lang("Entry type to be created:"));
         labelSearchingDirectoryInfo = new JLabel(Localization.lang("Searching file system..."));
-        labelSearchingDirectoryInfo.setHorizontalAlignment(JTextField.CENTER);
+        labelSearchingDirectoryInfo.setHorizontalAlignment(SwingConstants.CENTER);
         labelSearchingDirectoryInfo.setVisible(false);
         labelImportingInfo = new JLabel(Localization.lang("Importing into Database..."));
-        labelImportingInfo.setHorizontalAlignment(JTextField.CENTER);
+        labelImportingInfo.setHorizontalAlignment(SwingConstants.CENTER);
         labelImportingInfo.setVisible(false);
 
         tree = new JTree();
-        GUIUtil.correctRowHeight(tree);
 
         scrollpaneTree = new JScrollPane(tree);
         scrollpaneTree.setWheelScrollingEnabled(true);

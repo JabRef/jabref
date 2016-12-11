@@ -243,9 +243,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        entry.getField(FieldName.TITLE).ifPresent(title -> {
+        entry.getField(FieldName.TITLE).ifPresent(dirtyTitle -> {
             // USe the alt-text and replace image links
-            title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
+            String title = dirtyTitle.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             title = title.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -275,8 +275,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // clean up author
-        entry.getField(FieldName.AUTHOR).ifPresent(author -> {
-            author = author.replaceAll("\\s+", " ");
+        entry.getField(FieldName.AUTHOR).ifPresent(dirtyAuthor -> {
+            String author = dirtyAuthor.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
             String[] authorSplit = author.split("(^\\s*|\\s*$|\\s+and\\s+)");
@@ -294,8 +294,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // clean up month
-        entry.getField(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(month -> {
-            month = month.replace(".", "");
+        entry.getField(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(dirtyMonth -> {
+            String month = dirtyMonth.replace(".", "");
             month = month.toLowerCase();
 
             Matcher mm = MONTH_PATTERN.matcher(month);
@@ -455,10 +455,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        entry.getField(FieldName.ABSTRACT).ifPresent(abstr -> {
+        entry.getField(FieldName.ABSTRACT).ifPresent(dirtyAbstr -> {
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
-            abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
+            String abstr = dirtyAbstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
             abstr = abstr.replaceAll("/sup /spl infin//", "\\$\\^\\\\infty\\$");
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");

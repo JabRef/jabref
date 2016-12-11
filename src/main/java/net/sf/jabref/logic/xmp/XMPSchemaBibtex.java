@@ -59,8 +59,10 @@ public class XMPSchemaBibtex extends XMPSchema {
      *
      * @param e
      *            The existing XML element.
+     * @param namespace
+     *            The name space considered. Must currently be there for compatibility reasons despite being unused.
      */
-    public XMPSchemaBibtex(Element e, String namespace) {
+    public XMPSchemaBibtex(Element e, @SuppressWarnings("unused") String namespace) {
         super(e, XMPSchemaBibtex.KEY);
     }
 
@@ -275,13 +277,13 @@ public class XMPSchemaBibtex extends XMPSchema {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
+        if ((xmpPreferences != null) && xmpPreferences.isUseXMPPrivacyFilter()) {
             Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
 
         for (String field : fields) {
-            String value = BibDatabase.getResolvedField(field, entry, database).orElse("");
+            String value = entry.getResolvedFieldOrAlias(field, database).orElse("");
             if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {

@@ -5,23 +5,24 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
-import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class AstrophysicsDataSystemTest {
 
     private AstrophysicsDataSystem fetcher;
@@ -71,10 +72,12 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("journal", "Living Reviews in Relativity");
         famaeyMcGaughEntry.setField("year", "2012");
         famaeyMcGaughEntry.setField("volume", "15");
-        famaeyMcGaughEntry.setField("month", "#sep#");
+        famaeyMcGaughEntry.setField("month", "#dec#");
         famaeyMcGaughEntry.setField("archiveprefix", "arXiv");
         famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
+        famaeyMcGaughEntry.setField("eid", "10");
         famaeyMcGaughEntry.setField("eprint", "1112.3960");
+        famaeyMcGaughEntry.setField("pages", "10");
         famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
 
         sunWelchEntry = new BibEntry();
@@ -167,10 +170,10 @@ public class AstrophysicsDataSystemTest {
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test(expected = FetcherException.class)
+    @Test
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        fetcher.performSearchById("this.doi.will.fail");
-        fail();
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("this.doi.will.fail");
+        assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test
