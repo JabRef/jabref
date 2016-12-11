@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>net.sf.jabref.model.groups.AbstractGroup</OriginalElement>
+  <nodes>
+    <node x="1030.5" y="1576.5">net.sf.jabref.model.groups.RegexKeywordGroup</node>
+    <node x="1300.0" y="1002.5">net.sf.jabref.model.groups.AllEntriesGroup</node>
+    <node x="1058.25" y="367.0">net.sf.jabref.model.groups.AbstractGroup</node>
+    <node x="132.2499999999999" y="2027.0">net.sf.jabref.model.groups.ExplicitGroup</node>
+    <node x="500.9999999999999" y="838.0">net.sf.jabref.model.groups.SearchGroup</node>
+    <node x="1328.75" y="101.0">net.sf.jabref.model.groups.GroupHierarchyType</node>
+    <node x="1725.0" y="838.5">net.sf.jabref.model.groups.GroupTreeNode</node>
+    <node x="986.7499999999999" y="163.0">net.sf.jabref.model.search.SearchMatcher</node>
+    <node x="1030.75" y="0.0">java.lang.FunctionalInterface</node>
+    <node x="0.0" y="1044.0">net.sf.jabref.model.groups.GroupEntryChanger</node>
+    <node x="921.9999999999999" y="1023.5">net.sf.jabref.model.groups.KeywordGroup</node>
+    <node x="105.24999999999989" y="1474.0">net.sf.jabref.model.groups.SimpleKeywordGroup</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="net.sf.jabref.model.groups.GroupTreeNode" target="net.sf.jabref.model.groups.AbstractGroup">
+      <point x="0.0" y="-292.5" />
+      <point x="2085.5" y="808.0" />
+      <point x="1484.375" y="808.0" />
+      <point x="182.625" y="210.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.AbstractGroup" target="net.sf.jabref.model.groups.GroupHierarchyType">
+      <point x="121.75" y="-210.5" />
+      <point x="1423.5" y="342.0" />
+      <point x="1455.75" y="342.0" />
+      <point x="0.0" y="108.0" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.KeywordGroup" target="net.sf.jabref.model.groups.AbstractGroup">
+      <point x="0.0" y="-107.5" />
+      <point x="1101.0" y="818.0" />
+      <point x="1240.875" y="818.0" />
+      <point x="-60.875" y="210.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.SearchGroup" target="net.sf.jabref.model.groups.AbstractGroup">
+      <point x="0.0" y="-293.0" />
+      <point x="701.4999999999999" y="808.0" />
+      <point x="1119.125" y="808.0" />
+      <point x="-182.625" y="210.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.search.SearchMatcher" target="java.lang.FunctionalInterface">
+      <point x="0.0" y="-46.0" />
+      <point x="0.0" y="25.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.AbstractGroup" target="net.sf.jabref.model.search.SearchMatcher">
+      <point x="-121.75" y="-210.5" />
+      <point x="1180.0" y="342.0" />
+      <point x="1147.75" y="342.0" />
+      <point x="0.0" y="46.0" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.AllEntriesGroup" target="net.sf.jabref.model.groups.AbstractGroup">
+      <point x="0.0" y="-128.5" />
+      <point x="1502.5" y="818.0" />
+      <point x="1362.625" y="818.0" />
+      <point x="60.875" y="210.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.SimpleKeywordGroup" target="net.sf.jabref.model.groups.GroupEntryChanger">
+      <point x="-135.25" y="-251.5" />
+      <point x="0.0" y="87.0" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.ExplicitGroup" target="net.sf.jabref.model.groups.SimpleKeywordGroup">
+      <point x="0.0" y="-190.5" />
+      <point x="0.0" y="251.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.SimpleKeywordGroup" target="net.sf.jabref.model.groups.KeywordGroup">
+      <point x="135.25" y="-251.5" />
+      <point x="510.9999999999999" y="1449.0" />
+      <point x="1011.4999999999999" y="1449.0" />
+      <point x="-89.5" y="107.5" />
+    </edge>
+    <edge source="net.sf.jabref.model.groups.RegexKeywordGroup" target="net.sf.jabref.model.groups.KeywordGroup">
+      <point x="0.0" y="-149.0" />
+      <point x="89.5" y="107.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.34308072487644153" x="1223.0" y="1204.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -1,4 +1,4 @@
-package net.sf.jabref.model.groups;
+package net.sf.jabref.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

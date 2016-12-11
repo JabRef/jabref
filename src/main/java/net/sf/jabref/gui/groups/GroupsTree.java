@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.JTree;
@@ -33,11 +32,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupEntryChanger;
 import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.MoveGroupChange;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -173,7 +172,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // worth the bother (DropTargetDragEvent does not provide
                 // access to the drag object)...
                 // it might even be irritating to the user.
-                if (target.getNode().supportsAddingEntries()) {
+                if (target.getNode().getGroup() instanceof GroupEntryChanger) {
                     // accept: assignment from EntryTable
                     dtde.acceptDrag(DnDConstants.ACTION_LINK);
                 } else {
@@ -261,7 +260,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
                 final AbstractGroup group = target.getNode().getGroup();
-                if (!target.getNode().supportsAddingEntries()) {
+                if (!(target.getNode().getGroup() instanceof GroupEntryChanger)) {
                     // this should never happen, because the same condition
                     // is checked in dragOver already
                     dtde.rejectDrop();
@@ -289,10 +288,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                Optional<EntriesGroupChange> undo = target.addEntriesToGroup(selection.getSelection());
-                if (undo.isPresent()) {
+                List<FieldChange> undo = target.addEntriesToGroup(selection.getSelection());
+                if (!undo.isEmpty()) {
                     dtde.getDropTargetContext().dropComplete(true);
-                    groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo.get()),
+                    groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo),
                             target.getNode(), assignedEntries);
                 }
             } else {
