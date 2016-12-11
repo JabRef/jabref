@@ -26,7 +26,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -36,7 +35,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -101,8 +99,8 @@ import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.citationstyle.CitationStyleCache;
-import net.sf.jabref.logic.citationstyle.CitationStyleGenerator;
 import net.sf.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import net.sf.jabref.logic.citationstyle.CitationStyleToClipboardWorker;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -139,7 +137,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 
-import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -709,24 +706,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param outputFormat the desired {@link CitationStyleOutputFormat}
      */
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
-        EventList<BibEntry> selectedEntries = mainTable.getSelected();
-        String style = citationStyleCache.getCitationStyle().getSource();
-        new SwingWorker<String, Void>() {
-            @Override
-            protected String doInBackground() throws Exception {
-                return CitationStyleGenerator.generateCitations(selectedEntries, style, outputFormat);
-            }
-
-            @Override
-            public void done() {
-                try {
-                    new ClipBoardManager().setClipboardContents(get());
-                    frame.setStatus(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
-                } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error("Error while copying citations to the clipboard", e);
-                }
-            }
-        }.execute();
+        new CitationStyleToClipboardWorker(this, outputFormat).execute();
     }
 
     private void copy() {
