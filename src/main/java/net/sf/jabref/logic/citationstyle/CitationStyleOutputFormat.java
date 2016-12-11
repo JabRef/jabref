@@ -4,7 +4,7 @@ package net.sf.jabref.logic.citationstyle;
 public enum CitationStyleOutputFormat {
 
     ASCII_DOC("asciidoc"),
-    FO("fo"),
+    XSLFO("fo"),
     HTML("html"),
     RTF("rtf"),
     TEXT("text");

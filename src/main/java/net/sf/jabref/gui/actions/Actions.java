@@ -14,7 +14,7 @@ public class Actions {
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
     public static final String COPY_CITATION_ASCII_DOC = "copyCitaitonAsciidoc";
-    public static final String COPY_CITATION_FO = "copyCitaitonFo";
+    public static final String COPY_CITATION_XSLFO = "copyCitaitonFo";
     public static final String COPY_CITATION_HTML = "copyCitaitonHtml";
     public static final String COPY_CITATION_RTF = "copyCitaitonRtf";
     public static final String COPY_CITATION_TEXT = "copyCitaitonText";

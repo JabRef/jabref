@@ -495,7 +495,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
         actions.put(Actions.COPY_CITATION_ASCII_DOC, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
-        actions.put(Actions.COPY_CITATION_FO, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.FO));
+        actions.put(Actions.COPY_CITATION_XSLFO, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.XSLFO));
         actions.put(Actions.COPY_CITATION_HTML, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
         actions.put(Actions.COPY_CITATION_RTF, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
         actions.put(Actions.COPY_CITATION_TEXT, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));

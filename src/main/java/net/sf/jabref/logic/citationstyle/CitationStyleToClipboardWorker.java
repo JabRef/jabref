@@ -73,7 +73,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<String, Void> {
             if (CitationStyle.isCitationStyleFile(style)) {
                 String result;
                 switch (outputFormat) {
-                    case FO:
+                    case XSLFO:
                         result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
                                 "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
                                 "   <fo:layout-master-set>" + OS.NEWLINE +
