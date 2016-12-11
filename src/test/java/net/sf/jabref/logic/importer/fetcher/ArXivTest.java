@@ -123,7 +123,7 @@ public class ArXivTest {
         expected.setField("eprintclass", "hep-ex");
         expected.setField("keywords", "hep-ex");
         expected.setField("doi", "10.1140/epjc/s2003-01326-x");
-        expected.setField("journaltitle", "Eur.Phys.J.C31:17-29,2003");
+        expected.setField("journal", "Eur.Phys.J.C31:17-29,2003");
 
         assertEquals(Optional.of(expected), finder.performSearchById("hep-ex/0307015"));
     }

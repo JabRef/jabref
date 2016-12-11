@@ -404,21 +404,24 @@ public class BibEntry implements Cloneable {
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
      * on the BibLatex documentation, chapter 2.2.5:<br>
-     * address      <-> location <br>
-     * annote           <-> annotation <br>
-     * archiveprefix    <-> eprinttype <br>
-     * journal      <-> journaltitle <br>
-     * key              <-> sortkey <br>
-     * pdf          <-> file <br
-     * primaryclass     <-> eprintclass <br>
-     * school           <-> institution <br>
+     * address        <-> location <br>
+     * annote         <-> annotation <br>
+     * archiveprefix  <-> eprinttype <br>
+     * journal        <-> journaltitle <br>
+     * key            <-> sortkey <br>
+     * pdf            <-> file <br
+     * primaryclass   <-> eprintclass <br>
+     * school         <-> institution <br>
      * These work bidirectional. <br>
+     * </p>
+     *
      * <p>
      * Special attention is paid to dates: (see the BibLatex documentation,
      * chapter 2.3.8)
      * The fields 'year' and 'month' are used if the 'date'
      * field is empty. Conversely, getFieldOrAlias("year") also tries to
      * extract the year from the 'date' field (analogously for 'month').
+     * </p>
      */
     public Optional<String> getFieldOrAlias(String name) {
         return genericGetFieldOrAlias(name, this::getField);
@@ -824,4 +827,17 @@ public class BibEntry implements Cloneable {
             return Optional.of(latexFreeField);
         }
     }
+
+    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+        Optional<String> oldValue = this.getField(FieldName.FILE);
+        String newValue = FileField.getStringRepresentation(files);
+
+        if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
+            return Optional.empty();
+        }
+
+        this.setField(FieldName.FILE, newValue);
+        return Optional.of(new FieldChange(this, FieldName.FILE, oldValue.orElse(""), newValue));
+    }
+
 }

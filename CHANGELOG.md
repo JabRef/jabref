@@ -23,6 +23,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
 - We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
 - Replaces manual thread management with cached thread pool
+- We enhanced the integrity checks testing for biblatex-only fields to be aware of more fields (e.g., `location`).
+- We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 
