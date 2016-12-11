@@ -3,11 +3,11 @@ package net.sf.jabref.logic.citationstyle;
 
 public enum CitationStyleOutputFormat {
 
-    HTML("html"),
-    TEXT("text"),
     ASCII_DOC("asciidoc"),
     FO("fo"),
-    RTF("rtf");
+    HTML("html"),
+    RTF("rtf"),
+    TEXT("text");
 
     private final String format;
 

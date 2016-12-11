@@ -62,11 +62,19 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addPopupMenuListener(this);
 
+        JMenu copyCitationMenu = new JMenu(Localization.lang("Copy Citation..."));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_ASCII_DOC, "AsciiDoc"));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_FO, "FO"));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, "HTML"));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_RTF, "RTF"));
+        copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_TEXT, "Text"));
+
         JMenu copySpecialMenu = new JMenu(Localization.lang("Copy") + "...");
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key"), KeyBinding.COPY_BIBTEX_KEY));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}"), KeyBinding.COPY_CITE_BIBTEX_KEY));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title"), KeyBinding.COPY_BIBTEX_KEY_AND_TITLE));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_LINK, Localization.lang("Copy BibTeX key and link"), KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
+        copySpecialMenu.add(copyCitationMenu);
         copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
                 IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
 
