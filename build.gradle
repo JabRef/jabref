@@ -106,7 +106,7 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
 
     // JavaFX stuff
-    compile 'com.airhacks:afterburner.fx:1.6.3'
+    compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.12'
 
