@@ -721,7 +721,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void done() {
                 try {
                     new ClipBoardManager().setClipboardContents(get());
-                    frame.setStatus(Localization.lang("Copied citations to the clipboard!"));
+                    frame.setStatus(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
                 } catch (InterruptedException | ExecutionException e) {
                     LOGGER.error("Error while copying citations to the clipboard", e);
                 }
