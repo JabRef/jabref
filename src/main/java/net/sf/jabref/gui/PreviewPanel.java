@@ -76,6 +76,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     private final PrintAction printAction = new PrintAction();
     private final CloseAction closeAction = new CloseAction();
+    private final CopyPreviewAction copyPreviewAction = new CopyPreviewAction();
 
     private Optional<Pattern> highlightPattern = Optional.empty();
     private Optional<CitationStyleWorker> citationStyleWorker = Optional.empty();
@@ -136,11 +137,16 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         final String close = "close";
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), close);
         actionMap.put(close, this.closeAction);
+
+        final String copy = "copy";
+        getInputMap(JComponent.WHEN_FOCUSED).put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
+        actionMap.put(copy, this.copyPreviewAction);
     }
 
     private JPopupMenu createPopupMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(this.printAction);
+        menu.add(this.copyPreviewAction);
         this.basePanel.ifPresent(p -> menu.add(p.frame().getNextPreviewStyleAction()));
         this.basePanel.ifPresent(p -> menu.add(p.frame().getPreviousPreviewStyleAction()));
         return menu;
@@ -372,6 +378,22 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         @Override
         public void actionPerformed(ActionEvent e) {
             close();
+        }
+    }
+
+    class CopyPreviewAction extends AbstractAction {
+
+        public CopyPreviewAction() {
+            super(Localization.lang("Copy preview"), IconTheme.JabRefIcon.COPY.getSmallIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Copy preview"));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            previewPane.selectAll();
+            previewPane.copy();
+            previewPane.select(0, -1);
         }
     }
 
