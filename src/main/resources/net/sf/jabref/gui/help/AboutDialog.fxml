@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.help.AboutDialogViewModel">
+<DialogPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.help.AboutDialogController">
 	<content>
 		<BorderPane>
 			<center>
@@ -24,7 +24,7 @@
 							<children>
 								<VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top" HBox.hgrow="NEVER">
 									<children>
-                                        <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.heading}" textFill="#2c3e50" wrapText="true">
+                                        <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
@@ -32,12 +32,12 @@
 	                                           <Tooltip text="%Copy Version" />
 	                                        </tooltip>
                                         </Label>
-                              <Label styleClass="dev-heading" fx:id="devVersionLabel" />
+                              			<Label styleClass="dev-heading" fx:id="devVersionLabel" visible="${controller.viewModel.isDevelopmentVersion}" managed="${controller.viewModel.isDevelopmentVersion}" text="${controller.viewModel.developmentVersion}" />
                                         <Hyperlink styleClass="top-padding" onAction="#openChangeLog" text="%What's new in this version?" />
                                         <Label styleClass="filler" />
 										<HBox alignment="CENTER_LEFT">
 											<children>
-												<Label styleClass="space-after" text="${controller.license}" wrapText="true" />
+												<Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true" />
 												<Hyperlink onAction="#openLicense" text="%MIT" />
 											</children>
 										</HBox>
@@ -71,14 +71,14 @@
 						</HBox>
 						<Label alignment="CENTER_LEFT" styleClass="sub-heading" text="%Developers">
 						</Label>
-						<Label alignment="CENTER" styleClass="info-sections" text="${controller.developers}" textAlignment="JUSTIFY" wrapText="true" />
+						<Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.developers}" textAlignment="JUSTIFY" wrapText="true" />
 						<Label alignment="CENTER_LEFT" styleClass="sub-heading" text="%Authors">
 						</Label>
 						<HBox alignment="CENTER" VBox.vgrow="ALWAYS">
 							<children>
 								<ScrollPane fitToWidth="true">
 									<content>
-										<Label styleClass="info-sections" text="${controller.authors}" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER" />
+										<Label styleClass="info-sections" text="${controller.viewModel.authors}" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER" />
 									</content>
 								</ScrollPane>
 							</children>
