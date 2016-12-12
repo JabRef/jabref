@@ -100,7 +100,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         result = "<!DOCTYPE html>" + OS.NEWLINE +
                                 "<html>" + OS.NEWLINE +
                                 "   <head>" + OS.NEWLINE +
-                                "      <meta charset=\\\"utf-8\\\">" + OS.NEWLINE +
+                                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
                                 "   </head>" + OS.NEWLINE +
                                 "   <body>" + OS.NEWLINE + OS.NEWLINE;
 
