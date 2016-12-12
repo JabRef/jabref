@@ -105,7 +105,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         customFoundLabel.setFont(boldStandardFont);
         checkboxPanel.add(customFoundLabel);
 
-        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences.")+"\n");
+        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences")+":");
         selectLabel.setFont(boldStandardFont);
         checkboxPanel.add(selectLabel);
 
@@ -113,7 +113,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         // add all unknown types:
         if (!newTypes.isEmpty()) {
-            checkboxPanel.add(new JLabel(Localization.lang("Currently unknown:")));
+            checkboxPanel.add(new JLabel(Localization.lang("Currently unknown")+":"));
             for(EntryType type : newTypes) {
                 JCheckBox box = new JCheckBox(type.getName(), true);
                 checkboxPanel.add(box);
@@ -123,7 +123,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         // add all different customizations
         if (!differentCustomizations.isEmpty()) {
-            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten:")));
+            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten")+":"));
             for(EntryType type : differentCustomizations) {
                 JCheckBox box = new JCheckBox(type.getName(), true);
                 checkboxPanel.add(box);
