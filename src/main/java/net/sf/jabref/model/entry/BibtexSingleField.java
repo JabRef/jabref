@@ -4,12 +4,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- *
  * Class for keeping properties of a single BibTeX/BibLatex field
- *
  */
 public class BibtexSingleField {
-
     // some field constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;
     public static final double MAX_FIELD_WEIGHT = 2;
@@ -20,14 +17,12 @@ public class BibtexSingleField {
 
     public static final int DEFAULT_FIELD_LENGTH = 100;
 
-
     private enum Flag {
         STANDARD,
         PRIVATE,
         DISPLAYABLE,
         WRITEABLE
     }
-
 
     // the field name
     private String name;

@@ -97,7 +97,7 @@ public class AutoSetLinks {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                List<String> dirsS = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                 dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
 
                 // determine extensions

@@ -15,9 +15,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by Morten O. Alver, 16 Feb. 2007
- */
 public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author

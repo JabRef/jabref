@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.groups;
+package net.sf.jabref.gui.groups;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +12,10 @@ import java.util.Set;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.groups.GroupsUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class GroupsUtilTest {
 
@@ -36,21 +33,21 @@ public class GroupsUtilTest {
             List<String> fieldList = new ArrayList<>();
             fieldList.add("author");
 
-            Set<String> authorSet = GroupsUtil.findAuthorLastNames(db, fieldList);
-            assertTrue(authorSet.contains("Brewer"));
-            assertEquals(15, authorSet.size());
+            Set<String> authorSet = AutoGroupDialog.findAuthorLastNames(db, fieldList);
+            Assert.assertTrue(authorSet.contains("Brewer"));
+            Assert.assertEquals(15, authorSet.size());
 
-            Set<String> keywordSet = GroupsUtil.findDeliminatedWordsInField(db, "keywords", ";");
-            assertTrue(keywordSet.contains("Brain"));
-            assertEquals(60, keywordSet.size());
+            Set<String> keywordSet = AutoGroupDialog.findDeliminatedWordsInField(db, "keywords", ";");
+            Assert.assertTrue(keywordSet.contains("Brain"));
+            Assert.assertEquals(60, keywordSet.size());
 
-            Set<String> wordSet = GroupsUtil.findAllWordsInField(db, "month", "");
-            assertTrue(wordSet.contains("Feb"));
-            assertTrue(wordSet.contains("Mar"));
-            assertTrue(wordSet.contains("May"));
-            assertTrue(wordSet.contains("Jul"));
-            assertTrue(wordSet.contains("Dec"));
-            assertEquals(5, wordSet.size());
+            Set<String> wordSet = AutoGroupDialog.findAllWordsInField(db, "month", "");
+            Assert.assertTrue(wordSet.contains("Feb"));
+            Assert.assertTrue(wordSet.contains("Mar"));
+            Assert.assertTrue(wordSet.contains("May"));
+            Assert.assertTrue(wordSet.contains("Jul"));
+            Assert.assertTrue(wordSet.contains("Dec"));
+            Assert.assertEquals(5, wordSet.size());
         }
     }
 

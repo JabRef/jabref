@@ -141,7 +141,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
                     // We need to specify which directories to search in for Util.expandFilename:
                     List<String> dirsS = panel.getBibDatabaseContext()
-                            .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                            .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                     List<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -369,7 +369,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 canceled = true;
             }
 
-            List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            List<String> dirs = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

@@ -41,7 +41,11 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void init() throws Exception {
-        basePanel.output(Localization.lang("Looking for full text document..."));
+        if (!basePanel.getSelectedEntries().isEmpty()) {
+            basePanel.output(Localization.lang("Looking for full text document..."));
+        } else {
+            LOGGER.debug("No entry selected for fulltext download.");
+        }
     }
 
     @Override
@@ -74,7 +78,7 @@ public class FindFullTextAction extends AbstractWorker {
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
                 List<String> dirs = basePanel.getBibDatabaseContext()
-                        .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                 if (dirs.isEmpty()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
