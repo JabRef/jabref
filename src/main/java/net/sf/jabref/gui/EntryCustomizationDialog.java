@@ -8,12 +8,15 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -238,8 +241,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
     private void applyChanges() {
         valueChanged(new ListSelectionEvent(new JList<>(), 0, 0, false));
-        // Iterate over our map of required fields, and list those types if necessary:
 
+        List<String> actuallyChangedTypes = new ArrayList<>();
+
+        // Iterate over our map of required fields, and list those types if necessary:
         List<String> types = typeComp.getFields();
         for (Map.Entry<String, List<String>> stringListEntry : reqLists.entrySet()) {
             if (!types.contains(stringListEntry.getKey())) {
@@ -260,10 +265,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
-                String nm = StringUtil.capitalizeFirst(stringListEntry.getKey());
-                EntryTypes.removeType(nm, bibDatabaseMode);
+                EntryTypes.removeType(stringListEntry.getKey(), bibDatabaseMode);
 
-                updateTypesForEntries();
+                actuallyChangedTypes.add(stringListEntry.getKey().toLowerCase(Locale.ENGLISH));
+                defaulted.remove(stringListEntry.getKey());
                 continue;
             }
 
@@ -289,11 +294,16 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                         new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 EntryTypes.addOrModifyCustomEntryType(typ, bibDatabaseMode);
-                updateTypesForEntries();
+                actuallyChangedTypes.add(typ.getName().toLowerCase(Locale.ENGLISH));
             }
         }
 
-        Set<Object> toRemove = new HashSet<>();
+        // update all affected entries if something has been changed
+        if(!actuallyChangedTypes.isEmpty()) {
+            updateTypesForEntries(actuallyChangedTypes);
+        }
+
+        Set<String> toRemove = new HashSet<>();
         for (String o : EntryTypes.getAllTypes(bibDatabaseMode)) {
             if (!types.contains(o)) {
                 toRemove.add(o);
@@ -302,8 +312,8 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
         // Remove those that should be removed:
         if (!toRemove.isEmpty()) {
-            for (Object aToRemove : toRemove) {
-                typeDeletion((String) aToRemove);
+            for (String aToRemove : toRemove) {
+                typeDeletion(aToRemove);
             }
         }
 
@@ -328,7 +338,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateTypesForEntries();
+            updateTypesForEntries(Arrays.asList(name.toLowerCase(Locale.ENGLISH)));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);
@@ -372,17 +382,14 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
     }
 
-    /**
-     * Cycle through all databases, and make sure everything is updated with
-     * the new type customization. This includes making sure all entries have
-     * a valid type, that no obsolete entry editors are around, and that
-     * the right-click menus' change type menu is up-to-date.
-     */
-    private void updateTypesForEntries() {
+    private void updateTypesForEntries(List<String> actuallyChangedTypes) {
         for (BasePanel bp : frame.getBasePanelList()) {
-            for (BibEntry entry : bp.getDatabase().getEntries()) {
-                EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
-            }
+            // get all affected entries
+            List<BibEntry> filtered = bp.getDatabase().getEntries().stream()
+                    .filter(entry -> actuallyChangedTypes.contains(entry.getType().toLowerCase(Locale.ENGLISH))).collect(Collectors.toList());
+
+            // update all affected entries with new type
+            filtered.forEach(entry -> EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType));
         }
     }
 
