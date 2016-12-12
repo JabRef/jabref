@@ -30,7 +30,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
-    private static final Pattern WHITESPACE  = Pattern.compile("\\v+");
+    private static final Pattern WHITESPACE  = Pattern.compile("(?m)^\\s|\\v+");
     private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
 
     private final BasePanel basePanel;
