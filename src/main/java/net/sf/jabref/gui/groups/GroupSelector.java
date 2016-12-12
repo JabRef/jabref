@@ -58,12 +58,12 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.MoveGroupChange;
 import net.sf.jabref.model.groups.event.GroupUpdatedEvent;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.search.SearchMatcher;
@@ -580,7 +580,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
         for(GroupTreeNodeViewModel node : getLeafsOfSelection()) {
-            SearchMatcher searchRule = node.getNode().getSearchRule();
+            SearchMatcher searchRule = node.getNode().getSearchMatcher();
             searchRules.addRule(searchRule);
         }
         SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
@@ -798,13 +798,14 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 boolean keepPreviousAssignments = (i == JOptionPane.YES_OPTION) &&
                         WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+                boolean removePreviousAssignents = (oldGroup instanceof ExplicitGroup) && (newGroup instanceof ExplicitGroup);
 
                 AbstractUndoableEdit undoAddPreviousEntries = null;
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
-                Optional<EntriesGroupChange> addChange = node.getNode().setGroup(newGroup, keepPreviousAssignments,
-                        panel.getDatabase().getEntries());
-                if (addChange.isPresent()) {
-                    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
+                List<FieldChange> addChange = node.getNode().setGroup(newGroup, keepPreviousAssignments,
+                        removePreviousAssignents, panel.getDatabase().getEntries());
+                if (!addChange.isEmpty()) {
+                    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
                 }
 
                 groupsTreeModel.reload();

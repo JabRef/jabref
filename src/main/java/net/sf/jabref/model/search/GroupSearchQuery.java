@@ -54,4 +54,16 @@ public class GroupSearchQuery implements SearchMatcher {
     public SearchRule getRule() {
         return rule;
     }
+
+    public String getSearchExpression() {
+        return query;
+    }
+
+    public boolean isCaseSensitive() {
+        return caseSensitive;
+    }
+
+    public boolean isRegularExpression() {
+        return regularExpression;
+    }
 }

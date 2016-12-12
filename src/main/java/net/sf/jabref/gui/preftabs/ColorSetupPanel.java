@@ -25,13 +25,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 10, 2005
- * Time: 4:29:35 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ColorSetupPanel extends JPanel {
 
     private static final int ICON_WIDTH = 30;
