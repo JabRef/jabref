@@ -9,16 +9,16 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class RtfSelection implements Transferable {
+class RtfTransferable implements Transferable {
 
-    private static final Log LOGGER = LogFactory.getLog(RtfSelection.class);
+    private static final Log LOGGER = LogFactory.getLog(RtfTransferable.class);
 
     private DataFlavor rtfFlavor;
     private DataFlavor[] supportedFlavors;
     private final String content;
 
 
-    public RtfSelection(String s) {
+    public RtfTransferable(String s) {
         content = s;
         try {
             rtfFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
