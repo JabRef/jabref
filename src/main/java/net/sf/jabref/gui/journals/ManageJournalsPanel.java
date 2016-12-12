@@ -62,10 +62,6 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA. User: alver Date: Sep 19, 2005 Time: 7:57:29 PM To browseOld this template use File |
- * Settings | File Templates.
- */
 class ManageJournalsPanel extends JPanel {
 
     private static final Log LOGGER = LogFactory.getLog(ManageJournalsPanel.class);

@@ -1315,16 +1315,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void editEntryByKeyAndFocusField(final String bibtexKey, final String fieldName) {
-        final List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntriesByKey(bibtexKey);
-        if (entries.size() == 1) {
-            mainTable.setSelected(mainTable.findEntry(entries.get(0)));
+    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
+        final Optional<BibEntry> entry = bibDatabaseContext.getDatabase().getEntryById(entryId);
+        entry.ifPresent(e -> {
+            mainTable.setSelected(mainTable.findEntry(e));
             selectionListener.editSignalled();
-            final EntryEditor editor = getEntryEditor(entries.get(0));
+            final EntryEditor editor = getEntryEditor(e);
             editor.setFocusToField(fieldName);
             this.showEntryEditor(editor);
             editor.requestFocus();
-        }
+        });
     }
 
     public void updateTableFont() {

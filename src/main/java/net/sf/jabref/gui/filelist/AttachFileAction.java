@@ -7,13 +7,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: 5/24/12
- * Time: 8:48 PM
- * To change this template use File | Settings | File Templates.
- */
 public class AttachFileAction implements BaseAction {
 
     private final BasePanel panel;

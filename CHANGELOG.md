@@ -28,6 +28,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Add the possibility to copy citations of multiple entries to the clipboard.
 
 ### Fixed
+- We fixed a few groups related issues:
+  - "Remove entries from group" no longer removes entries from groups with similar names. [#2334](https://github.com/JabRef/jabref/issues/2334)
+  - If an entry's group field contains 'a b' it is no longer considered a member the groups 'a', 'b', and 'a b'. [1873](https://github.com/JabRef/jabref/issues/1873)
+  - Reading and writing now works for groups that contain special escaped characters in their names. [1681](https://github.com/JabRef/jabref/issues/1681)
 - We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).

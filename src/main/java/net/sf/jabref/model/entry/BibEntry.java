@@ -36,7 +36,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
-
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
