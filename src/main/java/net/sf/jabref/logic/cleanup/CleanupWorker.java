@@ -50,6 +50,12 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreset preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        if (preset.isConvertToBiblatex()) {
+            jobs.add(new BiblatexCleanup());
+        }
+        if(preset.getFormatterCleanups().isEnabled()) {
+            jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
+        }
         if (preset.isCleanUpUpgradeExternalLinks()) {
             jobs.add(new UpgradePdfPsToFileCleanup());
         }
@@ -73,13 +79,6 @@ public class CleanupWorker {
                     fileNamePattern, fileDirPattern, prefs, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
-        }
-        if (preset.isConvertToBiblatex()) {
-            jobs.add(new BiblatexCleanup());
-        }
-
-        if(preset.getFormatterCleanups().isEnabled()) {
-            jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
         }
 
         return jobs;

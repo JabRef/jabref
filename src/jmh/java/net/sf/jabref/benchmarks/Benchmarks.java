@@ -25,6 +25,7 @@ import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -124,14 +125,8 @@ public class Benchmarks {
 
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
-        KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, ',');
+        KeywordGroup group = new WordKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, "keyword", "testkeyword", false, ',', false);
         return group.containsAll(database.getEntries());
-    }
-
-    @Benchmark
-    public boolean keywordGroupContainsWord() {
-        return KeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
     }
 
     public static void main(String[] args) throws IOException, RunnerException {

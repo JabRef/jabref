@@ -38,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
-
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -149,6 +148,16 @@ public class BibDatabase {
             });
         }
         return result;
+    }
+
+    /**
+     * Finds the entry with a specified ID.
+     *
+     * @param id
+     * @return The entry that has the given id
+     */
+    public synchronized Optional<BibEntry> getEntryById(String id) {
+        return entries.stream().filter(entry -> entry.getId().equals(id)).findFirst();
     }
 
     /**
