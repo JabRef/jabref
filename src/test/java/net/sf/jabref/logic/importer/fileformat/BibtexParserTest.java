@@ -1238,23 +1238,6 @@ public class BibtexParserTest {
     }
 
     /**
-     * Test for [2022983]
-     *
-     * @author Uwe Kuehn
-     * @author Andrei Haralevich
-     */
-    @Test
-    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
-    public void parseRemovesNewlineInFileField() throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,file = {ups \n\tsala}}"),
-                importFormatPreferences);
-
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        BibEntry e = c.iterator().next();
-        assertEquals(Optional.of("ups  sala"), e.getField("file"));
-    }
-
-    /**
      * Test for #650
      */
     @Test
