@@ -1,7 +1,9 @@
 package net.sf.jabref.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +167,18 @@ public class EntryTypes {
         }
     }
 
+    public static List<EntryType> getAllModifiedStandardTypes(BibDatabaseMode mode) {
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return BIBTEX.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
+                    .filter(type -> BIBTEX.getStandardType(type.getName()).isPresent())
+                    .collect(Collectors.toList());
+        } else {
+            return BIBLATEX.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
+                    .filter(type -> BIBLATEX.getStandardType(type.getName()).isPresent())
+                    .collect(Collectors.toList());
+        }
+    }
+
     /**
      * Removes a customized entry type from the type map. If this type
      * overrode a standard type, we reinstate the standard one.
@@ -188,6 +202,48 @@ public class EntryTypes {
                     }
                 });
             }
+        }
+    }
+
+    /**
+     * Checks whether two EntryTypes are equal or not based on the equality of the type names and on the equality of
+     * the required and optional field lists
+     *
+     * @param type1 the first EntryType to compare
+     * @param type2 the secend EntryType to compare
+     * @return returns true if the two compared entry types have the same name and equal required and optional fields
+     */
+    public static boolean isEqualNameAndFieldBased(EntryType type1, EntryType type2) {
+        if (type1 == null && type2 == null) {
+            return true;
+        } else if (type1 == null || type2 == null) {
+            return false;
+        } else
+            return type1.getName().equals(type2.getName()) && checkEqualityOfLists(type1.getRequiredFields(),
+                    type2.getRequiredFields()) && checkEqualityOfLists(type1.getOptionalFields(),
+                    type2.getOptionalFields());
+    }
+
+    /**
+     * Compares to String lists regardless of the internal sorting
+     * - clones the Lists internally to be able to sort them without side effects
+     *
+     * @param fieldList1 first list of Strings
+     * @param fieldList2 second list of Strings
+     * @return returns true if both lists have the same length and all entries of the first list are contained in the
+     *                      second list (independent of the internal order)
+     */
+    private static boolean checkEqualityOfLists(List<String> fieldList1, List<String> fieldList2) {
+
+        if(fieldList1.size()!=fieldList2.size()) {
+            return false;
+        } else {
+            ArrayList<String> copyList1 = new ArrayList<>(fieldList1);
+            ArrayList<String> copyList2 = new ArrayList<>(fieldList2);
+            Collections.sort(copyList1);
+            Collections.sort(copyList2);
+
+            return copyList1.equals(copyList2);
         }
     }
 }
