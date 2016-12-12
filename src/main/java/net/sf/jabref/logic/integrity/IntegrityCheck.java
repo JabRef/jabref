@@ -51,6 +51,7 @@ public class IntegrityCheck {
             result.addAll(new PagesChecker().check(entry));
             result.addAll(new ASCIICharacterChecker().check(entry));
             result.addAll(new NoBibtexFieldChecker().check(entry));
+            result.addAll(new BibTeXEntryTypeChecker().check(entry));
         } else {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
