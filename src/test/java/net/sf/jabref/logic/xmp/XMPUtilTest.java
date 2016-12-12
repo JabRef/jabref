@@ -38,7 +38,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.io.CharStreams;

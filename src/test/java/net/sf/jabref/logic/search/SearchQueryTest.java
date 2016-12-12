@@ -3,7 +3,6 @@ package net.sf.jabref.logic.search;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Test;
 

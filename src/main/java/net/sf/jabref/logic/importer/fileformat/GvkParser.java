@@ -13,7 +13,6 @@ import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;

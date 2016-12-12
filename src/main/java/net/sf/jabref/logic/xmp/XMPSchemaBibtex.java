@@ -17,7 +17,6 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.jempbox.xmp.XMPMetadata;

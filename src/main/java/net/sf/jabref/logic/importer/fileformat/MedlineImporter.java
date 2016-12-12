@@ -75,7 +75,6 @@ import net.sf.jabref.logic.importer.fileformat.medline.Text;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;

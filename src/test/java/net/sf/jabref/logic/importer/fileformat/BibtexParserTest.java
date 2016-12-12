@@ -27,7 +27,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;

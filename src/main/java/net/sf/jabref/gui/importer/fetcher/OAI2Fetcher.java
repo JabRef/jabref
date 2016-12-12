@@ -24,7 +24,6 @@ import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;

@@ -15,7 +15,6 @@ import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 /**
  * Imports an Ovid file.

@@ -35,7 +35,6 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
