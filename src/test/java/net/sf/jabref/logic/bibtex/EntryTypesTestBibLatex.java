@@ -35,7 +35,6 @@ public class EntryTypesTestBibLatex {
         assertEquals(BibLatexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype", BibDatabaseMode.BIBLATEX));
     }
 
-
     @Test
     public void detectExclusiveBiblatexType() {
         assertTrue(EntryTypes.isExclusiveBibLatex(BibLatexEntryTypes.MVBOOK.getName()));
