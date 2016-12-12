@@ -178,7 +178,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t2BibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");

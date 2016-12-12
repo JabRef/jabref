@@ -362,7 +362,7 @@ public class GvkParser implements Parser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibEntry result = new BibEntry(IdGenerator.next(), entryType);
+        BibEntry result = new BibEntry(entryType);
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {

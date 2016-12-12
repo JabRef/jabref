@@ -59,7 +59,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchingForOpenBraketInBooktitle() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField(FieldName.BOOKTITLE, "Super Conference (SC)");
 
         SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
@@ -68,7 +68,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeywordNotPart() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("keywords", "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
@@ -77,7 +77,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchMatchesSingleKeyword() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("keywords", "banana, pineapple, orange");
 
         SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
@@ -86,7 +86,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFields() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
@@ -96,7 +96,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsNotForSpecificField() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
@@ -106,7 +106,7 @@ public class SearchQueryTest {
 
     @Test
     public void testSearchAllFieldsAndSpecificField() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 

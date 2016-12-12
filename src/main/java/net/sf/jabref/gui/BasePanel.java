@@ -565,8 +565,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
             }
 
-            String id = IdGenerator.next();
-            BibEntry bibEntry = new BibEntry(id, tp.getName());
+            BibEntry bibEntry = new BibEntry(tp.getName());
             TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
             tidialog.setLocationRelativeTo(BasePanel.this);
             tidialog.setVisible(true);
@@ -1107,8 +1106,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             actualType = etd.getChoice();
         }
         if (actualType != null) { // Only if the dialog was not canceled.
-            String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, actualType.getName());
+            final BibEntry be = new BibEntry(actualType.getName());
             try {
                 bibDatabaseContext.getDatabase().insertEntry(be);
                 // Set owner/timestamp if options are enabled:

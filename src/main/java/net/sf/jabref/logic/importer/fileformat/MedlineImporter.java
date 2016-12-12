@@ -247,7 +247,7 @@ public class MedlineImporter extends Importer implements Parser {
             putIfValueNotNull(fields, "pubstatus", bookData.getPublicationStatus());
         }
 
-        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField(fields);
 
         bibItems.add(entry);
@@ -393,7 +393,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField(fields);
 
         bibItems.add(entry);

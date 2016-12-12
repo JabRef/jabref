@@ -359,7 +359,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
@@ -374,7 +374,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
 

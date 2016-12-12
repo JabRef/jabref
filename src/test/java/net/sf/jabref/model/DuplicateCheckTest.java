@@ -15,9 +15,9 @@ public class DuplicateCheckTest {
 
     @Test
     public void testDuplicateDetection() {
-        BibEntry one = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
+        BibEntry one = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
 
-        BibEntry two = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
+        BibEntry two = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");
