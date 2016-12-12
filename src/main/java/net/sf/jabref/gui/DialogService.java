@@ -36,6 +36,13 @@ public interface DialogService {
     void showErrorDialogAndWait(String title, String content);
 
     /**
+     * Create and display error dialog displaying the given exception.
+     * @param message the error message
+     * @param exception the exception causing the error
+     */
+    void showErrorDialogAndWait(String message, Throwable exception);
+
+    /**
      * This will create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
      * a OK and Cancel Button. To create a confirmation dialog with custom
@@ -62,4 +69,10 @@ public interface DialogService {
      * @return Optional with the pressed Button as ButtonType
      */
     Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
+
+    /**
+     * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     * @param message the message to show.
+     */
+    void notify(String message);
 }
