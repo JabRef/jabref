@@ -161,20 +161,23 @@ public class EntryTypes {
                     .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
         } else {
-            return allTypes.stream().filter(entryType -> !BibLatexEntryTypes.getType(entryType.getName()).isPresent()).collect(Collectors.toList());
+            return allTypes.stream().filter(entryType -> !BibLatexEntryTypes.getType(entryType.getName()).isPresent())
+                    .collect(Collectors.toList());
         }
     }
 
     public static List<EntryType> getAllModifiedStandardTypes(BibDatabaseMode mode) {
         if (mode == BibDatabaseMode.BIBTEX) {
-            return BIBTEX.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
-                    .filter(type -> BIBTEX.getStandardType(type.getName()).isPresent())
-                    .collect(Collectors.toList());
+            return getAllModifiedStandardTypes(BIBTEX);
         } else {
-            return BIBLATEX.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
-                    .filter(type -> BIBLATEX.getStandardType(type.getName()).isPresent())
-                    .collect(Collectors.toList());
+            return getAllModifiedStandardTypes(BIBLATEX);
         }
+    }
+
+    private static List<EntryType> getAllModifiedStandardTypes(InternalEntryTypes internalTypes) {
+        return internalTypes.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
+                .filter(type -> internalTypes.getStandardType(type.getName()).isPresent())
+                .collect(Collectors.toList());
     }
 
     /**

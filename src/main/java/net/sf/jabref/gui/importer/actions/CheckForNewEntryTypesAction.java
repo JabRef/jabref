@@ -38,7 +38,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
 
-        BibDatabaseMode mode = parserResult.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         List<EntryType> typesToStore = determineEntryTypesToSave(panel, getListOfUnknownAndUnequalCustomizations(parserResult), mode);
 
@@ -49,7 +49,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     }
 
     private List<EntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
-        BibDatabaseMode mode = parserResult.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
 
         return parserResult.getEntryTypes().values().stream()
                 .filter(type ->
@@ -59,18 +59,15 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
     }
 
     private List<EntryType> determineEntryTypesToSave(BasePanel panel, List<EntryType> allCustomizedEntryTypes, BibDatabaseMode databaseMode) {
-
-
-
         List<EntryType> newTypes = new ArrayList<>();
         List<EntryType> differentCustomizations = new ArrayList<>();
 
-        for(EntryType customType : allCustomizedEntryTypes) {
-            if(!EntryTypes.getType(customType.getName(), databaseMode).isPresent()) {
+        for (EntryType customType : allCustomizedEntryTypes) {
+            if (!EntryTypes.getType(customType.getName(), databaseMode).isPresent()) {
                 newTypes.add(customType);
             } else {
                 EntryType currentlyStoredType = EntryTypes.getType(customType.getName(), databaseMode).get();
-                if(!EntryTypes.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
+                if (!EntryTypes.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
                     differentCustomizations.add(customType);
                 }
             }
@@ -87,8 +84,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
                 JOptionPane.QUESTION_MESSAGE);
 
         if (answer == JOptionPane.YES_OPTION) {
-            return typeCheckBoxMap.entrySet().stream().filter(entry -> entry.getValue().isSelected()).map(Map.Entry::getKey).collect(
-                    Collectors.toList());
+            return typeCheckBoxMap.entrySet().stream().filter(entry -> entry.getValue().isSelected())
+                    .map(Map.Entry::getKey).collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -113,8 +110,8 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         // add all unknown types:
         if (!newTypes.isEmpty()) {
-            checkboxPanel.add(new JLabel(Localization.lang("Currently unknown")+":"));
-            for(EntryType type : newTypes) {
+            checkboxPanel.add(new JLabel(Localization.lang("Currently unknown") + ":"));
+            for (EntryType type : newTypes) {
                 JCheckBox box = new JCheckBox(type.getName(), true);
                 checkboxPanel.add(box);
                 typeCheckBoxMap.put(type, box);
@@ -123,13 +120,17 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         // add all different customizations
         if (!differentCustomizations.isEmpty()) {
-            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten")+":"));
-            for(EntryType type : differentCustomizations) {
+            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten") + ":"));
+            for (EntryType type : differentCustomizations) {
                 JCheckBox box = new JCheckBox(type.getName(), true);
                 checkboxPanel.add(box);
                 typeCheckBoxMap.put(type, box);
             }
         }
         return checkboxPanel;
+    }
+
+    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult) {
+        return parserResult.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
     }
 }
