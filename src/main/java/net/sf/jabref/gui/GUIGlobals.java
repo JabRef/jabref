@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
-
     private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");

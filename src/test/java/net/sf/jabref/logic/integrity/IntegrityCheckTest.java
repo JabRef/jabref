@@ -33,6 +33,14 @@ public class IntegrityCheckTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @Test
+    public void testEntryTypeChecks() {
+        assertCorrect(withMode(createContext("title", "sometitle", "article"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("title", "sometitle", "patent"), BibDatabaseMode.BIBTEX));
+        assertCorrect((withMode(createContext("title", "sometitle", "patent"), BibDatabaseMode.BIBLATEX)));
+        assertCorrect(withMode(createContext("title", "sometitle", "article"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
     public void testUrlChecks() {
         assertCorrect(createContext("url", "http://www.google.com"));
         assertCorrect(createContext("url", "file://c:/asdf/asdf"));
