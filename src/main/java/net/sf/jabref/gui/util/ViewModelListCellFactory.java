@@ -65,8 +65,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
                     }
                     if (toStyleClass != null) {
-                        getStyleClass().clear();
-                        getStyleClass().add(toStyleClass.call(viewModel));
+                        getStyleClass().setAll(toStyleClass.call(viewModel));
                     }
                 }
                 getListView().refresh();

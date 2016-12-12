@@ -59,7 +59,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
      */
     private String getLogMessagesAsString(List<LogEventViewModel> messages) {
         return messages.stream()
-                .map(LogEventViewModel::getDisplayText)
+                .map(LogEventViewModel::getDetailedText)
                 .collect(Collectors.joining(OS.NEWLINE));
     }
 
@@ -91,8 +91,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
-                    Localization.lang("Your issue was reported in your browser.") + "\n\n" +
-                            Localization.lang("The log and exception information was copied to your clipboard.") + "\n\n" +
+                    Localization.lang("Your issue was reported in your browser.") + "\n" +
+                            Localization.lang("The log and exception information was copied to your clipboard.") + " " +
                             Localization.lang("Please paste this information (with Ctrl+V) in the issue description."));
             URIBuilder uriBuilder = new URIBuilder()
                     .setScheme("https").setHost("github.com")
@@ -102,8 +102,8 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
 
             // Append log messages in issue description
-            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n"
-                    + getLogMessagesAsString(allMessagesData) + "\n```\n</details>";
+            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
+                    + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
             clipBoardManager.setClipboardContents(issueDetails);
         } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);

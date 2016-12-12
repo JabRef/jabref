@@ -1,9 +1,12 @@
 package net.sf.jabref.gui.errorconsole;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.util.OS;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.core.LogEvent;
 
 public class LogEventViewModel {
@@ -40,5 +43,13 @@ public class LogEventViewModel {
             default:
                 return (IconTheme.JabRefIcon.INTEGRITY_INFO);
         }
+    }
+
+    public Optional<String> getStackTrace() {
+        return Optional.ofNullable(logEvent.getMessage().getThrowable()).map(ExceptionUtils::getStackTrace);
+    }
+
+    public String getDetailedText() {
+        return getDisplayText() + getStackTrace().map(stacktrace -> OS.NEWLINE + stacktrace).orElse("");
     }
 }

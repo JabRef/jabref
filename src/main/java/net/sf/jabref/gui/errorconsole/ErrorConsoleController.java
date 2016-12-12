@@ -5,12 +5,18 @@ import javax.inject.Inject;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.ClipBoardManager;
@@ -18,7 +24,6 @@ import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
-import net.sf.jabref.gui.util.ViewModelListCellFactory;
 import net.sf.jabref.logic.util.BuildInfo;
 
 public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {
@@ -38,11 +43,7 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
     private void initialize() {
         viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
 
-        messagesListView.setCellFactory(new ViewModelListCellFactory<LogEventViewModel>()
-                .withGraphic(viewModel1 -> viewModel1.getIcon().getGraphicNode())
-                .withStyleClass(LogEventViewModel::getStyleClass)
-                .withText(LogEventViewModel::getDisplayText)
-        );
+        messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
         messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
         messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -53,6 +54,41 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
             }
         }));
         descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
+    }
+
+    private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {
+        return cell -> new ListCell<LogEventViewModel>() {
+
+            private HBox graphic;
+            private Node icon;
+            private VBox message;
+            private Label heading;
+            private Label stacktrace;
+
+            {
+                graphic = new HBox(10);
+                heading = new Label();
+                stacktrace = new Label();
+                message = new VBox();
+                message.getChildren().setAll(heading, stacktrace);
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            }
+
+            @Override
+            public void updateItem(LogEventViewModel event, boolean empty) {
+                if (event == null || empty) {
+                    setGraphic(null);
+                } else {
+                    icon = event.getIcon().getGraphicNode();
+                    heading.setText(event.getDisplayText());
+                    heading.getStyleClass().setAll(event.getStyleClass());
+                    stacktrace.setText(event.getStackTrace().orElse(""));
+                    graphic.getStyleClass().setAll(event.getStyleClass());
+                    graphic.getChildren().setAll(icon, message);
+                    setGraphic(graphic);
+                }
+            }
+        };
     }
 
     @FXML
