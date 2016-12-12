@@ -301,7 +301,7 @@ public class IsiImporter extends Importer {
                 continue;
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, Type);
+            BibEntry b = new BibEntry(Type);
             // id assumes an existing database so don't
 
             // Remove empty fields:
