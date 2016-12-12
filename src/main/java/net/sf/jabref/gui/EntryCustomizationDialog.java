@@ -60,8 +60,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     private JButton apply;
     protected JButton helpButton;
     protected JButton delete;
-    protected JButton importTypes;
-    protected JButton exportTypes;
     private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
     private final Map<String, List<String>> reqLists = new HashMap<>();
@@ -189,13 +187,13 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             }
         }
 
-        String s = typeComp.getFirstSelected();
-        if (s == null) {
+        String selectedTypeName = typeComp.getFirstSelected();
+        if (selectedTypeName == null) {
             return;
         }
-        List<String> rl = reqLists.get(s);
-        if (rl == null) {
-            Optional<EntryType> type = EntryTypes.getType(s, bibDatabaseMode);
+        List<String> requiredFieldsSelectedType = reqLists.get(selectedTypeName);
+        if (requiredFieldsSelectedType == null) {
+            Optional<EntryType> type = EntryTypes.getType(selectedTypeName, bibDatabaseMode);
             if (type.isPresent()) {
                 List<String> req = type.get().getRequiredFields();
 
@@ -227,15 +225,15 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                 reqComp.requestFocus();
             }
         } else {
-            reqComp.setFields(rl);
-            optComp.setFields(optLists.get(s));
+            reqComp.setFields(requiredFieldsSelectedType);
+            optComp.setFields(optLists.get(selectedTypeName));
             if (biblatexMode) {
-                optComp2.setFields(opt2Lists.get(s));
+                optComp2.setFields(opt2Lists.get(selectedTypeName));
             }
         }
 
-        lastSelected = s;
-        typeComp.enable(s, changed.contains(lastSelected) && !defaulted.contains(lastSelected));
+        lastSelected = selectedTypeName;
+        typeComp.enable(selectedTypeName, changed.contains(lastSelected) && !defaulted.contains(lastSelected));
     }
 
     private void applyChanges() {
