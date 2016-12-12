@@ -99,20 +99,16 @@ public class BibEntry implements Cloneable {
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
     public BibEntry(String type) {
-        this.id = IdGenerator.next();
-        setType(type);
-        this.sharedBibEntryData = new SharedBibEntryData();
+        this(IdGenerator.next(), type);
     }
 
     /**
      * Constructs a new BibEntry with the given ID and given type
      *
-     * TODO: should be removed. ID must be set globally.
-     *
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id, String type) {
+    private BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
