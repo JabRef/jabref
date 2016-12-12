@@ -157,12 +157,7 @@ public class BibDatabase {
      * @return The entry that has the given id
      */
     public synchronized Optional<BibEntry> getEntryById(String id) {
-        for (BibEntry entry : entries) {
-            if (entry.getId().equals(id)) {
-                return Optional.of(entry);
-            }
-        }
-        return Optional.empty();
+        return entries.stream().filter(entry -> entry.getId().equals(id)).findFirst();
     }
 
     /**
