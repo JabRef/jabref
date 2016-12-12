@@ -25,7 +25,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,9 +34,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class OOBibStyleTest {
-
     private LayoutFormatterPreferences layoutFormatterPreferences;
-
 
     @Before
     public void setUp() {
@@ -497,11 +494,8 @@ public class OOBibStyleTest {
     }
 
     @Test
-    @Ignore
     public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
-        String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
-        OOBibStyle style = new OOBibStyle(fileName,
-                layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle("test.jstyle", layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
@@ -514,7 +508,7 @@ public class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        assertEquals("von Beta, Epsilon, and Tau, 2016",
+        assertEquals("von Beta, Epsilon, & Tau, 2016",
                 style.getCitationMarker(entries, entryDBMap, true, null, null));
 
     }

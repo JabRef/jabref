@@ -1205,7 +1205,6 @@ public class XMPUtilTest {
      * Test whether the command-line client can pick one of several entries from a bibtex file
      * @throws IOException
      * @throws TransformerException
-     *
      */
     @Test
     @Ignore
