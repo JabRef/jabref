@@ -76,6 +76,8 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
 
             @Override
             public void updateItem(LogEventViewModel event, boolean empty) {
+                super.updateItem(event, empty);
+
                 if (event == null || empty) {
                     setGraphic(null);
                 } else {
