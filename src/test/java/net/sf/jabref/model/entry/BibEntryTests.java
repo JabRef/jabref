@@ -390,7 +390,7 @@ public class BibEntryTests {
     }
 
     @Test
-    public void testCiteKeyAndID() {
+    public void setCiteKey() {
         BibEntry be = new BibEntry();
         Assert.assertFalse(be.hasCiteKey());
         be.setField("author", "Albert Einstein");
@@ -400,9 +400,5 @@ public class BibEntryTests {
         assertEquals(Optional.of("Albert Einstein"), be.getField("author"));
         be.clearField("author");
         assertEquals(Optional.empty(), be.getField("author"));
-
-        String id = IdGenerator.next();
-        be.setId(id);
-        assertEquals(id, be.getId());
     }
 }

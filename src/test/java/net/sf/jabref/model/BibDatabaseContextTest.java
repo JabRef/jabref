@@ -32,7 +32,7 @@ public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnInferredModeBibTeX() {
         BibDatabase db = new BibDatabase();
-        BibEntry e1 = new BibEntry("1");
+        BibEntry e1 = new BibEntry();
         db.insertEntry(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);

@@ -85,26 +85,29 @@ public class BibEntry implements Cloneable {
 
     private final EventBus eventBus = new EventBus();
 
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
 
     public BibEntry() {
-        this(IdGenerator.next());
+        this(IdGenerator.next(), DEFAULT_TYPE);
     }
 
     /**
-     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     * Constructs a new BibEntry with the given type
      *
-     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id) {
-        this(id, DEFAULT_TYPE);
+    public BibEntry(String type) {
+        this.id = IdGenerator.next();
+        setType(type);
+        this.sharedBibEntryData = new SharedBibEntryData();
     }
 
     /**
      * Constructs a new BibEntry with the given ID and given type
+     *
+     * TODO: should be removed. ID must be set globally.
      *
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.

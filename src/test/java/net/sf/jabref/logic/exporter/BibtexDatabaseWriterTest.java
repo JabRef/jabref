@@ -523,17 +523,17 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws Exception {
-        BibEntry firstEntry = new BibEntry(IdGenerator.next());
+        BibEntry firstEntry = new BibEntry();
         firstEntry.setType(BibtexEntryTypes.ARTICLE);
         firstEntry.setField("author", "A");
         firstEntry.setField("year", "2010");
 
-        BibEntry secondEntry = new BibEntry(IdGenerator.next());
+        BibEntry secondEntry = new BibEntry();
         secondEntry.setType(BibtexEntryTypes.ARTICLE);
         secondEntry.setField("author", "B");
         secondEntry.setField("year", "2000");
 
-        BibEntry thirdEntry = new BibEntry(IdGenerator.next());
+        BibEntry thirdEntry = new BibEntry();
         thirdEntry.setType(BibtexEntryTypes.ARTICLE);
         thirdEntry.setField("author", "A");
         thirdEntry.setField("year", "2000");
