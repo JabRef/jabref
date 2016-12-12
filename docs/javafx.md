@@ -1,4 +1,4 @@
-## Architecture: Model - View - (Controller) - View Model  (MV(C)VM)
+## Architecture: Model - View - (Controller) - ViewModel  (MV(C)VM)
 The goal of the MVVM architecture is to separate the state/behavior from the appearance of the ui. 
 This is archived by dividing JabRef into different layers, each having a clear responsibility.
 - The _Model_ contains the business logic and data structures. These aspects are again encapsulated in the _logic_ and _model_ package, respectively.
@@ -11,8 +11,8 @@ The only class which access model and logic classes is the ViewModel. Controller
 More details about the MVVM pattern can be found in [an article by Microsoft](https://msdn.microsoft.com/en-us/magazine/dd419663.aspx).
 
 ## An example
-### View model:
-- The view model should derive from `AbstractViewModel`.
+### ViewModel:
+- The ViewModel should derive from `AbstractViewModel`.
 ````java
 public class MyDialogViewModel extends AbstractViewModel {
 }
@@ -76,7 +76,7 @@ private void openJabrefWebsite() {
 
 ### View:
 The view consists of two parts:
-- a FXML file "MyDialog.fxml" which defines the structure and the layout of the UI. It is recommended to use a graphical UI builder like JavaFX SceneBuilder to edit the FXML file.
+- a FXML file "MyDialog.fxml" which defines the structure and the layout of the UI. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
 - a `View` class that loads the FXML file. For dialogs this amounts to deriving from `AbstractDialogView`. The fxml file is loaded automatically using the same name as the class. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
 ````java
 public class MyDialogView extends AbstractDialogView
