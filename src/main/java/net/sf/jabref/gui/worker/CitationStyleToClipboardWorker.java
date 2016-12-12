@@ -78,38 +78,10 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 String result = "";
                 switch (outputFormat) {
                     case XSLFO:
-                        result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
-                                "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
-                                "   <fo:layout-master-set>" + OS.NEWLINE +
-                                "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
-                                "         <fo:region-body/>" + OS.NEWLINE +
-                                "      </fo:simple-page-master>" + OS.NEWLINE +
-                                "   </fo:layout-master-set>" + OS.NEWLINE +
-                                "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
-                                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
-
-                        for (String citation : citations) {
-                            result += citation + OS.NEWLINE;
-                        }
-
-                        result +="      </fo:flow>" + OS.NEWLINE +
-                                "   </fo:page-sequence>" + OS.NEWLINE +
-                                "</fo:root>" + OS.NEWLINE;
+                        result = processXslfo(citations);
                         break;
                     case HTML:
-                        result = "<!DOCTYPE html>" + OS.NEWLINE +
-                                "<html>" + OS.NEWLINE +
-                                "   <head>" + OS.NEWLINE +
-                                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                                "   </head>" + OS.NEWLINE +
-                                "   <body>" + OS.NEWLINE + OS.NEWLINE;
-
-                        for (String citation : citations) {
-                            result += citation + OS.NEWLINE;
-                        }
-
-                        result +="   </body>" + OS.NEWLINE +
-                                "</html>" + OS.NEWLINE;
+                        result = processHtml(citations);
                         break;
                     default:
                         for (String citation : citations) {
@@ -117,27 +89,68 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         }
                         break;
                 }
-
                 new ClipBoardManager().setTransferableClipboardContents(result);
 
             // if it's not a citation style take care of the preview
             } else {
-                String html = "";
-                String plain = "";
-                for (String citation : citations) {
-                    html += citation + "<br>";
-
-                    String tmp = WHITESPACE.matcher(citation).replaceAll("");
-                    tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
-                    plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
-                }
-
-                new ClipBoardManager().setTransferableClipboardContents(html, plain);
+                processPreview(citations);
             }
         } catch (InterruptedException | ExecutionException e) {
             LOGGER.error("Error while copying citations to the clipboard", e);
         }
         basePanel.frame().setStatus(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
+    }
+
+    private void processPreview(List<String> citations){
+        String html = "";
+        String plain = "";
+        for (String citation : citations) {
+            html += citation + "<br>";
+
+            String tmp = WHITESPACE.matcher(citation).replaceAll("");
+            tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
+            plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
+        }
+        new ClipBoardManager().setTransferableClipboardContents(html, plain);
+    }
+
+
+    private String processXslfo(List<String> citations) {
+        String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
+                "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
+                "   <fo:layout-master-set>" + OS.NEWLINE +
+                "      <fo:simple-page-master master-name=\"citations\">" + OS.NEWLINE +
+                "         <fo:region-body/>" + OS.NEWLINE +
+                "      </fo:simple-page-master>" + OS.NEWLINE +
+                "   </fo:layout-master-set>" + OS.NEWLINE +
+                "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
+                "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
+
+        for (String citation : citations) {
+            result += citation + OS.NEWLINE;
+        }
+
+        result +="      </fo:flow>" + OS.NEWLINE +
+                "   </fo:page-sequence>" + OS.NEWLINE +
+                "</fo:root>" + OS.NEWLINE;
+        return result;
+    }
+
+    private String processHtml(List<String> citations) {
+        String result = "<!DOCTYPE html>" + OS.NEWLINE +
+                "<html>" + OS.NEWLINE +
+                "   <head>" + OS.NEWLINE +
+                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                "   </head>" + OS.NEWLINE +
+                "   <body>" + OS.NEWLINE + OS.NEWLINE;
+
+        for (String citation : citations) {
+            result += citation + OS.NEWLINE;
+        }
+
+        result +="   </body>" + OS.NEWLINE +
+                "</html>" + OS.NEWLINE;
+        return result;
     }
 
 }
