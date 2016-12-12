@@ -46,14 +46,9 @@ public class AuthorLastFirstAbbreviatorTester {
         Assert.assertEquals("Abbreviator Test", expectedResult, result);
     }
 
-    /**
-     * Testcase for
-     * http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
-     */
     @Test
     @Ignore
     public void testJrAuthor() {
-        //TODO what should be done here? reimplement it?
         Assert.assertEquals("Other, A. N.", abbreviate("Other, Jr., Anthony N."));
     }
 

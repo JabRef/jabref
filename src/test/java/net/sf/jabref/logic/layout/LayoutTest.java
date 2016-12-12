@@ -23,9 +23,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
 public class LayoutTest {
-
     private LayoutFormatterPreferences prefs;
-
 
     /**
      * Initialize Preferences.
@@ -56,7 +54,6 @@ JabRefPreferences.getInstance().getImportFormatPreferences());
     }
 
     public String layout(String layoutFile, String entry) throws IOException {
-
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr, prefs)
