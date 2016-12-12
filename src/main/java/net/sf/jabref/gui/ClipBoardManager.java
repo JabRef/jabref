@@ -48,7 +48,7 @@ public class ClipBoardManager implements ClipboardOwner {
     }
 
     /**
-     * Places the String on the clipboard in two flavours:
+     * Places the string into the clipboard in two flavours:
      * @param html good for copying the text to WYSIWYG Editors
      * @param text for plain text editors
      */
@@ -61,7 +61,7 @@ public class ClipBoardManager implements ClipboardOwner {
     }
 
     /**
-     * Places the String on the clipboard in two flavours: html and plain text
+     * Places the string into the clipboard in two flavours: html and plain text
      * @param string interprets it for both the html and plain text flavour
      */
     public void setTransferableClipboardContents(String string){
