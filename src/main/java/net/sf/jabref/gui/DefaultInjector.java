@@ -2,6 +2,9 @@ package net.sf.jabref.gui;
 
 import java.util.function.Function;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
+
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
 import org.apache.commons.logging.Log;
@@ -29,6 +32,8 @@ public class DefaultInjector implements PresenterFactory {
     private static Object createDependency(Class<?> clazz) {
         if (clazz == DialogService.class) {
             return new FXDialogService();
+        } else if (clazz == KeyBindingPreferences.class) {
+            return Globals.getKeyPrefs();
         } else {
             try {
                 return clazz.newInstance();

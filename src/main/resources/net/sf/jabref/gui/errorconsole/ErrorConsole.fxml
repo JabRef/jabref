@@ -17,13 +17,13 @@
                     </BorderPane.margin>
                     <buttons>
                         <Button fx:id="closeButton" cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#closeErrorDialog" text="%Close" textAlignment="CENTER" ButtonBar.buttonData="RIGHT"/>
-                        <Button fx:id="copyLogButton" mnemonicParsing="false" onAction="#copyLogButton" text="%Copy Log" ButtonBar.buttonData="LEFT"/>
-                        <Button fx:id="createIssueButton" mnemonicParsing="false" onAction="#createIssueButton" text="%Report Issue" ButtonBar.buttonData="LEFT"/>
+                        <Button fx:id="copyLogButton" mnemonicParsing="false" onAction="#copyLog" text="%Copy Log" ButtonBar.buttonData="LEFT"/>
+                        <Button fx:id="createIssueButton" mnemonicParsing="false" onAction="#createIssue" text="%Report Issue" ButtonBar.buttonData="LEFT"/>
                     </buttons>
                 </ButtonBar>
             </bottom>
             <center>
-                <ListView fx:id="allMessages" onKeyPressed="#copySelectedLogEntries" styleClass="list-content" BorderPane.alignment="CENTER" />
+                <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="list-content" BorderPane.alignment="CENTER" />
             </center>
         </BorderPane>
     </content>
