@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
@@ -17,12 +19,10 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
 public class EntryTypes {
-
     /**
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
     private static class InternalEntryTypes {
-
         private final Map<String, EntryType> ALL_TYPES = new TreeMap<>();
         private final Map<String, EntryType> STANDARD_TYPES;
         private final EntryType defaultType;
@@ -170,5 +170,17 @@ public class EntryTypes {
                 });
             }
         }
+    }
+
+    public static boolean isExclusiveBibLatex(String type) {
+        return filterEntryTypesNames(BibLatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type);
+    }
+
+    private static List<String> filterEntryTypesNames(List<EntryType> types, Predicate<EntryType> predicate) {
+        return types.stream().filter(predicate).map(type -> type.getName().toLowerCase()).collect(Collectors.toList());
+    }
+
+    private static Predicate<EntryType> isNotIncludedIn(List<EntryType> collection) {
+        return entry -> collection.stream().noneMatch(c -> c.getName().equalsIgnoreCase(entry.getName()));
     }
 }
