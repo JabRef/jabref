@@ -36,4 +36,12 @@ public class BibEntryTest {
 
         Assert.assertEquals(Optional.of("value"), entry.getField("tEsT"));
     }
+
+    @Test
+    public void clonedBibentryHasUniqueID() throws Exception {
+        BibEntry entry = new BibEntry();
+        BibEntry entryClone = (BibEntry) entry.clone();
+
+        Assert.assertNotEquals(entry.getId(), entryClone.getId());
+    }
 }

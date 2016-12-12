@@ -572,10 +572,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns a clone of this entry. Useful for copying.
+     * This will set a new ID for the cloned entry to be able to distinguish both copies.
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(id, type);
+        BibEntry clone = new BibEntry(type);
         clone.fields = new HashMap<>(fields);
         return clone;
     }

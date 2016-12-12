@@ -44,7 +44,6 @@ import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
@@ -1364,7 +1363,6 @@ class OOBibBase {
                 // If entry found
                 if (entry.isPresent()) {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
-                    clonedEntry.setId(IdGenerator.next());
                     // Insert a copy of the entry
                     resultDatabase.insertEntry(clonedEntry);
                     // Check if the cloned entry has a crossref field

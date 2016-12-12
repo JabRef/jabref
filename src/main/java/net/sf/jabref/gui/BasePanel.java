@@ -125,7 +125,6 @@ import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
@@ -799,7 +798,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // entries must exist
                 // independently of the copied
                 // ones.
-                be.setId(IdGenerator.next());
                 bibDatabaseContext.getDatabase().insertEntry(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
