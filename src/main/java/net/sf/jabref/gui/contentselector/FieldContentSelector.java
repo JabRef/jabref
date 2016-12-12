@@ -150,8 +150,7 @@ public class FieldContentSelector extends JComponent {
     }
 
     private void selectionMade() {
-        // The first element is only for show.
-        // CO: Why?
+        // The first element is empty to avoid a preselection
         if (comboBox.getSelectedIndex() == 0) {
             return;
         }
@@ -161,19 +160,18 @@ public class FieldContentSelector extends JComponent {
             return;
         }
 
-        // The following is not possible at the moment since the
-        // combobox cannot be edited!
 
-        // User edited in a new word. Add it.
-        // if (comboBox.getSelectedIndex() == -1)
-        // addWord(chosen);
+        String currentText = editor.getText();
 
-        // TODO: could improve checking as not do add the same item twice
-        if (!"".equals(editor.getText())) {
+        // not the first word and no duplicate -> we need a comma
+        if (!"".equals(currentText) && !currentText.contains(chosen)) {
             editor.append(FieldContentSelector.this.delimiter);
         }
 
-        editor.append(chosen);
+        // no duplicate -> add it
+        if (!currentText.contains(chosen)) {
+            editor.append(chosen);
+        }
 
         comboBox.setSelectedIndex(0);
 
