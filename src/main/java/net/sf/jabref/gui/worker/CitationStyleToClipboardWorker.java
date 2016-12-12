@@ -131,11 +131,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Joins every citation with a newline and returns it.
      */
     private String generateDefault(List<String> citations) {
-        String result = "";
-        for (String citation : citations) {
-            result += citation + OS.NEWLINE;
-        }
-        return result;
+        return String.join(OS.NEWLINE, citations);
     }
 
     /**
