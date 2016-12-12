@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class RtfTransferable implements Transferable {
+public class RtfTransferable implements Transferable {
 
     private static final Log LOGGER = LogFactory.getLog(RtfTransferable.class);
 

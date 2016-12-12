@@ -56,6 +56,10 @@ public class ClipBoardManager implements ClipboardOwner {
         CLIPBOARD.setContents(new HtmlTransferable(html, text), this);
     }
 
+    public void setTransferableClipboardContents(Transferable transferable){
+        CLIPBOARD.setContents(transferable, this);
+    }
+
     /**
      * Places the String on the clipboard in two flavours: html and plain text
      * @param string interprets it for both the html and plain text flavour

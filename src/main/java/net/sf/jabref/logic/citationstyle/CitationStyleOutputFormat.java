@@ -4,10 +4,10 @@ package net.sf.jabref.logic.citationstyle;
 public enum CitationStyleOutputFormat {
 
     ASCII_DOC("asciidoc"),
-    XSLFO("fo"),
     HTML("html"),
     RTF("rtf"),
-    TEXT("text");
+    TEXT("text"),
+    XSLFO("fo");
 
     private final String format;
 
