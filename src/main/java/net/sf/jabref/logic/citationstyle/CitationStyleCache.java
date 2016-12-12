@@ -32,7 +32,8 @@ public class CitationStyleCache {
     }
 
     /**
-     * returns the citation for the given BibEntry and the set CitationStyle
+     * @param entry the BibEntry to generate the citation for
+     * @return citation for the given BibEntry and the set CitationStyle
      */
     public String getCitationFor(BibEntry entry) {
         String citation = citationStylesCache.get(entry);
