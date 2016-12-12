@@ -10,11 +10,13 @@ import javax.xml.parsers.SAXParserFactory;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.xml.sax.SAXException;
 
 /**
@@ -24,6 +26,7 @@ import org.xml.sax.SAXException;
  * @author Christian Kopf
  * @author Christopher Oezbek
  */
+@Category(GUITests.class)
 public class OAI2HandlerFetcherTest {
 
     protected OAI2Handler handler;

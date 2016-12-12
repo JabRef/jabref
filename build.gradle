@@ -14,11 +14,18 @@ buildscript {
 }
 
 plugins {
+    id 'com.gradle.build-scan' version '1.3'
     id "com.install4j.gradle" version "6.1.3"
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
     // If this is updated to 0.0.9, check configurations.errorprone
     id "net.ltgt.errorprone" version "0.0.8"
     id 'me.champeau.gradle.jmh' version '0.3.1'
+}
+
+// use the gradle build scan feature: https://scans.gradle.com/get-started
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }
 
 apply plugin: "java"
@@ -57,12 +64,6 @@ repositories {
 configurations {
     antlr3
     antlr4
-
-    databaseTestCompile.extendsFrom testCompile
-    databaseTestRuntime.extendsFrom testRuntime
-
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -70,7 +71,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
-    compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
+    // Later versions cannot be used. Tested until 1.6.5-1.
+    // See https://github.com/JabRef/jabref/issues/271 for details
+    compile 'org.swinglabs.swingx:swingx-core:1.6.4'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
     compile 'org.apache.pdfbox:pdfbox:1.8.12'
@@ -87,7 +90,7 @@ dependencies {
     compile 'org.openoffice:ridl:4.1.2'
     compile 'org.openoffice:unoil:4.1.2'
 
-    compile 'com.googlecode.java-diff-utils:diffutils:1.3.0'
+    compile 'com.github.bkromhout:java-diff-utils:2.1.1'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -129,33 +132,20 @@ dependencies {
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
+    
+    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.2.2'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.15'
-    testCompile 'com.github.tomakehurst:wiremock:2.3.1'
+    testCompile 'org.mockito:mockito-core:2.2.28'
+    testCompile 'com.github.tomakehurst:wiremock:2.4.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
 sourceSets {
     main {
         java {
-            // remove "src/oracleMock" if ojdbc.jar is available
-            srcDirs = ["src/main/java", "src/main/gen", "src/oracleMock"]
+            srcDirs = ["src/main/java", "src/main/gen"]
         }
-    }
-    databaseTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-        }
-    }
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integrationTest/java')
-        }
-        resources.srcDir file('src/integrationTest/resources')
     }
 }
 
@@ -165,7 +155,7 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
-                filteringCharset = 'UTF-8'
+        filteringCharset = 'UTF-8'
     }
     filteringCharset = 'UTF-8'
 
@@ -243,9 +233,32 @@ javadoc {
 }
 
 test {
+    useJUnit {
+        excludeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
+        excludeCategories 'net.sf.jabref.testutils.category.FetcherTests'
+        excludeCategories 'net.sf.jabref.testutils.category.GUITests'
+    }
     testLogging {
         events "failed"
         exceptionFormat "full"
+    }
+}
+
+task databaseTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
+    }
+}
+
+task fetcherTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.FetcherTests'
+    }
+}
+
+task guiTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.GUITests'
     }
 }
 
@@ -254,16 +267,6 @@ task copyTestResources(type: Copy) {
     into "${buildDir}/classes/test"
 }
 processTestResources.dependsOn copyTestResources
-
-task databaseTest(type: Test) {
-    testClassesDir = sourceSets.databaseTest.output.classesDir
-    classpath = sourceSets.databaseTest.runtimeClasspath
-}
-
-task integrationTest(type: Test) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
@@ -347,6 +350,8 @@ if (hasProperty('dev')) {
 task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
     projectFile = file('jabref.install4j')
     release = project.version
+    winKeystorePassword = System.getenv('CERTIFICATE_PW')
+    macKeystorePassword = System.getenv('CERTIFICATE_PW')
     variables = [
             versionFourDots: project.ext.threeDotVersion,
             buildFileName  : jar.archiveName,

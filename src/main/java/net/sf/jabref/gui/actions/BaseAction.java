@@ -8,5 +8,5 @@ package net.sf.jabref.gui.actions;
 @FunctionalInterface
 public interface BaseAction {
 
-    void action() throws Throwable;
+    void action() throws Exception;
 }

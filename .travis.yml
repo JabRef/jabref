@@ -2,19 +2,9 @@ language: java
 
 # we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
 # see https://docs.travis-ci.com/user/trusty-ci-environment/
-sudo: required
+# This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
 dist: trusty
-
-# update to latest Java8 as described at https://github.com/travis-ci/travis-ci/issues/4042#issuecomment-109756980
-addons:
-  apt:
-    packages:
-      # most recent Java8 - this makes the DK switcher obsolete - see https://github.com/travis-ci/travis-ci/issues/5897#issuecomment-218354129
-      - oracle-java8-installer
-      # MySQL 5.6 as desccribed at https://docs.travis-ci.com/user/database-setup/#MySQL-5.6
-      - mysql-server-5.6
-      - mysql-client-core-5.6
-      - mysql-client-5.6
+sudo: required
 
 services:
   - postgresql
@@ -29,7 +19,6 @@ before_install:
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
 
-# skip installation as this is also done during the script step
 install: true
 
 before_script:
@@ -37,13 +26,14 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check
-  - ./gradlew databaseTest
+  - ./gradlew check -Dscan
+  - ./gradlew fetcherTest -Dscan
+  - ./gradlew databaseTest -Dscan
   # no need for databases for the integrationTest -> save memory
-  - sudo service mysql stop
+  # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
   - sudo service postgresql stop
   # following services identified by "sudo service --status-all" do not need to run, too
-  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unkonwn instance" error)
+  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unknown instance" error)
   - sudo service acpid stop
   - sudo service atd stop
   - sudo service cron stop
@@ -53,8 +43,8 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  # Integratation tests run in a timeout. Just start them and kill them after 60s
-  - timeout 60 ./gradlew integrationTest --info || true
+  # Integration tests run in a timeout. Just start them and kill them after 60s.
+  - timeout 60 ./gradlew guiTest -Dscan --info || true
 
 after_script:
   # enable codecov report

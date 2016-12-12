@@ -15,7 +15,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
@@ -46,7 +46,6 @@ public class CleanupWorkerTest {
     private CleanupWorker worker;
     private File pdfFolder;
 
-
     @Before
     public void setUp() throws IOException {
         pdfFolder = bibFolder.newFolder();
@@ -54,10 +53,15 @@ public class CleanupWorkerTest {
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
+
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
+
         worker = new CleanupWorker(context,
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                        mock(LayoutFormatterPreferences.class),
-                        JabRefPreferences.getInstance().getFileDirectoryPreferences()));
+                        "", //empty fileDirPattern for backwards compatibility
+                        prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                        prefs.getFileDirectoryPreferences()));
+
     }
 
     @Test(expected = NullPointerException.class)
@@ -219,8 +223,7 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -234,8 +237,7 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -250,8 +252,7 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -282,8 +283,8 @@ public class CleanupWorkerTest {
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         Collections.emptyList(), Collections.emptyList()));
         Assert.assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
-        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
+        CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true, Collections
+                .singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
@@ -323,4 +324,5 @@ public class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         Assert.assertEquals(Optional.of("01"), entry.getField("month"));
     }
+
 }

@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -119,7 +121,15 @@ public class IntegrityCheckTest {
 
     @Test
     public void testBibtexkeyChecks() {
-        assertCorrect(createContext("bibtexkey", "Knuth2014"));
+        final BibDatabaseContext correctContext = createContext("bibtexkey", "Knuth2014");
+        correctContext.getDatabase().getEntries().get(0).setField("author","Knuth");
+        correctContext.getDatabase().getEntries().get(0).setField("year","2014");
+        assertCorrect(correctContext);
+
+        final BibDatabaseContext wrongContext = createContext("bibtexkey", "Knuth2014a");
+        wrongContext.getDatabase().getEntries().get(0).setField("author","Knuth");
+        wrongContext.getDatabase().getEntries().get(0).setField("year","2014");
+        assertWrong(wrongContext);
     }
 
     @Test
@@ -280,6 +290,14 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testDOIChecks() {
+        assertCorrect(createContext("doi", "10.1023/A:1022883727209"));
+        assertCorrect(createContext("doi", "10.17487/rfc1436"));
+        assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
+        assertWrong(createContext("doi", "asdf"));
+    }
+
+    @Test
     public void testASCIIChecks() {
         assertCorrect(createContext("title", "Only ascii characters!'@12"));
         assertWrong(createContext("month", "Umlauts are nöt ällowed"));
@@ -309,15 +327,29 @@ public class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                createBibtexKeyPatternPreferences())
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences()).checkBibtexDatabase();
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                createBibtexKeyPatternPreferences()).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
+    }
+
+    private BibtexKeyPatternPreferences createBibtexKeyPatternPreferences() {
+        final GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+        return new BibtexKeyPatternPreferences(
+                "",
+                "",
+                false,
+                false,
+                false,
+                keyPattern,
+                ',');
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {
