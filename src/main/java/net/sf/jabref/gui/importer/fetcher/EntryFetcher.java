@@ -8,7 +8,7 @@ import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 
 /**
- * @deprecated
+ * @Deprecated
  * Use {@link SearchBasedEntryFetcher} instead <br>
  * Implement this interface to add another activeFetcher (something that grabs records
  * from the Web for JabRef). Have a look at the existing implemenations
