@@ -17,6 +17,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.layout.Sizes;
@@ -162,14 +164,16 @@ public class FieldContentSelector extends JComponent {
 
 
         String currentText = editor.getText();
+        KeywordList words = KeywordList.parse(currentText, this.delimiter.charAt(0));
+        boolean alreadyInList = words.contains(new Keyword(chosen));
 
         // not the first word and no duplicate -> we need a comma
-        if (!"".equals(currentText) && !currentText.contains(chosen)) {
+        if (!"".equals(currentText) && !alreadyInList) {
             editor.append(FieldContentSelector.this.delimiter);
         }
 
         // no duplicate -> add it
-        if (!currentText.contains(chosen)) {
+        if (!alreadyInList) {
             editor.append(chosen);
         }
 
