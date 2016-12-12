@@ -1,9 +1,7 @@
 package net.sf.jabref.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -219,31 +217,9 @@ public class EntryTypes {
         } else if (type1 == null || type2 == null) {
             return false;
         } else
-            return type1.getName().equals(type2.getName()) && checkEqualityOfLists(type1.getRequiredFields(),
-                    type2.getRequiredFields()) && checkEqualityOfLists(type1.getOptionalFields(),
-                    type2.getOptionalFields());
-    }
-
-    /**
-     * Compares to String lists regardless of the internal sorting
-     * - clones the Lists internally to be able to sort them without side effects
-     *
-     * @param fieldList1 first list of Strings
-     * @param fieldList2 second list of Strings
-     * @return returns true if both lists have the same length and all entries of the first list are contained in the
-     *                      second list (independent of the internal order)
-     */
-    private static boolean checkEqualityOfLists(List<String> fieldList1, List<String> fieldList2) {
-
-        if(fieldList1.size()!=fieldList2.size()) {
-            return false;
-        } else {
-            ArrayList<String> copyList1 = new ArrayList<>(fieldList1);
-            ArrayList<String> copyList2 = new ArrayList<>(fieldList2);
-            Collections.sort(copyList1);
-            Collections.sort(copyList2);
-
-            return copyList1.equals(copyList2);
-        }
+            return type1.getName().equals(type2.getName())
+                    && type1.getRequiredFields().equals(type2.getRequiredFields())
+                    && type1.getOptionalFields().equals(type2.getOptionalFields())
+                    && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
     }
 }
