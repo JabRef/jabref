@@ -343,7 +343,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
-            journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNAL, journal));
+            journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
             getPdfUrl().ifPresent(url -> bibEntry
                     .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
             return bibEntry;

@@ -836,8 +836,7 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        this.setField(FieldName.FILE, newValue);
-        return Optional.of(new FieldChange(this, FieldName.FILE, oldValue.orElse(""), newValue));
+        return this.setField(FieldName.FILE, newValue);
     }
 
 }

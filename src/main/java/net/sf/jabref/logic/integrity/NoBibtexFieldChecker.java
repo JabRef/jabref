@@ -11,6 +11,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.FieldName;
 
+/**
+ * This checker checks whether the entry does not contain any field appearing only in BibLaTeX (and not in BibTex)
+ */
 public class NoBibtexFieldChecker implements Checker {
 
     @Override
@@ -18,10 +21,10 @@ public class NoBibtexFieldChecker implements Checker {
         SortedSet<String> allBibLaTeXOnlyFields = new TreeSet<>();
         allBibLaTeXOnlyFields.addAll(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.keySet());
 
-        // file is both in bibtex and biblatex
+        // file is both in BibTeX and BibLaTeX
         allBibLaTeXOnlyFields.remove(FieldName.FILE);
 
-        // this exists in BibLaTeX only (and is no aliassed field)
+        // this exists in BibLaTeX only (and is no aliased field)
         allBibLaTeXOnlyFields.add(FieldName.JOURNALSUBTITLE);
 
         return entry.getFieldNames().stream()
