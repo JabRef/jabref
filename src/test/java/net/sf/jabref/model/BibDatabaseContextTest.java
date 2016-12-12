@@ -42,7 +42,7 @@ public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
-        BibEntry e1 = new BibEntry("1", "electronic");
+        BibEntry e1 = new BibEntry("electronic");
         db.insertEntry(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);

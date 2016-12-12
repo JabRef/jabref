@@ -47,7 +47,7 @@ public class BibEntryTests {
 
     @Test
     public void allFieldsPresentDefault() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -63,7 +63,7 @@ public class BibEntryTests {
 
     @Test
     public void allFieldsPresentOr() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -79,7 +79,7 @@ public class BibEntryTests {
 
     @Test(expected = NullPointerException.class)
     public void isNullCiteKeyThrowsNPE() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
 
         e.setCiteKey(null);
         Assert.fail();
@@ -87,7 +87,7 @@ public class BibEntryTests {
 
     @Test
     public void isEmptyCiteKey() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         Assert.assertFalse(e.hasCiteKey());
 
         e.setCiteKey("");
