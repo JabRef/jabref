@@ -173,7 +173,7 @@ public class EntryTypes {
     }
 
     public static boolean isExclusiveBibLatex(String type) {
-        return filterEntryTypesNames(BibLatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type);
+        return filterEntryTypesNames(BibLatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase());
     }
 
     private static List<String> filterEntryTypesNames(List<EntryType> types, Predicate<EntryType> predicate) {
