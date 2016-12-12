@@ -7,7 +7,6 @@ import com.airhacks.afterburner.injection.PresenterFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-@SuppressWarnings("unused")
 public class DefaultInjector implements PresenterFactory {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultInjector.class);
@@ -34,7 +33,8 @@ public class DefaultInjector implements PresenterFactory {
             try {
                 return clazz.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
-                throw new IllegalStateException("Cannot instantiate dependency: " + clazz, ex);
+                LOGGER.error("Cannot instantiate dependency: " + clazz, ex);
+                return null;
             }
         }
     }

@@ -22,8 +22,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
-    private final String homepageUrl = "http://www.jabref.org";
-    private final String donationUrl = "http://www.jabref.org/#donations";
+    private final String homepageUrl = "https://www.jabref.org";
+    private final String donationUrl = "https://donations.jabref.org";
     private final String librariesUrl = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
     private final String githubUrl = "https://github.com/JabRef/jabref";
     private final String licenseUrl = "https://github.com/JabRef/jabref/blob/master/license.md";
