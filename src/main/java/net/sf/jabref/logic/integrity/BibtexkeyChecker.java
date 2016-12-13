@@ -10,6 +10,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
+/**
+ * Currently only checks the key if there is an author, year, and title present.
+ */
 public class BibtexkeyChecker implements Checker {
 
     @Override

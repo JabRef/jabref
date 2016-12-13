@@ -9,54 +9,84 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ExplicitGroupTest {
 
     private ExplicitGroup group;
     private ExplicitGroup group2;
 
-    private BibEntry emptyEntry;
+    private BibEntry entry;
 
     @Before
     public void setUp() {
         group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
-        emptyEntry = new BibEntry();
+        entry = new BibEntry();
     }
 
     @Test
-     public void testToStringSimple() {
-        assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
+    public void addSingleGroupToEmptyBibEntryChangesGroupsField() {
+        group.add(entry);
+
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
     @Test
-    public void toStringDoesNotWriteAssignedEntries() {
-        group.add(emptyEntry);
+    public void addSingleGroupToNonemptyBibEntryAppendsToGroupsField() {
+        entry.setField(FieldName.GROUPS, "some thing");
+        group.add(entry);
 
-        assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
+        assertEquals(Optional.of("some thing, myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
     @Test
-    public void addSingleGroupToBibEntrySuccessfullyIfEmptyBefore() {
-        group.add(emptyEntry);
+    public void addTwoGroupsToBibEntryChangesGroupsField() {
+        group.add(entry);
+        group2.add(entry);
 
-        assertEquals(Optional.of("myExplicitGroup"), emptyEntry.getField(FieldName.GROUPS));
+        assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), entry.getField(FieldName.GROUPS));
     }
 
     @Test
-    public void addTwoGroupsToBibEntrySuccessfully() {
-        group.add(emptyEntry);
-        group2.add(emptyEntry);
+    public void addDuplicateGroupDoesNotChangeGroupsField() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup");
+        group.add(entry);
 
-        assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), emptyEntry.getField(FieldName.GROUPS));
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
     @Test
-    public void noDuplicateStoredIfAlreadyInGroup() throws Exception {
-        emptyEntry.setField(FieldName.GROUPS, "myExplicitGroup");
-        group.add(emptyEntry);
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsPart() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup_alternative");
+        group.remove(entry);
 
-        assertEquals(Optional.of("myExplicitGroup"), emptyEntry.getField(FieldName.GROUPS));
+        assertEquals(Optional.of("myExplicitGroup_alternative"), entry.getField(FieldName.GROUPS));
     }
 
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsWord() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup alternative");
+        group.remove(entry);
+
+        assertEquals(Optional.of("myExplicitGroup alternative"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithWhitespace() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup b");
+
+        assertFalse(group.contains(entry));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithSlash() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup/b");
+
+        assertFalse(group.contains(entry));
+    }
 }

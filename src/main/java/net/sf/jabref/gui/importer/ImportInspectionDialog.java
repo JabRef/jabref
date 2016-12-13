@@ -74,7 +74,6 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -86,6 +85,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.DuplicateCheck;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.AuthorList;
@@ -95,7 +95,7 @@ import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupEntryChanger;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
@@ -221,8 +221,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
-
-        GUIUtil.correctRowHeight(glTable);
 
         setWidths();
 
@@ -565,7 +563,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
     private AbstractAction getAction(GroupTreeNode node) {
         AbstractAction action = new AddToGroupAction(node);
-        action.setEnabled(node.supportsAddingEntries());
+        action.setEnabled(node.getGroup() instanceof GroupEntryChanger);
         return action;
     }
 
@@ -768,13 +766,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // If the key existed, or exists now, go ahead:
             if (entry.hasCiteKey()) {
                 for (GroupTreeNode node : groups) {
-                    if (node.supportsAddingEntries()) {
+                    if (node.getGroup() instanceof GroupEntryChanger) {
                         // Add the entry:
-
-                        Optional<EntriesGroupChange> undo = node.getGroup().add(Collections.singletonList(entry));
-                        if (undo.isPresent()) {
+                        GroupEntryChanger entryChanger = (GroupEntryChanger)node.getGroup();
+                        List<FieldChange> undo = entryChanger.add(Collections.singletonList(entry));
+                        if (!undo.isEmpty()) {
                             ce.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node),
-                                    undo.get()));
+                                    undo));
                         }
                     }
                 }

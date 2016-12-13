@@ -13,7 +13,7 @@ public class ProtectTermsFormatter implements Formatter {
     private static ProtectedTermsLoader protectedTermsLoader;
 
     /**
-     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     * @Deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
      */
     @Deprecated
     public ProtectTermsFormatter() {

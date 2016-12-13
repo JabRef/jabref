@@ -4,14 +4,15 @@ import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class EntryTypesTestBibLatex {
-
-
     @Test
     public void testBibLatexMode() {
         // BibLatex mode
@@ -31,5 +32,19 @@ public class EntryTypesTestBibLatex {
         assertEquals(BibLatexEntryTypes.MISC, EntryTypes.getTypeOrDefault("unknowntype", BibDatabaseMode.BIBLATEX));
     }
 
+    @Test
+    public void detectExclusiveBiblatexType() {
+        assertTrue(EntryTypes.isExclusiveBibLatex(BibLatexEntryTypes.MVBOOK.getName()));
+    }
 
+    @Test
+    public void detectUndistinguishableAsBibtex() {
+        assertFalse(EntryTypes.isExclusiveBibLatex(BibtexEntryTypes.ARTICLE.getName()));
+        assertFalse(EntryTypes.isExclusiveBibLatex(BibLatexEntryTypes.ARTICLE.getName()));
+    }
+
+    @Test
+    public void detectUnknownTypeAsBibtex() {
+        assertFalse(EntryTypes.isExclusiveBibLatex("unknowntype"));
+    }
 }

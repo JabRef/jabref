@@ -89,9 +89,9 @@ public enum SpecialField {
             case "ranking":
                 return Optional.of(SpecialField.RANKING);
             case "readstatus":
-                return Optional.of(SpecialField.RELEVANCE);
-            case "relevance":
                 return Optional.of(SpecialField.READ_STATUS);
+            case "relevance":
+                return Optional.of(SpecialField.RELEVANCE);
             case "printed":
                 return Optional.of(SpecialField.PRINTED);
             default:

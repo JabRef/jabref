@@ -31,7 +31,6 @@ public class EntryFetchers {
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
-        // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());

@@ -10,11 +10,14 @@ import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.TestUtils;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(GUITests.class)
 public class EntryEditorTest {
 
     @Test

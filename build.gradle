@@ -16,7 +16,7 @@ buildscript {
 plugins {
     id 'com.gradle.build-scan' version '1.3'
     id "com.install4j.gradle" version "6.1.3"
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
     // If this is updated to 0.0.9, check configurations.errorprone
     id "net.ltgt.errorprone" version "0.0.8"
     id 'me.champeau.gradle.jmh' version '0.3.1'
@@ -64,12 +64,6 @@ repositories {
 configurations {
     antlr3
     antlr4
-
-    databaseTestCompile.extendsFrom testCompile
-    databaseTestRuntime.extendsFrom testRuntime
-
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -77,7 +71,9 @@ dependencies {
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
-    compile 'org.swinglabs:swingx:1.6.1' // do not update, 1.6.5.1 is broken
+    // Later versions cannot be used. Tested until 1.6.5-1.
+    // See https://github.com/JabRef/jabref/issues/271 for details
+    compile 'org.swinglabs.swingx:swingx-core:1.6.4'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
     compile 'org.apache.pdfbox:pdfbox:1.8.12'
@@ -118,7 +114,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.10.1'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.19'
+    compile 'info.debatty:java-string-similarity:0.20'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.7'
     compile 'org.apache.logging.log4j:log4j-api:2.7'
@@ -134,7 +130,7 @@ dependencies {
     compile 'com.github.lgooddatepicker:LGoodDatePicker:8.2.2'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.2.26'
+    testCompile 'org.mockito:mockito-core:2.2.28'
     testCompile 'com.github.tomakehurst:wiremock:2.4.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
@@ -142,24 +138,8 @@ dependencies {
 sourceSets {
     main {
         java {
-            // remove "src/oracleMock" if ojdbc.jar is available
-            srcDirs = ["src/main/java", "src/main/gen", "src/oracleMock"]
+            srcDirs = ["src/main/java", "src/main/gen"]
         }
-    }
-    databaseTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/databaseTest/java')
-        }
-    }
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir file('src/integrationTest/java')
-        }
-        resources.srcDir file('src/integrationTest/resources')
     }
 }
 
@@ -169,7 +149,7 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
-                filteringCharset = 'UTF-8'
+        filteringCharset = 'UTF-8'
     }
     filteringCharset = 'UTF-8'
 
@@ -247,9 +227,32 @@ javadoc {
 }
 
 test {
+    useJUnit {
+        excludeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
+        excludeCategories 'net.sf.jabref.testutils.category.FetcherTests'
+        excludeCategories 'net.sf.jabref.testutils.category.GUITests'
+    }
     testLogging {
         events "failed"
         exceptionFormat "full"
+    }
+}
+
+task databaseTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
+    }
+}
+
+task fetcherTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.FetcherTests'
+    }
+}
+
+task guiTest(type: Test) {
+    useJUnit {
+        includeCategories 'net.sf.jabref.testutils.category.GUITests'
     }
 }
 
@@ -258,16 +261,6 @@ task copyTestResources(type: Copy) {
     into "${buildDir}/classes/test"
 }
 processTestResources.dependsOn copyTestResources
-
-task databaseTest(type: Test) {
-    testClassesDir = sourceSets.databaseTest.output.classesDir
-    classpath = sourceSets.databaseTest.runtimeClasspath
-}
-
-task integrationTest(type: Test) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
