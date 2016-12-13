@@ -13,17 +13,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 @Category(FetcherTests.class)
-public class IsbnFetcherTest {
+public class IsbnViaEbookDeFetcherTest {
 
-    private IsbnFetcher fetcher;
+    private IsbnViaEbookDeFetcher fetcher;
     private BibEntry bibEntry;
 
     @Before
     public void setUp() {
-        fetcher = new IsbnFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+        fetcher = new IsbnViaEbookDeFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         bibEntry = new BibEntry();
         bibEntry.setType(BibLatexEntryTypes.BOOK);
@@ -84,12 +83,12 @@ public class IsbnFetcherTest {
 
     /**
      * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21
-     * However, this ISBN is not available on ebook.de. The fetcher should something as it falls back to Chimbori
+     * However, this ISBN is not available on ebook.de. The fetcher should return nothing rather than throwing an exeption.
      */
     @Test
-    public void searchForIsbnAvailableAtChimboriButNonOnEbookDe() throws Exception {
+    public void searchForValidButNotFoundISBN() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
-        assertNotEquals(Optional.empty(), fetchedEntry);
+        assertEquals(Optional.empty(), fetchedEntry);
     }
 
 }
