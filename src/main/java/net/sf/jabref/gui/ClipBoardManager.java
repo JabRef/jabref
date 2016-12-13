@@ -49,7 +49,7 @@ public class ClipBoardManager implements ClipboardOwner {
 
     /**
      * Places the string into the clipboard in two flavours:
-     * @param html good for copying the text to WYSIWYG Editors
+     * @param html proper copying for the text to WYSIWYG editors
      * @param text for plain text editors
      */
     public void setTransferableClipboardContents(String html, String text){

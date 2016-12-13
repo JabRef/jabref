@@ -22,7 +22,7 @@ import org.jbibtex.TokenMgrException;
 
 
 /**
- * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
+ * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
  */
 public class CitationStyleGenerator {
 
@@ -30,31 +30,31 @@ public class CitationStyleGenerator {
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
 
     /**
+     * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      * Generates a Citation based on the given entry and style
-     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, CitationStyle style) {
         return generateCitation(entry, style.getSource(), CitationStyleOutputFormat.HTML);
     }
 
     /**
+     * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      * Generates a Citation based on the given entry and style
-     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, String style) {
         return generateCitation(entry, style, CitationStyleOutputFormat.HTML);
     }
 
     /**
+     * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      * Generates a Citation based on the given entry, style, and output format
-     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
     protected static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         return generateCitations(Collections.singletonList(entry), style, outputFormat).get(0);
     }
 
     /**
-     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
+     * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      * Generates the citation for multiple entries at once. This is useful when the Citation Style has an increasing number
      */
     public static List<String> generateCitations(List<BibEntry> bibEntries, String style, CitationStyleOutputFormat outputFormat) {
@@ -82,10 +82,14 @@ public class CitationStyleGenerator {
         }
     }
 
+    /**
+     * Converts the {@link BibEntry} into {@link CSLItemData}.
+     */
     private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
         String citeKey = bibEntry.getCiteKeyOptional().orElse("");
         BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType()), new Key(citeKey));
 
+        // Not every field is already generated into latex free fields
         for (String key : bibEntry.getFieldMap().keySet()) {
             Optional<String> latexFreeField = bibEntry.getLatexFreeField(key);
             latexFreeField.ifPresent(value -> bibTeXEntry.addField(new Key(key), new DigitStringValue(value)));
