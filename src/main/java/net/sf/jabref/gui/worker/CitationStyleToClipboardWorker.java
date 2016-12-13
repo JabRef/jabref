@@ -36,7 +36,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
     private static final Pattern WHITESPACE  = Pattern.compile("(?m)^\\s|\\v+");
     private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
-    private static final Pattern FIX_RTF = Pattern.compile("\\\\uc0|\\{\\}");
+    private static final Pattern FIX_RTF = Pattern.compile("\\\\uc0|\\{|\\}");
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
