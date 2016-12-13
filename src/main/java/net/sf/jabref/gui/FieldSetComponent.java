@@ -162,17 +162,6 @@ class FieldSetComponent extends JPanel {
         } else {
             sel = new JComboBox<>(preset.toArray(new String[preset.size()]));
             sel.setEditable(true);
-//            sel.addActionListener(e -> {
-//                if ("comboBoxChanged".equals(e.getActionCommand()) && (e.getModifiers() == 0)) {
-//                    // These conditions signify arrow key navigation in the dropdown list, so we should
-//                    // not react to it. I'm not sure if this is well defined enough to be guaranteed to work
-//                    // everywhere.
-//                    return;
-//                }
-//                String s = sel.getSelectedItem().toString();
-//                addField(s);
-//                sel.getEditor().selectAll();
-//            });
             gbl.setConstraints(sel, con);
             add(sel);
         }
