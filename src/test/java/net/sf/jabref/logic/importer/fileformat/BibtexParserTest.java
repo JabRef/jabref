@@ -1207,6 +1207,25 @@ public class BibtexParserTest {
         assertEquals(Optional.of("ups  sala"), e.getField("file"));
     }
 
+    @Test
+    public void parsePreservesTabsInAbstractField() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups  \tsala}}"),
+                importFormatPreferences);
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        BibEntry e = c.iterator().next();
+        assertEquals(Optional.of("ups  \tsala"), e.getField("abstract"));
+    }
+
+    @Test
+    public void parsePreservesNewlineInAbstractField() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups \nsala}}"),
+                importFormatPreferences);
+
+        Collection<BibEntry> c = result.getDatabase().getEntries();
+        BibEntry e = c.iterator().next();
+        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), e.getField("abstract"));
+    }
+
     /**
      * Test for #650
      */
