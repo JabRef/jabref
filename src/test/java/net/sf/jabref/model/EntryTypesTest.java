@@ -1,6 +1,7 @@
 package net.sf.jabref.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -100,6 +101,12 @@ public class EntryTypesTest {
     }
 
     @Test
+    public void registeredCustomEntryTypeIsContainedInListOfCustomizedEntryTypes() {
+        EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
+        assertEquals(Arrays.asList(newCustomType), EntryTypes.getAllCustomTypes(mode));
+    }
+
+    @Test
     public void registerCustomEntryTypeDoesNotAffectOtherMode() {
         EntryTypes.addOrModifyCustomEntryType(newCustomType, mode);
         assertFalse(EntryTypes.getAllValues(otherMode).contains(newCustomType));
@@ -118,6 +125,13 @@ public class EntryTypesTest {
         EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
         assertEquals(Optional.of(overwrittenStandardType), EntryTypes.getType(overwrittenStandardType.getName(), mode));
     }
+
+    @Test
+    public void registeredCustomizedStandardEntryTypeIsContainedInListOfCustomizedEntryTypes() {
+        EntryTypes.addOrModifyCustomEntryType(overwrittenStandardType, mode);
+        assertEquals(Arrays.asList(overwrittenStandardType), EntryTypes.getAllModifiedStandardTypes(mode));
+    }
+
 
     @Test
     public void standardTypeIsStillAcessibleIfOverwritten() {
