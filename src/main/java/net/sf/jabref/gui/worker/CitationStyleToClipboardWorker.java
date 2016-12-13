@@ -140,7 +140,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Converts the citations into the RTF format.
      */
     private void processRtf(List<String> citations) {
-        String result = generateDefault(citations);
+        String result = String.join("\\line", citations);
         result = FIX_RTF.matcher(result).replaceAll("");
         result = RTF_NEWLINE.matcher(result).replaceAll("\\\\line");
         new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
