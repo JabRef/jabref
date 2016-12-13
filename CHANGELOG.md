@@ -25,6 +25,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Replaces manual thread management with cached thread pool
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
+  
+  
+- [#2375](https://github.com/JabRef/jabref/issues/2375) LaTeXCleanup action does now preserve % signs inside BibTeX fields
 
 ### Fixed
 - We fixed a few groups related issues:
