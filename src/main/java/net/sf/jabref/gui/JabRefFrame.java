@@ -302,7 +302,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
 
-    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy citation..."),
+    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
