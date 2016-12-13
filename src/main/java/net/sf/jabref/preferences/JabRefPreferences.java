@@ -385,12 +385,6 @@ public class JabRefPreferences {
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
     public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
 
-    //non-default preferences
-    private static final String CUSTOM_TYPE_NAME = "customTypeName_";
-    private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
-    private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
-    private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
 
@@ -1252,54 +1246,6 @@ public class JabRefPreferences {
         } else {
             return Optional.of("");
         }
-    }
-
-    /**
-     * Stores all information about the entry type in preferences, with the tag given by number.
-     */
-    public void storeCustomEntryType(CustomEntryType tp, int number) {
-        String nr = String.valueOf(number);
-        put(CUSTOM_TYPE_NAME + nr, tp.getName());
-        put(CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
-        List<String> optionalFields = tp.getOptionalFields();
-        putStringList(CUSTOM_TYPE_OPT + nr, optionalFields);
-        List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
-        putStringList(CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields);
-    }
-
-    /**
-     * Retrieves all information about the entry type in preferences, with the tag given by number.
-     */
-    public Optional<CustomEntryType> getCustomEntryType(int number) {
-        String nr = String.valueOf(number);
-        String name = get(CUSTOM_TYPE_NAME + nr);
-        if (name == null) {
-            return Optional.empty();
-        }
-        List<String> req = getStringList(CUSTOM_TYPE_REQ + nr);
-        List<String> opt = getStringList(CUSTOM_TYPE_OPT + nr);
-        List<String> priOpt = getStringList(CUSTOM_TYPE_PRIOPT + nr);
-        if (priOpt.isEmpty()) {
-            return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt));
-        }
-        List<String> secondary = new ArrayList<>(opt);
-        secondary.removeAll(priOpt);
-
-        return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secondary));
-
-    }
-
-
-    /**
-     * Removes all information about custom entry types with tags of
-     *
-     * @param number or higher.
-     */
-    public void purgeCustomEntryTypes(int number) {
-        purgeSeries(CUSTOM_TYPE_NAME, number);
-        purgeSeries(CUSTOM_TYPE_REQ, number);
-        purgeSeries(CUSTOM_TYPE_OPT, number);
-        purgeSeries(CUSTOM_TYPE_PRIOPT, number);
     }
 
     /**

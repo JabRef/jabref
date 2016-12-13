@@ -60,6 +60,7 @@ public class JabRefMain {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeStoredCustomEntryTypes();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
