@@ -36,6 +36,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
     private static final Pattern WHITESPACE  = Pattern.compile("(?m)^\\s|\\v+");
     private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
+    private static final Pattern FIX_RTF = Pattern.compile("\\\\uc0");
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
@@ -88,7 +89,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         processHtml(citations);
                         break;
                     case RTF:
-                        new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(generateDefault(citations)));
+                        processRtf(citations);
                         break;
                     case XSLFO:
                         processXslfo(citations);
@@ -132,6 +133,15 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      */
     private String generateDefault(List<String> citations) {
         return String.join(OS.NEWLINE, citations);
+    }
+
+    /**
+     * Converts the citations into the RTF format.
+     */
+    private void processRtf(List<String> citations) {
+        String result = generateDefault(citations);
+        result = FIX_RTF.matcher(result).replaceAll("");
+        new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
     }
 
     /**
