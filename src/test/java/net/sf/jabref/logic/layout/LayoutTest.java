@@ -17,7 +17,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -80,15 +79,6 @@ JabRefPreferences.getInstance().getImportFormatPreferences());
                 "@other{bla, author={This\nis\na\ntext}}");
 
         Assert.assertEquals("This is a text", layoutText);
-    }
-
-    @Test
-    @Ignore
-    public void testHTMLCharDoubleLineBreak() throws IOException {
-        String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
-                "@other{bla, author={This\nis\na\n\ntext}}");
-
-        Assert.assertEquals("This is a<br>text ", layoutText);
     }
 
     @Test
