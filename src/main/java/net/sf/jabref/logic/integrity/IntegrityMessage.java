@@ -3,6 +3,7 @@ package net.sf.jabref.logic.integrity;
 import java.util.Objects;
 
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public final class IntegrityMessage implements Cloneable {

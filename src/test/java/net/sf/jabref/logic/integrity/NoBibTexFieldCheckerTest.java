@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
