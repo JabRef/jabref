@@ -786,19 +786,6 @@ public class BibtexParserTest {
     }
 
     @Test
-    @Ignore("Ignoring because this is an edge case")
-    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
-
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"),
-                importFormatPreferences);
-
-        assertTrue("There should be warnings", result.hasWarnings());
-
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
-    }
-
-    @Test
     public void parseAcceptsEntryWithAtSymbolInBrackets() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ good}}"),
