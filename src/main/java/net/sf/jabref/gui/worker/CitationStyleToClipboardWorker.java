@@ -37,6 +37,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     private static final Pattern WHITESPACE  = Pattern.compile("(?m)^\\s|\\v+");
     private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
     private static final Pattern FIX_RTF = Pattern.compile("\\\\uc0|\\{\\}");
+    private static final Pattern RTF_NEWLINE = Pattern.compile("\\\\tab");
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
@@ -141,6 +142,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     private void processRtf(List<String> citations) {
         String result = generateDefault(citations);
         result = FIX_RTF.matcher(result).replaceAll("");
+        result = RTF_NEWLINE.matcher(result).replaceAll("\\\\line");
         new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
     }
 
