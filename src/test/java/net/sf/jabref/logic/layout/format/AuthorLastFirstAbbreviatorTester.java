@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
