@@ -164,7 +164,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-
     /**
      * For Unit-testing only. <i>Don't remove!</i> <br>
      * Used via reflection in {@link net.sf.jabref.importer.DatabaseFileLookup} to construct this

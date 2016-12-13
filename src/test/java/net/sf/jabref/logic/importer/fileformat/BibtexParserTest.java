@@ -27,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -1212,7 +1213,7 @@ public class BibtexParserTest {
                 importFormatPreferences);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals(Optional.of("ups  \tsala"), e.getField("abstract"));
+        assertEquals(Optional.of("ups  \tsala"), e.getField(FieldName.ABSTRACT));
     }
 
     @Test
@@ -1222,7 +1223,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), e.getField("abstract"));
+        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), e.getField(FieldName.ABSTRACT));
     }
 
     /**
