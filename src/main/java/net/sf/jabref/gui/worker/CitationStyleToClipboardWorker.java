@@ -12,6 +12,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.exporter.RtfTransferable;
+import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
 import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.citationstyle.CitationStyleGenerator;
 import net.sf.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -95,11 +96,11 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         break;
                     case ASCII_DOC:
                     case TEXT:
-                        new ClipBoardManager().setTransferableClipboardContents(generateDefault(citations));
+                        processText(citations);
                         break;
                     default:
                         LOGGER.warn("unknown output format: '" + outputFormat + "', processing it via the default.");
-                        new ClipBoardManager().setTransferableClipboardContents(generateDefault(citations));
+                        processText(citations);
                         break;
                 }
             }
@@ -124,14 +125,15 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
             tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
             plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
         }
-        new ClipBoardManager().setTransferableClipboardContents(html, plain);
+        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(html, plain));
     }
 
     /**
      * Joins every citation with a newline and returns it.
      */
-    private String generateDefault(List<String> citations) {
-        return String.join(OS.NEWLINE, citations);
+    private void processText(List<String> citations) {
+        String text = String.join("", citations);
+        new ClipBoardManager().setClipboardContents(text);
     }
 
     /**
@@ -164,7 +166,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 "   </fo:page-sequence>" + OS.NEWLINE +
                 "</fo:root>" + OS.NEWLINE;
 
-        new ClipBoardManager().setTransferableClipboardContents(result);
+        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(result, result));
     }
 
     /**
@@ -185,7 +187,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
         result +="   </body>" + OS.NEWLINE +
                 "</html>" + OS.NEWLINE;
 
-        new ClipBoardManager().setTransferableClipboardContents(result);
+        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(result, result));
     }
 
 }
