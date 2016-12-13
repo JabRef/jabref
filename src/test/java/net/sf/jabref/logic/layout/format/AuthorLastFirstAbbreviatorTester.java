@@ -47,9 +47,8 @@ public class AuthorLastFirstAbbreviatorTester {
     }
 
     @Test
-    @Ignore
     public void testJrAuthor() {
-        Assert.assertEquals("Other, A. N.", abbreviate("Other, Jr., Anthony N."));
+        Assert.assertEquals("Other, Jr., A. N.", abbreviate("Other, Jr., Anthony N."));
     }
 
     @Test
