@@ -81,7 +81,7 @@ public class ChangeEntryTypeMenu {
         }
     }
 
-    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<? extends EntryType> types) {
+    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, List<? extends EntryType> types) {
         // bibtex
         JMenuItem header = new JMenuItem(title);
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
