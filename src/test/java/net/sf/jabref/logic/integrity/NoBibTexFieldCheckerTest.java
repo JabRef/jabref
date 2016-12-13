@@ -1,13 +1,12 @@
 package net.sf.jabref.logic.integrity;
 
 import java.util.Collections;
+import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 
 public class NoBibTexFieldCheckerTest {
@@ -32,14 +31,18 @@ public class NoBibTexFieldCheckerTest {
     public void journaltitleIsRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("journaltitle", "test");
-        assertNotEquals(Collections.emptyList(), checker.check(entry));
+        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "journaltitle");
+        List<IntegrityMessage> messages = checker.check(entry);
+        assertEquals(messages, Collections.singletonList(message));
     }
 
     @Test
     public void locationIsRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("location", "test");
-        assertNotEquals(Collections.emptyList(), checker.check(entry));
+        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "location");
+        List<IntegrityMessage> messages = checker.check(entry);
+        assertEquals(messages, Collections.singletonList(message));
     }
 
 }
