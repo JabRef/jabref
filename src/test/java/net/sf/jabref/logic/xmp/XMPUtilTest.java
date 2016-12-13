@@ -1207,47 +1207,45 @@ public class XMPUtilTest {
      */
     @Test
     public void testCommandLineByKey() throws IOException, TransformerException {
-
         File tempBib = File.createTempFile("JabRef", ".bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
-            fileWriter.close();
+        }
 
-            { // First try canh05
-                PrintStream oldOut = System.out;
-                try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                    System.setOut(new PrintStream(s));
-                    XMPUtilMain.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
+        PrintStream sysOut = System.out;
 
-                // PDF should be annotated:
-                List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-                Assert.assertEquals(1, l.size());
-                assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
-            }
-            // Now try OezbekC06
-            try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                PrintStream oldOut = System.out;
-                System.setOut(new PrintStream(s));
-                try {
-                    XMPUtilMain.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
-            }
-
-            // PDF should be annotated:
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-            Assert.assertEquals(1, l.size());
-            assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+        // First try canh05
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            XMPUtilMain.main(new String[]{"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
         } finally {
-            if (!tempBib.delete()) {
-                // TODO: file is still locked
-                System.err.println("Cannot delete temporary file");
+            System.setOut(sysOut);
+        }
+
+        // PDF should be annotated:
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+
+        // Now try OezbekC06
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            try {
+                XMPUtilMain.main(new String[]{"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+            } finally {
+                System.setOut(sysOut);
             }
+        }
+
+        // PDF should be annotated:
+        l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+
+        if (!tempBib.delete()) {
+            // TODO: file is still locked
+            System.err.println("Cannot delete temporary file");
         }
     }
 
