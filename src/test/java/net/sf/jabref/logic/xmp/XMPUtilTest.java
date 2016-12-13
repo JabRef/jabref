@@ -1207,13 +1207,13 @@ public class XMPUtilTest {
      * @throws TransformerException
      */
     @Test
-    @Ignore
     public void testCommandLineByKey() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
+            fileWriter.close();
 
             { // First try canh05
                 PrintStream oldOut = System.out;
@@ -1246,6 +1246,7 @@ public class XMPUtilTest {
             assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
         } finally {
             if (!tempBib.delete()) {
+                // TODO: file is still locked
                 System.err.println("Cannot delete temporary file");
             }
         }
