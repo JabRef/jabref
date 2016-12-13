@@ -7,7 +7,6 @@ import javax.swing.Action;
 
 import javafx.application.Platform;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -24,7 +23,7 @@ public class KeyBindingAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         Platform.runLater(() -> {
             KeyBindingsDialogView view = new KeyBindingsDialogView();
-            view.show(Globals.getKeyPrefs());
+            view.show();
         });
     }
 
