@@ -5,46 +5,62 @@ import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.gui.FXDialogService;
+import net.sf.jabref.gui.MappedList;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.LogMessages;
 import net.sf.jabref.logic.util.BuildInfo;
+import net.sf.jabref.logic.util.OS;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
 
-public class ErrorConsoleViewModel {
+public class ErrorConsoleViewModel extends AbstractViewModel {
 
     private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
-    private ListProperty<LogEvent> allMessagesData = LogMessages.getInstance().messagesProperty();
+    private final DialogService dialogService;
+    private final ClipBoardManager clipBoardManager;
+    private final BuildInfo buildInfo;
+    private final ListProperty<LogEventViewModel> allMessagesData;
 
-    public ListProperty<LogEvent> allMessagesDataproperty() {
+    public ErrorConsoleViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
+        this.buildInfo = Objects.requireNonNull(buildInfo);
+
+        ObservableList<LogEventViewModel> eventViewModels =
+                new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
+        allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
+    }
+
+    public ListProperty<LogEventViewModel> allMessagesDataProperty() {
         return this.allMessagesData;
     }
 
     /**
-     * Concatenates the formatted message of the given LogEvents by using the a new line separator
+     * Concatenates the formatted message of the given {@link LogEvent}s by using the a new line separator.
      *
-     * @param selectedEntries as {@link ObservableList<LogEvent>}
      * @return all messages as String
      */
-    private String getLogMessagesAsString(ObservableList<LogEvent> selectedEntries) {
-        String logMessagesContent = selectedEntries.stream().map(message -> message.getMessage().getFormattedMessage()).collect(Collectors.joining(System.lineSeparator()));
-        return logMessagesContent;
+    private String getLogMessagesAsString(List<LogEventViewModel> messages) {
+        return messages.stream()
+                .map(LogEventViewModel::getDetailedText)
+                .collect(Collectors.joining(OS.NEWLINE));
     }
 
     /**
@@ -55,40 +71,42 @@ public class ErrorConsoleViewModel {
     }
 
     /**
-     * Copies the selected LogEvents to the Clipboard
-     *
-     * @param selectedEntries as ObservableList of LogEvents
+     * Copies the given list of {@link LogEvent}s to the clipboard.
      */
-    public void copyLog(ObservableList<LogEvent> selectedEntries) {
-        new ClipBoardManager().setClipboardContents(getLogMessagesAsString(selectedEntries));
-        JabRefGUI.getMainFrame().output(Localization.lang("Log copied to clipboard."));
+    public void copyLog(List<LogEventViewModel> messages) {
+        if (messages.isEmpty()) {
+            return;
+        }
+        clipBoardManager.setClipboardContents(getLogMessagesAsString(messages));
+        dialogService.notify(Localization.lang("Log copied to clipboard."));
     }
 
     /**
-     * Handler for report Issues on GitHub by click of Report Issue Button
+     * Opens a new issue on GitHub and copies log to clipboard.
      */
     public void reportIssue() {
         try {
             String issueTitle = "Automatic Bug Report-" + dateFormat.format(date);
-            String issueBody = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", Globals.BUILD_INFO.getVersion(), BuildInfo.OS,
+            String issueBody = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", buildInfo.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
-            JabRefGUI.getMainFrame().output(Localization.lang("Issue on GitHub successfully reported."));
-            DialogService dialogService = new FXDialogService();
+            dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
-                    Localization.lang("Your issue was reported in your browser.") + "\n\n" +
-                            Localization.lang("The log and exception information was copied to your clipboard.") + "\n\n" +
+                    Localization.lang("Your issue was reported in your browser.") + "\n" +
+                            Localization.lang("The log and exception information was copied to your clipboard.") + " " +
                             Localization.lang("Please paste this information (with Ctrl+V) in the issue description."));
-            URIBuilder uriBuilder = new URIBuilder().setScheme("https").setHost("github.com").setPath("/JabRef/jabref/issues/new")
-                    .setParameter("title", issueTitle).setParameter("body", issueBody);
+            URIBuilder uriBuilder = new URIBuilder()
+                    .setScheme("https").setHost("github.com")
+                    .setPath("/JabRef/jabref/issues/new")
+                    .setParameter("title", issueTitle)
+                    .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
-            // Format the contents of listview in Issue Description
-            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + getLogMessagesAsString(allMessagesData) + "\n```\n</details>");
-            new ClipBoardManager().setClipboardContents(issueDetails);
-        } catch (IOException e) {
-            LOGGER.error(e);
-        } catch (URISyntaxException e) {
+
+            // Append log messages in issue description
+            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
+                    + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
+            clipBoardManager.setClipboardContents(issueDetails);
+        } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);
         }
-
     }
 }

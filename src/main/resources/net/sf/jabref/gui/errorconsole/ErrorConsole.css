@@ -2,6 +2,10 @@
 	-fx-padding: 10.0px;
 }
 
+.list-cell:default {
+	-fx-background-color: white;
+}
+
 .info-section {
 	-fx-padding: 10.0px;
 }
@@ -10,15 +14,6 @@
 	-fx-font-size: 48.0;
 }
 
-.list-cell {
-    -fx-background-color: white;
- }
-
-.list-cell:selected {
-	-fx-background-color: blue;
-	-fx-text-fill: white;
-}
- 
  .icon {
  	-fx-font-family: 'Material Design Icons';
 	-fx-font-size: 16.0;

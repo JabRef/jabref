@@ -1,76 +1,114 @@
 package net.sf.jabref.gui.errorconsole;
 
+import javax.inject.Inject;
+
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.AbstractController;
+import net.sf.jabref.gui.ClipBoardManager;
+import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
-import net.sf.jabref.gui.util.ViewModelListCellFactory;
+import net.sf.jabref.logic.util.BuildInfo;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.LogEvent;
+public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {
 
-/**
- * Controller for the error console view model having access to ui elements as well as to the view model.
- */
-public class ErrorConsoleController {
+    @FXML private Button closeButton;
+    @FXML private Button copyLogButton;
+    @FXML private Button createIssueButton;
+    @FXML private ListView<LogEventViewModel> messagesListView;
+    @FXML private Label descriptionLabel;
 
-    private final ErrorConsoleViewModel errorViewModel = new ErrorConsoleViewModel();
-
-    @FXML
-    private Button closeButton;
-    @FXML
-    private Button copyLogButton;
-    @FXML
-    private Button createIssueButton;
-    @FXML
-    private ListView<LogEvent> allMessages;
-    @FXML
-    private Label descriptionLabel;
+    @Inject private DialogService dialogService;
+    @Inject private ClipBoardManager clipBoardManager;
+    @Inject private BuildInfo buildInfo;
+    @Inject private KeyBindingPreferences keyBindingPreferences;
 
     @FXML
     private void initialize() {
-        listViewStyle();
-        allMessages.itemsProperty().bind(errorViewModel.allMessagesDataproperty());
-        allMessages.scrollTo(errorViewModel.allMessagesDataproperty().getSize() - 1);
-        allMessages.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        errorViewModel.allMessagesDataproperty().addListener((ListChangeListener) (change -> {
-            int size = errorViewModel.allMessagesDataproperty().size();
+        viewModel = new ErrorConsoleViewModel(dialogService, clipBoardManager, buildInfo);
+
+        messagesListView.setCellFactory(createCellFactory());
+        messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
+        messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
+        messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (change -> {
+            int size = viewModel.allMessagesDataProperty().size();
             if (size > 0) {
-                allMessages.scrollTo(size - 1);
+                messagesListView.scrollTo(size - 1);
             }
         }));
         descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
     }
 
+    private Callback<ListView<LogEventViewModel>, ListCell<LogEventViewModel>> createCellFactory() {
+        return cell -> new ListCell<LogEventViewModel>() {
+
+            private HBox graphic;
+            private Node icon;
+            private VBox message;
+            private Label heading;
+            private Label stacktrace;
+
+            {
+                graphic = new HBox(10);
+                heading = new Label();
+                stacktrace = new Label();
+                message = new VBox();
+                message.getChildren().setAll(heading, stacktrace);
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            }
+
+            @Override
+            public void updateItem(LogEventViewModel event, boolean empty) {
+                super.updateItem(event, empty);
+
+                if (event == null || empty) {
+                    setGraphic(null);
+                } else {
+                    icon = event.getIcon().getGraphicNode();
+                    heading.setText(event.getDisplayText());
+                    heading.getStyleClass().setAll(event.getStyleClass());
+                    stacktrace.setText(event.getStackTrace().orElse(""));
+                    graphic.getStyleClass().setAll(event.getStyleClass());
+                    graphic.getChildren().setAll(icon, message);
+                    setGraphic(graphic);
+                }
+            }
+        };
+    }
+
     @FXML
     private void copySelectedLogEntries(KeyEvent event) {
-        KeyBindingPreferences keyPreferences = Globals.getKeyPrefs();
-        if (keyPreferences.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
-            ObservableList<LogEvent> selectedEntries = allMessages.getSelectionModel().getSelectedItems();
-            if (!selectedEntries.isEmpty()) {
-                errorViewModel.copyLog(selectedEntries);
-            }
+        if (keyBindingPreferences.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
+            ObservableList<LogEventViewModel> selectedEntries = messagesListView.getSelectionModel().getSelectedItems();
+            viewModel.copyLog(selectedEntries);
         }
     }
 
     @FXML
-    private void copyLogButton() {
-        errorViewModel.copyLog();
+    private void copyLog() {
+        viewModel.copyLog();
     }
 
     @FXML
-    private void createIssueButton() {
-        errorViewModel.reportIssue();
+    private void createIssue() {
+        viewModel.reportIssue();
     }
 
     @FXML
@@ -78,41 +116,4 @@ public class ErrorConsoleController {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
-
-    /**
-     * Style the list view with icon and message color
-     */
-    private void listViewStyle() {
-        // Handler for listCell appearance (example for exception Cell)
-        allMessages.setCellFactory(new ViewModelListCellFactory<LogEvent>().
-                withGraphic( viewModel -> {
-                    Level logLevel = viewModel.getLevel();
-                    switch (logLevel.getStandardLevel()) {
-                        case ERROR:
-                            return (IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
-                        case WARN:
-                            return (IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
-                        case INFO:
-                            return (IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
-                        default:
-                            return null;
-                    }
-                }).
-                withStyleClass( viewModel -> {
-                    Level logLevel = viewModel.getLevel();
-                    switch (logLevel.getStandardLevel()) {
-                        case ERROR:
-                            return "exception";
-                        case WARN:
-                            return "output";
-                        case INFO:
-                            return "log";
-                        default:
-                            return null;
-                    }
-                }).
-                withText( viewModel -> viewModel.getMessage().getFormattedMessage())
-        );
-    }
-
 }
