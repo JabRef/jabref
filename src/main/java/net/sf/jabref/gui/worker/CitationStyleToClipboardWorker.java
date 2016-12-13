@@ -143,7 +143,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
         for (String citation : citations) {
             citation = citation.replaceAll("\\\\tab", "\\\\line");
             citation = citation.replaceFirst("\\\\line", "\\\\tab");
-            result += citation + "\\\\line ";
+            result += citation + "\\line ";
         }
         result = FIX_RTF.matcher(result).replaceAll("");
         new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
