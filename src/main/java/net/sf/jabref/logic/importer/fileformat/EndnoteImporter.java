@@ -253,8 +253,6 @@ public class EndnoteImporter extends Importer {
                 hm.put(FieldName.PAGES, artnum);
             }
 
-            // id assumes an existing database so don't
-            // create one here
             BibEntry b = new BibEntry(type);
             b.setField(hm);
             if (!b.getFieldNames().isEmpty()) {
