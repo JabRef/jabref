@@ -3,10 +3,8 @@ package net.sf.jabref.gui.help;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 
 import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.ClipBoardManager;
@@ -17,7 +15,6 @@ import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 
 public class AboutDialogController extends AbstractController<AboutDialogViewModel> {
 
-    @FXML protected Button closeButton;
     @FXML protected ImageView iconImage;
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
@@ -34,8 +31,7 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
 
     @FXML
     private void closeAboutDialog() {
-        Stage stage = (Stage) closeButton.getScene().getWindow();
-        stage.close();
+        getStage().close();
     }
 
     @FXML

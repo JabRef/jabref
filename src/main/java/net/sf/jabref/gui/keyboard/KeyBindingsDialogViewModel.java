@@ -15,13 +15,14 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.FXDialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class KeyBindingsDialogViewModel {
+public class KeyBindingsDialogViewModel extends AbstractController<KeyBindingsDialogViewModel> {
 
     private KeyBindingRepository keyBindingRepository;
     private KeyBindingPreferences keyBindingPreferences;
@@ -52,9 +53,6 @@ public class KeyBindingsDialogViewModel {
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         ButtonBar.setButtonData(resetButton, ButtonData.LEFT);
         selectedKeyBinding.bind(keyBindingsTable.getSelectionModel().selectedItemProperty());
-    }
-
-    public void initializeView() {
         registerKeyEvents();
         populateTable();
         bindColumnValues();
@@ -97,14 +95,9 @@ public class KeyBindingsDialogViewModel {
         keyBindingsTable.setOnKeyPressed(evt -> grabKey(evt));
     }
 
-    private Stage getDialogStage() {
-        return (Stage) closeButton.getScene().getWindow();
-    }
-
     @FXML
     private void closeDialog() {
-        Stage stage = getDialogStage();
-        stage.close();
+        getStage().close();
     }
 
     public void saveKeyBindings() {
