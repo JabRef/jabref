@@ -20,6 +20,11 @@ public class IsbnFetcher extends AbstractIsbnFetcher {
         super(importFormatPreferences);
     }
 
+    @Override
+    public String getName() {
+        return "ISBN";
+    }
+
     /**
      * Method never used
      */

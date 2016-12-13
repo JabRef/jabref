@@ -18,11 +18,6 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
     }
 
     @Override
-    public String getName() {
-        return "ISBN";
-    }
-
-    @Override
     public HelpFile getHelpPage() {
         return HelpFile.FETCHER_ISBN_TO_BIBTEX;
     }

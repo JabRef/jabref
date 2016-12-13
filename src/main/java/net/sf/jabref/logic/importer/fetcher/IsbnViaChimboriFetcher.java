@@ -25,6 +25,11 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         super(importFormatPreferences);
     }
 
+    @Override
+    public String getName() {
+        return "ISBN (Chimbori/Amazon)";
+    }
+
     /**
      * @return null, because the identifier is passed using form data. This method is not used.
      */

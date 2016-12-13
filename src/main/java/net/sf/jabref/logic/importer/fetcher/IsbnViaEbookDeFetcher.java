@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
@@ -20,6 +21,11 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
 
     public IsbnViaEbookDeFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
+    }
+
+    @Override
+    public String getName() {
+        return "ISBN (ebook.de)";
     }
 
     @Override
@@ -40,6 +46,7 @@ public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
         entry.getField(FieldName.PAGETOTAL).ifPresent(pages ->
                 entry.setField(FieldName.PAGETOTAL, pages.replaceAll("[\\D]", "")));
         new FieldFormatterCleanup(FieldName.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
 }

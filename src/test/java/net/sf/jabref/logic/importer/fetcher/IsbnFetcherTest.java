@@ -31,7 +31,7 @@ public class IsbnFetcherTest {
         bibEntry.setField("title", "Effective Java");
         bibEntry.setField("publisher", "Addison Wesley");
         bibEntry.setField("year", "2008");
-        bibEntry.setField("author", "Joshua Bloch");
+        bibEntry.setField("author", "Bloch, Joshua");
         bibEntry.setField("date", "2008-05-08");
         bibEntry.setField("ean", "9780321356680");
         bibEntry.setField("isbn", "0321356683");

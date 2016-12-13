@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Adds integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
 - Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
 - ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
+- When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
 - We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
 - Replaces manual thread management with cached thread pool
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
