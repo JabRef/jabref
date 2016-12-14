@@ -258,7 +258,6 @@ public class ManageJournalAbbreviationsTest {
         Assert.assertEquals(5, viewModel.abbreviationsProperty().size());
         viewModel.currentFileProperty().set(test5);
         Assert.assertEquals(5, viewModel.abbreviationsProperty().size());
-
     }
 
     @Test
@@ -474,5 +473,4 @@ public class ManageJournalAbbreviationsTest {
         viewModel.currentAbbreviationProperty()
                 .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
     }
-
 }

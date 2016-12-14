@@ -23,5 +23,4 @@ public class ManageJournalAbbreviationsView extends AbstractDialogView {
         journalAbbreviationsDialog.setDialogPane((DialogPane) this.getView());
         journalAbbreviationsDialog.show();
     }
-
 }

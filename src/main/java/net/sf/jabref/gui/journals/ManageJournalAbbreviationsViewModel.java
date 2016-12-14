@@ -54,9 +54,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
-                    boolean isAbbreviation = (newvalue != null) && !newvalue.isPseudoAbbreviation();
-                    boolean isEditableFile = (currentFile != null) && !currentFile.get().isBuiltInListProperty().get();
-                    isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
+            boolean isAbbreviation = (newvalue != null) && !newvalue.isPseudoAbbreviation();
+            boolean isEditableFile = (currentFile != null) && !currentFile.get().isBuiltInListProperty().get();
+            isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
         currentFile.addListener((observable, oldvalue, newvalue) -> {
             if (oldvalue != null) {
@@ -192,7 +192,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * Method to add a new abbreviation to the abbreviations list property.
      * It also sets the currentAbbreviation property to the new abbreviation.
      *
-     * @param name of the abbreviation object
+     * @param name         of the abbreviation object
      * @param abbreviation of the abbreviation object
      */
     public void addAbbreviation(String name, String abbreviation) {
@@ -209,7 +209,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     /**
      * Method to change the currentAbbrevaition property to a new abbreviation.
      *
-     * @param name of the abbreviation object
+     * @param name         of the abbreviation object
      * @param abbreviation of the abbreviation object
      */
     public void editAbbreviation(String name, String abbreviation) {

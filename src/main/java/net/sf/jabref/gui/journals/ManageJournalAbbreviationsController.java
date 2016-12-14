@@ -99,7 +99,8 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
                         return evt -> addAbbreviation();
                     } else {
                         return viewModel.isAbbreviationEditableAndRemovable() ?
-                                evt -> editAbbreviation() : evt -> {};
+                                evt -> editAbbreviation() : evt -> {
+                        };
                     }
                 })
         );
@@ -116,7 +117,8 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
                     if (!isPseudoAbbreviation && viewModel.isAbbreviationEditableAndRemovable()) {
                         return evt -> removeAbbreviation();
                     } else {
-                        return evt -> {};
+                        return evt -> {
+                        };
                     }
                 })
         );
@@ -142,7 +144,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     @FXML
     private void addNewFile() {
         viewModel.addNewFile();
-
     }
 
     @FXML
