@@ -206,6 +206,19 @@ public class EntryTypes {
     }
 
     /**
+     * Load given custom entry types for BibTeX and BibLatex mode
+     */
+    public static void loadCustomEntryTypes(List<CustomEntryType> customBibtexEntryTypes, List<CustomEntryType> customBibLatexEntryTypes) {
+        for (CustomEntryType type : customBibtexEntryTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
+        }
+
+        for (CustomEntryType type : customBibLatexEntryTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
+        }
+    }
+
+    /**
      * Checks whether two EntryTypes are equal or not based on the equality of the type names and on the equality of
      * the required and optional field lists
      *

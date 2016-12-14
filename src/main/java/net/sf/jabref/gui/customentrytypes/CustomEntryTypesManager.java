@@ -1,4 +1,4 @@
-package net.sf.jabref.logic;
+package net.sf.jabref.gui.customentrytypes;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,22 +9,6 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
-
-    /**
-     * Load all custom entry types from preferences. This method is
-     * called from JabRef when the program starts.
-     */
-    public static void loadCustomEntryTypes(JabRefPreferences prefs) {
-        List<CustomEntryType> customBibtexTypes = prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX);
-        for(CustomEntryType type : customBibtexTypes) {
-            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
-        }
-
-        List<CustomEntryType> customBiblatexTypes = prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX);
-        for(CustomEntryType type :customBiblatexTypes) {
-            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
-        }
-    }
 
     /**
      * Iterate through all entry types, and store those that are

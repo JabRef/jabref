@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.gui.customentrytypes.CustomEntryTypesManager;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
