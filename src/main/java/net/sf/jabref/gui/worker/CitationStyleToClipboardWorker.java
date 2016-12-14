@@ -117,7 +117,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * (WYSIWYG Editors use the HTML, plain text editors the text)
      */
     static HtmlTransferable processPreview(List<String> citations) {
-        String html = String.join(OS.NEWLINE + "<br>" + OS.NEWLINE, citations);
+        String html = String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
         String plain = "";
         for (String citation : citations) {
             String tmp = WHITESPACE.matcher(citation).replaceAll("");
@@ -131,14 +131,16 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Joins every citation with a newline and returns it.
      */
     static String processText(List<String> citations) {
-        return String.join("", citations);
+        return String.join(CitationStyleOutputFormat.TEXT.getLineSeparator(), citations);
     }
 
     /**
      * Converts the citations into the RTF format.
      */
     static RtfTransferable processRtf(List<String> citations) {
-        String result = "{\\rtf" + OS.NEWLINE + String.join("\\line ", citations) + "}";
+        String result = "{\\rtf" + OS.NEWLINE +
+                String.join(CitationStyleOutputFormat.RTF.getLineSeparator(), citations) +
+                "}";
         return new RtfTransferable(result);
     }
 
@@ -156,11 +158,10 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
                 "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
 
-        for (String citation : citations) {
-            result += citation + OS.NEWLINE;
-        }
+        result += String.join(CitationStyleOutputFormat.XSLFO.getLineSeparator(), citations);
 
-        result += "      </fo:flow>" + OS.NEWLINE +
+        result += OS.NEWLINE +
+                "      </fo:flow>" + OS.NEWLINE +
                 "   </fo:page-sequence>" + OS.NEWLINE +
                 "</fo:root>" + OS.NEWLINE;
 
@@ -178,11 +179,10 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 "   </head>" + OS.NEWLINE +
                 "   <body>" + OS.NEWLINE + OS.NEWLINE;
 
-        for (String citation : citations) {
-            result += citation + OS.NEWLINE;
-        }
+        result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
 
-        result += "   </body>" + OS.NEWLINE +
+        result += OS.NEWLINE +
+                "   </body>" + OS.NEWLINE +
                 "</html>" + OS.NEWLINE;
 
         return new HtmlTransferable(result);

@@ -74,9 +74,9 @@ public class CitationStyleGenerator {
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
             return Collections.singletonList(new StringBuilder()
                     .append(Localization.lang("Cannot generate preview based on selected citation style."))
-                    .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")
+                    .append(outputFormat.getLineSeparator())
                     .append(Localization.lang("Bad character inside entry"))
-                    .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")
+                    .append(outputFormat.getLineSeparator())
                     .append(e.getLocalizedMessage())
                     .toString());
         }

@@ -1,22 +1,30 @@
 package net.sf.jabref.logic.citationstyle;
 
 
+import net.sf.jabref.logic.util.OS;
+
 public enum CitationStyleOutputFormat {
 
-    ASCII_DOC("asciidoc"),
-    HTML("html"),
-    RTF("rtf"),
-    TEXT("text"),
-    XSLFO("fo");
+    ASCII_DOC("asciidoc", "\br"),
+    HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
+    RTF("rtf", "\\line" + OS.NEWLINE),
+    TEXT("text", OS.NEWLINE),
+    XSLFO("fo", OS.NEWLINE);
 
     private final String format;
+    private final String lineSeparator;
 
-    CitationStyleOutputFormat(String format) {
+    CitationStyleOutputFormat(String format, String lineSeparator) {
         this.format = format;
+        this.lineSeparator = lineSeparator;
     }
 
     public String getFormat() {
         return format;
+    }
+
+    public String getLineSeparator() {
+        return lineSeparator;
     }
 
     @Override
