@@ -128,7 +128,7 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.2.2'
+    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.3.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.3.0'
