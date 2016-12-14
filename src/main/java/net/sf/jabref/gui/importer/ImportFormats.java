@@ -14,6 +14,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 
+import javafx.stage.FileChooser;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
@@ -60,10 +62,10 @@ public class ImportFormats {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
-                List<FileExtensions> extensions = importers.stream().map(p -> p.getExtensions()).collect(Collectors.toList());
+                List<FileExtensions> extensions = importers.stream().map(Importer::getExtensions).collect(Collectors.toList());
                 FileDialog dialog = new FileDialog(frame, Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 // Add file filter for all supported types
-                ImportFileFilter allImports = new ImportFileFilter(Localization.lang("Available import formats"), importers);
+                FileChooser.ExtensionFilter allImports = ImportFileFilter.convert(Localization.lang("Available import formats"), importers);
                 dialog.setFileFilter(allImports);
                 // Add filters for extensions
                 dialog.withExtensions(extensions);

@@ -95,7 +95,7 @@ public class FXDialogService implements DialogService {
     @Override
     public Optional<Path> showSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(fileDialogConfiguration.getExtensionFilters());
+        chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
         File file = chooser.showSaveDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
     }
@@ -103,7 +103,9 @@ public class FXDialogService implements DialogService {
     @Override
     public Optional<Path> showOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(fileDialogConfiguration.getExtensionFilters());
+        chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
+        chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());
+        chooser.setInitialDirectory(fileDialogConfiguration.getInitialDirectory().toFile());
         File file = chooser.showOpenDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
     }
