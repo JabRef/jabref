@@ -32,10 +32,10 @@
          <bottom>
             <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
-                  <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists" visible="false" />
-                  <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4" visible="false" />
-                <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
-                  <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save changes" />
+                  <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists" visible="false" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
+                  <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4" visible="false" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
+                <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
+                  <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviationsAndCloseDialog" text="%Save changes" ButtonBar.buttonData="OK_DONE" />
               </buttons>
             </ButtonBar>
          </bottom>
@@ -44,7 +44,7 @@
    <header>
       <HBox spacing="10.0" styleClass="custom-header">
          <children>
-            <ComboBox fx:id="journalFilesBox" minWidth="200.0" onAction="#fileChanged" promptText="%No abbreviation files loaded" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="journalFilesBox" minWidth="200.0" promptText="%No abbreviation files loaded" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
             <Pane HBox.hgrow="ALWAYS" />
             <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
                <tooltip>

@@ -1,10 +1,13 @@
 package net.sf.jabref.gui;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+
+import net.sf.jabref.gui.util.FileDialogConfiguration;
 
 /**
  * This interface provides methods to create dialogs and show them to the user.
@@ -43,6 +46,12 @@ public interface DialogService {
     void showErrorDialogAndWait(String message, Throwable exception);
 
     /**
+     * Create and display error dialog displaying the given message.
+     * @param message the error message
+     */
+    void showErrorDialogAndWait(String message);
+
+    /**
      * This will create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
      * a OK and Cancel Button. To create a confirmation dialog with custom
@@ -75,4 +84,23 @@ public interface DialogService {
      * @param message the message to show.
      */
     void notify(String message);
+
+    /**
+     * Shows a new file save dialog. The method doesn't return until the
+     * displayed file save dialog is dismissed. The return value specifies the
+     * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     *
+     * @return the selected file or an empty {@link Optional} if no file has been selected
+     */
+    Optional<Path> showSaveDialog(FileDialogConfiguration fileDialogConfiguration);
+
+    /**
+     * Shows a new file open dialog. The method doesn't return until the
+     * displayed open dialog is dismissed. The return value specifies
+     * the file chosen by the user or an empty {@link Optional} if no selection has been
+     * made.
+     *
+     * @return the selected file or an empty {@link Optional} if no file has been selected
+     */
+    Optional<Path> showOpenDialog(FileDialogConfiguration fileDialogConfiguration);
 }

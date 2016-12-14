@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,8 +33,8 @@ public class AbbreviationsFileViewModel {
     private final Optional<Path> path;
 
 
-    public AbbreviationsFileViewModel(String filePath) {
-        this.path = Optional.ofNullable(Paths.get(filePath));
+    public AbbreviationsFileViewModel(Path filePath) {
+        this.path = Optional.ofNullable(filePath);
         this.name = path.get().toAbsolutePath().toString();
         this.isBuiltInList = new SimpleBooleanProperty(false);
         this.abbreviations.add(new AbbreviationViewModel(null));
@@ -67,8 +66,6 @@ public class AbbreviationsFileViewModel {
      * This method will write all abbreviations of this abbreviation file to the file on the file system.
      * It essentially will check if the current file is a built in list and if not it will call
      * {@link AbbreviationWriter#writeOrCreate()}.
-     *
-     * @throws IOException
      */
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
@@ -112,5 +109,4 @@ public class AbbreviationsFileViewModel {
             return false;
         }
     }
-
 }
