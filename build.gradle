@@ -112,6 +112,7 @@ dependencies {
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.12'
+    compile 'org.fxmisc.easybind:easybind:1.0.3'
 
 
     compile 'commons-logging:commons-logging:1.2'
