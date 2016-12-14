@@ -1,10 +1,11 @@
 package net.sf.jabref.gui.worker;
 
-import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.util.Arrays;
 
+import net.sf.jabref.gui.exporter.RtfTransferable;
 import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
+import net.sf.jabref.gui.fieldeditors.XmlTransferable;
 import net.sf.jabref.logic.util.OS;
 
 import org.junit.Assert;
@@ -29,9 +30,9 @@ public class CitationStyleToClipboardWorkerTest {
                 "Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. " + OS.NEWLINE +
                 OS.NEWLINE;
 
-        CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        HtmlTransferable HtmlTransferable = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        Object actual = HtmlTransferable.getTransferData(DataFlavor.stringFlavor);
         Assert.assertEquals(expected, actual);
     }
 
@@ -82,9 +83,9 @@ public class CitationStyleToClipboardWorkerTest {
                 "</dd>" + OS.NEWLINE +
                 "<p></p></font>";
 
-        CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
+        HtmlTransferable transferable = CitationStyleToClipboardWorker.processPreview(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(HtmlTransferable.HTML_FLAVOR);
+        Object actual = transferable.getTransferData(HtmlTransferable.HTML_FLAVOR);
         Assert.assertEquals(expected, actual);
     }
 
@@ -94,9 +95,8 @@ public class CitationStyleToClipboardWorkerTest {
                 "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
 
         String citation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
-        CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        String actual = CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
         Assert.assertEquals(expected, actual);
     }
 
@@ -108,9 +108,9 @@ public class CitationStyleToClipboardWorkerTest {
                 "}";
 
         String citation = "[1]\\tab B. Smith, B. Jones, and J. Williams, \\uc0\\u8220{}Title of the test entry,\\uc0\\u8221{} {\\i{}BibTeX Journal}, vol. 34, no. 3, pp. 45\\uc0\\u8211{}67, Jul. 2016." + OS.NEWLINE;
-        CitationStyleToClipboardWorker.processRtf(Arrays.asList(citation, citation));
+        RtfTransferable rtfTransferable = CitationStyleToClipboardWorker.processRtf(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        Object actual = rtfTransferable.getTransferData(DataFlavor.stringFlavor);
         Assert.assertEquals(expected, actual);
     }
 
@@ -181,9 +181,9 @@ public class CitationStyleToClipboardWorkerTest {
                 "  </fo:table>" + OS.NEWLINE +
                 "</fo:block>" + OS.NEWLINE;
 
-        CitationStyleToClipboardWorker.processXslFo(Arrays.asList(citation, citation));
+        XmlTransferable xmlTransferable = CitationStyleToClipboardWorker.processXslFo(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        Object actual = xmlTransferable.getTransferData(DataFlavor.stringFlavor);
         Assert.assertEquals(expected, actual);
     }
 
@@ -210,9 +210,9 @@ public class CitationStyleToClipboardWorkerTest {
         String citation = "  <div class=\"csl-entry\">" + OS.NEWLINE +
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>" + OS.NEWLINE +
                 "  </div>" + OS.NEWLINE;
-        CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
+        HtmlTransferable htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
 
-        Object actual = Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+        Object actual = htmlTransferable.getTransferData(DataFlavor.stringFlavor);
         Assert.assertEquals(expected, actual);
     }
 
