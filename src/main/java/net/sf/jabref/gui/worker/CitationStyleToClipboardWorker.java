@@ -13,6 +13,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.exporter.RtfTransferable;
 import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
+import net.sf.jabref.gui.fieldeditors.XmlTransferable;
 import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.citationstyle.CitationStyleGenerator;
 import net.sf.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -92,7 +93,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         processRtf(citations);
                         break;
                     case XSLFO:
-                        processXslfo(citations);
+                        processXslFo(citations);
                         break;
                     case ASCII_DOC:
                     case TEXT:
@@ -140,14 +141,14 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Converts the citations into the RTF format.
      */
     private void processRtf(List<String> citations) {
-        String result = "{\\rtf" + OS.NEWLINE + String.join("\\line ", citations) + "}";;
+        String result = "{\\rtf" + OS.NEWLINE + String.join("\\line ", citations) + "}";
         new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
     }
 
     /**
      * Inserts each citation into a XLSFO body and copies it to the clipboard
      */
-    private void processXslfo(List<String> citations) {
+    private void processXslFo(List<String> citations) {
         String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
                 "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
                 "   <fo:layout-master-set>" + OS.NEWLINE +
@@ -166,7 +167,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 "   </fo:page-sequence>" + OS.NEWLINE +
                 "</fo:root>" + OS.NEWLINE;
 
-        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(result, result));
+        new ClipBoardManager().setTransferableClipboardContents(new XmlTransferable(result));
     }
 
     /**
@@ -187,7 +188,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
         result +="   </body>" + OS.NEWLINE +
                 "</html>" + OS.NEWLINE;
 
-        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(result, result));
+        new ClipBoardManager().setTransferableClipboardContents(new HtmlTransferable(result));
     }
 
 }

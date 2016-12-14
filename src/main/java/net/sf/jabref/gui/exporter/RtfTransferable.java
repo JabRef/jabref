@@ -3,52 +3,51 @@ package net.sf.jabref.gui.exporter;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class RtfTransferable implements Transferable {
 
-    private static final Log LOGGER = LogFactory.getLog(RtfTransferable.class);
+    private static final DataFlavor RTF_Flavour = new DataFlavor("text/rtf;charset=utf-8;class=java.lang.String", "RTF Format");
+    private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
-    private DataFlavor rtfFlavor;
-    private DataFlavor[] supportedFlavors;
-    private final String content;
+    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(RTF_Flavour, TEXT_FLAVOR);
+
+    private final String rtfText;
+    private final String plainText;
 
 
-    public RtfTransferable(String s) {
-        content = s;
-        try {
-            rtfFlavor = new DataFlavor("text/rtf; class=java.io.InputStream");
-            supportedFlavors = new DataFlavor[] {rtfFlavor, DataFlavor.stringFlavor};
-        } catch (ClassNotFoundException ex) {
-            LOGGER.warn("Cannot find class", ex);
-        }
+    public RtfTransferable(String text) {
+        this.rtfText = text;
+        this.plainText = text;
     }
 
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor.equals(rtfFlavor) ||
-                flavor.equals(DataFlavor.stringFlavor);
+    public RtfTransferable(String rtfText, String plainText) {
+        this.rtfText = rtfText;
+        this.plainText = plainText;
     }
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return supportedFlavors;
+        return ALL_FLAVORS.toArray(new DataFlavor[ALL_FLAVORS.size()]);
     }
 
     @Override
-    public Object getTransferData(DataFlavor flavor)
-            throws UnsupportedFlavorException, IOException {
-
-        if (flavor.equals(DataFlavor.stringFlavor)) {
-            return content;
-        } else if (flavor.equals(rtfFlavor)) {
-            byte[] byteArray = content.getBytes();
-            return new ByteArrayInputStream(byteArray);
-        }
-        throw new UnsupportedFlavorException(flavor);
+    public boolean isDataFlavorSupported(DataFlavor flavor) {
+        return ALL_FLAVORS.parallelStream().anyMatch(flavor::equals);
     }
+
+    @Override
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
+       if (flavor.equals(RTF_Flavour)) {
+            return rtfText;
+        } else if (flavor.equals(TEXT_FLAVOR)) {
+           return plainText;
+       } else {
+            throw new UnsupportedFlavorException(flavor);
+        }
+    }
+
 }
