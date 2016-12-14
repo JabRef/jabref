@@ -10,10 +10,10 @@ import java.util.List;
 
 public class RtfTransferable implements Transferable {
 
-    private static final DataFlavor RTF_Flavour = new DataFlavor("text/rtf;charset=utf-8;class=java.lang.String", "RTF Format");
+    private static final DataFlavor RTF_FLAVOR = new DataFlavor("text/rtf;charset=utf-8;class=java.lang.String", "RTF Format");
     private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
-    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(RTF_Flavour, TEXT_FLAVOR);
+    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(RTF_FLAVOR, TEXT_FLAVOR);
 
     private final String rtfText;
     private final String plainText;
@@ -41,7 +41,7 @@ public class RtfTransferable implements Transferable {
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-       if (flavor.equals(RTF_Flavour)) {
+       if (flavor.equals(RTF_FLAVOR)) {
             return rtfText;
         } else if (flavor.equals(TEXT_FLAVOR)) {
            return plainText;
