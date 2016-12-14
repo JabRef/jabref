@@ -18,6 +18,6 @@ public class ManageJournalsAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        Platform.runLater(() -> new ManageJournalAbbreviationsView().showAndWait());
+        Platform.runLater(() -> new ManageJournalAbbreviationsView().show());
     }
 }

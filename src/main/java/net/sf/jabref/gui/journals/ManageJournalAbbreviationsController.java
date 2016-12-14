@@ -1,15 +1,10 @@
 package net.sf.jabref.gui.journals;
 
-import java.io.File;
+import javax.inject.Inject;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -18,51 +13,36 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import net.sf.jabref.JabRefException;
+import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.gui.FXDialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.ValueTableCellFactory;
-import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
-import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
-public class ManageJournalAbbreviationsController{
+public class ManageJournalAbbreviationsController extends AbstractController<ManageJournalAbbreviationsViewModel> {
 
-    private final ManageJournalAbbreviationsViewModel viewModel = new ManageJournalAbbreviationsViewModel();
+    @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
+    @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
+    @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
+    @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableEditColumn;
+    @FXML private TableColumn<AbbreviationViewModel, Boolean> journalTableDeleteColumn;
+    @FXML private Button cancelButton;
+    @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
+    @FXML private Button addJournalFileButton;
+    @FXML private Button addNewJournalFileButton;
+    @FXML private Button removeJournalAbbreviationsButton;
+    @FXML private ProgressIndicator progressIndicator;
+    @FXML private Label loadingLabel;
 
-    @FXML
-    private TableView<AbbreviationViewModel> journalAbbreviationsTable;
-    @FXML
-    private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
-    @FXML
-    private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
-    @FXML
-    private TableColumn<AbbreviationViewModel, Boolean> journalTableEditColumn;
-    @FXML
-    private TableColumn<AbbreviationViewModel, Boolean> journalTableDeleteColumn;
-    @FXML
-    private Button cancelButton;
-    @FXML
-    private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
-    @FXML
-    private Button addJournalFileButton;
-    @FXML
-    private Button addNewJournalFileButton;
-    @FXML
-    private Button removeJournalAbbreviationsButton;
-    @FXML
-    private ProgressIndicator progressIndicator;
-    @FXML
-    private Label loadingLabel;
-
+    @Inject private JabRefPreferences preferences;
+    @Inject private DialogService dialogService;
 
     @FXML
     private void initialize() {
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService);
+
         setUpTable();
         setBindings();
         setButtonStyles();
@@ -91,10 +71,6 @@ public class ManageJournalAbbreviationsController{
         addJournalFileButton.setGraphic(IconTheme.JabRefIcon.OPEN.getGraphicNode());
         addNewJournalFileButton.setGraphic(IconTheme.JabRefIcon.NEW.getGraphicNode());
         removeJournalAbbreviationsButton.setGraphic(IconTheme.JabRefIcon.CLOSE.getGraphicNode());
-        ButtonBar.setButtonData(progressIndicator, ButtonData.LEFT);
-        ButtonBar.setButtonData(loadingLabel, ButtonData.LEFT);
-        ButtonBar.setButtonUniformSize(progressIndicator, false);
-        ButtonBar.setButtonUniformSize(loadingLabel, false);
     }
 
     private void setUpTable() {
@@ -149,45 +125,29 @@ public class ManageJournalAbbreviationsController{
     private void setBindings() {
         journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
-        viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
-            journalFilesBox.getSelectionModel().select(newvalue);
-        });
-        viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) -> {
-            journalAbbreviationsTable.getSelectionModel().select(newvalue);
-        });
+
+        viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) ->
+                journalFilesBox.getSelectionModel().select(newvalue));
+        journalFilesBox.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldvalue, newvalue) -> viewModel.currentFileProperty().set(newvalue));
+
+        viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) ->
+                journalAbbreviationsTable.getSelectionModel().select(newvalue));
         journalAbbreviationsTable.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldvalue, newvalue) -> {
-                    viewModel.currentAbbreviationProperty().set(newvalue);
-                });
+                .addListener((observable, oldvalue, newvalue) -> viewModel.currentAbbreviationProperty().set(newvalue));
+
         removeJournalAbbreviationsButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
     }
 
     @FXML
     private void addNewFile() {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("%0 file", "TXT"), "*.txt"));
-        File file = chooser.showSaveDialog(null);
-        if (file != null) {
-            try {
-                viewModel.addNewFile(file.getAbsolutePath());
-            } catch (DuplicatedJournalFileException e) {
-                showErrorDialog(e);
-            }
-        }
+        viewModel.addNewFile();
+
     }
 
     @FXML
     private void openFile() {
-        FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(Localization.lang("%0 file", "TXT"), "*.txt"));
-        File file = chooser.showOpenDialog(null);
-        if (file != null) {
-            try {
-                viewModel.openFile(file.getAbsolutePath());
-            } catch (DuplicatedJournalFileException e) {
-                showErrorDialog(e);
-            }
-        }
+        viewModel.openFile();
     }
 
     @FXML
@@ -196,17 +156,8 @@ public class ManageJournalAbbreviationsController{
     }
 
     @FXML
-    private void fileChanged() {
-        viewModel.currentFileProperty().set(journalFilesBox.getSelectionModel().getSelectedItem());
-    }
-
-    @FXML
     private void addAbbreviation() {
-        try {
-            viewModel.addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"));
-        } catch (DuplicatedJournalAbbreviationException e) {
-            showErrorDialog(e);
-        }
+        viewModel.addAbbreviation();
         selectNewAbbreviation();
     }
 
@@ -223,11 +174,6 @@ public class ManageJournalAbbreviationsController{
         journalAbbreviationsTable.getFocusModel().focus(lastRow);
     }
 
-    private void showErrorDialog(JabRefException e) {
-        DialogService dialogService = new FXDialogService();
-        dialogService.showErrorDialogAndWait(Localization.lang("An error occurred"), Localization.lang(e.getMessage()));
-    }
-
     @FXML
     private void removeAbbreviation() {
         viewModel.deleteAbbreviation();
@@ -240,7 +186,7 @@ public class ManageJournalAbbreviationsController{
     }
 
     @FXML
-    private void saveAbbreviations() {
+    private void saveAbbreviationsAndCloseDialog() {
         Task<Void> task = new Task<Void>() {
 
             @Override
@@ -257,7 +203,6 @@ public class ManageJournalAbbreviationsController{
     /**
      * This class provides a editable text field that is used as table cell.
      * It handles the editing of the name column.
-     *
      */
     public class JournalAbbreviationsNameTableEditingCell extends TableCell<AbbreviationViewModel, String> {
 
@@ -314,52 +259,38 @@ public class ManageJournalAbbreviationsController{
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(name);
             current.setName(oldName);
-            try {
-                viewModel.editAbbreviation(name, current.getAbbreviation());
-            } catch (JabRefException e) {
-                showErrorDialog(e);
-            }
+            viewModel.editAbbreviation(name, current.getAbbreviation());
         }
 
         private void createTextField() {
             textField = new TextField(getString());
             textField.setMinWidth(this.getWidth() - (this.getGraphicTextGap() * 2));
-            textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    if (!newValue) {
-                        commitEdit(textField.getText());
-                    }
+            textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    commitEdit(textField.getText());
                 }
             });
-            textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-
-                @Override
-                public void handle(KeyEvent t) {
-                    if (t.getCode() == KeyCode.ENTER) {
-                        if (isEditing()) {
-                            journalAbbreviationsTable.requestFocus();
-                        } else {
-                            startEdit();
-                        }
-                    } else if (t.getCode() == KeyCode.ESCAPE) {
-                        cancelEdit();
+            textField.setOnKeyPressed(t -> {
+                if (t.getCode() == KeyCode.ENTER) {
+                    if (isEditing()) {
+                        journalAbbreviationsTable.requestFocus();
+                    } else {
+                        startEdit();
                     }
+                } else if (t.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
                 }
             });
         }
 
         private String getString() {
-            return getItem() == null ? "" : getItem().toString();
+            return getItem() == null ? "" : getItem();
         }
-
     }
 
     /**
      * This class provides a editable text field that is used as table cell.
      * It handles the editing of the abbreviation column.
-     *
      */
     public class JournalAbbreviationsAbbreviationTableEditingCell extends TableCell<AbbreviationViewModel, String> {
 
@@ -416,46 +347,32 @@ public class ManageJournalAbbreviationsController{
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(abbreviation);
             current.setAbbreviation(oldAbbreviation);
-            try {
-                viewModel.editAbbreviation(current.getName(), abbreviation);
-            } catch (JabRefException e) {
-                showErrorDialog(e);
-            }
+            viewModel.editAbbreviation(current.getName(), abbreviation);
         }
 
         private void createTextField() {
             textField = new TextField(getString());
             textField.setMinWidth(this.getWidth() - (this.getGraphicTextGap() * 2));
-            textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-                @Override
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    if (!newValue) {
-                        commitEdit(textField.getText());
-                    }
+            textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    commitEdit(textField.getText());
                 }
             });
-            textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-
-                @Override
-                public void handle(KeyEvent t) {
-                    if (t.getCode() == KeyCode.ENTER) {
-                        if (isEditing()) {
-                            journalAbbreviationsTable.requestFocus();
-                        } else {
-                            startEdit();
-                        }
-                    } else if (t.getCode() == KeyCode.ESCAPE) {
-                        cancelEdit();
+            textField.setOnKeyPressed(t -> {
+                if (t.getCode() == KeyCode.ENTER) {
+                    if (isEditing()) {
+                        journalAbbreviationsTable.requestFocus();
+                    } else {
+                        startEdit();
                     }
+                } else if (t.getCode() == KeyCode.ESCAPE) {
+                    cancelEdit();
                 }
             });
         }
 
         private String getString() {
-            return getItem() == null ? "" : getItem().toString();
+            return getItem() == null ? "" : getItem();
         }
-
     }
-
 }
