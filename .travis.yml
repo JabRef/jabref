@@ -26,7 +26,7 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check -Dscan
+  - ./gradlew check modernizer -Dscan
   - ./gradlew fetcherTest -Dscan
   - ./gradlew databaseTest -Dscan
   # no need for databases for the integrationTest -> save memory

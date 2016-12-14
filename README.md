@@ -54,13 +54,13 @@ JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer),
 
 ### Installing and Running, Mac OS X:
 
-Please see our [Mac OS X FAQ](http://jabref.sourceforge.net/faq.php#osx).
+Please see our [Mac OS X FAQ](https://help.jabref.org/en/FAQosx).
 
 ### Installing and Running, Windows:
 
 JabRef offers an installer, which also adds a shortcut to JabRef to your start menu.
 
-Please also see our [Windows FAQ](http://jabref.sourceforge.net/faq.php#windows)
+Please also see our [Windows FAQ](https://help.jabref.org/en/FAQwindows)
 
 ### Installing and Running, General:
 
