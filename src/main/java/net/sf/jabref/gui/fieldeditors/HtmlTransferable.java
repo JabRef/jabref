@@ -13,8 +13,8 @@ import java.util.List;
  */
 public class HtmlTransferable implements Transferable {
 
-    private static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format");
-    private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
+    public static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format");
+    public static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
     private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(HTML_FLAVOR, TEXT_FLAVOR);
 

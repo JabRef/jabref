@@ -116,12 +116,10 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Generates a plain text string out of the preview and copies it additionally to the html to the clipboard
      * (WYSIWYG Editors use the HTML, plain text editors the text)
      */
-    private void processPreview(List<String> citations){
-        String html = "";
+    static void processPreview(List<String> citations){
+        String html = String.join(OS.NEWLINE + "<br>" + OS.NEWLINE, citations);
         String plain = "";
         for (String citation : citations) {
-            html += citation + "<br>";
-
             String tmp = WHITESPACE.matcher(citation).replaceAll("");
             tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
             plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
@@ -132,7 +130,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Joins every citation with a newline and returns it.
      */
-    private void processText(List<String> citations) {
+    static void processText(List<String> citations) {
         String text = String.join("", citations);
         new ClipBoardManager().setClipboardContents(text);
     }
@@ -140,7 +138,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Converts the citations into the RTF format.
      */
-    private void processRtf(List<String> citations) {
+    static void processRtf(List<String> citations) {
         String result = "{\\rtf" + OS.NEWLINE + String.join("\\line ", citations) + "}";
         new ClipBoardManager().setTransferableClipboardContents(new RtfTransferable(result));
     }
@@ -148,7 +146,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Inserts each citation into a XLSFO body and copies it to the clipboard
      */
-    private void processXslFo(List<String> citations) {
+    static void processXslFo(List<String> citations) {
         String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
                 "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
                 "   <fo:layout-master-set>" + OS.NEWLINE +
@@ -173,7 +171,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Inserts each citation into a HTML body and copies it to the clipboard
      */
-    private void processHtml(List<String> citations) {
+    static void processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
                 "<html>" + OS.NEWLINE +
                 "   <head>" + OS.NEWLINE +
