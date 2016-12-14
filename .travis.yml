@@ -20,10 +20,6 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  # We have more than 20 issues, which are not fixed yet. Nevertheless, we produce the modernizer output.
-  # See https://github.com/andrewgaul/modernizer-maven-plugin for more informations
-  - ./gradlew modernizer || true
-  # Execute tests and checkstyle
   - ./gradlew check -Dscan
   - ./gradlew fetcherTest -Dscan
   - ./gradlew databaseTest -Dscan
