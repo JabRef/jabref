@@ -3,11 +3,11 @@ package net.sf.jabref.gui;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import net.sf.jabref.gui.util.FileDialogConfiguration;
-
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+
+import net.sf.jabref.gui.util.FileDialogConfiguration;
 
 /**
  * This interface provides methods to create dialogs and show them to the user.

@@ -2,13 +2,10 @@ package net.sf.jabref.gui.journals;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.DialogPane;
-import javafx.stage.Stage;
 
 import net.sf.jabref.gui.AbstractDialogView;
 import net.sf.jabref.gui.FXDialog;
 import net.sf.jabref.logic.l10n.Localization;
-
-import com.airhacks.afterburner.views.FXMLView;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog.
