@@ -43,15 +43,19 @@ public void shutdown() {
 }
 ````
 ### Controller:
-The "code-behind" part of the view, which binds the `View` to the `ViewModel`.
+- The "code-behind" part of the view, which binds the `View` to the `ViewModel`.
+
 - 
 ````java
 public class AboutDialogController extends AbstractController<AboutDialogViewModel>
 ````
 - 
 ````java
-@FXML protected Button closeButton;
+@FXML protected Button helloButton;
 @FXML protected ImageView iconImage;
+````
+- Dependencies can easily be injected into the controller using the `@Inject` annotation.
+````java
 @Inject private DialogService dialogService;
 ````
 - 
@@ -74,20 +78,23 @@ private void openJabrefWebsite() {
 }
 ````
 
+- The current stage can be received using `getStage()`, which is helpful to close the current dialog `getStage().close()`.
+
 ### View:
 The view consists of two parts:
 - a FXML file "MyDialog.fxml" which defines the structure and the layout of the UI. It is recommended to use a graphical design tools like [SceneBuilder](http://gluonhq.com/labs/scene-builder/) to edit the FXML file. The tool [Scenic View](http://fxexperience.com/scenic-view/) is very helpful in debugging styling issues.
-- a `View` class that loads the FXML file. For dialogs this amounts to deriving from `AbstractDialogView`. The fxml file is loaded automatically using the same name as the class. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
+- a `View` class that loads the FXML file. The fxml file is loaded automatically using the same name as the class. To make this convention-over-configuration approach work, both the FXML file and the View class should have the same name and should be located in the same package.
+
+- For dialogs, we simply derive from `AbstractDialogView` and implement the `show` method.
 ````java
-public class MyDialogView extends AbstractDialogView
-````
-- 
-````java
-@Override
-public void show() {
-    FXDialog aboutDialog = new FXDialog(AlertType.INFORMATION, Localization.lang("About JabRef"));
-    aboutDialog.setDialogPane((DialogPane) this.getView());
-    aboutDialog.show();
+public class MyDialogView extends AbstractDialogView {
+
+    @Override
+    public void show() {
+        FXDialog myDialog = new FXDialog(AlertType.INFORMATION, Localization.lang("My first dialog"));
+        myDialog.setDialogPane((DialogPane) this.getView());
+        myDialog.show();
+    }
 }
 ````
 
