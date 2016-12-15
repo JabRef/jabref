@@ -126,7 +126,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
         for (String citation : citations) {
             String tmp = WHITESPACE.matcher(citation).replaceAll("");
             tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
-            plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE + OS.NEWLINE;
+            plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE;
         }
         return new HtmlTransferable(html, plain);
     }

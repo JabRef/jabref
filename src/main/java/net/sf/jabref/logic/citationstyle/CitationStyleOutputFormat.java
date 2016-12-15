@@ -5,10 +5,10 @@ import net.sf.jabref.logic.util.OS;
 
 public enum CitationStyleOutputFormat {
 
-    ASCII_DOC("asciidoc", OS.NEWLINE),
+    ASCII_DOC("asciidoc", ""),
     HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
     RTF("rtf", "\\line" + OS.NEWLINE),
-    TEXT("text", OS.NEWLINE),
+    TEXT("text", ""),
     XSL_FO("fo", OS.NEWLINE);
 
     private final String format;
