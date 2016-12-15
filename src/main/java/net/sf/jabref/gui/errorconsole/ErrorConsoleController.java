@@ -15,7 +15,6 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import net.sf.jabref.gui.AbstractController;
@@ -28,7 +27,6 @@ import net.sf.jabref.logic.util.BuildInfo;
 
 public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {
 
-    @FXML private Button closeButton;
     @FXML private Button copyLogButton;
     @FXML private Button createIssueButton;
     @FXML private ListView<LogEventViewModel> messagesListView;
@@ -113,7 +111,6 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
 
     @FXML
     private void closeErrorDialog() {
-        Stage stage = (Stage) closeButton.getScene().getWindow();
-        stage.close();
+        getStage().close();
     }
 }

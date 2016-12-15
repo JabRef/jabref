@@ -1,9 +1,15 @@
 package net.sf.jabref.gui.keyboard;
 
+import java.util.Optional;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+
+import net.sf.jabref.gui.IconTheme;
 
 import com.google.common.base.CaseFormat;
 
@@ -22,15 +28,23 @@ public class KeyBindingViewModel {
     private final SimpleStringProperty shownBinding = new SimpleStringProperty();
     private final KeyBindingCategory category;
 
+    public ObservableList<KeyBindingViewModel> getChildren() {
+        return children;
+    }
 
-    public KeyBindingViewModel(KeyBinding keyBinding, String binding) {
-        this(keyBinding.getCategory());
+    private ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
+    private KeyBindingRepository keyBindingRepository;
+
+
+    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBinding keyBinding, String binding) {
+        this(keyBindingRepository, keyBinding.getCategory());
         this.keyBinding = keyBinding;
         setDisplayName();
         setBinding(binding);
     }
 
-    public KeyBindingViewModel(KeyBindingCategory category) {
+    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBindingCategory category) {
+        this.keyBindingRepository = keyBindingRepository;
         this.category = category;
         setDisplayName();
     }
@@ -111,10 +125,8 @@ public class KeyBindingViewModel {
 
     /**
      * This method will reset the key bind of this models KeyBinding object to it's default bind
-     *
-     * @param keyBindingRepository as KeyBindingRepository
      */
-    public void resetToDefault(KeyBindingRepository keyBindingRepository) {
+    public void resetToDefault() {
         if (!isCategory()) {
             String key = getKeyBinding().getKey();
             keyBindingRepository.resetToDefault(key);
@@ -122,4 +134,7 @@ public class KeyBindingViewModel {
         }
     }
 
+    public Optional<IconTheme.JabRefIcon> getIcon() {
+        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcon.CLEANUP_ENTRIES);
+    }
 }

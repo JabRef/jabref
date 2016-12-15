@@ -8,15 +8,15 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 
-<DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.keyboard.KeyBindingsDialogViewModel">
+<DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.keyboard.KeyBindingsDialogController">
    <content>
       <BorderPane prefHeight="428.0" prefWidth="402.0">
          <bottom>
             <ButtonBar minWidth="350.0" prefHeight="40.0" prefWidth="250.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
-                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#setDefaultBindings" text="%Reset Bindings" />
-                  <Button defaultButton="true" mnemonicParsing="false" onAction="#saveKeyBindingsAndCloseDialog" text="%Save" />
-                  <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
+                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#setDefaultBindings" text="%Reset Bindings" ButtonBar.buttonData="LEFT" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#saveKeyBindingsAndCloseDialog" text="%Save" ButtonBar.buttonData="OK_DONE" />
+                  <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
               </buttons>
             </ButtonBar>
          </bottom>
