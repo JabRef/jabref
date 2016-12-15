@@ -110,7 +110,7 @@ public class CitationStyleGeneratorTest {
                 "</fo:block>\n";
         BibEntry entry = TestEntry.getTestEntry();
         String style = CitationStyle.getDefault().getSource();
-        CitationStyleOutputFormat format = CitationStyleOutputFormat.XSLFO;
+        CitationStyleOutputFormat format = CitationStyleOutputFormat.XSL_FO;
 
         String actualCitation = CitationStyleGenerator.generateCitation(entry, style, format);
         assertEquals(expectedCitation, actualCitation);

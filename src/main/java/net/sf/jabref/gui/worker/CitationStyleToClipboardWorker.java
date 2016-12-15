@@ -92,7 +92,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                     case RTF:
                         new ClipBoardManager().setTransferableClipboardContents(processRtf(citations));
                         break;
-                    case XSLFO:
+                    case XSL_FO:
                         new ClipBoardManager().setTransferableClipboardContents(processXslFo(citations));
                         break;
                     case ASCII_DOC:
@@ -158,7 +158,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                 "   <fo:page-sequence master-reference=\"citations\">" + OS.NEWLINE +
                 "      <fo:flow flow-name=\"xsl-region-body\">" + OS.NEWLINE + OS.NEWLINE;
 
-        result += String.join(CitationStyleOutputFormat.XSLFO.getLineSeparator(), citations);
+        result += String.join(CitationStyleOutputFormat.XSL_FO.getLineSeparator(), citations);
 
         result += OS.NEWLINE +
                 "      </fo:flow>" + OS.NEWLINE +
