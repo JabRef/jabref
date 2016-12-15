@@ -83,7 +83,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
     public boolean addProtectedTerm(String term, boolean create) {
         Objects.requireNonNull(term);
-        // Can not add to internal lists
+        // Cannot add to internal lists
         if (internalList) {
             return false;
         }
