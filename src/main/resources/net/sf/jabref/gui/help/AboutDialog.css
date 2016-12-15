@@ -3,7 +3,7 @@
 }
 
 .about-heading:pressed {
-	-fx-text-fill: #1E90FF;
+	-fx-text-fill: -fx-focus-color;
 }
 
 .top-padding {
@@ -43,15 +43,4 @@
 .dialog-pane *.button-bar {
 	-fx-max-height: 0;
 	-fx-pref-height: 0;
-}
-
-.hyperlink {
-    -fx-padding: 0;
-    -fx-underline: false;
-    -fx-border-style: null;
-    -fx-border-color: null;
-}
-
-.hyperlink:visited {
-    -fx-text-fill: -fx-accent;
 }

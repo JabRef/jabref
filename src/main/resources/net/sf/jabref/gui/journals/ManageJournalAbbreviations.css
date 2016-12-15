@@ -13,20 +13,8 @@
     -fx-spacing: 5px;
 }
 
-.custom-header > .button {
-    -fx-font-family: 'Material Design Icons';
-    -fx-font-size: 16;
-    -fx-fill: #5e5f5e;
-}
-
 .table-row-cell:empty {
     visibility: hidden;
-}
-
-.table-row-cell > .table-cell > .icon {
-    -fx-font-family: 'Material Design Icons';
-    -fx-font-size: 16;
-    -fx-fill: #5e5f5e;
 }
 
 .table-row-cell:selected > .table-cell > .icon, .table-row-cell:pressed > .table-cell > .icon {

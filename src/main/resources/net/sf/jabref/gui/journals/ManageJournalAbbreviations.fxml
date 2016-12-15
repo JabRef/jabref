@@ -46,15 +46,15 @@
          <children>
             <ComboBox fx:id="journalFilesBox" minWidth="200.0" promptText="%No abbreviation files loaded" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
+            <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" styleClass="icon">
                <tooltip>
                   <Tooltip autoHide="true" text="%Create new list" />
                </tooltip></Button>
-          <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile">
+          <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" styleClass="icon">
                <tooltip>
                   <Tooltip autoHide="true" text="%Add existing file" />
                </tooltip></Button>
-            <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList">
+            <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList" styleClass="icon">
                <tooltip>
                   <Tooltip autoHide="true" text="%Remove list" />
                </tooltip></Button>
