@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
@@ -16,8 +17,8 @@ public class FileDialogConfiguration {
     private final List<FileChooser.ExtensionFilter> extensionFilters;
     private final Path initialDirectory;
 
-    public Path getInitialDirectory() {
-        return initialDirectory;
+    public Optional<Path> getInitialDirectory() {
+        return Optional.ofNullable(initialDirectory);
     }
 
     public FileChooser.ExtensionFilter getDefaultExtension() {

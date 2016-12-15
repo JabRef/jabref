@@ -133,7 +133,7 @@ public class FileDialog {
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(Localization.lang("Select directory"));
-        directoryChooser.setInitialDirectory(configuration.getInitialDirectory().toFile());
+        configuration.getInitialDirectory().map(Path::toFile).ifPresent(directoryChooser::setInitialDirectory);
 
         return runInJavaFXThread(() -> Optional.ofNullable(directoryChooser.showDialog(null)).map(File::toPath));
     }
@@ -157,7 +157,7 @@ public class FileDialog {
         FileDialogConfiguration configuration = configurationBuilder.build();
         fileChooser.getExtensionFilters().addAll(configuration.getExtensionFilters());
         fileChooser.setSelectedExtensionFilter(configuration.getDefaultExtension());
-        fileChooser.setInitialDirectory(configuration.getInitialDirectory().toFile());
+        configuration.getInitialDirectory().map(Path::toFile).ifPresent(fileChooser::setInitialDirectory);
     }
 
     /**

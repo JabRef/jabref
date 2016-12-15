@@ -14,34 +14,20 @@
 	-fx-font-size: 48.0;
 }
 
- .icon {
- 	-fx-font-family: 'Material Design Icons';
-	-fx-font-size: 16.0;
-	-fx-fill : #5e5f5e;
-}
-
 .exception{
-    -fx-text-fill: red;
+    -fx-text-fill: -fx-negative;
 }
 
 .exception .icon {
-	-fx-fill: #FF0000;
+	-fx-fill: -fx-negative;
 }
 
 .log {
-    -fx-text-fill: blue;
+    -fx-text-fill: -fx-info;
 }
 
 .log .icon {
-	-fx-fill: #00008B;
-}
-
-.output {
-    -fx-text-fill: black;
-}
-
-.output .icon {
-	-fx-fill: #000000;
+	-fx-fill: -fx-info;
 }
 
 .custom-buttons {
