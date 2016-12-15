@@ -116,7 +116,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      * Generates a plain text string out of the preview and copies it additionally to the html to the clipboard
      * (WYSIWYG Editors use the HTML, plain text editors the text)
      */
-    static HtmlTransferable processPreview(List<String> citations) {
+    protected static HtmlTransferable processPreview(List<String> citations) {
         String html = String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
         String plain = "";
         for (String citation : citations) {
@@ -130,14 +130,14 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Joins every citation with a newline and returns it.
      */
-    static String processText(List<String> citations) {
+    protected static String processText(List<String> citations) {
         return String.join(CitationStyleOutputFormat.TEXT.getLineSeparator(), citations);
     }
 
     /**
      * Converts the citations into the RTF format.
      */
-    static RtfTransferable processRtf(List<String> citations) {
+    protected static RtfTransferable processRtf(List<String> citations) {
         String result = "{\\rtf" + OS.NEWLINE +
                 String.join(CitationStyleOutputFormat.RTF.getLineSeparator(), citations) +
                 "}";
@@ -147,7 +147,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Inserts each citation into a XLSFO body and copies it to the clipboard
      */
-    static XmlTransferable processXslFo(List<String> citations) {
+    protected static XmlTransferable processXslFo(List<String> citations) {
         String result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + OS.NEWLINE +
                 "<fo:root xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">" + OS.NEWLINE +
                 "   <fo:layout-master-set>" + OS.NEWLINE +
@@ -171,7 +171,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
     /**
      * Inserts each citation into a HTML body and copies it to the clipboard
      */
-    static HtmlTransferable processHtml(List<String> citations) {
+    protected static HtmlTransferable processHtml(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
                 "<html>" + OS.NEWLINE +
                 "   <head>" + OS.NEWLINE +
