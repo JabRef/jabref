@@ -7,21 +7,21 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.text.html.HTML;
+
 
 public class XmlTransferable implements Transferable {
 
     private static final DataFlavor XML_FLAVOR = new DataFlavor("application/xml;charset=utf-8;class=java.lang.String", "XML Format");
     private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
-    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(XML_FLAVOR, TEXT_FLAVOR);
+    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(XML_FLAVOR, HtmlTransferable.HTML_FLAVOR, TEXT_FLAVOR);
 
     private final String xmlText;
     private final String plainText;
 
-
     public XmlTransferable(String text) {
-        this.xmlText = text;
-        this.plainText = text;
+        this(text, text);
     }
 
     public XmlTransferable(String xmlText, String plainText) {
@@ -41,7 +41,7 @@ public class XmlTransferable implements Transferable {
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (flavor.equals(XML_FLAVOR)) {
+        if (flavor.equals(XML_FLAVOR) || flavor.equals(HtmlTransferable.HTML_FLAVOR)) {
             return xmlText;
         } else if (flavor.equals(TEXT_FLAVOR)) {
             return plainText;
