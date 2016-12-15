@@ -235,10 +235,10 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
         if (name.trim().isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Name can not be empty"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Name cannot be empty"));
             return;
         } else if (abbreviation.trim().isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation can not be empty"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Abbreviation cannot be empty"));
             return;
         }
         currentAbbreviation.get().setName(name);
