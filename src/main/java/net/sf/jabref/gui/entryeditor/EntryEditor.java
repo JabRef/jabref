@@ -52,9 +52,7 @@ import javax.swing.text.JTextComponent;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
-import javafx.scene.web.WebView;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
@@ -106,8 +104,8 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.MathSciNetId;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -341,10 +339,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addSpecialTabs() {
 
         // MathSciNet Review
-        if(entry.hasField("MRNumber")) {
-            String mrNumberRaw = entry.getField("MRNumber").get();
-            // Take everything before whitespace or open bracket, so something like `619693 (82j:58046)` gets parsed correctly
-            String mrNumber = StringUtil.tokenizeToList(mrNumberRaw, " (").get(0);
+        entry.getField(FieldName.MR_NUMBER).ifPresent(mrNumberRaw -> {
+            MathSciNetId mrNumber = MathSciNetId.fromString(mrNumberRaw);
 
             JFXPanel reviewPane = new JFXPanel();
             tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
@@ -352,28 +348,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Execute on JavaFX Application Thread
             Platform.runLater(() -> {
-                StackPane root = new StackPane();
-                ProgressIndicator progress = new ProgressIndicator();
-                progress.setMaxSize(100, 100);
-                WebView browser = new WebView();
-
-                // Quick hack to disable navigating
-                browser.addEventFilter(javafx.scene.input.MouseEvent.ANY, javafx.scene.input.MouseEvent::consume);
-                browser.setContextMenuEnabled(false);
-
-                root.getChildren().addAll(browser, progress);
+                StackPane root = new MathSciNetPaneView(mrNumber).getPane();
                 reviewPane.setScene(new Scene(root));
-
-                browser.getEngine().load("http://www.ams.org/mathscinet-getitem?mr=" + mrNumber);
-
-                // Hide progress indicator if finished (over 70% loaded)
-                browser.getEngine().getLoadWorker().progressProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue.doubleValue() >= 0.7) {
-                        progress.setVisible(false);
-                    }
-                });
             });
-        }
+        });
     }
 
     private void addSourceTab() {
