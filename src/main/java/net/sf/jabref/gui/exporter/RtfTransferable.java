@@ -1,34 +1,32 @@
-package net.sf.jabref.gui.fieldeditors;
+package net.sf.jabref.gui.exporter;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 
-/**
- Based on http://newsgroups.derkeiler.com/Archive/De/de.comp.lang.java/2010-04/msg00203.html
- */
-public class HtmlTransferable implements Transferable {
+public class RtfTransferable implements Transferable {
 
-    public static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format");
-    public static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
+    private static final DataFlavor RTF_FLAVOR = new DataFlavor("text/rtf; class=java.io.InputStream", "RTF Format");
+    private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
-    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(HTML_FLAVOR, TEXT_FLAVOR);
+    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(RTF_FLAVOR, TEXT_FLAVOR);
 
-    private final String htmlText;
+    private final String rtfText;
     private final String plainText;
 
 
-    public HtmlTransferable(String text) {
-        this.htmlText = text;
+    public RtfTransferable(String text) {
+        this.rtfText = text;
         this.plainText = text;
     }
 
-    public HtmlTransferable(String htmlText, String plainText) {
-        this.htmlText = htmlText;
+    public RtfTransferable(String rtfText, String plainText) {
+        this.rtfText = rtfText;
         this.plainText = plainText;
     }
 
@@ -44,11 +42,11 @@ public class HtmlTransferable implements Transferable {
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (flavor.equals(HTML_FLAVOR)) {
-            return htmlText;
+       if (flavor.equals(RTF_FLAVOR)) {
+           return new ByteArrayInputStream(rtfText.getBytes());
         } else if (flavor.equals(TEXT_FLAVOR)) {
-            return plainText;
-        } else {
+           return plainText;
+       } else {
             throw new UnsupportedFlavorException(flavor);
         }
     }
