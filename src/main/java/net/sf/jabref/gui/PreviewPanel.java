@@ -139,7 +139,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         actionMap.put(close, this.closeAction);
 
         final String copy = "copy";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
+        getInputMap(JComponent.WHEN_FOCUSED).put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
         actionMap.put(copy, this.copyPreviewAction);
     }
 

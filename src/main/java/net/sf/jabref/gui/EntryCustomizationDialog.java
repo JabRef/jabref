@@ -45,7 +45,7 @@ import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class EntryCustomizationDialog extends JDialog implements ListSelectionListener, ActionListener {
+public class EntryCustomizationDialog extends JDialog implements ListSelectionListener {
 
     private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
@@ -106,7 +106,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
         typeComp = new EntryTypeList(entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
-        typeComp.addAdditionActionListener(this);
+        typeComp.addAdditionActionListener(e -> typeComp.selectField(e.getActionCommand()));
         typeComp.addDefaultActionListener(new DefaultListener());
         typeComp.setListSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -137,9 +137,12 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
         apply = new JButton(Localization.lang("Apply"));
-        ok.addActionListener(this);
-        apply.addActionListener(this);
-        cancel.addActionListener(this);
+        ok.addActionListener(e -> {
+            applyChanges();
+            dispose();
+        });
+        apply.addActionListener(e -> applyChanges());
+        cancel.addActionListener(e -> dispose());
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         buttons.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         bb.addGlue();
@@ -356,20 +359,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
         // If we get here, all entries have matched.
         return true;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == ok) {
-            applyChanges();
-            dispose();
-        } else if (e.getSource() == cancel) {
-            dispose();
-        } else if (e.getSource() == apply) {
-            applyChanges();
-        } else if (e.getSource() == typeComp) {
-            typeComp.selectField(e.getActionCommand());
-        }
     }
 
     /**
