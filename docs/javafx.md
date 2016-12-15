@@ -107,3 +107,4 @@ public class MyDialogView extends AbstractDialogView {
 - [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
 - [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 - [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
+- [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
