@@ -1067,7 +1067,7 @@ public class JabRefPreferences {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            LOGGER.warn("Can not communicate with backing store", ex);
+            LOGGER.warn("Cannot communicate with backing store", ex);
         }
     }
 

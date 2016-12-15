@@ -47,6 +47,13 @@ public class ClipBoardManager implements ClipboardOwner {
     }
 
     /**
+     * Places the string into the clipboard using a {@link Transferable}.
+     */
+    public void setTransferableClipboardContents(Transferable transferable){
+        CLIPBOARD.setContents(transferable, this);
+    }
+
+    /**
      * Get the String residing on the clipboard.
      *
      * @return any text found on the Clipboard; if none found, return an
