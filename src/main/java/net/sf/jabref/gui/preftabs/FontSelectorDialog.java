@@ -61,8 +61,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -169,10 +167,27 @@ public class FontSelectorDialog extends JDialog {
         styleList.setSelectedIndex(font.getStyle());
         styleField.setText(styleList.getSelectedValue());
 
-        ListHandler listHandler = new ListHandler();
-        familyList.addListSelectionListener(listHandler);
-        sizeList.addListSelectionListener(listHandler);
-        styleList.addListSelectionListener(listHandler);
+        familyList.addListSelectionListener(evt -> {
+            String family = familyList.getSelectedValue();
+            if (family != null) {
+                familyField.setText(family);
+            }
+            updatePreview();
+        });
+        sizeList.addListSelectionListener(evt -> {
+            String size = sizeList.getSelectedValue();
+            if (size != null) {
+                sizeField.setText(size);
+            }
+            updatePreview();
+        });
+        styleList.addListSelectionListener(evt -> {
+            String style = styleList.getSelectedValue();
+            if (style != null) {
+                styleField.setText(style);
+            }
+            updatePreview();
+        });
 
         content.add(BorderLayout.NORTH, listPanel);
 
@@ -320,31 +335,5 @@ public class FontSelectorDialog extends JDialog {
         }
         int style = styleList.getSelectedIndex();
         preview.setFont(new Font(family, style, size));
-    }
-
-
-    private class ListHandler implements ListSelectionListener {
-
-        @Override
-        public void valueChanged(ListSelectionEvent evt) {
-            Object source = evt.getSource();
-            if (familyList.equals(source)) {
-                String family = familyList.getSelectedValue();
-                if (family != null) {
-                    familyField.setText(family);
-                }
-            } else if (sizeList.equals(source)) {
-                String size = sizeList.getSelectedValue();
-                if (size != null) {
-                    sizeField.setText(size);
-                }
-            } else if (styleList.equals(source)) {
-                String style = styleList.getSelectedValue();
-                if (style != null) {
-                    styleField.setText(style);
-                }
-            }
-            updatePreview();
-        }
     }
 }
