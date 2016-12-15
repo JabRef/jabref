@@ -139,9 +139,9 @@ import net.sf.jabref.preferences.SearchPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
@@ -668,11 +668,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //if the events happen too early (ie when the window is not initialized yet), the
         //opened (double-clicked) documents are not displayed.
         if (OS.OS_X) {
-            try {
-                new MacAdapter().registerMacEvents(this);
-            } catch (Exception e) {
-                LOGGER.fatal("Could not interface with Mac OS X methods.", e);
-            }
+            LOGGER.fatal("This program is not designed to run at Mac OS X");
         }
 
     }
