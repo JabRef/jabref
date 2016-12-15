@@ -3,6 +3,7 @@ package net.sf.jabref.gui.exporter;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +43,7 @@ public class RtfTransferable implements Transferable {
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
        if (flavor.equals(RTF_FLAVOR)) {
-            return rtfText;
+           return new ByteArrayInputStream(rtfText.getBytes());
         } else if (flavor.equals(TEXT_FLAVOR)) {
            return plainText;
        } else {
