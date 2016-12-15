@@ -27,7 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
   
   
-- [#2375](https://github.com/JabRef/jabref/issues/2375) LaTeXCleanup action does now preserve % signs inside BibTeX fields
+- [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
 
 ### Fixed
 - We fixed a few groups related issues:
