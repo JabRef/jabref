@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.worker;
 
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 
 import net.sf.jabref.gui.exporter.RtfTransferable;
@@ -95,8 +96,9 @@ public class CitationStyleToClipboardWorkerTest {
                 "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
 
         String citation = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
+        StringSelection textTransferable = CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
 
-        String actual = CitationStyleToClipboardWorker.processText(Arrays.asList(citation, citation));
+        Object actual = textTransferable.getTransferData(DataFlavor.stringFlavor);
         Assert.assertEquals(expected, actual);
     }
 
