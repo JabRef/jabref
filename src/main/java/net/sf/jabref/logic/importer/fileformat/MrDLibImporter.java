@@ -39,9 +39,6 @@ public class MrDLibImporter extends Importer {
     private static final Log LOGGER = LogFactory.getLog(MrDLibImporter.class);
 
 
-    public MrDLibImporter() {
-    }
-
     /**
      *
      * @see net.sf.jabref.logic.importer.Importer#isRecognizedFormat(java.io.BufferedReader)
@@ -74,6 +71,12 @@ public class MrDLibImporter extends Importer {
         return true;
     }
 
+    /**
+     * The SaxParser needs s String. So I convert it here.
+     * @param input
+     * @return
+     * @throws IOException
+     */
     private String BufferedReaderToParsableString(BufferedReader input) throws IOException {
         String line;
         StringBuilder sb = new StringBuilder();
@@ -82,7 +85,7 @@ public class MrDLibImporter extends Importer {
                 sb.append(line);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return sb.toString();
 
@@ -98,7 +101,7 @@ public class MrDLibImporter extends Importer {
         // The document to parse
         String recommendations = BufferedReaderToParsableString(input);
         // The list ob BibEntries with its associated rank
-        ArrayList<RankedBibEntry> rankedBibEntries = new ArrayList<>();
+        List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
         // The sorted BibEntries gets stored here later
         List<BibEntry> bibEntries = new ArrayList<>();
         //Parsing the response with a SAX parser
@@ -214,11 +217,11 @@ public class MrDLibImporter extends Importer {
 
 
             bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
-        } catch (ParserConfigurationException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             LOGGER.error(e.getMessage(), e);
-        } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
         }
+
         for (BibEntry bibentry : bibEntries) {
             bibDatabase.insertEntry(bibentry);
         }
@@ -252,6 +255,11 @@ public class MrDLibImporter extends Importer {
     }
 
 
+    /**
+     * Small pair-class to ensure the right order of the recommendations
+     *
+     *
+     */
     private class RankedBibEntry {
 
         public BibEntry entry;

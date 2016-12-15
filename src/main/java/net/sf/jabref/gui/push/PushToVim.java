@@ -22,10 +22,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA. User: alver Date: Mar 7, 2007 Time: 6:55:56 PM To change this template use File | Settings
- * | File Templates.
- */
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 
     private static final Log LOGGER = LogFactory.getLog(PushToVim.class);

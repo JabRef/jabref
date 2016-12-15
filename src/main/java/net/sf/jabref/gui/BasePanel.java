@@ -503,7 +503,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
             final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                    bibDatabaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
+                    bibDatabaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
             for (final File f : files) {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
@@ -1299,16 +1299,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void editEntryByKeyAndFocusField(final String bibtexKey, final String fieldName) {
-        final List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntriesByKey(bibtexKey);
-        if (entries.size() == 1) {
-            mainTable.setSelected(mainTable.findEntry(entries.get(0)));
+    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
+        final Optional<BibEntry> entry = bibDatabaseContext.getDatabase().getEntryById(entryId);
+        entry.ifPresent(e -> {
+            mainTable.setSelected(mainTable.findEntry(e));
             selectionListener.editSignalled();
-            final EntryEditor editor = getEntryEditor(entries.get(0));
+            final EntryEditor editor = getEntryEditor(e);
             editor.setFocusToField(fieldName);
             this.showEntryEditor(editor);
             editor.requestFocus();
-        }
+        });
     }
 
     public void updateTableFont() {
@@ -2306,7 +2306,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             final List<String> mdDirs = basePanel.getBibDatabaseContext()
-                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             for (final String mdDir : mdDirs) {
                 dirs.add(new File(mdDir));
             }

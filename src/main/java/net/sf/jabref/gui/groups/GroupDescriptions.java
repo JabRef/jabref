@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.groups;
+package net.sf.jabref.gui.groups;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.groups.ExplicitGroup;

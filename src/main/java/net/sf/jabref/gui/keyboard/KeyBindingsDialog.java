@@ -15,7 +15,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -79,7 +78,6 @@ public class KeyBindingsDialog extends JDialog {
         table.setColumnSelectionAllowed(false);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoCreateRowSorter(true);
-        GUIUtil.correctRowHeight(table);
 
         return table;
     }

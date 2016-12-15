@@ -8,7 +8,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -16,12 +15,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 @Category(FetcherTests.class)
 public class DiVATest {
 
     private DiVA fetcher;
-
 
     @Before
     public void setUp() {
@@ -39,7 +36,6 @@ public class DiVATest {
     }
 
     @Test
-    @Ignore("Server currently sends 500")
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType("article");

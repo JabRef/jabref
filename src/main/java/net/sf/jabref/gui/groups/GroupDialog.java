@@ -31,15 +31,15 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
-import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -105,12 +105,10 @@ class GroupDialog extends JDialog {
      * Shows a group add/edit dialog.
      *
      * @param jabrefFrame The parent frame.
-     * @param basePanel   The default grouping field.
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame,
-            AbstractGroup editedGroup) {
+    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
 
         // set default values (overwritten if editedGroup != null)
@@ -267,17 +265,22 @@ class GroupDialog extends JDialog {
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    resultingGroup = new KeywordGroup(nameField.getText().trim(),
-                            keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
-                            keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
-                            Globals.prefs.getKeywordDelimiter());
+                    if (keywordGroupRegExp.isSelected()) {
+                        resultingGroup = new RegexKeywordGroup(nameField.getText().trim(), getContext(),
+                                keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                keywordGroupCaseSensitive.isSelected());
+                    } else {
+                        resultingGroup = new WordKeywordGroup(nameField.getText().trim(), getContext(),
+                                keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
+                    }
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(nameField.getText().trim(), searchGroupSearchExpression.getText().trim(),
-                                isCaseSensitive(), isRegex(), getContext());
+                        resultingGroup = new SearchGroup(nameField.getText().trim(), getContext(), searchGroupSearchExpression.getText().trim(),
+                                isCaseSensitive(), isRegex());
                     } catch (Exception e1) {
                         // should never happen
                     }
@@ -301,13 +304,22 @@ class GroupDialog extends JDialog {
         searchGroupCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
-        if ((editedGroup != null) && (editedGroup.getClass() == KeywordGroup.class)) {
-            KeywordGroup group = (KeywordGroup) editedGroup;
+        if ((editedGroup != null) && (editedGroup.getClass() == WordKeywordGroup.class)) {
+            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());
             keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
-            keywordGroupRegExp.setSelected(group.isRegExp());
+            keywordGroupRegExp.setSelected(false);
+            keywordsRadioButton.setSelected(true);
+            setContext(editedGroup.getHierarchicalContext());
+        } else if ((editedGroup != null) && (editedGroup.getClass() == RegexKeywordGroup.class)) {
+            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
+            nameField.setText(group.getName());
+            keywordGroupSearchField.setText(group.getSearchField());
+            keywordGroupSearchTerm.setText(group.getSearchExpression());
+            keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
+            keywordGroupRegExp.setSelected(true);
             keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == SearchGroup.class)) {
@@ -315,7 +327,7 @@ class GroupDialog extends JDialog {
             nameField.setText(group.getName());
             searchGroupSearchExpression.setText(group.getSearchExpression());
             searchGroupCaseSensitive.setSelected(group.isCaseSensitive());
-            searchGroupRegExp.setSelected(group.isRegExp());
+            searchGroupRegExp.setSelected(group.isRegularExpression());
             searchRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == ExplicitGroup.class)) {

@@ -1,7 +1,9 @@
 package net.sf.jabref.model.database;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,7 +58,8 @@ public class BibDatabaseContext {
         this(database, metaData, new Defaults());
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults, DatabaseLocation location) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, File file, Defaults defaults,
+            DatabaseLocation location) {
         this(database, metaData, defaults);
         Objects.requireNonNull(location);
         this.setDatabaseFile(file);
@@ -89,7 +92,7 @@ public class BibDatabaseContext {
             BibDatabaseMode inferredMode = BibDatabaseModeDetection.inferMode(database);
             BibDatabaseMode newMode = BibDatabaseMode.BIBTEX;
             if ((defaults.mode == BibDatabaseMode.BIBLATEX) || (inferredMode == BibDatabaseMode.BIBLATEX)) {
-                newMode =  BibDatabaseMode.BIBLATEX;
+                newMode = BibDatabaseMode.BIBLATEX;
             }
             this.setMode(newMode);
             return newMode;
@@ -140,12 +143,23 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    public List<String> getFileDirectory(FileDirectoryPreferences preferences) {
-        return getFileDirectory(FieldName.FILE, preferences);
+    public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
+        return getFileDirectories(FieldName.FILE, preferences);
     }
 
     /**
-    * Look up the directory set up for the given field type for this database.
+     * Returns the first existing file directory from  {@link #getFileDirectories(FileDirectoryPreferences)}
+     * @param preferences The FileDirectoryPreferences
+     * @return Optional of Path
+     */
+    public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
+        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(p -> Paths.get(p))
+                .filter(Files::exists).findFirst();
+        //Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
+    }
+
+    /**
+    * Look up the directories set up for the given field type for this database.
     * If no directory is set up, return that defined in global preferences.
     * There can be up to three directory definitions for these files:
     * the database's metadata can specify a general directory and/or a user-specific directory
@@ -161,27 +175,29 @@ public class BibDatabaseContext {
     * @param fieldName The field type
     * @return The default directory for this field type.
     */
-    public List<String> getFileDirectory(String fieldName, FileDirectoryPreferences preferences) {
+    public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
         Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
-        if(userFileDirectory.isPresent()) {
+        if (userFileDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
         }
 
         // 2. metadata general directory
         Optional<String> metaDataDirectory = metaData.getDefaultFileDirectory();
-        if(metaDataDirectory.isPresent()) {
+        if (metaDataDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(metaDataDirectory.get()));
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(fileDirs::add);
+        preferences.getFileDirectory(fieldName).ifPresent(path ->
+            fileDirs.add(path.toAbsolutePath().toString())
+        );
 
         // 4. BIB file directory
-        getDatabaseFile().ifPresent(databaseFile -> {
-            String parentDir = databaseFile.getParent();
+        getDatabasePath().ifPresent(dbPath -> {
+            String parentDir = dbPath.getParent().toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);

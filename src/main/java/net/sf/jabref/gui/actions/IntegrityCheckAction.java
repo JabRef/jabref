@@ -16,13 +16,13 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
@@ -31,12 +31,9 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
-
     private static final String ELLIPSES = "...";
 
-
     private final JabRefFrame frame;
-
 
     public IntegrityCheckAction(JabRefFrame frame) {
         this.frame = frame;
@@ -56,26 +53,30 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         } else {
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model
-            Object[][] model = new Object[messages.size()][3];
+            Object[][] model = new Object[messages.size()][4];
             int i = 0;
             for (IntegrityMessage message : messages) {
-                model[i][0] = message.getEntry().getCiteKeyOptional().orElse("");
-                model[i][1] = message.getFieldName();
-                model[i][2] = message.getMessage();
+                model[i][0] = message.getEntry().getId();
+                model[i][1] = message.getEntry().getCiteKeyOptional().orElse("");
+                model[i][2] = message.getFieldName();
+                model[i][3] = message.getMessage();
                 showMessage.put(message.getMessage(), true);
                 i++;
             }
 
             // construct view
             JTable table = new JTable(model,
-                    new Object[] {Localization.lang("BibTeX key"), Localization.lang("Field"),
+                    new Object[] {"ID", Localization.lang("BibTeX key"), Localization.lang("Field"),
                             Localization.lang("Message")});
 
-            RowFilter<Object, Object> filter = new RowFilter<Object, Object>() {
+            // hide IDs
+            TableColumnModel columnModel = table.getColumnModel();
+            columnModel.removeColumn(columnModel.getColumn(0));
 
+            RowFilter<Object, Object> filter = new RowFilter<Object, Object>() {
                 @Override
                 public boolean include(Entry<?, ?> entry) {
-                    return showMessage.get(entry.getStringValue(2));
+                    return showMessage.get(entry.getStringValue(3));
                 }
             };
 
@@ -86,23 +87,23 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
             table.setDefaultEditor(Object.class, null);
             ListSelectionModel selectionModel = table.getSelectionModel();
 
-
             selectionModel.addListSelectionListener(event -> {
                 if (!event.getValueIsAdjusting()) {
                     try {
-                        String citeKey = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][0];
-                        String fieldName = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][1];
-                        frame.getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
+                        String entryId = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][0];
+                        String fieldName = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][2];
+                        frame.getCurrentBasePanel().editEntryByIdAndFocusField(entryId, fieldName);
                     } catch (ArrayIndexOutOfBoundsException exception) {
                         // Ignore -- most likely caused by filtering out the earlier selected row
                     }
                 }
             });
-
-            GUIUtil.correctRowHeight(table);
-
+            
+            // BibTeX key
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
+            // field name
             table.getColumnModel().getColumn(1).setPreferredWidth(60);
+            // message
             table.getColumnModel().getColumn(2).setPreferredWidth(400);
             table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
             JScrollPane scrollPane = new JScrollPane(table);

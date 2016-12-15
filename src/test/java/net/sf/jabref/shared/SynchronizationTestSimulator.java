@@ -138,7 +138,7 @@ public class SynchronizationTestSimulator {
         BibEntry bibEntryOfClientB = clientContextB.getDatabase().getEntries().get(0);
         bibEntryOfClientB.setField("year", "2016"); // B also tries to change something
 
-        // B now can not update the shared entry, due to optimistic offline lock.
+        // B now cannot update the shared entry, due to optimistic offline lock.
         // In this case an BibEntry merge dialog pops up.
         Assert.assertNotNull(eventListenerB.getUpdateRefusedEvent());
     }

@@ -70,14 +70,19 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      */
     public void setHtmlText(List<BibEntry> list) {
         StringBuffer htmlContent = new StringBuffer();
-        htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
+        URL url = IconTheme.getIconUrl("mdlListIcon");
+        htmlContent
+                .append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8><ul style='list-style-image:("
+                        + url + ")'>");
         for (BibEntry bibEntry : list) {
             if (bibEntry != null) {
+                htmlContent.append("<li>");
                 htmlContent.append(bibEntry.getLatexFreeField("html_representation").get());
-                htmlContent.append(RECOMMENDATION_SEPERATOR);
+                htmlContent.append("</li>");
             }
         }
-        htmlContent.append("</font></body></html>");
+        htmlContent.append("</ul></font></body></html>");
+        System.out.println(htmlContent.toString());
         this.setText(htmlContent.toString());
     }
 
@@ -154,6 +159,11 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     }
 
 
+    /**
+     * Helper Class to initiate SwingWorker
+     *
+     *
+     */
     class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
 
 

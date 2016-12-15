@@ -11,13 +11,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Nov 9, 2007
- * Time: 7:04:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DuplicateCheckTest {
 
     @Test

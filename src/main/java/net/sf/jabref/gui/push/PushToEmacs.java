@@ -23,9 +23,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM
- */
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
     private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
