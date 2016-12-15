@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
@@ -122,12 +123,11 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      */
     protected static HtmlTransferable processPreview(List<String> citations) {
         String html = String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-        String plain = "";
-        for (String citation : citations) {
-            String tmp = WHITESPACE.matcher(citation).replaceAll("");
+        String plain = citations.stream().map(c -> {
+            String tmp = WHITESPACE.matcher(c).replaceAll("");
             tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
-            plain += HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE;
-        }
+            return HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE;
+        }).collect(Collectors.joining(""));
         return new HtmlTransferable(html, plain);
     }
 
