@@ -103,6 +103,7 @@ import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.openoffice.OpenOfficeSidePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
+import net.sf.jabref.gui.prrv.PrrvAction;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
@@ -226,6 +227,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
             IconTheme.getImage("about"));
+    private final AbstractAction prrv = new PrrvAction(Localization.menuTitle("Paper Reference Relationship Visualization"), Localization.lang("Paper Reference Relationship Visualization"),
+            IconTheme.JabRefIcon.PICTURE.getSmallIcon());
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
@@ -1272,6 +1275,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
+        view.addSeparator();
+        view.add(prrv);
+
 
         mb.add(view);
 
@@ -1507,7 +1513,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
-                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
+                toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent(), prrv));
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
 

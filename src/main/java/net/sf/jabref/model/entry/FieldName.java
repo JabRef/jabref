@@ -38,6 +38,7 @@ public class FieldName {
     public static final String BOOKTITLE = "booktitle";
     public static final String BOOKTITLEADDON = "booktitleaddon";
     public static final String CHAPTER = "chapter";
+    public static final String CITES = "cites";
     public static final String COMMENTATOR = "commentator";
     public static final String COMMENTS = "comments";
     public static final String CROSSREF = "crossref";

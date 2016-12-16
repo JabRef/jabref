@@ -58,9 +58,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Removed
 
-
-
-
+### Feature
+- Reimplemented [Paper Reference Relationship Visualization](https://sourceforge.net/projects/jabrefprrvp/) using JavaFX technology for a  force based graph.
 
 
 
