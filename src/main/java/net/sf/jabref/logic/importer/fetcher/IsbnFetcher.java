@@ -3,32 +3,21 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
-import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.IdBasedParserFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.Parser;
-import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.ISBN;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.helper.StringUtil;
 
 /**
- * Fetcher for ISBN using http://www.ebook.de.
+ * Fetcher for ISBN trying ebook.de first and then chimbori.com
  */
-public class IsbnFetcher implements IdBasedParserFetcher {
-
-    private ImportFormatPreferences importFormatPreferences;
+public class IsbnFetcher extends AbstractIsbnFetcher {
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences){
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -36,35 +25,36 @@ public class IsbnFetcher implements IdBasedParserFetcher {
         return "ISBN";
     }
 
-    @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ISBN_TO_BIBTEX;
-    }
-
+    /**
+     * Method never used
+     */
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        ISBN isbn = new ISBN(identifier);
-        if (!isbn.isValid()) {
-            throw new FetcherException(Localization.lang("Invalid_ISBN:_'%0'.", identifier));
-        }
-
-        URIBuilder uriBuilder = new URIBuilder("http://www.ebook.de/de/tools/isbn2bibtex");
-        uriBuilder.addParameter("isbn", identifier);
-        return uriBuilder.build().toURL();
+        return null;
     }
 
     @Override
-    public Parser getParser() {
-        return new BibtexParser(importFormatPreferences);
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+
+        this.ensureThatIsbnIsValid(identifier);
+
+        IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
+        Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
+        // nothing found at ebook.de, try chimbori.com
+        if (!bibEntry.isPresent()) {
+            IsbnViaChimboriFetcher isbnViaChimboriFetcher = new IsbnViaChimboriFetcher(importFormatPreferences);
+            bibEntry = isbnViaChimboriFetcher.performSearchById(identifier);
+        }
+
+        return bibEntry;
     }
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
-
-        // Fetcher returns page numbers as "30 Seiten" -> remove every non-digit character in the PAGETOTAL field
-        entry.getField(FieldName.PAGETOTAL).ifPresent(pages ->
-            entry.setField(FieldName.PAGETOTAL, pages.replaceAll("[\\D]", "")));
-        new FieldFormatterCleanup(FieldName.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);
+        // no action needed
     }
+
 }
