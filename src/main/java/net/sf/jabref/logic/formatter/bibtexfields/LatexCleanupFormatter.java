@@ -32,6 +32,7 @@ public class LatexCleanupFormatter implements Formatter {
         newValue = newValue.replace("  ", " "); // Clean up
         newValue = newValue.replace("$$", "");
         newValue = newValue.replace(" )$", ")$");
+        newValue = newValue.replace("%", "\\%"); // escape % used for comments in TeX
         return newValue;
     }
 

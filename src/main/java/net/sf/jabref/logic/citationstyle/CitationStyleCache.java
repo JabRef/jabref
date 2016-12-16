@@ -37,7 +37,7 @@ public class CitationStyleCache {
     public String getCitationFor(BibEntry entry) {
         String citation = citationStylesCache.get(entry);
         if (citation == null) {
-            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle);
+            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle.getSource(), CitationStyleOutputFormat.HTML);
             citationStylesCache.put(entry, citation);
         }
         return citation;
