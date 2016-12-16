@@ -48,7 +48,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         setLayout(new BorderLayout());
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP-metadata"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
         ButtonGroup bg = new ButtonGroup();
