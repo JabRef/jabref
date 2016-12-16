@@ -91,6 +91,7 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
+import net.sf.jabref.gui.worker.CitationStyleToClipboardWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
 import net.sf.jabref.gui.worker.Worker;
@@ -100,6 +101,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.citationstyle.CitationStyleCache;
+import net.sf.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -493,6 +495,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
+        actions.put(Actions.COPY_CITATION_ASCII_DOC, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
+        actions.put(Actions.COPY_CITATION_XSLFO, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
+        actions.put(Actions.COPY_CITATION_HTML, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
+        actions.put(Actions.COPY_CITATION_RTF, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
+        actions.put(Actions.COPY_CITATION_TEXT, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
+
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
         actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable));
 
@@ -698,6 +706,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
+    }
+
+    /**
+     * Generates and copies citations based on the selected entries to the clipboard
+     * @param outputFormat the desired {@link CitationStyleOutputFormat}
+     */
+    private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
+        new CitationStyleToClipboardWorker(this, outputFormat).execute();
     }
 
     private void copy() {
@@ -1306,16 +1322,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void editEntryByKeyAndFocusField(final String bibtexKey, final String fieldName) {
-        final List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntriesByKey(bibtexKey);
-        if (entries.size() == 1) {
-            mainTable.setSelected(mainTable.findEntry(entries.get(0)));
+    public void editEntryByIdAndFocusField(final String entryId, final String fieldName) {
+        final Optional<BibEntry> entry = bibDatabaseContext.getDatabase().getEntryById(entryId);
+        entry.ifPresent(e -> {
+            mainTable.setSelected(mainTable.findEntry(e));
             selectionListener.editSignalled();
-            final EntryEditor editor = getEntryEditor(entries.get(0));
+            final EntryEditor editor = getEntryEditor(e);
             editor.setFocusToField(fieldName);
             this.showEntryEditor(editor);
             editor.requestFocus();
-        }
+        });
     }
 
     public void updateTableFont() {

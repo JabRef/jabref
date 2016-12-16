@@ -301,9 +301,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
-    private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
-            Localization.menuTitle("Manage content selectors"));
 
+    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
+            Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
@@ -1155,6 +1155,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
         edit.add(copyKeyAndLink);
+        edit.add(copyPreview);
         edit.add(exportToClipboard);
         edit.add(sendAsEmail);
 
@@ -1330,7 +1331,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
-        options.add(manageSelectors);
         options.add(protectTerms);
         options.add(selectKeys);
         mb.add(options);
@@ -1496,7 +1496,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
+        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
@@ -1705,10 +1705,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) ||
+        return (context.getLocation() == DatabaseLocation.SHARED ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
     }
+
 
     /**
      * Creates icons for the disabled state for all JMenuItems with FontBasedIcons in the given menuElement.

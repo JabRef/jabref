@@ -8,27 +8,22 @@ import java.util.Arrays;
 import java.util.List;
 
 
-/**
- Based on http://newsgroups.derkeiler.com/Archive/De/de.comp.lang.java/2010-04/msg00203.html
- */
-public class HtmlTransferable implements Transferable {
+public class XmlTransferable implements Transferable {
 
-    public static final DataFlavor HTML_FLAVOR = new DataFlavor("text/html;charset=utf-8;class=java.lang.String", "HTML Format");
-    public static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
+    private static final DataFlavor XML_FLAVOR = new DataFlavor("application/xml;charset=utf-8;class=java.lang.String", "XML Format");
+    private static final DataFlavor TEXT_FLAVOR = DataFlavor.stringFlavor;
 
-    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(HTML_FLAVOR, TEXT_FLAVOR);
+    private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(XML_FLAVOR, HtmlTransferable.HTML_FLAVOR, TEXT_FLAVOR);
 
-    private final String htmlText;
+    private final String xmlText;
     private final String plainText;
 
-
-    public HtmlTransferable(String text) {
-        this.htmlText = text;
-        this.plainText = text;
+    public XmlTransferable(String text) {
+        this(text, text);
     }
 
-    public HtmlTransferable(String htmlText, String plainText) {
-        this.htmlText = htmlText;
+    public XmlTransferable(String xmlText, String plainText) {
+        this.xmlText = xmlText;
         this.plainText = plainText;
     }
 
@@ -44,8 +39,8 @@ public class HtmlTransferable implements Transferable {
 
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
-        if (flavor.equals(HTML_FLAVOR)) {
-            return htmlText;
+        if (flavor.equals(XML_FLAVOR) || flavor.equals(HtmlTransferable.HTML_FLAVOR)) {
+            return xmlText;
         } else if (flavor.equals(TEXT_FLAVOR)) {
             return plainText;
         } else {
