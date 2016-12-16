@@ -140,7 +140,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
         }
         if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            Optional<FieldChange> change = entry.setFiles(newFileList);
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.

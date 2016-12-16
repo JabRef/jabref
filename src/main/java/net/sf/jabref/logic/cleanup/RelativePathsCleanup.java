@@ -49,7 +49,7 @@ public class RelativePathsCleanup implements CleanupJob {
         }
 
         if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            Optional<FieldChange> change = entry.setFiles(newFileList);
             if(change.isPresent()) {
                 return Collections.singletonList(change.get());
             } else {

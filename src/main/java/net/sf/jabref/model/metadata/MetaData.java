@@ -22,6 +22,7 @@ import net.sf.jabref.model.metadata.event.MetaDataChangedEvent;
 import com.google.common.eventbus.EventBus;
 
 public class MetaData {
+
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
     public static final String SAVE_ACTIONS = "saveActions";
@@ -31,6 +32,7 @@ public class MetaData {
     public static final String GROUPSTREE = "groupstree";
     public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String SELECTOR_META_PREFIX = "selector_";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
@@ -40,13 +42,15 @@ public class MetaData {
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
-    private Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
-    private Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
+    private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
+    private ContentSelectors contentSelectors = new ContentSelectors();
+
 
     /**
      * Constructs an empty metadata.
@@ -145,6 +149,28 @@ public class MetaData {
 
     public boolean isProtected() {
         return isProtected;
+    }
+
+    public ContentSelectors getContentSelectors() {
+        return contentSelectors;
+    }
+
+    public List<ContentSelector> getContentSelectorList() {
+        return contentSelectors.getContentSelectors();
+    }
+
+    public void addContentSelector(ContentSelector contentSelector) {
+        this.contentSelectors.addContentSelector(contentSelector);
+        postChange();
+    }
+
+    public void clearContentSelectors(String fieldName) {
+        contentSelectors.removeSelector(fieldName);
+        postChange();
+    }
+
+    public List<String> getContentSelectorValuesForField(String fieldName) {
+        return contentSelectors.getSelectorValuesForField(fieldName);
     }
 
     public Optional<String> getDefaultFileDirectory() {
@@ -248,16 +274,19 @@ public class MetaData {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         MetaData metaData = (MetaData) o;
-        return isProtected == metaData.isProtected && Objects.equals(groupsRoot, metaData.groupsRoot) && Objects.equals(
-                encoding, metaData.encoding) && Objects.equals(saveOrderConfig, metaData.saveOrderConfig) && Objects
-                .equals(citeKeyPatterns, metaData.citeKeyPatterns) && Objects.equals(userFileDirectory,
-                metaData.userFileDirectory) && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
-                && Objects.equals(saveActions, metaData.saveActions) && mode == metaData.mode && Objects.equals(
-                defaultFileDirectory, metaData.defaultFileDirectory);
+        return (isProtected == metaData.isProtected) && Objects.equals(groupsRoot, metaData.groupsRoot)
+                && Objects.equals(encoding, metaData.encoding)
+                && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
+                && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
+                && Objects.equals(userFileDirectory, metaData.userFileDirectory)
+                && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
+                && Objects.equals(saveActions, metaData.saveActions) && (mode == metaData.mode)
+                && Objects.equals(defaultFileDirectory, metaData.defaultFileDirectory)
+                && Objects.equals(contentSelectors, metaData.contentSelectors);
     }
 
     @Override

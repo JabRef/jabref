@@ -304,6 +304,17 @@ public class CleanupWorkerTest {
     }
 
     @Test
+    public void convertToBiblatexMovesAddressToLocation() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
+        BibEntry entry = new BibEntry();
+        entry.setField("address", "test");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals(Optional.empty(), entry.getField("address"));
+        Assert.assertEquals(Optional.of("test"), entry.getField("location"));
+    }
+
+    @Test
     public void convertToBiblatexMovesJournalToJournalTitle() {
         CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         BibEntry entry = new BibEntry();

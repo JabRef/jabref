@@ -7,7 +7,9 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 We follow the [SPDX license identifiers](https://spdx.org/licenses/).
 In case you add a library, please use these identifiers.
-For instance, "BSD" is not exactg enough, there are numerous variants out there: BSD-2-Clouse,  	BSD-3-Clause-No-Nuclear-Warranty, ...
+For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
+Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
+
 
 # Fonts and Icons
 

@@ -8,7 +8,6 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-
 ## [Unreleased]
 
 ## JavaFX Changes
@@ -22,39 +21,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 
 ### Changed
-- Bibliographic information from web resources can now be used to complete existing entries.
-  This functionality can be accessed via a new button in the entry editor.
-- URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options.
-  The referenced file is downloaded and then imported as usual.
-- Windows and OSX binaries are now signed with a certificate.
-- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`.
-  [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
-- Adds integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
-- Adds an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
-- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
-- Replaces manual thread management with cached thread pool
-- Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
-  The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
-- [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
-- Add the possibility to copy citations of multiple entries to the clipboard
 
 ### Fixed
-- We fixed a few groups related issues:
-  - "Remove entries from group" no longer removes entries from groups with similar names. [#2334](https://github.com/JabRef/jabref/issues/2334)
-  - If an entry's group field contains 'a b' it is no longer considered a member the groups 'a', 'b', and 'a b'. [1873](https://github.com/JabRef/jabref/issues/1873)
-  - Reading and writing now works for groups that contain special escaped characters in their names. [1681](https://github.com/JabRef/jabref/issues/1681)
-- We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
-- We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
-- We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
-- We fixed an issue which prevented the preference dialog to open on systems with Java 9.
-- Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
-- Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
-- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
-- We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
-- We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
-- We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
-- We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
-- Fixed [#2378](https://github.com/JabRef/jabref/issues/2378): Saving of the Backup-Option in the Preferences does now work.
 
 ### Removed
 
@@ -99,53 +67,56 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+## [3.8] - 2016-12-16
 
+### Changed
+- Bibliographic information from web resources can now be used to complete existing entries.
+  This functionality can be accessed via a new button in the entry editor.
+- URLs can now be passed as arguments to the `-import` and `-importToOpen` command line options.
+  The referenced file is downloaded and then imported as usual.
+- We added integrity check to detect all bibtex keys which deviate from their generation pattern [#2206](https://github.com/JabRef/jabref/issues/2206)
+- We added an integrity check that detects invalid DOIs [#1445](https://github.com/JabRef/jabref/issues/1445)
+- We enhanced the integrity checks testing for biblatex-only fields to be aware of more fields (e.g., `location`).
+- ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
+- When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
+- We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
+- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
+- Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
+  The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
+- [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
+- Add the possibility to copy citations of multiple entries to the clipboard
+- Custom EntryTypes are now stored independently for BibTeX and BibLatex mode.
+  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to BibLatex)
+- Upon opening a file with customized entry types it is now possible to choose which customizations should be stored in local preferences.
+- The default emacs executable name on linux changed from `gnuclient` to `emacsclient`.
+  [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
+- Replaces manual thread management with cached thread pool
+- Windows and OSX binaries are now signed with a certificate.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Fixed
+- We fixed various problems with customized entry types:
+  - Resetting the preferences now also resets custom entry types. [#2261](https://github.com/JabRef/jabref/issues/2261)
+  - Importing preferences does no longer duplicate custom entry types. [#772](https://github.com/JabRef/jabref/issues/772)
+  - Potenial problems upon resetting to defaults should be fixed. [#772](https://github.com/JabRef/jabref/issues/772)
+  - Customized standard types (such as `@article`) are no longer listed as "custom" type in "New Entry" dialog.
+  - Applying changes in the "Custom Entry Types" dialog is now faster. [#2318](https://github.com/JabRef/jabref/issues/2318)
+- We fixed a few groups related issues:
+  - "Remove entries from group" no longer removes entries from groups with similar names. [#2334](https://github.com/JabRef/jabref/issues/2334)
+  - If an entry's group field contains 'a b' it is no longer considered a member the groups 'a', 'b', and 'a b'. [1873](https://github.com/JabRef/jabref/issues/1873)
+  - Reading and writing now works for groups that contain special escaped characters in their names. [1681](https://github.com/JabRef/jabref/issues/1681)
+- Fixed [#2221](https://github.com/JabRef/jabref/issues/2221): Customizable field content selectors due to popular demand. Content selectors now avoid duplicate words.
+- We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
+- We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
+- We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).
+- Update check now correctly notifies about new release if development version is used. [#2298](https://github.com/JabRef/jabref/issues/2298)
+- Fixed [#2311](https://github.com/JabRef/jabref/issues/2311): The DBLP fetcher has been rewritten and is working again.
+- Fixed [#2273](https://github.com/JabRef/jabref/issues/2273): Export via commandline in no-gui mode is now working again.
+- We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
+- We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
+- We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
+- We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
+- Fixed [#2378](https://github.com/JabRef/jabref/issues/2378): Saving of the Backup-Option in the Preferences does now work.
+- We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 
 
 ## [3.7] - 2016-11-14
@@ -744,7 +715,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v3.7...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v3.8...HEAD
+[3.8]: https://github.com/JabRef/jabref/compare/v3.7...v3.8
 [3.7]: https://github.com/JabRef/jabref/compare/v3.6...v3.7
 [3.6]: https://github.com/JabRef/jabref/compare/v3.5...v3.6
 [3.5]: https://github.com/JabRef/jabref/compare/v3.4...v3.5

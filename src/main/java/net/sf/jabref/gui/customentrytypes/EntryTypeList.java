@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.customentrytypes;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
