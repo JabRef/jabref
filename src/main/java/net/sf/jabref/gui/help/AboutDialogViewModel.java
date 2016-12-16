@@ -22,11 +22,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
-    private final String homepageUrl = "https://www.jabref.org";
-    private final String donationUrl = "https://donations.jabref.org";
-    private final String librariesUrl = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
-    private final String githubUrl = "https://github.com/JabRef/jabref";
-    private final String licenseUrl = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String homepageUrl = "https://www.jabref.org";
+    private static final String donationUrl = "https://donations.jabref.org";
+    private static final String librariesUrl = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
+    private static final String githubUrl = "https://github.com/JabRef/jabref";
+    private static final String licenseUrl = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
     private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
