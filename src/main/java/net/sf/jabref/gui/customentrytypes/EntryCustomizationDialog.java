@@ -372,20 +372,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         return true;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == ok) {
-            applyChanges();
-            dispose();
-        } else if (e.getSource() == cancel) {
-            dispose();
-        } else if (e.getSource() == apply) {
-            applyChanges();
-        } else if (e.getSource() == typeComp) {
-            typeComp.selectField(e.getActionCommand());
-        }
-    }
-
     private void updateEntriesForChangedTypes(List<String> actuallyChangedTypes) {
         for (BasePanel bp : frame.getBasePanelList()) {
             // get all affected entries
