@@ -83,6 +83,8 @@ public class JabRefPreferences {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
+    private static final Class PREFS_BASE_CLASS = JabRefMain.class;
+
     /**
      * HashMap that contains all preferences which are set by default
      */
@@ -385,14 +387,12 @@ public class JabRefPreferences {
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
     public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
 
-    //non-default preferences
-    private static final String CUSTOM_TYPE_NAME = "customTypeName_";
-    private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
-    private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
-    private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
+
+    // Prefs node for customized entry types
+    public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
+    public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
 
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
@@ -463,7 +463,7 @@ public class JabRefPreferences {
         }
 
         // load user preferences
-        prefs = Preferences.userNodeForPackage(JabRefMain.class);
+        prefs = Preferences.userNodeForPackage(PREFS_BASE_CLASS);
 
         SearchPreferences.putDefaults(defaults);
 
@@ -1046,6 +1046,8 @@ public class JabRefPreferences {
      * @throws BackingStoreException
      */
     public void clear() throws BackingStoreException {
+        clearAllCustomEntryTypes();
+        clearKeyPatterns();
         prefs.clear();
     }
 
@@ -1079,7 +1081,7 @@ public class JabRefPreferences {
      */
     public GlobalBibtexKeyPattern getKeyPattern() {
         keyPattern = GlobalBibtexKeyPattern.fromPattern(get(DEFAULT_BIBTEX_KEY_PATTERN));
-        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1102,7 +1104,7 @@ public class JabRefPreferences {
         keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1118,6 +1120,63 @@ public class JabRefPreferences {
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }
+    }
+
+    private void clearKeyPatterns() throws BackingStoreException {
+        Preferences pre = Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(BIBTEX_KEY_PATTERNS_NODE);
+        pre.clear();
+    }
+
+    public void storeCustomEntryTypes(List<CustomEntryType> customEntryTypes, BibDatabaseMode bibDatabaseMode) {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+
+        try {
+            // clear old custom types
+            clearCustomEntryTypes(bibDatabaseMode);
+
+            // store current custom types
+            customEntryTypes.forEach(type -> prefsNode.put(type.getName(), type.getAsString()));
+
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    public List<CustomEntryType> loadCustomEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<CustomEntryType> storedEntryTypes = new ArrayList<>();
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        try {
+            Arrays.stream(prefsNode.keys())
+                    .map(key -> prefsNode.get(key, null))
+                    .filter(Objects::nonNull)
+                    .forEach(typeString -> CustomEntryType.parse(typeString).ifPresent(storedEntryTypes::add));
+        } catch (BackingStoreException e) {
+            LOGGER.info("Parsing customized entry types failed.", e);
+        }
+        return storedEntryTypes;
+    }
+
+    private void clearAllCustomEntryTypes() throws BackingStoreException {
+        for(BibDatabaseMode mode :BibDatabaseMode.values()) {
+            clearCustomEntryTypes(mode);
+        }
+    }
+
+    private void clearCustomEntryTypes(BibDatabaseMode mode) throws BackingStoreException {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+        prefsNode.clear();
+    }
+
+    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+        if (mode == BibDatabaseMode.BIBLATEX) {
+            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBLATEX_TYPES);
+        }
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return Preferences.userNodeForPackage(PREFS_BASE_CLASS).node(CUSTOMIZED_BIBTEX_TYPES);
+        }
+
+        throw new IllegalArgumentException("Unknown BibDatabaseMode: " + mode);
     }
 
     public Map<String, Object> getPreferences() {
@@ -1187,53 +1246,6 @@ public class JabRefPreferences {
         } else {
             return Optional.of("");
         }
-    }
-
-    /**
-     * Stores all information about the entry type in preferences, with the tag given by number.
-     */
-    public void storeCustomEntryType(CustomEntryType tp, int number) {
-        String nr = String.valueOf(number);
-        put(CUSTOM_TYPE_NAME + nr, tp.getName());
-        put(CUSTOM_TYPE_REQ + nr, tp.getRequiredFieldsString());
-        List<String> optionalFields = tp.getOptionalFields();
-        putStringList(CUSTOM_TYPE_OPT + nr, optionalFields);
-        List<String> primaryOptionalFields = tp.getPrimaryOptionalFields();
-        putStringList(CUSTOM_TYPE_PRIOPT + nr, primaryOptionalFields);
-    }
-
-    /**
-     * Retrieves all information about the entry type in preferences, with the tag given by number.
-     */
-    public Optional<CustomEntryType> getCustomEntryType(int number) {
-        String nr = String.valueOf(number);
-        String name = get(CUSTOM_TYPE_NAME + nr);
-        if (name == null) {
-            return Optional.empty();
-        }
-        List<String> req = getStringList(CUSTOM_TYPE_REQ + nr);
-        List<String> opt = getStringList(CUSTOM_TYPE_OPT + nr);
-        List<String> priOpt = getStringList(CUSTOM_TYPE_PRIOPT + nr);
-        if (priOpt.isEmpty()) {
-            return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt));
-        }
-        List<String> secondary = new ArrayList<>(opt);
-        secondary.removeAll(priOpt);
-
-        return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secondary));
-
-    }
-
-    /**
-     * Removes all information about custom entry types with tags of
-     *
-     * @param number or higher.
-     */
-    public void purgeCustomEntryTypes(int number) {
-        purgeSeries(CUSTOM_TYPE_NAME, number);
-        purgeSeries(CUSTOM_TYPE_REQ, number);
-        purgeSeries(CUSTOM_TYPE_OPT, number);
-        purgeSeries(CUSTOM_TYPE_PRIOPT, number);
     }
 
     /**

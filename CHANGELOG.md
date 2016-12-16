@@ -29,6 +29,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 - [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
 - Add the possibility to copy citations of multiple entries to the clipboard
+- Custom EntryTypes are now stored independently for BibTeX and BibLatex mode.
+  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to BibLatex)
+- Upon opening a file with customized entry types it is now possible to choose which customizations should be stored in local preferences.
 
 ### Fixed
 - Fixed [#2221](https://github.com/JabRef/jabref/issues/2221) customizable field content selectors due to popular demand. Content selectors now avoid duplicate words.
@@ -36,6 +39,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - "Remove entries from group" no longer removes entries from groups with similar names. [#2334](https://github.com/JabRef/jabref/issues/2334)
   - If an entry's group field contains 'a b' it is no longer considered a member the groups 'a', 'b', and 'a b'. [1873](https://github.com/JabRef/jabref/issues/1873)
   - Reading and writing now works for groups that contain special escaped characters in their names. [1681](https://github.com/JabRef/jabref/issues/1681)
+- We fixed various problems with customized entry types:
+  - Resetting the preferences now also resets custom entry types. [#2261](https://github.com/JabRef/jabref/issues/2261)
+  - Importing preferences does no longer duplicate custom entry types. [#772](https://github.com/JabRef/jabref/issues/772)
+  - Potenial problems upon resetting to defaults should be fixed. [#772](https://github.com/JabRef/jabref/issues/772)
+  - Customized standard types (such as `@article`) are no longer listed as "custom" type in "New Entry" dialog.
+  - Applying changes in the "Custom Entry Types" dialog is now faster. [#2318](https://github.com/JabRef/jabref/issues/2318)
 - We fixed an issue which prevented JabRef from closing using the "Quit" menu command. [#2336](https://github.com/JabRef/jabref/issues/2336)
 - We fixed an issue where the file permissions of the .bib-file were changed upon saving [#2279](https://github.com/JabRef/jabref/issues/2279).
 - We fixed an issue which prevented that a database was saved successfully if JabRef failed to generate new BibTeX-keys [#2285](https://github.com/JabRef/jabref/issues/2285).

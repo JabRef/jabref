@@ -76,6 +76,7 @@ import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
 import net.sf.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
+import net.sf.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.exporter.ExportAction;
 import net.sf.jabref.gui.exporter.ExportCustomizationDialog;
@@ -109,7 +110,6 @@ import net.sf.jabref.gui.specialfields.SpecialFieldDropDown;
 import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.autosaveandbackup.AutosaveManager;
 import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.help.HelpFile;
@@ -792,7 +792,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         fileHistory.storeHistory();
         prefs.customExports.store(Globals.prefs);
         prefs.customImports.store();
-        CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 
         prefs.flush();
 

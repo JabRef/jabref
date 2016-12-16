@@ -1,21 +1,28 @@
 package net.sf.jabref.gui.importer.actions;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.customentrytypes.CustomEntryTypesManager;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This action checks whether any new custom entry types were loaded from this
@@ -24,42 +31,106 @@ import net.sf.jabref.preferences.JabRefPreferences;
 public class CheckForNewEntryTypesAction implements PostOpenAction {
 
     @Override
-    public boolean isActionNecessary(ParserResult pr) {
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BibDatabaseMode mode = new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults).getMode();
-        // See if any custom entry types were imported, but disregard those we already know:
-        for (Iterator<String> i = pr.getEntryTypes().keySet().iterator(); i.hasNext();) {
-            String typeName = i.next().toLowerCase();
-            if (EntryTypes.getType(typeName, mode).isPresent()) {
-                i.remove();
-            }
-        }
-        return !pr.getEntryTypes().isEmpty();
+    public boolean isActionNecessary(ParserResult parserResult) {
+        return !getListOfUnknownAndUnequalCustomizations(parserResult).isEmpty();
     }
 
     @Override
-    public void performAction(BasePanel panel, ParserResult pr) {
+    public void performAction(BasePanel panel, ParserResult parserResult) {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(Localization.lang("Custom entry types found in file")).append(": ");
-        Object[] types = pr.getEntryTypes().keySet().toArray();
-        Arrays.sort(types);
-        for (Object type : types) {
-            sb.append(type).append(", ");
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
+
+        List<EntryType> typesToStore = determineEntryTypesToSave(panel, getListOfUnknownAndUnequalCustomizations(parserResult), mode);
+
+        if (!typesToStore.isEmpty()) {
+            typesToStore.forEach(type -> EntryTypes.addOrModifyCustomEntryType((CustomEntryType) type, mode));
+            CustomEntryTypesManager.saveCustomEntryTypes(Globals.prefs);
         }
-        String s = sb.toString();
+    }
+
+    private List<EntryType> getListOfUnknownAndUnequalCustomizations(ParserResult parserResult) {
+        BibDatabaseMode mode = getBibDatabaseModeFromParserResult(parserResult);
+
+        return parserResult.getEntryTypes().values().stream()
+                .filter(type ->
+                    (!EntryTypes.getType(type.getName(), mode).isPresent())
+                        || !EntryTypes.isEqualNameAndFieldBased(type, EntryTypes.getType(type.getName(), mode).get()))
+                .collect(Collectors.toList());
+    }
+
+    private List<EntryType> determineEntryTypesToSave(BasePanel panel, List<EntryType> allCustomizedEntryTypes, BibDatabaseMode databaseMode) {
+        List<EntryType> newTypes = new ArrayList<>();
+        List<EntryType> differentCustomizations = new ArrayList<>();
+
+        for (EntryType customType : allCustomizedEntryTypes) {
+            if (!EntryTypes.getType(customType.getName(), databaseMode).isPresent()) {
+                newTypes.add(customType);
+            } else {
+                EntryType currentlyStoredType = EntryTypes.getType(customType.getName(), databaseMode).get();
+                if (!EntryTypes.isEqualNameAndFieldBased(customType, currentlyStoredType)) {
+                    differentCustomizations.add(customType);
+                }
+            }
+        }
+
+        Map<EntryType, JCheckBox> typeCheckBoxMap = new HashMap<>();
+
+        JPanel checkboxPanel = createCheckBoxPanel(newTypes, differentCustomizations, typeCheckBoxMap);
+
         int answer = JOptionPane.showConfirmDialog(panel.frame(),
-                s.substring(0, s.length() - 2) + ".\n"
-                        + Localization.lang("Remember these entry types?"),
+                checkboxPanel,
                 Localization.lang("Custom entry types"),
-                JOptionPane.YES_NO_OPTION,
+                JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
         if (answer == JOptionPane.YES_OPTION) {
-            // Import
-            for (EntryType typ : pr.getEntryTypes().values()) {
-                EntryTypes.addOrModifyCustomEntryType((CustomEntryType) typ);
+            return typeCheckBoxMap.entrySet().stream().filter(entry -> entry.getValue().isSelected())
+                    .map(Map.Entry::getKey).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+
+    }
+
+    private JPanel createCheckBoxPanel(List<EntryType> newTypes, List<EntryType> differentCustomizations,
+            Map<EntryType, JCheckBox> typeCheckBoxMap) {
+        JPanel checkboxPanel = new JPanel();
+        checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.PAGE_AXIS));
+
+        JLabel customFoundLabel = new JLabel(Localization.lang("Custom entry types found in file")+".");
+        Font boldStandardFont = new Font(customFoundLabel.getFont().getFontName(), Font.BOLD, customFoundLabel.getFont().getSize());
+        customFoundLabel.setFont(boldStandardFont);
+        checkboxPanel.add(customFoundLabel);
+
+        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences")+":");
+        selectLabel.setFont(boldStandardFont);
+        checkboxPanel.add(selectLabel);
+
+        checkboxPanel.add(new JLabel(" "));
+
+        // add all unknown types:
+        if (!newTypes.isEmpty()) {
+            checkboxPanel.add(new JLabel(Localization.lang("Currently unknown") + ":"));
+            for (EntryType type : newTypes) {
+                JCheckBox box = new JCheckBox(type.getName(), true);
+                checkboxPanel.add(box);
+                typeCheckBoxMap.put(type, box);
             }
         }
+
+        // add all different customizations
+        if (!differentCustomizations.isEmpty()) {
+            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten") + ":"));
+            for (EntryType type : differentCustomizations) {
+                JCheckBox box = new JCheckBox(type.getName(), true);
+                checkboxPanel.add(box);
+                typeCheckBoxMap.put(type, box);
+            }
+        }
+        return checkboxPanel;
+    }
+
+    private BibDatabaseMode getBibDatabaseModeFromParserResult(ParserResult parserResult) {
+        return parserResult.getMetaData().getMode().orElse(Globals.prefs.getDefaultBibDatabaseMode());
     }
 }

@@ -12,8 +12,6 @@ import net.sf.jabref.gui.auximport.FromAuxDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * The action concerned with generate a new (sub-)database from latex AUX file.
@@ -39,8 +37,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
         dialog.setVisible(true);
 
         if (dialog.generatePressed()) {
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
             BasePanel bp = new BasePanel(jabRefFrame, new BibDatabaseContext(dialog.getGenerateDB(), defaults));
             jabRefFrame.addTab(bp, true);
             jabRefFrame.output(Localization.lang("New database created."));

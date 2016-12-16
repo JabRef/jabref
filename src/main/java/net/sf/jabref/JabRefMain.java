@@ -7,7 +7,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.SavePreferences;
@@ -23,6 +22,8 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.migrations.PreferencesMigrations;
+import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -60,6 +61,7 @@ public class JabRefMain {
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
+        PreferencesMigrations.upgradeStoredCustomEntryTypes();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -75,7 +77,8 @@ public class JabRefMain {
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
                 Globals.prefs.getXMPPreferences());
-        CustomEntryTypesManager.loadCustomEntryTypes(preferences);
+        EntryTypes.loadCustomEntryTypes(preferences.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
+                preferences.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
         Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                 Globals.journalAbbreviationLoader);
         LayoutFormatterPreferences layoutPreferences = Globals.prefs
