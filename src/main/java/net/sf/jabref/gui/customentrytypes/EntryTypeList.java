@@ -1,7 +1,6 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.customentrytypes;
 
 import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +41,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
         gbl.setConstraints(def, con);
         add(def);
         list.addListSelectionListener(this);
-        def.addActionListener(this);
+        def.addActionListener(e -> def.setEnabled(false));
         def.setEnabled(false);
         remove.setEnabled(false);
     }
@@ -124,16 +123,6 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
 
     public void addDefaultActionListener(ActionListener l) {
         def.addActionListener(l);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // Default button pressed.
-        if (e.getSource() == def) {
-            def.setEnabled(false);
-        } else {
-            super.actionPerformed(e);
-        }
     }
 
     @Override

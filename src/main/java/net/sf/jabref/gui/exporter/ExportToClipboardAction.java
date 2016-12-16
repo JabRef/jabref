@@ -111,7 +111,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            RtfSelection rs = new RtfSelection(sb.toString());
+            RtfTransferable rs = new RtfTransferable(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();

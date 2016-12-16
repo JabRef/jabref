@@ -128,7 +128,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final AddToGroupAction moveToGroup = new AddToGroupAction(true);
     private final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
 
-    private ToggleAction toggleAction;
+    private final ToggleAction toggleAction;
 
 
     /**

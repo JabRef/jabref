@@ -238,6 +238,8 @@ class FileTab extends JPanel implements PrefsTab {
         // we also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = newline;
 
+        prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
+
         prefs.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, reformatFileOnSaveAndExport.isSelected());
         prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
         prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());

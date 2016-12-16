@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * This class defines entry types for BibLatex support.
- * @see http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf
+ * @see <a href="http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf">biblatex documentation</a>
  */
 public class BibLatexEntryTypes {
 
@@ -19,7 +19,8 @@ public class BibLatexEntryTypes {
                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE,
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE,
+                    FieldName.orFields(FieldName.JOURNAL, FieldName.JOURNALTITLE),
                     FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TRANSLATOR, FieldName.ANNOTATOR, FieldName.COMMENTATOR, FieldName.SUBTITLE,
                     FieldName.TITLEADDON, FieldName.EDITOR, FieldName.EDITORA, FieldName.EDITORB, FieldName.EDITORC,

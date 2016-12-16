@@ -27,6 +27,11 @@ public class LatexCleanupFormatterTest {
     }
 
     @Test
+    public void preservePercentSign() {
+        assertEquals("\\%", formatter.format("%"));
+    }
+
+    @Test
     public void formatExample() {
         assertEquals("{VLSI DSP}", formatter.format(formatter.getExampleInput()));
     }
