@@ -49,6 +49,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.contentselector.ContentSelectorDialog;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.exporter.ExportToClipboardAction;
@@ -679,6 +680,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
+        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
+            csd.setLocationRelativeTo(frame);
+            csd.setVisible(true);
+        });
+
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -757,7 +764,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        if (mainTable.getSelectedRow() != mainTable.getRowCount() -1){
+        if (mainTable.getSelectedRow() != (mainTable.getRowCount() -1)){
             selectNextEntry();
         } else {
             selectPreviousEntry();
@@ -1519,7 +1526,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
+                    autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
@@ -1797,6 +1805,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markNonUndoableBaseChanged() {
         nonUndoableChange = true;
         markBaseChanged();
+    }
+
+    public void rebuildAllEntryEditors() {
+        currentEditor.rebuildPanels();
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -2366,6 +2378,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    /**
+     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
+     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
+     * after the user has made changes in the Manage dialog.
+     */
+    public void updateAllContentSelectors() {
+        currentEditor.updateAllContentSelectors();
+    }
 
     /**
      * Set the preview active state for all BasePanel instances.

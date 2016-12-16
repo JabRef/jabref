@@ -98,7 +98,7 @@ public class DBMSConnectionProperties {
     public boolean equals(DBMSConnectionProperties properties) {
         return this.type.equals(properties.getType())
                 && this.host.equalsIgnoreCase(properties.getHost())
-                && this.port == properties.getPort()
+                && (this.port == properties.getPort())
                 && this.database.equals(properties.getDatabase())
                 && this.user.equals(properties.getUser());
     }

@@ -34,7 +34,6 @@ import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.RegexKeywordGroup;
 import net.sf.jabref.model.groups.WordKeywordGroup;
-import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -1573,9 +1572,15 @@ public class BibtexParserTest {
     @Test
     public void integrationTestOldContentSelectorsAreIgnored() throws IOException {
         ParserResult result = BibtexParser.parse(
-                new StringReader("@comment{jabref-meta: selector_title:testWord;word2;}"), importFormatPreferences);
+                new StringReader("@Comment{jabref-meta: selector_status:approved;captured;received;status;}"), importFormatPreferences);
 
-        assertEquals(new MetaData(), result.getMetaData());
+        List<String> values = new ArrayList(4);
+        values.add("approved");
+        values.add("captured");
+        values.add("received");
+        values.add("status");
+
+        assertEquals(values, result.getMetaData().getContentSelectors().getSelectorValuesForField("status"));
     }
 
     @Test
