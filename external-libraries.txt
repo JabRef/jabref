@@ -115,6 +115,11 @@ Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
 License: MIT
 
+Id:      org.fx.misc.easybin:easybind
+Projekt: EasyBind
+URL:     https://github.com/TomasMikula/EasyBind
+License: BSD-2-Clause
+
 Id:      org.jsoup:jsoup
 Project: jsoup
 URL:     https://github.com/jhy/jsoup/
