@@ -61,7 +61,7 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("2006"), entry.getField("date"));
                 assertEquals(Optional.of("Effect of immobilization on catalytic characteristics"),
                         entry.getField("indextitle"));
-                assertEquals(Optional.of("#jomch#"), entry.getField("journaltitle"));
+                assertEquals(Optional.of("#jomch#"), entry.getField("journal"));
                 assertEquals(Optional.of("13"), entry.getField("number"));
                 assertEquals(Optional.of("3027-3036"), entry.getField("pages"));
                 assertEquals(Optional

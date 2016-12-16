@@ -88,7 +88,7 @@ public class BibTeXConverter {
         }
 
         if (entry.journalName != null) {
-            fieldValues.put(FieldName.JOURNALTITLE, entry.journalName);
+            fieldValues.put(FieldName.JOURNAL, entry.journalName);
         }
         if (entry.month != null) {
             Month month = MonthUtil.getMonth(entry.month);
