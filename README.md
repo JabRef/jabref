@@ -1,4 +1,4 @@
-# JabRef Development Version
+# JabRef Version 3.8
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
@@ -7,13 +7,9 @@
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
 [![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
 
-This version is a development version. Features may not work as expected.
+Development builds are available at [builds.jabref.org](https://builds.jabref.org/master/) whereas the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
-Branches of JabRef development are listed at https://github.com/JabRef/jabref/wiki/Branches.
-
-Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
-
-Explanation of donation possibilities and usage of donations is available at our [donations page](https://github.com/JabRef/jabref/wiki/Donations).
+Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
 
 We use [install4j], the multi-platform installer builder.
 
@@ -28,7 +24,7 @@ JabRef also lets you easily link to PDF or web sources for your reference entrie
 JabRef can import from and export to several formats, and you can customize export filters.
 JabRef can be run as a command line application to convert from any import format to any export format.
 
-* Homepage: http://www.jabref.org
+* Homepage: https://www.jabref.org
 * Development page: https://github.com/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
