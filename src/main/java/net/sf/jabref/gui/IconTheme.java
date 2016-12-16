@@ -32,12 +32,12 @@ public class IconTheme {
     /* Colors */
 
     // JabRef's default colors
-    public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
-    public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
+    //public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
+    //public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
 
     // Christmas edition
-    //public static final Color DEFAULT_COLOR = new Color(0x155115);
-    //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
+    public static final Color DEFAULT_COLOR = new Color(0x155115);
+    public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
 
 
     public static final int DEFAULT_SIZE = 24;
