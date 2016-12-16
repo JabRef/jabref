@@ -301,7 +301,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
-
+    private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
+            Localization.menuTitle("Manage content selectors"));
     private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
 
@@ -1333,6 +1334,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(manageJournals);
         options.add(protectTerms);
         options.add(selectKeys);
+        options.add(manageSelectors);
         mb.add(options);
 
         helpMenu.add(help);
@@ -1496,7 +1498,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
