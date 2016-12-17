@@ -22,6 +22,13 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
+    public void commentIsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("comment", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
     public void instituationIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("institution", "test");
@@ -42,6 +49,13 @@ public class NoBibTexFieldCheckerTest {
         IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "journaltitle");
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(messages, Collections.singletonList(message));
+    }
+
+    @Test
+    public void keywordsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("keywords", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @Test
