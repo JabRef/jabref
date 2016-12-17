@@ -175,7 +175,7 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.EXTERNAL, FieldProperty.VERBATIM));
         add(dummy);
 
-        add(new BibtexSingleField("comment", false, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.COMMENT, false, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.KEYWORDS, false, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.FILE, false);

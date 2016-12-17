@@ -203,7 +203,7 @@ public class MedlinePlainImporter extends Importer {
             fixAuthors(fields, author, FieldName.AUTHOR);
             fixAuthors(fields, editor, FieldName.EDITOR);
             if (!comment.isEmpty()) {
-                fields.put("comment", comment);
+                fields.put(FieldName.COMMENT, comment);
             }
 
             BibEntry b = new BibEntry(type);
