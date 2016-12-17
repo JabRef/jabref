@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
+- The integrigrity check now determines the set of biblatex only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 
 ### Removed
 

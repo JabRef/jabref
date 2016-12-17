@@ -22,6 +22,13 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
+    public void instituationIsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("institution", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
     public void journalIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("journal", "test");
