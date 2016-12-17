@@ -19,7 +19,6 @@ import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -133,7 +132,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
         // Find title, and create entry if we do. Otherwise assume we did not get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
-            BibEntry entry = new BibEntry(IdGenerator.next());
+            BibEntry entry = new BibEntry();
             entry.setField(FieldName.TITLE, m.group(1));
 
             // Find authors:

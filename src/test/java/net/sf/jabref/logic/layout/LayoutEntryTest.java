@@ -45,7 +45,7 @@ public class LayoutEntryTest {
 
         // create Bibtext Entry
 
-        mBTE = new BibEntry("testid");
+        mBTE = new BibEntry();
         mBTE.setField("abstract", "In this paper, we initiate a formal study of security on Android: Google's new open-source platform for mobile devices. Tags: Paper android google Open-Source Devices");
         //  Specifically, we present a core typed language to describe Android applications, and to reason about their data-flow security properties. Our operational semantics and type system provide some necessary foundations to help both users and developers of Android applications deal with their security concerns.
         mBTE.setField("keywords", "android, mobile devices, security");

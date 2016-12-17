@@ -28,9 +28,11 @@ public class BibEntryEqualityTest {
 
     @Test
     public void compareIsTrueWhenIdAndFieldsAreEqual() throws Exception {
-        BibEntry e1 = new BibEntry("1");
+        BibEntry e1 = new BibEntry();
+        e1.setId("1");
         e1.setField("key", "value");
-        BibEntry e2 = new BibEntry("1");
+        BibEntry e2 = new BibEntry();
+        e2.setId("1");
         assertFalse(e1.equals(e2));
         e2.setField("key", "value");
         assertTrue(e1.equals(e2));

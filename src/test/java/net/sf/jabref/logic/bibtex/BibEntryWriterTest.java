@@ -37,7 +37,7 @@ public class BibEntryWriterTest {
     public void testSerialization() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("1234", "article");
+        BibEntry entry = new BibEntry("article");
         //set a required field
         entry.setField("author", "Foo Bar");
         entry.setField("journal", "International Journal of Something");
@@ -383,7 +383,7 @@ public class BibEntryWriterTest {
     public void doNotWriteEmptyFields() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("1234", "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField("author", "  ");
         entry.setField("note", "some note");
 
@@ -402,7 +402,7 @@ public class BibEntryWriterTest {
     public void trimFieldContents() throws IOException {
         StringWriter stringWriter = new StringWriter();
 
-        BibEntry entry = new BibEntry("1234", "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField("note", "        some note    \t");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);

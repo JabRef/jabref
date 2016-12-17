@@ -98,7 +98,7 @@ public class CopacImporter extends Importer {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, "book");
+            BibEntry b = new BibEntry("book");
 
             String[] lines = entry.split("\n");
 

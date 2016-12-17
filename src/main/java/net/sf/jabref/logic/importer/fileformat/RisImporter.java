@@ -238,7 +238,7 @@ public class RisImporter extends Importer {
 
                 fields.put(FieldName.PAGES, startPage + endPage);
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());

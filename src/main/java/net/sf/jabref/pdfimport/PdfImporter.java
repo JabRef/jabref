@@ -35,7 +35,6 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -258,8 +257,7 @@ public class PdfImporter {
         EntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not canceled.
-            String id = IdGenerator.next();
-            final BibEntry bibEntry = new BibEntry(id, type.getName());
+            final BibEntry bibEntry = new BibEntry(type.getName());
             try {
                 panel.getDatabase().insertEntry(bibEntry);
 
