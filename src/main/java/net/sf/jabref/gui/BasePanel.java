@@ -128,7 +128,6 @@ import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
@@ -574,8 +573,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
             }
 
-            String id = IdGenerator.next();
-            BibEntry bibEntry = new BibEntry(id, tp.getName());
+            BibEntry bibEntry = new BibEntry(tp.getName());
             TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
             tidialog.setLocationRelativeTo(BasePanel.this);
             tidialog.setVisible(true);
@@ -823,7 +821,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // entries must exist
                 // independently of the copied
                 // ones.
-                be.setId(IdGenerator.next());
                 bibDatabaseContext.getDatabase().insertEntry(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
@@ -1130,8 +1127,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             actualType = etd.getChoice();
         }
         if (actualType != null) { // Only if the dialog was not canceled.
-            String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, actualType.getName());
+            final BibEntry be = new BibEntry(actualType.getName());
             try {
                 bibDatabaseContext.getDatabase().insertEntry(be);
                 // Set owner/timestamp if options are enabled:

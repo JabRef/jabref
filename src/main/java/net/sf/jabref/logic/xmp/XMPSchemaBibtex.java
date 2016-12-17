@@ -17,7 +17,6 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -295,7 +294,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     public BibEntry getBibtexEntry() {
         String type = getTextProperty(BibEntry.TYPE_HEADER);
-        BibEntry e = new BibEntry(IdGenerator.next(), type);
+        BibEntry e = new BibEntry(type);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");

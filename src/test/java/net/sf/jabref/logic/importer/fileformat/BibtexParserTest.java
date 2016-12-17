@@ -27,7 +27,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
@@ -358,7 +357,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
@@ -373,7 +372,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
 

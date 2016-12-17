@@ -539,8 +539,7 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        String id = IdGenerator.next();
-        BibEntry result = new BibEntry(id, entryType);
+        BibEntry result = new BibEntry(entryType);
         skipWhitespace();
         consume('{', '(');
         int character = peek();
