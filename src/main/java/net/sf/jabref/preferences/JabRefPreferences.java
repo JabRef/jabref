@@ -427,7 +427,7 @@ public class JabRefPreferences {
     private static final String USER_HOME = System.getProperty("user.home");
 
     /**
-     * Set with all custom {@link Importer}s
+     * Set with all custom {@link net.sf.jabref.logic.importer.Importer}s
      */
     public final CustomImportList customImports;
 
