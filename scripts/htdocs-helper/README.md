@@ -2,7 +2,7 @@
 
 ## Helper scripts
 
-* [generate-htdocs-help-from-jabref-src-help](generate-htdocs-help-from-jabref-src-help) is a script generating the help fiels in `htdocs` based on the content from `src/main/resources/help`
+* [generate-htdocs-help-from-jabref-src-help](generate-htdocs-help-from-jabref-src-help) is a script generating the help files in `htdocs` based on the content from `src/main/resources/help`
 * [validate-htdocs-syntax.pl](validate-htdocs-syntax.pl) is used for syntax checking of the `htdocs` repository.
 
 ## Repository `htdocs`
