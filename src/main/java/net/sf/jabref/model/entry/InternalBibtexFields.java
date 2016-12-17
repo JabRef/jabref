@@ -72,7 +72,7 @@ public class InternalBibtexFields {
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
             FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
-    
+
     private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
             SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
             SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
@@ -87,8 +87,8 @@ public class InternalBibtexFields {
         BibtexSingleField dummy;
 
         // FIRST: all standard fields
-        // These are the fields that BibTex might want to treat, so these
-        // must conform to BibTex rules.
+        // These are the fields that BibTeX might want to treat, so these
+        // must conform to BibTeX rules.
         add(new BibtexSingleField(FieldName.ADDRESS, true, BibtexSingleField.SMALL_W));
         // An annotation. It is not used by the standard bibliography styles,
         // but may be used by others that produce an annotated bibliography.
