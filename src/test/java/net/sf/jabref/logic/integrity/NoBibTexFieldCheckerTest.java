@@ -22,6 +22,15 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
+    public void afterwordIsRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("afterword", "test");
+        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "afterword");
+        List<IntegrityMessage> messages = checker.check(entry);
+        assertEquals(messages, Collections.singletonList(message));
+    }
+
+    @Test
     public void arbitraryNonBibLaTeXFieldIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("fieldNameNotDefinedInTheBibLaTeXManual", "test");
