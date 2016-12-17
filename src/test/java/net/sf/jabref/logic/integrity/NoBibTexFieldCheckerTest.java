@@ -22,6 +22,13 @@ public class NoBibTexFieldCheckerTest {
     }
 
     @Test
+    public void arbitraryNonBibLaTeXFieldIsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("fieldNameNotDefinedInTheBibLaTeXManual", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
     public void commentIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("comment", "test");
