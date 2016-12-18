@@ -17,8 +17,8 @@ public class CitationStyleToClipboardWorkerTest {
 
     @Test
     public void processPreviewText() throws Exception {
-        String expected = "Article (Smith2016)Smith, B.; Jones, B. &amp; Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger." + OS.NEWLINE +
-                "Article (Smith2016)Smith, B.; Jones, B. &amp; Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.";
+        String expected = "Article (Smith2016)Smith, B.; Jones, B. & Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger." + OS.NEWLINE +
+                "Article (Smith2016)Smith, B.; Jones, B. & Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.";
 
         String citation = "Article (Smith2016)" + OS.NEWLINE +
                 "Smith, B.; Jones, B. &amp; Williams, J." + OS.NEWLINE +

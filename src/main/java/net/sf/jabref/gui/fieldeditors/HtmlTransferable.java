@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import net.sf.jabref.logic.util.OS;
 
 
@@ -38,6 +39,8 @@ public class HtmlTransferable implements Transferable {
         plain = WHITESPACE_AROUND_NEWLINE.matcher(plain).replaceAll("");
         plain = DOUBLE_WHITESPACES.matcher(plain).replaceAll(" ");
         plain = HTML_NEWLINE.matcher(plain).replaceAll(OS.NEWLINE);
+        // replace all HTML codes such as &amp;
+        plain = new HtmlToUnicodeFormatter().format(plain);
         this.plainText = plain.trim();
     }
 

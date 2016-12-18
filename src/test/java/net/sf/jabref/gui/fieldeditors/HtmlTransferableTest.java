@@ -69,4 +69,23 @@ public class HtmlTransferableTest {
         assertEquals(expected, htmlTransferable.getTransferData(DataFlavor.stringFlavor));
     }
 
+    @Test
+    public void testAmpersandConversion() throws Exception {
+        String html = "<!DOCTYPE html>" + OS.NEWLINE +
+                "<html>" + OS.NEWLINE +
+                "   <head>" + OS.NEWLINE +
+                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                "   </head>" + OS.NEWLINE +
+                "   <body>" + OS.NEWLINE +
+                OS.NEWLINE +
+                "  <div>Let's rock &amp; have fun" + OS.NEWLINE +
+                "  </div>" + OS.NEWLINE +
+                OS.NEWLINE +
+                "   </body>" + OS.NEWLINE +
+                "</html>" + OS.NEWLINE;
+        String expected = "Let's rock & have fun";
+        HtmlTransferable htmlTransferable = new HtmlTransferable(html);
+        assertEquals(expected, htmlTransferable.getTransferData(DataFlavor.stringFlavor));
+    }
+
 }
