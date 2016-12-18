@@ -233,7 +233,7 @@ public class RisImporter extends Importer {
                     fields.put(FieldName.EDITOR, editor);
                 }
                 if (!comment.isEmpty()) {
-                    fields.put("comment", comment);
+                    fields.put(FieldName.COMMENT, comment);
                 }
 
                 fields.put(FieldName.PAGES, startPage + endPage);
