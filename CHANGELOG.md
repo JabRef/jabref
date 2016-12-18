@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
+- We fixed an issue where groups containing brackets were not working properly. [#2394](https://github.com/JabRef/jabref/issues/2394)
 
 ### Removed
 
