@@ -9,6 +9,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.auximport.FromAuxDialog;
+import net.sf.jabref.gui.auximport.FromAuxGroups;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -30,6 +31,8 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         // Create a new, empty, database.
+        FromAuxGroups dia = new FromAuxGroups(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
+        dia.setVisible(true);
 
         FromAuxDialog dialog = new FromAuxDialog(jabRefFrame, "", true, jabRefFrame.getTabbedPane());
 
