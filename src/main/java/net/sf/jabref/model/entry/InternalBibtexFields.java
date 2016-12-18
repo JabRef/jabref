@@ -18,16 +18,24 @@ import net.sf.jabref.model.entry.specialfields.SpecialField;
 /**
  * Handling of bibtex fields.
  * All bibtex-field related stuff should be placed here!
- * Because we can export these informations into additional
- * config files -> simple extension and definition of new fields....
+ * Because we can export this information into additional
+ * config files -> simple extension and definition of new fields
  *
  * TODO:
- *  - handling of identically fields with different names
- *    e.g. LCCN = lib-congress
- *  - group id for each fields, e.g. standard, jurabib, bio....
+ *  - handling of identically fields with different names (https://github.com/JabRef/jabref/issues/521)
+ *    e.g. LCCN = lib-congress, journaltitle = journal
+ *  - group id for each fields, e.g. standard, jurabib, bio, ...
  *  - add a additional properties functionality into the BibtexSingleField class
  */
 public class InternalBibtexFields {
+
+    /**
+     * These are the fields JabRef always displays as default
+     * {@link net.sf.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     *
+     * A user can change them. The change is curently stored in the preferences only and not explicitley exposed as separte preferences object
+     */
+    public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP, FieldName.ABSTRACT, FieldName.REVIEW);
 
     // contains all bibtex-field objects (BibtexSingleField)
     private final Map<String, BibtexSingleField> fieldSet;

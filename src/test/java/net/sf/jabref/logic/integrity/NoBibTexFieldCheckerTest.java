@@ -27,7 +27,7 @@ public class NoBibTexFieldCheckerTest {
         entry.setField("afterword", "test");
         IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "afterword");
         List<IntegrityMessage> messages = checker.check(entry);
-        assertEquals(messages, Collections.singletonList(message));
+        assertEquals(Collections.singletonList(message), messages);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class NoBibTexFieldCheckerTest {
         entry.setField("journaltitle", "test");
         IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "journaltitle");
         List<IntegrityMessage> messages = checker.check(entry);
-        assertEquals(messages, Collections.singletonList(message));
+        assertEquals(Collections.singletonList(message), messages);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class NoBibTexFieldCheckerTest {
         entry.setField("location", "test");
         IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "location");
         List<IntegrityMessage> messages = checker.check(entry);
-        assertEquals(messages, Collections.singletonList(message));
+        assertEquals(Collections.singletonList(message), messages);
     }
 
 }

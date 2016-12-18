@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -10,24 +9,19 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * This checker checks whether the entry does not contain any field appearing only in BibLaTeX (and not in BibTeX)
  */
 public class NoBibtexFieldChecker implements Checker {
 
-
     private List<String> getAllBiblatexOnlyFields() {
         Set<String> allBibtexFields = BibtexEntryTypes.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
-
-        // fields as set at net.sf.jabref.preferences.JabRefPreferences.setLanguageDependentDefaultValues()
-        final List<String> JABREF_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP, FieldName.ABSTRACT, FieldName.REVIEW);
-
         return BibLatexEntryTypes.ALL.stream()
                 .flatMap(type -> type.getAllFields().stream())
                 .filter(fieldName -> !allBibtexFields.contains(fieldName))
-                .filter(fieldName -> !JABREF_GENERAL_FIELDS.contains(fieldName))
+                .filter(fieldName -> !InternalBibtexFields.DEFAULT_GENERAL_FIELDS.contains(fieldName))
                 .sorted()
                 .collect(Collectors.toList());
     }
@@ -35,9 +29,9 @@ public class NoBibtexFieldChecker implements Checker {
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         // non-static initalization of ALL_BIBLATEX_ONLY_FIELDS as the user can customize the entry types during runtime
-        final List<String> ALL_BIBLATEX_ONLY_FIELDS = getAllBiblatexOnlyFields();
+        final List<String> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
         return entry.getFieldNames().stream()
-                .filter(name ->  ALL_BIBLATEX_ONLY_FIELDS.contains(name))
+                .filter(name ->  allBiblatexOnlyFields.contains(name))
                 .map(name -> new IntegrityMessage(Localization.lang("BibLaTeX field only"), entry, name)).collect(Collectors.toList());
     }
 
