@@ -75,4 +75,20 @@ public class URLDownloadTest {
         Assert.assertNotNull(path);
     }
 
+    @Test
+    public void downloadOfHttpSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
+    }
+
+    @Test
+    public void downloadOfHttpsSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
+    }
+
 }
