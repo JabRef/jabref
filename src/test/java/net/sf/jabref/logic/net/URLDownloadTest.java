@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -64,6 +65,14 @@ public class URLDownloadTest {
 
         String path = google.downloadToTemporaryFile().toString();
         Assert.assertTrue(path, path.contains("LICENSE") && path.endsWith(".md"));
+    }
+
+    @Test
+    public void downloadOfFTPSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
     }
 
 }

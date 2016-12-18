@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - When editing an article, the tab "Optional fields" now shows "ISSN"
 - When editing a book, the tab "Optional fields" now shows "ISBN"
 - When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
+- When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
