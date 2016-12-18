@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
@@ -28,6 +29,7 @@ public class ClipBoardManager implements ClipboardOwner {
     private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private static final Optional<Clipboard> SELECTION = Optional.ofNullable(Toolkit.getDefaultToolkit().getSystemSelection());
 
     /**
      * Empty implementation of the ClipboardOwner interface.
@@ -44,6 +46,8 @@ public class ClipBoardManager implements ClipboardOwner {
     public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
         CLIPBOARD.setContents(stringSelection, this);
+        SELECTION.ifPresent(s -> s.setContents(stringSelection, this));
+
     }
 
     /**
@@ -51,6 +55,7 @@ public class ClipBoardManager implements ClipboardOwner {
      */
     public void setTransferableClipboardContents(Transferable transferable){
         CLIPBOARD.setContents(transferable, this);
+        SELECTION.ifPresent(s -> s.setContents(transferable, this));
     }
 
     /**
@@ -62,7 +67,13 @@ public class ClipBoardManager implements ClipboardOwner {
     public String getClipboardContents() {
         String result = "";
         //odd: the Object param of getContents is not currently used
-        Transferable contents = CLIPBOARD.getContents(null);
+        Transferable contents = null;
+        if (SELECTION.isPresent()) {
+            contents = SELECTION.get().getContents(null);
+        }
+        if (contents == null) {
+            contents = CLIPBOARD.getContents(null);
+        }
         if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
@@ -78,8 +89,8 @@ public class ClipBoardManager implements ClipboardOwner {
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);
+        Objects.requireNonNull(content);
         List<BibEntry> result = new ArrayList<>();
-
 
         if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
             // We have determined that the clipboard data is a set of entries.

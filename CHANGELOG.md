@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- When copying and pasting, the X11 selection is read first and also set. [#2389](https://github.com/JabRef/jabref/issues/2389).
 - When editing an article, the tab "Optional fields" now shows "ISSN"
 - When editing a book, the tab "Optional fields" now shows "ISBN"
 
