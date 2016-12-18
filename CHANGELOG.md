@@ -11,9 +11,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- When editing an article, the tab "Optional fields" now shows "ISSN"
+- When editing a book, the tab "Optional fields" now shows "ISBN"
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
+- The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 
 ### Removed
 
