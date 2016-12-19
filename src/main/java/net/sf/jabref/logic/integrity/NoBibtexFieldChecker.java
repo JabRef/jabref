@@ -9,6 +9,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
@@ -21,7 +22,10 @@ public class NoBibtexFieldChecker implements Checker {
         return BibLatexEntryTypes.ALL.stream()
                 .flatMap(type -> type.getAllFields().stream())
                 .filter(fieldName -> !allBibtexFields.contains(fieldName))
+                // these fields are displayed by JabRef as default
                 .filter(fieldName -> !InternalBibtexFields.DEFAULT_GENERAL_FIELDS.contains(fieldName))
+                .filter(fieldName -> !fieldName.equals(FieldName.ABSTRACT))
+                .filter(fieldName -> !fieldName.equals(FieldName.REVIEW))
                 .sorted()
                 .collect(Collectors.toList());
     }
