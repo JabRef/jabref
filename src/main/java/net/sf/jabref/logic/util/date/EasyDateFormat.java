@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.util.date;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class EasyDateFormat {
@@ -27,7 +27,7 @@ public class EasyDateFormat {
      * @return The date string.
      */
     public String getCurrentDate() {
-        return getDateAt(ZonedDateTime.now());
+        return getDateAt(LocalDateTime.now());
     }
 
     /**
@@ -36,7 +36,7 @@ public class EasyDateFormat {
      *
      * @return The formatted date string.
      */
-    public String getDateAt(ZonedDateTime dateTime) {
+    public String getDateAt(LocalDateTime dateTime) {
         // first use, create an instance
         return dateTime.format(dateFormatter);
     }
