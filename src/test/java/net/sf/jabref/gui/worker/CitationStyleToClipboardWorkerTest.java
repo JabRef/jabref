@@ -17,8 +17,8 @@ public class CitationStyleToClipboardWorkerTest {
 
     @Test
     public void processPreviewText() throws Exception {
-        String expected = "Article (Smith2016)Smith, B.; Jones, B. &amp; Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. " + OS.NEWLINE +
-                "Article (Smith2016)Smith, B.; Jones, B. &amp; Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract:  This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger. " + OS.NEWLINE;
+        String expected = "Article (Smith2016)Smith, B.; Jones, B. & Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger." + OS.NEWLINE +
+                "Article (Smith2016)Smith, B.; Jones, B. & Williams, J.Taylor, P. (Ed.)Title of the test entry BibTeX Journal, JabRef Publishing, 2016, 34, 45-67 Abstract: This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.";
 
         String citation = "Article (Smith2016)" + OS.NEWLINE +
                 "Smith, B.; Jones, B. &amp; Williams, J." + OS.NEWLINE +
@@ -188,7 +188,7 @@ public class CitationStyleToClipboardWorkerTest {
     }
 
     @Test
-    public void processHtml() throws Exception {
+    public void processHtmlAsHtml() throws Exception {
         String expected = "<!DOCTYPE html>" + OS.NEWLINE +
                 "<html>" + OS.NEWLINE +
                 "   <head>" + OS.NEWLINE +
@@ -213,8 +213,21 @@ public class CitationStyleToClipboardWorkerTest {
                 "  </div>" + OS.NEWLINE;
         HtmlTransferable htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
 
-        Object actual = htmlTransferable.getTransferData(DataFlavor.stringFlavor);
+        Object actual = htmlTransferable.getTransferData(DataFlavor.allHtmlFlavor);
         Assert.assertEquals(expected, actual);
     }
 
+    @Test
+    public void processHtmlAsText() throws Exception {
+        String expected = "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal , vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE +
+                "[1] B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal , vol. 34, no. 3, pp. 45–67, Jul. 2016.";
+
+        String citation = "  <div class=\"csl-entry\">" + OS.NEWLINE +
+                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>" + OS.NEWLINE +
+                "  </div>" + OS.NEWLINE;
+        HtmlTransferable htmlTransferable = CitationStyleToClipboardWorker.processHtml(Arrays.asList(citation, citation));
+
+        Object actual = htmlTransferable.getTransferData(DataFlavor.stringFlavor);
+        Assert.assertEquals(expected, actual);
+    }
 }

@@ -1,7 +1,9 @@
 package net.sf.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -17,7 +19,7 @@ import net.sf.jabref.model.strings.StringUtil;
 public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger {
 
     protected final Character keywordSeparator;
-    private final List<String> searchWords;
+    private final Set<String> searchWords;
     private final boolean onlySplitWordsAtSeparator;
 
     public WordKeywordGroup(String name, GroupHierarchyType context, String searchField,
@@ -26,11 +28,11 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         super(name, context, searchField, searchExpression, caseSensitive);
 
         this.keywordSeparator = keywordSeparator;
-        this.searchWords = StringUtil.getStringAsWords(searchExpression);
         this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
+        this.searchWords = getSearchWords(searchExpression);
     }
 
-    private static boolean containsCaseInsensitive(Set<String> searchIn, List<String> searchFor) {
+    private static boolean containsCaseInsensitive(Set<String> searchIn, Collection<String> searchFor) {
         for (String searchWord : searchFor) {
             if (!containsCaseInsensitive(searchIn, searchWord)) {
                 return false;
@@ -116,6 +118,14 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
                     .orElse(Collections.emptySet());
         } else {
             return entry.getFieldAsWords(searchField);
+        }
+    }
+
+    private Set<String> getSearchWords(String searchExpression) {
+        if (onlySplitWordsAtSeparator) {
+            return KeywordList.parse(searchExpression, keywordSeparator).toStringList();
+        } else {
+            return new HashSet<>(StringUtil.getStringAsWords(searchExpression));
         }
     }
 

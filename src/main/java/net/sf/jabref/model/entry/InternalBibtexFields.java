@@ -33,9 +33,9 @@ public class InternalBibtexFields {
      * These are the fields JabRef always displays as default
      * {@link net.sf.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
      *
-     * A user can change them. The change is curently stored in the preferences only and not explicitley exposed as separte preferences object
+     * A user can change them. The change is currently stored in the preferences only and not explicitley exposed as separte preferences object
      */
-    public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP, FieldName.ABSTRACT, FieldName.REVIEW);
+    public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
 
     // contains all bibtex-field objects (BibtexSingleField)
     private final Map<String, BibtexSingleField> fieldSet;

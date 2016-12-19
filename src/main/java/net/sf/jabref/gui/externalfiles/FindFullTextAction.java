@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class FindFullTextAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
-    private static final int warningLimit = 10; // The minimum number of selected entries to ask the user for confirmation
+    private static final int warningLimit = 5; // The minimum number of selected entries to ask the user for confirmation
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -56,9 +56,10 @@ public class FindFullTextAction extends AbstractWorker {
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                            + Localization.lang("JabRef will send at least one request per entry to a publisher.") + "\n"
                             + Localization.lang("Do you still want to continue?"),
                     Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
             if (answer != JOptionPane.OK_OPTION) {
                 basePanel.output(Localization.lang("Operation canceled."));
                 return;

@@ -21,12 +21,16 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 
 ### Changed
-- When editing an article, the tab "Optional fields" now shows "ISSN"
-- When editing a book, the tab "Optional fields" now shows "ISBN"
+- When editing an article, the tab "Optional fields" now shows "ISSN".
+- When editing a book, the tab "Optional fields" now shows "ISBN".
+- When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
+- When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
+- When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
+- We fixed an issue where groups containing brackets were not working properly. [#2394](https://github.com/JabRef/jabref/issues/2394)
 
 ### Removed
 
@@ -84,7 +88,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
 - When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
 - We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
-- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
+- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [#1441](https://github.com/JabRef/jabref/issues/1441)
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 - [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
