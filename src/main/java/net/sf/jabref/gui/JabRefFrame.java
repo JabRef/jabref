@@ -60,7 +60,6 @@ import javax.swing.WindowConstants;
 
 import javafx.application.Platform;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.actions.Actions;
