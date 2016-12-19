@@ -77,7 +77,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
 - When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
 - We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
-- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [1441](https://github.com/JabRef/jabref/issues/1441)
+- We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [#1441](https://github.com/JabRef/jabref/issues/1441)
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 - [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
