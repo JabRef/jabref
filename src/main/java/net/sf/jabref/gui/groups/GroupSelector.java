@@ -368,7 +368,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             StackPane root = new StackPane();
             root.getChildren().addAll(new GroupTreeView().getView());
             Scene scene = new Scene(root);
-            //ScenicView.show(scene);
             groupsPane.setScene(scene);
         });
     }
