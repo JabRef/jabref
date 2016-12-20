@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -94,7 +96,6 @@ import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -1485,7 +1486,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private Optional<FieldChange> doUpdateTimeStamp() {
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         String timeStampFormat = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
-        String timestamp = EasyDateFormat.fromTimeStampFormat(timeStampFormat).getCurrentDate();
+        String timestamp = DateTimeFormatter.ofPattern(timeStampFormat).format(LocalDateTime.now());
         return UpdateField.updateField(entry, timeStampField, timestamp);
     }
 

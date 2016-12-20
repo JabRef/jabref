@@ -2,7 +2,6 @@ package net.sf.jabref.gui.date;
 
 import java.awt.BorderLayout;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JComponent;
@@ -11,7 +10,6 @@ import javax.swing.JPanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.github.lgooddatepicker.components.DatePicker;
@@ -27,11 +25,16 @@ public class DatePickerButton implements DateChangeListener {
     private final DatePicker datePicker;
     private final JPanel panel = new JPanel();
     private final FieldEditor editor;
-    private final boolean isoFormat;
+    private final DateTimeFormatter dateTimeFormatter;
 
 
-    public DatePickerButton(FieldEditor pEditor, Boolean isoFormat) {
-        this.isoFormat = isoFormat;
+    public DatePickerButton(FieldEditor pEditor, boolean useIsoFormat) {
+        if (useIsoFormat) {
+            dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+        } else {
+            dateTimeFormatter = DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
+        }
+
         // Create a date picker with hidden text field (showing button only).
         DatePickerSettings dateSettings = new DatePickerSettings();
         dateSettings.setVisibleDateTextField(false);
@@ -51,13 +54,9 @@ public class DatePickerButton implements DateChangeListener {
     public void dateChanged(DateChangeEvent dateChangeEvent) {
         LocalDate date = datePicker.getDate();
         if (date != null) {
-            if (isoFormat) {
-                editor.setText(date.format(DateTimeFormatter.ISO_DATE));
-            } else {
-                EasyDateFormat.fromTimeStampFormat(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)).getDateAt(ZonedDateTime.from(date));
-            }
+            editor.setText(dateTimeFormatter.format(date.atStartOfDay()));
         } else {
-            // in this case the user selected "none" in the date picker, so we just clear the field
+            // in this case the user selected "clear" in the date picker, so we just clear the field
             editor.setText("");
         }
         // Set focus to editor component after changing its text:
