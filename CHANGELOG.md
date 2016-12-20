@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 - We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
 - We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. Today and clear work again. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
+- Fixes [#2406](https://github.com/JabRef/jabref/issues/2406) so that the integrity check filter works again
 
 ### Removed
 
