@@ -197,7 +197,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param entries list of entries to be searched
      * @return number of hits
      */
-    public int numberOfMatches(List<BibEntry> entries) {
+    public int calculateNumberOfMatches(List<BibEntry> entries) {
         int hits = 0;
         SearchMatcher matcher = getSearchMatcher();
         for (BibEntry entry : entries) {
@@ -208,7 +208,12 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return hits;
     }
 
-    public Integer numberOfMatches(BibDatabase database) {
-        return numberOfMatches(database.getEntries());
+    /**
+     * Determines the number of entries in the specified database which are matched by this group.
+     * @param database database to be searched
+     * @return number of hits
+     */
+    public int calculateNumberOfMatches(BibDatabase database) {
+        return calculateNumberOfMatches(database.getEntries());
     }
 }

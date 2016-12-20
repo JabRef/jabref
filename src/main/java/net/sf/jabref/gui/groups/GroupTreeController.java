@@ -24,7 +24,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> mainColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel,Integer> numberColumn;
+    @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> numberColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> disclosureNodeColumn;
 
     @Inject private StateManager stateManager;
@@ -53,8 +53,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         );
 
         // Number of hits
-        //numberColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().getHits());
-        numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, Integer>()
+        numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");

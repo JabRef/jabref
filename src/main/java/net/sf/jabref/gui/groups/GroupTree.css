@@ -55,12 +55,14 @@
     -fx-background-color: lightgrey;
 }
 
-.tree-table-row-cell:selected, .tree-table-row-cell:pressed {
-    -fx-background-color: rgb(106, 159, 205);
+.tree-table-row-cell:selected,
+.tree-table-row-cell:pressed {
+    -fx-background-color: #6A9FCD;
     -fx-text-fill: white;
 }
 
-.tree-table-row-cell:selected > .tree-table-cell > .icon, .tree-table-row-cell:pressed > .tree-table-cell > .icon {
+.tree-table-row-cell:selected > .tree-table-cell > .icon,
+.tree-table-row-cell:pressed > .tree-table-cell > .icon {
     -fx-fill: white;
 }
 
@@ -89,17 +91,6 @@
 .tree-table-row-cell:expanded > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-rotate: 90;
 }
-
-
-
-/*
-.numberColumn > .hits > .text {
-    -fx-fill: white;
-}
-*/
-
-
-
 
 .tree-table-row-cell > .tree-table-cell > .icon {
     -fx-font-family: 'MaterialDesignIcons';

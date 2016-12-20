@@ -22,6 +22,16 @@
      * A dark grayish blue to display information (but kind of highlighted).
      */
     -fx-info: #2c3e50;
+
+    /*
+     * A light gray for accented background
+     */
+    -fx-accented-background: #dadad8;
+
+    /*
+     * A dark gray as background
+     */
+    -fx-dark-background: #757575
 }
 
 .hyperlink {
@@ -42,6 +52,6 @@
 }
 
 .tooltip {
-    -fx-background-color: #757575;
+    -fx-background-color: -fx-dark-background;
     -fx-effect:none;
 }

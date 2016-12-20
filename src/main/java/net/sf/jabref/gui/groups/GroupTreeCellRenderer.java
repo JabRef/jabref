@@ -14,7 +14,6 @@ import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
 import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its toString() method.
@@ -71,7 +70,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (viewModel.printInItalics()) {
             sb.append("<i>");
         }
-        sb.append(StringUtil.quoteForHTML(viewModel.getText()));
+        sb.append("Group Name");
         if (viewModel.printInItalics()) {
             sb.append("</i>");
         }

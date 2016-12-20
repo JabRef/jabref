@@ -101,8 +101,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
     private final JCheckBoxMenuItem showOverlappingGroups = new JCheckBoxMenuItem(
             Localization.lang("Highlight overlapping groups"));
-    private final JCheckBoxMenuItem showNumberOfElements = new JCheckBoxMenuItem(
-            Localization.lang("Show number of elements contained in each group"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Localization.lang("Automatically assign new entry to selected groups"));
     private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit group membership"),
@@ -193,26 +191,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             andCb.setSelected(false);
         }
 
-        showNumberOfElements.addChangeListener(new ChangeListener() {
-
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                Globals.prefs.putBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS,
-                        showNumberOfElements.isSelected());
-                if (groupsTree != null) {
-                    groupsTree.invalidate();
-                    groupsTree.repaint();
-                }
-            }
-        });
-
         autoAssignGroup.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected()));
 
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
         editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
         editModeCb.setSelected(editModeIndicator);
-        showNumberOfElements.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
         autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
         JButton openSettings = new JButton(IconTheme.JabRefIcon.PREFERENCES.getSmallIcon());
@@ -228,13 +212,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         settings.addSeparator();
         settings.add(showOverlappingGroups);
         settings.addSeparator();
-        settings.add(showNumberOfElements);
         settings.add(autoAssignGroup);
         openSettings.addActionListener(e -> {
             if (!settings.isVisible()) {
                 JButton src = (JButton) e.getSource();
-                showNumberOfElements
-                        .setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS));
                 autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
                 settings.show(src, 0, openSettings.getHeight());
             }

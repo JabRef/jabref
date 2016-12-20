@@ -179,22 +179,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
     }
 
-    public String getText() {
-        AbstractGroup group = node.getGroup();
-        StringBuilder sb = new StringBuilder(60);
-        sb.append(group.getName());
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
-                && (JabRefGUI.getMainFrame() != null)) {
-            BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
-            if (currentBasePanel != null) {
-                sb.append(" [").append(node.numberOfMatches(currentBasePanel.getDatabase().getEntries())).append(']');
-            }
-        }
-
-        return sb.toString();
-    }
-
     public String getDescription() {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";

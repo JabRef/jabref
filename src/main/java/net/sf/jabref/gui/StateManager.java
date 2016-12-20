@@ -19,12 +19,11 @@ import net.sf.jabref.model.groups.GroupTreeNode;
 public class StateManager {
 
     private final ObjectProperty<Optional<BibDatabaseContext>> activeDatabase = new SimpleObjectProperty<>(Optional.empty());
+    private final ObjectProperty<Optional<GroupTreeNode>> activeGroup = new SimpleObjectProperty<>(Optional.empty());
 
     public ObjectProperty<Optional<BibDatabaseContext>> activeDatabaseProperty() {
         return activeDatabase;
     }
-
-    private final ObjectProperty<Optional<GroupTreeNode>> activeGroup = new SimpleObjectProperty<>();
 
     public ObjectProperty<Optional<GroupTreeNode>> activeGroupProperty() {
         return activeGroup;
