@@ -15,12 +15,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - When editing a book, the tab "Optional fields" now shows "ISBN".
 - When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
 - When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
-- When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests
+- When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests.
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
-- We fixed an issue where groups containing brackets were not working properly. [#2394](https://github.com/JabRef/jabref/issues/2394)
+- We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
+- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. Today and clear work again. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
 
 ### Removed
 
