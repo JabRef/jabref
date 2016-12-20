@@ -1,61 +1,65 @@
 package net.sf.jabref.gui.groups;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import net.sf.jabref.gui.AbstractViewModel;
-import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.StateManager;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.metadata.MetaData;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
+    private final ObjectProperty<GroupNodeViewModel> selectedGroup = new SimpleObjectProperty<>();
+    private final StateManager stateManager;
+    private Optional<BibDatabaseContext> currentDatabase;
 
     public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
         return rootGroup;
     }
 
-    public GroupTreeViewModel() {
-        GroupNodeViewModel root = new GroupNodeViewModel("All Entries", true, 30000,
-                IconTheme.JabRefIcon.CLOSE, false);
-        //root.setExpanded(true);
+    public ObjectProperty<GroupNodeViewModel> selectedGroupProperty() {
+        return selectedGroup;
+    }
 
-        GroupNodeViewModel authors = new GroupNodeViewModel("Authors", false, 300,
-                IconTheme.JabRefIcon.PRIORITY, false);
-        //authors.setExpanded(true);
-        authors.getChildren().addAll(
-                new GroupNodeViewModel("Ethan", false, 100, true),
-                new GroupNodeViewModel("Isabella", false, 40, true),
-                new GroupNodeViewModel("Emma", false, 50, IconTheme.JabRefIcon.HELP, true),
-                new GroupNodeViewModel("Michael", false, 30, true)
-        );
+    public GroupTreeViewModel(StateManager stateManager) {
+        this.stateManager = Objects.requireNonNull(stateManager);
 
-        GroupNodeViewModel journals = new GroupNodeViewModel("Journals", false, 300,
-                IconTheme.JabRefIcon.MAKE_KEY, false);
-        //journals.setExpanded(true);
-        journals.getChildren().addAll(
-                new GroupNodeViewModel("JabRef", false, 295, true),
-                new GroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true),
-                new GroupNodeViewModel("JavaFX", false, 1, true),
-                new GroupNodeViewModel("FXML", false, 1, true)
-        );
+        // Init
+        onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
 
-        GroupNodeViewModel keywords = new GroupNodeViewModel("keywords", false, 300, IconTheme.JabRefIcon.MAKE_KEY, false);
-        //keywords.setExpanded(true);
-        GroupNodeViewModel keywordSub = new GroupNodeViewModel("deeper", false, 20, IconTheme.JabRefIcon.SOURCE, false);
-        //keywordSub.setExpanded(true);
-        keywordSub.getChildren().addAll(
-                new GroupNodeViewModel("JabRef", false, 295, true),
-                new GroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true)
-        );
-        keywords.getChildren().addAll(
-                new GroupNodeViewModel("JabRef", false, 295, true),
-                new GroupNodeViewModel("Java", false, 1, IconTheme.JabRefIcon.PREFERENCES, true),
-                keywordSub,
-                new GroupNodeViewModel("JavaFX", false, 1, true),
-                new GroupNodeViewModel("FXML", false, 1, true)
-        );
+        // Register listener
+        stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
+        selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+    }
 
-        root.getChildren().addAll(authors, journals, keywords);
-        rootGroup.setValue(root);
+    /**
+     * Gets invoked if the user selects a different group.
+     * We need to notify the {@link StateManager} about this change so that the main table gets updated.
+     */
+    private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
+        stateManager.activeGroupProperty().setValue(
+                Optional.ofNullable(newValue).map(GroupNodeViewModel::getGroupNode));
+    }
+
+    /**
+     * Gets invoked if the user changes the active database.
+     * We need to get the new group tree and update the view
+     */
+    private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
+        currentDatabase = newDatabase;
+
+        if (newDatabase.isPresent()) {
+            GroupNodeViewModel newRoot = newDatabase
+                    .map(BibDatabaseContext::getMetaData)
+                    .flatMap(MetaData::getGroups)
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), root))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get()));
+            rootGroup.setValue(newRoot);
+        }
     }
 }

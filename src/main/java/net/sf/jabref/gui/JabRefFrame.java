@@ -631,6 +631,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
          * cut/paste/copy operations would some times occur in the wrong tab.
          */
         tabbedPane.addChangeListener(e -> {
+
             markActiveBasePanel();
 
             BasePanel currentBasePanel = getCurrentBasePanel();
@@ -638,6 +639,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 return;
             }
 
+            // Poor-mans binding to global state
+            // We need to invoke this in the JavaFX thread as all the listeners sit there
+            Platform.runLater(() ->
+                    Globals.stateManager.activeDatabaseProperty().setValue(Optional.of(currentBasePanel.getBibDatabaseContext()))
+            );
             if (new SearchPreferences(Globals.prefs).isGlobalSearch()) {
                 globalSearchBar.performSearch();
             } else {

@@ -61,12 +61,12 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
 
-                S viewModel = getTreeTableRow().getItem();
-                if (empty || viewModel == null) {
+                if (empty || getTreeTableRow() == null || getTreeTableRow().getItem() == null) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
                 } else {
+                    S viewModel = getTreeTableRow().getItem();
                     if (toText != null) {
                         setText(toText.call(viewModel));
                     }

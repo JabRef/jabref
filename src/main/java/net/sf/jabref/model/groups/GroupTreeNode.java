@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.TreeNode;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.SearchMatcher;
 import net.sf.jabref.model.search.matchers.MatcherSet;
@@ -205,5 +206,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         }
         return hits;
+    }
+
+    public Integer numberOfMatches(BibDatabase database) {
+        return numberOfMatches(database.getEntries());
     }
 }

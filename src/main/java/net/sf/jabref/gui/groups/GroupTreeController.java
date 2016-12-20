@@ -1,8 +1,12 @@
 package net.sf.jabref.gui.groups;
 
+import javax.inject.Inject;
+
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.Control;
+import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
@@ -10,6 +14,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 import net.sf.jabref.gui.AbstractController;
+import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.RecursiveTreeItem;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
 
@@ -22,13 +27,21 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     @FXML private TreeTableColumn<GroupNodeViewModel,Integer> numberColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> disclosureNodeColumn;
 
+    @Inject private StateManager stateManager;
+
     @FXML
     public void initialize() {
-        viewModel = new GroupTreeViewModel();
+        viewModel = new GroupTreeViewModel(stateManager);
 
+        // Set-up bindings
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
                         group -> new RecursiveTreeItem<>(group, GroupNodeViewModel::getChildren))
+        );
+        viewModel.selectedGroupProperty().bind(
+                EasyBind.monadic(groupTree.selectionModelProperty())
+                        .flatMap(SelectionModel::selectedItemProperty)
+                        .selectProperty(TreeItem::valueProperty)
         );
 
         // Icon and group name
@@ -40,12 +53,13 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         );
 
         // Number of hits
-        numberColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().getHits());
+        //numberColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().getHits());
         numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, Integer>()
                 .withGraphic(viewModel -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
-                    Text text = new Text(viewModel.getHits().getValue().toString());
+                    Text text = new Text();
+                    text.textProperty().bind(viewModel.getHits().asString());
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);

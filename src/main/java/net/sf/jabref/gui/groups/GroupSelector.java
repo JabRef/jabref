@@ -143,6 +143,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
 
+        Globals.stateManager.activeGroupProperty().addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
+
+
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
                 Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
@@ -606,6 +609,17 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         worker.getCallBack().update();
     }
 
+    private void updateShownEntriesAccordingToSelectedGroups(Optional<GroupTreeNode> selectedGroup) {
+        if (!selectedGroup.isPresent()) {
+            // No selected group, nothing to do
+            return;
+        }
+        SearchMatcher searchRule = selectedGroup.get().getSearchMatcher();
+        GroupingWorker worker = new GroupingWorker(searchRule);
+        worker.getWorker().run();
+        worker.getCallBack().update();
+    }
+
     private List<GroupTreeNodeViewModel> getLeafsOfSelection() {
         TreePath[] selection = groupsTree.getSelectionPaths();
         if((selection == null) || (selection.length == 0)) {
@@ -743,7 +757,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     private void setGroups(GroupTreeNode groupsRoot) {
-        this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
+        // We ignore the set group since this is handled via JavaFX
+        this.groupsRoot = new GroupTreeNodeViewModel(new GroupTreeNode(new AllEntriesGroup("DUMMY")));
+        //this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
         groupsTree.setModel(groupsTreeModel);
@@ -1219,7 +1235,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
 
 
-    public GroupTreeNodeViewModel getGroupTreeRoot() {
+    private GroupTreeNodeViewModel getGroupTreeRoot() {
         return groupsRoot;
     }
 
