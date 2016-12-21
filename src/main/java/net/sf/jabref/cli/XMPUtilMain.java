@@ -153,7 +153,7 @@ public class XMPUtilMain {
     /**
      * Print usage information for the command line tool xmpUtil.
      *
-     * @see XMPUtil#main(String[])
+     * @see XMPUtilMain#main(String[])
      */
     private static void usage() {
         System.out.println("Read or write XMP-metadata from or to pdf file.");
