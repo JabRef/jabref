@@ -10,6 +10,7 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
@@ -18,7 +19,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class DoiFetcher implements IdBasedFetcher {
 
-    private ImportFormatPreferences preferences;
+    private final ImportFormatPreferences preferences;
 
     public DoiFetcher(ImportFormatPreferences preferences) {
         this.preferences = preferences;
@@ -58,6 +59,8 @@ public class DoiFetcher implements IdBasedFetcher {
             }
         } catch (IOException e) {
             throw new FetcherException(Localization.lang("Invalid URL"), e);
+        } catch (ParseException e) {
+            throw new FetcherException("Could not parse BibTeX entry", e);
         }
     }
 }
