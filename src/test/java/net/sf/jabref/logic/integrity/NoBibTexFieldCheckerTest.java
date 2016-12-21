@@ -15,6 +15,13 @@ public class NoBibTexFieldCheckerTest {
     private NoBibtexFieldChecker checker = new NoBibtexFieldChecker();
 
     @Test
+    public void abstractIsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("abstract", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
     public void addressIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("address", "test");
@@ -81,6 +88,13 @@ public class NoBibTexFieldCheckerTest {
         IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "location");
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
+    }
+
+    @Test
+    public void reviewIsNotRecognizedAsBibLaTeXOnlyField() {
+        BibEntry entry = new BibEntry();
+        entry.setField("review", "test");
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
 }

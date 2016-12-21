@@ -35,7 +35,7 @@ public class DoiFetcher implements IdBasedFetcher {
 
     @Override
     public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DOI_TO_BIBTEX;
+        return HelpFile.FETCHER_DOI;
     }
 
     @Override
