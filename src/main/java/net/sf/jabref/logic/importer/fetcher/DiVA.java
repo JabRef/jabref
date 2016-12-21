@@ -32,7 +32,7 @@ public class DiVA implements IdBasedParserFetcher {
 
     @Override
     public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_DIVA_TO_BIBTEX;
+        return HelpFile.FETCHER_DIVA;
     }
 
     @Override

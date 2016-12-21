@@ -19,7 +19,7 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
 
     @Override
     public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_ISBN_TO_BIBTEX;
+        return HelpFile.FETCHER_ISBN;
     }
 
     protected void ensureThatIsbnIsValid(String identifier) throws FetcherException {

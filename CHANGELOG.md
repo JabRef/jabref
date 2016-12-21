@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- When [adding a new entry](http://help.jabref.org/en/BaseFrame#adding-a-new-entry), one can select "title" to create a full BibTeX entry based on a title.
 - When editing an article, the tab "Optional fields" now shows "ISSN".
 - When editing a book, the tab "Optional fields" now shows "ISBN".
 - When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
