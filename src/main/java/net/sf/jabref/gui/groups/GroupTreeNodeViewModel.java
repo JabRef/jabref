@@ -151,11 +151,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     /** Collapse this node and all its children. */
     public void collapseSubtree(JTree tree) {
-        tree.collapsePath(this.getTreePath());
-
-        for(GroupTreeNodeViewModel child : getChildren()) {
+        for (GroupTreeNodeViewModel child : getChildren()) {
             child.collapseSubtree(tree);
         }
+        tree.collapsePath(this.getTreePath());
     }
 
     /** Expand this node and all its children. */
