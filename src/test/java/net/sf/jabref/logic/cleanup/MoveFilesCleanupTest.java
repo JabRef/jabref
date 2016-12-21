@@ -2,6 +2,8 @@ package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -100,6 +102,7 @@ public class MoveFilesCleanupTest {
     public void movesFileFromSubfolderWithFileDirPattern() throws IOException {
         File subfolder = bibFolder.newFolder();
         File fileBefore = new File(subfolder, "test.pdf");
+
         assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
@@ -111,10 +114,11 @@ public class MoveFilesCleanupTest {
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
-        File fileAfter = new File(pdfFolder, "test.pdf");
-        assertTrue(fileAfter.exists());
+        Path after = pdfFolder.toPath().resolve("Misc").resolve("test.pdf");
+        assertTrue(Files.exists(after));
 
-        assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
+        assertEquals(Optional
+                .of(FileField.getStringRepresentation(new ParsedFileField("", after.getFileName().toString(), ""))),
                 entry.getField("file"));
     }
 }

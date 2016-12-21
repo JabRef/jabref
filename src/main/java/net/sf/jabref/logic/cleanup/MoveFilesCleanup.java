@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +20,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class MoveFilesCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
@@ -25,6 +30,7 @@ public class MoveFilesCleanup implements CleanupJob {
     private final LayoutFormatterPreferences prefs;
 
     private final String fileDirPattern;
+    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences prefs) {
@@ -62,6 +68,7 @@ public class MoveFilesCleanup implements CleanupJob {
                 continue;
             }
 
+            System.out.println("Old File:" + oldFile.get());
             System.out.println(fileDirPattern);
             String targetDirName = "";
             if (!fileDirPattern.isEmpty()) {
@@ -72,19 +79,28 @@ public class MoveFilesCleanup implements CleanupJob {
             Path newTargetFile = targetDirectory.get().toPath().resolve(targetDirName).resolve(oldFile.get().getName());
             System.out.println("Target Path " + newTargetFile);
 
-            File targetFile = new File(targetDirectory.get(), oldFile.get().getName());
-            if (targetFile.exists()) {
+            if (Files.exists(newTargetFile)) {
                 // We do not overwrite already existing files
                 newFileList.add(fileEntry);
                 continue;
             }
 
-            oldFile.get().renameTo(targetFile);
-            String newFileName = targetFile.getName();
+            try {
+                if (!Files.exists(newTargetFile)) {
+                    Files.createDirectories(newTargetFile);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Could no create target necessary target directoires for renaming", e);
+            }
+
+            if (FileUtil.renameFile(oldFile.get().toPath(), newTargetFile, true)) {
+                changed = true;
+            }
 
             ParsedFileField newFileEntry = fileEntry;
-            if (!oldFileName.equals(newFileName)) {
-                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
+            if (!oldFileName.equals(newTargetFile.toString())) {
+                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newTargetFile.getFileName().toString(),
+                        fileEntry.getFileType());
                 changed = true;
             }
             newFileList.add(newFileEntry);
