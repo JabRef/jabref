@@ -1485,11 +1485,83 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestOldContentSelectorsAreIgnored() throws IOException {
-        ParserResult result = new BibtexParser(importFormatPreferences)
-                .parse(new StringReader("@comment{jabref-meta: selector_title:testWord;word2;}"));
+    public void integrationTestContentSelectors() throws IOException {
+        ParserResult result = BibtexParser.parse(
+                new StringReader("@Comment{jabref-meta: selector_status:approved;captured;received;status;}"), importFormatPreferences);
 
-        assertEquals(new MetaData(), result.getMetaData());
+        List<String> values = new ArrayList(4);
+        values.add("approved");
+        values.add("captured");
+        values.add("received");
+        values.add("status");
+
+        assertEquals(values, result.getMetaData().getContentSelectors().getSelectorValuesForField("status"));
+    }
+
+    @Test
+    public void parseReallyUnknownType() throws Exception {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Reallyunknowntype");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+    @Test
+    public void parseOtherTypeTest() throws Exception {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                " Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexEntry);
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setType("Other");
+        expectedEntry.setCiteKey("test");
+        expectedEntry.setField("comment", "testentry");
+
+        assertEquals(Collections.singletonList(expectedEntry), entries);
+    }
+
+
+    @Test
+    public void parseRecognizesDatabaseID() throws Exception {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        String expectedDatabaseID = "q1w2e3r4t5z6";
+
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% DBID: ").append(expectedDatabaseID)
+                .append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+
+        String actualDatabaseID = parserResult.getDatabase().getSharedDatabaseID().get();
+
+        assertEquals(expectedDatabaseID, actualDatabaseID);
+    }
+
+    @Test
+    public void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        StringBuilder sharedDatabaseFileContent = new StringBuilder()
+                .append("% Encoding: UTF-8").append(OS.NEWLINE)
+                .append("% DBID: q1w2e3r4t5z6").append(OS.NEWLINE)
+                .append("@Article{a}");
+
+        ParserResult parserResult = parser.parse(new StringReader(sharedDatabaseFileContent.toString()));
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+
+        assertEquals(1, entries.size());
+        assertEquals("", entries.get(0).getUserComments());
     }
 
     @Test
