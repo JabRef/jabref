@@ -46,6 +46,7 @@ public enum HelpFile {
     FETCHER_MEDLINE("Medline"),
     FETCHER_OAI2_ARXIV("arXiv"),
     FETCHER_SPRINGER("Springer"),
+    FETCHER_TITLE("TitleToBibTeX"),
     FETCHER_SCIENCEDIRECT(""),
     DATABASE_PROPERTIES("DatabaseProperties"),
     FIND_DUPLICATES("FindDuplicates"),

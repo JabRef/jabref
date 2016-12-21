@@ -20,6 +20,7 @@ import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.importer.fetcher.MathSciNet;
 import net.sf.jabref.logic.importer.fetcher.MedlineFetcher;
+import net.sf.jabref.logic.importer.fetcher.TitleFetcher;
 import net.sf.jabref.logic.importer.fetcher.zbMATH;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
@@ -58,6 +59,7 @@ public class EntryFetchers {
         list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
         list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));
         list.add(new MedlineFetcher());
+        list.add(new TitleFetcher(Globals.prefs.getImportFormatPreferences()));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
