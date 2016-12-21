@@ -151,6 +151,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
+        Objects.requireNonNull(resourcePath);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
         initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
@@ -215,6 +216,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private void initialize(InputStream stream) throws IOException {
+        Objects.requireNonNull(stream);
+
         try (Reader reader = new InputStreamReader(stream, encoding)) {
             readFormatFile(reader);
         }
