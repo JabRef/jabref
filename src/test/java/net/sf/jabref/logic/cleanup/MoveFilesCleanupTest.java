@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
@@ -21,6 +23,7 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class MoveFilesCleanupTest {
 
@@ -30,15 +33,21 @@ public class MoveFilesCleanupTest {
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
     private MoveFilesCleanup cleanup;
+    private JabRefPreferences prefs;
+    private BibEntry entry;
 
     @Before
     public void setUp() throws IOException {
-        pdfFolder = bibFolder.newFolder();
+        prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
+        pdfFolder = bibFolder.newFolder();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
+        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        databaseContext.setDatabaseFile(bibFolder.newFile("test.bib"));
+        entry = new BibEntry();
+        entry.setCiteKey("Toot");
+        entry.setField("title", "test title");
 
-        cleanup = new MoveFilesCleanup(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences());
     }
 
     @Test
@@ -48,10 +57,10 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
-        BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
-
+        cleanup = new MoveFilesCleanup(databaseContext, "", prefs.getFileDirectoryPreferences(),
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
@@ -69,10 +78,12 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
-        BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""), fileField, new ParsedFileField("","",""))));
+        entry.setField("file", FileField.getStringRepresentation(
+                Arrays.asList(new ParsedFileField("", "", ""), fileField, new ParsedFileField("", "", ""))));
 
+        cleanup = new MoveFilesCleanup(databaseContext, "", prefs.getFileDirectoryPreferences(),
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
@@ -82,6 +93,28 @@ public class MoveFilesCleanupTest {
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
+                entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithFileDirPattern() throws IOException {
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", prefs.getFileDirectoryPreferences(),
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(entry);
+
+        assertFalse(fileBefore.exists());
+        File fileAfter = new File(pdfFolder, "test.pdf");
+        assertTrue(fileAfter.exists());
+
+        assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
                 entry.getField("file"));
     }
 }

@@ -69,7 +69,7 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext, fileDirectoryPreferences));
+            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, prefs));
         }
         if (preset.isMakePathsRelative()) {
             jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));

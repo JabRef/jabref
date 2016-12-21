@@ -92,7 +92,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
                 String expandedOldFilePath = expandedOldFile.get().toString();
                 boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
-                        && !newPath.equals(expandedOldFilePath);
+                        && !newPath.toString().equals(expandedOldFilePath);
 
                 if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
                     // we do not overwrite files
