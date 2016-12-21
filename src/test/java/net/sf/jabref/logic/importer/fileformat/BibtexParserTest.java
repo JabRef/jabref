@@ -33,6 +33,8 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -327,7 +329,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
 
         assertEquals(Collections.singletonList(expected), parsed);
@@ -342,7 +344,7 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
 
@@ -1464,12 +1466,14 @@ public class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(new AllEntriesGroup(""), root.getGroup());
+        assertEquals(new AllEntriesGroup("All entries"), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());
-        assertEquals(new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true,
-                GroupHierarchyType.INDEPENDENT, ','), root.getChildren().get(0).getGroup());
-        assertEquals(new KeywordGroup("Invariant theory", "keywords", "GIT", false, false,
-                GroupHierarchyType.INDEPENDENT, ','), root.getChildren().get(1).getGroup());
+        assertEquals(
+                new RegexKeywordGroup("Fréchet", GroupHierarchyType.INDEPENDENT, "keywords", "FrechetSpace", false),
+                root.getChildren().get(0).getGroup());
+        assertEquals(
+                new WordKeywordGroup("Invariant theory", GroupHierarchyType.INDEPENDENT, "keywords", "GIT", false, ',', false),
+                root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
