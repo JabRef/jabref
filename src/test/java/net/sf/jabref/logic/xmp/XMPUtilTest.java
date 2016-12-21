@@ -56,13 +56,17 @@ import org.apache.pdfbox.util.XMLUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
  */
 public class XMPUtilTest {
 
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
     /**
      * The PDF file that basically all operations are done upon.
      */
@@ -229,10 +233,7 @@ public class XMPUtilTest {
     @Before
     public void setUp() throws IOException, COSVisitorException {
 
-        pdfFile = File.createTempFile("JabRef", ".pdf");
-
-        // ensure that the file will be deleted upon exit
-        pdfFile.deleteOnExit();
+        pdfFile = tempFolder.newFile("JabRef.pdf");
 
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
@@ -1110,7 +1111,7 @@ public class XMPUtilTest {
     public void testCommandLineSingleBib() throws IOException, TransformerException, COSVisitorException {
 
         // First check conversion from .bib to .xmp
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.close();
@@ -1128,10 +1129,6 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
@@ -1207,7 +1204,7 @@ public class XMPUtilTest {
      */
     @Test
     public void testCommandLineByKey() throws IOException, TransformerException {
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
@@ -1242,11 +1239,6 @@ public class XMPUtilTest {
         l = XMPUtil.readXMP(pdfFile, xmpPreferences);
         Assert.assertEquals(1, l.size());
         assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
-
-        if (!tempBib.delete()) {
-            // TODO: file is still locked
-            System.err.println("Cannot delete temporary file");
-        }
     }
 
     /**
@@ -1257,7 +1249,7 @@ public class XMPUtilTest {
     @Test
     public void testCommandLineSeveral() throws IOException, TransformerException {
 
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
 
@@ -1292,11 +1284,6 @@ public class XMPUtilTest {
 
             assertEqualsBibtexEntry(t1, a);
             assertEqualsBibtexEntry(t3, b);
-
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
