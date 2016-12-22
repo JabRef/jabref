@@ -21,7 +21,7 @@ public class ParsedBibEntryTests {
     }
 
     @Test
-    public void testGetPublicationDate() throws ParseException {
+    public void testGetPublicationDate() {
 
         Assert.assertEquals(Optional.of("2003-02"),
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }",

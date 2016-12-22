@@ -33,7 +33,8 @@ public class DatabaseFileLookupTest {
     public void setUp() throws FileNotFoundException, IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences()).parse(reader);
+            ParserResult result = BibtexParser.parse(reader,
+                    JabRefPreferences.getInstance().getImportFormatPreferences());
             database = result.getDatabase();
             entries = database.getEntries();
 

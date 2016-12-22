@@ -26,7 +26,6 @@ import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
@@ -147,8 +146,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
 
             //parse the page into Bibtex entries
-            Collection<BibEntry> parsedBibtexCollection = new BibtexParser(Globals.prefs.getImportFormatPreferences())
-                    .parseEntries(bibtexPage);
+            Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage,
+                    Globals.prefs.getImportFormatPreferences());
             int nEntries = parsedBibtexCollection.size();
             Iterator<BibEntry> parsedBibtexCollectionIterator = parsedBibtexCollection.iterator();
             while (parsedBibtexCollectionIterator.hasNext() && shouldContinue) {
@@ -159,7 +158,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             return true;
 
-        } catch (ParseException | IOException | JSONException e) {
+        } catch (IOException | JSONException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }

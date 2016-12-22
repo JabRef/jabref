@@ -67,7 +67,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences).parse(reader);
+        return BibtexParser.parse(reader, importFormatPreferences);
     }
 
     @Override
