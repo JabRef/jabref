@@ -27,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
@@ -37,7 +38,6 @@ import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -737,28 +737,23 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
+    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"),
+                importFormatPreferences);
 
-        ParserResult result = parser
-                .parse(new StringReader("@article{test,author={author bracket }, too much}"));
-
-        assertTrue("There should be warnings", result.hasWarnings());
-
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+        List<BibEntry> entries = result.getDatabase().getEntries();
+        assertEquals(Optional.of("author bracket #too##much#"), entries.get(0).getField("author"));
     }
 
     @Test
-    @Ignore("Ignoring because this is an edge case")
-    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
-
-        ParserResult result = parser
-                .parse(new StringReader("@article{test,author={author bracket } too much}"));
+    public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"),
+                importFormatPreferences);
 
         assertTrue("There should be warnings", result.hasWarnings());
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+        List<BibEntry> entries = result.getDatabase().getEntries();
+        assertEquals("Size should be zero, but was " + entries.size(), 0, entries.size());
     }
 
     @Test
@@ -767,9 +762,7 @@ public class BibtexParserTest {
         ParserResult result = parser
                 .parse(new StringReader("@article{test,author={author @ good}}"));
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        List<BibEntry> entries = new ArrayList<>(1);
-        entries.addAll(c);
+        List<BibEntry> entries = result.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
         assertEquals(Optional.of("author @ good"), entries.get(0).getField("author"));
@@ -1175,38 +1168,23 @@ public class BibtexParserTest {
         assertEquals(Optional.of("ups  sala"), e.getField("file"));
     }
 
-    /**
-     * Test for [2022983]
-     *
-     * @author Uwe Kuehn
-     * @author Andrei Haralevich
-     */
     @Test
-    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
-    public void parseRemovesTabsInFileField() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{canh05,file = {ups  \tsala}}"));
-
+    public void parsePreservesTabsInAbstractField() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups  \tsala}}"),
+                importFormatPreferences);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals(Optional.of("ups  sala"), e.getField("file"));
+        assertEquals(Optional.of("ups  \tsala"), e.getField(FieldName.ABSTRACT));
     }
 
-    /**
-     * Test for [2022983]
-     *
-     * @author Uwe Kuehn
-     * @author Andrei Haralevich
-     */
     @Test
-    @Ignore("Ignoring, since the parser is not responsible for fixing the content. This should be done later")
-    public void parseRemovesNewlineInFileField() throws IOException {
-        ParserResult result = parser
-                .parse(new StringReader("@article{canh05,file = {ups \n\tsala}}"));
+    public void parsePreservesNewlineInAbstractField() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{canh05,abstract = {ups \nsala}}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals(Optional.of("ups  sala"), e.getField("file"));
+        assertEquals(Optional.of("ups " + OS.NEWLINE + "sala"), e.getField(FieldName.ABSTRACT));
     }
 
     /**
