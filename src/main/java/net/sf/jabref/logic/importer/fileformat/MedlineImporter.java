@@ -75,7 +75,6 @@ import net.sf.jabref.logic.importer.fileformat.medline.Text;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
@@ -247,7 +246,7 @@ public class MedlineImporter extends Importer implements Parser {
             putIfValueNotNull(fields, "pubstatus", bookData.getPublicationStatus());
         }
 
-        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField(fields);
 
         bibItems.add(entry);
@@ -393,7 +392,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
 
-        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        BibEntry entry = new BibEntry("article");
         entry.setField(fields);
 
         bibItems.add(entry);

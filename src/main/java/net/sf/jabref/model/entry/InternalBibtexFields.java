@@ -18,16 +18,24 @@ import net.sf.jabref.model.entry.specialfields.SpecialField;
 /**
  * Handling of bibtex fields.
  * All bibtex-field related stuff should be placed here!
- * Because we can export these informations into additional
- * config files -> simple extension and definition of new fields....
+ * Because we can export this information into additional
+ * config files -> simple extension and definition of new fields
  *
  * TODO:
- *  - handling of identically fields with different names
- *    e.g. LCCN = lib-congress
- *  - group id for each fields, e.g. standard, jurabib, bio....
+ *  - handling of identically fields with different names (https://github.com/JabRef/jabref/issues/521)
+ *    e.g. LCCN = lib-congress, journaltitle = journal
+ *  - group id for each fields, e.g. standard, jurabib, bio, ...
  *  - add a additional properties functionality into the BibtexSingleField class
  */
 public class InternalBibtexFields {
+
+    /**
+     * These are the fields JabRef always displays as default
+     * {@link net.sf.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     *
+     * A user can change them. The change is currently stored in the preferences only and not explicitley exposed as separte preferences object
+     */
+    public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
 
     // contains all bibtex-field objects (BibtexSingleField)
     private final Map<String, BibtexSingleField> fieldSet;
@@ -72,7 +80,7 @@ public class InternalBibtexFields {
 
     private static final List<String> VERBATIM_FIELDS = Arrays.asList(FieldName.URL, FieldName.FILE,
             FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
-    
+
     private static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialField.PRINTED.getFieldName(),
             SpecialField.PRIORITY.getFieldName(), SpecialField.QUALITY.getFieldName(),
             SpecialField.RANKING.getFieldName(), SpecialField.READ_STATUS.getFieldName(),
@@ -87,8 +95,8 @@ public class InternalBibtexFields {
         BibtexSingleField dummy;
 
         // FIRST: all standard fields
-        // These are the fields that BibTex might want to treat, so these
-        // must conform to BibTex rules.
+        // These are the fields that BibTeX might want to treat, so these
+        // must conform to BibTeX rules.
         add(new BibtexSingleField(FieldName.ADDRESS, true, BibtexSingleField.SMALL_W));
         // An annotation. It is not used by the standard bibliography styles,
         // but may be used by others that produce an annotated bibliography.
@@ -175,7 +183,7 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.EXTERNAL, FieldProperty.VERBATIM));
         add(dummy);
 
-        add(new BibtexSingleField("comment", false, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.COMMENT, false, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.KEYWORDS, false, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.FILE, false);

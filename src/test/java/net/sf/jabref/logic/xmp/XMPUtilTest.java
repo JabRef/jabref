@@ -38,7 +38,6 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.io.CharStreams;
@@ -143,7 +142,7 @@ public class XMPUtilTest {
 
     public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
             throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader(s), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
@@ -181,7 +180,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t2BibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");
@@ -1154,7 +1153,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = BibtexParser.parse(new StringReader(bibtex), importFormatPreferences);
+                ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtex));
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1347,7 +1346,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 

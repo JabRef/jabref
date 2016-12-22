@@ -55,9 +55,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -329,8 +327,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         Localization.lang("Unable to generate new database"), JOptionPane.ERROR_MESSAGE);
             }
 
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
 
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
             this.frame.addTab(databaseContext, true);

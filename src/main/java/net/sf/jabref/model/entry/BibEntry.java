@@ -85,22 +85,21 @@ public class BibEntry implements Cloneable {
 
     private final EventBus eventBus = new EventBus();
 
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
 
     public BibEntry() {
-        this(IdGenerator.next());
+        this(IdGenerator.next(), DEFAULT_TYPE);
     }
 
     /**
-     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     * Constructs a new BibEntry with the given type
      *
-     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id) {
-        this(id, DEFAULT_TYPE);
+    public BibEntry(String type) {
+        this(IdGenerator.next(), type);
     }
 
     /**
@@ -109,7 +108,7 @@ public class BibEntry implements Cloneable {
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id, String type) {
+    private BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
@@ -403,21 +402,24 @@ public class BibEntry implements Cloneable {
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
      * on the BibLatex documentation, chapter 2.2.5:<br>
-     * address      <-> location <br>
-     * annote           <-> annotation <br>
-     * archiveprefix    <-> eprinttype <br>
-     * journal      <-> journaltitle <br>
-     * key              <-> sortkey <br>
-     * pdf          <-> file <br
-     * primaryclass     <-> eprintclass <br>
-     * school           <-> institution <br>
+     * address        <-> location <br>
+     * annote         <-> annotation <br>
+     * archiveprefix  <-> eprinttype <br>
+     * journal        <-> journaltitle <br>
+     * key            <-> sortkey <br>
+     * pdf            <-> file <br
+     * primaryclass   <-> eprintclass <br>
+     * school         <-> institution <br>
      * These work bidirectional. <br>
+     * </p>
+     *
      * <p>
      * Special attention is paid to dates: (see the BibLatex documentation,
      * chapter 2.3.8)
      * The fields 'year' and 'month' are used if the 'date'
      * field is empty. Conversely, getFieldOrAlias("year") also tries to
      * extract the year from the 'date' field (analogously for 'month').
+     * </p>
      */
     public Optional<String> getFieldOrAlias(String name) {
         return genericGetFieldOrAlias(name, this::getField);
@@ -569,10 +571,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns a clone of this entry. Useful for copying.
+     * This will set a new ID for the cloned entry to be able to distinguish both copies.
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(id, type);
+        BibEntry clone = new BibEntry(type);
         clone.fields = new HashMap<>(fields);
         return clone;
     }
@@ -823,4 +826,16 @@ public class BibEntry implements Cloneable {
             return Optional.of(latexFreeField);
         }
     }
+
+    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+        Optional<String> oldValue = this.getField(FieldName.FILE);
+        String newValue = FileField.getStringRepresentation(files);
+
+        if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
+            return Optional.empty();
+        }
+
+        return this.setField(FieldName.FILE, newValue);
+    }
+
 }

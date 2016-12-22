@@ -16,14 +16,14 @@ import static org.junit.Assert.assertEquals;
 public class BibDatabaseModeDetectionTest {
     @Test
     public void detectBiblatex() {
-        Collection<BibEntry> entries = Arrays.asList(new BibEntry("someid", BibLatexEntryTypes.MVBOOK.getName()));
+        Collection<BibEntry> entries = Arrays.asList(new BibEntry(BibLatexEntryTypes.MVBOOK.getName()));
 
         assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
     }
 
     @Test
     public void detectUndistinguishableAsBibtex() {
-        BibEntry entry = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry entry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         entry.setField("title", "My cool paper");
         Collection<BibEntry> entries = Arrays.asList(entry);
 
@@ -32,9 +32,9 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void detectMixedModeAsBiblatex() {
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry bibtex = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         bibtex.setField("journal", "IEEE Trans. Services Computing");
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE.getName());
+        BibEntry biblatex = new BibEntry(BibLatexEntryTypes.ARTICLE.getName());
         biblatex.setField("translator", "Stefan Kolb");
         Collection<BibEntry> entries = Arrays.asList(bibtex, biblatex);
 
@@ -43,7 +43,7 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void detectUnknownTypeAsBibtex() {
-        BibEntry entry = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
+        BibEntry entry = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
         Collection<BibEntry> entries = Arrays.asList(entry);
 
         assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
@@ -51,9 +51,9 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void ignoreUnknownTypesForBibtexDecision() {
-        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.ARTICLE.getName());
+        BibEntry custom = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
+        BibEntry bibtex = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry biblatex = new BibEntry(BibLatexEntryTypes.ARTICLE.getName());
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
         assertEquals(BibDatabaseMode.BIBTEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));
@@ -61,9 +61,9 @@ public class BibDatabaseModeDetectionTest {
 
     @Test
     public void ignoreUnknownTypesForBiblatexDecision() {
-        BibEntry custom = new BibEntry("someid", new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
-        BibEntry bibtex = new BibEntry("someid", BibtexEntryTypes.ARTICLE.getName());
-        BibEntry biblatex = new BibEntry("someid", BibLatexEntryTypes.MVBOOK.getName());
+        BibEntry custom = new BibEntry(new CustomEntryType("unknowntype", new ArrayList<>(0), new ArrayList<>(0)).getName());
+        BibEntry bibtex = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        BibEntry biblatex = new BibEntry(BibLatexEntryTypes.MVBOOK.getName());
         Collection<BibEntry> entries = Arrays.asList(custom, bibtex, biblatex);
 
         assertEquals(BibDatabaseMode.BIBLATEX, BibDatabaseModeDetection.inferMode(BibDatabases.createDatabase(entries)));

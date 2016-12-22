@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -28,14 +27,7 @@ public class BibTeXConverter {
         Map<String, String> fieldValues = new HashMap<>();
 
         String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
-        if (entry.getCiteKey() == null) {
-            result = new BibEntry(Importer.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
-
-        } else {
-            // TODO: the cite key should not be the ID?!
-            // id assumes an existing database so don't
-            result = new BibEntry(entry.getCiteKey(), bibTexEntryType);
-        }
+        result = new BibEntry(bibTexEntryType);
 
         // add String fields
         for (Map.Entry<String, String> field : entry.fields.entrySet()) {
@@ -88,7 +80,7 @@ public class BibTeXConverter {
         }
 
         if (entry.journalName != null) {
-            fieldValues.put(FieldName.JOURNALTITLE, entry.journalName);
+            fieldValues.put(FieldName.JOURNAL, entry.journalName);
         }
         if (entry.month != null) {
             Month month = MonthUtil.getMonth(entry.month);

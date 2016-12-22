@@ -196,7 +196,7 @@ public class ExportFormat implements IExportFormat {
             } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
-                LOGGER.warn("Can not get save session.", ex);
+                LOGGER.warn("Cannot get save session.", ex);
             }
         }
         if (ss == null) {

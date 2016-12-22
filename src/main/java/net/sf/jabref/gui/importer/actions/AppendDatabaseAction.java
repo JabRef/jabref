@@ -26,10 +26,10 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -70,12 +70,14 @@ public class AppendDatabaseAction implements BaseAction {
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             JabRefExecutorService.INSTANCE.execute(
-                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups()));
+                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups(), md.importSelectorWords()));
+
         }
 
     }
 
-    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups) {
+    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups,
+            boolean importSelectorWords) {
         if (filesToOpen.isEmpty()) {
             return;
         }
@@ -85,7 +87,8 @@ public class AppendDatabaseAction implements BaseAction {
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult pr = OpenDatabase.loadDatabase(file,
                         Globals.prefs.getImportFormatPreferences());
-                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups);
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups,
+                        importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
@@ -96,7 +99,7 @@ public class AppendDatabaseAction implements BaseAction {
     }
 
     private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr, boolean importEntries,
-            boolean importStrings, boolean importGroups) throws KeyCollisionException {
+            boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
 
         BibDatabase fromDatabase = pr.getDatabase();
         List<BibEntry> appendedEntries = new ArrayList<>();
@@ -112,7 +115,6 @@ public class AppendDatabaseAction implements BaseAction {
 
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
-                be.setId(IdGenerator.next());
                 UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
                 database.insertEntry(be);
@@ -153,6 +155,12 @@ public class AppendDatabaseAction implements BaseAction {
             });
         }
 
+        if (importSelectorWords) {
+
+            for(ContentSelector selector: meta.getContentSelectorList()) {
+                panel.getBibDatabaseContext().getMetaData().addContentSelector(selector);
+            }
+        }
         ce.end();
         panel.getUndoManager().addEdit(ce);
         panel.markBaseChanged();

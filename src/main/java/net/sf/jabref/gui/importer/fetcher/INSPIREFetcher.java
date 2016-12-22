@@ -99,7 +99,7 @@ public class INSPIREFetcher implements EntryFetcher {
      * @param key The OAI2 key to fetch from ArXiv.
      * @return The imported BibEntry or null if none.
      */
-    private BibDatabase importInspireEntries(String key, OutputPrinter frame) throws IOException {
+    private BibDatabase importInspireEntries(String key) throws IOException {
         String url = constructUrl(key);
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestProperty("User-Agent", "JabRef");
@@ -107,12 +107,10 @@ public class INSPIREFetcher implements EntryFetcher {
 
         try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
                 new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
-
-            ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
+            ParserResult pr = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(reader);
             return pr.getDatabase();
         }
     }
-
 
     /*
      * @see net.sf.jabref.imports.fetcher.EntryFetcher
@@ -146,7 +144,7 @@ public class INSPIREFetcher implements EntryFetcher {
         try {
             status.setStatus(Localization.lang("Fetching entries from Inspire"));
             /* query the archive and load the results into the BibEntry */
-            BibDatabase bd = importInspireEntries(query, status);
+            BibDatabase bd = importInspireEntries(query);
 
             status.setStatus(Localization.lang("Adding fetched entries"));
             /* add the entry to the inspection dialog */

@@ -1,9 +1,10 @@
 package net.sf.jabref.logic.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -86,7 +87,7 @@ public class UpdateField {
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
             UpdateFieldPreferences prefs) {
         String defaultOwner = prefs.getDefaultOwner();
-        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
+        String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
         String timeStampField = prefs.getTimeStampField();
         boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
         boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
@@ -131,7 +132,7 @@ public class UpdateField {
 
         String timeStampField = prefs.getTimeStampField();
         String defaultOwner = prefs.getDefaultOwner();
-        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
+        String timestamp = DateTimeFormatter.ofPattern(prefs.getTimeStampFormat()).format(LocalDateTime.now());
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {

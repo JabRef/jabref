@@ -8,10 +8,16 @@ public class ProxyRegisterer {
             System.setProperty("http.proxyHost", proxyPrefs.getHostname());
             System.setProperty("http.proxyPort", proxyPrefs.getPort());
 
+            System.setProperty("https.proxyHost", proxyPrefs.getHostname());
+            System.setProperty("https.proxyPort", proxyPrefs.getPort());
+
             // NetworkTab.java ensures that proxyUsername and proxyPassword are neither null nor empty
             if (proxyPrefs.isUseAuthentication()) {
                 System.setProperty("http.proxyUser", proxyPrefs.getUsername());
                 System.setProperty("http.proxyPassword", proxyPrefs.getPassword());
+
+                System.setProperty("https.proxyUser", proxyPrefs.getUsername());
+                System.setProperty("https.proxyPassword", proxyPrefs.getPassword());
             }
         } else {
             // The following two lines signal that the system proxy settings

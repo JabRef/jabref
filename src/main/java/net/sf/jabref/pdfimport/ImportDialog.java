@@ -79,7 +79,7 @@ public class ImportDialog extends JDialog {
         panel3.add(headLinePanel);
         panel3.add(labelSubHeadline);
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create blank entry linking the PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP data"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP-metadata"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create entry based on content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only attach PDF"));
         JButton buttonOK = new JButton(Localization.lang("OK"));

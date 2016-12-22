@@ -252,9 +252,9 @@ public class BiblioscapeImporter extends Importer {
                 }
 
                 if (!comments.isEmpty()) { // set comment if present
-                    hm.put("comment", String.join(";", comments));
+                    hm.put(FieldName.COMMENT, String.join(";", comments));
                 }
-                BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, bibtexType);
+                BibEntry b = new BibEntry(bibtexType);
                 b.setField(hm);
                 bibItems.add(b);
 

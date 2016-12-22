@@ -2,7 +2,6 @@ package net.sf.jabref.model.search.rules;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class ContainBasedSearchRuleTest {
     }
 
     public BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
         e.setField("year", "2001");

@@ -13,6 +13,11 @@ public class Actions {
     public static final String BACK = "back";
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
+    public static final String COPY_CITATION_ASCII_DOC = "copyCitaitonAsciidoc";
+    public static final String COPY_CITATION_XSLFO = "copyCitaitonFo";
+    public static final String COPY_CITATION_HTML = "copyCitaitonHtml";
+    public static final String COPY_CITATION_RTF = "copyCitaitonRtf";
+    public static final String COPY_CITATION_TEXT = "copyCitaitonText";
     public static final String COPY_KEY = "copyKey";
     public static final String COPY_CITE_KEY = "copyCiteKey";
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
@@ -28,6 +33,7 @@ public class Actions {
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
     public static final String MAKE_KEY = "makeKey";
+    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
