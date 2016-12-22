@@ -94,7 +94,6 @@ import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.CitationStyleToClipboardWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
-import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -988,7 +987,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 ((BaseAction) o).action();
             } else {
                 // This part uses Spin's features:
-                Worker wrk = ((AbstractWorker) o).getWorker();
+                Runnable wrk = ((AbstractWorker) o).getWorker();
                 // The Worker returned by getWorker() has been wrapped
                 // by Spin.off(), which makes its methods be run in
                 // a different thread from the EDT.
