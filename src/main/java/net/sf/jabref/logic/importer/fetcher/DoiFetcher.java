@@ -5,6 +5,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -15,7 +16,9 @@ import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class DoiFetcher implements IdBasedFetcher {
 
@@ -23,10 +26,6 @@ public class DoiFetcher implements IdBasedFetcher {
 
     public DoiFetcher(ImportFormatPreferences preferences) {
         this.preferences = preferences;
-    }
-
-    private String cleanupEncoding(String bibtex) {
-        return new NormalizePagesFormatter().format(bibtex);
     }
 
     @Override
@@ -53,7 +52,9 @@ public class DoiFetcher implements IdBasedFetcher {
                 String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
 
                 // BibTeX entry
-                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
+                Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);
+                fetchedEntry.ifPresent(this::doPostCleanup);
+                return fetchedEntry;
             } else {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
@@ -62,5 +63,10 @@ public class DoiFetcher implements IdBasedFetcher {
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
         }
+    }
+
+    private void doPostCleanup(BibEntry entry) {
+        new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()).cleanup(entry);
+        new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
     }
 }
