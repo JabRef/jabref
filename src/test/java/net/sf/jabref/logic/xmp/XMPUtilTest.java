@@ -139,7 +139,7 @@ public class XMPUtilTest {
 
     public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
             throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader(s), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
@@ -1157,7 +1157,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = BibtexParser.parse(new StringReader(bibtex), importFormatPreferences);
+                ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtex));
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1362,7 +1362,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 

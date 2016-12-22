@@ -1,11 +1,8 @@
 package net.sf.jabref.cli;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -87,7 +84,7 @@ public class XMPUtilMain {
             } else if (args[0].endsWith(".bib")) {
                 // Read from BIB and write as XMP
                 try (FileReader fr = new FileReader(args[0])) {
-                    ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
+                    ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
@@ -114,10 +111,7 @@ public class XMPUtilMain {
             }
 
             if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), StandardCharsets.UTF_8));
-                // we need ParserResult as we access result.getDatabase() later
-                ParserResult result = new BibtexParser(importFormatPreferences).parse(reader);
+                ParserResult result = new BibtexParser(importFormatPreferences).parse(new FileReader(args[0]));
 
                 Collection<BibEntry> entries = result.getDatabase().getEntries();
 
@@ -138,7 +132,7 @@ public class XMPUtilMain {
                 break;
             }
 
-            ParserResult result = BibtexParser.parse(new FileReader(args[1]), importFormatPreferences);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(new FileReader(args[1]));
 
             Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
