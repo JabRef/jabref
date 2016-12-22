@@ -16,6 +16,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class DoiFetcher implements IdBasedFetcher {
 
@@ -53,7 +54,8 @@ public class DoiFetcher implements IdBasedFetcher {
                 String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
 
                 // BibTeX entry
-                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
+                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences)
+                        .map(e -> {e.clearField(FieldName.URL); return e;});
             } else {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }

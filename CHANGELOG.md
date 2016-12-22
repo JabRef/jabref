@@ -27,7 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixes [#2406](https://github.com/JabRef/jabref/issues/2406) so that the integrity check filter works again
 - Closing of subtrees in the groups panel using "close subtree" is working again. Fixes [#2319](https://github.com/JabRef/jabref/issues/2319).
 - The proxy settings are now also applied to HTTPS connections. Fixes [#2249](https://github.com/JabRef/jabref/issues/2249).
-
+- Fixes [#2417](https://github.com/JabRef/jabref/issues/2417) by removing the URL when creating an entry by DOI.
 
 
 ### Removed
