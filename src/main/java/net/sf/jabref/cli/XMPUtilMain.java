@@ -170,7 +170,7 @@ public class XMPUtilMain {
         System.out.println("  xmpUtil <bib> <pdf>");
         System.out.println("");
         System.out
-        .println("To report bugs visit http://jabref.sourceforge.net");
+        .println("To report bugs visit https://issues.jabref.org");
     }
 
 }

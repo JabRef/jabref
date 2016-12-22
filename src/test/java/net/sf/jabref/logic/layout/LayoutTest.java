@@ -17,15 +17,12 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
 
 public class LayoutTest {
-
     private LayoutFormatterPreferences prefs;
-
 
     /**
      * Initialize Preferences.
@@ -55,7 +52,6 @@ public class LayoutTest {
     }
 
     public String layout(String layoutFile, String entry) throws IOException {
-
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr, prefs)
@@ -85,20 +81,19 @@ public class LayoutTest {
     }
 
     @Test
-    @Ignore
-    public void testHTMLCharDoubleLineBreak() throws IOException {
-        String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
-                "@other{bla, author={This\nis\na\n\ntext}}");
-
-        Assert.assertEquals("This is a<br>text ", layoutText);
-    }
-
-    @Test
     public void testPluginLoading() throws IOException {
         String layoutText = layout("\\begin{author}\\format[NameFormatter]{\\author}\\end{author}",
                 "@other{bla, author={Joe Doe and Jane, Moon}}");
 
         Assert.assertEquals("Joe Doe, Moon Jane", layoutText);
+    }
+
+    @Test
+    public void testHTMLCharDoubleLineBreak() throws IOException {
+        String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
+                "@other{bla, author={This\nis\na\n\ntext}}");
+
+        Assert.assertEquals("This is a text ", layoutText);
     }
 
     /**
