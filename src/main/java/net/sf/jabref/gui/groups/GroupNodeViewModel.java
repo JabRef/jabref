@@ -3,6 +3,7 @@ package net.sf.jabref.gui.groups;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -139,6 +140,9 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        new Thread(()-> hits.setValue(groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))).start();
+        new Thread(()-> {
+            int newHits = groupNode.calculateNumberOfMatches(databaseContext.getDatabase());
+            Platform.runLater(() -> hits.setValue(newHits));
+        }).start();
     }
 }
