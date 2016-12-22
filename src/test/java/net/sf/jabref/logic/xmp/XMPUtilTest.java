@@ -55,14 +55,17 @@ import org.apache.pdfbox.util.XMLUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
  */
 public class XMPUtilTest {
 
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
     /**
      * The PDF file that basically all operations are done upon.
      */
@@ -139,7 +142,7 @@ public class XMPUtilTest {
 
     public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
             throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader(s), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
@@ -229,10 +232,7 @@ public class XMPUtilTest {
     @Before
     public void setUp() throws IOException, COSVisitorException {
 
-        pdfFile = File.createTempFile("JabRef", ".pdf");
-
-        // ensure that the file will be deleted upon exit
-        pdfFile.deleteOnExit();
+        pdfFile = tempFolder.newFile("JabRef.pdf");
 
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
@@ -1110,7 +1110,7 @@ public class XMPUtilTest {
     public void testCommandLineSingleBib() throws IOException, TransformerException, COSVisitorException {
 
         // First check conversion from .bib to .xmp
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.close();
@@ -1128,10 +1128,6 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
@@ -1157,7 +1153,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = BibtexParser.parse(new StringReader(bibtex), importFormatPreferences);
+                ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtex));
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1204,51 +1200,44 @@ public class XMPUtilTest {
      * Test whether the command-line client can pick one of several entries from a bibtex file
      * @throws IOException
      * @throws TransformerException
-     *
      */
     @Test
-    @Ignore
     public void testCommandLineByKey() throws IOException, TransformerException {
-
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
+        }
 
-            { // First try canh05
-                PrintStream oldOut = System.out;
-                try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                    System.setOut(new PrintStream(s));
-                    XMPUtilMain.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
+        PrintStream sysOut = System.out;
 
-                // PDF should be annotated:
-                List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-                Assert.assertEquals(1, l.size());
-                assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
-            }
-            // Now try OezbekC06
-            try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                PrintStream oldOut = System.out;
-                System.setOut(new PrintStream(s));
-                try {
-                    XMPUtilMain.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
-            }
-
-            // PDF should be annotated:
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-            Assert.assertEquals(1, l.size());
-            assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+        // First try canh05
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            XMPUtilMain.main(new String[]{"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
         } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
+            System.setOut(sysOut);
+        }
+
+        // PDF should be annotated:
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+
+        // Now try OezbekC06
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            try {
+                XMPUtilMain.main(new String[]{"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+            } finally {
+                System.setOut(sysOut);
             }
         }
+
+        // PDF should be annotated:
+        l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
     }
 
     /**
@@ -1259,7 +1248,7 @@ public class XMPUtilTest {
     @Test
     public void testCommandLineSeveral() throws IOException, TransformerException {
 
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
 
@@ -1294,11 +1283,6 @@ public class XMPUtilTest {
 
             assertEqualsBibtexEntry(t1, a);
             assertEqualsBibtexEntry(t3, b);
-
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
@@ -1362,7 +1346,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 

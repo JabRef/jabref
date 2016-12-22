@@ -21,7 +21,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
-import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.autosaveandbackup.AutosaveManager;
 import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -282,7 +281,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public void runCommand() throws Exception {
         // This part uses Spin's features:
-        Worker worker = getWorker();
+        Runnable worker = getWorker();
         // The Worker returned by getWorker() has been wrapped
         // by Spin.off(), which makes its methods be run in
         // a different thread from the EDT.
