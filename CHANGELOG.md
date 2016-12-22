@@ -32,8 +32,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 - We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
-- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. Today and clear work again. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
+- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. However, clearing with the clear button is not possible if timestamp format does not match the current settings. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
 - Fixes [#2406](https://github.com/JabRef/jabref/issues/2406) so that the integrity check filter works again
+- Closing of subtrees in the groups panel using "close subtree" is working again. Fixes [#2319](https://github.com/JabRef/jabref/issues/2319).
 
 ### Removed
 

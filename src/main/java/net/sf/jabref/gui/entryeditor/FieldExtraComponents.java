@@ -444,6 +444,26 @@ public class FieldExtraComponents {
         // insert a datepicker, if the extras field contains this command
         if (useDatePicker) {
             DatePickerButton datePicker = new DatePickerButton(editor, useIsoFormat);
+
+            // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
+            ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+            });
+
             return Optional.of(datePicker.getDatePicker());
         } else {
             return Optional.empty();
