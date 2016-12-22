@@ -89,6 +89,14 @@ JabRefPreferences.getInstance().getImportFormatPreferences());
         Assert.assertEquals("Joe Doe, Moon Jane", layoutText);
     }
 
+    @Test
+    public void testHTMLCharDoubleLineBreak() throws IOException {
+        String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
+                "@other{bla, author={This\nis\na\n\ntext}}");
+
+        Assert.assertEquals("This is a text ", layoutText);
+    }
+
     /**
      * [ 1495181 ] Dotless i and tilde not handled in preview
      *

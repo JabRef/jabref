@@ -774,6 +774,15 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseWarnsAboutUnmatchedContentInEntryWithoutComma() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket } too much}"),
+                importFormatPreferences);
+
+        List<BibEntry> entries = result.getDatabase().getEntries();
+        assertEquals(Optional.of("author bracket #too##much#"), entries.get(0).getField("author"));
+    }
+
+    @Test
     public void parseWarnsAboutUnmatchedContentInEntry() throws IOException {
 
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author bracket }, too much}"),
@@ -781,8 +790,8 @@ public class BibtexParserTest {
 
         assertTrue("There should be warnings", result.hasWarnings());
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        assertEquals("Size should be zero, but was " + c.size(), 0, c.size());
+        List<BibEntry> entries = result.getDatabase().getEntries();
+        assertEquals("Size should be zero, but was " + entries.size(), 0, entries.size());
     }
 
     @Test
@@ -791,9 +800,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={author @ good}}"),
                 importFormatPreferences);
 
-        Collection<BibEntry> c = result.getDatabase().getEntries();
-        List<BibEntry> entries = new ArrayList<>(1);
-        entries.addAll(c);
+        List<BibEntry> entries = result.getDatabase().getEntries();
 
         assertEquals(1, entries.size());
         assertEquals(Optional.of("author @ good"), entries.get(0).getField("author"));
