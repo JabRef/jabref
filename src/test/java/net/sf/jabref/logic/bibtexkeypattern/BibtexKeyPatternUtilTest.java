@@ -3,7 +3,6 @@ package net.sf.jabref.logic.bibtexkeypattern;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -47,7 +46,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testAndInAuthorName() throws ParseException {
+    public void testAndInAuthorName() {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
                 importFormatPreferences);
         assertEquals("Holland",
@@ -56,7 +55,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testAndAuthorNames() throws ParseException {
+    public void testAndAuthorNames() {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
@@ -65,7 +64,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testSpecialLatexCharacterInAuthorName() throws ParseException {
+    public void testSpecialLatexCharacterInAuthorName() {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
         assertEquals("Popovicova",
@@ -78,7 +77,7 @@ public class BibtexKeyPatternUtilTest {
      * Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
      */
     @Test
-    public void testMakeLabelAndCheckLegalKeys() throws ParseException {
+    public void testMakeLabelAndCheckLegalKeys() {
 
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences);
@@ -157,7 +156,7 @@ public class BibtexKeyPatternUtilTest {
      * Test the Labelmaker and with accent grave Chars to test: "ÀÈÌÒÙ";
      */
     @Test
-    public void testMakeLabelAndCheckLegalKeysAccentGrave() throws ParseException {
+    public void testMakeLabelAndCheckLegalKeysAccentGrave() {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", importFormatPreferences);
         assertEquals("Aoen",
@@ -270,7 +269,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testUniversity() throws ParseException {
+    public void testUniversity() {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
         assertEquals("UniLinkoeping",
@@ -279,7 +278,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testDepartment() throws ParseException {
+    public void testDepartment() {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
                 importFormatPreferences);
@@ -289,7 +288,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testSchool() throws ParseException {
+    public void testSchool() {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
                 importFormatPreferences);
@@ -299,7 +298,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testInstituteOfTechnology() throws ParseException {
+    public void testInstituteOfTechnology() {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",

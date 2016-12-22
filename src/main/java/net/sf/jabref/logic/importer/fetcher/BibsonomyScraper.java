@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -41,9 +40,6 @@ public class BibsonomyScraper {
             return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
-            return Optional.empty();
-        } catch (ParseException ex) {
-            LOGGER.warn("Could not parse entry", ex);
             return Optional.empty();
         } catch (RuntimeException ex) {
             LOGGER.warn("Could not get entry", ex);

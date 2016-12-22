@@ -49,7 +49,7 @@ public class EntryFromFileCreatorManagerTest {
     public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(reader);
+            ParserResult result = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();
