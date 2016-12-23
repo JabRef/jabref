@@ -99,7 +99,7 @@ public class FileBasedTestCase {
     public void testFindFilesException() {
         List<String> extensions = Arrays.asList("jpg", "pdf");
         List<File> dirs = Arrays.asList(rootDir.resolve("asdfasdf/asdfasdf").toFile());
-        Set<File> results = FileFinder.findFiles(extensions, dirs);
+        Set<Path> results = FileFinder.findFiles(extensions, dirs);
 
         assertEquals(Collections.emptySet(), results);
     }

@@ -20,8 +20,7 @@ public class FileFinder {
 
     private static final Log LOGGER = LogFactory.getLog(FileFinder.class);
 
-
-    public static Set<File> findFiles(List<String> extensions, List<File> directories) {
+    public static Set<Path> findFiles(List<String> extensions, List<File> directories) {
 
         Objects.requireNonNull(directories, "Directories must not be null!");
         Objects.requireNonNull(extensions, "Extensions must not be null!");
@@ -30,11 +29,11 @@ public class FileFinder {
                 attr) -> !Files.isDirectory(path)
                         && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse(""));
 
-        Set<File> result = new HashSet<>();
+        Set<Path> result = new HashSet<>();
         for (File directory : directories) {
 
-            try (Stream<File> files = Files.find(directory.toPath(), Integer.MAX_VALUE, isDirectoryAndContainsExtension)
-                    .map(x -> x.toFile())) {
+            try (Stream<Path> files = Files.find(directory.toPath(), Integer.MAX_VALUE,
+                    isDirectoryAndContainsExtension)) {
                 result.addAll(files.collect(Collectors.toSet()));
 
             } catch (IOException e) {

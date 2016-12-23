@@ -51,12 +51,14 @@ public class MoveFileAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent event) {
+
         int selected = editor.getSelectedRow();
 
         if (selected == -1) {
             return;
         }
 
+        //  MoveFilesCleanup cleanup = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),  Globals.prefs.get, fileDirectoryPreferences, prefs)
         FileListEntry entry = editor.getTableModel().getEntry(selected);
 
         // Check if the current file exists:
