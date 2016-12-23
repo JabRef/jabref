@@ -11,18 +11,25 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- When [adding a new entry](http://help.jabref.org/en/BaseFrame#adding-a-new-entry), one can select "title" to create a full BibTeX entry based on a title.
 - When editing an article, the tab "Optional fields" now shows "ISSN".
 - When editing a book, the tab "Optional fields" now shows "ISBN".
 - When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
 - When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
 - When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests.
+- The entry received from DOI does no longer contain the DOI as URL. Implements [#2417](https://github.com/JabRef/jabref/issues/2417).
+- We use following parameters for the JVM on Windows and OSX: `-XX:+UseG1GC -XX:+UseStringDeduplication -XX:StringTableSize=1000003`.
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
 - The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 - We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
-- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. Today and clear work again. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
+- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. However, clearing with the clear button is not possible if timestamp format does not match the current settings. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
 - Fixes [#2406](https://github.com/JabRef/jabref/issues/2406) so that the integrity check filter works again
+- Closing of subtrees in the groups panel using "close subtree" is working again. Fixes [#2319](https://github.com/JabRef/jabref/issues/2319).
+- The proxy settings are now also applied to HTTPS connections. Fixes [#2249](https://github.com/JabRef/jabref/issues/2249).
+
+
 
 ### Removed
 
@@ -67,7 +74,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
-## [3.8] - 2016-12-16
+## [3.8] – 2016-12-16
 
 ### Changed
 - Bibliographic information from web resources can now be used to complete existing entries.
@@ -119,7 +126,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 
 
-## [3.7] - 2016-11-14
+## [3.7] – 2016-11-14
 
 ### Changed
 - Implementation of eventbased autosave and backup functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
@@ -234,7 +241,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
 
 
-## [3.6] - 2016-08-26
+## [3.6] – 2016-08-26
 
 ### Changed
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
@@ -327,7 +334,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed preview toolbar (since long disabled)
 
 
-## [3.5] - 2016-07-13
+## [3.5] – 2016-07-13
 
 ### Changed
 - Implemented [#1356](https://github.com/JabRef/jabref/issues/1356): Added a formatter for converting HTML to Unicode
@@ -357,7 +364,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 
 
-## [3.4] - 2016-06-02
+## [3.4] – 2016-06-02
 
 ### Changed
 - Implemented [#629](https://github.com/JabRef/jabref/issues/629): Explicit groups are now written in the "groups" field of the entry instead of at the end of the bib file
@@ -422,7 +429,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed not-working option "Select Matches" under Groups -> Settings.
 
 
-## [3.3] - 2016-04-17
+## [3.3] – 2016-04-17
 
 ### Changed
 - Migrated JabRef help to markdown at https://github.com/JabRef/help.jabref.org
@@ -524,7 +531,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed double click listener from `doi` and `url` fields
 
 
-## [3.2] - 2016-01-10
+## [3.2] – 2016-01-10
 
 ### Changed
 - All import/open database warnings are now shown in a scrolling text area
@@ -544,7 +551,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - OpenOffice/LibreOffice is removed from the push-to-application button and only accessed through the side panel
 
 
-## [3.1] - 2015-12-24
+## [3.1] – 2015-12-24
 
 ### Changed
 - Added new DoiResolution fetcher that tries to download full text PDF from DOI link
@@ -598,7 +605,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed the ability to export references on the CLI interface based on year ranges
 
 
-## [3.0] - 2015-11-29
+## [3.0] – 2015-11-29
 
 ### Changed
  - Updated to support OpenOffice 4 and LibreOffice 5
@@ -706,7 +713,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Remove non-working web searches: JSTOR and Sciencedirect (planned to be fixed for the next release)
  - Remove option Tools -> Open PDF or PS which is replaced by Tools -> Open File
 
-## 2.80 - never released
+## 2.80 – never released
 
 Version 2.80 was intended as intermediate step to JabRef 3.0.
 Since much functionality has changed during development, a release of this version was skipped.

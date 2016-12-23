@@ -11,7 +11,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 
 import spin.Spin;
@@ -20,7 +19,7 @@ import spin.Spin;
  *
  * @author alver
  */
-public class SaveAllAction extends MnemonicAwareAction implements Worker {
+public class SaveAllAction extends MnemonicAwareAction implements Runnable {
 
     private final JabRefFrame frame;
     private int databases;

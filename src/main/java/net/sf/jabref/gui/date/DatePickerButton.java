@@ -3,6 +3,7 @@ package net.sf.jabref.gui.date;
 import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -16,11 +17,15 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
 import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * wrapper and service class for the DatePicker handling at the EntryEditor
  */
 public class DatePickerButton implements DateChangeListener {
+
+    private static final Log LOGGER = LogFactory.getLog(DatePickerButton.class);
 
     private final DatePicker datePicker;
     private final JPanel panel = new JPanel();
@@ -53,11 +58,12 @@ public class DatePickerButton implements DateChangeListener {
     @Override
     public void dateChanged(DateChangeEvent dateChangeEvent) {
         LocalDate date = datePicker.getDate();
+        String newDate = "";
         if (date != null) {
-            editor.setText(dateTimeFormatter.format(date.atStartOfDay()));
-        } else {
-            // in this case the user selected "clear" in the date picker, so we just clear the field
-            editor.setText("");
+            newDate = dateTimeFormatter.format(date.atStartOfDay());
+        }
+        if (!newDate.equals(editor.getText())) {
+            editor.setText(newDate);
         }
         // Set focus to editor component after changing its text:
         editor.getTextComponent().requestFocus();
@@ -66,5 +72,20 @@ public class DatePickerButton implements DateChangeListener {
     public JComponent getDatePicker() {
         //return datePicker;
         return panel;
+    }
+
+    /**
+     * Used to set the calender popup to the currently used Date
+     * @param dateString
+     */
+    public void updateDatePickerDate(String dateString) {
+        if(dateString!=null && !dateString.isEmpty()) {
+            try {
+                datePicker.setDate(LocalDate.parse(dateString, dateTimeFormatter));
+            } catch (DateTimeParseException exception) {
+                LOGGER.warn("Unable to parse stored date for field '"+editor.getFieldName()+"' with current settings. "
+                        + "Clear button in calender popup will not work.");
+            }
+        }
     }
 }

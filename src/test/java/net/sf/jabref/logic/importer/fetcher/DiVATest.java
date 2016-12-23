@@ -32,7 +32,7 @@ public class DiVATest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals(HelpFile.FETCHER_DIVA_TO_BIBTEX, HelpFile.FETCHER_DIVA_TO_BIBTEX);
+        assertEquals(HelpFile.FETCHER_DIVA, HelpFile.FETCHER_DIVA);
     }
 
     @Test
