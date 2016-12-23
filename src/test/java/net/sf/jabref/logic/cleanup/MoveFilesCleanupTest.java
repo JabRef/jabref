@@ -115,10 +115,11 @@ public class MoveFilesCleanupTest {
 
         assertFalse(fileBefore.exists());
         Path after = pdfFolder.toPath().resolve("Misc").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
         assertTrue(Files.exists(after));
 
         assertEquals(Optional
-                .of(FileField.getStringRepresentation(new ParsedFileField("", after.getFileName().toString(), ""))),
+                .of(FileField.getStringRepresentation(new ParsedFileField("", relativefileDir.toString(), ""))),
                 entry.getField("file"));
     }
 }

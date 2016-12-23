@@ -125,13 +125,11 @@ public class RenamePdfCleanup implements CleanupJob {
 
                         Path parent = settingsDir.get();
                         String newFileEntryFileName;
-                        if ((parent == null)) {
+                        if (parent == null) {
                             newFileEntryFileName = targetFileName.toString();
-
                         } else {
                             newFileEntryFileName = parent.relativize(newPath).toString();
                         }
-
                         newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
                     }
                 } else {

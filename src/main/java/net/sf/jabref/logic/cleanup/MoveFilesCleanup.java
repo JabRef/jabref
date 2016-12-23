@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,8 +78,6 @@ public class MoveFilesCleanup implements CleanupJob {
             }
 
             Path newTargetFile = targetDirectory.get().toPath().resolve(targetDirName).resolve(oldFile.get().getName());
-            System.out.println("Target Path " + newTargetFile);
-
             if (Files.exists(newTargetFile)) {
                 // We do not overwrite already existing files
                 newFileList.add(fileEntry);
@@ -90,20 +89,21 @@ public class MoveFilesCleanup implements CleanupJob {
                     Files.createDirectories(newTargetFile);
                 }
             } catch (IOException e) {
-                LOGGER.error("Could no create target necessary target directoires for renaming", e);
+                LOGGER.error("Could no create necessary target directoires for renaming", e);
             }
 
             if (FileUtil.renameFile(oldFile.get().toPath(), newTargetFile, true)) {
                 changed = true;
-            }
 
-            ParsedFileField newFileEntry = fileEntry;
-            if (!oldFileName.equals(newTargetFile.toString())) {
-                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newTargetFile.getFileName().toString(),
-                        fileEntry.getFileType());
-                changed = true;
+                String newEntryFilePath = Paths.get(defaultFileDirectory).relativize(newTargetFile).toString();
+                ParsedFileField newFileEntry = fileEntry;
+                if (!oldFileName.equals(newTargetFile.toString())) {
+                    newFileEntry = new ParsedFileField(fileEntry.getDescription(), newEntryFilePath,
+                            fileEntry.getFileType());
+                    changed = true;
+                }
+                newFileList.add(newFileEntry);
             }
-            newFileList.add(newFileEntry);
         }
 
         if (changed) {
