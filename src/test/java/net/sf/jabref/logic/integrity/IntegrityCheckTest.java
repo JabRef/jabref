@@ -158,8 +158,10 @@ public class IntegrityCheckTest {
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"),
+                    BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"),
+                    BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, "and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
@@ -305,6 +307,18 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("doi", "10.17487/rfc1436"));
         assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
         assertWrong(createContext("doi", "asdf"));
+    }
+
+    @Test
+    public void testNoBibtexOrBiblatexChecks() {
+        assertCorrect(createContext("editor", "Knuth"));
+        assertWrong(createContext("abcd", "asdf"));
+    }
+
+    @Test
+    public void testBiblatexOnlyChecks() {
+        assertCorrect(createContext("author", "Knuth"));
+        assertWrong(createContext("editora", "Knuth"));
     }
 
     @Test

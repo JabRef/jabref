@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests.
 - The entry received from DOI does no longer contain the DOI as URL. Implements [#2417](https://github.com/JabRef/jabref/issues/2417).
 - We use following parameters for the JVM on Windows and OSX: `-XX:+UseG1GC -XX:+UseStringDeduplication -XX:StringTableSize=1000003`.
+- We added an integrity check that detects non BibTeX/BibLaTeX fields.
 
 ### Fixed
 - Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.

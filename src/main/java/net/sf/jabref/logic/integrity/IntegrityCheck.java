@@ -56,6 +56,7 @@ public class IntegrityCheck {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
 
+        result.addAll(new NoBibtexOrBiblatexFieldChecker().check(entry));
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
         result.addAll(new BibtexkeyChecker().check(entry));

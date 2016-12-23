@@ -32,7 +32,7 @@ public class NoBibtexFieldChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        // non-static initalization of ALL_BIBLATEX_ONLY_FIELDS as the user can customize the entry types during runtime
+        // non-static initialization of ALL_BIBLATEX_ONLY_FIELDS as the user can customize the entry types during runtime
         final List<String> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
         return entry.getFieldNames().stream()
                 .filter(name ->  allBiblatexOnlyFields.contains(name))
