@@ -76,6 +76,12 @@ public class ArXivTest {
     }
 
     @Test
+    public void findByEprintWithPrefix() throws IOException {
+        entry.setField("eprint", "arXiv:1603.06570");
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
+    }
+
+    @Test
     public void findByEprintWithUnknownDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
         entry.setField("eprint", "1603.06570");
@@ -136,6 +142,11 @@ public class ArXivTest {
     @Test
     public void searchEntryByIdWith4Digits() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249"));
+    }
+
+    @Test
+    public void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv:1405.2249"));
     }
 
     @Test
