@@ -107,6 +107,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private Optional<ArXivEntry> searchForEntryById(String identifier) throws FetcherException {
+        identifier = identifier.replace("arxiv:", "");
+        identifier = identifier.replace("arXiv:", "");
+        identifier = identifier.replace("arxiv", "");
+        identifier = identifier.replace("arXiv", "");
         List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier), 0, 1);
         if (entries.size() == 1) {
             return Optional.of(entries.get(0));
