@@ -15,7 +15,6 @@ import net.sf.jabref.model.entry.FieldName;
  */
 public class NoBibtexOrBiblatexFieldChecker implements Checker {
 
-
     private List<String> getAllBiblatexFields() {
         return BibLatexEntryTypes.ALL.stream().flatMap(type -> type.getAllFields().stream())
                 .collect(Collectors.toList());
