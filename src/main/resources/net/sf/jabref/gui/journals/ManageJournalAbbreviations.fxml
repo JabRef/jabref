@@ -12,7 +12,6 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
-
 <DialogPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.journals.ManageJournalAbbreviationsController">
    <content>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
@@ -32,8 +31,8 @@
          <bottom>
             <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
-                  <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists" visible="false" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
-                  <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4" visible="false" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
+                  <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
+                  <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4" ButtonBar.buttonData="LEFT" ButtonBar.buttonUniformSize="false" />
                 <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
                   <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviationsAndCloseDialog" text="%Save changes" ButtonBar.buttonData="OK_DONE" />
               </buttons>

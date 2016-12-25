@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -14,10 +16,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.concurrent.Task;
 
 import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
+import net.sf.jabref.gui.util.TaskUtil;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -45,10 +49,10 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
     private final JabRefPreferences preferences;
     private final DialogService dialogService;
-
     public ManageJournalAbbreviationsViewModel(JabRefPreferences preferences, DialogService dialogService) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
@@ -56,7 +60,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
             boolean isAbbreviation = (newvalue != null) && !newvalue.isPseudoAbbreviation();
-            boolean isEditableFile = (currentFile != null) && !currentFile.get().isBuiltInListProperty().get();
+            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get();
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
         currentFile.addListener((observable, oldvalue, newvalue) -> {
@@ -91,6 +95,10 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         });
     }
 
+    public SimpleBooleanProperty isLoadingProperty() {
+        return isLoading;
+    }
+
     public boolean isAbbreviationEditableAndRemovable() {
         return isAbbreviationEditableAndRemovable.get();
     }
@@ -100,22 +108,36 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * and add them to the list of journal abbreviation files.
      */
     public void addBuiltInLists() {
-        List<Abbreviation> builtInList = JournalAbbreviationLoader.getBuiltInAbbreviations();
+        Task<List<Abbreviation>> loadBuiltIn = TaskUtil.create(JournalAbbreviationLoader::getBuiltInAbbreviations);
+        loadBuiltIn.setOnRunning(event -> isLoading.setValue(true));
+        loadBuiltIn.setOnSucceeded(event -> {
+            isLoading.setValue(false);
+            addList(Localization.lang("JabRef built in list"), loadBuiltIn.getValue());
+        });
+
+        Task<List<Abbreviation>> loadIeee = TaskUtil.create(() -> {
+            if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+                return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
+            } else {
+                return JournalAbbreviationLoader.getStandardIEEEAbbreviations();
+            }
+        });
+        loadIeee.setOnRunning(event -> isLoading.setValue(true));
+        loadIeee.setOnSucceeded(event -> {
+            isLoading.setValue(false);
+            addList(Localization.lang("IEEE built in list"), loadBuiltIn.getValue());
+        });
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(loadBuiltIn);
+        executorService.submit(loadIeee);
+        executorService.shutdown();
+    }
+
+    private void addList(String name, List<Abbreviation> abbreviations) {
         List<AbbreviationViewModel> builtInListViewModel = new ArrayList<>();
-        builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFileViewModel builtInFile = new AbbreviationsFileViewModel(builtInListViewModel,
-                Localization.lang("JabRef built in list"));
-        List<Abbreviation> ieeeList;
-        if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-            ieeeList = JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
-        } else {
-            ieeeList = JournalAbbreviationLoader.getStandardIEEEAbbreviations();
-        }
-        List<AbbreviationViewModel> ieeeListViewModel = new ArrayList<>();
-        ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFileViewModel ieeeFile = new AbbreviationsFileViewModel(ieeeListViewModel,
-                Localization.lang("IEEE built in list"));
-        journalFiles.addAll(builtInFile, ieeeFile);
+        abbreviations.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
+        AbbreviationsFileViewModel fileViewModel = new AbbreviationsFileViewModel(builtInListViewModel, name);
+        journalFiles.add(fileViewModel);
     }
 
     /**
@@ -352,5 +374,11 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void addAbbreviation() {
         addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"));
+    }
+
+    public void init() {
+        createFileObjects();
+        selectLastJournalFile();
+        addBuiltInLists();
     }
 }

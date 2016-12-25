@@ -33,8 +33,9 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     @FXML private Button addJournalFileButton;
     @FXML private Button addNewJournalFileButton;
     @FXML private Button removeJournalAbbreviationsButton;
-    @FXML private ProgressIndicator progressIndicator;
-    @FXML private Label loadingLabel;
+    @FXML public Label loadingLabel;
+    @FXML public ProgressIndicator progressIndicator;
+
 
     @Inject private JabRefPreferences preferences;
     @Inject private DialogService dialogService;
@@ -46,25 +47,7 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         setUpTable();
         setBindings();
         setButtonStyles();
-        loadListsInBackground();
-    }
-
-    private void loadListsInBackground() {
-        Task<Void> task = new Task<Void>() {
-
-            @Override
-            protected Void call() {
-                loadingLabel.setVisible(true);
-                progressIndicator.setVisible(true);
-                viewModel.createFileObjects();
-                viewModel.selectLastJournalFile();
-                viewModel.addBuiltInLists();
-                loadingLabel.setVisible(false);
-                progressIndicator.setVisible(false);
-                return null;
-            }
-        };
-        new Thread(task).start();
+        viewModel.init();
     }
 
     private void setButtonStyles() {
@@ -139,6 +122,9 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
                 .addListener((observable, oldvalue, newvalue) -> viewModel.currentAbbreviationProperty().set(newvalue));
 
         removeJournalAbbreviationsButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
+
+        loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
+        progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
     }
 
     @FXML

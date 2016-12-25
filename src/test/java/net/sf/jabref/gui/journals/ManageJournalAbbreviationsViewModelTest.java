@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import net.sf.jabref.CatchExceptionsFromThread;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.logic.journals.Abbreviation;
@@ -22,12 +23,12 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.assertj.core.util.Files;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static net.sf.jabref.logic.util.OS.NEWLINE;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -38,12 +39,15 @@ import static org.mockito.Mockito.when;
  * This is the test class of the ManageAbbreviationsViewModel which is used to
  * create the underlying logic of the Manage Abbreviations Dialog UI.
  */
-public class ManageJournalAbbreviationsTest {
+public class ManageJournalAbbreviationsViewModelTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @ClassRule
+    public static CatchExceptionsFromThread catchExceptions = new CatchExceptionsFromThread();
 
     private Path emptyTestFile;
     private Path testFile1Entries;
