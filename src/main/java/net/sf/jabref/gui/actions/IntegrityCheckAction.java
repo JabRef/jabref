@@ -25,6 +25,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -45,7 +46,9 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
     public void actionPerformed(ActionEvent e) {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
-                Globals.prefs.getBibtexKeyPatternPreferences());
+                Globals.prefs.getBibtexKeyPatternPreferences(),
+                 Globals.journalAbbreviationLoader
+                .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
         List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
         if (messages.isEmpty()) {
@@ -98,7 +101,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                     }
                 }
             });
-            
+
             // BibTeX key
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             // field name

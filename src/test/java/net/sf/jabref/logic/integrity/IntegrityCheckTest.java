@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
@@ -195,6 +197,12 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testJournalIsKnownInAbbreviationList() {
+        assertCorrect(createContext("journal", "IEEE Software"));
+        assertWrong(createContext("journal", "IEEE Whocares"));
+    }
+
+    @Test
     public void testFileChecks() {
         MetaData metaData = Mockito.mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
@@ -338,7 +346,8 @@ public class IntegrityCheckTest {
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                createBibtexKeyPatternPreferences())
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
@@ -346,7 +355,9 @@ public class IntegrityCheckTest {
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                createBibtexKeyPatternPreferences()).checkBibtexDatabase();
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"))
+                ).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

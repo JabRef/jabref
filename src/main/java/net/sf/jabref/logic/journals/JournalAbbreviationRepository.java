@@ -26,6 +26,12 @@ public class JournalAbbreviationRepository {
 
     private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
 
+    public JournalAbbreviationRepository(Abbreviation... abbreviations) {
+        for (Abbreviation abbreviation : abbreviations) {
+            addEntry(abbreviation);
+        }
+    }
+
     public int size() {
         return abbreviations.size();
     }

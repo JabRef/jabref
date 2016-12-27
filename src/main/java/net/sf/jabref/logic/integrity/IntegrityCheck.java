@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -16,14 +17,17 @@ public class IntegrityCheck {
     private final BibDatabaseContext bibDatabaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
             FileDirectoryPreferences fileDirectoryPreferences,
-            BibtexKeyPatternPreferences bibtexKeyPatternPreferences
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+            JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -68,6 +72,7 @@ public class IntegrityCheck {
         result.addAll(new TypeChecker().check(entry));
         for (String journalField : InternalBibtexFields.getJournalNameFields()) {
             result.addAll(new AbbreviationChecker(journalField).check(entry));
+            result.addAll(new JournalInAbbreviationListChecker(journalField, journalAbbreviationRepository).check(entry));
         }
         for (String bookNameField : InternalBibtexFields.getBookNameFields()) {
             result.addAll(new AbbreviationChecker(bookNameField).check(entry));
