@@ -2,8 +2,6 @@ package net.sf.jabref.gui.util;
 
 import java.util.function.Consumer;
 
-import javafx.concurrent.Task;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,7 +16,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
 
     /**
      * Executes the task on the current thread.
-     * The code is essentially taken from {@link Task.TaskCallable#call()},
+     * The code is essentially taken from {@link javafx.concurrent.Task.TaskCallable#call()},
      * but adapted to run sequentially.
      */
     @Override
@@ -27,9 +25,8 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
         if (onRunning != null) {
             onRunning.run();
         }
-        final V result;
         try {
-            result = task.call();
+            final V result = task.call();
             Consumer<V> onSuccess = task.getOnSuccess();
             if (onSuccess != null) {
                 onSuccess.accept(result);
