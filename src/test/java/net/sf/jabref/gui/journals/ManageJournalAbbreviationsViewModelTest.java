@@ -16,6 +16,8 @@ import javafx.collections.ObservableList;
 import net.sf.jabref.CatchExceptionsFromThread;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.DialogService;
+import net.sf.jabref.gui.util.CurrentThreadTaskExecutor;
+import net.sf.jabref.gui.util.TaskExecutor;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -35,10 +37,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * This is the test class of the ManageAbbreviationsViewModel which is used to
- * create the underlying logic of the Manage Abbreviations Dialog UI.
- */
 public class ManageJournalAbbreviationsViewModelTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
@@ -61,7 +59,8 @@ public class ManageJournalAbbreviationsViewModelTest {
     public void setUpViewModel() throws Exception {
         preferences = mock(JabRefPreferences.class);
         dialogService = mock(DialogService.class);
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService);
+        TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor);
         emptyTestFile = createTemporaryTestFile("emptyTestFile.txt", "");
         testFile1Entries = createTemporaryTestFile("testFile1Entries.txt", "Test Entry = TE" + NEWLINE + "");
         testFile3Entries = createTemporaryTestFile("testFile3Entries.txt",
@@ -218,7 +217,7 @@ public class ManageJournalAbbreviationsViewModelTest {
     }
 
     @Test
-    public void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() {
+    public void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
         when(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
         viewModel.addBuiltInLists();
         viewModel.selectLastJournalFile();

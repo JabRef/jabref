@@ -8,6 +8,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
 import net.sf.jabref.gui.util.FileDialogConfiguration;
+import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * This interface provides methods to create dialogs and show them to the user.
@@ -44,6 +45,14 @@ public interface DialogService {
      * @param exception the exception causing the error
      */
     void showErrorDialogAndWait(String message, Throwable exception);
+
+    /**
+     * Create and display error dialog displaying the given exception.
+     * @param exception the exception causing the error
+     */
+    default void showErrorDialogAndWait(Exception exception) {
+        showErrorDialogAndWait(Localization.lang("Unhandled exception occurred."), exception);
+    }
 
     /**
      * Create and display error dialog displaying the given message.

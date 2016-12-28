@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.util.TaskExecutor;
 import net.sf.jabref.gui.util.ValueTableCellFactory;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -39,10 +40,11 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
 
     @Inject private JabRefPreferences preferences;
     @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor);
 
         setUpTable();
         setBindings();

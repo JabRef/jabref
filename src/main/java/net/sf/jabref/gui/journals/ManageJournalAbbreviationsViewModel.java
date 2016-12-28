@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -16,12 +14,12 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.concurrent.Task;
 
 import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.DialogService;
+import net.sf.jabref.gui.util.BackgroundTask;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
-import net.sf.jabref.gui.util.TaskUtil;
+import net.sf.jabref.gui.util.TaskExecutor;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -53,9 +51,12 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
     private final JabRefPreferences preferences;
     private final DialogService dialogService;
-    public ManageJournalAbbreviationsViewModel(JabRefPreferences preferences, DialogService dialogService) {
+    private final TaskExecutor taskExecutor;
+
+    public ManageJournalAbbreviationsViewModel(JabRefPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
@@ -107,30 +108,33 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * This will wrap the built in and ieee abbreviations in pseudo abbreviation files
      * and add them to the list of journal abbreviation files.
      */
-    public void addBuiltInLists() {
-        Task<List<Abbreviation>> loadBuiltIn = TaskUtil.create(JournalAbbreviationLoader::getBuiltInAbbreviations);
-        loadBuiltIn.setOnRunning(event -> isLoading.setValue(true));
-        loadBuiltIn.setOnSucceeded(event -> {
-            isLoading.setValue(false);
-            addList(Localization.lang("JabRef built in list"), loadBuiltIn.getValue());
-        });
+    void addBuiltInLists() {
+        BackgroundTask<List<Abbreviation>> loadBuiltIn = BackgroundTask
+                .run(JournalAbbreviationLoader::getBuiltInAbbreviations)
+                .onRunning(() -> isLoading.setValue(true))
+                .onSuccess(result -> {
+                    isLoading.setValue(false);
+                    addList(Localization.lang("JabRef built in list"), result);
+                })
+                .onFailure(dialogService::showErrorDialogAndWait);
 
-        Task<List<Abbreviation>> loadIeee = TaskUtil.create(() -> {
-            if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
-            } else {
-                return JournalAbbreviationLoader.getStandardIEEEAbbreviations();
-            }
-        });
-        loadIeee.setOnRunning(event -> isLoading.setValue(true));
-        loadIeee.setOnSucceeded(event -> {
-            isLoading.setValue(false);
-            addList(Localization.lang("IEEE built in list"), loadBuiltIn.getValue());
-        });
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(loadBuiltIn);
-        executorService.submit(loadIeee);
-        executorService.shutdown();
+        BackgroundTask<List<Abbreviation>> loadIeee = BackgroundTask
+                .run(() -> {
+                    if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+                        return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
+                    } else {
+                        return JournalAbbreviationLoader.getStandardIEEEAbbreviations();
+                    }
+                })
+                .onRunning(() -> isLoading.setValue(true))
+                .onSuccess(result -> {
+                    isLoading.setValue(false);
+                    addList(Localization.lang("IEEE built in list"), result);
+                })
+                .onFailure(dialogService::showErrorDialogAndWait);
+
+        taskExecutor.execute(loadBuiltIn);
+        taskExecutor.execute(loadIeee);
     }
 
     private void addList(String name, List<Abbreviation> abbreviations) {
