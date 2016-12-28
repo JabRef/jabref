@@ -3,24 +3,22 @@ package net.sf.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISSN;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 
-public class ISSNChecker implements Checker {
+public class ISSNChecker extends FieldChecker {
 
+    public ISSNChecker() {
+        super(FieldName.ISSN);
+    }
 
     @Override
-    public List<IntegrityMessage> check(BibEntry entry) {
-        if (!entry.hasField(FieldName.ISSN)) {
-            return Collections.emptyList();
-        }
-
+    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
         // Check that the ISSN is on the correct form
-        String issnString = entry.getField(FieldName.ISSN).get().trim();
+        String issnString = value.trim();
 
         ISSN issn = new ISSN(issnString);
         if (!issn.isValidFormat()) {
@@ -35,5 +33,4 @@ public class ISSNChecker implements Checker {
                     .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISSN));
         }
     }
-
 }
