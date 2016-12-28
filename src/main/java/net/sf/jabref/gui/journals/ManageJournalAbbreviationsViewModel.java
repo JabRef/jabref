@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -48,6 +49,8 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
     private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty isLoadingBuiltIn = new SimpleBooleanProperty(false);
+    private final SimpleBooleanProperty isLoadingIeee = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
     private final JabRefPreferences preferences;
     private final DialogService dialogService;
@@ -94,6 +97,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 }
             }
         });
+        isLoading.bind(isLoadingBuiltIn.and(isLoadingBuiltIn));
     }
 
     public SimpleBooleanProperty isLoadingProperty() {
@@ -111,9 +115,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     void addBuiltInLists() {
         BackgroundTask<List<Abbreviation>> loadBuiltIn = BackgroundTask
                 .run(JournalAbbreviationLoader::getBuiltInAbbreviations)
-                .onRunning(() -> isLoading.setValue(true))
+                .onRunning(() -> isLoadingBuiltIn.setValue(true))
                 .onSuccess(result -> {
-                    isLoading.setValue(false);
+                    isLoadingBuiltIn.setValue(false);
                     addList(Localization.lang("JabRef built in list"), result);
                 })
                 .onFailure(dialogService::showErrorDialogAndWait);
@@ -126,9 +130,9 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                         return JournalAbbreviationLoader.getStandardIEEEAbbreviations();
                     }
                 })
-                .onRunning(() -> isLoading.setValue(true))
+                .onRunning(() -> isLoadingIeee.setValue(true))
                 .onSuccess(result -> {
-                    isLoading.setValue(false);
+                    isLoadingIeee.setValue(false);
                     addList(Localization.lang("IEEE built in list"), result);
                 })
                 .onFailure(dialogService::showErrorDialogAndWait);
