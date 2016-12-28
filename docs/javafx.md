@@ -101,7 +101,7 @@ public class MyDialogView extends AbstractDialogView {
 # Resources:
 - [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
 - [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
-- [usage of icon fonts with JavaFX](http://aalmiray.github.io/ikonli/#_javafx) 
+- [usage of icon fonts with JavaFX](http://aalmiray.github.io/ikonli/#_javafx) or [jIconFont](https://github.com/jIconFont/jiconfont-google_material_design_icons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
 - [Undo manager](https://github.com/TomasMikula/UndoFX)
 - [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 - [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
