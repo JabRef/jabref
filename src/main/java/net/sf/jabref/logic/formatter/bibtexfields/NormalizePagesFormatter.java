@@ -20,10 +20,10 @@ import com.google.common.base.Strings;
  */
 public class NormalizePagesFormatter implements Formatter {
 
-    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(\\d+)(?:-{1,2}(\\d+))?\\Z");
+    private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A((\\d+:)?\\d+)(?:-{1,2}((\\d+:)?\\d+))?\\Z");
 
-    private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,]";
-    private static final String PAGES_REPLACE_PATTERN = "$1--$2";
+    private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,:]";
+    private static final String PAGES_REPLACE_PATTERN = "$1--$3";
     private static final String SINGLE_PAGE_REPLACE_PATTERN = "$1";
 
 
@@ -66,9 +66,9 @@ public class NormalizePagesFormatter implements Formatter {
         cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             // replace
-            if(Strings.isNullOrEmpty(matcher.group(2))) {
+            if (Strings.isNullOrEmpty(matcher.group(3))) {
                 return matcher.replaceFirst(SINGLE_PAGE_REPLACE_PATTERN);
             } else {
                 return matcher.replaceFirst(PAGES_REPLACE_PATTERN);

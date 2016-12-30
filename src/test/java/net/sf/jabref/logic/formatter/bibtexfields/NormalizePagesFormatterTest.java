@@ -88,6 +88,18 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void formatACMPages() {
+        // This appears in https://doi.org/10.1145/1658373.1658375
+        expectCorrect("2:1-2:33", "2:1--2:33");
+    }
+
+    @Test
+    public void keepFormattedACMPages() {
+        // This appears in https://doi.org/10.1145/1658373.1658375
+        expectCorrect("2:1--2:33", "2:1--2:33");
+    }
+
+    @Test
     public void formatExample() {
         expectCorrect(formatter.getExampleInput(), "1--2");
     }
