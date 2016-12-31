@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Using "Look up DOIs" in the quality menu, it is possible to look up DOIs for multiple entries.
 
 ### Fixed
 The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.

@@ -458,6 +458,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
 
+    private final AbstractAction lookupDOIs = new GeneralAction(Actions.LOOKUP_DOIS,
+            Localization.menuTitle("Look up DOIs"),
+            Localization.lang("Look up DOIs"));
+
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
@@ -1304,6 +1308,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         quality.add(autoSetFile);
         quality.add(findUnlinkedFiles);
         quality.add(autoLinkFile);
+        quality.add(lookupDOIs);
         quality.add(downloadFullText);
         mb.add(quality);
 
@@ -1501,7 +1506,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, lookupDOIs, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
@@ -1534,7 +1539,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupDOIs));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 

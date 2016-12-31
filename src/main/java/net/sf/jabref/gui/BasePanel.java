@@ -92,6 +92,7 @@ import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.CitationStyleToClipboardWorker;
+import net.sf.jabref.gui.worker.LookupDOIsWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
@@ -702,6 +703,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.REMOVE_FROM_GROUP, new GroupAddRemoveDialog(this, false, false));
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
+        actions.put(Actions.LOOKUP_DOIS, new LookupDOIsWorker(frame));
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
     }
 

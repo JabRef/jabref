@@ -169,7 +169,7 @@ public class FieldExtraComponents {
             }
         });
         // lookup doi
-        JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
+        JButton doiButton = new JButton(Localization.lang("Look up DOI"));
         doiButton.addActionListener(actionEvent -> {
             Optional<DOI> doi = DOI.fromBibEntry(entryEditor.getEntry());
             if (doi.isPresent()) {

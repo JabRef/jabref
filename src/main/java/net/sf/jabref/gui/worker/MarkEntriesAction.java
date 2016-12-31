@@ -18,9 +18,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- *
- */
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 
     private final JabRefFrame frame;
