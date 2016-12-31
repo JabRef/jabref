@@ -18,93 +18,94 @@ public class NormalizePagesFormatterTest {
 
     @Test
     public void formatSinglePageResultsInNoChange() {
-        expectCorrect("1", "1");
+        Assert.assertEquals("1", formatter.format("1"));
     }
 
     @Test
     public void formatPageNumbers() {
-        expectCorrect("1-2", "1--2");
+        Assert.assertEquals("1--2", formatter.format("1-2"));
     }
 
     @Test
     public void formatPageNumbersCommaSeparated() {
-        expectCorrect("1,2,3", "1,2,3");
+        Assert.assertEquals("1,2,3", formatter.format("1,2,3"));
     }
 
     @Test
     public void formatPageNumbersPlusRange() {
-        expectCorrect("43+", "43+");
+        Assert.assertEquals("43+", formatter.format("43+"));
     }
 
     @Test
     public void ignoreWhitespaceInPageNumbers() {
-        expectCorrect("   1  - 2 ", "1--2");
+        Assert.assertEquals("1--2", formatter.format("   1  - 2 "));
     }
 
     @Test
-    public void removeWhitespace() {
-        expectCorrect("   1  ", "1");
-        expectCorrect("   1 -- 2  ", "1--2");
+    public void removeWhitespaceSinglePage() {
+        Assert.assertEquals("1", formatter.format("   1  "));
+    }
+
+    @Test
+    public void removeWhitespacePageRange() {
+        Assert.assertEquals("1--2", formatter.format("   1 -- 2  "));
     }
 
     @Test
     public void ignoreWhitespaceInPageNumbersWithDoubleDash() {
-        expectCorrect("43 -- 103", "43--103");
+        Assert.assertEquals("43--103", formatter.format("43 -- 103"));
     }
 
     @Test
     public void keepCorrectlyFormattedPageNumbers() {
-        expectCorrect("1--2", "1--2");
+        Assert.assertEquals("1--2", formatter.format("1--2"));
     }
 
     @Test
     public void formatPageNumbersRemoveUnexpectedLiterals() {
-        expectCorrect("{1}-{2}", "1--2");
+        Assert.assertEquals("1--2", formatter.format("{1}-{2}"));
     }
 
     @Test
     public void formatPageNumbersRegexNotMatching() {
-        expectCorrect("12", "12");
+        Assert.assertEquals("12", formatter.format("12"));
     }
 
     @Test
     public void doNotRemoveLetters() {
-        expectCorrect("R1-R50", "R1-R50");
+        Assert.assertEquals("R1-R50", formatter.format("R1-R50"));
     }
 
     @Test
     public void replaceLongDashWithDoubleDash() {
-        expectCorrect("1 \u2014 50", "1--50");
+        Assert.assertEquals("1--50", formatter.format("1 \u2014 50"));
     }
 
     @Test
     public void removePagePrefix() {
-        expectCorrect("p.50", "50");
+        Assert.assertEquals("50", formatter.format("p.50"));
     }
 
     @Test
     public void removePagesPrefix() {
-        expectCorrect("pp.50", "50");
+        Assert.assertEquals("50", formatter.format("pp.50"));
     }
 
     @Test
     public void formatACMPages() {
         // This appears in https://doi.org/10.1145/1658373.1658375
-        expectCorrect("2:1-2:33", "2:1--2:33");
+        Assert.assertEquals("2:1--2:33", formatter.format("2:1-2:33"));
     }
 
     @Test
     public void keepFormattedACMPages() {
         // This appears in https://doi.org/10.1145/1658373.1658375
-        expectCorrect("2:1--2:33", "2:1--2:33");
+        Assert.assertEquals("2:1--2:33", formatter.format("2:1--2:33"));
     }
 
     @Test
     public void formatExample() {
-        expectCorrect(formatter.getExampleInput(), "1--2");
+        Assert.assertEquals("1--2", formatter.format(formatter.getExampleInput()));
     }
 
-    private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
-    }
 }
