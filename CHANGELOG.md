@@ -24,6 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 ### Fixed
+The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
 
 ### Removed
 
