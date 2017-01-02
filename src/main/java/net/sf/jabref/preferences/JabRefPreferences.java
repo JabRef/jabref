@@ -225,6 +225,8 @@ public class JabRefPreferences {
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
     public static final String TABLE_BACKGROUND = "tableBackground";
+    public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
+    public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
@@ -600,6 +602,10 @@ public class JabRefPreferences {
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
         defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
+
+        // default icon colors
+        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 

@@ -25,6 +25,9 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.preferences.JabRefPreferences;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,8 +39,8 @@ public class IconTheme {
 
     /* Colors */
     // JabRef's default colors
-    public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
-    public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
+    public static final Color DEFAULT_COLOR = Globals.prefs.getColor(JabRefPreferences.ICON_ENABLED_COLOR);
+    public static final Color DEFAULT_DISABLED_COLOR = Globals.prefs.getColor(JabRefPreferences.ICON_DISABLED_COLOR);
 
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
