@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.autocompleter;
 
-import java.awt.TextComponent;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
