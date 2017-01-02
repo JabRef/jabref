@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -558,6 +560,22 @@ public class BibtexDatabaseWriterTest {
                         "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE
                 , session.getStringValue());
+    }
+
+    @Test
+    public void roundtripWithContentSelectorsAndUmlauts() throws IOException, SaveException {
+        String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\"U}mlaut;}" + OS.NEWLINE;
+        Charset encoding = StandardCharsets.UTF_8;
+
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries(), preferences);
+
+        assertEquals(fileContent, session.getStringValue());
     }
 
 }
