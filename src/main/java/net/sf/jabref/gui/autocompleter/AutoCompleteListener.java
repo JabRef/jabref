@@ -268,7 +268,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         }
 
         // don't do auto completion inside words
-        if (!isJTextCompontent(e.getSource()) || !atEndOfWord((JTextComponent) e.getSource())) {
+        if (!(e.getSource() instanceof JTextComponent) || !atEndOfWord((JTextComponent) e.getSource())) {
             return;
         }
 
@@ -404,15 +404,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         LOGGER.debug("Resetting autocompletion");
         toSetIn = null;
         lastBeginning = null;
-    }
-
-    private boolean isJTextCompontent(Object eventSource) {
-        try {
-            JTextComponent temp = (JTextComponent) eventSource;
-            return true;
-        } catch (ClassCastException e) {
-            return false;
-        }
     }
 
     private List<String> findCompletions(String beginning) {
