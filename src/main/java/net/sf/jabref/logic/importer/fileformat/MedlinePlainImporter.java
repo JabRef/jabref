@@ -203,10 +203,10 @@ public class MedlinePlainImporter extends Importer {
             fixAuthors(fields, author, FieldName.AUTHOR);
             fixAuthors(fields, editor, FieldName.EDITOR);
             if (!comment.isEmpty()) {
-                fields.put("comment", comment);
+                fields.put(FieldName.COMMENT, comment);
             }
 
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);

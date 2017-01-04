@@ -5,6 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,7 +35,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.ISBN;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -415,26 +417,53 @@ public class FieldExtraComponents {
      * Set up field such that double click inserts the current date
      * If isDataPicker is True, a button with a data picker is returned
      *
-     * @param editor
-     * @param isDatePicker
+     * @param editor reference to the FieldEditor to display the date value
+     * @param useDatePicker shows a DatePickerButton if true
+     * @param useIsoFormat if true ISO format is always used
      * @return
      */
-    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, Boolean isDatePicker,
-            Boolean isoFormat) {
+    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, boolean useDatePicker,
+            boolean useIsoFormat) {
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {// double click
-                    String date = EasyDateFormat.isoDateFormat().getCurrentDate();
+                    String date = "";
+                    if(useIsoFormat) {
+                        date = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
+                    } else {
+                        date = DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)).format(
+                                LocalDateTime.now());
+                    }
                     editor.setText(date);
                 }
             }
         });
 
         // insert a datepicker, if the extras field contains this command
-        if (isDatePicker) {
-            DatePickerButton datePicker = new DatePickerButton(editor, isoFormat);
+        if (useDatePicker) {
+            DatePickerButton datePicker = new DatePickerButton(editor, useIsoFormat);
+
+            // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
+            ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
+
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    datePicker.updateDatePickerDate(editor.getText());
+                }
+            });
+
             return Optional.of(datePicker.getDatePicker());
         } else {
             return Optional.empty();

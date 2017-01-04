@@ -39,7 +39,7 @@ public class FieldName {
     public static final String BOOKTITLEADDON = "booktitleaddon";
     public static final String CHAPTER = "chapter";
     public static final String COMMENTATOR = "commentator";
-    public static final String COMMENTS = "comments";
+    public static final String COMMENT = "comment";
     public static final String CROSSREF = "crossref";
     public static final String DATE = "date";
     public static final String DAY = "day";

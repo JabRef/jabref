@@ -6,8 +6,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
@@ -38,9 +36,6 @@ import org.apache.commons.logging.LogFactory;
 public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
-    private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
-    private static final Pattern WHITESPACE = Pattern.compile("(?m)^\\s|\\v+");
-    private static final Pattern HTML_NEWLINE = Pattern.compile("<br>|<BR>");
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
@@ -123,12 +118,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
      */
     protected static HtmlTransferable processPreview(List<String> citations) {
         String html = String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-        String plain = citations.stream().map(c -> {
-            String tmp = WHITESPACE.matcher(c).replaceAll("");
-            tmp = REMOVE_HTML.matcher(tmp).replaceAll("");
-            return HTML_NEWLINE.matcher(tmp).replaceAll(OS.NEWLINE) + OS.NEWLINE;
-        }).collect(Collectors.joining(""));
-        return new HtmlTransferable(html, plain);
+        return new HtmlTransferable(html);
     }
 
     /**

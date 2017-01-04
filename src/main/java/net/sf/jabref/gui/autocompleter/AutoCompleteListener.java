@@ -164,7 +164,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
      * @param wordSeperatorTyped indicates whether the user has typed a white space character or a
      */
     private void setUnmodifiedTypedLetters(JTextComponent comp, boolean lastBeginningContainsTypedCharacter,
-            boolean wordSeperatorTyped) {
+                                           boolean wordSeperatorTyped) {
         if (lastBeginning == null) {
             LOGGER.debug("No last beginning found");
             // There was no previous input (if the user typed a word, where no autocompletion is available)
@@ -268,7 +268,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         }
 
         // don't do auto completion inside words
-        if (!atEndOfWord((JTextComponent) e.getSource())) {
+        if (!(e.getSource() instanceof JTextComponent) || !atEndOfWord((JTextComponent) e.getSource())) {
             return;
         }
 
@@ -276,6 +276,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             if (Character.isLetter(ch) || Character.isDigit(ch)
                     || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
+
                 JTextComponent comp = (JTextComponent) e.getSource();
 
                 if (toSetIn == null) {

@@ -85,22 +85,21 @@ public class BibEntry implements Cloneable {
 
     private final EventBus eventBus = new EventBus();
 
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
 
     public BibEntry() {
-        this(IdGenerator.next());
+        this(IdGenerator.next(), DEFAULT_TYPE);
     }
 
     /**
-     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     * Constructs a new BibEntry with the given type
      *
-     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id) {
-        this(id, DEFAULT_TYPE);
+    public BibEntry(String type) {
+        this(IdGenerator.next(), type);
     }
 
     /**
@@ -109,7 +108,7 @@ public class BibEntry implements Cloneable {
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id, String type) {
+    private BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
@@ -572,10 +571,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns a clone of this entry. Useful for copying.
+     * This will set a new ID for the cloned entry to be able to distinguish both copies.
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(id, type);
+        BibEntry clone = new BibEntry(type);
         clone.fields = new HashMap<>(fields);
         return clone;
     }

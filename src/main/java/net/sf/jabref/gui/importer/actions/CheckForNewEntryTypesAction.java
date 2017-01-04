@@ -120,7 +120,7 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
 
         // add all different customizations
         if (!differentCustomizations.isEmpty()) {
-            checkboxPanel.add(new JLabel(Localization.lang("Different Customization, current settings will be overwritten") + ":"));
+            checkboxPanel.add(new JLabel(Localization.lang("Different customization, current settings will be overwritten") + ":"));
             for (EntryType type : differentCustomizations) {
                 JCheckBox box = new JCheckBox(type.getName(), true);
                 checkboxPanel.add(box);

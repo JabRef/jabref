@@ -13,7 +13,6 @@ import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;
@@ -362,7 +361,7 @@ public class GvkParser implements Parser {
          * dann @incollection annehmen, wenn weder ISBN noch
          * ZDB-ID vorhanden sind.
          */
-        BibEntry result = new BibEntry(IdGenerator.next(), entryType);
+        BibEntry result = new BibEntry(entryType);
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {

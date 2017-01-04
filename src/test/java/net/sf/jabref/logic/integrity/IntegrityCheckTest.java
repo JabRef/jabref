@@ -153,15 +153,17 @@ public class IntegrityCheckTest {
     @Test
     public void testAuthorNameChecks() {
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            assertCorrect(createContext(field, ""));
-            assertCorrect(createContext(field, "Knuth"));
-            assertCorrect(createContext(field, "   Knuth, Donald E. "));
-            assertCorrect(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"));
-            assertCorrect(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"));
-            assertWrong(createContext(field, ", and Kurt Cobain and A. Einstein"));
-            assertWrong(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"));
-            assertWrong(createContext(field, "and Kurt Cobain and A. Einstein"));
-            assertWrong(createContext(field, "Donald E. Knuth and Kurt Cobain and"));
+            // getPersonNameFields returns fields that are available in BibLaTeX only
+            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a BibLaTeX only field
+            assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and"), BibDatabaseMode.BIBLATEX));
         }
     }
 

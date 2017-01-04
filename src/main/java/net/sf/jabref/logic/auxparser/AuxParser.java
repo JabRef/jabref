@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -172,7 +171,6 @@ public class AuxParser {
      */
     private void insertEntry(BibEntry entry, AuxParserResult result) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        clonedEntry.setId(IdGenerator.next());
         result.getGeneratedBibDatabase().insertEntry(clonedEntry);
     }
 }

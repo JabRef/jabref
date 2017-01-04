@@ -120,8 +120,7 @@ public class InspecImporter extends Importer {
                     }
                 }
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
-            // create one here
+            BibEntry b = new BibEntry(type);
             b.setField(h);
 
             bibitems.add(b);
