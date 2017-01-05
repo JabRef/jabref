@@ -61,7 +61,7 @@ public class MetaDataSerializer {
             StringBuilder stringBuilder = new StringBuilder();
             for (String dataItem : metaItem.getValue()) {
                 stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
-
+                
                 //in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)

@@ -564,7 +564,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void roundtripWithContentSelectorsAndUmlauts() throws IOException, SaveException {
-        String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\"U}mlaut;}" + OS.NEWLINE;
+        String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\\\"U}mlaut;}" + OS.NEWLINE;
         Charset encoding = StandardCharsets.UTF_8;
 
         ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));

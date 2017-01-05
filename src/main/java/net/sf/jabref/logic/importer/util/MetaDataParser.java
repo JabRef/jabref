@@ -16,6 +16,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.metadata.ContentSelectors;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +54,7 @@ public class MetaDataParser {
                 metaData.setUserFileDirectory(user, getSingleItem(value));
                 continue;
             } else if(entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)){
-                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), entry.getValue()));
+                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
             }
 
