@@ -16,6 +16,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Fixed
 - The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
 - Backslashes in content selectors are now corretly escaped. Fixes [#2426](https://github.com/JabRef/jabref/issues/2426).
+- Non-ISO timestamp settings prevented the opening of the entry editor (see [#2447](https://github.com/JabRef/jabref/issues/2447))
+
 
 ### Removed
 

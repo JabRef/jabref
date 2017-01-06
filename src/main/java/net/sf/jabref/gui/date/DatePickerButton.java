@@ -79,6 +79,9 @@ public class DatePickerButton implements DateChangeListener {
      * @param dateString
      */
     public void updateDatePickerDate(String dateString) {
+        // unregister DateChangeListener before update to prevent circular calls resulting in IllegalStateExceptions
+        datePicker.removeDateChangeListener(this);
+
         if(dateString!=null && !dateString.isEmpty()) {
             try {
                 datePicker.setDate(LocalDate.parse(dateString, dateTimeFormatter));
@@ -87,5 +90,7 @@ public class DatePickerButton implements DateChangeListener {
                         + "Clear button in calender popup will not work.");
             }
         }
+
+        datePicker.addDateChangeListener(this);
     }
 }
