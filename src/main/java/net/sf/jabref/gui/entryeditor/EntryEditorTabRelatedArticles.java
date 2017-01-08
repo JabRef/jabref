@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
+
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.importer.FetcherException;
