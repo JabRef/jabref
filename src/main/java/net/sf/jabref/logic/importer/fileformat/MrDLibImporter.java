@@ -8,7 +8,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +44,7 @@ public class MrDLibImporter extends Importer {
      */
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        String recommendationsAsString = BufferedReaderToParsableString(input);
+        String recommendationsAsString = convertToString(input);
         // check for valid format
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -54,8 +53,7 @@ public class MrDLibImporter extends Importer {
                 // No Processing here. Just check for valid xml.
             };
 
-            try {
-                InputStream stream = new ByteArrayInputStream(recommendationsAsString.toString().getBytes());
+            try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.toString().getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
@@ -72,22 +70,22 @@ public class MrDLibImporter extends Importer {
     }
 
     /**
-     * The SaxParser needs s String. So I convert it here.
-     * @param input
-     * @return
+     * The SaxParser needs this String. So I convert it here.
+     * @param Takes a BufferedReader with a reference to the XML document delivered by mdl server.
+     * @return Returns an String containing the XML file.
      * @throws IOException
      */
-    private String BufferedReaderToParsableString(BufferedReader input) throws IOException {
+    private String convertToString(BufferedReader input) throws IOException {
         String line;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stringBuilder = new StringBuilder();
         try {
             while ((line = input.readLine()) != null) {
-                sb.append(line);
+                stringBuilder.append(line);
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
-        return sb.toString();
+        return stringBuilder.toString();
 
     }
 
@@ -99,7 +97,7 @@ public class MrDLibImporter extends Importer {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse
-        String recommendations = BufferedReaderToParsableString(input);
+        String recommendations = convertToString(input);
         // The list ob BibEntries with its associated rank
         List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
         // The sorted BibEntries gets stored here later
@@ -127,37 +125,37 @@ public class MrDLibImporter extends Importer {
                 public void startElement(String uri, String localName, String qName, Attributes attributes)
                         throws SAXException {
 
-                    if (qName.equalsIgnoreCase("related_article")) {
+                    switch (qName.toLowerCase()) {
+                    case "related_article":
                         currentEntry = new BibEntry();
-                    }
-                    if (qName.equalsIgnoreCase("authors")) {
-                        authors = true;
-                    }
-                    if (qName.equalsIgnoreCase("published_in")) {
-                        published_in = true;
-                    }
-                    if (qName.equalsIgnoreCase("title")) {
-                        title = true;
-                    }
-                    if (qName.equalsIgnoreCase("year")) {
-                        year = true;
-                    }
-                    if (qName.equalsIgnoreCase("type")) {
-                        type = true;
-                    }
-                    //-----------
-                    if (qName.equalsIgnoreCase("related_article")) {
                         htmlSnippetSingle = null;
                         htmlSnippetSingleRank = -1;
+                        break;
+                    case "authors":
+                        authors = true;
+                        break;
+                    case "published_in":
+                        published_in = true;
+                        break;
+                    case "title":
+                        title = true;
+                        break;
+                    case "year":
+                        year = true;
+                        break;
+                    case "type":
+                        type = true;
+                        break;
+                    case "suggested_rank":
+                        rank = true;
+                        break;
+                    default:
+                        break;
                     }
                     if (qName.equalsIgnoreCase("snippet")
                             && attributes.getValue(0).equalsIgnoreCase("html_fully_formatted")) {
                         snippet = true;
                     }
-                    if (qName.equalsIgnoreCase("suggested_rank")) {
-                        rank = true;
-                    }
-
                 }
 
                 @Override
@@ -187,7 +185,6 @@ public class MrDLibImporter extends Importer {
                         currentEntry.setField("year", new String(ch, start, length));
                         year = false;
                     }
-                    // -------------
                     if (rank) {
                         htmlSnippetSingleRank = Integer.parseInt(new String(ch, start, length));
                         rank = false;
@@ -201,24 +198,15 @@ public class MrDLibImporter extends Importer {
 
             };
 
-            try {
-                InputStream stream = new ByteArrayInputStream(recommendations.getBytes());
+            try (InputStream stream = new ByteArrayInputStream(recommendations.getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
-            rankedBibEntries.sort(new Comparator<RankedBibEntry>() {
-
-                @Override
-                public int compare(RankedBibEntry o1, RankedBibEntry o2) {
-                    return o1.rank.compareTo(o2.rank);
-                }
-            });
-
-
+            rankedBibEntries.sort((RankedBibEntry rankedBibEntry1,
+                    RankedBibEntry rankedBibEntry2) -> rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank));
             bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
         } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error(e.getMessage(), e);
             LOGGER.error(e.getMessage(), e);
         }
 
@@ -256,9 +244,7 @@ public class MrDLibImporter extends Importer {
 
 
     /**
-     * Small pair-class to ensure the right order of the recommendations
-     *
-     *
+     * Small pair-class to ensure the right order of the recommendations.
      */
     private class RankedBibEntry {
 

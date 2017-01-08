@@ -13,8 +13,6 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -72,8 +70,10 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         StringBuffer htmlContent = new StringBuffer();
         URL url = IconTheme.getIconUrl("mdlListIcon");
         htmlContent
-                .append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8><ul style='list-style-image:("
-                        + url + ")'>");
+                .append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
+        htmlContent.append("<ul style='list-style-image:(");
+        htmlContent.append(url);
+        htmlContent.append(")'>");
         for (BibEntry bibEntry : list) {
             if (bibEntry != null) {
                 htmlContent.append("<li>");
@@ -82,8 +82,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
             }
         }
         htmlContent.append("</ul></font></body></html>");
-        System.out.println(htmlContent.toString());
         this.setText(htmlContent.toString());
+
     }
 
     /**
@@ -105,23 +105,21 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Makes the Hyperlinks clickable. Opens the link destination in a Browsertab
      */
     private void registerHyperlinkListener() {
-        this.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    try {
-                        if (e.getURL() != null) {
-                            new JabRefDesktop().openBrowser(e.getURL().toString());
-                        }
-                    } catch (IOException e1) {
-                        LOGGER.error(e1.getMessage(), e1);
+        System.out.println("try to register hyperlinkL");
+        this.addHyperlinkListener(e -> {
+            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                try {
+                    if (e.getURL() != null) {
+                        System.out.println("call browser with: " + e.getURL().toString());
+                        new JabRefDesktop().openBrowser(e.getURL().toString());
                     }
+                } catch (IOException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                    System.out.println("hyperlink failed: " + e1.getMessage());
                 }
             }
         });
     }
-
 
     /**
      * Starts a Fetcher getting the recommendations form Mr. DLib
@@ -133,19 +131,14 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
             mdlFetcher.execute();
             mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
 
-                // todo
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                         try {
                             relatedArticles = mdlFetcher.get();
                             setHtmlText(relatedArticles);
-                        } catch (InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        } catch (ExecutionException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                        } catch (InterruptedException | ExecutionException e) {
+                            LOGGER.error(e.getMessage(), e);
                         }
                     }
 
@@ -158,11 +151,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         }
     }
 
-
     /**
      * Helper Class to initiate SwingWorker
-     *
-     *
      */
     class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
 
