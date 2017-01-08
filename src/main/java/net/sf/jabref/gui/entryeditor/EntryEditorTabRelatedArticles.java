@@ -31,10 +31,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     //The entry the user selects in the table
     private final BibEntry selectedEntry;
 
-    //The Fetcher delivers the recommendatinos
+    //The Fetcher delivers the recommendatinons
     private MrDLibFetcherWorker mdlFetcher;
-
-    private static final String RECOMMENDATION_SEPERATOR = "<br>";
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
 
@@ -51,7 +49,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     /**
      * Takes the selected entry, runs a request to Mr. DLib and returns the recommendations as a JEditorPane
-     * @param selectedEntry
+     * @param The entry selected by the user
      */
     public EntryEditorTabRelatedArticles(BibEntry selectedEntry) {
         this.selectedEntry = selectedEntry;
@@ -63,8 +61,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
 
     /**
-     * Takes a List of html snippets and sets it in the JEditorPane
-     * @param list
+     * Takes a List of HTML snippets and sets it in the JEditorPane
+     * @param list of HTML Strings
      */
     public void setHtmlText(List<BibEntry> list) {
         StringBuffer htmlContent = new StringBuffer();
@@ -105,17 +103,14 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Makes the Hyperlinks clickable. Opens the link destination in a Browsertab
      */
     private void registerHyperlinkListener() {
-        System.out.println("try to register hyperlinkL");
         this.addHyperlinkListener(e -> {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
                     if (e.getURL() != null) {
-                        System.out.println("call browser with: " + e.getURL().toString());
                         new JabRefDesktop().openBrowser(e.getURL().toString());
                     }
                 } catch (IOException e1) {
                     LOGGER.error(e1.getMessage(), e1);
-                    System.out.println("hyperlink failed: " + e1.getMessage());
                 }
             }
         });
@@ -123,7 +118,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     /**
      * Starts a Fetcher getting the recommendations form Mr. DLib
-     * @param selectedEntry
      */
     public void requestRecommendations() {
         try {

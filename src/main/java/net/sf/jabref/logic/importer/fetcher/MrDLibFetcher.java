@@ -35,7 +35,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 
 /**
- *
+ *  This class is responible to get the recommendations from MDL
  *
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
@@ -82,17 +82,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     /**
      * Contact the server with the title of the selected item
-     * @param query
-     * @return Returns the server respons. This is an XML document as a String.
+     * @param query: The query holds the title of the selected entry. Used to make a query to the MDL Server
+     * @return Returns the server response. This is an XML document as a String.
      * @throws FetcherException
      */
     private String makeServerRequest(String query) throws FetcherException {
         query = constructQuery(query);
         String response = "";
-
-        //Makes a request to the RESTful MDL-API. Example document.
-        //Servers-side functionality in implementation.
-
         SSLContext sslContext = null;
 
         try {
@@ -112,13 +108,12 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                 throw new FetcherException(e.getMessage(), Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"),
                         e);
             }
-            //Conversion. Server delivers false format, conversion here
+            //Conversion of < and >
             response = response.replaceAll("&gt;", ">");
             response = response.replaceAll("&lt;", "<");
         } catch (IOException e1) {
             LOGGER.error(e1.getMessage(), e1);
         }
-        System.out.println("response: " + response);
         return response;
     }
 
@@ -129,7 +124,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      */
     private String constructQuery(String query) {
         StringBuffer queryBuffer = new StringBuffer();
-        queryBuffer.append("http://api-dev.mr-dlib.org/feyer/documents/");
+        queryBuffer.append("http://api-dev.mr-dlib.org/v1/documents/");
         try {
             queryBuffer.append(URLEncoder.encode(query, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -140,7 +135,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryBuffer.append("&app_id=jabref_desktop");
         queryBuffer.append("&app_version=" + VERSION);
         queryBuffer.append("&app_lang=" + LANGUAGE);
-        System.out.println("query: " + queryBuffer.toString());
         return queryBuffer.toString();
     }
 
