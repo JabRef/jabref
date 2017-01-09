@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JabRefExecutorService implements Executor {
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
+    private static final Log LOGGER = LogFactory.getLog(JabRefExecutorService.class);
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
 
