@@ -2,12 +2,9 @@ package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.strings.LatexToUnicode;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class MainTableNameFormatter {
-
-    private static final LatexToUnicode latexToUnicode = new LatexToUnicode();
 
     /**
      * Format a name field for the table, according to user preferences.
@@ -15,7 +12,7 @@ public class MainTableNameFormatter {
      * @param nameToFormat The contents of the name field.
      * @return The formatted name field.
      */
-    public static String formatName(String nameToFormat) {
+    public static String formatName(final String nameToFormat) {
         if (nameToFormat == null) {
             return null;
         }
@@ -27,8 +24,6 @@ public class MainTableNameFormatter {
         final boolean namesFf = Globals.prefs.getBoolean(JabRefPreferences.NAMES_FIRST_LAST);
 
         final boolean abbrAuthorNames = Globals.prefs.getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES); //MK:
-
-        nameToFormat = latexToUnicode.format(nameToFormat);
 
         if (namesAsIs) {
             return nameToFormat;
