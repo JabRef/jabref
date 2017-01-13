@@ -115,7 +115,7 @@ public class MedlineFetcherTest {
         bibEntrySari.setField("keywords", "Antibodies, Protozoan; Antibodies, Viral, immunology; Coinfection, epidemiology, immunology; Female; HIV Infections, epidemiology; HTLV-I Antibodies, immunology; HTLV-I Infections, epidemiology, immunology; HTLV-II Antibodies, immunology; HTLV-II Infections, epidemiology, immunology; Hepatitis Antibodies, immunology; Hepatitis B Antibodies, immunology; Hepatitis C Antibodies, immunology; Hepatitis Delta Virus, immunology; Hepatitis, Viral, Human, epidemiology, immunology; Humans; Immunoglobulin G, immunology; Immunoglobulin M, immunology; Indonesia, epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma, immunology; Toxoplasmosis, epidemiology, immunology");
         bibEntrySari.setField("month", "#nov#");
         bibEntrySari.setField("pubstatus", "ppublish");
-        bibEntrySari.setField("revised", "2016-02-12");
+        bibEntrySari.setField("revised", "2017-01-10");
         bibEntrySari.setField("nlm-id", "0266303");
         bibEntrySari.setField("owner", "NLM");
         bibEntrySari.setField("pages", "977--985");
