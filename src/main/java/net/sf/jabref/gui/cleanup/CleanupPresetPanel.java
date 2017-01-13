@@ -1,7 +1,9 @@
 package net.sf.jabref.gui.cleanup;
 
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
@@ -35,8 +37,6 @@ public class CleanupPresetPanel {
     private JPanel panel;
     private CleanupPreset cleanupPreset;
 
-
-
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
         this.cleanupPreset = Objects.requireNonNull(cleanupPreset);
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -47,15 +47,17 @@ public class CleanupPresetPanel {
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         cleanUpISSN = new JCheckBox(Localization.lang("Reformat ISSN"));
-        if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+
+        Optional<Path> firstExistingDir = databaseContext
+                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFileDirectoryPreferences());
+        if (firstExistingDir.isPresent()) {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
-                    databaseContext.getMetaData().getDefaultFileDirectory().get()));
+                    firstExistingDir.get().toString()));
         } else {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
             cleanUpMovePDF.setEnabled(false);
             cleanUpMovePDF.setSelected(false);
         }
-
 
         cleanUpMakePathsRelative = new JCheckBox(
                 Localization.lang("Make paths of linked files relative (if possible)"));

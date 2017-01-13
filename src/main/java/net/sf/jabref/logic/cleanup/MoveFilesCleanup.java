@@ -43,12 +43,14 @@ public class MoveFilesCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        if (!databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+        Optional<Path> firstExistingFileDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+
+        if (!firstExistingFileDir.isPresent()) {
             return Collections.emptyList();
         }
 
         List<String> paths = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
+        String defaultFileDirectory = firstExistingFileDir.get().toString();
         Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
 
         if (!targetDirectory.isPresent()) {

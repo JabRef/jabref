@@ -14,8 +14,8 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MoveFilesCleanupTest {
 
@@ -35,12 +36,11 @@ public class MoveFilesCleanupTest {
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
     private MoveFilesCleanup cleanup;
-    private JabRefPreferences prefs;
     private BibEntry entry;
+    private FileDirectoryPreferences fileDirPrefs;
 
     @Before
     public void setUp() throws IOException {
-        prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         pdfFolder = bibFolder.newFolder();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
@@ -50,6 +50,8 @@ public class MoveFilesCleanupTest {
         entry.setCiteKey("Toot");
         entry.setField("title", "test title");
 
+        fileDirPrefs = mock(FileDirectoryPreferences.class);
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false); //Biblocation as Primary overwrites all other dirs, therefore we set it to false here
     }
 
     @Test
@@ -61,7 +63,7 @@ public class MoveFilesCleanupTest {
 
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
-        cleanup = new MoveFilesCleanup(databaseContext, "", prefs.getFileDirectoryPreferences(),
+        cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
@@ -84,7 +86,7 @@ public class MoveFilesCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(
                 Arrays.asList(new ParsedFileField("", "", ""), fileField, new ParsedFileField("", "", ""))));
 
-        cleanup = new MoveFilesCleanup(databaseContext, "", prefs.getFileDirectoryPreferences(),
+        cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
@@ -109,7 +111,7 @@ public class MoveFilesCleanupTest {
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", prefs.getFileDirectoryPreferences(),
+        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
