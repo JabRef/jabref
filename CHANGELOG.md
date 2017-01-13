@@ -8,28 +8,17 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
+
 ## [Unreleased]
 
 ### Changed
-- When [adding a new entry](http://help.jabref.org/en/BaseFrame#adding-a-new-entry), one can select "title" to create a full BibTeX entry based on a title.
-- When editing an article, the tab "Optional fields" now shows "ISSN".
-- When editing a book, the tab "Optional fields" now shows "ISBN".
-- When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
-- When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
-- When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests.
-- The entry received from DOI does no longer contain the DOI as URL. Implements [#2417](https://github.com/JabRef/jabref/issues/2417).
-- We use following parameters for the JVM on Windows and OSX: `-XX:+UseG1GC -XX:+UseStringDeduplication -XX:StringTableSize=1000003`.
 
 ### Fixed
-- Fixed [#2391](https://github.com/JabRef/jabref/issues/2391): Clicking on "Get Fulltext" button sets links correctly for the entry being edited.
-- The integrity check now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
-- We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
-- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. However, clearing with the clear button is not possible if timestamp format does not match the current settings. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
-- Fixes [#2406](https://github.com/JabRef/jabref/issues/2406) so that the integrity check filter works again
-- Closing of subtrees in the groups panel using "close subtree" is working again. Fixes [#2319](https://github.com/JabRef/jabref/issues/2319).
-- The proxy settings are now also applied to HTTPS connections. Fixes [#2249](https://github.com/JabRef/jabref/issues/2249).
-
-
+- The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
+- Backslashes in content selectors are now correctly escaped. Fixes [#2426](https://github.com/JabRef/jabref/issues/2426).
+- Non-ISO timestamp settings prevented the opening of the entry editor (see [#2447](https://github.com/JabRef/jabref/issues/2447))
+- When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused the text will be selected.
+- LaTeX symbols are now displayed as Unicode for the author column in the main table. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
 
 ### Removed
 
@@ -72,6 +61,38 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+## [3.8.1] – 2016-12-24
+
+### Changed
+- When [adding a new entry](https://help.jabref.org/en/BaseFrame#adding-a-new-entry), one can select "title" to create a full BibTeX entry based on a title.
+- When [editing](https://help.jabref.org/en/EntryEditor) an article, the tab "Optional fields" now shows "ISSN".
+- When editing a book, the tab "Optional fields" now shows "ISBN".
+- When using "Copy citation (HTML)" and pasting into a text editor, plain text is always pasted.
+- When using the "Download from URL" functionality, one is not limited to http(s) URLs, but can, for instance, enter ftp URLs.
+- When using the "Look up full text documents" functionality, JabRef warns more explicitly about multiple requests.
+- The entry received from DOI does no longer contain the DOI as URL. Implements [#2417](https://github.com/JabRef/jabref/issues/2417).
+- We use following parameters for the JVM on Windows and OSX: `-XX:+UseG1GC -XX:+UseStringDeduplication -XX:StringTableSize=1000003`.
+
+### Fixed
+- Clicking on "Get Fulltext" button sets links correctly for the entry being edited. Fixes [#2391](https://github.com/JabRef/jabref/issues/2391).
+- The [integrity check](https://help.jabref.org/en/CheckIntegrity) now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
+- The integrity check filter works again. Fixes [#2406](https://github.com/JabRef/jabref/issues/2406).
+- The [ArXiv fetcher](http://help.jabref.org/en/arXiv) also accepts identifiers that include the "arXiv:" prefix. Fixes [#2427](https://github.com/JabRef/jabref/issues/2427).
+- We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
+- Closing of subtrees in the groups panel using "close subtree" is working again. Fixes [#2319](https://github.com/JabRef/jabref/issues/2319).
+- We fixed issues with the [timestamp](http://help.jabref.org/en/TimeStamp) field. However, clearing with the clear button is not possible if timestamp format does not match the current settings. Fixes [#2403](https://github.com/JabRef/jabref/issues/2403).
+- The proxy settings are now also applied to HTTPS connections. Fixes [#2249](https://github.com/JabRef/jabref/issues/2249).
 
 
 ## [3.8] – 2016-12-16
@@ -722,7 +743,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v3.8...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1
 [3.8]: https://github.com/JabRef/jabref/compare/v3.7...v3.8
 [3.7]: https://github.com/JabRef/jabref/compare/v3.6...v3.7
 [3.6]: https://github.com/JabRef/jabref/compare/v3.5...v3.6

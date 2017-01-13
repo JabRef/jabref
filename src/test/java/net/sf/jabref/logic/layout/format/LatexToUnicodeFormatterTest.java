@@ -87,4 +87,9 @@ public class LatexToUnicodeFormatterTest {
     public void unknownCommandWithEmptyArgumentIsKept() {
         assertEquals("aaaa", formatter.format("\\aaaa{}"));
     }
+
+    @Test
+    public void testTildeN () {
+        assertEquals("Montaña", formatter.format("Monta\\~{n}a"));
+    }
 }
