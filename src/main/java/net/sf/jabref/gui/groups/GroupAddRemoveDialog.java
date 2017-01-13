@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 
@@ -136,31 +135,33 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
-    private void expandAll(final JTree tree, final boolean expand) {
+    private void expandAll(final JTree subtree, final boolean expand) {
         SwingUtilities.invokeLater(() -> {
-            TreeNode root = ((TreeNode) tree.getModel().getRoot());
+            TreeNode root = ((TreeNode) subtree.getModel().getRoot());
             // walk through the tree, beginning at the root:
-            expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
+            expandAll(subtree, new TreePath(((DefaultTreeModel) subtree.getModel()).getPathToRoot(root)), expand);
             tree.requestFocusInWindow();
         });
     }
 
-    private void expandAll(final JTree tree, final TreePath parent, final boolean expand) {
+    private void expandAll(final JTree subtree, final TreePath parent, final boolean expand) {
         // walk through the children:
         TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
-                TreeNode n = (TreeNode) e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                expandAll(tree, path, expand);
+        int numChildren = node.getChildCount();
+        if (numChildren > 0) {
+            for (int i = 0; i < numChildren; i++) {
+                TreeNode child = node.getChildAt(i);
+                TreePath path = parent.pathByAddingChild(child);
+                expandAll(subtree, path, expand);
             }
-
         }
         // "expand" / "collapse" occurs from bottom to top:
         if (expand) {
             tree.expandPath(parent);
         } else {
-            tree.collapsePath(parent);
+            if (node.getParent() != null) {
+                tree.collapsePath(parent);
+            }
         }
     }
 
