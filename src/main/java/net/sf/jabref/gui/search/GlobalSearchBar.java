@@ -304,6 +304,7 @@ public class GlobalSearchBar extends JPanel {
 
         if (currentBasePanel != null) {
             currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+            currentBasePanel.setCurrentSearchQuery(null);
         }
 
         if (dontSelectSearchBar){

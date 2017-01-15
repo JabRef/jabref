@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Non-ISO timestamp settings prevented the opening of the entry editor (see [#2447](https://github.com/JabRef/jabref/issues/2447))
 - When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused the text will be selected.
 - LaTeX symbols are now displayed as Unicode for the author column in the main table. "'n" and "\'{n}" are parsed correctly. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
+- If one deleted the current query it was not saved (every basepanel can have it's own query). Fixes [#2468](https://github.com/JabRef/jabref/issues/2468).
 
 ### Removed
 
