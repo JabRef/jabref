@@ -7,8 +7,6 @@ import java.util.Objects;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 public class IntegrityCheck {
@@ -43,41 +41,21 @@ public class IntegrityCheck {
             return result;
         }
 
-        result.addAll(new AuthorNameChecker().check(entry));
+        for (FieldChecker checker : FieldCheckers.getAll(bibDatabaseContext, fileDirectoryPreferences)) {
+            result.addAll(checker.check(entry));
+        }
 
-        // BibTeX only checkers
         if (!bibDatabaseContext.isBiblatexMode()) {
-            result.addAll(new TitleChecker().check(entry));
-            result.addAll(new PagesChecker().check(entry));
+            // BibTeX only checkers
             result.addAll(new ASCIICharacterChecker().check(entry));
             result.addAll(new NoBibtexFieldChecker().check(entry));
             result.addAll(new BibTeXEntryTypeChecker().check(entry));
-        } else {
-            result.addAll(new BiblatexPagesChecker().check(entry));
         }
 
-        result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
-        result.addAll(new YearChecker().check(entry));
         result.addAll(new BibtexkeyChecker().check(entry));
-        result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
-        result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
-        result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));
-        result.addAll(new MonthChecker(bibDatabaseContext).check(entry));
-        result.addAll(new UrlChecker().check(entry));
-        result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));
-        for (String journalField : InternalBibtexFields.getJournalNameFields()) {
-            result.addAll(new AbbreviationChecker(journalField).check(entry));
-        }
-        for (String bookNameField : InternalBibtexFields.getBookNameFields()) {
-            result.addAll(new AbbreviationChecker(bookNameField).check(entry));
-        }
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
-        result.addAll(new BooktitleChecker().check(entry));
-        result.addAll(new ISSNChecker().check(entry));
-        result.addAll(new ISBNChecker().check(entry));
-        result.addAll(new DOIValidityChecker().check(entry));
         result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
         result.addAll(new BibtexkeyDeviationChecker(bibDatabaseContext, bibtexKeyPatternPreferences).check(entry));
 

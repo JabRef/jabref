@@ -8,27 +8,27 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseContext;
 
-public class NoteChecker implements ValueChecker {
+public class HowPublishedChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
 
-    private final BibDatabaseContext bibDatabaseContextEdition;
+    private final BibDatabaseContext databaseContext;
 
 
-    public NoteChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+    public HowPublishedChecker(BibDatabaseContext databaseContext) {
+        this.databaseContext = Objects.requireNonNull(databaseContext);
     }
 
     /**
-     * BibLaTeX package documentation (Section 4.9.1):
-     * The BibLaTeX package will automatically capitalize the first word when required at the beginning of a sentence.
      * Official BibTeX specification:
-     * note: Any additional information that can help the reader. The first word should be capitalized.
+     *  HowPublished: How something strange has been published. The first word should be capitalized.
+     * BibLaTeX package documentation (Section 4.9.1):
+     *  The BibLaTeX package will automatically capitalize the first word when required at the beginning of a sentence.
      */
     @Override
     public Optional<String> checkValue(String value) {
         //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+        if (!databaseContext.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));
         }
 
