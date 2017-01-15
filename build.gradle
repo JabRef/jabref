@@ -134,6 +134,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.3.0'
     testCompile 'com.github.tomakehurst:wiremock:2.4.1'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
+    testCompile 'org.reflections:reflections:0.9.10'
 }
 
 sourceSets {

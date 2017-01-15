@@ -9,6 +9,7 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.WebFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
@@ -52,22 +53,23 @@ public class EntryFetchers {
         return Collections.unmodifiableList(this.entryFetchers);
     }
 
-    public static ArrayList<IdBasedFetcher> getIdFetchers() {
+    public static ArrayList<IdBasedFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
-        list.add(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences()));
-        list.add(new IsbnFetcher(Globals.prefs.getImportFormatPreferences()));
-        list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
-        list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));
+        list.add(new ArXiv(importFormatPreferences));
+        list.add(new AstrophysicsDataSystem(importFormatPreferences));
+        list.add(new IsbnFetcher(importFormatPreferences));
+        list.add(new DiVA(importFormatPreferences));
+        list.add(new DoiFetcher(importFormatPreferences));
         list.add(new MedlineFetcher());
-        list.add(new TitleFetcher(Globals.prefs.getImportFormatPreferences()));
+        list.add(new TitleFetcher(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
 
-    public static ArrayList<EntryBasedFetcher> getEntryBasedFetchers() {
+    public static ArrayList<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<EntryBasedFetcher> list = new ArrayList<>();
-        list.add(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences()));
-        list.add(new MathSciNet(Globals.prefs.getImportFormatPreferences()));
+        list.add(new AstrophysicsDataSystem(importFormatPreferences));
+        list.add(new MathSciNet(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
