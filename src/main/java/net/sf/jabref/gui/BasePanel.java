@@ -2415,11 +2415,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param currentSearchQuery can be null
      */
     public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
-        if (currentSearchQuery == null) {
-            this.currentSearchQuery = Optional.empty();
-        } else {
-            this.currentSearchQuery = Optional.of(currentSearchQuery);
-        }
+        this.currentSearchQuery = Optional.ofNullable(currentSearchQuery);
     }
 
     public CitationStyleCache getCitationStyleCache() {
