@@ -207,7 +207,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private ContentAutoCompleters autoCompleters;
 
-    private SearchQuery currentSearchQuery;
+    /** the query the user searches when this basepanel is active */
+    private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
@@ -2405,12 +2406,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return bibDatabaseContext;
     }
 
-    public SearchQuery getCurrentSearchQuery() {
+    public Optional<SearchQuery> getCurrentSearchQuery() {
         return currentSearchQuery;
     }
 
+    /**
+     * Set the query the user currently searches while this basepanel is active
+     * @param currentSearchQuery can be null
+     */
     public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
-        this.currentSearchQuery = currentSearchQuery;
+        if (currentSearchQuery == null) {
+            this.currentSearchQuery = Optional.empty();
+        } else {
+            this.currentSearchQuery = Optional.of(currentSearchQuery);
+        }
     }
 
     public CitationStyleCache getCitationStyleCache() {
