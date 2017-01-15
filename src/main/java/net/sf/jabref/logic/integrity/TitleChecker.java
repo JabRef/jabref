@@ -1,22 +1,22 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.database.BibDatabaseContext;
 
-public class TitleChecker extends FieldChecker {
+public class TitleChecker implements ValueChecker {
 
     private static final Pattern INSIDE_CURLY_BRAKETS = Pattern.compile("\\{[^}\\{]*\\}");
     private static final Predicate<String> HAS_CAPITAL_LETTERS = Pattern.compile("[\\p{Lu}\\p{Lt}]").asPredicate();
 
-    public TitleChecker() {
-        super(FieldName.TITLE);
+    private final BibDatabaseContext databaseContext;
+
+    public TitleChecker(BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
     }
 
     /**
@@ -27,7 +27,11 @@ public class TitleChecker extends FieldChecker {
      * - check if at least one capital letter is in the title
      */
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
+        if (databaseContext.isBiblatexMode()) {
+            return Optional.empty();
+        }
+
         String valueTrimmed = value.trim();
         String valueIgnoringFirstLetter = valueTrimmed.startsWith("{") ? valueTrimmed : valueTrimmed.substring(1);
         String valueOnlySpacesWithinCurlyBraces = valueIgnoringFirstLetter;
@@ -43,11 +47,9 @@ public class TitleChecker extends FieldChecker {
                 .test(valueOnlySpacesWithinCurlyBraces);
 
         if (hasCapitalLettersThatBibtexWillConvertToSmallerOnes) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("capital letters are not masked using curly brackets {}"),
-                            entry, FieldName.TITLE));
+            return Optional.of(Localization.lang("capital letters are not masked using curly brackets {}"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

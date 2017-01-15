@@ -1,26 +1,17 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-public class UrlChecker extends FieldChecker {
-
-    public UrlChecker() {
-        super(FieldName.URL);
-    }
+public class UrlChecker implements ValueChecker {
 
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         if (!value.contains("://")) {
-            return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry,
-                    FieldName.URL));
+            return Optional.of(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...");
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

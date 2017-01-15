@@ -1,36 +1,26 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISBN;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 
-public class ISBNChecker extends FieldChecker {
-
-
-    public ISBNChecker() {
-        super(FieldName.ISBN);
-    }
+public class ISBNChecker implements ValueChecker {
 
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         // Check that the ISBN is on the correct form
         ISBN isbn = new ISBN(value);
 
         if (!isbn.isValidFormat()) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISBN));
+            return Optional.of(Localization.lang("incorrect format"));
         }
 
         if (!isbn.isValidChecksum()) {
-            return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISBN));
+            return Optional.of(Localization.lang("incorrect control digit"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

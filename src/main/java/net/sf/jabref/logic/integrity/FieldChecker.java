@@ -2,15 +2,19 @@ package net.sf.jabref.logic.integrity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.util.OptionalUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
-public abstract class FieldChecker implements IntegrityCheck.Checker {
+public class FieldChecker implements IntegrityCheck.Checker {
     protected final String field;
+    private final ValueChecker checker;
 
-    public FieldChecker(String field) {
+    public FieldChecker(String field, ValueChecker checker) {
         this.field = field;
+        this.checker = Objects.requireNonNull(checker);
     }
 
     @Override
@@ -20,8 +24,6 @@ public abstract class FieldChecker implements IntegrityCheck.Checker {
             return Collections.emptyList();
         }
 
-        return checkValue(value.get(), entry);
+        return OptionalUtil.toList(checker.checkValue(value.get()).map(message -> new IntegrityMessage(message, entry, field)));
     }
-
-    protected abstract List<IntegrityMessage> checkValue(String value, BibEntry entry);
 }

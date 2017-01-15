@@ -1,26 +1,18 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-public class BooktitleChecker extends FieldChecker {
-
-    public BooktitleChecker() {
-        super(FieldName.BOOKTITLE);
-    }
+public class BooktitleChecker implements ValueChecker {
 
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         if (value.toLowerCase(Locale.ENGLISH).endsWith("conference on")) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("booktitle ends with 'conference on'"), entry, field));
+            return Optional.of(Localization.lang("booktitle ends with 'conference on'"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

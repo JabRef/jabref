@@ -1,25 +1,17 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 
-public class AbbreviationChecker extends FieldChecker {
-
-
-    public AbbreviationChecker(String field) {
-        super(field);
-    }
+public class AbbreviationChecker implements ValueChecker {
 
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         if (value.contains(".")) {
-            return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("abbreviation detected"), entry, field));
+            return Optional.of(Localization.lang("abbreviation detected"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

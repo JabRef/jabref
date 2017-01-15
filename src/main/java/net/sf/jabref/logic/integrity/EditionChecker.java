@@ -1,17 +1,14 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-public class EditionChecker extends FieldChecker {
+public class EditionChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
     private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9].+)$")
@@ -21,7 +18,6 @@ public class EditionChecker extends FieldChecker {
 
 
     public EditionChecker(BibDatabaseContext bibDatabaseContext) {
-        super(FieldName.EDITION);
         this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
     }
 
@@ -36,19 +32,17 @@ public class EditionChecker extends FieldChecker {
      * This should be an ordinal, and should have the first letter capitalized.
      */
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         //BibLaTeX
         if (bibDatabaseContextEdition.isBiblatexMode() && !ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
-            return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
+            return Optional.of(Localization.lang("should contain an integer or a literal"));
         }
 
         //BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
-            return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
+            return Optional.of(Localization.lang("should have the first letter capitalized"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

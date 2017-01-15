@@ -1,19 +1,13 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 
-public class BracketChecker extends FieldChecker {
-
-    public BracketChecker(String field) {
-        super(field);
-    }
+public class BracketChecker implements ValueChecker {
 
     @Override
-    protected List<IntegrityMessage> checkValue(String value, BibEntry entry) {
+    public Optional<String> checkValue(String value) {
         // metaphor: integer-based stack (push + / pop -)
         int counter = 0;
         for (char a : value.trim().toCharArray()) {
@@ -21,8 +15,7 @@ public class BracketChecker extends FieldChecker {
                 counter++;
             } else if (a == '}') {
                 if (counter == 0) {
-                    return Collections.singletonList(
-                            new IntegrityMessage(Localization.lang("unexpected closing curly bracket"), entry, field));
+                    return Optional.of(Localization.lang("unexpected closing curly bracket"));
                 } else {
                     counter--;
                 }
@@ -30,10 +23,9 @@ public class BracketChecker extends FieldChecker {
         }
 
         if (counter > 0) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("unexpected opening curly bracket"), entry, field));
+            return Optional.of(Localization.lang("unexpected opening curly bracket"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }
