@@ -185,7 +185,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         idTextField = new JTextField("");
         comboBox = new JComboBox<>();
 
-        EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -287,7 +287,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
-            fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
+            fetcher = EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);

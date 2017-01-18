@@ -92,4 +92,10 @@ public class LatexToUnicodeFormatterTest {
     public void testTildeN () {
         assertEquals("Montaña", formatter.format("Monta\\~{n}a"));
     }
+
+    @Test
+    public void testApostrophN () {
+        assertEquals("Maliński", formatter.format("Mali\\'{n}ski"));
+        assertEquals("Maliŉski", formatter.format("Mali'nski"));
+    }
 }

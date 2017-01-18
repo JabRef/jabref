@@ -1,39 +1,27 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.Optional;
 
-import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISSN;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 
-public class ISSNChecker implements Checker {
-
+public class ISSNChecker implements ValueChecker {
 
     @Override
-    public List<IntegrityMessage> check(BibEntry entry) {
-        if (!entry.hasField(FieldName.ISSN)) {
-            return Collections.emptyList();
-        }
-
+    public Optional<String> checkValue(String value) {
         // Check that the ISSN is on the correct form
-        String issnString = entry.getField(FieldName.ISSN).get().trim();
+        String issnString = value.trim();
 
         ISSN issn = new ISSN(issnString);
         if (!issn.isValidFormat()) {
-            return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISSN));
+            return Optional.of(Localization.lang("incorrect format"));
         }
 
         if (issn.isValidChecksum()) {
-            return Collections.emptyList();
+            return Optional.empty();
         } else {
-            return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISSN));
+            return Optional.of(Localization.lang("incorrect control digit"));
         }
     }
-
 }

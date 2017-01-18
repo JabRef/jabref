@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 public class MathSciNetTest {
 
     MathSciNet fetcher;
-    BibEntry ratiuEntry;
+    private BibEntry ratiuEntry;
 
     @Before
     public void setUp() throws Exception {
