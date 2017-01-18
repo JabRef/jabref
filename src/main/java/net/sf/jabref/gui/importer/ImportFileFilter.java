@@ -1,10 +1,10 @@
 package net.sf.jabref.gui.importer;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -13,6 +13,7 @@ import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
+
     private final String description;
     private final FileNameExtensionFilter fileFilter;
 
@@ -24,10 +25,11 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     public ImportFileFilter(String description, Collection<Importer> formats) {
         this.description = description;
-
         List<FileExtensions> extensions = formats.stream().map(p -> p.getExtensions()).collect(Collectors.toList());
-        List<String> flatExtensions = extensions.stream().flatMap(extList -> Stream.of(extList.getExtensions())).collect(Collectors.toList());
-        fileFilter = new FileNameExtensionFilter(description, flatExtensions.toArray(new String[flatExtensions.size()]));
+        List<String> flatExtensions = extensions.stream().flatMap(extList -> Arrays.stream(extList.getExtensions()))
+                .collect(Collectors.toList());
+        fileFilter = new FileNameExtensionFilter(description,
+                flatExtensions.toArray(new String[flatExtensions.size()]));
     }
 
     @Override
