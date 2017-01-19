@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
@@ -32,9 +33,11 @@ import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -47,7 +50,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(
+            new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences()));
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;
 
@@ -67,6 +71,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final String RESULTS_FOUND_PATTERN = "<div id=\"resfound\">";
     private static final String PAGE_RANGE_PATTERN = "<div class=\"pagerange\">";
+
+    private static final String START_BIBTEX_ENTRY = "@";
+    private static final String END_BIBTEX_ENTRY_HTML = "</pre>";
 
     private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
     private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
@@ -94,7 +101,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Pattern TITLE_PATTERN = Pattern.compile("<a href=.*?\">([^<]*)</a>");
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<div .*?>(.*?)</div>");
     private static final Pattern SOURCE_PATTERN = Pattern.compile("<span style=\"padding-left:10px\">([^<]*)</span>");
-
 
     @Override
     public JPanel getOptionsPanel() {
@@ -169,7 +175,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 break;
             }
             if (selentry.getValue()) {
-                downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry ->  {
+                downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry -> {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
                     entry.getField(FieldName.TITLE).ifPresent(title -> {
                         title = title.replace("\\&", "&").replace("\\#", "#");
@@ -223,8 +229,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         return sb.toString();
     }
 
-
-
     private void parse(String text, int hits, Map<String, JLabel> entries) {
         int entryNumber = 1;
         while (getNextEntryURL(text, entryNumber, entries) && (entryNumber <= hits)) {
@@ -251,8 +255,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         if (index >= 0) {
             String text = allText.substring(index, endIndex);
             // Always try RIS import first
-            Matcher fullCitation =
-                    ACMPortalFetcher.FULL_CITATION_PATTERN.matcher(text);
+            Matcher fullCitation = ACMPortalFetcher.FULL_CITATION_PATTERN.matcher(text);
             String item;
             if (fullCitation.find()) {
                 String link = getEntryBibTeXURL(fullCitation.group(1));
@@ -305,17 +308,23 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static Optional<BibEntry> downloadEntryBibTeX(String id, boolean downloadAbstract) {
         try {
-            URL url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END);
+            URL url = new URL(
+                    ACMPortalFetcher.START_URL + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END);
             URLConnection connection = url.openConnection();
 
             // set user-agent to avoid being blocked as a crawler
-            connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+            connection.addRequestProperty("User-Agent",
+                    "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
             Collection<BibEntry> items = null;
+
             try (BufferedReader in = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(in).getDatabase()
-                        .getEntries();
-            } catch (IOException e) {
+                String htmlCode = in.lines().filter(s -> !s.isEmpty()).collect(Collectors.joining());
+                String bibtexString = htmlCode.substring(htmlCode.indexOf(START_BIBTEX_ENTRY),
+                        htmlCode.indexOf(END_BIBTEX_ENTRY_HTML));
+                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
+
+            } catch (IOException | ParseException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
             }
             if ((items == null) || items.isEmpty()) {
@@ -338,7 +347,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             return Optional.of(entry);
         } catch (NoSuchElementException e) {
-            LOGGER.info("Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
+            LOGGER.info(
+                    "Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
                     e);
         } catch (MalformedURLException e) {
             LOGGER.info("Malformed URL.", e);
@@ -392,7 +402,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     public HelpFile getHelpPage() {
         return HelpFile.FETCHER_ACM;
     }
-
 
     // This method is called by the dialog when the user has canceled or
     //signaled a stop. It is expected that any long-running fetch operations
