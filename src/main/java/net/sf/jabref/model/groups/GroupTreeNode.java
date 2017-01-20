@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.TreeNode;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.SearchMatcher;
 import net.sf.jabref.model.search.matchers.MatcherSet;
@@ -196,7 +197,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param entries list of entries to be searched
      * @return number of hits
      */
-    public int numberOfMatches(List<BibEntry> entries) {
+    public int calculateNumberOfMatches(List<BibEntry> entries) {
         int hits = 0;
         SearchMatcher matcher = getSearchMatcher();
         for (BibEntry entry : entries) {
@@ -205,5 +206,14 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         }
         return hits;
+    }
+
+    /**
+     * Determines the number of entries in the specified database which are matched by this group.
+     * @param database database to be searched
+     * @return number of hits
+     */
+    public int calculateNumberOfMatches(BibDatabase database) {
+        return calculateNumberOfMatches(database.getEntries());
     }
 }
