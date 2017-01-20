@@ -588,8 +588,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
-
-
     }
 
     void addSearchListener(SearchQueryHighlightListener listener) {

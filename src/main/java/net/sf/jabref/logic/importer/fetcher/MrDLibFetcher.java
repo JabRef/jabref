@@ -20,10 +20,9 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.MrDLibImporter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.BuildInfo;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -46,11 +45,11 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
     private final String LANGUAGE;
     private final String VERSION;
-    private final JabRefPreferences prefs = JabRefPreferences.getInstance();
 
-    public MrDLibFetcher() {
-        LANGUAGE = prefs.get(JabRefPreferences.LANGUAGE);
-        VERSION = new BuildInfo().getVersion().getFullVersion();
+
+    public MrDLibFetcher(String language, String version) {
+        LANGUAGE = language;
+        VERSION = version;
     }
 
     @Override
@@ -61,7 +60,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        String response = makeServerRequest(entry.getLatexFreeField("title").get());
+        String response = makeServerRequest(entry.getLatexFreeField(FieldName.TITLE).get());
         MrDLibImporter importer = new MrDLibImporter();
         ParserResult parserResult = new ParserResult();
         try {
@@ -78,6 +77,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             }
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
+            throw new FetcherException("XML Parser IOException.");
         }
         return parserResult.getDatabase().getEntries();
     }
@@ -97,6 +97,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e1) {
             LOGGER.error(e1.getMessage(), e1);
+            throw new FetcherException("SSL Error.");
         }
 
         SSLConnectionSocketFactory sslSocketFacktory = new SSLConnectionSocketFactory(sslContext);
@@ -115,6 +116,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
             response = response.replaceAll("&lt;", "<");
         } catch (IOException e1) {
             LOGGER.error(e1.getMessage(), e1);
+            throw new FetcherException("IOException by trying to get HTTP response.");
         }
         return response;
     }

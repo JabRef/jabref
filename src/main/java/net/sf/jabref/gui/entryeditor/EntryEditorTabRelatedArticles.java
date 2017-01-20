@@ -3,8 +3,6 @@
  */
 package net.sf.jabref.gui.entryeditor;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -14,11 +12,14 @@ import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,9 +32,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     //The entry the user selects in the table
     private final BibEntry selectedEntry;
-
-    //The Fetcher delivers the recommendatinons
-    private MrDLibFetcherWorker mdlFetcher;
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
 
@@ -76,7 +74,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         for (BibEntry bibEntry : list) {
             if (bibEntry != null) {
                 htmlContent.append("<li>");
-                htmlContent.append(bibEntry.getLatexFreeField("html_representation").get());
+                bibEntry.getField("html_representation").ifPresent(htmlContent::append);
                 htmlContent.append("</li>");
             }
         }
@@ -93,10 +91,12 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         StringBuffer htmlContent = new StringBuffer();
         URL url = IconTheme.getIconUrl("mdlloading");
         htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
-        htmlContent.append("Loading Recommendations for ");
-        htmlContent.append(selectedEntry.getLatexFreeField("title").get());
-        htmlContent.append("<br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
-        htmlContent.append("</font></body></html>");
+        htmlContent.append(Localization.lang("Loading_Recommendations_for"));
+        htmlContent.append(": ");
+        htmlContent.append("<b>");
+        htmlContent.append(selectedEntry.getLatexFreeField(FieldName.TITLE).get());
+        htmlContent.append("</b><br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
+        htmlContent.append("</body></html>");
         this.setText(htmlContent.toString());
     }
 
@@ -121,26 +121,21 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Starts a Fetcher getting the recommendations form Mr. DLib
      */
     public void requestRecommendations() {
+        //The Fetcher delivers the recommendations
+        MrDLibFetcherWorker mdlFetcher;
         try {
             mdlFetcher = new MrDLibFetcherWorker(selectedEntry);
-            mdlFetcher.execute();
-            mdlFetcher.addPropertyChangeListener(new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-                        try {
-                            relatedArticles = mdlFetcher.get();
-                            setHtmlText(relatedArticles);
-                        } catch (InterruptedException | ExecutionException e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
+            mdlFetcher.addPropertyChangeListener(evt -> {
+                if (evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
+                    try {
+                        relatedArticles = mdlFetcher.get();
+                        setHtmlText(relatedArticles);
+                    } catch (InterruptedException | ExecutionException e) {
+                        LOGGER.error(e.getMessage(), e);
                     }
-
                 }
             });
-        } catch (FetcherException e) {
-            LOGGER.error(e.getMessage(), e);
+            mdlFetcher.execute();
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -153,11 +148,13 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
 
         private final MrDLibFetcher fetcher;
+        private final JabRefPreferences prefs = JabRefPreferences.getInstance();
         BibEntry selectedEntry;
 
         public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
             this.selectedEntry = selectedEntry;
-            fetcher = new MrDLibFetcher();
+            fetcher = new MrDLibFetcher(prefs.get(JabRefPreferences.LANGUAGE),
+                    Globals.BUILD_INFO.getVersion().getFullVersion());
         }
 
         @Override

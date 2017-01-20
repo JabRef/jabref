@@ -20,6 +20,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,10 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MrDLibImporter extends Importer {
 
-    private final String NAME = "MrDLibImporter";
-    private final String DESCRIPTION = "Takes valid xml documents. Parses from MrDLib API a BibEntriy";
     private static final Log LOGGER = LogFactory.getLog(MrDLibImporter.class);
-
 
     /**
      *
@@ -59,10 +57,7 @@ public class MrDLibImporter extends Importer {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
-        } catch (ParserConfigurationException e) {
-            LOGGER.error(e.getMessage(), e);
-            return false;
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | SAXException e) {
             LOGGER.error(e.getMessage(), e);
             return false;
         }
@@ -117,9 +112,7 @@ public class MrDLibImporter extends Importer {
                 boolean type;
                 String htmlSnippetSingle;
                 int htmlSnippetSingleRank = -1;
-
                 BibEntry currentEntry;
-
 
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes)
@@ -170,19 +163,19 @@ public class MrDLibImporter extends Importer {
                 public void characters(char ch[], int start, int length) throws SAXException {
 
                     if (authors) {
-                        currentEntry.setField("author", new String(ch, start, length));
+                        currentEntry.setField(FieldName.AUTHOR, new String(ch, start, length));
                         authors = false;
                     }
                     if (published_in) {
-                        currentEntry.setField("journal", new String(ch, start, length));
+                        currentEntry.setField(FieldName.JOURNAL, new String(ch, start, length));
                         published_in = false;
                     }
                     if (title) {
-                        currentEntry.setField("title", new String(ch, start, length));
+                        currentEntry.setField(FieldName.TITLE, new String(ch, start, length));
                         title = false;
                     }
                     if (year) {
-                        currentEntry.setField("year", new String(ch, start, length));
+                        currentEntry.setField(FieldName.YEAR, new String(ch, start, length));
                         year = false;
                     }
                     if (rank) {
@@ -223,7 +216,7 @@ public class MrDLibImporter extends Importer {
      */
     @Override
     public String getName() {
-        return NAME;
+        return "MrDLibImporter";
     }
 
     /*
@@ -239,7 +232,7 @@ public class MrDLibImporter extends Importer {
      */
     @Override
     public String getDescription() {
-        return DESCRIPTION;
+        return "Takes valid xml documents. Parses from MrDLib API a BibEntriy";
     }
 
 
