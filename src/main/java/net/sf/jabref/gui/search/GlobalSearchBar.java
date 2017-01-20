@@ -290,8 +290,8 @@ public class GlobalSearchBar extends JPanel {
     public void focus() {
         if (!searchField.hasFocus()) {
             searchField.requestFocus();
-            searchField.selectAll();
         }
+        searchField.selectAll();
     }
 
     private void clearSearch(BasePanel currentBasePanel) {
@@ -304,6 +304,7 @@ public class GlobalSearchBar extends JPanel {
 
         if (currentBasePanel != null) {
             currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+            currentBasePanel.setCurrentSearchQuery(null);
         }
 
         if (dontSelectSearchBar){
