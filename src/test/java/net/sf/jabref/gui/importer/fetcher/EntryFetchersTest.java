@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.importer.fetcher;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class EntryFetchersTest {
 
     @Test
     public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
-        ArrayList<IdBasedFetcher> idFetchers = EntryFetchers.getIdFetchers(importFormatPreferences);
+        List<IdBasedFetcher> idFetchers = EntryFetchers.getIdFetchers(importFormatPreferences);
 
         Set<Class<? extends IdBasedFetcher>> expected = reflections.getSubTypesOf(IdBasedFetcher.class);
         expected.remove(AbstractIsbnFetcher.class);
@@ -46,7 +45,7 @@ public class EntryFetchersTest {
 
     @Test
     public void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        ArrayList<EntryBasedFetcher> idFetchers = EntryFetchers.getEntryBasedFetchers(importFormatPreferences);
+        List<EntryBasedFetcher> idFetchers = EntryFetchers.getEntryBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends EntryBasedFetcher>> expected = reflections.getSubTypesOf(EntryBasedFetcher.class);
         expected.remove(EntryBasedParserFetcher.class);

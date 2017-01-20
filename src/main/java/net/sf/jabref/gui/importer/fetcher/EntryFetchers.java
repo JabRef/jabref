@@ -53,7 +53,7 @@ public class EntryFetchers {
         return Collections.unmodifiableList(this.entryFetchers);
     }
 
-    public static ArrayList<IdBasedFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static List<IdBasedFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
@@ -66,9 +66,10 @@ public class EntryFetchers {
         return list;
     }
 
-    public static ArrayList<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static List<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<EntryBasedFetcher> list = new ArrayList<>();
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
+        list.add(new DoiFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
