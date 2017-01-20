@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.importer;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Set;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -15,6 +17,15 @@ public class ImportFormatPreferences {
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
     private final FieldContentParserPreferences fieldContentParserPreferences;
     private final boolean keywordSyncEnabled;
+
+    public ImportFormatPreferences() {
+        this.customImportList = Collections.emptySet();
+        this.encoding = StandardCharsets.UTF_8;
+        this.keywordSeparator = ',';
+        this.bibtexKeyPatternPreferences = new BibtexKeyPatternPreferences();
+        this.fieldContentParserPreferences = new FieldContentParserPreferences();
+        this.keywordSyncEnabled = false;
+    }
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences,

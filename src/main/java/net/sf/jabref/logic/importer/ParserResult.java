@@ -21,14 +21,12 @@ public class ParserResult {
 
     private static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
     private final BibDatabase base;
-    private MetaData metaData;
     private final Map<String, EntryType> entryTypes;
-    private BibDatabaseContext bibDatabaseContext;
-
-    private File file;
     private final List<String> warnings = new ArrayList<>();
     private final List<String> duplicateKeys = new ArrayList<>();
-
+    private MetaData metaData;
+    private BibDatabaseContext bibDatabaseContext;
+    private File file;
     private String errorMessage;
 
     private boolean invalid;
@@ -59,6 +57,18 @@ public class ParserResult {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning(message);
         return parserResult;
+    }
+
+    public static ParserResult getNullResult() {
+        return NULL_RESULT;
+    }
+
+    public static ParserResult fromError(Exception exception) {
+        return fromErrorMessage(exception.getLocalizedMessage());
+    }
+
+    public static ParserResult fromEntry(BibEntry entry) {
+        return new ParserResult(Collections.singleton(entry));
     }
 
     /**
@@ -180,9 +190,5 @@ public class ParserResult {
 
     public boolean isNullResult() {
         return this == NULL_RESULT;
-    }
-
-    public static ParserResult getNullResult() {
-        return NULL_RESULT;
     }
 }

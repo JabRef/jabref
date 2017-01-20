@@ -60,6 +60,9 @@ repositories {
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
     }
+    maven {
+        url 'http://maven.icm.edu.pl/artifactory/repo'
+    }
 }
 
 configurations {
@@ -80,6 +83,8 @@ dependencies {
     compile 'org.apache.pdfbox:pdfbox:1.8.13'
     compile 'org.apache.pdfbox:fontbox:1.8.13'
     compile 'org.apache.pdfbox:jempbox:1.8.13'
+
+    compile 'pl.edu.icm.cermine:cermine-impl:1.11'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     compile 'org.bouncycastle:bcprov-jdk15on:1.55'
