@@ -20,15 +20,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused the text will be selected.
 - LaTeX symbols are now displayed as Unicode for the author column in the main table. "'n" and "\'{n}" are parsed correctly. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
 - If one deleted the current query it was not saved (every basepanel can have it's own query). Fixes [#2468](https://github.com/JabRef/jabref/issues/2468).
-- The ACM fetcher does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472)
+- The [ACM fetcher](https://help.jabref.org/en/ACMPortal) does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472)
+- When [finding unlinked files](https://help.jabref.org/en/FindUnlinkedFiles), JabRef does not freeze any more. Fixes [#2309]()https://github.com/JabRef/jabref/issues/2309)
 - Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef. 
 
 ### Removed
-
-
-
-
-
 
 
 
