@@ -52,6 +52,7 @@ public class IntegrityCheck {
             result.addAll(new BibTeXEntryTypeChecker().check(entry));
         }
 
+        result.addAll(new NoBibtexOrBiblatexFieldChecker().check(entry));
         result.addAll(new BibtexkeyChecker().check(entry));
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new BibStringChecker().check(entry));

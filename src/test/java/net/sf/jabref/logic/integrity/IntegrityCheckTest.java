@@ -130,13 +130,13 @@ public class IntegrityCheckTest {
     @Test
     public void testBibtexkeyChecks() {
         final BibDatabaseContext correctContext = createContext("bibtexkey", "Knuth2014");
-        correctContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        correctContext.getDatabase().getEntries().get(0).setField("year","2014");
+        correctContext.getDatabase().getEntries().get(0).setField("author", "Knuth");
+        correctContext.getDatabase().getEntries().get(0).setField("year", "2014");
         assertCorrect(correctContext);
 
         final BibDatabaseContext wrongContext = createContext("bibtexkey", "Knuth2014a");
-        wrongContext.getDatabase().getEntries().get(0).setField("author","Knuth");
-        wrongContext.getDatabase().getEntries().get(0).setField("year","2014");
+        wrongContext.getDatabase().getEntries().get(0).setField("author", "Knuth");
+        wrongContext.getDatabase().getEntries().get(0).setField("year", "2014");
         assertWrong(wrongContext);
     }
 
@@ -158,12 +158,16 @@ public class IntegrityCheckTest {
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"),
+                    BibDatabaseMode.BIBLATEX));
+            assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"),
+                    BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-            assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
+            assertWrong(
+                    withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, "and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
-            assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and"), BibDatabaseMode.BIBLATEX));
+            assertWrong(
+                    withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and"), BibDatabaseMode.BIBLATEX));
         }
     }
 
@@ -175,7 +179,9 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBTEX));
-        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBTEX));
+        assertCorrect(
+                withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"),
+                        BibDatabaseMode.BIBTEX));
 
         assertCorrect(withMode(createContext("title", "This is a title"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("title", "This is a Title"), BibDatabaseMode.BIBLATEX));
@@ -183,7 +189,9 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("title", "{This is a Title}"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("title", "This is a {Title}"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("title", "{C}urrent {C}hronicle"), BibDatabaseMode.BIBLATEX));
-        assertCorrect(withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(
+                withMode(createContext("title", "{A Model-Driven Approach for Monitoring {ebBP} BusinessTransactions}"),
+                        BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -226,8 +234,12 @@ public class IntegrityCheckTest {
 
     @Test
     public void testBooktitleChecks() {
-        assertCorrect(createContext("booktitle", "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)", "proceedings"));
-        assertWrong(createContext("booktitle", "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on", "proceedings"));
+        assertCorrect(createContext("booktitle",
+                "2014 Fourth International Conference on Digital Information and Communication Technology and it's Applications (DICTAP)",
+                "proceedings"));
+        assertWrong(createContext("booktitle",
+                "Digital Information and Communication Technology and it's Applications (DICTAP), 2014 Fourth International Conference on",
+                "proceedings"));
     }
 
     @Test
@@ -274,7 +286,8 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("title", "Not a single {HTML} character"));
         assertCorrect(createContext("month", "#jan#"));
         assertCorrect(createContext("author", "A. Einstein and I. Newton"));
-        assertCorrect(createContext("url", "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
+        assertCorrect(createContext("url",
+                "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
         assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
         assertWrong(createContext("author", "Lenhard, J&#227;rg"));
         assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
@@ -305,6 +318,18 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("doi", "10.17487/rfc1436"));
         assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
         assertWrong(createContext("doi", "asdf"));
+    }
+
+    @Test
+    public void testNoBibtexOrBiblatexChecks() {
+        assertCorrect(createContext("editor", "Knuth"));
+        assertWrong(createContext("abcd", "asdf"));
+    }
+
+    @Test
+    public void testBiblatexOnlyChecks() {
+        assertCorrect(createContext("author", "Knuth"));
+        assertWrong(createContext("editora", "Knuth"));
     }
 
     @Test
@@ -339,7 +364,7 @@ public class IntegrityCheckTest {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
                 createBibtexKeyPatternPreferences())
-                .checkBibtexDatabase();
+                        .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
