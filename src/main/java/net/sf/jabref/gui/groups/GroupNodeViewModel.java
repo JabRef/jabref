@@ -82,7 +82,7 @@ public class GroupNodeViewModel {
         if (!children.equals(that.children)) return false;
         if (!databaseContext.equals(that.databaseContext)) return false;
         if (!groupNode.equals(that.groupNode)) return false;
-        return hits.equals(that.hits);
+        return hits.getValue().equals(that.hits.getValue());
     }
 
     @Override
