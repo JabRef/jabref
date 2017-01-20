@@ -19,8 +19,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.model.FieldChange;
