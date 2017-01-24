@@ -58,26 +58,90 @@ import org.apache.commons.logging.LogFactory;
 public class ArgumentProcessor {
 
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
-
-
-    public enum Mode {
-        INITIAL_START, REMOTE_START
-    }
-
-
     private final JabRefCLI cli;
-
     private final List<ParserResult> parserResults;
-
     private final Mode startupMode;
-
     private boolean noGUINeeded;
-
 
     public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
+    }
+
+    /**
+     * Will open a file (like importFile), but will also request JabRef to focus on this database
+     *
+     * @param argument See importFile.
+     * @return ParserResult with setToOpenTab(true)
+     */
+    private static Optional<ParserResult> importToOpenBase(String argument) {
+        Optional<ParserResult> result = importFile(argument);
+
+        result.ifPresent(x -> x.setToOpenTab());
+
+        return result;
+    }
+
+    private static Optional<ParserResult> importFile(String argument) {
+        String[] data = argument.split(",");
+
+        String address = data[0];
+        Path file;
+        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
+            // Download web resource to temporary file
+            try {
+                file = new URLDownload(address).downloadToTemporaryFile();
+            } catch (IOException e) {
+                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
+                return Optional.empty();
+            }
+        } else {
+            if (OS.WINDOWS) {
+                file = Paths.get(address);
+            } else {
+                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+            }
+        }
+
+        String importFormat;
+        if (data.length > 1) {
+            importFormat = data[1];
+        } else {
+            importFormat = "*";
+        }
+
+        Optional<ParserResult> importResult = importFile(file, importFormat);
+        importResult.ifPresent(result -> {
+            OutputPrinter printer = new SystemOutputPrinter();
+            if (result.hasWarnings()) {
+                printer.showMessage(result.getErrorMessage());
+            }
+        });
+        return importResult;
+    }
+
+    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+        try {
+            if (!"*".equals(importFormat)) {
+                System.out.println(Localization.lang("Importing") + ": " + file);
+                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                return Optional.of(result);
+            } else {
+                // * means "guess the format":
+                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
+
+                ImportFormatReader.UnknownFormatImport importResult;
+                importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+
+                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
+                return Optional.of(importResult.parserResult);
+            }
+        } catch (ImportException ex) {
+            System.err
+                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            return Optional.empty();
+        }
     }
 
     public List<ParserResult> getParserResults() {
@@ -518,83 +582,12 @@ public class ArgumentProcessor {
         return cli.isBlank();
     }
 
-    /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database
-     *
-     * @param argument See importFile.
-     * @return ParserResult with setToOpenTab(true)
-     */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
-        Optional<ParserResult> result = importFile(argument);
-
-        result.ifPresent(x -> x.setToOpenTab(true));
-
-        return result;
-    }
-
-    private static Optional<ParserResult> importFile(String argument) {
-        String[] data = argument.split(",");
-
-        String address = data[0];
-        Path file;
-        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
-            // Download web resource to temporary file
-            try {
-                file = new URLDownload(address).downloadToTemporaryFile();
-            } catch (IOException e) {
-                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
-                return Optional.empty();
-            }
-        } else {
-            if (OS.WINDOWS) {
-                file = Paths.get(address);
-            } else {
-                file = Paths.get(address.replace("~", System.getProperty("user.home")));
-            }
-        }
-
-        String importFormat;
-        if (data.length > 1) {
-            importFormat = data[1];
-        } else {
-            importFormat = "*";
-        }
-
-        Optional<ParserResult> importResult = importFile(file, importFormat);
-        importResult.ifPresent(result -> {
-            OutputPrinter printer = new SystemOutputPrinter();
-            if (result.hasWarnings()) {
-                printer.showMessage(result.getErrorMessage());
-            }
-        });
-        return importResult;
-    }
-
-    private static Optional<ParserResult> importFile(Path file, String importFormat) {
-        try {
-            if (!"*".equals(importFormat)) {
-                System.out.println(Localization.lang("Importing") + ": " + file);
-                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
-                return Optional.of(result);
-            } else {
-                // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
-
-                ImportFormatReader.UnknownFormatImport importResult;
-                importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
-
-                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
-                return Optional.of(importResult.parserResult);
-            }
-        } catch (ImportException ex) {
-            System.err
-                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
-            return Optional.empty();
-        }
-    }
-
     public boolean shouldShutDown() {
         return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
+    }
+
+    public enum Mode {
+        INITIAL_START, REMOTE_START
     }
 
 }

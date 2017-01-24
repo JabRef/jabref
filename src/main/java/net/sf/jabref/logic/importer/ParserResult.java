@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -19,18 +20,13 @@ import net.sf.jabref.model.metadata.MetaData;
 
 public class ParserResult {
 
-    private static final ParserResult NULL_RESULT = new ParserResult(null, null, null);
-    private final BibDatabase base;
-    private MetaData metaData;
+    private static final ParserResult NULL_RESULT = new ParserResult();
     private final Map<String, EntryType> entryTypes;
-    private BibDatabaseContext bibDatabaseContext;
-
-    private File file;
     private final List<String> warnings = new ArrayList<>();
     private final List<String> duplicateKeys = new ArrayList<>();
-
-    private String errorMessage;
-
+    private BibDatabase database;
+    private MetaData metaData = new MetaData();
+    private File file;
     private boolean invalid;
     private boolean toOpenTab;
 
@@ -46,36 +42,48 @@ public class ParserResult {
         this(database, new MetaData(), new HashMap<>());
     }
 
-    public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
-        this.base = base;
-        this.metaData = metaData;
-        this.entryTypes = entryTypes;
-        if (Objects.nonNull(base) && Objects.nonNull(metaData)) {
-            this.bibDatabaseContext = new BibDatabaseContext(base, metaData, file);
-        }
+    public ParserResult(BibDatabase database, MetaData metaData, Map<String, EntryType> entryTypes) {
+        this.database = Objects.requireNonNull(database);
+        this.metaData = Objects.requireNonNull(metaData);
+        this.entryTypes = Objects.requireNonNull(entryTypes);
     }
 
     public static ParserResult fromErrorMessage(String message) {
         ParserResult parserResult = new ParserResult();
         parserResult.addWarning(message);
+        parserResult.setInvalid(true);
         return parserResult;
     }
 
+    private static String getErrorMessage(Exception exception) {
+        String errorMessage = exception.getLocalizedMessage();
+        if (exception.getCause() != null) {
+            errorMessage += " Caused by: " + exception.getCause().getLocalizedMessage();
+        }
+        return errorMessage;
+    }
+
+    public static ParserResult getNullResult() {
+        return NULL_RESULT;
+    }
+
+    public static ParserResult fromError(Exception exception) {
+        return fromErrorMessage(getErrorMessage(exception));
+    }
+
     /**
-     * Check if this base is marked to be added to the currently open tab. Default is false.
-     *
-     * @return
+     * Check if this database is marked to be added to the currently open tab. Default is false.
      */
     public boolean toOpenTab() {
         return toOpenTab;
     }
 
-    public void setToOpenTab(boolean toOpenTab) {
-        this.toOpenTab = toOpenTab;
+    public void setToOpenTab() {
+        this.toOpenTab = true;
     }
 
     public BibDatabase getDatabase() {
-        return base;
+        return database;
     }
 
     public MetaData getMetaData() {
@@ -107,6 +115,11 @@ public class ParserResult {
         if (!warnings.contains(s)) {
             warnings.add(s);
         }
+    }
+
+    public void addException(Exception exception) {
+        String errorMessage = getErrorMessage(exception);
+        addWarning(errorMessage);
     }
 
     public boolean hasWarnings() {
@@ -155,34 +168,21 @@ public class ParserResult {
     }
 
     public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+        return warnings().stream().collect(Collectors.joining(" "));
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        if (this.bibDatabaseContext == null) {
-            this.bibDatabaseContext = new BibDatabaseContext(base, metaData, file);
-        }
-        return this.bibDatabaseContext;
+        return new BibDatabaseContext(database, metaData, file);
     }
 
     public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
         Objects.requireNonNull(bibDatabaseContext);
-        this.bibDatabaseContext = bibDatabaseContext;
-    }
-
-    public boolean hasDatabaseContext() {
-        return Objects.nonNull(this.bibDatabaseContext);
+        database = bibDatabaseContext.getDatabase();
+        metaData = bibDatabaseContext.getMetaData();
+        file = bibDatabaseContext.getDatabaseFile().orElse(null);
     }
 
     public boolean isNullResult() {
         return this == NULL_RESULT;
-    }
-
-    public static ParserResult getNullResult() {
-        return NULL_RESULT;
     }
 }

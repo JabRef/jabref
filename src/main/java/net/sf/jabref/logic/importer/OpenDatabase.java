@@ -26,9 +26,9 @@ public class OpenDatabase {
         LOGGER.info("Opening: " + name);
 
         if (!file.exists()) {
-            ParserResult pr = new ParserResult(null, null, null);
+            ParserResult pr = ParserResult.fromErrorMessage(Localization.lang("File not found"));
             pr.setFile(file);
-            pr.setInvalid(true);
+
             LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
         }
@@ -49,10 +49,8 @@ public class OpenDatabase {
             }
             return pr;
         } catch (IOException ex) {
-            ParserResult pr = new ParserResult(null, null, null);
+            ParserResult pr = ParserResult.fromError(ex);
             pr.setFile(file);
-            pr.setInvalid(true);
-            pr.setErrorMessage(ex.getMessage());
             LOGGER.error("Problem opening .bib-file", ex);
             return pr;
         }
