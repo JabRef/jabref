@@ -53,8 +53,18 @@ public class AutosaveManager {
     }
 
     private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
+        try {
+            bibDatabaseContext.getDatabase().unregisterListener(this);
+        } catch(IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
+        try {
+            bibDatabaseContext.getMetaData().unregisterListener(this);
+        } catch(IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
         executor.shutdown();
     }
 
