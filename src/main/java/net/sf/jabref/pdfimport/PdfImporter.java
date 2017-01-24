@@ -1,6 +1,7 @@
 package net.sf.jabref.pdfimport;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -42,12 +43,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class PdfImporter {
 
+    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final MainTable entryTable;
     private final int dropRow;
-
-    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
     /**
      * Creates the PdfImporter
@@ -63,30 +63,6 @@ public class PdfImporter {
         this.entryTable = entryTable;
         this.dropRow = dropRow;
     }
-
-
-    public class ImportPdfFilesResult {
-
-        private final List<String> noPdfFiles;
-        private final List<BibEntry> entries;
-
-
-        public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
-            this.noPdfFiles = noPdfFiles;
-            this.entries = entries;
-        }
-
-
-        public List<String> getNoPdfFiles() {
-            return noPdfFiles;
-        }
-
-
-        public List<BibEntry> getEntries() {
-            return entries;
-        }
-    }
-
 
     /**
      *
@@ -218,7 +194,13 @@ public class PdfImporter {
         PdfContentImporter contentImporter = new PdfContentImporter(
                 Globals.prefs.getImportFormatPreferences());
         Path filePath = Paths.get(fileName);
-        ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        ParserResult result;
+        try {
+            result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        } catch (IOException e) {
+            frame.showMessage(e.getLocalizedMessage());
+            return;
+        }
         if (result.hasWarnings()) {
             frame.showMessage(result.getErrorMessage());
         }
@@ -290,5 +272,27 @@ public class PdfImporter {
             }
         }
         return Optional.empty();
+    }
+
+    public class ImportPdfFilesResult {
+
+        private final List<String> noPdfFiles;
+        private final List<BibEntry> entries;
+
+
+        public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
+            this.noPdfFiles = noPdfFiles;
+            this.entries = entries;
+        }
+
+
+        public List<String> getNoPdfFiles() {
+            return noPdfFiles;
+        }
+
+
+        public List<BibEntry> getEntries() {
+            return entries;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.bibtexkeypattern;
 
+import java.util.Collections;
+
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 
 public class BibtexKeyPatternPreferences {
@@ -11,6 +13,16 @@ public class BibtexKeyPatternPreferences {
     private final boolean enforceLegalKey;
     private final GlobalBibtexKeyPattern keyPattern;
     private Character keywordDelimiter;
+
+    public BibtexKeyPatternPreferences() {
+        this.keyPatternRegex = "";
+        this.keyPatternReplacement = "";
+        this.alwaysAddLetter = false;
+        this.firstLetterA = false;
+        this.enforceLegalKey = false;
+        this.keyPattern = new GlobalBibtexKeyPattern(Collections.emptyList());
+        this.keywordDelimiter = ',';
+    }
 
     public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement, boolean alwaysAddLetter,
             boolean firstLetterA, boolean enforceLegalKey, GlobalBibtexKeyPattern keyPattern,
