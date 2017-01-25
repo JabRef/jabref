@@ -530,7 +530,12 @@ public class BibDatabase {
      * @param listener listener (subscriber) to remove
      */
     public void unregisterListener(Object listener) {
-        this.eventBus.unregister(listener);
+        try {
+            this.eventBus.unregister(listener);
+        } catch(IllegalArgumentException e) {
+        // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
     }
 
     @Subscribe

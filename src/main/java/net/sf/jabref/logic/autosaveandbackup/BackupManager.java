@@ -145,18 +145,8 @@ public class BackupManager {
      * This method should only be used when closing a database/JabRef legally.
      */
     private void shutdown() {
-        try {
-            bibDatabaseContext.getDatabase().unregisterListener(this);
-        } catch(IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
-        }
-        try {
-            bibDatabaseContext.getMetaData().unregisterListener(this);
-        } catch(IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
-        }
+        bibDatabaseContext.getDatabase().unregisterListener(this);
+        bibDatabaseContext.getMetaData().unregisterListener(this);
         executor.shutdown();
         determineBackupPath().ifPresent(this::deleteBackupFile);
     }

@@ -31,7 +31,11 @@ public class SearchQueryHighlightObservable {
     public void removeSearchListener(SearchQueryHighlightListener listener) {
         Objects.requireNonNull(listener);
 
-        eventBus.unregister(listener);
+        try {
+            eventBus.unregister(listener);
+        } catch(IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+        }
     }
     /**
      * Fires an event if a search was started (or cleared)
