@@ -766,7 +766,7 @@ public class BibEntry implements Cloneable {
     public void unregisterListener(Object object) {
         try {
             this.eventBus.unregister(object);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
             LOGGER.debug(e);
         }
