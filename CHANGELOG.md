@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added the option to update bibliographic information from DOI to the sidebar of the entryeditor. Implements [#2432](https://github.com/JabRef/jabref/issues/2432).
 
 ### Fixed
 - The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
@@ -20,13 +21,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused the text will be selected.
 - LaTeX symbols are now displayed as Unicode for the author column in the main table. "'n" and "\'{n}" are parsed correctly. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
 - If one deleted the current query it was not saved (every basepanel can have it's own query). Fixes [#2468](https://github.com/JabRef/jabref/issues/2468).
+- The [ACM fetcher](https://help.jabref.org/en/ACMPortal) does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472).
+- When [finding unlinked files](https://help.jabref.org/en/FindUnlinkedFiles), JabRef does not freeze any more. Fixes [#2309]()https://github.com/JabRef/jabref/issues/2309).
+- Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef.
+- The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475).
+- When the database is changed external, JabRef is no longer prevented from an orderly shutdown. Fixes [#2486](https://github.com/JabRef/jabref/issues/2486).
+- Parsing of damaged metadata is now more robust and reports a more detailed error message. Fixes [#2477](https://github.com/JabRef/jabref/issues/2477).
+- Dynamic groups with regular expression can be edited again. Fixes [#2481](https://github.com/JabRef/jabref/issues/2481).
 
 ### Removed
-
-
-
-
-
 
 
 

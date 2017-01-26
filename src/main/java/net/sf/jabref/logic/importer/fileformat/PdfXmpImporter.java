@@ -49,7 +49,7 @@ public class PdfXmpImporter extends Importer {
         try {
             return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
         } catch (IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+            return ParserResult.fromError(exception);
         }
     }
 

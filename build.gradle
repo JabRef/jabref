@@ -107,7 +107,7 @@ dependencies {
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:20.0'
+    compile 'com.google.guava:guava:21.0'
 
     compile 'commons-logging:commons-logging:1.2'
 
@@ -131,7 +131,7 @@ dependencies {
     compile 'com.github.lgooddatepicker:LGoodDatePicker:8.3.0'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.5.5'
+    testCompile 'org.mockito:mockito-core:2.6.2'
     testCompile 'com.github.tomakehurst:wiremock:2.5.0'
     testCompile 'org.assertj:assertj-swing-junit:3.5.0'
     testCompile 'org.reflections:reflections:0.9.10'

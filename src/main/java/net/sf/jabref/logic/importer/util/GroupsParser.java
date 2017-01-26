@@ -113,18 +113,22 @@ public class GroupsParser {
         }
     }
 
-    public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
-        if (!s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
-            throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
+    private static ExplicitGroup explicitGroupFromString(String input, Character keywordSeparator) throws ParseException {
+        if (!input.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
+            throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + input + "\".");
         }
-        QuotedStringTokenizer tok = new QuotedStringTokenizer(s.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
-        int context = Integer.parseInt(tok.nextToken());
-        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
-        GroupsParser.addLegacyEntryKeys(tok, newGroup);
-        return newGroup;
+        try {
+            int context = Integer.parseInt(tok.nextToken());
+            ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
+            GroupsParser.addLegacyEntryKeys(tok, newGroup);
+            return newGroup;
+        } catch (NumberFormatException exception) {
+            throw new ParseException("Could not parse context in " + input);
+        }
     }
 
     /**
@@ -140,7 +144,7 @@ public class GroupsParser {
         }
     }
 
-    public static AbstractGroup allEntriesGroupFromString(String s) {
+    private static AbstractGroup allEntriesGroupFromString(String s) {
         if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
@@ -153,7 +157,7 @@ public class GroupsParser {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup searchGroupFromString(String s) {
+    private static AbstractGroup searchGroupFromString(String s) {
         if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
