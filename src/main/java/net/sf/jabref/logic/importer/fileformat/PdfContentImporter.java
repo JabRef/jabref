@@ -41,18 +41,13 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
-
+    private final ImportFormatPreferences importFormatPreferences;
     // input lines into several lines
     private String[] lines;
-
     // current index in lines
     private int i;
-
     private String curString;
-
     private String year;
-
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
@@ -479,7 +474,7 @@ public class PdfContentImporter extends Importer {
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch(IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+            return ParserResult.fromError(exception);
         } catch (FetcherException e) {
             return ParserResult.fromErrorMessage(e.getMessage());
         }
