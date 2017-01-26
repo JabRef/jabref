@@ -106,7 +106,7 @@ public class ModsImporter extends Importer {
             }
         } catch (JAXBException e) {
             LOGGER.debug("could not parse document", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
+            return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
     }
