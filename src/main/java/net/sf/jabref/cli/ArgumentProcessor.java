@@ -78,7 +78,7 @@ public class ArgumentProcessor {
     private static Optional<ParserResult> importToOpenBase(String argument) {
         Optional<ParserResult> result = importFile(argument);
 
-        result.ifPresent(x -> x.setToOpenTab());
+        result.ifPresent(ParserResult::setToOpenTab);
 
         return result;
     }
@@ -131,8 +131,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult;
-                importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -308,12 +307,12 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = ParserResult.getNullResult();
+                ParserResult pr = new ParserResult();
                 if (bibExtension) {
                     pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
                 }
 
-                if (!bibExtension || (pr.isNullResult())) {
+                if (!bibExtension || (pr.isEmpty())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -323,7 +322,7 @@ public class ArgumentProcessor {
                     if (startupMode == Mode.INITIAL_START) {
                         toImport.add(aLeftOver);
                     } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.getNullResult()));
+                        loaded.add(importToOpenBase(aLeftOver).orElse(new ParserResult()));
                     }
                 } else {
                     loaded.add(pr);

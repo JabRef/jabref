@@ -37,7 +37,7 @@ public class OpenDatabase {
             if (!FileBasedLock.waitForFileLock(file.toPath())) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
-                return ParserResult.getNullResult();
+                return new ParserResult();
             }
 
             ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences);

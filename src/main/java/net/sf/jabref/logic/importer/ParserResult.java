@@ -20,7 +20,6 @@ import net.sf.jabref.model.metadata.MetaData;
 
 public class ParserResult {
 
-    private static final ParserResult NULL_RESULT = new ParserResult();
     private final Map<String, EntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
     private final List<String> duplicateKeys = new ArrayList<>();
@@ -61,10 +60,6 @@ public class ParserResult {
             errorMessage += " Caused by: " + exception.getCause().getLocalizedMessage();
         }
         return errorMessage;
-    }
-
-    public static ParserResult getNullResult() {
-        return NULL_RESULT;
     }
 
     public static ParserResult fromError(Exception exception) {
@@ -182,7 +177,7 @@ public class ParserResult {
         file = bibDatabaseContext.getDatabaseFile().orElse(null);
     }
 
-    public boolean isNullResult() {
-        return this == NULL_RESULT;
+    public boolean isEmpty() {
+        return this == new ParserResult();
     }
 }
