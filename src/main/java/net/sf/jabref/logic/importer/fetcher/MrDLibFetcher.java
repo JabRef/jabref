@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +21,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.MrDLibImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -89,36 +91,16 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @throws FetcherException
      */
     private String makeServerRequest(String query) throws FetcherException {
-        query = constructQuery(query);
-        String response = "";
-        SSLContext sslContext = null;
-
         try {
-            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
-        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e1) {
-            LOGGER.error(e1.getMessage(), e1);
-            throw new FetcherException("SSL Error.");
-        }
+            String response = new URLDownload(constructQuery(query)).downloadToString(StandardCharsets.UTF_8);
 
-        SSLConnectionSocketFactory sslSocketFacktory = new SSLConnectionSocketFactory(sslContext);
-
-        try (CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslSocketFacktory).build()) {
-            Unirest.setHttpClient(httpclient);
-            try {
-                response = Unirest.get(query).asString().getBody();
-            } catch (UnirestException e) {
-                LOGGER.error(e.getMessage(), e);
-                throw new FetcherException(e.getMessage(), Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"),
-                        e);
-            }
             //Conversion of < and >
             response = response.replaceAll("&gt;", ">");
             response = response.replaceAll("&lt;", "<");
-        } catch (IOException e1) {
-            LOGGER.error(e1.getMessage(), e1);
-            throw new FetcherException("IOException by trying to get HTTP response.");
+            return response;
+        } catch (IOException e) {
+            throw new FetcherException("Problem downloading", e);
         }
-        return response;
     }
 
     /**
