@@ -26,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef.
 - The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475). 
 - Parsing of damaged metadata is now more robust and reports a more detailed error message. Fixes [#2477](https://github.com/JabRef/jabref/issues/2477).
+- Dynamic groups with regular expression can be edited again. Fixes [#2481](https://github.com/JabRef/jabref/issues/2481).
 
 ### Removed
 
