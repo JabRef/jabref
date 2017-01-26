@@ -22,6 +22,6 @@ public class GroupsParserTest {
 
     @Test(expected = ParseException.class)
     public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
-        GroupsParser.fromString("3 ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',');
+        GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',');
     }
 }
