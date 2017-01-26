@@ -73,14 +73,19 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append(")'>");
         for (BibEntry bibEntry : list) {
             if (bibEntry != null) {
-                htmlContent.append("<li>");
+                htmlContent.append("<li style='margin: 5px'>");
                 bibEntry.getField("html_representation").ifPresent(htmlContent::append);
                 htmlContent.append("</li>");
             }
         }
-        htmlContent.append("</ul></font></body></html>");
+        htmlContent.append("</ul></font>");
+        htmlContent.append("<br><div style='margin-left: 5px'>");
+        htmlContent.append(
+                "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
+        htmlContent.append(Localization.lang("What_is_Mr._Dlib?"));
+        htmlContent.append("</a></div>");
+        htmlContent.append("</body></html>");
         this.setText(htmlContent.toString());
-
     }
 
     /**
@@ -90,12 +95,18 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     private void setDefaultContent() {
         StringBuffer htmlContent = new StringBuffer();
         URL url = IconTheme.getIconUrl("mdlloading");
-        htmlContent.append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=5>");
+        htmlContent
+                .append("<html><head><title></title></head><body bgcolor='#ffffff'><div align='center' style='font-size:20px'>");
         htmlContent.append(Localization.lang("Loading_Recommendations_for"));
         htmlContent.append(": ");
         htmlContent.append("<b>");
         htmlContent.append(selectedEntry.getLatexFreeField(FieldName.TITLE).get());
-        htmlContent.append("</b><br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img>");
+        htmlContent.append("<div>");
+        htmlContent.append(
+                "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
+        htmlContent.append(Localization.lang("What_is_Mr._Dlib?"));
+        htmlContent.append("</a></div>");
+        htmlContent.append("</b><br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img></div>");
         htmlContent.append("</body></html>");
         this.setText(htmlContent.toString());
     }
@@ -105,15 +116,14 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      */
     private void registerHyperlinkListener() {
         this.addHyperlinkListener(e -> {
-            if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                try {
-                    if (e.getURL() != null) {
+            try {
+                if ((e.getURL() != null) && (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)) {
                         new JabRefDesktop().openBrowser(e.getURL().toString());
                     }
                 } catch (IOException e1) {
                     LOGGER.error(e1.getMessage(), e1);
                 }
-            }
+
         });
     }
 

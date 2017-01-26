@@ -128,7 +128,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      */
     private String constructQuery(String query) {
         StringBuffer queryBuffer = new StringBuffer();
-        queryBuffer.append("http://api-dev.mr-dlib.org/v1/documents/");
+        queryBuffer.append("https://api-dev2.mr-dlib.org/v1/documents/");
         try {
             queryBuffer.append(URLEncoder.encode(query, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
@@ -141,7 +141,5 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryBuffer.append("&app_lang=" + LANGUAGE);
         return queryBuffer.toString();
     }
-
-
 
 }
