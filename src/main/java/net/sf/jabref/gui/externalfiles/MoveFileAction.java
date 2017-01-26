@@ -2,26 +2,22 @@ package net.sf.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.filelist.FileListEntry;
-import net.sf.jabref.gui.util.component.CheckBoxMessage;
+import net.sf.jabref.logic.cleanup.CleanupPreferences;
+import net.sf.jabref.logic.cleanup.MoveFilesCleanup;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,7 +36,6 @@ public class MoveFileAction extends AbstractAction {
     private final boolean toFileDir;
 
     private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
-
 
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor, boolean toFileDir) {
         this.frame = frame;
@@ -91,7 +86,15 @@ public class MoveFileAction extends AbstractAction {
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
 
-            File newFile = null;
+            CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
+
+            MoveFilesCleanup myCleanUp = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                    prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
+                    prefs.getLayoutFormatterPreferences());
+
+            myCleanUp.cleanup((eEditor.getEntry()));
+            //myCleanUp.cleanup();
+            /*  File newFile = null;
             boolean repeat = true;
             while (repeat) {
                 repeat = false;
@@ -186,7 +189,7 @@ public class MoveFileAction extends AbstractAction {
                             MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
                 }
 
-            }
+            }*/
         } else {
             // File doesn't exist, so we can't move it.
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", entry.link),
