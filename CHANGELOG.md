@@ -24,7 +24,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The [ACM fetcher](https://help.jabref.org/en/ACMPortal) does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472).
 - When [finding unlinked files](https://help.jabref.org/en/FindUnlinkedFiles), JabRef does not freeze any more. Fixes [#2309]()https://github.com/JabRef/jabref/issues/2309).
 - Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef.
-- The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475). 
+- The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475).
+- When the database is changed external, JabRef is no longer prevented from an orderly shutdown. Fixes [#2486](https://github.com/JabRef/jabref/issues/2486).
 - Parsing of damaged metadata is now more robust and reports a more detailed error message. Fixes [#2477](https://github.com/JabRef/jabref/issues/2477).
 - Dynamic groups with regular expression can be edited again. Fixes [#2481](https://github.com/JabRef/jabref/issues/2481).
 
