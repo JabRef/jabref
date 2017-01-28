@@ -21,6 +21,10 @@ dependencies:
 test:
   override:
     - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace
+  post:
+    # save test reports as build artifacts
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/build/test-results/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
 
 deployment:
   release:
