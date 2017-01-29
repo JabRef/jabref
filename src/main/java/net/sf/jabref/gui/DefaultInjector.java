@@ -41,6 +41,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.prefs;
         } else if (clazz == KeyBindingPreferences.class) {
             return Globals.getKeyPrefs();
+        } else if (clazz == StateManager.class) {
+            return Globals.stateManager;
         } else {
             try {
                 return clazz.newInstance();

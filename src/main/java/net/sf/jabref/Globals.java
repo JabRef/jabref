@@ -2,6 +2,7 @@ package net.sf.jabref;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.gui.GlobalFocusListener;
+import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -35,6 +36,11 @@ public class Globals {
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;
+
+    /**
+     * Manager for the state of the GUI.
+     */
+    public static StateManager stateManager = new StateManager();
 
     // Key binding preferences
     private static KeyBindingPreferences keyPrefs;

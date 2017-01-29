@@ -2,9 +2,11 @@ package net.sf.jabref.gui.util;
 
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 
 /**
@@ -18,6 +20,7 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private Callback<S, String> toTooltip;
 
     public ViewModelTreeTableCellFactory<S, T> withText(Callback<S, String> toText) {
         this.toText = toText;
@@ -26,6 +29,20 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
 
     public ViewModelTreeTableCellFactory<S, T> withGraphic(Callback<S, Node> toGraphic) {
         this.toGraphic = toGraphic;
+        return this;
+    }
+
+    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, String> toIcon) {
+        this.toGraphic = viewModel -> {
+            Text graphic = new Text(toIcon.call(viewModel));
+            graphic.getStyleClass().add("icon");
+            return graphic;
+        };
+        return this;
+    }
+
+    public ViewModelTreeTableCellFactory<S, T> withTooltip(Callback<S, String> toTooltip) {
+        this.toTooltip = toTooltip;
         return this;
     }
 
@@ -44,17 +61,20 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
             protected void updateItem(T item, boolean empty) {
                 super.updateItem(item, empty);
 
-                S viewModel = getTreeTableRow().getItem();
-                if (empty || viewModel == null) {
+                if (empty || getTreeTableRow() == null || getTreeTableRow().getItem() == null) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
                 } else {
+                    S viewModel = getTreeTableRow().getItem();
                     if (toText != null) {
                         setText(toText.call(viewModel));
                     }
                     if (toGraphic != null) {
                         setGraphic(toGraphic.call(viewModel));
+                    }
+                    if (toTooltip != null) {
+                        setTooltip(new Tooltip(toTooltip.call(viewModel)));
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));

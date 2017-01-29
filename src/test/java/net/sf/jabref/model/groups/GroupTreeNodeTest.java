@@ -160,7 +160,7 @@ public class GroupTreeNodeTest {
 
     @Test
     public void numberOfHitsReturnsZeroForEmptyList() throws Exception {
-        assertEquals(0, getNodeInSimpleTree().numberOfMatches(Collections.emptyList()));
+        assertEquals(0, getNodeInSimpleTree().calculateNumberOfMatches(Collections.emptyList()));
     }
 
     @Test
@@ -168,7 +168,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
-        assertEquals(1, node.numberOfMatches(entries));
+        assertEquals(1, node.calculateNumberOfMatches(entries));
     }
 
     @Test
@@ -176,7 +176,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
-        assertEquals(2, node.numberOfMatches(entries));
+        assertEquals(2, node.calculateNumberOfMatches(entries));
     }
 
     @Test
@@ -186,7 +186,7 @@ public class GroupTreeNodeTest {
                 new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
         GroupTreeNode node = parent.addSubgroup(
                 new WordKeywordGroup("node", GroupHierarchyType.REFINING, "author", "author1", true, ',', false));
-        assertEquals(1, node.numberOfMatches(entries));
+        assertEquals(1, node.calculateNumberOfMatches(entries));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class GroupTreeNodeTest {
                 new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author2", true, ',', false));
         GroupTreeNode node = parent.addSubgroup(
                 new WordKeywordGroup("node", GroupHierarchyType.INDEPENDENT, "author", "author1", true, ',', false));
-        assertEquals(2, node.numberOfMatches(entries));
+        assertEquals(2, node.calculateNumberOfMatches(entries));
     }
 
     @Test

@@ -196,7 +196,6 @@ public class JabRefPreferences {
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
-    public static final String GROUP_SHOW_NUMBER_OF_ELEMENTS = "groupShowNumberOfElements";
     public static final String GROUP_EXPAND_TREE = "groupExpandTree";
     public static final String GROUP_SHOW_DYNAMIC = "groupShowDynamic";
     public static final String GROUP_SHOW_ICONS = "groupShowIcons";
@@ -608,7 +607,6 @@ public class JabRefPreferences {
         defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
         defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
         defaults.put(GROUP_EXPAND_TREE, Boolean.TRUE);
-        defaults.put(GROUP_SHOW_NUMBER_OF_ELEMENTS, Boolean.FALSE);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
