@@ -77,7 +77,7 @@
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="content" overwriteMode="5" fileMode="644">
+      <vmOptionsFile mode="content" overwriteMode="1" fileMode="644">
         <content>-XX:+UseG1GC
 -XX:+UseStringDeduplication
 -XX:StringTableSize=1000003</content>
