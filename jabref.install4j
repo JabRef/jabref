@@ -77,8 +77,10 @@
       </java>
       <includedFiles />
       <unextractableFiles />
-      <vmOptionsFile mode="template" overwriteMode="0" fileMode="644">
-        <content />
+      <vmOptionsFile mode="content" overwriteMode="5" fileMode="644">
+        <content>-XX:+UseG1GC
+-XX:+UseStringDeduplication
+-XX:StringTableSize=1000003</content>
       </vmOptionsFile>
       <customScript mode="1" file="">
         <content />
@@ -750,9 +752,4 @@ return true;</string>
   </mediaSets>
   <buildIds buildAll="true" />
   <buildOptions verbose="false" faster="false" disableSigning="false" disableJreBundling="false" debug="false" />
-  <jvmArguments>
-      <arg>-XX:+UseG1GC</arg>
-      <arg>-XX:+UseStringDeduplication</arg>
-      <arg>-XX:StringTableSize=1000003</arg>
-  </jvmArguments>
 </install4j>
