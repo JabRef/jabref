@@ -10,7 +10,7 @@ public enum KeyBinding {
     AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7"),
     BACK("Back", Localization.lang("Back"), "alt LEFT"),
     CHECK_INTEGRITY("Check integrity", Localization.menuTitle("Check integrity"), "ctrl F8"),
-    CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "F8"),
+    CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "alt F8"),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE"),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W"),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE"),
