@@ -18,6 +18,6 @@ if [ ! -d ~/.install4j6/jres/ ]; then
   mkdir -p ~/.install4j6/jres/
 fi
 cd ~/.install4j6/jres/
-wget --quiet -nc https://files.jabref.org/jres/windows-x86-1.8.0_112.tar.gz
-wget --quiet -nc https://files.jabref.org/jres/windows-amd64-1.8.0_112.tar.gz
-wget --quiet -nc https://files.jabref.org/jres/macosx-amd64-1.8.0_112_unpacked.tar.gz
+wget --quiet -nc https://files.jabref.org/jres/windows-x86-1.8.0_121.tar.gz
+wget --quiet -nc https://files.jabref.org/jres/windows-amd64-1.8.0_121.tar.gz
+wget --quiet -nc https://files.jabref.org/jres/macosx-amd64-1.8.0_121_unpacked.tar.gz
