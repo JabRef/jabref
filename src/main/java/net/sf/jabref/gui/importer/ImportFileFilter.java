@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.stage.FileChooser;
+
 import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.util.FileExtensions;
-
-import javafx.stage.FileChooser;
 
 class ImportFileFilter {
 
