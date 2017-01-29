@@ -1,0 +1,47 @@
+/*
+ * The base css file defining the style that is valid for every pane and dialog.
+ */
+
+.root {
+    /*
+     * A strong blue to indicate something neutral.
+     */
+    -fx-neutral: #2980b9;
+
+    /*
+     * A strong green to indicate something positive.
+     */
+    -fx-positive: #27ae60;
+
+    /*
+     * A strong red to indicate something negative.
+     */
+    -fx-negative: #c0392b;
+
+    /*
+     * A dark grayish blue to display information (but kind of highlighted).
+     */
+    -fx-info: #2c3e50;
+}
+
+.hyperlink {
+    -fx-padding: 0;
+    -fx-underline: false;
+    -fx-border-style: null;
+    -fx-border-color: null;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: -fx-accent;
+}
+
+ .icon {
+ 	-fx-font-family: 'Material Design Icons';
+	-fx-font-size: 16.0;
+	-fx-fill : -fx-mid-text-color;
+}
+
+.tooltip {
+    -fx-background-color: #757575;
+    -fx-effect:none;
+}

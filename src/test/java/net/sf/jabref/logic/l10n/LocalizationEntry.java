@@ -56,7 +56,7 @@ class LocalizationEntry implements Comparable<LocalizationEntry>{
 
     @Override
     public String toString() {
-        return String.format("%s %s (%s)", path, key, bundle);
+        return String.format("%s (%s %s)", key, path, bundle);
     }
 
     @Override
