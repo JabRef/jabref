@@ -5,6 +5,10 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.stage.Stage;
+
 import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.exporter.ExportFormat;
@@ -33,11 +37,20 @@ import org.apache.commons.logging.LogFactory;
 /**
  * JabRef MainClass
  */
-public class JabRefMain {
+public class JabRefMain extends Application {
+
     private static final Log LOGGER = LogFactory.getLog(JabRefMain.class);
+    private static String[] arguments;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> start(args));
+        arguments = args;
+        launch(arguments);
+    }
+
+    @Override
+    public void start(Stage mainStage) throws Exception {
+        Platform.setImplicitExit(false);
+        SwingUtilities.invokeLater(() -> start(arguments));
     }
 
     private static void start(String[] args) {

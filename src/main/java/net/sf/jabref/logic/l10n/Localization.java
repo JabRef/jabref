@@ -13,11 +13,16 @@ import org.apache.commons.logging.LogFactory;
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    protected static final String RESOURCE_PREFIX = "l10n/JabRef";
-    protected static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String RESOURCE_PREFIX = "l10n/JabRef";
+    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String BIBTEX = "BibTeX";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
+    
+    public static LocalizationBundle getMessages() {
+        return new LocalizationBundle(messages);
+    }
 
     public static void setLanguage(String language) {
         Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
@@ -54,7 +59,7 @@ public class Localization {
      * @param params            a list of Strings to replace %0, %1, ...
      * @return
      */
-    private static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
+    protected static String translate(ResourceBundle resBundle, String idForErrorMessage, String key, String... params) {
         Objects.requireNonNull(resBundle);
 
         String translation = null;

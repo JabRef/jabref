@@ -51,6 +51,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
+
 import net.sf.jabref.Globals;
 
 import net.sf.jabref.gui.BasePanel;
@@ -102,6 +107,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.MathSciNetId;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -324,6 +330,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // general fields from preferences
         addGeneralTabs();
+        // special tabs (like MathSciNet Reviews)
+        addSpecialTabs();
         // source tab
         addSourceTab();
         //related articles
@@ -341,6 +349,24 @@ public class EntryEditor extends JPanel implements EntryContainer {
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
+    }
+
+    private void addSpecialTabs() {
+
+        // MathSciNet Review
+        entry.getField(FieldName.MR_NUMBER).ifPresent(mrNumberRaw -> {
+            MathSciNetId mrNumber = MathSciNetId.fromString(mrNumberRaw);
+
+            JFXPanel reviewPane = new JFXPanel();
+            tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
+            tabs.add(reviewPane);
+
+            // Execute on JavaFX Application Thread
+            Platform.runLater(() -> {
+                StackPane root = new MathSciNetPaneView(mrNumber).getPane();
+                reviewPane.setScene(new Scene(root));
+            });
+        });
     }
 
     private void addSourceTab() {
@@ -483,7 +509,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         toolBar.add(writeXmp);
 
         JPopupMenu fetcherPopup = new JPopupMenu();
-        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers()) {
+        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
             fetcherPopup.add(new JMenuItem(new AbstractAction(fetcher.getName()) {
 
                 @Override

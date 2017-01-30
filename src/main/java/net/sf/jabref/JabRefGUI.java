@@ -210,7 +210,7 @@ public class JabRefGUI {
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
                     Globals.prefs.getImportFormatPreferences());
 
-            if (parsedDatabase.isNullResult()) {
+            if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
                 bibDatabases.add(parsedDatabase);

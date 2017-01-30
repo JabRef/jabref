@@ -4,25 +4,20 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sf.jabref.gui.JabRefFrame;
+import javafx.application.Platform;
+
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class ManageJournalsAction extends MnemonicAwareAction {
 
-    private final JabRefFrame frame;
-
-    public ManageJournalsAction(JabRefFrame frame) {
+    public ManageJournalsAction() {
         super();
         putValue(Action.NAME, Localization.menuTitle("Manage journal abbreviations"));
-        this.frame = frame;
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        ManageJournalsPanel panel = new ManageJournalsPanel(frame);
-        panel.getDialog().setLocationRelativeTo(frame);
-        panel.setValues();
-        panel.getDialog().setVisible(true);
+        Platform.runLater(() -> new ManageJournalAbbreviationsView().show());
     }
 }

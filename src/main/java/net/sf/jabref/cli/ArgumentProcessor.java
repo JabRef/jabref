@@ -58,26 +58,89 @@ import org.apache.commons.logging.LogFactory;
 public class ArgumentProcessor {
 
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
-
-
-    public enum Mode {
-        INITIAL_START, REMOTE_START
-    }
-
-
     private final JabRefCLI cli;
-
     private final List<ParserResult> parserResults;
-
     private final Mode startupMode;
-
     private boolean noGUINeeded;
-
 
     public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
+    }
+
+    /**
+     * Will open a file (like importFile), but will also request JabRef to focus on this database
+     *
+     * @param argument See importFile.
+     * @return ParserResult with setToOpenTab(true)
+     */
+    private static Optional<ParserResult> importToOpenBase(String argument) {
+        Optional<ParserResult> result = importFile(argument);
+
+        result.ifPresent(ParserResult::setToOpenTab);
+
+        return result;
+    }
+
+    private static Optional<ParserResult> importFile(String argument) {
+        String[] data = argument.split(",");
+
+        String address = data[0];
+        Path file;
+        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
+            // Download web resource to temporary file
+            try {
+                file = new URLDownload(address).downloadToTemporaryFile();
+            } catch (IOException e) {
+                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
+                return Optional.empty();
+            }
+        } else {
+            if (OS.WINDOWS) {
+                file = Paths.get(address);
+            } else {
+                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+            }
+        }
+
+        String importFormat;
+        if (data.length > 1) {
+            importFormat = data[1];
+        } else {
+            importFormat = "*";
+        }
+
+        Optional<ParserResult> importResult = importFile(file, importFormat);
+        importResult.ifPresent(result -> {
+            OutputPrinter printer = new SystemOutputPrinter();
+            if (result.hasWarnings()) {
+                printer.showMessage(result.getErrorMessage());
+            }
+        });
+        return importResult;
+    }
+
+    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+        try {
+            if (!"*".equals(importFormat)) {
+                System.out.println(Localization.lang("Importing") + ": " + file);
+                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                return Optional.of(result);
+            } else {
+                // * means "guess the format":
+                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
+
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+
+                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
+                return Optional.of(importResult.parserResult);
+            }
+        } catch (ImportException ex) {
+            System.err
+                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            return Optional.empty();
+        }
     }
 
     public List<ParserResult> getParserResults() {
@@ -244,12 +307,12 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = ParserResult.getNullResult();
+                ParserResult pr = new ParserResult();
                 if (bibExtension) {
                     pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
                 }
 
-                if (!bibExtension || (pr.isNullResult())) {
+                if (!bibExtension || (pr.isEmpty())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -259,7 +322,7 @@ public class ArgumentProcessor {
                     if (startupMode == Mode.INITIAL_START) {
                         toImport.add(aLeftOver);
                     } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.getNullResult()));
+                        loaded.add(importToOpenBase(aLeftOver).orElse(new ParserResult()));
                     }
                 } else {
                     loaded.add(pr);
@@ -518,83 +581,12 @@ public class ArgumentProcessor {
         return cli.isBlank();
     }
 
-    /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database
-     *
-     * @param argument See importFile.
-     * @return ParserResult with setToOpenTab(true)
-     */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
-        Optional<ParserResult> result = importFile(argument);
-
-        result.ifPresent(x -> x.setToOpenTab(true));
-
-        return result;
-    }
-
-    private static Optional<ParserResult> importFile(String argument) {
-        String[] data = argument.split(",");
-
-        String address = data[0];
-        Path file;
-        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
-            // Download web resource to temporary file
-            try {
-                file = new URLDownload(address).downloadToTemporaryFile();
-            } catch (IOException e) {
-                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
-                return Optional.empty();
-            }
-        } else {
-            if (OS.WINDOWS) {
-                file = Paths.get(address);
-            } else {
-                file = Paths.get(address.replace("~", System.getProperty("user.home")));
-            }
-        }
-
-        String importFormat;
-        if (data.length > 1) {
-            importFormat = data[1];
-        } else {
-            importFormat = "*";
-        }
-
-        Optional<ParserResult> importResult = importFile(file, importFormat);
-        importResult.ifPresent(result -> {
-            OutputPrinter printer = new SystemOutputPrinter();
-            if (result.hasWarnings()) {
-                printer.showMessage(result.getErrorMessage());
-            }
-        });
-        return importResult;
-    }
-
-    private static Optional<ParserResult> importFile(Path file, String importFormat) {
-        try {
-            if (!"*".equals(importFormat)) {
-                System.out.println(Localization.lang("Importing") + ": " + file);
-                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
-                return Optional.of(result);
-            } else {
-                // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
-
-                ImportFormatReader.UnknownFormatImport importResult;
-                importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
-
-                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
-                return Optional.of(importResult.parserResult);
-            }
-        } catch (ImportException ex) {
-            System.err
-                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
-            return Optional.empty();
-        }
-    }
-
     public boolean shouldShutDown() {
         return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
+    }
+
+    public enum Mode {
+        INITIAL_START, REMOTE_START
     }
 
 }

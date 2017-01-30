@@ -19,8 +19,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.model.FieldChange;
@@ -176,22 +174,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     protected boolean printInItalics() {
         return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
-    }
-
-    public String getText() {
-        AbstractGroup group = node.getGroup();
-        StringBuilder sb = new StringBuilder(60);
-        sb.append(group.getName());
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
-                && (JabRefGUI.getMainFrame() != null)) {
-            BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
-            if (currentBasePanel != null) {
-                sb.append(" [").append(node.numberOfMatches(currentBasePanel.getDatabase().getEntries())).append(']');
-            }
-        }
-
-        return sb.toString();
     }
 
     public String getDescription() {

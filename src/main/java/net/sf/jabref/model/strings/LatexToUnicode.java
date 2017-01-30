@@ -62,6 +62,12 @@ public class LatexToUnicode {
                     || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
+                // a single ' can also be a command
+                if('\'' == c){
+                    incommand = true;
+                    currentCommand = new StringBuilder();
+                }
+
                 if (!incommand) {
                     sb.append(c);
                 } else {
@@ -83,7 +89,7 @@ public class LatexToUnicode {
                         } else {
                             commandBody = field.substring(i, i + 1);
                         }
-                        String result = CHARS.get(command + commandBody);
+                        String result = fixCollidingCommand(CHARS.get(command + commandBody), c);
 
                         if (result == null) {
                             // Use combining accents if argument is single character or empty
@@ -205,5 +211,14 @@ public class LatexToUnicode {
         result = TILDE.matcher(result).replaceAll("\u00A0");
         return result;
 
+    }
+
+    private String fixCollidingCommand(String currentChar, Character bracket) {
+        // when stripping Latex, there is a collision between unicode characters 324 and 329. Hence, this needs to be checked
+        if (!("ŉ".equals(currentChar) && '{' == bracket)) {
+            return currentChar;
+        } else {
+            return "ń";
+        }
     }
 }
