@@ -38,7 +38,7 @@ public class MrDLibImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals("Takes valid xml documents. Parses from MrDLib API a BibEntriy", importer.getDescription());
+        assertEquals("Takes valid xml documents. Parses from MrDLib API a BibEntry", importer.getDescription());
     }
 
     @Test
