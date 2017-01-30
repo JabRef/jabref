@@ -69,7 +69,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         StringBuffer htmlContent = new StringBuffer();
         URL url = IconTheme.getIconUrl("mdlListIcon");
         htmlContent
-                .append("<html><head><title></title></head><body bgcolor='#ffffff'><font size=8>");
+                .append("<html><head><title></title></head><body bgcolor='#ffffff'>");
         htmlContent.append("<ul style='list-style-image:(");
         htmlContent.append(url);
         htmlContent.append(")'>");
@@ -80,7 +80,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
                 htmlContent.append("</li>");
             }
         }
-        htmlContent.append("</ul></font>");
+        htmlContent.append("</ul>");
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
