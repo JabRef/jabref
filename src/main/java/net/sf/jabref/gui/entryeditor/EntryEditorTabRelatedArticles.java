@@ -166,7 +166,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
     class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
         private final MrDLibFetcher fetcher;
         private final JabRefPreferences prefs = JabRefPreferences.getInstance();
-        BibEntry selectedEntry;
+        private final BibEntry selectedEntry;
 
         public MrDLibFetcherWorker(BibEntry selectedEntry) throws Exception {
             this.selectedEntry = selectedEntry;

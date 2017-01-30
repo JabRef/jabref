@@ -14,17 +14,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertSame;
 
 public class MrDLibImporterTest {
 
     private MrDLibImporter importer;
-    BufferedReader inputMin;
-    BufferedReader inputMax;
-    BufferedReader inputError;
-    String testMax;
-    String testMin;
-    String testError;
+    private BufferedReader inputMin;
+    private BufferedReader inputMax;
+    private BufferedReader inputError;
+    private String testMax;
+    private String testMin;
+    private String testError;
 
     @Before
     public void setUp() {
@@ -52,22 +52,34 @@ public class MrDLibImporterTest {
     }
 
     @Test
-    public void testImportDatabaseMax() throws IOException {
+    public void testImportDatabaseIsHtmlSetCorrectly() throws IOException {
         ParserResult parserResult = importer.importDatabase(inputMax);
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
-        assertEquals("Gesundheit von Arbeitslosen fördern!: ein Handbuch für Wissenschaft und Praxis",
-                resultList.get(0).getLatexFreeField(FieldName.TITLE).get());
-        assertEquals("2009",
-                resultList.get(0).getLatexFreeField(FieldName.YEAR).get());
         assertEquals(
                 "<a href='https://api-dev.mr-dlib.org/v1/recommendations/204944/original_url?access_key=99ab2fc64f3228ab839e9e3525ac37f8format=direct_url_forward'><font color='#000000' size='5' face='Arial, Helvetica, sans-serif'>Gesundheit von Arbeitslosen fördern!: ein Handbuch für Wissenschaft und Praxis.</font></a><font color='#000000' size='5' face='Arial, Helvetica, sans-serif'>. <i>Fachhochschulverl.</i>. 2009.</font>",
                 resultList.get(0).getField("html_representation").get());
     }
 
     @Test
+    public void testImportDatabaseIsYearSetCorrectly() throws IOException {
+        ParserResult parserResult = importer.importDatabase(inputMax);
+        List<BibEntry> resultList = parserResult.getDatabase().getEntries();
+        assertEquals("2009",
+                resultList.get(0).getLatexFreeField(FieldName.YEAR).get());
+    }
+
+    @Test
+    public void testImportDatabaseIsTitleSetCorrectly() throws IOException {
+        ParserResult parserResult = importer.importDatabase(inputMax);
+        List<BibEntry> resultList = parserResult.getDatabase().getEntries();
+        assertEquals("Gesundheit von Arbeitslosen fördern!: ein Handbuch für Wissenschaft und Praxis",
+                resultList.get(0).getLatexFreeField(FieldName.TITLE).get());
+    }
+
+    @Test
     public void testImportDatabaseMin() throws IOException {
         ParserResult parserResult = importer.importDatabase(inputMin);
         List<BibEntry> resultList = parserResult.getDatabase().getEntries();
-        assertTrue(resultList.size() == 0);
+        assertSame(0, resultList.size());
     }
 }

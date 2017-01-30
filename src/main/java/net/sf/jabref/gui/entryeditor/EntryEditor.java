@@ -169,8 +169,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private EntryEditorTabRelatedArticles relatedArticlesTab;
 
-    private final boolean relatedAcrticlesTabNeedsRecommendations = true;
-
     private JTextArea source;
 
     private final JTabbedPane tabbed = new JTabbedPane();

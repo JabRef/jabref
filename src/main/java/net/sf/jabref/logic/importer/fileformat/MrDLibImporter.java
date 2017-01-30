@@ -35,11 +35,8 @@ import org.xml.sax.helpers.DefaultHandler;
 public class MrDLibImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(MrDLibImporter.class);
+    public ParserResult parserResult;
 
-    /**
-     *
-     * @see net.sf.jabref.logic.importer.Importer#isRecognizedFormat(java.io.BufferedReader)
-     */
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         String recommendationsAsString = convertToString(input);
@@ -52,7 +49,7 @@ public class MrDLibImporter extends Importer {
                 // Later here will be the check against the XML schema.
             };
 
-            try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.toString().getBytes())) {
+            try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
@@ -65,37 +62,25 @@ public class MrDLibImporter extends Importer {
         return true;
     }
 
-    /*
-     * @see net.sf.jabref.logic.importer.Importer#importDatabase(java.io.BufferedReader)
-     */
     @Override
     public ParserResult importDatabase(BufferedReader input) throws IOException {
         parse(input);
         return parserResult;
     }
 
-    /*
-     * @see net.sf.jabref.logic.importer.Importer#getName()
-     */
     @Override
     public String getName() {
         return "MrDLibImporter";
     }
 
-    /*
-     * @see net.sf.jabref.logic.importer.Importer#getExtensions()
-     */
     @Override
     public FileExtensions getExtensions() {
         return FileExtensions.XML;
     }
 
-    /*
-     * @see net.sf.jabref.logic.importer.Importer#getDescription()
-     */
     @Override
     public String getDescription() {
-        return "Takes valid xml documents. Parses from MrDLib API a BibEntriy";
+        return "Takes valid xml documents. Parses from MrDLib API a BibEntry";
     }
 
     /**
@@ -131,10 +116,11 @@ public class MrDLibImporter extends Importer {
         }
     }
 
-    public ParserResult parserResult;
-
-
-
+    /**
+     * Parses the input from the server to a ParserResult
+     * @param input A BufferedReader with a reference to a string with the servers response
+     * @throws IOException
+     */
     private void parse(BufferedReader input) throws IOException {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
@@ -171,25 +157,28 @@ public class MrDLibImporter extends Importer {
         return parserResult;
     }
 
+    /**
+     * Handler that parses the response from Mr. DLib to BibEntries
+     */
     private class MrDlibImporterHandler extends DefaultHandler {
 
         // The list ob BibEntries with its associated rank
         private final List<RankedBibEntry> rankedBibEntries = new ArrayList<>();
 
+        private boolean authors;
+        private boolean published_in;
+        private boolean title;
+        private boolean year;
+        private boolean snippet;
+        private boolean rank;
+        private boolean type;
+        private String htmlSnippetSingle;
+        private int htmlSnippetSingleRank = -1;
+        private BibEntry currentEntry;
+
         public List<RankedBibEntry> getRankedBibEntries() {
             return rankedBibEntries;
         }
-
-        boolean authors;
-        boolean published_in;
-        boolean title;
-        boolean year;
-        boolean snippet;
-        boolean rank;
-        boolean type;
-        String htmlSnippetSingle;
-        int htmlSnippetSingleRank = -1;
-        BibEntry currentEntry;
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes)

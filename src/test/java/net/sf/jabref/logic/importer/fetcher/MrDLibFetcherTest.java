@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category(FetcherTests.class)
 public class MrDLibFetcherTest {
@@ -29,7 +30,7 @@ public class MrDLibFetcherTest {
     @Test
     public void testPerformSearch() throws FetcherException {
         List<BibEntry> bibEntrys = fetcher.performSearch(bibEntry);
-        assertEquals(false, bibEntrys.isEmpty());
+        assertFalse(bibEntrys.isEmpty());
     }
 
     @Test

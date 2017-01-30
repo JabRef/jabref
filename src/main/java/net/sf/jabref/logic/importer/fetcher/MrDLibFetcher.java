@@ -78,9 +78,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @return Returns the server response. This is an XML document as a String.
      * @throws FetcherException
      */
-    private String makeServerRequest(String query) throws FetcherException {
+    private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
-            String response = new URLDownload(constructQuery(query)).downloadToString(StandardCharsets.UTF_8);
+            String response = new URLDownload(constructQuery(queryByTitle)).downloadToString(StandardCharsets.UTF_8);
 
             //Conversion of < and >
             response = response.replaceAll("&gt;", ">");
@@ -96,12 +96,12 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @param query: the title of the bib entry.
      * @return the string used to make the query at mdl server
      */
-    private String constructQuery(String query) {
-        query = query.replaceAll(":|'|\"|#|<|>|&|´|`|~|-", "");
+    private String constructQuery(String queryByTitle) {
+        queryByTitle = queryByTitle.replaceAll(":|'|\"|#|<|>|&|´|`|~|-", "");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https");
         builder.setHost("api-dev.mr-dlib.org");
-        builder.setPath("/v1/documents/" + query + "/related_documents");
+        builder.setPath("/v1/documents/" + queryByTitle + "/related_documents");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION);
