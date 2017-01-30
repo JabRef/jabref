@@ -76,6 +76,7 @@ import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
 import net.sf.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
+import net.sf.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.exporter.ExportAction;
 import net.sf.jabref.gui.exporter.ExportCustomizationDialog;
@@ -109,7 +110,6 @@ import net.sf.jabref.gui.specialfields.SpecialFieldDropDown;
 import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.autosaveandbackup.AutosaveManager;
 import net.sf.jabref.logic.autosaveandbackup.BackupManager;
 import net.sf.jabref.logic.help.HelpFile;
@@ -301,6 +301,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.PRINTED.getIcon());
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
+    private final AbstractAction manageSelectors = new GeneralAction(Actions.MANAGE_SELECTORS,
+            Localization.menuTitle("Manage content selectors"));
+    private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
+            Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
@@ -788,7 +792,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         fileHistory.storeHistory();
         prefs.customExports.store(Globals.prefs);
         prefs.customImports.store();
-        CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 
         prefs.flush();
 
@@ -1152,6 +1155,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
         edit.add(copyKeyAndLink);
+        edit.add(copyPreview);
         edit.add(exportToClipboard);
         edit.add(sendAsEmail);
 
@@ -1329,6 +1333,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(manageJournals);
         options.add(protectTerms);
         options.add(selectKeys);
+        options.add(manageSelectors);
         mb.add(options);
 
         helpMenu.add(help);
@@ -1492,7 +1497,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,

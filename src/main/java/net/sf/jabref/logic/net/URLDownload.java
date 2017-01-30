@@ -109,7 +109,7 @@ public class URLDownload {
     }
 
     private URLConnection openConnection() throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) source.openConnection();
+        URLConnection connection = source.openConnection();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -121,16 +121,18 @@ public class URLDownload {
 
         }
 
-        // normally, 3xx is redirect
-        int status = connection.getResponseCode();
-        if (status != HttpURLConnection.HTTP_OK) {
-            if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                    || status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                // get redirect url from "location" header field
-                String newUrl = connection.getHeaderField("Location");
-                // open the new connnection again
-                connection = (HttpURLConnection) new URLDownload(newUrl).openConnection();
+        if (connection instanceof HttpURLConnection) {
+            // normally, 3xx is redirect
+            int status = ((HttpURLConnection) connection).getResponseCode();
+            if (status != HttpURLConnection.HTTP_OK) {
+                if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                        || status == HttpURLConnection.HTTP_MOVED_PERM
+                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                    // get redirect url from "location" header field
+                    String newUrl = connection.getHeaderField("Location");
+                    // open the new connnection again
+                    connection = (HttpURLConnection) new URLDownload(newUrl).openConnection();
+                }
             }
         }
 

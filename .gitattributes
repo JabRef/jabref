@@ -6,7 +6,7 @@ gradlew eol=lf
 *.properties text
 *.java text
 
-# disalbe after a release
+# disable after a release
 # CHANGELOG.md merge=union
 
 src/main/resources/l10n/*.properties merge=union

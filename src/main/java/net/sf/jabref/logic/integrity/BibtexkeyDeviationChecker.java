@@ -36,7 +36,7 @@ public class BibtexkeyDeviationChecker implements Checker {
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("BibTeX key %0 deviates from generated key %1", key, generatedKey), entry, BibEntry.KEY_FIELD));
+                    Localization.lang("BibTeX key deviates from generated key"), entry, BibEntry.KEY_FIELD));
         }
 
         return Collections.emptyList();

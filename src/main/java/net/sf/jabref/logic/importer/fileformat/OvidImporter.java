@@ -15,7 +15,6 @@ import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 /**
  * Imports an Ovid file.
@@ -208,7 +207,7 @@ public class OvidImporter extends Importer {
                 // Move the "chaptertitle" to just "title":
                 h.put(FieldName.TITLE, h.remove("chaptertitle"));
             }
-            BibEntry b = new BibEntry(IdGenerator.next(), entryType);
+            BibEntry b = new BibEntry(entryType);
             b.setField(h);
 
             bibitems.add(b);

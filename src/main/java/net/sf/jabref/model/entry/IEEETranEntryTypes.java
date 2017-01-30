@@ -2,6 +2,7 @@ package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class represents all supported IEEETran entry types.
@@ -113,4 +114,8 @@ public class IEEETranEntryTypes {
     };
 
     public static final List<EntryType> ALL = Arrays.asList(ELECTRONIC, IEEETRANBSTCTL, PERIODICAL, PATENT, STANDARD);
+
+    public static Optional<EntryType> getType(String name) {
+        return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
+    }
 }

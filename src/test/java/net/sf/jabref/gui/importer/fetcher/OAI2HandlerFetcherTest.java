@@ -9,7 +9,6 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
@@ -42,7 +41,7 @@ public class OAI2HandlerFetcherTest {
     public void setUp() throws ParserConfigurationException, SAXException {
         parserFactory = SAXParserFactory.newInstance();
         saxParser = parserFactory.newSAXParser();
-        be = new BibEntry(IdGenerator.next(), "article");
+        be = new BibEntry("article");
         handler = new OAI2Handler(be);
     }
 

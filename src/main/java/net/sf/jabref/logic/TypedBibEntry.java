@@ -6,7 +6,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -17,6 +16,9 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.strings.StringUtil;
 
+/**
+ * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
+ */
 public class TypedBibEntry {
 
     private final BibEntry entry;
@@ -77,16 +79,4 @@ public class TypedBibEntry {
         return FileField.parse(oldValue.get());
     }
 
-    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
-
-        Optional<String> oldValue = entry.getField(FieldName.FILE);
-        String newValue = FileField.getStringRepresentation(files);
-
-        if(oldValue.isPresent() && oldValue.get().equals(newValue)) {
-            return Optional.empty();
-        }
-
-        entry.setField(FieldName.FILE, newValue);
-        return Optional.of(new FieldChange(entry, FieldName.FILE, oldValue.orElse(""), newValue));
-    }
 }

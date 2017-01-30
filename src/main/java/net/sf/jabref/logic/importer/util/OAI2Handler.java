@@ -87,7 +87,7 @@ public class OAI2Handler extends DefaultHandler {
         } else if ("abstract".equals(qualifiedName)) {
             entry.setField(FieldName.ABSTRACT, content);
         } else if ("comments".equals(qualifiedName)) {
-            entry.setField(FieldName.COMMENTS, content);
+            entry.setField(FieldName.COMMENT, content);
         } else if ("report-no".equals(qualifiedName)) {
             entry.setField(FieldName.REPORTNO, content);
         } else if ("doi".equals(qualifiedName)) {

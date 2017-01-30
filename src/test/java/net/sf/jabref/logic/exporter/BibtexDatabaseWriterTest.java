@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -26,7 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
@@ -244,7 +245,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
         try {
-            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
+            EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"), BibDatabaseMode.BIBTEX);
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
             database.insertEntry(entry);
@@ -267,8 +268,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtrip() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -284,8 +284,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -301,8 +300,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         BibEntry entry = result.getDatabase().getEntryByKey("1137631").get();
         entry.setField("author", "Mr. Author");
@@ -322,8 +320,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
-                importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed
@@ -523,17 +520,17 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws Exception {
-        BibEntry firstEntry = new BibEntry(IdGenerator.next());
+        BibEntry firstEntry = new BibEntry();
         firstEntry.setType(BibtexEntryTypes.ARTICLE);
         firstEntry.setField("author", "A");
         firstEntry.setField("year", "2010");
 
-        BibEntry secondEntry = new BibEntry(IdGenerator.next());
+        BibEntry secondEntry = new BibEntry();
         secondEntry.setType(BibtexEntryTypes.ARTICLE);
         secondEntry.setField("author", "B");
         secondEntry.setField("year", "2000");
 
-        BibEntry thirdEntry = new BibEntry(IdGenerator.next());
+        BibEntry thirdEntry = new BibEntry();
         thirdEntry.setType(BibtexEntryTypes.ARTICLE);
         thirdEntry.setField("author", "A");
         thirdEntry.setField("year", "2000");
@@ -563,6 +560,22 @@ public class BibtexDatabaseWriterTest {
                         "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE
                 , session.getStringValue());
+    }
+
+    @Test
+    public void roundtripWithContentSelectorsAndUmlauts() throws IOException, SaveException {
+        String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\\\"U}mlaut;}" + OS.NEWLINE;
+        Charset encoding = StandardCharsets.UTF_8;
+
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries(), preferences);
+
+        assertEquals(fileContent, session.getStringValue());
     }
 
 }

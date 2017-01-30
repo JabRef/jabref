@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
@@ -26,7 +25,6 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
@@ -109,8 +107,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     private Optional<ArXivEntry> searchForEntryById(String identifier) throws FetcherException {
+        identifier = identifier.replaceAll("(?i)arxiv:", "");
         List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier), 0, 1);
-        if (entries.size() == 1) {
+        if (entries.size() >= 1) {
             return Optional.of(entries.get(0));
         } else {
             return Optional.empty();
@@ -346,9 +345,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
-            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX))
+            getPdfUrl().ifPresent(url -> bibEntry
                     .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
-
             return bibEntry;
         }
     }

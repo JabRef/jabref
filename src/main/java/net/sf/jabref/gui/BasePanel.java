@@ -49,6 +49,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
 import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.contentselector.ContentSelectorDialog;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.exporter.ExportToClipboardAction;
@@ -90,15 +91,16 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
+import net.sf.jabref.gui.worker.CitationStyleToClipboardWorker;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
-import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.citationstyle.CitationStyleCache;
+import net.sf.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -125,7 +127,6 @@ import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
@@ -492,6 +493,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
+        actions.put(Actions.COPY_CITATION_ASCII_DOC, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.ASCII_DOC));
+        actions.put(Actions.COPY_CITATION_XSLFO, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.XSL_FO));
+        actions.put(Actions.COPY_CITATION_HTML, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.HTML));
+        actions.put(Actions.COPY_CITATION_RTF, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.RTF));
+        actions.put(Actions.COPY_CITATION_TEXT, (BaseAction) () -> copyCitationToClipboard(CitationStyleOutputFormat.TEXT));
+
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
         actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable));
 
@@ -565,8 +572,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
             }
 
-            String id = IdGenerator.next();
-            BibEntry bibEntry = new BibEntry(id, tp.getName());
+            BibEntry bibEntry = new BibEntry(tp.getName());
             TextInputDialog tidialog = new TextInputDialog(frame, bibEntry);
             tidialog.setLocationRelativeTo(BasePanel.this);
             tidialog.setVisible(true);
@@ -671,6 +677,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
         actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
+        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
+            ContentSelectorDialog csd = new ContentSelectorDialog(frame, frame, BasePanel.this, false, null);
+            csd.setLocationRelativeTo(frame);
+            csd.setVisible(true);
+        });
+
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
 
@@ -691,6 +703,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MOVE_TO_GROUP, new GroupAddRemoveDialog(this, true, true));
 
         actions.put(Actions.DOWNLOAD_FULL_TEXT, new FindFullTextAction(this));
+    }
+
+    /**
+     * Generates and copies citations based on the selected entries to the clipboard
+     * @param outputFormat the desired {@link CitationStyleOutputFormat}
+     */
+    private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
+        new CitationStyleToClipboardWorker(this, outputFormat).execute();
     }
 
     private void copy() {
@@ -741,7 +761,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        if (mainTable.getSelectedRow() != mainTable.getRowCount() -1){
+        if (mainTable.getSelectedRow() != (mainTable.getRowCount() -1)){
             selectNextEntry();
         } else {
             selectPreviousEntry();
@@ -800,7 +820,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // entries must exist
                 // independently of the copied
                 // ones.
-                be.setId(IdGenerator.next());
                 bibDatabaseContext.getDatabase().insertEntry(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
@@ -968,7 +987,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 ((BaseAction) o).action();
             } else {
                 // This part uses Spin's features:
-                Worker wrk = ((AbstractWorker) o).getWorker();
+                Runnable wrk = ((AbstractWorker) o).getWorker();
                 // The Worker returned by getWorker() has been wrapped
                 // by Spin.off(), which makes its methods be run in
                 // a different thread from the EDT.
@@ -1107,8 +1126,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             actualType = etd.getChoice();
         }
         if (actualType != null) { // Only if the dialog was not canceled.
-            String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, actualType.getName());
+            final BibEntry be = new BibEntry(actualType.getName());
             try {
                 bibDatabaseContext.getDatabase().insertEntry(be);
                 // Set owner/timestamp if options are enabled:
@@ -1503,7 +1521,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
+                    autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
@@ -1781,6 +1800,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markNonUndoableBaseChanged() {
         nonUndoableChange = true;
         markBaseChanged();
+    }
+
+    public void rebuildAllEntryEditors() {
+        currentEditor.rebuildPanels();
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -2350,6 +2373,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    /**
+     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
+     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
+     * after the user has made changes in the Manage dialog.
+     */
+    public void updateAllContentSelectors() {
+        currentEditor.updateAllContentSelectors();
+    }
 
     /**
      * Set the preview active state for all BasePanel instances.

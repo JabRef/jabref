@@ -64,6 +64,11 @@ public class KeywordListTest {
     }
 
     @Test
+    public void parseWordsWithBracketsReturnsOneKeyword() throws Exception {
+        assertEquals(new KeywordList("[a] keyword"), KeywordList.parse("[a] keyword", ','));
+    }
+
+    @Test
     public void asStringAddsSpaceAfterDelimiter() throws Exception {
         assertEquals("keywordOne, keywordTwo", keywords.getAsString(','));
     }

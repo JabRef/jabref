@@ -55,7 +55,8 @@ public class BibDatabaseTest {
         BibEntry entry0 = new BibEntry();
         database.insertEntry(entry0);
 
-        BibEntry entry1 = new BibEntry(entry0.getId());
+        BibEntry entry1 = new BibEntry();
+        entry1.setId(entry0.getId());
         database.insertEntry(entry1);
         fail();
     }

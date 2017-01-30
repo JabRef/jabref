@@ -17,6 +17,8 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +60,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
@@ -89,7 +92,6 @@ import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -170,6 +172,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final JabRefFrame frame;
 
     private final BasePanel panel;
+    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
 
     /**
      * This can be set to false to stop the source text area from getting updated. This is used in cases where the
@@ -521,6 +524,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
+     * Rebuild the field tabs. This is called e.g. when a new content selector
+     * has been added.
+     */
+    public void rebuildPanels() {
+        // Remove change listener, because the rebuilding causes meaningless
+        // events and trouble:
+        tabbed.removeChangeListener(tabListener);
+
+        setupFieldPanels();
+        // Add the change listener again:
+        tabbed.addChangeListener(tabListener);
+        revalidate();
+        repaint();
+    }
+
+    /**
      * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
      * If the name has an entry, the proper component to be shown is created and
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
@@ -545,7 +564,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
-            return FieldExtraComponents.getJournalExtraComponent(panel, editor, entry, getStoreFieldAction());
+            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
+                    getStoreFieldAction());
+        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
+            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
+                    getStoreFieldAction());
+
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
@@ -895,6 +919,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    public void updateAllContentSelectors() {
+        if (!contentSelectors.isEmpty()) {
+            for (FieldContentSelector contentSelector : contentSelectors) {
+                contentSelector.rebuildComboBox();
+            }
+        }
+    }
+
     /**
      * Update the JTextArea when a field has changed.
      */
@@ -961,11 +993,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     }
                 }
 
+
                 private void handleTypeChange() {
                     showChangeEntryTypePopupMenu();
                 }
             });
         }
+
 
         @Override
         public void paintComponent(Graphics g) {
@@ -1468,7 +1502,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private Optional<FieldChange> doUpdateTimeStamp() {
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         String timeStampFormat = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
-        String timestamp = EasyDateFormat.fromTimeStampFormat(timeStampFormat).getCurrentDate();
+        String timestamp = DateTimeFormatter.ofPattern(timeStampFormat).format(LocalDateTime.now());
         return UpdateField.updateField(entry, timeStampField, timestamp);
     }
 

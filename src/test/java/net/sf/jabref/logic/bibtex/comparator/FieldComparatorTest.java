@@ -94,7 +94,7 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldIdentity() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry equal = new BibEntry("1", "article");
+        BibEntry equal = new BibEntry("article");
 
         assertEquals(0, comparator.compare(equal, equal));
     }
@@ -102,8 +102,10 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldEquality() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry equal = new BibEntry("1", "article");
-        BibEntry equal2 = new BibEntry("1", "article");
+        BibEntry equal = new BibEntry("article");
+        equal.setId("1");
+        BibEntry equal2 = new BibEntry("article");
+        equal2.setId("1");
 
         assertEquals(0, comparator.compare(equal, equal2));
     }
@@ -111,8 +113,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerAscending() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype");
-        BibEntry smaller = new BibEntry("1", "article");
-        BibEntry bigger = new BibEntry("2", "book");
+        BibEntry smaller = new BibEntry("article");
+        BibEntry bigger = new BibEntry("book");
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }
@@ -120,8 +122,8 @@ public class FieldComparatorTest {
     @Test
     public void compareTypeFieldBiggerDescending() throws Exception {
         FieldComparator comparator = new FieldComparator("entrytype", true);
-        BibEntry bigger = new BibEntry("1", "article");
-        BibEntry smaller = new BibEntry("2", "book");
+        BibEntry bigger = new BibEntry("article");
+        BibEntry smaller = new BibEntry("book");
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }

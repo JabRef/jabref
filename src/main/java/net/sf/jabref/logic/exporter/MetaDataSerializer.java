@@ -12,6 +12,7 @@ import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.ContentSelector;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
@@ -40,6 +41,11 @@ public class MetaDataSerializer {
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
 
+        for(ContentSelector selector: metaData.getContentSelectorList()){
+                stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
+
+        }
+
         Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
 
         // Write groups if present.
@@ -55,7 +61,7 @@ public class MetaDataSerializer {
             StringBuilder stringBuilder = new StringBuilder();
             for (String dataItem : metaItem.getValue()) {
                 stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
-
+                
                 //in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)

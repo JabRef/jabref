@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ExplicitGroupTest {
 
@@ -88,5 +89,14 @@ public class ExplicitGroupTest {
         entry.setField(FieldName.GROUPS, "myExplicitGroup/b");
 
         assertFalse(group.contains(entry));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2394
+    public void containsMatchesPhraseWithBrackets() throws Exception {
+        entry.setField(FieldName.GROUPS, "[aa] Subgroup1");
+        ExplicitGroup explicitGroup = new ExplicitGroup("[aa] Subgroup1", GroupHierarchyType.INCLUDING, ',');
+
+        assertTrue(explicitGroup.contains(entry));
     }
 }
