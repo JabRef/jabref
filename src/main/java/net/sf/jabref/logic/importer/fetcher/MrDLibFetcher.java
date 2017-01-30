@@ -97,7 +97,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @return the string used to make the query at mdl server
      */
     private String constructQuery(String query) {
-        query = query.replaceAll(":|'|\"|#|<|>|&|´|`|*|~|+|-", "");
+        query = query.replaceAll(":|'|\"|#|<|>|&|´|`|~|-", "");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https");
         builder.setHost("api-dev.mr-dlib.org");
