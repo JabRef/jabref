@@ -161,7 +161,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private EntryEditorTabRelatedArticles relatedArticlesTab;
 
-    private boolean relatedAcrticlesTabNeedsRecommendations = true;
+    private final boolean relatedAcrticlesTabNeedsRecommendations = true;
 
     private JTextArea source;
 
@@ -1002,11 +1002,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
                 if (((JTabbedPane) event.getSource()).getSelectedComponent().getName()
                         .equals(Localization.lang("Related articles"))) {
-                    if (relatedAcrticlesTabNeedsRecommendations) {
-                        relatedArticlesTab.requestRecommendations();
-                        relatedAcrticlesTabNeedsRecommendations = false;
-                    }
-
+                    relatedArticlesTab.focus();
                 }
             });
         }

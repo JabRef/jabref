@@ -37,6 +37,8 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     private List<BibEntry> relatedArticles;
 
+    private Boolean onFocus = true;
+
 
     /**
      * Access related acticles delivered by Mr. DLib.
@@ -127,6 +129,13 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         });
     }
 
+    public void focus() {
+        if (onFocus) {
+            requestRecommendations();
+            onFocus = false;
+        }
+    }
+
     /**
      * Starts a Fetcher getting the recommendations form Mr. DLib
      */
@@ -155,8 +164,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * Helper Class to initiate SwingWorker
      */
     class MrDLibFetcherWorker extends SwingWorker<List<BibEntry>, Void> {
-
-
         private final MrDLibFetcher fetcher;
         private final JabRefPreferences prefs = JabRefPreferences.getInstance();
         BibEntry selectedEntry;

@@ -6,15 +6,10 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import javax.net.ssl.SSLContext;
 
 import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -26,16 +21,9 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.http.client.utils.URIBuilder;
 
 /**
  *  This class is responible to get the recommendations from MDL
@@ -109,19 +97,23 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @return the string used to make the query at mdl server
      */
     private String constructQuery(String query) {
-        StringBuffer queryBuffer = new StringBuffer();
-        queryBuffer.append("https://api-dev2.mr-dlib.org/v1/documents/");
+        query = query.replaceAll(":|'|\"|#|<|>|&", "");
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("https");
+        builder.setHost("api-dev.mr-dlib.org");
+        builder.setPath("/v1/documents/" + query + "/related_documents");
+        builder.addParameter("partner_id", "jabref");
+        builder.addParameter("app_id", "jabref_desktop");
+        builder.addParameter("app_version", VERSION);
+        builder.addParameter("app_lang", LANGUAGE);
+        URI uri = null;
         try {
-            queryBuffer.append(URLEncoder.encode(query, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
+            uri = builder.build();
+        } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        queryBuffer.append("/related_documents?");
-        queryBuffer.append("partner_id=jabref");
-        queryBuffer.append("&app_id=jabref_desktop");
-        queryBuffer.append("&app_version=" + VERSION);
-        queryBuffer.append("&app_lang=" + LANGUAGE);
-        return queryBuffer.toString();
+        System.out.println("Query: " + uri.toString());
+        return uri.toString();
     }
 
 }

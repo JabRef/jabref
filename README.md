@@ -102,7 +102,7 @@ Building a release requires [install4j]. We've got an [Open Source License](http
 Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A full release howto is available [in our wiki](https://github.com/JabRef/jabref/wiki/Releasing-a-new-Version).
 
 ## Rights of Loading Animation
-The loading animation during loading of recommendations from Mr. DLib is created by http://loading.io/ and is free of use.
+The loading animation during loading of recommendations from Mr. DLib is created by http://loading.io/ and is free of use under licence CC0 1.0.
 
 ## License
 
