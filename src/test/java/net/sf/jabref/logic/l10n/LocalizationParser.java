@@ -26,7 +26,7 @@ import com.sun.javafx.application.PlatformImpl;
 
 public class LocalizationParser {
 
-    public static SortedSet<LocalizationEntry> find(LocalizationBundle type) throws IOException {
+    public static SortedSet<LocalizationEntry> find(LocalizationBundleForTEst type) throws IOException {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
         Set<String> keysInJavaFiles = entries.stream()
@@ -36,7 +36,7 @@ public class LocalizationParser {
                 .collect(Collectors.toSet());
 
         Set<String> englishKeys;
-        if (type == LocalizationBundle.LANG) {
+        if (type == LocalizationBundleForTEst.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
@@ -48,13 +48,13 @@ public class LocalizationParser {
                 Collectors.toCollection(TreeSet::new));
     }
 
-    public static SortedSet<String> findObsolete(LocalizationBundle type) throws IOException {
+    public static SortedSet<String> findObsolete(LocalizationBundleForTEst type) throws IOException {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
         Set<String> keysInFiles = entries.stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
 
         Set<String> englishKeys;
-        if (type == LocalizationBundle.LANG) {
+        if (type == LocalizationBundleForTEst.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
@@ -64,8 +64,8 @@ public class LocalizationParser {
         return englishKeys.stream().collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundle type) throws IOException {
-        if (type == LocalizationBundle.MENU) {
+    private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundleForTEst type) throws IOException {
+        if (type == LocalizationBundleForTEst.MENU) {
             return findLocalizationEntriesInJavaFiles(type);
         } else {
             Set<LocalizationEntry> entriesInFiles = new HashSet<>();
@@ -75,7 +75,7 @@ public class LocalizationParser {
         }
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
+    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTEst type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
                 .filter(LocalizationParser::isJavaFile)
@@ -83,7 +83,7 @@ public class LocalizationParser {
                 .collect(Collectors.toSet());
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundle type)
+    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTEst type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
                 .filter(LocalizationParser::isFxmlFile)
@@ -121,7 +121,7 @@ public class LocalizationParser {
         return path.toString().endsWith(".fxml");
     }
 
-    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundle type) {
+    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTEst type) {
         List<LocalizationEntry> result = new LinkedList<>();
 
         try {
@@ -144,7 +144,7 @@ public class LocalizationParser {
     /**
      * Loads the fxml file and returns all used language resources.
      */
-    private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundle type) {
+    private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTEst type) {
         List<String> result = new LinkedList<>();
 
         // Record which keys are requested; we pretend that we have all keys
@@ -191,11 +191,11 @@ public class LocalizationParser {
 
         private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
 
-        public static List<String> getLanguageKeysInString(String content, LocalizationBundle type) {
+        public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTEst type) {
             List<String> result = new LinkedList<>();
 
             Matcher matcher;
-            if (type == LocalizationBundle.LANG) {
+            if (type == LocalizationBundleForTEst.LANG) {
                 matcher = LOCALIZATION_START_PATTERN.matcher(content);
             } else {
                 matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);

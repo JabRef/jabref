@@ -120,7 +120,7 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundle.LANG).stream().sorted()
+        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTEst.LANG).stream().sorted()
                 .distinct().collect(Collectors.toList());
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
@@ -134,7 +134,7 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findMissingMenuLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundle.MENU).stream()
+        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTEst.MENU).stream()
                 .collect(Collectors.toList());
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH MENU FILE\n" +
@@ -148,7 +148,7 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findObsoleteLocalizationKeys() throws IOException {
-        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTEst.LANG);
 
         assertEquals("Obsolete keys found in language properties file: " + obsoleteKeys + "\n" +
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
@@ -159,7 +159,7 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findObsoleteMenuLocalizationKeys() throws IOException {
-        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTEst.MENU);
 
         assertEquals("Obsolete keys found in the menu properties file: " + obsoleteKeys + "\n" +
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
