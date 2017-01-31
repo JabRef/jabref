@@ -30,7 +30,7 @@ public class LocalizationParserTest {
     }
 
     private void assertLocalizationParsing(String code, List<String> expectedLanguageKeys) {
-        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTEst.LANG);
+        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 

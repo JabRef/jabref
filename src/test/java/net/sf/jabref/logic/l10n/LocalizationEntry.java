@@ -7,9 +7,9 @@ class LocalizationEntry implements Comparable<LocalizationEntry>{
 
     private final Path path;
     private final String key;
-    private final LocalizationBundleForTEst bundle;
+    private final LocalizationBundleForTest bundle;
 
-    LocalizationEntry(Path path, String key, LocalizationBundleForTEst bundle) {
+    LocalizationEntry(Path path, String key, LocalizationBundleForTest bundle) {
         this.path = path;
         this.key = key;
         this.bundle = bundle;
@@ -50,7 +50,7 @@ class LocalizationEntry implements Comparable<LocalizationEntry>{
         return Objects.hash(key, bundle);
     }
 
-    public LocalizationBundleForTEst getBundle() {
+    public LocalizationBundleForTest getBundle() {
         return bundle;
     }
 
