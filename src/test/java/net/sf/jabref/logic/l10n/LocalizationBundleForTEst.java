@@ -1,5 +1,5 @@
 package net.sf.jabref.logic.l10n;
 
-enum LocalizationBundle {
+enum LocalizationBundleForTest {
     LANG, MENU
 }
