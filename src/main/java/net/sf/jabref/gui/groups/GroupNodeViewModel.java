@@ -1,11 +1,9 @@
 package net.sf.jabref.gui.groups;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -16,6 +14,7 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
+import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
@@ -23,7 +22,7 @@ public class GroupNodeViewModel {
     private final boolean isRoot;
     private final String iconCode;
     private final boolean isLeaf;
-    private final ObservableList<GroupNodeViewModel> children = FXCollections.observableArrayList();
+    private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
@@ -36,7 +35,7 @@ public class GroupNodeViewModel {
         isRoot = groupNode.isRoot();
         iconCode = "";
         isLeaf = groupNode.isLeaf();
-        children.addAll(groupNode.getChildren().stream().map(child -> new GroupNodeViewModel(databaseContext, child)).collect(Collectors.toList()));
+        children = EasyBind.map(groupNode.getChildren(), child -> new GroupNodeViewModel(databaseContext, child));
         hits = new SimpleIntegerProperty(0);
         calculateNumberOfMatches();
 
@@ -144,5 +143,9 @@ public class GroupNodeViewModel {
             int newHits = groupNode.calculateNumberOfMatches(databaseContext.getDatabase());
             Platform.runLater(() -> hits.setValue(newHits));
         }).start();
+    }
+
+    public void addSubgroup(AbstractGroup subgroup) {
+        groupNode.addSubgroup(subgroup);
     }
 }

@@ -7,8 +7,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import net.sf.jabref.gui.AbstractViewModel;
+import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.metadata.MetaData;
 
 public class GroupTreeViewModel extends AbstractViewModel {
@@ -16,18 +18,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
     private final ObjectProperty<GroupNodeViewModel> selectedGroup = new SimpleObjectProperty<>();
     private final StateManager stateManager;
+    private final DialogService dialogService;
     private Optional<BibDatabaseContext> currentDatabase;
 
-    public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
-        return rootGroup;
-    }
-
-    public ObjectProperty<GroupNodeViewModel> selectedGroupProperty() {
-        return selectedGroup;
-    }
-
-    public GroupTreeViewModel(StateManager stateManager) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService) {
         this.stateManager = Objects.requireNonNull(stateManager);
+        this.dialogService = Objects.requireNonNull(dialogService);
 
         // Init
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
@@ -35,6 +31,14 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // Register listener
         stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+    }
+
+    public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
+        return rootGroup;
+    }
+
+    public ObjectProperty<GroupNodeViewModel> selectedGroupProperty() {
+        return selectedGroup;
     }
 
     /**
@@ -61,5 +65,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get()));
             rootGroup.setValue(newRoot);
         }
+    }
+
+    /**
+     * Opens "New Group Dialog" and add the resulting group to the root
+     */
+    public void addNewGroupToRoot() {
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+        newGroup.ifPresent(group -> rootGroup.get().addSubgroup(group));
     }
 }

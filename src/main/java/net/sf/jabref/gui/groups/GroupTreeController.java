@@ -3,6 +3,7 @@ package net.sf.jabref.gui.groups;
 import javax.inject.Inject;
 
 import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Control;
 import javafx.scene.control.SelectionModel;
@@ -14,6 +15,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 import net.sf.jabref.gui.AbstractController;
+import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.RecursiveTreeItem;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
@@ -28,10 +30,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> disclosureNodeColumn;
 
     @Inject private StateManager stateManager;
+    @Inject private DialogService dialogService;
 
     @FXML
     public void initialize() {
-        viewModel = new GroupTreeViewModel(stateManager);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService);
 
         // Set-up bindings
         groupTree.rootProperty().bind(
@@ -102,5 +105,9 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
             return row;
         });
+    }
+
+    public void addNewGroup(ActionEvent actionEvent) {
+        viewModel.addNewGroupToRoot();
     }
 }

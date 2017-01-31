@@ -46,10 +46,10 @@
 .tree-table-row-cell:root > .numberColumn {
     -fx-padding: 0.40em 0.2em 0.40em 0em;
 }
+
 .tree-table-row-cell:root > .disclosureNodeColumn {
     -fx-padding: 0.45em 0.2em 0.45em 0.2em;
 }
-
 
 .tree-table-row-cell:hover {
     -fx-background-color: lightgrey;
@@ -99,3 +99,19 @@
     -fx-translate-x: -5px;
 }
 
+#buttonBarBottom {
+    -fx-background-color: #dadad8;
+    -fx-border-color: dimgray;
+    -fx-border-width: 1 0 0 0;
+}
+
+.flatButton {
+    -fx-shadow-highlight-color: transparent;
+    -fx-outer-border: transparent;
+    -fx-inner-border: transparent;
+    -fx-focus-color: #6A9FCD;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: transparent;
+    -fx-text-background-color: dimgray;
+    -fx-padding: 0.5em;
+}
