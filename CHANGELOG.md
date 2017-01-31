@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - Partly switched to new UI technology (JavaFX).
+    - Redesigned group panel.
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
