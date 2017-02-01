@@ -4,60 +4,41 @@ import java.awt.Component;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
+
+import javafx.application.Platform;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.util.FileDialogConfiguration;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class FileDialog {
-    /**
-     * Custom confirmation dialog
-     * http://stackoverflow.com/a/3729157
-     */
-    private final JFileChooser fileChooser = new JFileChooser() {
-        @Override
-        public void approveSelection() {
-            File file = getSelectedFile();
-            if (file.exists() && (getDialogType() == SAVE_DIALOG)) {
-                int result = JOptionPane.showConfirmDialog(this,
-                        Localization.lang("'%0' exists. Overwrite file?", file.getName()),
-                        Localization.lang("Existing file"), JOptionPane.YES_NO_CANCEL_OPTION);
-                switch (result) {
-                case JOptionPane.YES_OPTION:
-                    super.approveSelection();
-                    return;
-                case JOptionPane.NO_OPTION:
-                    return;
-                case JOptionPane.CLOSED_OPTION:
-                    return;
-                case JOptionPane.CANCEL_OPTION:
-                    cancelSelection();
-                    return;
-                default:
-                    return;
-                }
-            }
-            super.approveSelection();
-        }
-    };
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-    private final Component parent;
-    private final String directory;
-    private Collection<FileExtensions> extensions = EnumSet.noneOf(FileExtensions.class);
+/**
+ * @deprecated use {@link DialogService} instead.
+ */
+@Deprecated
+public class FileDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(FileDialog.class);
+
+    private final FileChooser fileChooser;
+    private FileDialogConfiguration.Builder configurationBuilder;
 
     /**
      * Creates a new filedialog showing the current working dir {@link JabRefPreferences#WORKING_DIRECTORY}
@@ -73,11 +54,15 @@ public class FileDialog {
      * @param dir The starting directory to show in the dialog
      */
     public FileDialog(Component parent, String dir) {
+        this(parent, Paths.get(dir));
+    }
+
+    public FileDialog(Component parent, Path dir) {
         Objects.requireNonNull(dir, "Directory must not be null");
 
-        this.parent = parent;
-        this.directory = dir;
-        fileChooser.setCurrentDirectory(Paths.get(dir).toFile());
+        fileChooser = new FileChooser();
+        configurationBuilder = new FileDialogConfiguration.Builder();
+        configurationBuilder = configurationBuilder.withInitialDirectory(dir);
     }
 
     /**
@@ -86,7 +71,7 @@ public class FileDialog {
      * @return FileDialog
      */
     public FileDialog withExtension(FileExtensions singleExt) {
-        withExtensions(EnumSet.of(singleExt));
+        configurationBuilder = configurationBuilder.addExtensionFilter(singleExt);
         return this;
     }
 
@@ -96,15 +81,7 @@ public class FileDialog {
      * @return FileDialog
      */
     public FileDialog withExtensions(Collection<FileExtensions> fileExtensions) {
-        this.extensions = fileExtensions;
-
-        for (FileExtensions ext : fileExtensions) {
-            FileNameExtensionFilter extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
-            fileChooser.addChoosableFileFilter(extFilter);
-            // explictly needed for OSX to enable *.* file filter
-            fileChooser.setAcceptAllFileFilterUsed(true);
-        }
-
+        configurationBuilder = configurationBuilder.addExtensionFilters(fileExtensions);
         return this;
     }
 
@@ -115,10 +92,7 @@ public class FileDialog {
      * @param extension the file extension
      */
     public void setDefaultExtension(FileExtensions extension) {
-        Arrays.stream(fileChooser.getChoosableFileFilters())
-                .filter(f -> Objects.equals(f.getDescription(), extension.getDescription()))
-                .findFirst()
-                .ifPresent(fileChooser::setFileFilter);
+        configurationBuilder = configurationBuilder.withDefaultExtension(extension);
     }
 
     /**
@@ -126,8 +100,8 @@ public class FileDialog {
      *
      * @return FileFilter
      */
-    public FileFilter getFileFilter() {
-        return fileChooser.getFileFilter();
+    public FileChooser.ExtensionFilter getFileFilter() {
+        return fileChooser.getSelectedExtensionFilter();
     }
 
     /**
@@ -136,8 +110,9 @@ public class FileDialog {
      *
      * @param filter the custom file filter
      */
-    public void setFileFilter(FileFilter filter) {
-        fileChooser.setFileFilter(filter);
+    public void setFileFilter(FileChooser.ExtensionFilter filter) {
+        fileChooser.getExtensionFilters().add(filter);
+        fileChooser.setSelectedExtensionFilter(filter);
     }
 
     /**
@@ -145,7 +120,7 @@ public class FileDialog {
      * @return FileDialog
      */
     public FileDialog updateWorkingDirPref() {
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, this.directory);
+        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileChooser.getInitialDirectory().getAbsolutePath());
         return this;
     }
 
@@ -154,29 +129,35 @@ public class FileDialog {
      * @return The path of the selected folder or {@link Optional#empty()} if dialog is aborted
      */
     public Optional<Path> showDialogAndGetSelectedDirectory() {
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.setDialogTitle(Localization.lang("Select directory"));
-        fileChooser.setApproveButtonText(Localization.lang("Select"));
-        fileChooser.setApproveButtonToolTipText(Localization.lang("Select directory"));
+        FileDialogConfiguration configuration = configurationBuilder.build();
 
-        return showDialogAndGetSelectedFile();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle(Localization.lang("Select directory"));
+        configuration.getInitialDirectory().map(Path::toFile).ifPresent(directoryChooser::setInitialDirectory);
+
+        return runInJavaFXThread(() -> Optional.ofNullable(directoryChooser.showDialog(null)).map(File::toPath));
     }
     /**
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select multiple files
      * @return List containing the paths of all files or an empty list if dialog is canceled
      */
     public List<String> showDialogAndGetMultipleFiles() {
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setMultiSelectionEnabled(true);
+        configureFileChooser();
+        return runInJavaFXThread(() -> {
+            List<File> files = fileChooser.showOpenMultipleDialog(null);
+            if (files == null) {
+                return Collections.emptyList();
+            } else {
+                return files.stream().map(File::toString).collect(Collectors.toList());
+            }
+        });
+    }
 
-        if (showDialogAndIsAccepted()) {
-            List<String> files = Arrays.stream(fileChooser.getSelectedFiles()).map(File::toString)
-                    .collect(Collectors.toList());
-
-            return files;
-        }
-
-        return Collections.emptyList();
+    private void configureFileChooser() {
+        FileDialogConfiguration configuration = configurationBuilder.build();
+        fileChooser.getExtensionFilters().addAll(configuration.getExtensionFilters());
+        fileChooser.setSelectedExtensionFilter(configuration.getDefaultExtension());
+        configuration.getInitialDirectory().map(Path::toFile).ifPresent(fileChooser::setInitialDirectory);
     }
 
     /**
@@ -184,13 +165,8 @@ public class FileDialog {
      * @return The path of the selected file/folder or {@link Optional#empty()} if dialog is aborted
      */
     public Optional<Path> showDialogAndGetSelectedFile() {
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-
-        if (showDialogAndIsAccepted()) {
-            return Optional.of(fileChooser.getSelectedFile().toPath());
-        }
-
-        return Optional.empty();
+        configureFileChooser();
+        return runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showOpenDialog(null)).map(File::toPath));
     }
 
     /**
@@ -200,21 +176,23 @@ public class FileDialog {
      * @return The path of the new file, or {@link Optional#empty()} if dialog is aborted
      */
     public Optional<Path> saveNewFile() {
-        fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        if (showDialogAndIsAccepted()) {
-            File file = fileChooser.getSelectedFile();
-
-            if (!extensions.isEmpty() && !fileChooser.accept(file)) {
-                return Optional.of(Paths.get(file.getPath() + extensions.iterator().next().getFirstExtensionWithDot()));
-            }
-
-            return Optional.of(file.toPath());
-        }
-        return Optional.empty();
+        configureFileChooser();
+        return runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showSaveDialog(null)).map(File::toPath));
     }
 
-    private boolean showDialogAndIsAccepted() {
-        return fileChooser.showDialog(parent, null) == JFileChooser.APPROVE_OPTION;
+    /**
+     * We need to be careful and run everything in the javafx thread
+     * TODO: Remove this work-around as soon as everything uses the javafx thread
+     */
+    private <V> V runInJavaFXThread(Callable<V> callable) {
+        FutureTask<V> task = new FutureTask<>(callable);
+        Platform.runLater(task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e);
+            return null;
+        }
     }
 
     private static String getWorkingDir() {

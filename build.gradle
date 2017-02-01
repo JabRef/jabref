@@ -43,8 +43,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
-version = "3.8.2-dev"
-project.ext.threeDotVersion = "3.8.1.1"
+version = "4.0.0-dev"
+project.ext.threeDotVersion = "4.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -109,6 +109,13 @@ dependencies {
 
     compile 'com.google.guava:guava:21.0'
 
+    // JavaFX stuff
+    compile 'com.airhacks:afterburner.fx:1.7.0'
+    compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
+    compile 'org.controlsfx:controlsfx:8.40.12'
+    compile 'org.fxmisc.easybind:easybind:1.0.3'
+
+
     compile 'commons-logging:commons-logging:1.2'
 
     compile 'org.apache.commons:commons-lang3:3.5'
@@ -141,6 +148,10 @@ sourceSets {
     main {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
+        }
+
+        resources {
+            srcDirs = ["src/main/java", "src/main/resources"]
         }
     }
 }
