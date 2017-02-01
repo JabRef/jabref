@@ -107,7 +107,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final AbstractAction editGroupAction = new EditGroupAction();
     private final NodeAction editGroupPopupAction = new EditGroupAction();
     private final NodeAction addGroupPopupAction = new AddGroupAction();
-    private final NodeAction addSubgroupPopupAction = new AddSubgroupAction();
     private final NodeAction removeGroupAndSubgroupsPopupAction = new RemoveGroupAndSubgroupsAction();
     private final NodeAction removeSubgroupsPopupAction = new RemoveSubgroupsAction();
     private final NodeAction removeGroupKeepSubgroupsPopupAction = new RemoveGroupKeepSubgroupsAction();
@@ -332,7 +331,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         // BasePanel (entryTable.addKeyListener(...)).
         groupsContextMenu.add(editGroupPopupAction);
         groupsContextMenu.add(addGroupPopupAction);
-        groupsContextMenu.add(addSubgroupPopupAction);
         groupsContextMenu.addSeparator();
         groupsContextMenu.add(removeGroupAndSubgroupsPopupAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsPopupAction);
@@ -411,7 +409,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private void showPopup(MouseEvent e) {
         final TreePath path = groupsTree.getPathForLocation(e.getPoint().x, e.getPoint().y);
         addGroupPopupAction.setEnabled(true);
-        addSubgroupPopupAction.setEnabled(path != null);
         editGroupPopupAction.setEnabled(path != null);
         removeGroupAndSubgroupsPopupAction.setEnabled(path != null);
         removeGroupKeepSubgroupsPopupAction.setEnabled(path != null);
@@ -426,7 +423,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (path != null) { // some path dependent enabling/disabling
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             editGroupPopupAction.setNode(node);
-            addSubgroupPopupAction.setNode(node);
             removeGroupAndSubgroupsPopupAction.setNode(node);
             removeSubgroupsPopupAction.setNode(node);
             removeGroupKeepSubgroupsPopupAction.setNode(node);
@@ -483,7 +479,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         } else {
             editGroupPopupAction.setNode(null);
             addGroupPopupAction.setNode(null);
-            addSubgroupPopupAction.setNode(null);
             removeGroupAndSubgroupsPopupAction.setNode(null);
             removeSubgroupsPopupAction.setNode(null);
             removeGroupKeepSubgroupsPopupAction.setNode(null);
@@ -1038,33 +1033,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
             groupsTree.expandPath((node == null ? groupsRoot : node).getTreePath());
-            // Store undo information.
-            panel.getUndoManager().addEdit(undo);
-            panel.markBaseChanged();
-            frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
-        }
-    }
-
-    private class AddSubgroupAction extends NodeAction {
-
-        public AddSubgroupAction() {
-            super(Localization.lang("Add subgroup"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final GroupDialog gd = new GroupDialog(frame, null);
-            gd.setVisible(true);
-            if (!gd.okPressed()) {
-                return; // ignore
-            }
-            final AbstractGroup newGroup = gd.getResultingGroup();
-            final GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
-            final GroupTreeNodeViewModel node = getNodeToUse();
-            node.getNode().addChild(newNode);
-            UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
-                    new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
-            groupsTree.expandPath(node.getTreePath());
             // Store undo information.
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();

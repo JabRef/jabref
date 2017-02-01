@@ -5,7 +5,9 @@ import javax.inject.Inject;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -19,6 +21,7 @@ import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.RecursiveTreeItem;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
+import net.sf.jabref.logic.l10n.Localization;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -73,17 +76,14 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         disclosureNodeColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
             .withGraphic(viewModel -> {
-                if (viewModel.isLeaf()) {
-                    return null;
-                } else {
-                    final StackPane disclosureNode = new StackPane();
-                    disclosureNode.getStyleClass().setAll("tree-disclosure-node");
+                final StackPane disclosureNode = new StackPane();
+                disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
+                disclosureNode.getStyleClass().setAll("tree-disclosure-node");
 
-                    final StackPane disclosureNodeArrow = new StackPane();
-                    disclosureNodeArrow.getStyleClass().setAll("arrow");
-                    disclosureNode.getChildren().add(disclosureNodeArrow);
-                    return disclosureNode;
-                }
+                final StackPane disclosureNodeArrow = new StackPane();
+                disclosureNodeArrow.getStyleClass().setAll("arrow");
+                disclosureNode.getChildren().add(disclosureNodeArrow);
+                return disclosureNode;
             }));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
@@ -103,8 +103,27 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             // Simply setting to null is not enough since it would be replaced by the default node on every change
             row.setDisclosureNode(null);
             row.disclosureNodeProperty().addListener((observable, oldValue, newValue) -> row.setDisclosureNode(null));
+
+            // Add context menu (only for non-null items)
+            row.contextMenuProperty().bind(
+                    EasyBind.monadic(row.itemProperty())
+                            .map(this::createContextMenuForGroup)
+                            .orElse((ContextMenu) null)
+            );
+
+
             return row;
         });
+    }
+
+    private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
+        addSubgroup.setOnAction(event -> viewModel.addNewSubgroup(group));
+
+        menu.getItems().add(addSubgroup);
+        return menu;
     }
 
     public void addNewGroup(ActionEvent actionEvent) {
