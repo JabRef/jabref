@@ -43,6 +43,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.externalfiles.AutoSetLinks;
 import net.sf.jabref.gui.externalfiles.DownloadExternalFile;
 import net.sf.jabref.gui.externalfiles.MoveFileAction;
+import net.sf.jabref.gui.externalfiles.RenameFileAction;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.filelist.FileListEntry;
@@ -212,11 +213,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         JMenuItem rename = new JMenuItem(Localization.lang("Move/Rename file"));
         menu.add(rename);
-        rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
+        rename.addActionListener(new RenameFileAction(frame, entryEditor, this));
 
         JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
         menu.add(moveToFileDir);
-        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
+        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this));
 
         JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
         menu.add(deleteFile);

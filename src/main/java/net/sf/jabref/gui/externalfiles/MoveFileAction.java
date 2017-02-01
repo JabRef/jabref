@@ -2,8 +2,11 @@ package net.sf.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -23,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Action for moving or renaming a file that is linked to from an entry in JabRef.
+ * Action for moving a file that is linked  from an entry in JabRef.
  */
 public class MoveFileAction extends AbstractAction {
 
@@ -32,16 +35,14 @@ public class MoveFileAction extends AbstractAction {
     private final JabRefFrame frame;
     private final EntryEditor eEditor;
     private final FileListEditor editor;
-
-    private final boolean toFileDir;
+    private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
     private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
-    public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor, boolean toFileDir) {
+    public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
         this.eEditor = eEditor;
         this.editor = editor;
-        this.toFileDir = toFileDir;
     }
 
     @Override
@@ -53,7 +54,6 @@ public class MoveFileAction extends AbstractAction {
             return;
         }
 
-        //  MoveFilesCleanup cleanup = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),  Globals.prefs.get, fileDirectoryPreferences, prefs)
         FileListEntry entry = editor.getTableModel().getEntry(selected);
 
         // Check if the current file exists:
@@ -66,15 +66,10 @@ public class MoveFileAction extends AbstractAction {
 
         // Get an absolute path representation:
         List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-        int found = -1;
-        for (int i = 0; i < dirs.size(); i++) {
-            if (new File(dirs.get(i)).exists()) {
-                found = i;
-                break;
-            }
-        }
-        if (found < 0) {
+                .getFileDirectories(prefs.getFileDirectoryPreferences());
+        Optional<Path> fileDir = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
+        if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
                     MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
             return;
@@ -83,16 +78,17 @@ public class MoveFileAction extends AbstractAction {
         if (!file.isAbsolute()) {
             file = FileUtil.expandFilename(ln, dirs).orElse(null);
         }
-        if ((file != null) && file.exists()) {
+
+        if ((file != null) && Files.exists(file.toPath())) {
             // Ok, we found the file. Now get a new name:
+            System.out.println("Cleanup of file " + file);
 
-            CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
-
-            MoveFilesCleanup myCleanUp = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
+            //Problem: All listed files are cleaned up
+            MoveFilesCleanup moveFiles = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
                     prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
                     prefs.getLayoutFormatterPreferences());
 
-            myCleanUp.cleanup((eEditor.getEntry()));
+            moveFiles.cleanup((eEditor.getEntry()));
             //myCleanUp.cleanup();
             /*  File newFile = null;
             boolean repeat = true;

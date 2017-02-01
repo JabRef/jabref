@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
  * This class represents a file link for a Bibtex entry.
@@ -41,5 +42,9 @@ public class FileListEntry {
     @Override
     public String toString() {
         return description + " : " + link + " : " + type.orElse(null);
+    }
+
+    public ParsedFileField toParsedFileField() {
+        return new ParsedFileField(description, link, type.isPresent() ? type.get().getName() : "");
     }
 }
