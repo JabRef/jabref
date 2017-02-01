@@ -17,8 +17,7 @@ public class LatexToUnicode {
     private static final Pattern P = Pattern.compile("<p>");
     private static final Pattern DOLLAR = Pattern.compile("\\&dollar;");
     private static final Pattern TILDE = Pattern.compile("~");
-    private static final Pattern N_APOSTROPHE_SPECIAL_VERSION_LOWERCASE = Pattern.compile("'n");
-    private static final Pattern N_APOSTROPHE_SPECIAL_VERSION_UPPERCASE = Pattern.compile("'N");
+    private static final Pattern APOSTROPHE_N = Pattern.compile("(?<!\\\\)'n");
 
     public String format(String inField) {
         if (inField.isEmpty()) {
@@ -30,8 +29,7 @@ public class LatexToUnicode {
         field = P_LATEX.matcher(field).replaceAll("<p>");
         field = DOLLAR_LATEX.matcher(field).replaceAll("&dollar;");
         field = DOLLARS_LATEX.matcher(field).replaceAll("\\{$1\\}");
-        field = N_APOSTROPHE_SPECIAL_VERSION_LOWERCASE.matcher(field).replaceAll("ń");
-        field = N_APOSTROPHE_SPECIAL_VERSION_UPPERCASE.matcher(field).replaceAll("Ń");
+        field = APOSTROPHE_N.matcher(field).replaceAll("ŉ");
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
