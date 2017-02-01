@@ -21,6 +21,7 @@ import net.sf.jabref.logic.cleanup.MoveFilesCleanup;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,12 +59,14 @@ public class MoveFileAction extends AbstractAction {
 
         // Check if the current file exists:
         String ln = entry.link;
+        ParsedFileField field = entry.toParsedFileField();
+
         boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
             return;
         }
-
+        System.out.println("Parsed file Field " + field);
         // Get an absolute path representation:
         List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
                 .getFileDirectories(prefs.getFileDirectoryPreferences());
@@ -86,7 +89,7 @@ public class MoveFileAction extends AbstractAction {
             //Problem: All listed files are cleaned up
             MoveFilesCleanup moveFiles = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
                     prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
-                    prefs.getLayoutFormatterPreferences());
+                    prefs.getLayoutFormatterPreferences(), field);
 
             moveFiles.cleanup((eEditor.getEntry()));
             //myCleanUp.cleanup();
