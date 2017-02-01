@@ -94,8 +94,24 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    public void testApostrophN () {
+    public void testApostrophNLongVersion () {
         assertEquals("Maliński", formatter.format("Mali\\'{n}ski"));
-        assertEquals("Maliŉski", formatter.format("Mali'nski"));
+        assertEquals("MaliŃski", formatter.format("Mali\\'{N}ski"));
+    }
+
+    @Test
+    public void testApostrophNShortVersion () {
+        assertEquals("Maliński", formatter.format("Mali'nski"));
+        assertEquals("MaliŃski", formatter.format("Mali'Nski"));
+    }
+
+    @Test
+    public void testApostrophO () {
+        assertEquals("L'oscillation", formatter.format("L'oscillation"));
+    }
+
+    @Test
+    public void testApostrophC () {
+        assertEquals("O'Connor", formatter.format("O'Connor"));
     }
 }
