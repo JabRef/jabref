@@ -6,10 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -34,8 +36,8 @@ public class RenamePdfCleanup implements CleanupJob {
     private final String fileDirPattern;
     private final LayoutFormatterPreferences prefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
-    private List<ParsedFileField> fileList = new ArrayList<>();
     private int unsuccessfulRenames;
+    private ParsedFileField singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             String fileDirPattern, LayoutFormatterPreferences prefs,
@@ -50,20 +52,28 @@ public class RenamePdfCleanup implements CleanupJob {
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             String fileDirPattern, LayoutFormatterPreferences prefs,
-            FileDirectoryPreferences fileDirectoryPreferences, List<ParsedFileField> parsedFields) {
+            FileDirectoryPreferences fileDirectoryPreferences, ParsedFileField singleField) {
         this(onlyRelativePaths, databaseContext, fileNamePattern, fileDirPattern, prefs,
                 fileDirectoryPreferences);
-        this.fileList = parsedFields;
+        this.singleFieldCleanup = singleField;
+
     }
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
+        List<ParsedFileField> newFileList;
+        List<ParsedFileField> fileList;
+        if (singleFieldCleanup != null) {
+            fileList = Arrays.asList(singleFieldCleanup);
 
-        if (fileList.isEmpty()) {
+            newFileList = typedEntry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
+                    .collect(Collectors.toList());
+        } else {
+            newFileList = new ArrayList<>();
             fileList = typedEntry.getFiles();
         }
-        List<ParsedFileField> newFileList = new ArrayList<>();
+
         boolean changed = false;
 
         for (ParsedFileField flEntry : fileList) {

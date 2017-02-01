@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -85,7 +84,7 @@ public class RenameFileAction extends AbstractAction {
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
                     frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
                     prefs.getFileDirPattern(), prefs.getLayoutFormatterPreferences(),
-                    prefs.getFileDirectoryPreferences(), Arrays.asList(field));
+                    prefs.getFileDirectoryPreferences(), field);
             pdfCleanup.cleanup(eEditor.getEntry());
 
         }
