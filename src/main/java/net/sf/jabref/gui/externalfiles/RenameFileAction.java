@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -21,6 +22,7 @@ import net.sf.jabref.logic.cleanup.RenamePdfCleanup;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +56,8 @@ public class RenameFileAction extends AbstractAction {
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
 
+        ParsedFileField field = entry.toParsedFileField();
+        System.out.println("Parsed file Field " + field);
         // Check if the current file exists:
         String ln = entry.link;
         boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
@@ -81,7 +85,7 @@ public class RenameFileAction extends AbstractAction {
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
                     frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
                     prefs.getFileDirPattern(), prefs.getLayoutFormatterPreferences(),
-                    prefs.getFileDirectoryPreferences());
+                    prefs.getFileDirectoryPreferences(), Arrays.asList(field));
             pdfCleanup.cleanup(eEditor.getEntry());
 
         }

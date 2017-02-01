@@ -34,6 +34,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final String fileDirPattern;
     private final LayoutFormatterPreferences prefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
+    private List<ParsedFileField> fileList = new ArrayList<>();
     private int unsuccessfulRenames;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
@@ -47,10 +48,21 @@ public class RenamePdfCleanup implements CleanupJob {
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
+    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
+            String fileDirPattern, LayoutFormatterPreferences prefs,
+            FileDirectoryPreferences fileDirectoryPreferences, List<ParsedFileField> parsedFields) {
+        this(onlyRelativePaths, databaseContext, fileNamePattern, fileDirPattern, prefs,
+                fileDirectoryPreferences);
+        this.fileList = parsedFields;
+    }
+
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
-        List<ParsedFileField> fileList = typedEntry.getFiles();
+
+        if (fileList.isEmpty()) {
+            fileList = typedEntry.getFiles();
+        }
         List<ParsedFileField> newFileList = new ArrayList<>();
         boolean changed = false;
 
