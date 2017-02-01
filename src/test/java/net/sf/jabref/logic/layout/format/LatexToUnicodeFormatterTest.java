@@ -108,7 +108,7 @@ public class LatexToUnicodeFormatterTest {
     @Test
     public void testApostrophN () {
         assertEquals("Maliŉski", formatter.format("Mali'nski"));
-        assertEquals("Maliŉski", formatter.format("Mali'Nski"));
+        assertEquals("Mali'Nski", formatter.format("Mali'Nski"));
     }
 
     @Test
