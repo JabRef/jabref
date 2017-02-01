@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 
 ### Fixed
+- LaTeX symbols are now escaped to Unicode in the entry preview panel. Fixes [#2498](https://github.com/JabRef/jabref/issues/2498).
 
 ### Removed
 

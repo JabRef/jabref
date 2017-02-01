@@ -141,6 +141,63 @@ public class BibEntry implements Cloneable {
     public Optional<String> getResolvedFieldOrAlias(String field, BibDatabase database) {
         Objects.requireNonNull(this, "entry cannot be null");
 
+        Optional<String> result = resolveTypeOrKeyFields(field);
+        if (result.isPresent()) {
+            return result;
+        }
+
+        result = getFieldOrAlias(field);
+
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry: Do not do this for the bibtex key.
+        if (!result.isPresent() && (database != null)) {
+            Optional<BibEntry> referred = database.getReferencedEntry(this);
+            result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
+        }
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
+    }
+
+
+    /**
+     * Returns the latex-free version of the text stored in the given field of the given bibtex entry
+     * which belongs to the given database.
+     * <p>
+     * If a database is given, this function will try to resolve any string
+     * references in the field-value.
+     * Also, if a database is given, this function will try to find values for
+     * unset fields in the entry linked by the "crossref" field, if any.
+     *
+     * @param field    The field to return the value of.
+     * @param database maybenull
+     *                 The database of the bibtex entry.
+     * @return The resolved field value or null if not found.
+     */
+    public Optional<String> getResolvedFieldOrAliasLatexFree(String field, BibDatabase database) {
+        Objects.requireNonNull(this, "entry cannot be null");
+
+        Optional<String> result = resolveTypeOrKeyFields(field);
+        if (result.isPresent()) {
+            return result;
+        }
+
+        result = getFieldOrAliasLatexFree(field);
+
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry: Do not do this for the bibtex key.
+        if (!result.isPresent() && (database != null)) {
+            Optional<BibEntry> referred = database.getReferencedEntry(this);
+            result = referred.flatMap(entry -> entry.getFieldOrAliasLatexFree(field));
+        }
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
+    }
+
+    /**
+     * Encapsulates type and key field handling for the getResolvedField methods
+     *
+     * @param field    The field to return the value of.
+     * @return The resolved field value or Optional.empty() if not found.
+     */
+    private Optional<String> resolveTypeOrKeyFields(String field) {
         if (TYPE_HEADER.equals(field) || OBSOLETE_TYPE_HEADER.equals(field)) {
             Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
             if (entryType.isPresent()) {
@@ -153,16 +210,7 @@ public class BibEntry implements Cloneable {
         if (KEY_FIELD.equals(field)) {
             return getCiteKeyOptional();
         }
-
-        Optional<String> result = getFieldOrAlias(field);
-
-        // If this field is not set, and the entry has a crossref, try to look up the
-        // field in the referred entry: Do not do this for the bibtex key.
-        if (!result.isPresent() && (database != null)) {
-            Optional<BibEntry> referred = database.getReferencedEntry(this);
-            result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
-        }
-        return result.map(resultText -> BibDatabase.getText(resultText, database));
+        return Optional.empty();
     }
 
     /**

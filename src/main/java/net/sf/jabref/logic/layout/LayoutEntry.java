@@ -184,7 +184,7 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
+            String value = bibtex.getResolvedFieldOrAliasLatexFree(text, database).orElse("");
 
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
@@ -223,7 +223,7 @@ class LayoutEntry {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? bibtex
-                    .getResolvedFieldOrAlias(text.substring(1), database)
+                    .getResolvedFieldOrAliasLatexFree(text.substring(1), database)
                     .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
@@ -245,13 +245,13 @@ class LayoutEntry {
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
-            field = bibtex.getResolvedFieldOrAlias(text, database);
+            field = bibtex.getResolvedFieldOrAliasLatexFree(text, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = bibtex.getResolvedFieldOrAliasLatexFree(part, database);
                 if (!field.isPresent()) {
                     break;
                 }
@@ -261,7 +261,7 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = bibtex.getResolvedFieldOrAliasLatexFree(part, database);
                 if (field.isPresent()) {
                     break;
                 }
