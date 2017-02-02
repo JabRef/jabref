@@ -129,7 +129,7 @@ public class RisImporter extends Importer {
                         fields.put(FieldName.TITLE, fields.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("BT".equals(tag)) {
                         fields.put(FieldName.BOOKTITLE, value);
-                    } else if ("T2".equals(tag)&&(fields.get(FieldName.JOURNAL) == null || "".equals(fields.get(FieldName.JOURNAL)))){
+                    } else if ("T2".equals(tag) && (fields.get(FieldName.JOURNAL) == null || "".equals(fields.get(FieldName.JOURNAL)))) {
                         //if there is no journal title, then put second title as journal title
                         fields.put(FieldName.JOURNAL, value);
                     } else if ("JO".equals(tag)) {
