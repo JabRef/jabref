@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
+ - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
 
 ### Removed
 

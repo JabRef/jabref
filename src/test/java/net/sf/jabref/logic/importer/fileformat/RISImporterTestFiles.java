@@ -41,7 +41,7 @@ public class RISImporterTestFiles {
     public static Collection<String> fileNames() {
         return Arrays.asList("RisImporterTest1", "RisImporterTest3", "RisImporterTest4a", "RisImporterTest4b",
                 "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6",
-                "RisImporterTestDoiAndJournalTitle", "RisImporterTestScopus");
+                "RisImporterTestDoiAndJournalTitle", "RisImporterTestScopus", "RisImporterTestScience");
     }
 
     @Test
