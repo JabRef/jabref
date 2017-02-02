@@ -12,7 +12,6 @@ public class MSBibConverter {
     private static final String MSBIB_PREFIX = "msbib-";
     private static final String BIBTEX_PREFIX = "BIBTEX_";
 
-
     public static MSBibEntry convert(BibEntry entry) {
         MSBibEntry result = new MSBibEntry();
 
@@ -45,9 +44,7 @@ public class MSBibConverter {
             result.broadcastTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
-        if (!entry.getField(FieldName.ISSUE).isPresent()) {
-            result.number = entry.getField(FieldName.NUMBER).orElse(null);
-        }
+        result.number = entry.getField(FieldName.NUMBER).orElse(null);
 
         if ("Patent".equalsIgnoreCase(entry.getType())) {
             result.patentNumber = entry.getField(FieldName.NUMBER).orElse(null);
