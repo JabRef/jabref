@@ -1,18 +1,18 @@
 package net.sf.jabref.logic.layout.format;
 
+import java.util.Objects;
+
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.strings.LatexToUnicode;
+
+import com.github.tomtung.latex2unicode.DefaultLatexToUnicodeConverter;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
  * and removes other LaTeX commands without handling them.
  */
 public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
-
-    private final LatexToUnicode formatter = new LatexToUnicode();
-
 
     @Override
     public String getName() {
@@ -26,7 +26,9 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String inField) {
-        return formatter.format(inField);
+        Objects.requireNonNull(inField);
+
+        return DefaultLatexToUnicodeConverter.convert(inField);
     }
 
     @Override
