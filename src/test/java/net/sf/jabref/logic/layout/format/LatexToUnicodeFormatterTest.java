@@ -87,4 +87,37 @@ public class LatexToUnicodeFormatterTest {
     public void unknownCommandWithEmptyArgumentIsKept() {
         assertEquals("aaaa", formatter.format("\\aaaa{}"));
     }
+
+    @Test
+    public void testTildeN () {
+        assertEquals("Montaña", formatter.format("Monta\\~{n}a"));
+    }
+
+    @Test
+    public void testAcuteNLongVersion () {
+        assertEquals("Maliński", formatter.format("Mali\\'{n}ski"));
+        assertEquals("MaliŃski", formatter.format("Mali\\'{N}ski"));
+    }
+
+    @Test
+    public void testAcuteNShortVersion () {
+        assertEquals("Maliński", formatter.format("Mali\\'nski"));
+        assertEquals("MaliŃski", formatter.format("Mali\\'Nski"));
+    }
+
+    @Test
+    public void testApostrophN () {
+        assertEquals("Maliŉski", formatter.format("Mali'nski"));
+        assertEquals("Mali'Nski", formatter.format("Mali'Nski"));
+    }
+
+    @Test
+    public void testApostrophO () {
+        assertEquals("L'oscillation", formatter.format("L'oscillation"));
+    }
+
+    @Test
+    public void testApostrophC () {
+        assertEquals("O'Connor", formatter.format("O'Connor"));
+    }
 }

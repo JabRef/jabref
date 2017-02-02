@@ -473,7 +473,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         toolBar.add(writeXmp);
 
         JPopupMenu fetcherPopup = new JPopupMenu();
-        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers()) {
+        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
             fetcherPopup.add(new JMenuItem(new AbstractAction(fetcher.getName()) {
 
                 @Override

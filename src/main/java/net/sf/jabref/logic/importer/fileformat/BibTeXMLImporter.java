@@ -147,7 +147,7 @@ public class BibTeXMLImporter extends Importer {
             }
         } catch (JAXBException e) {
             LOGGER.error("Error with XML parser configuration", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
+            return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
     }

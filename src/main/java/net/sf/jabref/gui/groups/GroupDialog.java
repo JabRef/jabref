@@ -314,7 +314,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
             keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == RegexKeywordGroup.class)) {
-            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
+            RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());

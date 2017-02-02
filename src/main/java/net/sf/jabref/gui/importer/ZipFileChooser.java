@@ -35,8 +35,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
- *
- * @author andreas_sf at rudert-home dot de
  */
 class ZipFileChooser extends JDialog {
 
@@ -46,7 +44,7 @@ class ZipFileChooser extends JDialog {
     /**
      * New ZIP file chooser.
      *
-     * @param owner  Owner of the file chooser
+     * @param importCustomizationDialog  Owner of the file chooser
      * @param zipFile  ZIP-Fle to choose from, must be readable
      */
     public ZipFileChooser(ImportCustomizationDialog importCustomizationDialog, ZipFile zipFile) {

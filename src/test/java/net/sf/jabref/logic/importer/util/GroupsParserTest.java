@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.importer.util;
 
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
@@ -19,4 +20,8 @@ public class GroupsParserTest {
         assertEquals(expected, parsed);
     }
 
+    @Test(expected = ParseException.class)
+    public void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
+        GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',');
+    }
 }

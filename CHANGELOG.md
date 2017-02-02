@@ -11,20 +11,19 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ## [Unreleased]
 
-## JavaFX Changes
-(to be moved to `##Changed` as soon as JavaFX is integrated in the main branch)
+### Changed
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - Partly switched to new UI technology (JavaFX).
+    - Redesigned group panel.
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 
-### Changed
-
 ### Fixed
-The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
+ - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
+ - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
 
 ### Removed
 
@@ -72,10 +71,28 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 
 
 
+## [3.8.2] – 2017-01-29
 
+### Changed
+- Added the option to update bibliographic information from DOI to the sidebar of the entryeditor. Implements [#2432](https://github.com/JabRef/jabref/issues/2432).
+- The default shortcut for "Cleanup entries" is now <kbd>Alt</kbd> + <kbd>F8</kbd> since <kbd>F8</kbd> alone did not work.
+  Please [reset your key bindings](http://help.jabref.org/en/CustomKeyBindings) to get <kbd>Alt</kbd> + <kbd>F8</kbd> as default.
+  Fixes [#2251](https://github.com/JabRef/jabref/issues/2251).
 
-
-
+### Fixed
+- The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
+- Backslashes in content selectors are now correctly escaped. Fixes [#2426](https://github.com/JabRef/jabref/issues/2426).
+- Non-ISO timestamp settings prevented the opening of the entry editor. Fixes [#2447](https://github.com/JabRef/jabref/issues/2447).
+- When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused, the text will be selected.
+- LaTeX symbols are now displayed as Unicode for the author column in the main table. `'n` and `\'{n}` are parsed correctly. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
+- If one deleted the current query it was not saved (every basepanel can have its own query). Fixes [#2468](https://github.com/JabRef/jabref/issues/2468).
+- The [ACM fetcher](https://help.jabref.org/en/ACMPortal) does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472).
+- When [finding unlinked files](https://help.jabref.org/en/FindUnlinkedFiles), JabRef does not freeze any more. Fixes [#2309]()https://github.com/JabRef/jabref/issues/2309).
+- Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef.
+- The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475).
+- When the database is changed externally, JabRef is no longer prevented from an orderly shutdown. Fixes [#2486](https://github.com/JabRef/jabref/issues/2486).
+- Parsing of damaged metadata is now more robust and reports a more detailed error message. Fixes [#2477](https://github.com/JabRef/jabref/issues/2477).
+- Dynamic groups with regular expression can be edited again. Fixes [#2481](https://github.com/JabRef/jabref/issues/2481).
 
 
 ## [3.8.1] – 2016-12-24
@@ -749,7 +766,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.1...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.2...HEAD
+[3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1
 [3.8]: https://github.com/JabRef/jabref/compare/v3.7...v3.8
 [3.7]: https://github.com/JabRef/jabref/compare/v3.6...v3.7
