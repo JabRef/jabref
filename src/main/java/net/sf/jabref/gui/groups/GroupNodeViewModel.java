@@ -1,11 +1,11 @@
 package net.sf.jabref.gui.groups;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -16,17 +16,18 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
+import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
     private final String name;
     private final boolean isRoot;
     private final String iconCode;
-    private final boolean isLeaf;
-    private final ObservableList<GroupNodeViewModel> children = FXCollections.observableArrayList();
+    private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
+    private final SimpleBooleanProperty hasChildren;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -35,8 +36,9 @@ public class GroupNodeViewModel {
         name = groupNode.getName();
         isRoot = groupNode.isRoot();
         iconCode = "";
-        isLeaf = groupNode.isLeaf();
-        children.addAll(groupNode.getChildren().stream().map(child -> new GroupNodeViewModel(databaseContext, child)).collect(Collectors.toList()));
+        children = EasyBind.map(groupNode.getChildren(), child -> new GroupNodeViewModel(databaseContext, child));
+        hasChildren = new SimpleBooleanProperty();
+        hasChildren.bind(Bindings.isNotEmpty(children));
         hits = new SimpleIntegerProperty(0);
         calculateNumberOfMatches();
 
@@ -44,12 +46,17 @@ public class GroupNodeViewModel {
         databaseContext.getDatabase().registerListener(this);
     }
 
+
     public GroupNodeViewModel(BibDatabaseContext databaseContext, AbstractGroup group) {
         this(databaseContext, new GroupTreeNode(group));
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase) {
         return new GroupNodeViewModel(newDatabase, new AllEntriesGroup(Localization.lang("All entries")));
+    }
+
+    public SimpleBooleanProperty hasChildrenProperty() {
+        return hasChildren;
     }
 
     public String getName() {
@@ -76,7 +83,6 @@ public class GroupNodeViewModel {
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
         if (isRoot != that.isRoot) return false;
-        if (isLeaf != that.isLeaf) return false;
         if (!name.equals(that.name)) return false;
         if (!iconCode.equals(that.iconCode)) return false;
         if (!children.equals(that.children)) return false;
@@ -91,7 +97,6 @@ public class GroupNodeViewModel {
                 "name='" + name + '\'' +
                 ", isRoot=" + isRoot +
                 ", iconCode='" + iconCode + '\'' +
-                ", isLeaf=" + isLeaf +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -104,7 +109,6 @@ public class GroupNodeViewModel {
         int result = name.hashCode();
         result = 31 * result + (isRoot ? 1 : 0);
         result = 31 * result + iconCode.hashCode();
-        result = 31 * result + (isLeaf ? 1 : 0);
         result = 31 * result + children.hashCode();
         result = 31 * result + databaseContext.hashCode();
         result = 31 * result + groupNode.hashCode();
@@ -114,10 +118,6 @@ public class GroupNodeViewModel {
 
     public String getIconCode() {
         return iconCode;
-    }
-
-    public boolean isLeaf() {
-        return isLeaf;
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -144,5 +144,9 @@ public class GroupNodeViewModel {
             int newHits = groupNode.calculateNumberOfMatches(databaseContext.getDatabase());
             Platform.runLater(() -> hits.setValue(newHits));
         }).start();
+    }
+
+    public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
+        return groupNode.addSubgroup(subgroup);
     }
 }
