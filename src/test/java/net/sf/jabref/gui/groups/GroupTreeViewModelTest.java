@@ -2,6 +2,7 @@ package net.sf.jabref.gui.groups;
 
 import java.util.Optional;
 
+import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.groups.AllEntriesGroup;
@@ -10,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class GroupTreeViewModelTest {
     StateManager stateManager;
@@ -21,7 +23,7 @@ public class GroupTreeViewModelTest {
         databaseContext = new BibDatabaseContext();
         stateManager = new StateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
-        groupTree = new GroupTreeViewModel(stateManager);
+        groupTree = new GroupTreeViewModel(stateManager, mock(DialogService.class));
     }
 
     @Test

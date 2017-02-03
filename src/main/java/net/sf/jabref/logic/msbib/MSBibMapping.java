@@ -34,6 +34,7 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.BOOKTITLE, "BookTitle");
         biblatexToMsBib.put("shorttitle", "ShortTitle");
         biblatexToMsBib.put(FieldName.NOTE, "Comments");
+        biblatexToMsBib.put(FieldName.VOLUMES, "NumberVolumes");
 
         //biblatexToMsBib.put(FieldName.BOOKTITLE, "ConferenceName");
         //biblatexToMsBib.put(FieldName.PAGES, "Pages");
@@ -51,6 +52,7 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
         biblatexToMsBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
         biblatexToMsBib.put(FieldName.HOWPUBLISHED, BIBTEX_PREFIX + "HowPublished");
+        biblatexToMsBib.put(FieldName.PUBSTATE, BIBTEX_PREFIX + "Pubstate");
         biblatexToMsBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
         biblatexToMsBib.put("contents", BIBTEX_PREFIX + "Contents");
         biblatexToMsBib.put("copyright", BIBTEX_PREFIX + "Copyright");
@@ -61,7 +63,6 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.KEY, BIBTEX_PREFIX + "Key");
 
         // MSBib only fields
-        biblatexToMsBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         biblatexToMsBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
         biblatexToMsBib.put(MSBIB_PREFIX + FieldName.DAY, "Day");
         biblatexToMsBib.put(MSBIB_PREFIX + "accessed", "Accessed");
@@ -78,7 +79,6 @@ public class MSBibMapping {
         biblatexToMsBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
         biblatexToMsBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
-
 
     public static String getBibLaTeXEntryType(String msbibType) {
         final String defaultType = BibtexEntryTypes.MISC.getName();

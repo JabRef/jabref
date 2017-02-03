@@ -89,6 +89,14 @@ public interface DialogService {
     Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane, ButtonType... buttonTypes);
 
     /**
+     * Shows a custom dialog and returns the result.
+     *
+     * @param dialog dialog to show
+     * @param <R>    type of result
+     */
+    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
+
+    /**
      * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
      * @param message the message to show.
      */

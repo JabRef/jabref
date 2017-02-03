@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -28,6 +29,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.Dialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -51,7 +54,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends JDialog {
+class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -337,6 +340,10 @@ class GroupDialog extends JDialog {
         }
     }
 
+    public GroupDialog() {
+        this(JabRefGUI.getMainFrame(), null);
+    }
+
     private static String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
         StringBuilder sb = new StringBuilder();
@@ -490,6 +497,17 @@ class GroupDialog extends JDialog {
             unionButton.setSelected(true);
         } else {
             independentButton.setSelected(true);
+        }
+    }
+
+    @Override
+    public Optional<AbstractGroup> showAndWait() {
+        this.setVisible(true);
+        if (this.okPressed()) {
+            AbstractGroup newGroup = getResultingGroup();
+            return Optional.of(newGroup);
+        } else {
+            return Optional.empty();
         }
     }
 }
