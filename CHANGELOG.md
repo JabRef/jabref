@@ -26,7 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
  - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
  - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
-	- The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
+ - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
 ### Removed
 
 
