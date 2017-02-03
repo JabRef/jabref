@@ -36,7 +36,6 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("σ", formatter.format("$\\sigma$"));
     }
 
-    @Ignore("Currently, this is not correctly converted by latex2unicode. Ignoring it for now.")
     @Test
     public void testEquationsMoreComplicatedFormatting() {
         assertEquals("A 32\u00A0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
