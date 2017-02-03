@@ -27,6 +27,13 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    public void testFormatTextit() {
+        // See #1464
+        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
+    }
+
+
+    @Test
     public void testEscapedDollarSign() {
         assertEquals("$", formatter.format("\\$"));
     }
@@ -85,35 +92,35 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    public void testTildeN () {
+    public void testTildeN() {
         assertEquals("Montaña", formatter.format("Monta\\~{n}a"));
     }
 
     @Test
-    public void testAcuteNLongVersion () {
+    public void testAcuteNLongVersion() {
         assertEquals("Maliński", formatter.format("Mali\\'{n}ski"));
         assertEquals("MaliŃski", formatter.format("Mali\\'{N}ski"));
     }
 
     @Test
-    public void testAcuteNShortVersion () {
+    public void testAcuteNShortVersion() {
         assertEquals("Maliński", formatter.format("Mali\\'nski"));
         assertEquals("MaliŃski", formatter.format("Mali\\'Nski"));
     }
 
     @Test
-    public void testApostrophN () {
+    public void testApostrophN() {
         assertEquals("Mali'nski", formatter.format("Mali'nski"));
         assertEquals("Mali'Nski", formatter.format("Mali'Nski"));
     }
 
     @Test
-    public void testApostrophO () {
+    public void testApostrophO() {
         assertEquals("L'oscillation", formatter.format("L'oscillation"));
     }
 
     @Test
-    public void testApostrophC () {
+    public void testApostrophC() {
         assertEquals("O'Connor", formatter.format("O'Connor"));
     }
 }
