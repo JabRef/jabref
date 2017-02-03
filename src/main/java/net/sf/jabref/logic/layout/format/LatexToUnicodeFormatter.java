@@ -1,12 +1,9 @@
 package net.sf.jabref.logic.layout.format;
 
-import java.util.Objects;
-
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.cleanup.Formatter;
-
-import com.github.tomtung.latex2unicode.DefaultLatexToUnicodeConverter;
+import net.sf.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
@@ -26,9 +23,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String inField) {
-        Objects.requireNonNull(inField);
-
-        return DefaultLatexToUnicodeConverter.convert(inField);
+        return LatexToUnicodeAdapter.format(inField);
     }
 
     @Override

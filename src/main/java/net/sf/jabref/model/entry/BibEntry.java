@@ -27,9 +27,9 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.LatexToUnicodeAdapter;
 import net.sf.jabref.model.strings.StringUtil;
 
-import com.github.tomtung.latex2unicode.DefaultLatexToUnicodeConverter;
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
@@ -821,7 +821,7 @@ public class BibEntry implements Cloneable {
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
         } else {
-            String latexFreeField = DefaultLatexToUnicodeConverter.convert(getField(name).get()).intern();
+            String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);
             return Optional.of(latexFreeField);
         }
