@@ -21,6 +21,14 @@
     -fx-background-radius: 10px;
 }
 
+.numberColumn > .hits:any-selected {
+    -fx-background-color: #c6c44f;
+}
+
+.numberColumn > .hits:all-selected {
+    -fx-background-color: #4dc64f;
+}
+
 .disclosureNodeColumn {
     -fx-alignment: top-right;
     -fx-font-size: 12px;

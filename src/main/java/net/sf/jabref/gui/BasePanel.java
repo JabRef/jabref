@@ -131,12 +131,10 @@ import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
-import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 
-import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -153,58 +151,40 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final MainTableDataModel tableModel;
 
     private final CitationStyleCache citationStyleCache;
-
-    // To contain instantiated entry editors. This is to save time
-    // As most enums, this must not be null
-    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
-    private EntryEditor currentEditor;
-
-    private MainTableSelectionListener selectionListener;
-
-    private ListEventListener<BibEntry> groupsHighlightListener;
-
-    private JSplitPane splitPane;
-
     private final JabRefFrame frame;
-    private String fileMonitorHandle;
-    private boolean saving;
-    private boolean updatedExternally;
-
-    // AutoCompleter used in the search bar
-    private AutoCompleter<String> searchAutoCompleter;
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
     private final CountingUndoManager undoManager = new CountingUndoManager();
-
     private final List<BibEntry> previousEntries = new ArrayList<>();
-
     private final List<BibEntry> nextEntries = new ArrayList<>();
+    // Keeps track of the string dialog if it is open.
+    private final Map<String, Object> actions = new HashMap<>();
+    private final SidePaneManager sidePaneManager;
+    // To contain instantiated entry editors. This is to save time
+    // As most enums, this must not be null
+    private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
+    private EntryEditor currentEditor;
+    private MainTableSelectionListener selectionListener;
+    private JSplitPane splitPane;
+    private String fileMonitorHandle;
+    private boolean saving;
+    private boolean updatedExternally;
+    // AutoCompleter used in the search bar
+    private AutoCompleter<String> searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
-
     // Used to track whether the base has changed since last save.
     private MainTable mainTable;
-
     private MainTableFormat tableFormat;
-
     private BibEntry showing;
-
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
-
     // in switching between entries.
     private PreambleEditor preambleEditor;
-
     // Keeps track of the preamble dialog if it is open.
     private StringDialog stringDialog;
-
-    // Keeps track of the string dialog if it is open.
-    private final Map<String, Object> actions = new HashMap<>();
-
-    private final SidePaneManager sidePaneManager;
-
     private ContentAutoCompleters autoCompleters;
 
     /** the query the user searches when this basepanel is active */
@@ -655,24 +635,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             setPreviewActiveBasePanels(enabled);
             frame.setPreviewToggle(enabled);
-        });
-
-        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY, (BaseAction) () -> {
-            new HighlightMatchingGroupPreferences(Globals.prefs).setToAny();
-            // ping the listener so it updates:
-            groupsHighlightListener.listChanged(null);
-        });
-
-        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL, (BaseAction) () -> {
-            new HighlightMatchingGroupPreferences(Globals.prefs).setToAll();
-            // ping the listener so it updates:
-            groupsHighlightListener.listChanged(null);
-        });
-
-        actions.put(Actions.TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE, (BaseAction) () -> {
-            new HighlightMatchingGroupPreferences(Globals.prefs).setToDisabled();
-            // ping the listener so it updates:
-            groupsHighlightListener.listChanged(null);
         });
 
         actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
@@ -1164,131 +1126,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return null;
     }
 
-    private class GroupTreeListener {
-
-        private final Runnable task = new Runnable() {
-
-            @Override
-            public void run() {
-                // Update group display (for example to reflect that the number of contained entries has changed)
-                frame.getGroupSelector().revalidateGroups();
-            }
-
-        };
-
-        /**
-         * Only access when you have the lock of the task instance
-         *
-         * Guarded by "task"
-         */
-        private TimerTask timerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-                task.run();
-            }
-        };
-
-
-        @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
-                scheduleUpdate();
-                return;
-            }
-
-            // Automatically add new entry to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.getGroupSelector().getToggleAction().isSelected()) {
-                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
-                final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
-                if (selection != null) {
-                    // it is possible that the user selected nothing. Therefore, checked for "!= null"
-                    for (final TreePath tree : selection) {
-                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
-                    }
-                }
-                SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
-            }
-
-            scheduleUpdate();
-        }
-
-        private void scheduleUpdate() {
-            // This is a quickfix/dirty hack.
-            // a better solution would be using RxJava or something reactive instead
-            // nevertheless it works correctly
-            synchronized (task) {
-                timerTask.cancel();
-                timerTask = new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        task.run();
-                    }
-                };
-                JabRefExecutorService.INSTANCE.submit(timerTask, 200);
-            }
-        }
-    }
-
-    /**
-     * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
-     * harvest words from the entry
-     */
-    private class SearchAutoCompleteListener {
-
-        @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
-        }
-    }
-
-    /**
-     * Ensures that auto completers are up to date when entries are changed AKA Let the auto completer, if any, harvest
-     * words from the entry
-     */
-    private class AutoCompleteListener {
-
-        @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
-        }
-    }
-
-    /**
-     * Ensures that the results of the current search are updated when a new entry is inserted into the database
-     */
-    private class SearchListener {
-        @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            frame.getGlobalSearchBar().performSearch();
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
-            frame.getGlobalSearchBar().performSearch();
-        }
-
-        @Subscribe
-        public void listen(EntryRemovedEvent removedEntryEvent) {
-            // IMO only used to update the status (found X entries)
-            frame.getGlobalSearchBar().performSearch();
-        }
-    }
-
-
     /**
      * This method is called from JabRefFrame when the user wants to create a new entry.
      *
@@ -1349,20 +1186,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.addKeyListener(selectionListener);
         mainTable.addFocusListener(selectionListener);
 
-        // Add the listener that will take care of highlighting groups as the selection changes:
-        groupsHighlightListener = listEvent -> {
-            HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(
-                    Globals.prefs);
-            if (highlightMatchingGroupPreferences.isAny()) {
-                getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), false);
-            } else if (highlightMatchingGroupPreferences.isAll()) {
-                getGroupSelector().showMatchingGroups(mainTable.getSelectedEntries(), true);
-            } else {
-                // no highlight
-                getGroupSelector().showMatchingGroups(null, true);
-            }
-        };
-        mainTable.addSelectionListener(groupsHighlightListener);
+        // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
+        mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
 
         String clearSearch = "clearSearch";
         mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
@@ -1949,120 +1774,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-
-    private class UndoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-                JComponent focused = Globals.getFocusListener().getFocused();
-                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
-                    // User is currently editing a field:
-                    // Check if it is the preamble:
-                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
-                        preambleEditor.storeCurrentEdit();
-                    } else {
-                        storeCurrentEdit();
-                    }
-                }
-                getUndoManager().undo();
-                markBaseChanged();
-                frame.output(Localization.lang("Undo"));
-            } catch (CannotUndoException ex) {
-                LOGGER.warn("Nothing to undo", ex);
-                frame.output(Localization.lang("Nothing to undo") + '.');
-            }
-
-            markChangedOrUnChanged();
-        }
-    }
-
-    private class OpenURLAction implements BaseAction {
-
-        @Override
-        public void action() {
-            final List<BibEntry> bes = mainTable.getSelectedEntries();
-            if (bes.size() == 1) {
-                String field = FieldName.DOI;
-                Optional<String> link = bes.get(0).getField(FieldName.DOI);
-                if (bes.get(0).hasField(FieldName.URL)) {
-                    link = bes.get(0).getField(FieldName.URL);
-                    field = FieldName.URL;
-                }
-                if (link.isPresent()) {
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
-                    }
-                } else {
-                    // No URL or DOI found in the "url" and "doi" fields.
-                    // Look for web links in the "file" field as a fallback:
-                    FileListEntry entry = null;
-                    FileListTableModel tm = new FileListTableModel();
-                    bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
-                    for (int i = 0; i < tm.getRowCount(); i++) {
-                        FileListEntry flEntry = tm.getEntry(i);
-                        if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
-                                || FieldName.PS.equalsIgnoreCase(flEntry.type.get().getName())
-                                || FieldName.PDF.equalsIgnoreCase(flEntry.type.get().getName())) {
-                            entry = flEntry;
-                            break;
-                        }
-                    }
-                    if (entry == null) {
-                        output(Localization.lang("No URL defined") + '.');
-                    } else {
-                        try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
-                            output(Localization.lang("External viewer called") + '.');
-                        } catch (IOException e) {
-                            output(Localization.lang("Could not open link"));
-                            LOGGER.info("Could not open link", e);
-                        }
-                    }
-                }
-            } else {
-                output(Localization.lang("This operation requires exactly one item to be selected."));
-            }
-
-        }
-    }
-
-    private class RedoAction implements BaseAction {
-
-        @Override
-        public void action() {
-            try {
-
-                JComponent focused = Globals.getFocusListener().getFocused();
-                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
-                    // User is currently editing a field:
-                    storeCurrentEdit();
-                }
-
-                getUndoManager().redo();
-                markBaseChanged();
-                frame.output(Localization.lang("Redo"));
-            } catch (CannotRedoException ex) {
-                frame.output(Localization.lang("Nothing to redo") + '.');
-            }
-
-            markChangedOrUnChanged();
-        }
-    }
-
-    private class PrintPreviewAction implements BaseAction {
-
-        @Override
-        public void action() throws Exception {
-            selectionListener.setPreviewActive(true);
-            showPreview(selectionListener.getPreview());
-            selectionListener.getPreview().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-        }
-    }
-
     // Method pertaining to the ClipboardOwner interface.
     @Override
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
@@ -2153,10 +1864,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public void setUpdatedExternally(boolean b) {
-        updatedExternally = b;
-    }
-
     /**
      * Get an array containing the currently selected entries. The array is stable and not changed if the selection
      * changes
@@ -2179,6 +1886,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return updatedExternally;
     }
 
+    public void setUpdatedExternally(boolean b) {
+        updatedExternally = b;
+    }
+
     public String getFileMonitorHandle() {
         return fileMonitorHandle;
     }
@@ -2199,12 +1910,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.baseChanged = baseChanged;
     }
 
-    public void setSaving(boolean saving) {
-        this.saving = saving;
-    }
-
     public boolean isSaving() {
         return saving;
+    }
+
+    public void setSaving(boolean saving) {
+        this.saving = saving;
     }
 
     private BibEntry getShowing() {
@@ -2282,28 +1993,59 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
     }
 
+    /**
+     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
+     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
+     * after the user has made changes in the Manage dialog.
+     */
+    public void updateAllContentSelectors() {
+        currentEditor.updateAllContentSelectors();
+    }
 
-    private class SaveSelectedAction implements BaseAction {
-
-        private final SavePreferences.DatabaseSaveType saveType;
-
-        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
-            this.saveType = saveType;
+    /**
+     * Set the preview active state for all BasePanel instances.
+     */
+    private void setPreviewActiveBasePanels(boolean enabled) {
+        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
+            frame.getBasePanelAt(i).setPreviewActive(enabled);
         }
+    }
 
-        @Override
-        public void action() throws SaveException {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
-            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
-            Optional<Path> chosenFile = dialog.saveNewFile();
+    public CountingUndoManager getUndoManager() {
+        return undoManager;
+    }
 
-            if (chosenFile.isPresent()) {
-                Path path = chosenFile.get();
-                saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
-                frame.getFileHistory().newFile(path.toString());
-                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
-            }
+    public MainTable getMainTable() {
+        return mainTable;
+    }
+
+    public BibDatabaseContext getDatabaseContext() {
+        return bibDatabaseContext;
+    }
+
+    public Optional<SearchQuery> getCurrentSearchQuery() {
+        return currentSearchQuery;
+    }
+
+    /**
+     * Set the query the user currently searches while this basepanel is active
+     *
+     * @param currentSearchQuery can be null
+     */
+    public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
+        this.currentSearchQuery = Optional.ofNullable(currentSearchQuery);
+    }
+
+    public CitationStyleCache getCitationStyleCache() {
+        return citationStyleCache;
+    }
+
+    public PreviewPanel getPreviewPanel() {
+        if (selectionListener == null) {
+            // only occurs if this is called while instantiating this BasePanel
+            return null;
         }
+        return selectionListener.getPreview();
     }
 
     private static class SearchAndOpenFile {
@@ -2374,60 +2116,261 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    /**
-     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
-     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
-     * after the user has made changes in the Manage dialog.
-     */
-    public void updateAllContentSelectors() {
-        currentEditor.updateAllContentSelectors();
-    }
+    private class GroupTreeListener {
 
-    /**
-     * Set the preview active state for all BasePanel instances.
-     *
-     * @param enabled
-     */
-    private void setPreviewActiveBasePanels(boolean enabled) {
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            frame.getBasePanelAt(i).setPreviewActive(enabled);
+        private final Runnable task = new Runnable() {
+
+            @Override
+            public void run() {
+                // Update group display (for example to reflect that the number of contained entries has changed)
+                frame.getGroupSelector().revalidateGroups();
+            }
+        };
+
+        /**
+         * Only access when you have the lock of the task instance
+         *
+         * Guarded by "task"
+         */
+        private TimerTask timerTask = new TimerTask() {
+
+            @Override
+            public void run() {
+                task.run();
+            }
+        };
+
+
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            // if the added entry is an undo don't add it to the current group
+            if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
+                scheduleUpdate();
+                return;
+            }
+
+            // Automatically add new entry to the selected group (or set of groups)
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP) && frame.getGroupSelector().getToggleAction().isSelected()) {
+                final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
+                final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
+                if (selection != null) {
+                    // it is possible that the user selected nothing. Therefore, checked for "!= null"
+                    for (final TreePath tree : selection) {
+                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
+                    }
+                }
+                SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
+            }
+
+            scheduleUpdate();
+        }
+
+        private void scheduleUpdate() {
+            // This is a quickfix/dirty hack.
+            // a better solution would be using RxJava or something reactive instead
+            // nevertheless it works correctly
+            synchronized (task) {
+                timerTask.cancel();
+                timerTask = new TimerTask() {
+
+                    @Override
+                    public void run() {
+                        task.run();
+                    }
+                };
+                JabRefExecutorService.INSTANCE.submit(timerTask, 200);
+            }
         }
     }
 
-    public CountingUndoManager getUndoManager() {
-        return undoManager;
-    }
+    /**
+     * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
+     * harvest words from the entry
+     */
+    private class SearchAutoCompleteListener {
 
-    public MainTable getMainTable() {
-        return mainTable;
-    }
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
+        }
 
-    public BibDatabaseContext getDatabaseContext() {
-        return bibDatabaseContext;
-    }
-
-    public Optional<SearchQuery> getCurrentSearchQuery() {
-        return currentSearchQuery;
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
+        }
     }
 
     /**
-     * Set the query the user currently searches while this basepanel is active
-     * @param currentSearchQuery can be null
+     * Ensures that auto completers are up to date when entries are changed AKA Let the auto completer, if any, harvest
+     * words from the entry
      */
-    public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
-        this.currentSearchQuery = Optional.ofNullable(currentSearchQuery);
-    }
+    private class AutoCompleteListener {
 
-    public CitationStyleCache getCitationStyleCache() {
-        return citationStyleCache;
-    }
-
-    public PreviewPanel getPreviewPanel() {
-        if (selectionListener == null) {
-            // only occurs if this is called while instantiating this BasePanel
-            return null;
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
         }
-        return selectionListener.getPreview();
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
+        }
     }
 
+    /**
+     * Ensures that the results of the current search are updated when a new entry is inserted into the database
+     */
+    private class SearchListener {
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryRemovedEvent removedEntryEvent) {
+            // IMO only used to update the status (found X entries)
+            frame.getGlobalSearchBar().performSearch();
+        }
+    }
+
+    private class UndoAction implements BaseAction {
+
+        @Override
+        public void action() {
+            try {
+                JComponent focused = Globals.getFocusListener().getFocused();
+                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
+                    // User is currently editing a field:
+                    // Check if it is the preamble:
+                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
+                        preambleEditor.storeCurrentEdit();
+                    } else {
+                        storeCurrentEdit();
+                    }
+                }
+                getUndoManager().undo();
+                markBaseChanged();
+                frame.output(Localization.lang("Undo"));
+            } catch (CannotUndoException ex) {
+                LOGGER.warn("Nothing to undo", ex);
+                frame.output(Localization.lang("Nothing to undo") + '.');
+            }
+
+            markChangedOrUnChanged();
+        }
+    }
+
+    private class OpenURLAction implements BaseAction {
+
+        @Override
+        public void action() {
+            final List<BibEntry> bes = mainTable.getSelectedEntries();
+            if (bes.size() == 1) {
+                String field = FieldName.DOI;
+                Optional<String> link = bes.get(0).getField(FieldName.DOI);
+                if (bes.get(0).hasField(FieldName.URL)) {
+                    link = bes.get(0).getField(FieldName.URL);
+                    field = FieldName.URL;
+                }
+                if (link.isPresent()) {
+                    try {
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
+                        output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                    }
+                } else {
+                    // No URL or DOI found in the "url" and "doi" fields.
+                    // Look for web links in the "file" field as a fallback:
+                    FileListEntry entry = null;
+                    FileListTableModel tm = new FileListTableModel();
+                    bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
+                    for (int i = 0; i < tm.getRowCount(); i++) {
+                        FileListEntry flEntry = tm.getEntry(i);
+                        if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
+                                || FieldName.PS.equalsIgnoreCase(flEntry.type.get().getName())
+                                || FieldName.PDF.equalsIgnoreCase(flEntry.type.get().getName())) {
+                            entry = flEntry;
+                            break;
+                        }
+                    }
+                    if (entry == null) {
+                        output(Localization.lang("No URL defined") + '.');
+                    } else {
+                        try {
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
+                            output(Localization.lang("External viewer called") + '.');
+                        } catch (IOException e) {
+                            output(Localization.lang("Could not open link"));
+                            LOGGER.info("Could not open link", e);
+                        }
+                    }
+                }
+            } else {
+                output(Localization.lang("This operation requires exactly one item to be selected."));
+            }
+        }
+    }
+
+    private class RedoAction implements BaseAction {
+
+        @Override
+        public void action() {
+            try {
+
+                JComponent focused = Globals.getFocusListener().getFocused();
+                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
+                    // User is currently editing a field:
+                    storeCurrentEdit();
+                }
+
+                getUndoManager().redo();
+                markBaseChanged();
+                frame.output(Localization.lang("Redo"));
+            } catch (CannotRedoException ex) {
+                frame.output(Localization.lang("Nothing to redo") + '.');
+            }
+
+            markChangedOrUnChanged();
+        }
+    }
+
+    private class PrintPreviewAction implements BaseAction {
+
+        @Override
+        public void action() throws Exception {
+            selectionListener.setPreviewActive(true);
+            showPreview(selectionListener.getPreview());
+            selectionListener.getPreview().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        }
+    }
+
+    private class SaveSelectedAction implements BaseAction {
+
+        private final SavePreferences.DatabaseSaveType saveType;
+
+        public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
+            this.saveType = saveType;
+        }
+
+        @Override
+        public void action() throws SaveException {
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            Optional<Path> chosenFile = dialog.saveNewFile();
+
+            if (chosenFile.isPresent()) {
+                Path path = chosenFile.get();
+                saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
+                frame.getFileHistory().newFile(path.toString());
+                frame.output(Localization.lang("Saved selected to '%0'.", path.toString()));
+            }
+        }
+    }
 }

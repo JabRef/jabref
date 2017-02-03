@@ -216,4 +216,12 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public int calculateNumberOfMatches(BibDatabase database) {
         return calculateNumberOfMatches(database.getEntries());
     }
+
+    /**
+     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information
+     * into account.
+     */
+    public boolean matches(BibEntry entry) {
+        return getSearchMatcher().isMatch(entry);
+    }
 }
