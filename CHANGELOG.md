@@ -20,11 +20,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned journal abbreviations dialog.
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
+- The MS-Office XML export now exports the field `volumes` and `pubstate`.
 
 ### Fixed
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
  - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
-
+ - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
+ - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
 ### Removed
 
 

@@ -79,7 +79,6 @@ class MSBibEntry {
     private static final Pattern DATE_PATTERN = Pattern
             .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
-
     public MSBibEntry() {
         //empty
     }
