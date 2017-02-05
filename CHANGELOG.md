@@ -27,7 +27,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
  - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
  - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
- - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
 ### Removed
 
 
