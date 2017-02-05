@@ -7,7 +7,6 @@ import java.awt.FontFormatException;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -346,8 +345,8 @@ public class IconTheme {
         }
     }
 
-    public static List<Image> getLogoSet() {
-        List<Image> jabrefLogos = new ArrayList<>();
+    public static List<java.awt.Image> getLogoSet() {
+        List<java.awt.Image> jabrefLogos = new ArrayList<>();
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
         jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon32")).getImage());
