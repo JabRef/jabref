@@ -10,7 +10,7 @@ public class LatexCleanupFormatter implements Formatter {
     private static final Pattern REMOVE_REDUNDANT = Pattern
             .compile("(?<!\\\\[\\p{Alpha}]{0,100}\\{[^\\}]{0,100})\\}([-/ ]?)\\{");
 
-    private static final Pattern REPLACE_WITH_AT = Pattern.compile("(([^$]|\\\\\\$)*)\\$");
+    private static final Pattern REPLACE_WITH_AT = Pattern.compile("(^|[^\\\\$])\\$");
     private static final Pattern REPLACE_EVERY_OTHER_AT = Pattern.compile("([^@]*)@@([^@]*)@@");
     private static final Pattern MOVE_NUMBERS_WITH_OPERATORS = Pattern.compile("([0-9\\(\\.]+[ ]?[-+/]?[ ]?)\\$");
     private static final Pattern MOVE_NUMBERS_RIGHT_INTO_EQUATION = Pattern.compile("@@([ ]?[-+/]?[ ]?[0-9\\)\\.]+)");
