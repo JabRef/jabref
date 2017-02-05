@@ -32,9 +32,18 @@ public class LatexCleanupFormatterTest {
     }
 
     @Test
+    public void escapePercentSignOnlyOnce() {
+        assertEquals("\\%", formatter.format("\\%"));
+    }
+
+    @Test
+    public void escapePercentSignOnlnyOnceWithNumber() {
+        assertEquals("50\\%", formatter.format("50\\%"));
+    }
+
+    @Test
     public void formatExample() {
         assertEquals("{VLSI DSP}", formatter.format(formatter.getExampleInput()));
     }
-
 
 }
