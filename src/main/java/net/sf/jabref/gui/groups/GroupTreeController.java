@@ -66,8 +66,10 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 .withGraphic(viewModel -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
-                    BindingsHelper.includePseudoClassWhen(node, anySelected, viewModel.anySelectedEntriesMatchedProperty());
-                    BindingsHelper.includePseudoClassWhen(node, allSelected, viewModel.allSelectedEntriesMatchedProperty());
+                    if (!viewModel.isRoot()) {
+                        BindingsHelper.includePseudoClassWhen(node, anySelected, viewModel.anySelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, allSelected, viewModel.allSelectedEntriesMatchedProperty());
+                    }
                     Text text = new Text();
                     text.textProperty().bind(viewModel.getHits().asString());
                     text.getStyleClass().setAll("text");
