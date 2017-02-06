@@ -80,7 +80,9 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      */
     private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
-            String response = new URLDownload(constructQuery(queryByTitle)).downloadToString(StandardCharsets.UTF_8);
+            URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
+            urlDownload.fixSSLVerification();
+            String response = urlDownload.downloadToString(StandardCharsets.UTF_8);
 
             //Conversion of < and >
             response = response.replaceAll("&gt;", ">");
