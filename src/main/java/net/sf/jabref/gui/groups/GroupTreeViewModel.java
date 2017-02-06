@@ -63,8 +63,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), root))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get()));
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
             rootGroup.setValue(newRoot);
         }
     }

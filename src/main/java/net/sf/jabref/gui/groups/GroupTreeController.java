@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
+import net.sf.jabref.gui.util.BindingsHelper;
 import net.sf.jabref.gui.util.RecursiveTreeItem;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
 import net.sf.jabref.logic.l10n.Localization;
@@ -59,10 +60,16 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         );
 
         // Number of hits
+        PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
+        PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
+                    if (!viewModel.isRoot()) {
+                        BindingsHelper.includePseudoClassWhen(node, anySelected, viewModel.anySelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, allSelected, viewModel.allSelectedEntriesMatchedProperty());
+                    }
                     Text text = new Text();
                     text.textProperty().bind(viewModel.getHits().asString());
                     text.getStyleClass().setAll("text");
