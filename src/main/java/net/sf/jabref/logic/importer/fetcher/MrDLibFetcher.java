@@ -96,12 +96,13 @@ public class MrDLibFetcher implements EntryBasedFetcher {
      * @param query: the title of the bib entry.
      * @return the string used to make the query at mdl server
      */
-    private String constructQuery(String queryByTitle) {
-        queryByTitle = queryByTitle.replaceAll(":|'|\"|#|<|>|&|´|`|~|-", "");
+    private String constructQuery(String queryWithTitle) {
+        // The encoding does not work for / so we convert them by our own
+        queryWithTitle = queryWithTitle.replaceAll("/", "convbckslsh");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https");
         builder.setHost("api-dev.mr-dlib.org");
-        builder.setPath("/v1/documents/" + queryByTitle + "/related_documents");
+        builder.setPath("/v1/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION);
