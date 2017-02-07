@@ -2,6 +2,7 @@ package net.sf.jabref.gui;
 
 import java.awt.Component;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -59,7 +60,10 @@ public class FileDialog {
 
     public FileDialog(Component parent, Path dir) {
         Objects.requireNonNull(dir, "Directory must not be null");
-
+        //Dir must be a folder, not a file
+        if (!Files.isDirectory(dir)) {
+            dir = dir.getParent();
+        }
         fileChooser = new FileChooser();
         configurationBuilder = new FileDialogConfiguration.Builder();
         configurationBuilder = configurationBuilder.withInitialDirectory(dir);
@@ -137,6 +141,7 @@ public class FileDialog {
 
         return runInJavaFXThread(() -> Optional.ofNullable(directoryChooser.showDialog(null)).map(File::toPath));
     }
+
     /**
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select multiple files
      * @return List containing the paths of all files or an empty list if dialog is canceled
