@@ -264,7 +264,11 @@ public class MetaData {
     }
 
     public void unregisterListener(Object listener) {
-        this.eventBus.unregister(listener);
+        try {
+            this.eventBus.unregister(listener);
+        } catch (IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+        }
     }
 
     private Optional<String> getDefaultCiteKeyPattern() {

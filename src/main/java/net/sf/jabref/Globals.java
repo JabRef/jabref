@@ -2,8 +2,8 @@ package net.sf.jabref;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.gui.GlobalFocusListener;
+import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
-import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -37,13 +37,17 @@ public class Globals {
      */
     public static ProtectedTermsLoader protectedTermsLoader;
 
+    /**
+     * Manager for the state of the GUI.
+     */
+    public static StateManager stateManager = new StateManager();
+
     // Key binding preferences
     private static KeyBindingPreferences keyPrefs;
 
     // Background tasks
     private static GlobalFocusListener focusListener;
     private static FileUpdateMonitor fileUpdateMonitor;
-    private static StreamEavesdropper streamEavesdropper;
 
     // Key binding preferences
     public static KeyBindingPreferences getKeyPrefs() {
@@ -58,8 +62,6 @@ public class Globals {
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
-        Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
-
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
     }
@@ -70,9 +72,5 @@ public class Globals {
 
     public static FileUpdateMonitor getFileUpdateMonitor() {
         return fileUpdateMonitor;
-    }
-
-    public static StreamEavesdropper getStreamEavesdropper() {
-        return streamEavesdropper;
     }
 }

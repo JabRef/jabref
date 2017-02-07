@@ -127,6 +127,7 @@ public class FieldName {
     public static final String VOLUMES = "volumes";
     public static final String YEAR = "year";
     public static final String YEARFILED = "yearfiled";
+    public static final String MR_NUMBER = "mrnumber";
 
     // Additional BibSonomy fields
     public static final String DESCRIPTION = "description";

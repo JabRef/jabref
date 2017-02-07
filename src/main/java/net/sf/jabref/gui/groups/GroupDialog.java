@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -28,6 +29,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.Dialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -51,7 +54,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends JDialog {
+class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -94,12 +97,9 @@ class GroupDialog extends JDialog {
             return d;
         }
     };
-
-    private boolean isOkPressed;
-
-    private AbstractGroup resultingGroup;
-
     private final CardLayout optionsLayout = new CardLayout();
+    private boolean isOkPressed;
+    private AbstractGroup resultingGroup;
 
     /**
      * Shows a group add/edit dialog.
@@ -314,7 +314,7 @@ class GroupDialog extends JDialog {
             keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == RegexKeywordGroup.class)) {
-            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
+            RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());
@@ -338,6 +338,36 @@ class GroupDialog extends JDialog {
             explicitRadioButton.setSelected(true);
             setContext(GroupHierarchyType.INDEPENDENT);
         }
+    }
+
+    public GroupDialog() {
+        this(JabRefGUI.getMainFrame(), null);
+    }
+
+    private static String formatRegExException(String regExp, Exception e) {
+        String[] sa = e.getMessage().split("\\n");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sa.length; ++i) {
+            if (i > 0) {
+                sb.append("<br>");
+            }
+            sb.append(StringUtil.quoteForHTML(sa[i]));
+        }
+        String s = Localization.lang(
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
+        if (!(e instanceof PatternSyntaxException)) {
+            return s;
+        }
+        int lastNewline = s.lastIndexOf("<br>");
+        int hat = s.lastIndexOf('^');
+        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
+        }
+        return s;
     }
 
     public boolean okPressed() {
@@ -433,32 +463,6 @@ class GroupDialog extends JDialog {
         descriptionLabel.setText("<html>" + description + "</html>");
     }
 
-    private static String formatRegExException(String regExp, Exception e) {
-        String[] sa = e.getMessage().split("\\n");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < sa.length; ++i) {
-            if (i > 0) {
-                sb.append("<br>");
-            }
-            sb.append(StringUtil.quoteForHTML(sa[i]));
-        }
-        String s = Localization.lang(
-                "The regular expression <b>%0</b> is invalid:",
-                StringUtil.quoteForHTML(regExp))
-                + "<p><tt>"
-                + sb
-                + "</tt>";
-        if (!(e instanceof PatternSyntaxException)) {
-            return s;
-        }
-        int lastNewline = s.lastIndexOf("<br>");
-        int hat = s.lastIndexOf('^');
-        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
-        }
-        return s;
-    }
-
     /**
      * Sets the font of the name entry field.
      */
@@ -493,6 +497,17 @@ class GroupDialog extends JDialog {
             unionButton.setSelected(true);
         } else {
             independentButton.setSelected(true);
+        }
+    }
+
+    @Override
+    public Optional<AbstractGroup> showAndWait() {
+        this.setVisible(true);
+        if (this.okPressed()) {
+            AbstractGroup newGroup = getResultingGroup();
+            return Optional.of(newGroup);
+        } else {
+            return Optional.empty();
         }
     }
 }

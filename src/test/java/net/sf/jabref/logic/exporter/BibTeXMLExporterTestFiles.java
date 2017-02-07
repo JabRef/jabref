@@ -33,7 +33,6 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
-
 @RunWith(Parameterized.class)
 public class BibTeXMLExporterTestFiles {
 
@@ -49,7 +48,6 @@ public class BibTeXMLExporterTestFiles {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws IOException, URISyntaxException {

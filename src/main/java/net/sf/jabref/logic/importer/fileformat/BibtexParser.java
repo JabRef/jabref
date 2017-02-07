@@ -59,17 +59,16 @@ import org.apache.commons.logging.LogFactory;
 public class BibtexParser implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
-
+    private static final Integer LOOKAHEAD = 64;
+    private final FieldContentParser fieldContentParser;
+    private final Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser;
     private ParserResult parserResult;
-    private static final Integer LOOKAHEAD = 64;
-    private final Deque<Character> pureTextFromFile = new LinkedList<>();
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -157,7 +156,7 @@ public class BibtexParser implements Parser {
     private void initializeParserResult() {
         database = new BibDatabase();
         entryTypes = new HashMap<>(); // To store custom entry types parsed.
-        parserResult = new ParserResult(database, null, entryTypes);
+        parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
 
@@ -218,7 +217,7 @@ public class BibtexParser implements Parser {
         try {
             parserResult.setMetaData(MetaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
-            parserResult.addWarning(exception.getLocalizedMessage());
+            parserResult.addException(exception);
         }
 
         parseRemainingContent();
