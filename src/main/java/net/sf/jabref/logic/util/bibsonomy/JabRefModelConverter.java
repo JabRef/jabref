@@ -151,7 +151,7 @@ public class JabRefModelConverter {
 				final String description = post.getDescription();
 				if (present(description)) {
 					entry.setField(FieldName.DESCRIPTION, post.getDescription());
-					entry.setField(FieldName.COMMENTS, post.getDescription());
+					entry.setField(FieldName.COMMENT, post.getDescription());
 				}
 
 				if (present(post.getDate())) {
@@ -364,8 +364,7 @@ public class JabRefModelConverter {
 		final Optional<String> entryDescriptionOpt = entry.getField(FieldName.DESCRIPTION);
 		entryDescriptionOpt.ifPresent(entryDescription -> post.setDescription(StringUtil.toUTF8(entryDescription)));
 
-
-		final Optional<String> entryCommentOpt = entry.getField(FieldName.COMMENTS);
+		final Optional<String> entryCommentOpt = entry.getField(FieldName.COMMENT);
 		entryCommentOpt.ifPresent(entryComment -> post.setDescription(StringUtil.toUTF8(entryComment)));
 
 		final Optional<String> entryMonthOpt = entry.getField(FieldName.MONTH);
