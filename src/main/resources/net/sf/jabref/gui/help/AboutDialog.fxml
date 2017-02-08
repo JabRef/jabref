@@ -38,7 +38,7 @@
 										<HBox alignment="CENTER_LEFT">
 											<children>
 												<Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true" />
-												<Hyperlink onAction="#openLicense" text="%MIT" />
+												<Hyperlink onAction="#openLicense" text="MIT" />
 											</children>
 										</HBox>
                                         <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries" />
