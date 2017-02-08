@@ -338,26 +338,24 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         return null;
     }
 
-    private void addEntry(String initialLink) {
-        int row = getSelectedRow();
-        if (row == -1) {
-            row = 0;
+    /**
+     * Will append a new file link at the last position
+     */
+    private void addEntry() {
+        List<String> defaultDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+
+        FileListEntry entry;
+        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
+            entry = new FileListEntry("", "");
+        } else {
+            entry = new FileListEntry("", defaultDirectory.get(0));
         }
-        FileListEntry entry = new FileListEntry("", initialLink);
+
         if (editListEntry(entry, true)) {
-            tableModel.addEntry(row, entry);
+            tableModel.addEntry(tableModel.getRowCount(), entry);
         }
         entryEditor.updateField(this);
         adjustColumnWidth();
-    }
-
-    private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
-            addEntry("");
-        } else {
-            addEntry(defaultDirectory.get(0));
-        }
     }
 
     private void removeEntries() {
