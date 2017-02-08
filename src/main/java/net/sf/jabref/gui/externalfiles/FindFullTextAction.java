@@ -91,10 +91,11 @@ public class FindFullTextAction extends AbstractWorker {
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
-                        FileListTableModel tm = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(tm::setContent);
-                        tm.addEntry(tm.getRowCount(), file);
-                        String newValue = tm.getStringRepresentation();
+                        FileListTableModel fileLinkModel = new FileListTableModel();
+                        entry.getField(FieldName.FILE).ifPresent(fileLinkModel::setContent);
+                        // add full text file link at first position
+                        fileLinkModel.addEntry(0, file);
+                        String newValue = fileLinkModel.getStringRepresentation();
                         UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
                                 entry.getField(FieldName.FILE).orElse(null), newValue);
                         entry.setField(FieldName.FILE, newValue);
