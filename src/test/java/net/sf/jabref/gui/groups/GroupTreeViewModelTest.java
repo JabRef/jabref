@@ -29,6 +29,6 @@ public class GroupTreeViewModelTest {
     @Test
     public void rootGroupIsAllEntriesByDefault() throws Exception {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, allEntriesGroup), groupTree.rootGroupProperty().getValue());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, allEntriesGroup), groupTree.rootGroupProperty().getValue());
     }
 }
