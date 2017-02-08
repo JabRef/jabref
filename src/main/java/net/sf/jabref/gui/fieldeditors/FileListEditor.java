@@ -472,14 +472,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      */
     @Override
     public void downloadComplete(FileListEntry file) {
-        tableModel.addEntry(tableModel.getRowCount(), file);
+        tableModel.addEntry(0, file);
         entryEditor.updateField(this);
         adjustColumnWidth();
     }
 
-
     class TableClickListener extends MouseAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
