@@ -30,7 +30,7 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
-    private final LayoutFormatterPreferences prefs;
+    private final LayoutFormatterPreferences layoutPrefs;
 
     private final String fileDirPattern;
     private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
@@ -38,11 +38,11 @@ public class MoveFilesCleanup implements CleanupJob {
     private ParsedFileField singleFieldCleanup = null;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
-            FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences prefs) {
+            FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
-        this.prefs = Objects.requireNonNull(prefs);
+        this.layoutPrefs = Objects.requireNonNull(layoutPrefs);
     }
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
@@ -95,7 +95,7 @@ public class MoveFilesCleanup implements CleanupJob {
             String targetDirName = "";
             if (!fileDirPattern.isEmpty()) {
                 targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
-                        prefs);
+                        layoutPrefs);
             }
 
             Path newTargetFile = targetDirectory.get().toPath().resolve(targetDirName).resolve(oldFile.get().getName());
