@@ -34,6 +34,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import net.sf.jabref.logic.util.io.FileUtil;
 
 import org.apache.commons.logging.Log;
@@ -244,8 +245,6 @@ public class URLDownload {
     }
 
     public void fixSSLVerification() {
-
-        LOGGER.warn("Fix SSL exception by accepting ALL certificates");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
