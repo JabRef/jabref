@@ -5,13 +5,10 @@ import java.util.Objects;
 
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
 
-
-
 /**
  * Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class
  */
 public class LatexToUnicodeAdapter {
-
 
     public static String format(String inField) {
         Objects.requireNonNull(inField);
