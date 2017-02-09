@@ -43,7 +43,7 @@ public class CrossRef {
         Optional<DOI> doi = Optional.empty();
 
         // title is minimum requirement
-        Optional<String> title = entry.getField(FieldName.TITLE);
+        Optional<String> title = entry.getLatexFreeField(FieldName.TITLE);
 
         if (!title.isPresent() || title.get().isEmpty()) {
             return doi;
