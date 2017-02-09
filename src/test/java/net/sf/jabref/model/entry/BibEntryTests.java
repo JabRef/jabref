@@ -205,7 +205,7 @@ public class BibEntryTests {
     @Test
     public void getFieldOrAliasLatexFreeComplexConversionInAlias() {
         emptyEntry.setField("journal", "A 32~{mA} {$\\Sigma\\Delta$}-modulator");
-        assertEquals(Optional.of("A 32\u00A0mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
+        assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
     }
 
     @Test
