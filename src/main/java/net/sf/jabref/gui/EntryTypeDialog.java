@@ -31,6 +31,7 @@ import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -186,6 +187,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         comboBox = new JComboBox<>();
 
         EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        // set DOI as default
+        comboBox.setSelectedItem(DoiFetcher.name);
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
