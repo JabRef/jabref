@@ -116,6 +116,7 @@ public class CrossRef {
                     }
                 }
             } catch(JSONException ex) {
+                LOGGER.warn("CrossRef API JSON format has changed: " + ex.getMessage());
                 return Optional.empty();
             }
         }
