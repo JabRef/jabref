@@ -22,7 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned journal abbreviations dialog.
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
-- Switch to the latex2unicode library https://github.com/tomtung/latex2unicode for converting LaTeX to unicode
+- Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
 - The MS-Office XML export now exports the field `volumes` and `pubstate`.
 
 ### Fixed
