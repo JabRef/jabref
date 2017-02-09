@@ -84,7 +84,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
-        htmlContent.append(Localization.lang("What_is_Mr._Dlib?"));
+        htmlContent.append(Localization.lang("What_is_Mr._DLib?"));
         htmlContent.append("</a></div>");
         htmlContent.append("</body></html>");
         this.setText(htmlContent.toString());
@@ -106,7 +106,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append("<div>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
-        htmlContent.append(Localization.lang("What_is_Mr._Dlib?"));
+        htmlContent.append(Localization.lang("What_is_Mr._DLib?"));
         htmlContent.append("</a></div>");
         htmlContent.append("</b><br><img width=\"100\" height=\"100\" src=\"" + url + "\"></img></div>");
         htmlContent.append("</body></html>");
