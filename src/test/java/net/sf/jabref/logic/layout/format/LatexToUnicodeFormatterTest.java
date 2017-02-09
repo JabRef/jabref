@@ -45,7 +45,7 @@ public class LatexToUnicodeFormatterTest {
 
     @Test
     public void testEquationsMoreComplicatedFormatting() {
-        assertEquals("A 32\u00A0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
+        assertEquals("A 32 mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
     @Test
