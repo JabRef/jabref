@@ -107,7 +107,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-
+            //check if expandeOldFile already has targetDirname inside
             Path newPath = expandedOldFile.get().getParent().resolve(targetDirName).resolve(targetFileName.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();

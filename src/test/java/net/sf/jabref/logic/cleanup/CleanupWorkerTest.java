@@ -18,6 +18,7 @@ import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
@@ -26,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -36,6 +38,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CleanupWorkerTest {
 
@@ -52,7 +55,11 @@ public class CleanupWorkerTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        context.setDatabaseFile(bibFolder.newFile("test.bib"));
+
+        FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Biblocation as Primary overwrites all other dirs
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
@@ -60,7 +67,7 @@ public class CleanupWorkerTest {
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
                         "", //empty fileDirPattern for backwards compatibility
                         prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                        prefs.getFileDirectoryPreferences()));
+                        fileDirPrefs));
 
     }
 
