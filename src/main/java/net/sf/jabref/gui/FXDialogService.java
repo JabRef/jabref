@@ -88,6 +88,11 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog) {
+        return dialog.showAndWait();
+    }
+
+    @Override
     public void notify(String message) {
         JabRefGUI.getMainFrame().output(message);
     }

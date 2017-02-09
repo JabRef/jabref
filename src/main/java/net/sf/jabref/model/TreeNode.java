@@ -1,12 +1,14 @@
 package net.sf.jabref.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 /**
  * Represents a node in a tree.
@@ -30,13 +32,19 @@ import java.util.function.Consumer;
 @SuppressWarnings("unchecked") public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
+     * Array of children, may be empty if this node has no children (but never null)
+     */
+    private final ObservableList<T> children;
+    /**
      * This node's parent, or null if this node has no parent
      */
     private T parent;
     /**
-     * Array of children, may be empty if this node has no children (but never null)
+     * The function which is invoked when something changed in the subtree.
      */
-    private final List<T> children;
+    private Consumer<T> onDescendantChanged = t -> {
+        /* Do nothing */
+    };
 
     /**
      * Constructs a tree node without parent and no children.
@@ -46,7 +54,7 @@ import java.util.function.Consumer;
      */
     public TreeNode(Class<T> derivingClass) {
         parent = null;
-        children = new ArrayList<>();
+        children = FXCollections.observableArrayList();
 
         if (!derivingClass.isInstance(this)) {
             throw new UnsupportedOperationException("The class extending TreeNode<T> has to derive from T");
@@ -400,8 +408,8 @@ import java.util.function.Consumer;
      *
      * @return a list of this node's children
      */
-    public List<T> getChildren() {
-        return Collections.unmodifiableList(children);
+    public ObservableList<T> getChildren() {
+        return FXCollections.unmodifiableObservableList(children);
     }
 
     /**
@@ -572,12 +580,6 @@ import java.util.function.Consumer;
      * @return a deep copy of this node
      */
     public abstract T copyNode();
-
-    /**
-     * The function which is invoked when something changed in the subtree.
-     */
-    private Consumer<T> onDescendantChanged = t -> {
-        /* Do nothing */ };
 
     /**
      * Adds the given function to the list of subscribers which are notified when something changes in the subtree.

@@ -240,7 +240,9 @@ public class PdfImporter {
                 Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
-        panel.highlightEntry(entry);
+
+        SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
+
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             EntryEditor editor = panel.getEntryEditor(entry);
             panel.showEntryEditor(editor);

@@ -15,16 +15,22 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - Partly switched to new UI technology (JavaFX).
     - Redesigned group panel.
+      - Number of matched entries is always shown.
+      - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 - Switch to the latex2unicode library https://github.com/tomtung/latex2unicode for converting LaTeX to unicode
+- The MS-Office XML export now exports the field `volumes` and `pubstate`.
 
 ### Fixed
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
-
+ - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
+ - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
+ - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
+ - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
 ### Removed
 
 

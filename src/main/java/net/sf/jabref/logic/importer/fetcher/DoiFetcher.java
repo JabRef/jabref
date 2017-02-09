@@ -24,6 +24,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
+    public static final String name = "DOI";
 
     private final ImportFormatPreferences preferences;
 
@@ -33,7 +34,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public String getName() {
-        return "DOI";
+        return DoiFetcher.name;
     }
 
     @Override
