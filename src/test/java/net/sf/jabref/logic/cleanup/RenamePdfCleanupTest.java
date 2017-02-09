@@ -154,7 +154,7 @@ public class RenamePdfCleanupTest {
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         String fileDirPattern = "\\EntryType";
 
-        File subFolder = testFolder.newFolder("subbfolder");
+        File subFolder = testFolder.newFolder("subfolder");
         Path file = Files.createTempFile(subFolder.toPath(), "Toot", "pdf");
 
         ParsedFileField fileField = new ParsedFileField("", file.toString(), "PDF");
@@ -167,7 +167,7 @@ public class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         Path parent = context.getFirstExistingFileDir(prefs.getFileDirectoryPreferences()).get();
-        String relativeFile = parent.relativize(parent.resolve("Misc/Toot - test title.pdf")).toString();
+        String relativeFile = parent.relativize(parent.resolve("subfolder/Misc/Toot - test title.pdf")).toString();
 
         ParsedFileField newFileField = new ParsedFileField("", relativeFile, "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
