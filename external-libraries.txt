@@ -193,4 +193,9 @@ Project: javafxsvg
 URL:     https://github.com/codecentric/javafxsvg
 License: BSD 3-Clause
 
+Id:      com.github.tomtung
+Project: latex2unicode
+URL:     https://github.com/tomtung/latex2unicode
+License: Apache 2.0
+
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
