@@ -22,8 +22,15 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    public void handleLaTeXCommandsWhichAreSubstrings() {
+        assertEquals("ç", formatter.format("$\\c{c}$"));
+        assertEquals("χ", formatter.format("$\\chi$"));
+    }
+
+    @Test
     public void testFormatStripLatexCommands() {
         assertEquals("-", formatter.format("\\mbox{-}"));
+        assertEquals("text", formatter.format("\\textit{text}"));
     }
 
     @Test
