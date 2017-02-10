@@ -19,7 +19,6 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 ### Ensure consistent formatting
 Ensure your code is formatted according the JabRef formatting guidelines.
 When you use Eclipse, the required configuration is generated automatically by `gradlew cleanEclipse eclipse`.
-You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 
 ### Add your change to CHANGELOG.md
