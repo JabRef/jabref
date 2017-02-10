@@ -83,7 +83,7 @@ public class RenameFileAction extends AbstractAction {
 
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
                     frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
-                    prefs.getFileDirPattern(), prefs.getLayoutFormatterPreferences(),
+                    prefs.getLayoutFormatterPreferences(),
                     prefs.getFileDirectoryPreferences(), field);
             pdfCleanup.cleanup(eEditor.getEntry());
 

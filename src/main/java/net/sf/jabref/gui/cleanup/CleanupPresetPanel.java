@@ -85,10 +85,6 @@ public class CleanupPresetPanel {
         builder.add(cleanUpMakePathsRelative).xyw(1, 4, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 5, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ");
-        String fileDirPattern = Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN);
-        if (!fileDirPattern.isEmpty()) {
-            currentPattern = currentPattern.concat(fileDirPattern).concat("/");
-        }
         currentPattern = currentPattern.concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 6);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);

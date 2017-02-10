@@ -33,28 +33,26 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final String fileNamePattern;
-    private final String fileDirPattern;
     private final LayoutFormatterPreferences layoutPrefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
     private ParsedFileField singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-            String fileDirPattern, LayoutFormatterPreferences layoutPrefs,
+            LayoutFormatterPreferences layoutPrefs,
             FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
-        this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.layoutPrefs = Objects.requireNonNull(layoutPrefs);
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-            String fileDirPattern, LayoutFormatterPreferences prefs,
+            LayoutFormatterPreferences layoutPrefs,
             FileDirectoryPreferences fileDirectoryPreferences, ParsedFileField singleField) {
 
-        this(onlyRelativePaths, databaseContext, fileNamePattern, fileDirPattern, prefs,
+        this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPrefs,
                 fileDirectoryPreferences);
         this.singleFieldCleanup = singleField;
 
@@ -89,12 +87,6 @@ public class RenamePdfCleanup implements CleanupJob {
                     .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
                     .trim());
 
-            String targetDirName = "";
-            if (!fileDirPattern.isEmpty()) {
-                targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
-                        layoutPrefs);
-            }
-
             //Add extension to newFilename
             targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
@@ -108,7 +100,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
             //check if expandeOldFile already has targetDirname inside
-            Path newPath = expandedOldFile.get().getParent().resolve(targetDirName).resolve(targetFileName.toString());
+            Path newPath = expandedOldFile.get().getParent().resolve(targetFileName.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
             boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)

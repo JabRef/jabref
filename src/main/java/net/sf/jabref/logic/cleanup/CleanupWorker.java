@@ -76,7 +76,7 @@ public class CleanupWorker {
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    fileNamePattern, fileDirPattern, layoutPrefs, fileDirectoryPreferences);
+                    fileNamePattern, layoutPrefs, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }
