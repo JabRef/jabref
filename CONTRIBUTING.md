@@ -1,5 +1,5 @@
 ## Understanding the basics
-We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch - not master**, and create a pull request.
+We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
 Be sure to create a **separate branch** for each improvement you implement.
 Take a look at GitHub's excellent [help documentation] for a detailed explanation.
 
@@ -19,7 +19,6 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 ### Ensure consistent formatting
 Ensure your code is formatted according the JabRef formatting guidelines.
 When you use Eclipse, the required configuration is generated automatically by `gradlew cleanEclipse eclipse`.
-You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 
 ### Add your change to CHANGELOG.md
@@ -92,14 +91,14 @@ because <additional rationale>.
 
 
 ### When adding a new Localization.lang entry
-Add new Localization.lang("KEY") to Java file.
+Add new `Localization.lang("KEY")` to Java file.
 Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
 Tests are green again.
 
 You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
-Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly)
+Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
 
 ### Create a pull request
