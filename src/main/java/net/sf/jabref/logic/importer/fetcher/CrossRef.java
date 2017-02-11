@@ -27,18 +27,23 @@ import org.json.JSONObject;
  */
 public class CrossRef {
     private static final Log LOGGER = LogFactory.getLog(CrossRef.class);
-    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     private static final String API_URL = "http://api.crossref.org";
+    // number of results to lookup from crossref API
+    private static final int API_RESULTS = 5;
+
     private static final Levenshtein METRIC_DISTANCE = new Levenshtein();
+    // edit distance threshold for entry title comnparison
     private static final int METRIC_THRESHOLD = 4;
+
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     public static Optional<DOI> findDOI(BibEntry entry) {
         Objects.requireNonNull(entry);
         Optional<DOI> doi = Optional.empty();
 
         // title is minimum requirement
-        Optional<String> title = entry.getField(FieldName.TITLE);
+        Optional<String> title = entry.getLatexFreeField(FieldName.TITLE);
 
         if (!title.isPresent() || title.get().isEmpty()) {
             return doi;
@@ -49,15 +54,16 @@ public class CrossRef {
         try {
             HttpResponse<JsonNode> response = Unirest.get(API_URL + "/works")
                     .queryString("query", query)
-                    .queryString("rows", "1")
+                    .queryString("rows", API_RESULTS)
                     .asJson();
 
             JSONArray items = response.getBody().getObject().getJSONObject("message").getJSONArray("items");
             // quality check
-            if (checkValidity(entry, items)) {
-                String dataDOI = items.getJSONObject(0).getString("DOI");
-                LOGGER.debug("DOI " + dataDOI + " for " + title.get() + " found.");
-                return DOI.build(dataDOI);
+            Optional<String> dataDoi = findMatchingEntry(entry, items);
+
+            if (dataDoi.isPresent()) {
+                LOGGER.debug("DOI " + dataDoi.get() + " for " + title.get() + " found.");
+                return DOI.build(dataDoi.get());
             }
         } catch (UnirestException e) {
             LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);
@@ -84,33 +90,38 @@ public class CrossRef {
         return enhancedQuery.toString();
     }
 
-    private static boolean checkValidity(BibEntry entry, JSONArray result) {
+    private static Optional<String> findMatchingEntry(BibEntry entry, JSONArray results) {
         final String entryTitle = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(FieldName.TITLE).orElse(""));
 
-        // currently only title-based
-        // title: [ "How the Mind Hurts and Heals the Body." ]
-        // subtitle: [ "" ]
-        try {
-            // title
-            JSONObject data = result.getJSONObject(0);
-            String dataTitle = data.getJSONArray("title").getString(0);
+        for (int i = 0; i < results.length(); i++) {
+            // currently only title-based
+            // title: [ "How the Mind Hurts and Heals the Body." ]
+            // subtitle: [ "" ]
+            try {
+                // title
+                JSONObject data = results.getJSONObject(i);
+                String dataTitle = data.getJSONArray("title").getString(0);
 
-            if (editDistanceIgnoreCase(entryTitle, dataTitle) <= METRIC_THRESHOLD) {
-                return true;
+                if (editDistanceIgnoreCase(entryTitle, dataTitle) <= METRIC_THRESHOLD) {
+                    return Optional.of(data.getString("DOI"));
+                }
+
+                // subtitle
+                // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
+                if (data.getJSONArray("subtitle").length() > 0) {
+                    String dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
+
+                    if (editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= METRIC_THRESHOLD) {
+                        return Optional.of(data.getString("DOI"));
+                    }
+                }
+            } catch(JSONException ex) {
+                LOGGER.warn("CrossRef API JSON format has changed: " + ex.getMessage());
+                return Optional.empty();
             }
-
-            // subtitle
-            // additional check, as sometimes subtitle is needed but sometimes only duplicates the title
-            if (data.getJSONArray("subtitle").length() > 0) {
-                String dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
-
-                return editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= METRIC_THRESHOLD;
-            }
-
-            return false;
-        } catch(JSONException ex) {
-            return false;
         }
+
+        return Optional.empty();
     }
 
     private static double editDistanceIgnoreCase(String a, String b) {
