@@ -64,7 +64,13 @@ public class FileDialog {
         if (!Files.isDirectory(dir)) {
             dir = dir.getParent();
         }
+        //The lines above work also if the dir does not exist at all!
+        //NULL is accepted by the filechooser as no inital path
+        if (!Files.exists(dir)) {
+            dir = null;
+        }
         fileChooser = new FileChooser();
+
         configurationBuilder = new FileDialogConfiguration.Builder();
         configurationBuilder = configurationBuilder.withInitialDirectory(dir);
     }
