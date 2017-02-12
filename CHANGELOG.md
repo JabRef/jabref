@@ -32,6 +32,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
  - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
  - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
+ - We fixed the import of MS-Office XML files, when the `month` field contained an invalid value.
 ### Removed
 
 
