@@ -66,6 +66,39 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
+    public void testIWithDiaresis() {
+        assertEquals("ï", formatter.format("\\\"{i}"));
+    }
+
+    @Test
+    public void testIWithDiaresisAndEscapedI() {
+        // this might look strange in the test, but is actually a correct translation and renders identically to the above example in the UI
+        assertEquals("ı̈", formatter.format("\\\"{\\i}"));
+    }
+
+
+    @Test
+    public void testIWithDiaresisAndUnnecessaryBraces() {
+        assertEquals("ï", formatter.format("{\\\"{i}}"));
+    }
+
+    @Test
+    public void testUpperCaseIWithDiaresis() {
+        assertEquals("Ï", formatter.format("\\\"{I}"));
+    }
+
+    @Test
+    public void testPolishName() {
+        assertEquals("Łęski", formatter.format("\\L\\k{e}ski"));
+    }
+
+
+    @Test
+    public void testDoubleCombiningAccents() {
+        assertEquals("ώ", formatter.format("$\\acute{\\omega}$"));
+    }
+
+    @Test
     public void testCombiningAccentsCase1() {
         assertEquals("ḩ", formatter.format("{\\c{h}}"));
     }
