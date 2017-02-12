@@ -24,12 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.ParsedFileField;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class RenameFileAction extends AbstractAction {
-
-    private static final Log LOGGER = LogFactory.getLog(RenameFileAction.class);
 
     private final JabRefFrame frame;
     private final EntryEditor eEditor;

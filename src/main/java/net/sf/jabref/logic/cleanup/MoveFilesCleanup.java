@@ -35,7 +35,7 @@ public class MoveFilesCleanup implements CleanupJob {
     private final String fileDirPattern;
     private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
-    private ParsedFileField singleFieldCleanup = null;
+    private ParsedFileField singleFieldCleanup;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
