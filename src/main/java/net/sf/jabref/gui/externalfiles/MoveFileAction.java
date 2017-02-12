@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -77,12 +78,12 @@ public class MoveFileAction extends AbstractAction {
                     MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
             return;
         }
-        File file = new File(ln);
+        Path file = Paths.get(ln);
         if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs).orElse(null);
+            file = FileUtil.expandFilename(ln, dirs).map(File::toPath).orElse(null);
         }
 
-        if ((file != null) && Files.exists(file.toPath())) {
+        if ((file != null) && Files.exists(file)) {
             // Ok, we found the file. Now get a new name:
             System.out.println("Cleanup of file " + file);
 

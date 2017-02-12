@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -35,7 +36,6 @@ public class RenameFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
-    private final boolean toFileDir = false;
     private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     public RenameFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
@@ -73,18 +73,22 @@ public class RenameFileAction extends AbstractAction {
                     MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
             return;
         }
-        File file = new File(ln);
+        Path file = Paths.get(ln);
         if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs).orElse(null);
+            file = FileUtil.expandFilename(ln, dirs).map(File::toPath).orElse(null);
         }
 
-        if ((file != null) && Files.exists(file.toPath())) {
+        if ((file != null) && Files.exists(file)) {
             System.out.println("Cleanup Rename of file " + file);
 
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
                     frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
                     prefs.getLayoutFormatterPreferences(),
                     prefs.getFileDirectoryPreferences(), field);
+
+            String targetFileName = pdfCleanup.getTargetFileName(field, eEditor.getEntry());
+            System.out.println("TargetFileName " + targetFileName);
+
             pdfCleanup.cleanup(eEditor.getEntry());
 
         }

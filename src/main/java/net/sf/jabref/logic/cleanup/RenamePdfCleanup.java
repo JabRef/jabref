@@ -78,17 +78,10 @@ public class RenamePdfCleanup implements CleanupJob {
         for (ParsedFileField flEntry : fileList) {
             String realOldFilename = flEntry.getLink();
 
-            if (onlyRelativePaths && (new File(realOldFilename).isAbsolute())) {
+            if (onlyRelativePaths && Paths.get(realOldFilename).isAbsolute()) {
                 newFileList.add(flEntry);
                 continue;
             }
-
-            StringBuilder targetFileName = new StringBuilder(FileUtil
-                    .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
-                    .trim());
-
-            //Add extension to newFilename
-            targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
             //old path and old filename
             Optional<Path> expandedOldFile = FileUtil.expandFilename(realOldFilename,
@@ -99,8 +92,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            //check if expandeOldFile already has targetDirname inside
-            Path newPath = expandedOldFile.get().getParent().resolve(targetFileName.toString());
+            String targetFileName = getTargetFileName(flEntry, entry);
+            Path newPath = expandedOldFile.get().getParent().resolve(targetFileName);
 
             String expandedOldFilePath = expandedOldFile.get().toString();
             boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
@@ -111,6 +104,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
                 // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
+                LOGGER.debug("There already exists a file with that name " + newPath.getFileName()
+                        + " so I won't rename it");
                 newFileList.add(flEntry);
                 continue;
             }
@@ -120,10 +115,9 @@ public class RenamePdfCleanup implements CleanupJob {
                     Files.createDirectories(newPath);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                LOGGER.error("Could no create necessary target directoires for renaming", e);
+                LOGGER.error("Could not create necessary target directoires for renaming", e);
             }
-            //do rename
+
             boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
             if (renameSuccessful) {
                 changed = true;
@@ -142,7 +136,6 @@ public class RenamePdfCleanup implements CleanupJob {
                         newFileEntryFileName = targetFileName.toString();
                     } else {
                         newFileEntryFileName = parent.relativize(newPath).toString();
-
                     }
                     newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
                 }
@@ -164,7 +157,22 @@ public class RenamePdfCleanup implements CleanupJob {
         return Collections.emptyList();
     }
 
+    public String getTargetFileName(ParsedFileField flEntry, BibEntry entry) {
+        String realOldFilename = flEntry.getLink();
+
+        StringBuilder targetFileName = new StringBuilder(FileUtil
+                .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
+                .trim());
+
+        //Add extension to newFilename
+        targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+
+        return targetFileName.toString();
+
+    }
+
     public int getUnsuccessfulRenames() {
         return unsuccessfulRenames;
     }
+
 }

@@ -138,5 +138,4 @@ public class MoveFilesCleanup implements CleanupJob {
 
         return Collections.emptyList();
     }
-
 }
