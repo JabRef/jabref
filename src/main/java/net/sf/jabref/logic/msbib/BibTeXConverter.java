@@ -16,7 +16,6 @@ public class BibTeXConverter {
 
     private static final String MSBIB_PREFIX = "msbib-";
 
-
     /**
      * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
      * @param entry The MsBibEntry to convert
@@ -84,7 +83,12 @@ public class BibTeXConverter {
         }
         if (entry.month != null) {
             Month month = MonthUtil.getMonth(entry.month);
-            fieldValues.put(FieldName.MONTH, month.shortName);
+            //if we encouter an UnknownMonth/NULL_OBJECT month, the shortname returns null
+            if (month.shortName == null) {
+                fieldValues.put(FieldName.MONTH, "");
+            } else {
+                fieldValues.put(FieldName.MONTH, month.shortName);
+            }
         }
         if (entry.number != null) {
             fieldValues.put(FieldName.NUMBER, entry.number);
