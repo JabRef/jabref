@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <VisualElements ForegroundText="light" BackgroundColor="#4F5F8F" ShowNameOnSquare150x150Logo="on"></VisualElements>
+  <VisualElements ForegroundText="light" BackgroundColor="#a2aed1" ShowNameOnSquare150x150Logo="on"></VisualElements>
 </Application>
