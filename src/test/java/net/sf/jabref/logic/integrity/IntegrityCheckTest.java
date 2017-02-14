@@ -330,8 +330,8 @@ public class IntegrityCheckTest {
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
                 createBibtexKeyPatternPreferences())
                 .checkBibtexDatabase();
-        // equals
-        clonedEntry.equals(entry);
+        
+        assertEquals(clonedEntry, entry);
     }
 
     @Test
