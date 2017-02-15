@@ -32,8 +32,8 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - if [ "$TEST_SUITE" != "guiTest" ]; ./gradlew $TEST_SUITE $OPTIONS -Dscan
-  - if [ "$TEST_SUITE" == "guiTest" ]; ./buildres/gui-tests.sh
+  - [ "$TEST_SUITE" != "guiTest" ] && ./gradlew $TEST_SUITE $OPTIONS -Dscan
+  - [ "$TEST_SUITE" == "guiTest" ] && ./buildres/gui-tests.sh
 
 after_script:
   # enable codecov report
