@@ -13,7 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
-- Partly switched to new UI technology (JavaFX).
+- Partly switched to a new UI technology (JavaFX).
     - Redesigned group panel.
       - Number of matched entries is always shown.
       - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
