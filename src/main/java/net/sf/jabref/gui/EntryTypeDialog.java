@@ -31,6 +31,7 @@ import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -185,7 +186,9 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         idTextField = new JTextField("");
         comboBox = new JComboBox<>();
 
-        EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        // set DOI as default
+        comboBox.setSelectedItem(DoiFetcher.name);
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -287,7 +290,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
-            fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
+            fetcher = EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);

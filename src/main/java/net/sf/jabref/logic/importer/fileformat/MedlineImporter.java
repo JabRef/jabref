@@ -94,6 +94,9 @@ public class MedlineImporter extends Importer implements Parser {
 
     private static final Locale ENGLISH = Locale.ENGLISH;
 
+    private static String join(List<String> list, String string) {
+        return Joiner.on(string).join(list);
+    }
 
     @Override
     public String getName() {
@@ -177,7 +180,7 @@ public class MedlineImporter extends Importer implements Parser {
             }
         } catch (JAXBException | XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
+            return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
     }
@@ -565,7 +568,6 @@ public class MedlineImporter extends Importer implements Parser {
         }
     }
 
-
     private void addElocationID(Map<String, String> fields, ELocationID eLocationID) {
         if (FieldName.DOI.equals(eLocationID.getEIdType())) {
             fields.put(FieldName.DOI, eLocationID.getContent());
@@ -644,10 +646,6 @@ public class MedlineImporter extends Importer implements Parser {
             }
         }
         fields.put(FieldName.AUTHOR, join(authorNames, " and "));
-    }
-
-    private static String join(List<String> list, String string) {
-        return Joiner.on(string).join(list);
     }
 
     private void addDateRevised(Map<String, String> fields, DateRevised dateRevised) {

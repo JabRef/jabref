@@ -507,7 +507,7 @@ public class InternalBibtexFields {
     /**
      * returns a List with all fieldnames incl. internal fieldnames
      */
-    public static List<String> getAllPublicAndInteralFieldNames() {
+    public static List<String> getAllPublicAndInternalFieldNames() {
         //add the internal field names to public fields
         List<String> publicAndInternalFields = new ArrayList<>();
         publicAndInternalFields.addAll(InternalBibtexFields.getAllPublicFieldNames());

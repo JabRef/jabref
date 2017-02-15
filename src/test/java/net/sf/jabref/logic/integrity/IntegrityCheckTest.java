@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
@@ -313,6 +314,32 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("doi", "10.17487/rfc1436"));
         assertCorrect(createContext("doi", "10.1002/(SICI)1097-4571(199205)43:4<284::AID-ASI3>3.0.CO;2-0"));
         assertWrong(createContext("doi", "asdf"));
+    }
+
+    @Test
+    public void testEntryIsUnchangedAfterChecks() {
+        BibEntry entry = new BibEntry();
+
+        // populate with all known fields
+        for (String fieldName : InternalBibtexFields.getAllPublicAndInternalFieldNames()) {
+            entry.setField(fieldName, UUID.randomUUID().toString());
+        }
+        // add a random field
+        entry.setField(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+
+        // duplicate entry
+        BibEntry clonedEntry = (BibEntry) entry.clone();
+
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
+
+        new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                createBibtexKeyPatternPreferences())
+                .checkBibtexDatabase();
+        
+        assertEquals(clonedEntry, entry);
     }
 
     @Test

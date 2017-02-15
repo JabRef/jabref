@@ -664,7 +664,7 @@ public class TreeNodeTest {
     /**
      * This is just a dummy class deriving from TreeNode<T> so that we can test the generic class
      */
-    private class TreeNodeMock extends TreeNode<TreeNodeMock> {
+    private static class TreeNodeMock extends TreeNode<TreeNodeMock> {
 
         private final String name;
 

@@ -117,6 +117,16 @@ Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
 License: MIT
 
+Id:      org.controlsfx:controlsfx
+Project: ControlsFX
+URL:     http://fxexperience.com/controlsfx/
+License: BSD-3-Clause
+
+Id:      org.fx.misc.easybin:easybind
+Projekt: EasyBind
+URL:     https://github.com/TomasMikula/EasyBind
+License: BSD-2-Clause
+
 Id:      org.jsoup:jsoup
 Project: jsoup
 URL:     https://github.com/jhy/jsoup/
@@ -172,5 +182,20 @@ Id:      de.undercouch.citeproc-java
 Project: Citeproc-Java
 URL:     http://michel-kraemer.github.io/citeproc-java/
 Licence: Apache-2.0
+
+Id:      com.airhacks:afterburner.fx
+Project: afterburner.fx
+URL:     https://github.com/AdamBien/afterburner.fx
+License: Apache 2.0
+
+Id:      de.codecentric.centerdevice
+Project: javafxsvg
+URL:     https://github.com/codecentric/javafxsvg
+License: BSD 3-Clause
+
+Id:      com.github.tomtung
+Project: latex2unicode
+URL:     https://github.com/tomtung/latex2unicode
+License: Apache 2.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

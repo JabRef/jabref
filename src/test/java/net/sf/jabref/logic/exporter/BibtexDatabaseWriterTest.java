@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -222,7 +224,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeString() throws Exception {
-        database.addString(new BibtexString("id", "name", "content"));
+        database.addString(new BibtexString("name", "content"));
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
@@ -232,7 +234,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeStringAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        database.addString(new BibtexString("id", "name", "content"));
+        database.addString(new BibtexString("name", "content"));
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
@@ -373,7 +375,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeSavedSerializationOfStringIfUnchanged() throws Exception {
-        BibtexString string = new BibtexString("id", "name", "content");
+        BibtexString string = new BibtexString("name", "content");
         string.setParsedSerialization("serialization");
         database.addString(string);
 
@@ -384,7 +386,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void reformatStringIfAskedToDoSo() throws Exception {
-        BibtexString string = new BibtexString("id", "name", "content");
+        BibtexString string = new BibtexString("name", "content");
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 
@@ -558,6 +560,22 @@ public class BibtexDatabaseWriterTest {
                         "@Comment{jabref-meta: databaseType:bibtex;}"
                         + OS.NEWLINE
                 , session.getStringValue());
+    }
+
+    @Test
+    public void roundtripWithContentSelectorsAndUmlauts() throws IOException, SaveException {
+        String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\\\"U}mlaut;}" + OS.NEWLINE;
+        Charset encoding = StandardCharsets.UTF_8;
+
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, firstParse.getDatabase().getEntries(), preferences);
+
+        assertEquals(fileContent, session.getStringValue());
     }
 
 }

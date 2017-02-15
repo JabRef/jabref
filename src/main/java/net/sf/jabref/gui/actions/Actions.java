@@ -60,9 +60,6 @@ public class Actions {
     public static final String GLOBAL_SEARCH = "globalSearch";
     public static final String SELECT_ALL = "selectAll";
     public static final String SEND_AS_EMAIL = "sendAsEmail";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL = "toggleHighlightGroupsMatchingAll";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY = "toggleHighlightGroupsMatchingAny";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE = "toggleHighlightGroupsMatchingDisable";
     public static final String TOGGLE_GROUPS = "toggleGroups";
     public static final String TOGGLE_PREVIEW = "togglePreview";
     public static final String UNABBREVIATE = "unabbreviate";

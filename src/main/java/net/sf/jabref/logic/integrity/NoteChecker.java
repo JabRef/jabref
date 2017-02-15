@@ -1,19 +1,14 @@
 package net.sf.jabref.logic.integrity;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-public class NoteChecker implements Checker {
+public class NoteChecker implements ValueChecker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
 
@@ -31,18 +26,12 @@ public class NoteChecker implements Checker {
      * note: Any additional information that can help the reader. The first word should be capitalized.
      */
     @Override
-    public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> value = entry.getField(FieldName.NOTE);
-        if (!value.isPresent()) {
-            return Collections.emptyList();
-        }
-
+    public Optional<String> checkValue(String value) {
         //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.get().trim())) {
-            return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("should have the first letter capitalized"), entry, FieldName.NOTE));
+        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
+            return Optional.of(Localization.lang("should have the first letter capitalized"));
         }
 
-        return Collections.emptyList();
+        return Optional.empty();
     }
 }

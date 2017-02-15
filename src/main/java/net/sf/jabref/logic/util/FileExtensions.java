@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.util;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringJoiner;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -53,6 +55,10 @@ public enum FileExtensions {
     //Array because a) is varags and b) gets passed as varags parameter to FileExtensionNameFilter
     public String[] getExtensions() {
         return extension;
+    }
+
+    public List<String> getExtensionsAsList() {
+        return Arrays.asList(extension);
     }
 
     public String getDescription() {

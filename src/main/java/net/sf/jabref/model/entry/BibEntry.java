@@ -27,7 +27,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
-import net.sf.jabref.model.strings.LatexToUnicode;
+import net.sf.jabref.model.strings.LatexToUnicodeAdapter;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
@@ -62,11 +62,6 @@ public class BibEntry implements Cloneable {
      * Cache that stores latex free versions of fields.
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
-
-    /**
-     * Used to cleanse field values for internal LaTeX-free storage
-     */
-    private LatexToUnicode unicodeConverter = new LatexToUnicode();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -764,7 +759,12 @@ public class BibEntry implements Cloneable {
     }
 
     public void unregisterListener(Object object) {
-        this.eventBus.unregister(object);
+        try {
+            this.eventBus.unregister(object);
+        } catch (IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
     }
 
     public BibEntry withField(String field, String value) {
@@ -821,7 +821,7 @@ public class BibEntry implements Cloneable {
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
         } else {
-            String latexFreeField = unicodeConverter.format(getField(name).get()).intern();
+            String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);
             return Optional.of(latexFreeField);
         }

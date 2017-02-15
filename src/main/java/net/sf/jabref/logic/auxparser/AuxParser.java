@@ -133,7 +133,9 @@ public class AuxParser {
         for (String key : result.getUniqueKeys()) {
             Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
-            if (entry.isPresent()) {
+            if(result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
+                // do nothing, key has already been processed
+            } else if (entry.isPresent()) {
                 insertEntry(entry.get(), result);
                 resolveCrossReferences(entry.get(), result);
             } else {
@@ -144,7 +146,7 @@ public class AuxParser {
         // Copy database definitions
         if (result.getGeneratedBibDatabase().hasEntries()) {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
-            result.getGeneratedBibDatabase().copyStrings(masterDatabase);
+            result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));
         }
     }
 

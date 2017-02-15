@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.bibtex.comparator;
 
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Test;
 
@@ -16,9 +15,9 @@ public class BibtexStringComparatorTest {
 
     @Test
     public void test() {
-        BibtexString bs1 = new BibtexString(IdGenerator.next(), "VLSI", "Very Large Scale Integration");
-        BibtexString bs2 = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
-        BibtexString bs3 = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
+        BibtexString bs1 = new BibtexString("VLSI", "Very Large Scale Integration");
+        BibtexString bs2 = new BibtexString("DSP", "Digital Signal Processing");
+        BibtexString bs3 = new BibtexString("DSP", "Digital Signal Processing");
 
         // Same string
         assertEquals(0, bsc1.compare(bs1, bs1));
@@ -35,7 +34,7 @@ public class BibtexStringComparatorTest {
         assertTrue(bsc2.compare(bs2, bs1) < 0);
 
         // Create string with internal string
-        BibtexString bs4 = new BibtexString(IdGenerator.next(), "DSPVLSI", "#VLSI# #DSP#");
+        BibtexString bs4 = new BibtexString("DSPVLSI", "#VLSI# #DSP#");
         // bs4 before bs1 if not considering that bs4 contains bs1
         assertTrue(bsc1.compare(bs1, bs4) > 0);
         assertTrue(bsc1.compare(bs4, bs1) < 0);

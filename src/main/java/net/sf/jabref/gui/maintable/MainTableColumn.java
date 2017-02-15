@@ -104,7 +104,7 @@ public class MainTableColumn {
         String result = content.orElse(null);
 
         if (isNameColumn) {
-            result = MainTableNameFormatter.formatName(result);
+            result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
         if (result != null) {

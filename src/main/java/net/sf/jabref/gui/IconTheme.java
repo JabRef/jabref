@@ -21,6 +21,10 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.text.Text;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,9 +32,9 @@ public class IconTheme {
 
     public static Font FONT;
     public static Font FONT_16;
+    public static javafx.scene.text.Font FX_FONT;
 
     /* Colors */
-
     // JabRef's default colors
     public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
     public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
@@ -39,7 +43,6 @@ public class IconTheme {
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
 
-
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
@@ -47,13 +50,15 @@ public class IconTheme {
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
 
-
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     static {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
+            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+                FX_FONT = javafx.scene.text.Font.loadFont(stream2, DEFAULT_SIZE);
+            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
@@ -182,6 +187,12 @@ public class IconTheme {
             return new FontBasedIcon(this.code, this.color, IconTheme.SMALL_SIZE);
         }
 
+        public Node getGraphicNode() {
+            Text graphic = new Text(this.code);
+            graphic.getStyleClass().add("icon");
+            return graphic;
+        }
+
         public String getCode() {
             return this.code;
         }
@@ -259,6 +270,22 @@ public class IconTheme {
     public static ImageIcon getImage(String name) {
         return new ImageIcon(getIconUrl(name));
     }
+
+    public static Image getJabRefImageFX() {
+        return getImageFX("jabrefIcon48");
+    }
+
+    /**
+     * Constructs an {@link Image} for the image representing the given function, in the resource
+     * file listing images.
+     *
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The {@link Image} for the function.
+     */
+    public static Image getImageFX(String name) {
+        return new Image(getIconUrl(name).toString());
+    }
+
 
     /**
      * Looks up the URL for the image representing the given function, in the resource
