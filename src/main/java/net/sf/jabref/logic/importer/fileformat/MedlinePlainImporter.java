@@ -37,7 +37,7 @@ public class MedlinePlainImporter extends Importer {
 
     @Override
     public String getName() {
-        return "MedlinePlain";
+        return "Medline/PubMed Plain";
     }
 
     @Override
