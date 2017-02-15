@@ -1,11 +1,9 @@
-/**
- *
- */
 package net.sf.jabref.gui.entryeditor;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JEditorPane;
@@ -30,10 +28,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class EntryEditorTabRelatedArticles extends JEditorPane {
 
+    private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
+
     //The entry the user selects in the table
     private final BibEntry selectedEntry;
-
-    private static final Log LOGGER = LogFactory.getLog(EntryEditorTabRelatedArticles.class);
 
     private List<BibEntry> relatedArticles;
 
@@ -66,7 +64,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * @param list of HTML Strings
      */
     public void setHtmlText(List<BibEntry> list) {
-        StringBuffer htmlContent = new StringBuffer();
+        StringBuilder htmlContent = new StringBuilder();
         URL url = IconTheme.getIconUrl("mdlListIcon");
         htmlContent
                 .append("<html><head><title></title></head><body bgcolor='#ffffff'>");
@@ -95,14 +93,19 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
      * that the search is in Progress
      */
     private void setDefaultContent() {
-        StringBuffer htmlContent = new StringBuffer();
+        StringBuilder htmlContent = new StringBuilder();
         URL url = IconTheme.getIconUrl("mdlloading");
         htmlContent
                 .append("<html><head><title></title></head><body bgcolor='#ffffff'><div align='center' style='font-size:20px'>");
         htmlContent.append(Localization.lang("Loading_Recommendations_for"));
         htmlContent.append(": ");
         htmlContent.append("<b>");
-        htmlContent.append(selectedEntry.getLatexFreeField(FieldName.TITLE).get());
+        Optional<String> title = selectedEntry.getLatexFreeField(FieldName.TITLE);
+        if(title.isPresent()) {
+            htmlContent.append(title.get());
+        } else {
+            htmlContent.append("");
+        }
         htmlContent.append("<div>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
