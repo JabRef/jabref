@@ -11,7 +11,12 @@ services:
   - mysql
 
 env:
-  - GRADLE_OPTS=-Dorg.gradle.daemon=false
+  global:
+    - GRADLE_OPTS=-Dorg.gradle.daemon=false
+  matrix:
+    - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=fetcherTest
+    - TEST_SUITE=databaseTest
 
 # JavaFX localization tests need a running X environment
 before_install:
@@ -26,9 +31,7 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check modernizer -Dscan
-  - ./gradlew fetcherTest -Dscan
-  - ./gradlew databaseTest -Dscan
+  - ./gradlew $TEST_SUITE $OPTIONS -Dscan
   # no need for databases for the integrationTest -> save memory
   # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
   - sudo service postgresql stop
