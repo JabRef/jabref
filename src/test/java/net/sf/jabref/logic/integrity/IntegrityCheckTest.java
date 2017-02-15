@@ -156,8 +156,8 @@ public class IntegrityCheckTest {
     @Test
     public void testAuthorNameChecks() {
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            // getPersonNameFields returns fields that are available in BibLaTeX only
-            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a BibLaTeX only field
+            // getPersonNameFields returns fields that are available in biblatex only
+            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));

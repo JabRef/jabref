@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
@@ -37,8 +37,8 @@ public class EntryTypesTest {
     public EntryTypesTest(BibDatabaseMode mode) {
         this.mode = mode;
         this.otherMode = (mode == BibDatabaseMode.BIBLATEX) ? BibDatabaseMode.BIBTEX : BibDatabaseMode.BIBLATEX;
-        this.standardArticleType = (mode == BibDatabaseMode.BIBLATEX) ? BibLatexEntryTypes.ARTICLE : BibtexEntryTypes.ARTICLE;
-        this.defaultType = (mode == BibDatabaseMode.BIBLATEX) ? BibLatexEntryTypes.MISC : BibtexEntryTypes.MISC;
+        this.standardArticleType = (mode == BibDatabaseMode.BIBLATEX) ? BiblatexEntryTypes.ARTICLE : BibtexEntryTypes.ARTICLE;
+        this.defaultType = (mode == BibDatabaseMode.BIBLATEX) ? BiblatexEntryTypes.MISC : BibtexEntryTypes.MISC;
     }
 
     @Parameterized.Parameters
@@ -74,7 +74,7 @@ public class EntryTypesTest {
 
     @Test
     public void assertDefaultValuesBiblatex() {
-        List<EntryType> sortedDefaultType = new ArrayList<>(BibLatexEntryTypes.ALL);
+        List<EntryType> sortedDefaultType = new ArrayList<>(BiblatexEntryTypes.ALL);
         Collections.sort(sortedDefaultType);
 
         List<EntryType> sortedEntryTypes = new ArrayList<>(EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX));

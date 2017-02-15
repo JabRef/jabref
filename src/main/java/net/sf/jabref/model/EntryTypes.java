@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
@@ -101,8 +101,8 @@ public class EntryTypes {
 
     public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.MISC,
             Arrays.asList(BibtexEntryTypes.ALL, IEEETranEntryTypes.ALL));
-    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BibLatexEntryTypes.MISC,
-            Arrays.asList(BibLatexEntryTypes.ALL));
+    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.MISC,
+            Arrays.asList(BiblatexEntryTypes.ALL));
 
     /**
      * This method returns the BibtexEntryType for the name of a type,
@@ -160,7 +160,7 @@ public class EntryTypes {
                     .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
         } else {
-            return allTypes.stream().filter(entryType -> !BibLatexEntryTypes.getType(entryType.getName()).isPresent())
+            return allTypes.stream().filter(entryType -> !BiblatexEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
         }
     }
@@ -206,14 +206,14 @@ public class EntryTypes {
     }
 
     /**
-     * Load given custom entry types for BibTeX and BibLatex mode
+     * Load given custom entry types for BibTeX and biblatex mode
      */
-    public static void loadCustomEntryTypes(List<CustomEntryType> customBibtexEntryTypes, List<CustomEntryType> customBibLatexEntryTypes) {
+    public static void loadCustomEntryTypes(List<CustomEntryType> customBibtexEntryTypes, List<CustomEntryType> customBiblatexEntryTypes) {
         for (CustomEntryType type : customBibtexEntryTypes) {
             EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
         }
 
-        for (CustomEntryType type : customBibLatexEntryTypes) {
+        for (CustomEntryType type : customBiblatexEntryTypes) {
             EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
         }
     }
@@ -238,8 +238,8 @@ public class EntryTypes {
                     && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
     }
 
-    public static boolean isExclusiveBibLatex(String type) {
-        return filterEntryTypesNames(BibLatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase());
+    public static boolean isExclusiveBiblatex(String type) {
+        return filterEntryTypesNames(BiblatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase());
     }
 
     private static List<String> filterEntryTypesNames(List<EntryType> types, Predicate<EntryType> predicate) {

@@ -140,7 +140,7 @@ public class ParameterizedDialogNewEntryTest extends AbstractUITest {
     public static Collection<Object[]> instancesToTest() {
         // Create entry from menu
         // Structure:
-        // {"BibTeX"/"BibLaTeX", "type"}
+        // {"BibTeX"/"biblatex", "type"}
         // @formatter:off
         return Arrays.asList(
                 new Object[]{"BibTeX", "Article"},
@@ -162,40 +162,40 @@ public class ParameterizedDialogNewEntryTest extends AbstractUITest {
                 new Object[]{"BibTeX", "Periodical"},
                 new Object[]{"BibTeX", "Patent"},
                 new Object[]{"BibTeX", "Standard"},
-                new Object[]{"BibLaTeX", "Article"},
-                new Object[]{"BibLaTeX", "Book"},
-                new Object[]{"BibLaTeX", "BookInBook"},
-                new Object[]{"BibLaTeX", "Booklet"},
-                new Object[]{"BibLaTeX", "Collection"},
-                new Object[]{"BibLaTeX", "Conference"},
-                new Object[]{"BibLaTeX", "Electronic"},
-                new Object[]{"BibLaTeX", "IEEEtranBSTCTL"},
-                new Object[]{"BibLaTeX", "InBook"},
-                new Object[]{"BibLaTeX", "InCollection"},
-                new Object[]{"BibLaTeX", "InProceedings"},
-                new Object[]{"BibLaTeX", "InReference"},
-                new Object[]{"BibLaTeX", "Manual"},
-                new Object[]{"BibLaTeX", "MastersThesis"},
-                new Object[]{"BibLaTeX", "Misc"},
-                new Object[]{"BibLaTeX", "MvBook"},
-                new Object[]{"BibLaTeX", "MvCollection"},
-                new Object[]{"BibLaTeX", "MvProceedings"},
-                new Object[]{"BibLaTeX", "MvReference"},
-                new Object[]{"BibLaTeX", "Online"},
-                new Object[]{"BibLaTeX", "Patent"},
-                new Object[]{"BibLaTeX", "Periodical"},
-                new Object[]{"BibLaTeX", "PhdThesis"},
-                new Object[]{"BibLaTeX", "Proceedings"},
-                new Object[]{"BibLaTeX", "Reference"},
-                new Object[]{"BibLaTeX", "Report"},
-                new Object[]{"BibLaTeX", "Set"},
-                new Object[]{"BibLaTeX", "SuppBook"},
-                new Object[]{"BibLaTeX", "SuppCollection"},
-                new Object[]{"BibLaTeX", "SuppPeriodical"},
-                new Object[]{"BibLaTeX", "TechReport"},
-                new Object[]{"BibLaTeX", "Thesis"},
-                new Object[]{"BibLaTeX", "Unpublished"},*/
-                new Object[]{"BibLaTeX", "WWW"}
+                new Object[]{"biblatex", "Article"},
+                new Object[]{"biblatex", "Book"},
+                new Object[]{"biblatex", "BookInBook"},
+                new Object[]{"biblatex", "Booklet"},
+                new Object[]{"biblatex", "Collection"},
+                new Object[]{"biblatex", "Conference"},
+                new Object[]{"biblatex", "Electronic"},
+                new Object[]{"biblatex", "IEEEtranBSTCTL"},
+                new Object[]{"biblatex", "InBook"},
+                new Object[]{"biblatex", "InCollection"},
+                new Object[]{"biblatex", "InProceedings"},
+                new Object[]{"biblatex", "InReference"},
+                new Object[]{"biblatex", "Manual"},
+                new Object[]{"biblatex", "MastersThesis"},
+                new Object[]{"biblatex", "Misc"},
+                new Object[]{"biblatex", "MvBook"},
+                new Object[]{"biblatex", "MvCollection"},
+                new Object[]{"biblatex", "MvProceedings"},
+                new Object[]{"biblatex", "MvReference"},
+                new Object[]{"biblatex", "Online"},
+                new Object[]{"biblatex", "Patent"},
+                new Object[]{"biblatex", "Periodical"},
+                new Object[]{"biblatex", "PhdThesis"},
+                new Object[]{"biblatex", "Proceedings"},
+                new Object[]{"biblatex", "Reference"},
+                new Object[]{"biblatex", "Report"},
+                new Object[]{"biblatex", "Set"},
+                new Object[]{"biblatex", "SuppBook"},
+                new Object[]{"biblatex", "SuppCollection"},
+                new Object[]{"biblatex", "SuppPeriodical"},
+                new Object[]{"biblatex", "TechReport"},
+                new Object[]{"biblatex", "Thesis"},
+                new Object[]{"biblatex", "Unpublished"},*/
+                new Object[]{"biblatex", "WWW"}
         );
         // @formatter:on
     }

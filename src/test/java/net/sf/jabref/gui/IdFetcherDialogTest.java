@@ -127,9 +127,9 @@ public class IdFetcherDialogTest extends AbstractUITest {
     public static Collection<Object[]> instancesToTest() {
         return Arrays.asList(
                 new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
-                new Object[]{"BibLaTeX", "DOI", "10.1002/9781118257517"},
+                new Object[]{"biblatex", "DOI", "10.1002/9781118257517"},
                 new Object[]{"BibTeX", "ISBN", "9780321356680"},
-                new Object[]{"BibLaTeX", "ISBN", "9780321356680"}
+                new Object[]{"biblatex", "ISBN", "9780321356680"}
         );
     }
 

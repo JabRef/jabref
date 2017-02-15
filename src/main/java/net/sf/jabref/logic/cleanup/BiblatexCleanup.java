@@ -12,7 +12,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
 /**
- * Converts the entry to BibLatex format.
+ * Converts the entry to biblatex format.
  */
 public class BiblatexCleanup implements CleanupJob {
 

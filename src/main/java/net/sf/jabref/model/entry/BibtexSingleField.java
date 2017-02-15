@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Class for keeping properties of a single BibTeX/BibLatex field
+ * Class for keeping properties of a single BibTeX/biblatex field
  */
 public class BibtexSingleField {
     // some field constants

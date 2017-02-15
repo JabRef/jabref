@@ -29,7 +29,7 @@ public class CleanupPresetPanel {
     private JCheckBox cleanUpRenamePDF;
     private JCheckBox cleanUpRenamePDFonlyRelativePaths;
     private JCheckBox cleanUpUpgradeExternalLinks;
-    private JCheckBox cleanUpBibLatex;
+    private JCheckBox cleanUpBiblatex;
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
     private JPanel panel;
@@ -65,8 +65,8 @@ public class CleanupPresetPanel {
         cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
         cleanUpUpgradeExternalLinks = new JCheckBox(
                 Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldName.FILE));
-        cleanUpBibLatex = new JCheckBox(Localization.lang(
-                "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
+        cleanUpBiblatex = new JCheckBox(Localization.lang(
+                "Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
         cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
                 Cleanups.DEFAULT_SAVE_ACTIONS);
@@ -86,7 +86,7 @@ public class CleanupPresetPanel {
                 .concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 6);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);
-        builder.add(cleanUpBibLatex).xyw(1, 8, 2);
+        builder.add(cleanUpBiblatex).xyw(1, 8, 2);
         builder.add(cleanUpISSN).xyw(1, 9, 2);
         builder.add(cleanUpFormatters).xyw(1, 10, 2);
         panel = builder.build();
@@ -102,8 +102,8 @@ public class CleanupPresetPanel {
         cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isRenamePdfOnlyRelativePaths());
         cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected());
         cleanUpUpgradeExternalLinks.setSelected(preset.isCleanUpUpgradeExternalLinks());
-        cleanUpBibLatex.setSelected(preset.isConvertToBiblatex());
-        cleanUpBibLatex.setSelected(preset.isCleanUpISSN());
+        cleanUpBiblatex.setSelected(preset.isConvertToBiblatex());
+        cleanUpBiblatex.setSelected(preset.isCleanUpISSN());
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
     }
 
@@ -138,7 +138,7 @@ public class CleanupPresetPanel {
         if (cleanUpUpgradeExternalLinks.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
-        if (cleanUpBibLatex.isSelected()) {
+        if (cleanUpBiblatex.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
         }
 

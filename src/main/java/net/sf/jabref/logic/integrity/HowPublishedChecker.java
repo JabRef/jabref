@@ -22,8 +22,8 @@ public class HowPublishedChecker implements ValueChecker {
     /**
      * Official BibTeX specification:
      *  HowPublished: How something strange has been published. The first word should be capitalized.
-     * BibLaTeX package documentation (Section 4.9.1):
-     *  The BibLaTeX package will automatically capitalize the first word when required at the beginning of a sentence.
+     * biblatex package documentation (Section 4.9.1):
+     *  The biblatex package will automatically capitalize the first word when required at the beginning of a sentence.
      */
     @Override
     public Optional<String> checkValue(String value) {
