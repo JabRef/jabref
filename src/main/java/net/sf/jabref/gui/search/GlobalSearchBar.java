@@ -86,7 +86,7 @@ public class GlobalSearchBar extends JPanel {
         searchField.setColumns(30);
 
         JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setToolTipText(Localization.lang("Search in all open databases"));
+        globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
 
         // default action to be performed for toggling globalSearch
         AbstractAction globalSearchStandardAction = new AbstractAction() {
@@ -234,7 +234,7 @@ public class GlobalSearchBar extends JPanel {
         }
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
-                Localization.lang("Search results in database %0 for %1", currentBasePanel.getBibDatabaseContext()
+                Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
                                 .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);

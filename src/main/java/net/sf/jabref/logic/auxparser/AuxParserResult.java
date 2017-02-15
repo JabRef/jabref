@@ -78,10 +78,10 @@ public class AuxParserResult {
     public String getInformation(boolean includeMissingEntries) {
         StringBuilder result = new StringBuilder();
 
-        result.append(Localization.lang("keys_in_database")).append(' ').append(masterDatabase.getEntryCount()).append('\n')
-                .append(Localization.lang("found_in_AUX_file")).append(' ').append(getFoundKeysInAux()).append('\n')
+        result.append(Localization.lang("keys in library")).append(' ').append(masterDatabase.getEntryCount()).append('\n')
+                .append(Localization.lang("found in AUX file")).append(' ').append(getFoundKeysInAux()).append('\n')
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
-                .append(Localization.lang("not_found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
+                .append(Localization.lang("not found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
                 .append(crossRefEntriesCount).append(Localization.lang("strings included")).append(' ')
                 .append(insertedStrings).append('\n');

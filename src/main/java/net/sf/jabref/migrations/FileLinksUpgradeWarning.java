@@ -99,7 +99,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Keep the formatting of these lines. Otherwise, strings have to be translated again.
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
         int row = 1;
-        formBuilder.add(new JLabel("<html>" + Localization.lang("This database uses outdated file links.") + "<br><br>"
+        formBuilder.add(new JLabel("<html>" + Localization.lang("This library uses outdated file links.") + "<br><br>"
                 + Localization.lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>") + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
 

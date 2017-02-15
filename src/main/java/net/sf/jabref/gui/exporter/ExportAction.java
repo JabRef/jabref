@@ -150,7 +150,7 @@ public class ExportAction {
                                 // Need to warn the user that saving failed!
                                 JOptionPane.showMessageDialog(frame,
                                         Localization.lang("Could not save file.") + "\n" + errorMessage,
-                                        Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+                                        Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     };

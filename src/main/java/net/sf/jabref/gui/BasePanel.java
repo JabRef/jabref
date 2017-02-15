@@ -235,7 +235,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    // Returns a collection of AutoCompleters, which are populated from the current database
+    // Returns a collection of AutoCompleters, which are populated from the current library
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
@@ -985,7 +985,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
-        final String SAVE_DATABASE = Localization.lang("Save database");
+        final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
@@ -1623,7 +1623,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.getStatusLineText().startsWith(Localization.lang("Saved database"))) {
+        if (frame.getStatusLineText().startsWith(Localization.lang("Saved library"))) {
             frame.output(" ");
         }
     }

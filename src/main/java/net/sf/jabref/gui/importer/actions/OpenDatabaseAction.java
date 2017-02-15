@@ -72,9 +72,9 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
         this.showDialog = showDialog;
-        putValue(Action.NAME, Localization.menuTitle("Open database"));
+        putValue(Action.NAME, Localization.menuTitle("Open library"));
         putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX database"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX library"));
     }
 
     @Override
@@ -275,7 +275,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
 
         if (Objects.nonNull(file)) {
-            frame.output(Localization.lang("Opened database") + " '" + file.getPath() + "' " + Localization.lang("with")
+            frame.output(Localization.lang("Opened library") + " '" + file.getPath() + "' " + Localization.lang("with")
                     + " "
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");
         }

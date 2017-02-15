@@ -65,7 +65,7 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
      * opens a database and gives JabRef a second to open it before proceeding
      */
     protected void importBibIntoNewDatabase(String path) {
-        mainFrame.menuItemWithPath("File", "Import into new database").click();
+        mainFrame.menuItemWithPath("File", "Import into new library").click();
         JFileChooserFixture openFileDialog = mainFrame.fileChooser();
         robot().settings().delayBetweenEvents(1);
         openFileDialog.fileNameTextBox().enterText(path);
@@ -83,7 +83,7 @@ public abstract class AbstractUITest extends AssertJSwingJUnitTestCase {
     }
 
     protected void closeDatabase() {
-        mainFrame.menuItemWithPath("File", "Close database").click();
+        mainFrame.menuItemWithPath("File", "Close library").click();
     }
 
     protected void takeScreenshot(AbstractWindowFixture<?, ?, ?> dialog, String filename) throws IOException {

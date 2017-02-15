@@ -316,7 +316,7 @@ public class ArgumentProcessor {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
-                    // listener, we will instead import it into the current database.
+                    // listener, we will instead import it into the current library.
                     // This will enable easy integration with web browsers that can
                     // open a reference file in JabRef.
                     if (startupMode == Mode.INITIAL_START) {
@@ -381,7 +381,7 @@ public class ArgumentProcessor {
             }
 
             if (!notSavedMsg) {
-                System.out.println(Localization.lang("no database generated"));
+                System.out.println(Localization.lang("no library generated"));
             }
             return false;
         } else {

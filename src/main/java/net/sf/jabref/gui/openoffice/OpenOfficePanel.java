@@ -205,7 +205,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     if (!unresolvedKeys.isEmpty()) {
                         JOptionPane.showMessageDialog(frame,
                                 Localization.lang(
-                                        "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                        "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                         unresolvedKeys.get(0)),
                                 Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     }
@@ -224,7 +224,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang(
-                                    "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                    "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.debug("BibEntry not found", ex);
@@ -322,9 +322,9 @@ public class OpenOfficePanel extends AbstractWorker {
             if (!unresolvedKeys.isEmpty()) {
                 JOptionPane.showMessageDialog(frame,
                         Localization.lang(
-                                "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                 unresolvedKeys.get(0)),
-                        Localization.lang("Unable to generate new database"), JOptionPane.ERROR_MESSAGE);
+                        Localization.lang("Unable to generate new library"), JOptionPane.ERROR_MESSAGE);
             }
 
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
@@ -335,7 +335,7 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (BibEntryNotFoundException ex) {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang(
-                            "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                            "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                             ex.getBibtexKey()),
                     Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
             LOGGER.debug("BibEntry not found", ex);
@@ -747,7 +747,7 @@ public class OpenOfficePanel extends AbstractWorker {
         final JRadioButtonMenuItem useActiveBase = new JRadioButtonMenuItem(
                 Localization.lang("Look up BibTeX entries in the active tab only"));
         final JRadioButtonMenuItem useAllBases = new JRadioButtonMenuItem(
-                Localization.lang("Look up BibTeX entries in all open databases"));
+                Localization.lang("Look up BibTeX entries in all open libraries"));
         final JMenuItem clearConnectionSettings = new JMenuItem(Localization.lang("Clear connection settings"));
         ButtonGroup bg = new ButtonGroup();
         bg.add(useActiveBase);
