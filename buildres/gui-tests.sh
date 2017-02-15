@@ -13,4 +13,4 @@ sudo service resolvconf stop
 sudo service sshguard stop
 sudo service ssh stop
 # Integration tests run in a timeout. Just start them and kill them after 60s.
-timeout 60 ./gradlew guiTest -Dscan --info 2>&1 || true
+timeout 60 ./gradlew guiTest -Dscan --info || true

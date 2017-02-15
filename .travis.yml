@@ -33,7 +33,7 @@ before_script:
 
 script:
   - if [ "$TEST_SUITE" != "guiTest" ]; then ./gradlew $TEST_SUITE $OPTIONS -Dscan; fi
-  - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh 2>&1; fi
+  - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
 
 after_success:
   # enable codecov report
