@@ -21,13 +21,11 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import net.sf.jabref.preferences.JabRefPreferences;
+
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
