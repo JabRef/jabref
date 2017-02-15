@@ -31,23 +31,16 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.desktop.os.Linux;
-import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfAnnotationImporterImpl;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.pdf.FileAnnotation;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
-
-import static net.sf.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
-import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class FileAnnotationTab extends JPanel {
 
@@ -72,7 +65,6 @@ public class FileAnnotationTab extends JPanel {
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
     private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
-    private final JButton openFileButton = new JButton();
     private final JButton reloadAnnotationsButton = new JButton();
     DefaultListModel<FileAnnotation> listModel;
 
@@ -266,8 +258,7 @@ public class FileAnnotationTab extends JPanel {
     private JPanel setUpButtons(){
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints buttonConstraints = new GridBagConstraints();
-        openFileButton.setText(Localization.lang("Open file"));
-        openFileButton.addActionListener(e -> openPdf());
+
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());
         reloadAnnotationsButton.setText(Localization.lang("Reload annotations"));
@@ -279,7 +270,7 @@ public class FileAnnotationTab extends JPanel {
         buttonPanel.add(copyToClipboardButton, buttonConstraints);
 
         buttonConstraints.gridx = 2;
-        buttonPanel.add(openFileButton, buttonConstraints);
+
         buttonConstraints.gridx = 1;
         buttonPanel.add(reloadAnnotationsButton, buttonConstraints);
 
@@ -298,36 +289,6 @@ public class FileAnnotationTab extends JPanel {
         sj.add("Highlighted: " + highlightTxtArea.getText());
 
         new ClipBoardManager().setClipboardContents(sj.toString());
-    }
-
-    private void openPdf() {
-
-        try {
-            NativeDesktop desktop = JabRefDesktop.getNativeDesktop();
-
-            String pageNo = "1";
-            if( null != commentList.getSelectedValue() && commentList.getSelectedValue().getPage() != 0) {
-                pageNo =  String.valueOf(commentList.getSelectedValue().getPage());
-            }
-            String pathToFile = fileNameComboBox.getSelectedItem().toString();
-            StringJoiner sj = new StringJoiner(" ");
-            if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(SUMATRA_PDF_COMMAND)){
-                sj.add("-page " + pageNo);
-            } else {
-                sj.add("/a page=" + pageNo);
-            }
-
-            if(desktop instanceof Linux){
-                pathToFile = System.getProperty("file.separator")
-                        + fileNameComboBox.getSelectedItem().toString();
-            }
-            JabRefDesktop.getNativeDesktop()
-                    .openPdfWithParameters(pathToFile, Arrays.asList(sj.toString().split(" ")));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void reloadAnnotations() {

@@ -786,7 +786,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
         }
     }
-    
+
     private boolean storeSource() {
         BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
