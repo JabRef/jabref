@@ -42,7 +42,7 @@ public class GUIGlobals {
     public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
     public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
 
-    public static final int WIDTH_ICON_COL = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL)+12;
+    public static final int WIDTH_ICON_COL = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL)+12; // add some additional space to improve appearance
     public static final int WIDTH_ICON_COL_RANKING = 5*JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL); // Width of Ranking Icon Column
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
