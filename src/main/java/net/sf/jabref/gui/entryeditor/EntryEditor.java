@@ -1457,7 +1457,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     class SaveDatabaseAction extends AbstractAction {
         public SaveDatabaseAction() {
-            super("Save database");
+            super("Save library");
         }
 
         @Override

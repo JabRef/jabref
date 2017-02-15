@@ -321,7 +321,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
     /**
      * Take a set of filenames. Those with names indicating BIB files are opened as such if possible. All other files we
-     * will attempt to import into the current database.
+     * will attempt to import into the current library.
      *
      * @param fileNames The names of the files to open.
      * @param dropRow success status for the operation

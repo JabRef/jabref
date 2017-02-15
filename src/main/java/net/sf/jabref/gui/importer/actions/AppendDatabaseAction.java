@@ -53,7 +53,7 @@ public class AppendDatabaseAction implements BaseAction {
     public void action() {
 
         filesToOpen.clear();
-        final MergeDialog md = new MergeDialog(frame, Localization.lang("Append database"), true);
+        final MergeDialog md = new MergeDialog(frame, Localization.lang("Append library"), true);
         md.setLocationRelativeTo(panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
@@ -92,7 +92,7 @@ public class AppendDatabaseAction implements BaseAction {
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
-                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open database"),
+                JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
                         JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -106,7 +106,7 @@ public class AppendDatabaseAction implements BaseAction {
         List<BibEntry> originalEntries = new ArrayList<>();
         BibDatabase database = panel.getDatabase();
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Append database"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Append library"));
         MetaData meta = pr.getMetaData();
 
         if (importEntries) { // Add entries

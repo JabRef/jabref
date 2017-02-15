@@ -209,10 +209,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
-    private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save database"),
-            Localization.lang("Save database"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
+    private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save library"),
+            Localization.lang("Save library"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
-            Localization.menuTitle("Save database as..."), Localization.lang("Save database as..."),
+            Localization.menuTitle("Save library as..."), Localization.lang("Save library as..."),
             Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
@@ -289,8 +289,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Copy BibTeX key and link"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
-            Localization.menuTitle("Append database"),
-            Localization.lang("Append contents from a BibTeX database into the currently viewed database"));
+            Localization.menuTitle("Append library"),
+            Localization.lang("Append contents from a BibTeX library into the currently viewed library"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
@@ -532,7 +532,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         popupMenu.addSeparator();
 
-        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Database properties"));
+        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Library properties"));
         databasePropertiesMenu.addActionListener(this.databaseProperties);
         popupMenu.add(databasePropertiesMenu);
 
@@ -1806,7 +1806,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         setWindowTitle();
         updateEnabledState();
-        output(Localization.lang("Closed database") + '.');
+        output(Localization.lang("Closed library") + '.');
         // update tab titles
         updateAllTabTitles();
     }
@@ -2155,7 +2155,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         private DatabasePropertiesDialog propertiesDialog;
 
         public DatabasePropertiesAction() {
-            putValue(Action.NAME, Localization.menuTitle("Database properties"));
+            putValue(Action.NAME, Localization.menuTitle("Library properties"));
         }
 
         @Override
@@ -2254,7 +2254,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public CloseDatabaseAction() {
             super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
+            putValue(Action.NAME, Localization.menuTitle("Close library"));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE));
         }

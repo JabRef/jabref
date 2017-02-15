@@ -379,8 +379,8 @@ class StringDialog extends JDialog {
 
 
         public SaveDatabaseAction(StringDialog parent) {
-            super("Save database", IconTheme.JabRefIcon.SAVE.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save database"));
+            super("Save library", IconTheme.JabRefIcon.SAVE.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save library"));
             this.parent = parent;
         }
 

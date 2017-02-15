@@ -985,7 +985,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
-        final String SAVE_DATABASE = Localization.lang("Save database");
+        final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
