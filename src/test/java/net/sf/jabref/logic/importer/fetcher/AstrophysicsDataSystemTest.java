@@ -7,7 +7,7 @@ import java.util.Optional;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.testutils.category.FetcherTests;
@@ -65,7 +65,7 @@ public class AstrophysicsDataSystemTest {
                         + "occurring symmetries." + NEWLINE);
 
         famaeyMcGaughEntry = new BibEntry();
-        famaeyMcGaughEntry.setType(BibLatexEntryTypes.ARTICLE);
+        famaeyMcGaughEntry.setType(BiblatexEntryTypes.ARTICLE);
         famaeyMcGaughEntry.setField("bibtexkey", "2012LRR....15...10F");
         famaeyMcGaughEntry.setField("author", "Famaey, B. and McGaugh, S. S.");
         famaeyMcGaughEntry.setField("title", "Modified Newtonian Dynamics (MOND): Observational Phenomenology and Relativistic Extensions");
@@ -81,7 +81,7 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
 
         sunWelchEntry = new BibEntry();
-        sunWelchEntry.setType(BibLatexEntryTypes.ARTICLE);
+        sunWelchEntry.setType(BiblatexEntryTypes.ARTICLE);
         sunWelchEntry.setField("bibtexkey", "2012NatMa..11...44S");
         sunWelchEntry.setField("author", "Sun, Y. and Welch, G. C. and Leong, W. L. and Takacs, C. J. and Bazan, G. C. and Heeger, A. J.");
         sunWelchEntry.setField("doi", "10.1038/nmat3160");
@@ -93,7 +93,7 @@ public class AstrophysicsDataSystemTest {
         sunWelchEntry.setField("year", "2012");
 
         xiongSunEntry = new BibEntry();
-        xiongSunEntry.setType(BibLatexEntryTypes.ARTICLE);
+        xiongSunEntry.setType(BiblatexEntryTypes.ARTICLE);
         xiongSunEntry.setField("bibtexkey", "2007ITGRS..45..879X");
         xiongSunEntry.setField("author", "Xiong, X. and Sun, J. and Barnes, W. and Salomonson, V. and Esposito, J. and Erives, H. and Guenther, B.");
         xiongSunEntry.setField("doi", "10.1109/TGRS.2006.890567");
@@ -105,7 +105,7 @@ public class AstrophysicsDataSystemTest {
         xiongSunEntry.setField("year", "2007");
 
         ingersollPollardEntry = new BibEntry();
-        ingersollPollardEntry.setType(BibLatexEntryTypes.ARTICLE);
+        ingersollPollardEntry.setType(BiblatexEntryTypes.ARTICLE);
         ingersollPollardEntry.setField("bibtexkey", "1982Icar...52...62I");
         ingersollPollardEntry.setField("author", "Ingersoll, A. P. and Pollard, D.");
         ingersollPollardEntry.setField("doi", "10.1016/0019-1035(82)90169-5");
@@ -118,7 +118,7 @@ public class AstrophysicsDataSystemTest {
         ingersollPollardEntry.setField("year", "1982");
 
         luceyPaulEntry = new BibEntry();
-        luceyPaulEntry.setType(BibLatexEntryTypes.ARTICLE);
+        luceyPaulEntry.setType(BiblatexEntryTypes.ARTICLE);
         luceyPaulEntry.setField("bibtexkey", "2000JGR...10520297L");
         luceyPaulEntry.setField("author", "Lucey, P. G. and Blewett, D. T. and Jolliff, B. L.");
         luceyPaulEntry.setField("doi", "10.1029/1999JE001117");

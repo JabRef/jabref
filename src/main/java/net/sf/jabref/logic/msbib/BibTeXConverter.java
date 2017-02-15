@@ -26,7 +26,7 @@ public class BibTeXConverter {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
 
-        String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
+        String bibTexEntryType = MSBibMapping.getBiblatexEntryType(entry.getType());
         result = new BibEntry(bibTexEntryType);
 
         // add String fields
