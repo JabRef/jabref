@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 public class IntegrityCheck {
@@ -14,14 +16,17 @@ public class IntegrityCheck {
     private final BibDatabaseContext bibDatabaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext,
-            FileDirectoryPreferences fileDirectoryPreferences,
-            BibtexKeyPatternPreferences bibtexKeyPatternPreferences
+                          FileDirectoryPreferences fileDirectoryPreferences,
+                          BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+                          JournalAbbreviationRepository journalAbbreviationRepository
     ) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
         this.bibtexKeyPatternPreferences = Objects.requireNonNull(bibtexKeyPatternPreferences);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -50,6 +55,9 @@ public class IntegrityCheck {
             result.addAll(new ASCIICharacterChecker().check(entry));
             result.addAll(new NoBibtexFieldChecker().check(entry));
             result.addAll(new BibTeXEntryTypeChecker().check(entry));
+            result.addAll(new JournalInAbbreviationListChecker(FieldName.JOURNAL, journalAbbreviationRepository).check(entry));
+        } else {
+            result.addAll(new JournalInAbbreviationListChecker(FieldName.JOURNALTITLE, journalAbbreviationRepository).check(entry));
         }
 
         result.addAll(new BibtexkeyChecker().check(entry));

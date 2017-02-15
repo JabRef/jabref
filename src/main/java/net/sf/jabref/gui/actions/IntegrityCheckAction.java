@@ -31,6 +31,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class IntegrityCheckAction extends MnemonicAwareAction {
+
     private static final String ELLIPSES = "...";
 
     private final JabRefFrame frame;
@@ -45,7 +46,9 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
     public void actionPerformed(ActionEvent e) {
         IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
                 Globals.prefs.getFileDirectoryPreferences(),
-                Globals.prefs.getBibtexKeyPatternPreferences());
+                Globals.prefs.getBibtexKeyPatternPreferences(),
+                Globals.journalAbbreviationLoader
+                        .getRepository(Globals.prefs.getJournalAbbreviationPreferences()));
         List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
         if (messages.isEmpty()) {
@@ -74,6 +77,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
             columnModel.removeColumn(columnModel.getColumn(0));
 
             RowFilter<Object, Object> filter = new RowFilter<Object, Object>() {
+
                 @Override
                 public boolean include(Entry<?, ?> entry) {
                     return showMessage.get(entry.getStringValue(3));
@@ -98,7 +102,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                     }
                 }
             });
-            
+
             // BibTeX key
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             // field name
