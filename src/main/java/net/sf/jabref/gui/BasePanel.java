@@ -1629,7 +1629,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void rebuildAllEntryEditors() {
-        currentEditor.rebuildPanels();
+        if (currentEditor != null) {
+            currentEditor.rebuildPanels();
+        }
     }
 
     private synchronized void markChangedOrUnChanged() {
