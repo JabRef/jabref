@@ -381,7 +381,7 @@ public class ArgumentProcessor {
             }
 
             if (!notSavedMsg) {
-                System.out.println(Localization.lang("no database generated"));
+                System.out.println(Localization.lang("no library generated"));
             }
             return false;
         } else {

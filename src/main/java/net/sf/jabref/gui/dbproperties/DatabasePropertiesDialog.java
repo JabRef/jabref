@@ -59,7 +59,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private JRadioButton saveInSpecifiedOrder;
 
     private final JCheckBox protect = new JCheckBox(
-            Localization.lang("Refuse to save the database before external changes have been reviewed."));
+            Localization.lang("Refuse to save the library before external changes have been reviewed."));
     private boolean oldProtectVal;
     private SaveOrderConfigDisplay saveOrderPanel;
 
@@ -110,7 +110,7 @@ public class DatabasePropertiesDialog extends JDialog {
         FormBuilder builder = FormBuilder.create().layout(form);
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        builder.add(Localization.lang("Database encoding")).xy(1, 1);
+        builder.add(Localization.lang("Library encoding")).xy(1, 1);
         builder.add(encoding).xy(3, 1);
 
         builder.addSeparator(Localization.lang("Override default file directories")).xyw(1, 3, 5);
@@ -128,7 +128,7 @@ public class DatabasePropertiesDialog extends JDialog {
         saveOrderPanel = new SaveOrderConfigDisplay();
         builder.add(saveOrderPanel.getPanel()).xyw(1, 21, 5);
 
-        builder.addSeparator(Localization.lang("Database protection")).xyw(1, 23, 5);
+        builder.addSeparator(Localization.lang("Library protection")).xyw(1, 23, 5);
         builder.add(protect).xyw(1, 25, 5);
 
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),

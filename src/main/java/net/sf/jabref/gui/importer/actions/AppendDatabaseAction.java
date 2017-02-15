@@ -89,7 +89,7 @@ public class AppendDatabaseAction implements BaseAction {
                         Globals.prefs.getImportFormatPreferences());
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups,
                         importSelectorWords);
-                panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
+                panel.output(Localization.lang("Imported from library") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
                 JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),

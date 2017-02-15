@@ -110,7 +110,7 @@ public class ParameterizedDialogTest extends AbstractUITest {
                 new Object[]{true, new String[]{"BibTeX", "New entry..."}, "Select entry type", "Cancel", false},
                 new Object[]{true, new String[]{"BibTeX", "New entry..."}, "Select entry type", "Close button", true},
                 new Object[]{true, new String[]{"BibTeX", "Edit preamble"}, "Edit preamble", "Close button", true},
-                new Object[]{true, new String[]{"BibTeX", "Edit strings"}, "Strings for database: untitled", "Close button", true},
+                new Object[]{true, new String[]{"BibTeX", "Edit strings"}, "Strings for library: untitled", "Close button", true},
                 new Object[]{true, new String[]{"BibTeX", "Customize entry types"}, "Customize entry types", "Cancel", false},
                 new Object[]{true, new String[]{"BibTeX", "Customize entry types"}, "Customize entry types", "OK", false},
                 new Object[]{true, new String[]{"BibTeX", "Customize entry types"}, "Customize entry types", "Close button", true},

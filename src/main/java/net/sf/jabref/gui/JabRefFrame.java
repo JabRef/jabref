@@ -806,7 +806,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             if (saveAction.isCanceled() || !saveAction.isSuccess()) {
                                 // The action was either canceled or unsuccessful.
                                 // Break!
-                                output(Localization.lang("Unable to save database"));
+                                output(Localization.lang("Unable to save library"));
                                 close = false;
                             }
                         } catch (Throwable ex) {
@@ -1742,7 +1742,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Localization.lang("Return to JabRef")};
 
         return JOptionPane.showOptionDialog(JabRefFrame.this,
-                Localization.lang("Database '%0' has changed.", filename),
+                Localization.lang("Library '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
     }
@@ -2255,7 +2255,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         public CloseDatabaseAction() {
             super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.NAME, Localization.menuTitle("Close library"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current library"));
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE));
         }
 

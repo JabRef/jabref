@@ -90,7 +90,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return;
             }
 
-            panel.frame().output(Localization.lang("Saving database") + "...");
+            panel.frame().output(Localization.lang("Saving library") + "...");
             panel.setSaving(true);
         } else if (filePath.isPresent()) {
             // save as directly if the target file location is known
@@ -106,7 +106,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // Reset title of tab
             frame.setTabTitle(panel, panel.getTabTitle(),
                     panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-            frame.output(Localization.lang("Saved database") + " '"
+            frame.output(Localization.lang("Saved library") + " '"
                     + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
             frame.setWindowTitle();
             frame.updateAllTabTitles();
@@ -444,7 +444,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
-                                    .lang("Database is protected. Cannot save until external changes have been reviewed."),
+                                    .lang("Library is protected. Cannot save until external changes have been reviewed."),
                             Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
                     canceled = true;
                 } else {

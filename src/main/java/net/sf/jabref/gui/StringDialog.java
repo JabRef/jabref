@@ -63,7 +63,7 @@ class StringDialog extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
-    private static final String STRINGS_TITLE = Localization.lang("Strings for database");
+    private static final String STRINGS_TITLE = Localization.lang("Strings for library");
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {

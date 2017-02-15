@@ -734,12 +734,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         labelDirectoryDescription = new JLabel(Localization.lang("Select a directory where the search shall start."));
         labelFileTypesDescription = new JLabel(Localization.lang("Select file type:"));
-        labelFilesDescription = new JLabel(Localization.lang("These files are not linked in the active database."));
+        labelFilesDescription = new JLabel(Localization.lang("These files are not linked in the active library."));
         labelEntryTypeDescription = new JLabel(Localization.lang("Entry type to be created:"));
         labelSearchingDirectoryInfo = new JLabel(Localization.lang("Searching file system..."));
         labelSearchingDirectoryInfo.setHorizontalAlignment(SwingConstants.CENTER);
         labelSearchingDirectoryInfo.setVisible(false);
-        labelImportingInfo = new JLabel(Localization.lang("Importing into Database..."));
+        labelImportingInfo = new JLabel(Localization.lang("Importing into Library..."));
         labelImportingInfo.setHorizontalAlignment(SwingConstants.CENTER);
         labelImportingInfo.setVisible(false);
 

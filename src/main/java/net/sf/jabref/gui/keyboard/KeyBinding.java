@@ -64,7 +64,7 @@ public enum KeyBinding {
     OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0", KeyBindingCategory.TOOLS),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl V", KeyBindingCategory.EDIT),
-    PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared library", Localization.lang("Pull changes from shared library"), "ctrl shift R", KeyBindingCategory.FILE),
+    PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl shift R", KeyBindingCategory.FILE),
     PREAMBLE_EDITOR_STORE_CHANGES("Preamble editor, store changes", Localization.lang("Preamble editor, store changes"), "alt S", KeyBindingCategory.FILE),
     PREVIOUS_PREVIEW_LAYOUT("Previous preview layout", Localization.lang("Previous preview layout"), "shift F9", KeyBindingCategory.VIEW),
     PREVIOUS_TAB("Previous tab", Localization.lang("Previous tab"), "ctrl PAGE_UP", KeyBindingCategory.VIEW),

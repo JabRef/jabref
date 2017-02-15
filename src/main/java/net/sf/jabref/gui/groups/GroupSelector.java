@@ -240,7 +240,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         grayOut.addActionListener(e -> valueChanged(null));
         andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
-        autoGroup.setToolTipText(Localization.lang("Automatically create groups for database."));
+        autoGroup.setToolTipText(Localization.lang("Automatically create groups for library."));
         openSettings.setToolTipText(Localization.lang("Settings"));
         invCb.setToolTipText("<html>" + Localization.lang("Show entries <b>not</b> in group selection") + "</html>");
         showOverlappingGroups.setToolTipText(

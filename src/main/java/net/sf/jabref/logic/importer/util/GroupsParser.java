@@ -57,7 +57,7 @@ public class GroupsParser {
             return root;
         } catch (ParseException e) {
             throw new ParseException(Localization
-                    .lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."),
+                    .lang("Group tree could not be parsed. If you save the BibTeX library, all groups will be lost."),
                     e);
         }
     }

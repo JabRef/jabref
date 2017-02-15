@@ -105,7 +105,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     /**
      * This method is called when stuff is drag to the component.
      *
-     * Imports the dropped URL or plain text as a new entry in the current database.
+     * Imports the dropped URL or plain text as a new entry in the current library.
      *
      */
     @Override
@@ -382,7 +382,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
         MonitoredURLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
 
-        // Import into new if entryTable==null, otherwise into current database:
+        // Import into new if entryTable==null, otherwise into current library:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);
         importer.automatedImport(Collections.singletonList(tmpfile.getAbsolutePath()));
 
