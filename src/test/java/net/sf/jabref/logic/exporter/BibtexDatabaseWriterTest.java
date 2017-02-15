@@ -224,7 +224,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeString() throws Exception {
-        database.addString(new BibtexString("id", "name", "content"));
+        database.addString(new BibtexString("name", "content"));
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
@@ -234,7 +234,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeStringAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        database.addString(new BibtexString("id", "name", "content"));
+        database.addString(new BibtexString("name", "content"));
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
@@ -375,7 +375,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeSavedSerializationOfStringIfUnchanged() throws Exception {
-        BibtexString string = new BibtexString("id", "name", "content");
+        BibtexString string = new BibtexString("name", "content");
         string.setParsedSerialization("serialization");
         database.addString(string);
 
@@ -386,7 +386,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void reformatStringIfAskedToDoSo() throws Exception {
-        BibtexString string = new BibtexString("id", "name", "content");
+        BibtexString string = new BibtexString("name", "content");
         string.setParsedSerialization("wrong serialization");
         database.addString(string);
 

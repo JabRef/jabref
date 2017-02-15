@@ -10,7 +10,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,8 +48,7 @@ class StringAddChange extends Change {
             LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
         try {
-            secondary.addString(new BibtexString(IdGenerator.next(), string.getName(),
-                    string.getContent()));
+            secondary.addString(new BibtexString(string.getName(), string.getContent()));
         } catch (KeyCollisionException ex) {
             LOGGER.info("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage(), ex);
         }

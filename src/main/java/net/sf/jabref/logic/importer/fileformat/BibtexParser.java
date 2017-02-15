@@ -34,7 +34,6 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.metadata.MetaData;
 
@@ -509,8 +508,7 @@ public class BibtexParser implements Parser {
         skipOneNewline();
         LOGGER.debug("Finished string parsing.");
 
-        String id = IdGenerator.next();
-        return new BibtexString(id, name, content);
+        return new BibtexString(name, content);
     }
 
     private String parsePreamble() throws IOException {

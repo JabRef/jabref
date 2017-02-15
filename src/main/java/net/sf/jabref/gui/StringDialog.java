@@ -46,7 +46,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 class StringDialog extends JDialog {
@@ -356,8 +355,7 @@ class StringDialog extends JDialog {
                 return;
             }
             try {
-                String newId = IdGenerator.next();
-                BibtexString bs = new BibtexString(newId, name, "");
+                BibtexString bs = new BibtexString(name, "");
 
                 // Store undo information:
                 panel.getUndoManager().addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
