@@ -23,6 +23,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
+import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +40,12 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final ColorSetupPanel colorPanel;
     private Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
+    private int oldSmallIconSize;
+    private int oldLargeIconSize;
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
+    private final JTextField largeIconsTextField;
+    private final JTextField smallIconsTextField;
     private final JTextField rowPadding;
     // look and feel
     private final JComboBox<String> classNamesLAF;
@@ -86,6 +91,10 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         // Row padding size:
         rowPadding = new JTextField(5);
+
+        // Icon sizes:
+        largeIconsTextField = new JTextField(5);
+        smallIconsTextField = new JTextField(5);
 
         colorCodes = new JCheckBox(
                 Localization.lang("Color codes for required and optional fields"));
@@ -142,16 +151,28 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
 
         builder.leadingColumnOffset(2);
-        JLabel lab;
+
+        // General appearance settings
         builder.appendSeparator(Localization.lang("General"));
-        JPanel p1 = new JPanel();
-        lab = new JLabel(Localization.lang("Menu and label font size") + ":");
-        p1.add(lab);
-        p1.add(fontSize);
-        builder.append(p1);
+
+        FormBuilder generalBuilder = FormBuilder.create();
+        JPanel generalPanel = generalBuilder.columns("left:pref, left:pref, 3dlu, pref, 7dlu, right:pref, 3dlu, pref")
+                .rows("pref, 3dlu, pref, 3dlu, pref")
+                .columnGroup(2,6)
+                .columnGroup(4,8)
+                .add(overrideFonts).xyw(1,1,5)
+                .add(new JLabel("    ")).xy(1,3)
+                .add(new JLabel(Localization.lang("Menu and label font size") + ":")).xy(2,3)
+                .add(fontSize).xy(4,3)
+                .add(new JLabel(Localization.lang("Size of large icons")+":")).xy(2, 5)
+                .add(largeIconsTextField).xy(4,5)
+                .add(new JLabel(Localization.lang("Size of small icons")+":")).xy(6, 5)
+                .add(smallIconsTextField).xy(8,5)
+                .build();
+
+        builder.append(generalPanel);
         builder.nextLine();
-        builder.append(overrideFonts);
-        builder.nextLine();
+
         builder.appendSeparator(Localization.lang("Table appearance"));
         JPanel p2 = new JPanel();
         p2.add(new JLabel(Localization.lang("Table row height padding") + ":"));
@@ -181,6 +202,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         iconCol.setLayout(gbl);
 
         overrideFonts.addActionListener(e -> fontSize.setEnabled(overrideFonts.isSelected()));
+        overrideFonts.addActionListener(e -> largeIconsTextField.setEnabled(overrideFonts.isSelected()));
+        overrideFonts.addActionListener(e -> smallIconsTextField.setEnabled(overrideFonts.isSelected()));
 
         fontButton.addActionListener(
                 e -> new FontSelectorDialog(null, usedFont).getSelectedFont().ifPresent(x -> usedFont = x));
@@ -201,12 +224,21 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
         resolvedColorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON));
-        fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
         rowPadding.setText(String.valueOf(prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING)));
+
+        oldOverrideFontSize = prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS);
         oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
-        overrideFonts.setSelected(prefs.getBoolean(JabRefPreferences.OVERRIDE_DEFAULT_FONTS));
-        oldOverrideFontSize = overrideFonts.isSelected();
+        oldLargeIconSize = prefs.getInt(JabRefPreferences.ICON_SIZE_LARGE);
+        oldSmallIconSize = prefs.getInt(JabRefPreferences.ICON_SIZE_SMALL);
+
+        overrideFonts.setSelected(oldOverrideFontSize);
+        fontSize.setText(String.valueOf(oldMenuFontSize));
+        smallIconsTextField.setText(String.valueOf(oldSmallIconSize));
+        largeIconsTextField.setText(String.valueOf(oldLargeIconSize));
+
         fontSize.setEnabled(overrideFonts.isSelected());
+        smallIconsTextField.setEnabled(overrideFonts.isSelected());
+        largeIconsTextField.setEnabled(overrideFonts.isSelected());
         showGrid.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_SHOW_GRID));
         colorPanel.setValues();
     }
@@ -234,24 +266,35 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.TABLE_SHOW_GRID, showGrid.isSelected());
         try {
             int size = Integer.parseInt(fontSize.getText());
-            if ((overrideFonts.isSelected() != oldOverrideFontSize) ||
-                    (size != oldMenuFontSize)) {
-                prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("You have changed the menu and label font size.")
-                                .concat(" ")
-                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
-                        Localization.lang("Changed font settings"),
-                        JOptionPane.WARNING_MESSAGE);
-            }
-        } catch (NumberFormatException ex) {
-            LOGGER.info("Invalid font size", ex);
-        }
-        try {
+            int smallIconSize = Integer.parseInt(smallIconsTextField.getText());
+            int largeIconSize = Integer.parseInt(largeIconsTextField.getText());
             int padding = Integer.parseInt(rowPadding.getText());
+            if (overrideFonts.isSelected() != oldOverrideFontSize) {
+                boolean somethingIsChanged = false;
+                if (size != oldMenuFontSize) {
+                    prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
+                    somethingIsChanged = true;
+                }
+                if (smallIconSize != oldSmallIconSize) {
+                    prefs.putInt(JabRefPreferences.ICON_SIZE_SMALL, smallIconSize);
+                    somethingIsChanged = true;
+                }
+                if (largeIconSize != oldLargeIconSize) {
+                    prefs.putInt(JabRefPreferences.ICON_SIZE_LARGE, largeIconSize);
+                    somethingIsChanged = true;
+                }
+                if (somethingIsChanged) {
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("You have changed the menu and label font size.").concat(" ")
+                                    .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                            Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
-            LOGGER.info("Invalid row padding", ex);
+            // should not happen as values are checked beforehand
+            LOGGER.error("Invalid data value, integer expected", ex);
         }
     }
 
@@ -272,6 +315,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         // Test if font size is a number:
         if (!validateIntegerField(Localization.lang("Menu and label font size"), fontSize.getText(),
+                Localization.lang("Invalid setting"))) {
+            return false;
+        }
+
+        if (!validateIntegerField(Localization.lang("Size of large icons"), largeIconsTextField.getText(),
+                Localization.lang("Invalid setting"))) {
+            return false;
+        }
+
+        if (!validateIntegerField(Localization.lang("Size of small icons"), smallIconsTextField.getText(),
                 Localization.lang("Invalid setting"))) {
             return false;
         }
