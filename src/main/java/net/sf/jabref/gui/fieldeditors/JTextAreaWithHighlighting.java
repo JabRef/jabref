@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.event.ActionEvent;
@@ -21,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -35,13 +19,14 @@ import javax.swing.undo.UndoManager;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.util.component.JTextAreaWithPlaceholder;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
+public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implements SearchQueryHighlightListener {
 
     private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
@@ -50,13 +35,22 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
     private UndoManager undo;
 
     public JTextAreaWithHighlighting() {
-        super();
-        setupUndoRedo();
-        setupPasteListener();
+        this("");
     }
 
-    JTextAreaWithHighlighting(String text) {
-        super(text);
+    public JTextAreaWithHighlighting(String text) {
+        this(text, "");
+    }
+
+    /**
+     * Creates a text area with the ability to highlight parts of the content.
+     * It also defines a placeholder which will be displayed the content is empty.
+     *
+     * @param text
+     * @param placeholder
+     */
+    public JTextAreaWithHighlighting(String text, String placeholder) {
+        super(text, placeholder);
         setupUndoRedo();
         setupPasteListener();
     }

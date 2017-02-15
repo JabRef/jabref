@@ -1,27 +1,12 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,18 +20,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +41,9 @@ public class FileUtil {
 
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
+
+    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
+            "posix");
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -69,18 +56,43 @@ public class FileUtil {
     }
 
     /**
-     * Returns the extension of a file name or Optional.empty() if the file does not have one (no . in name).
+     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
      * @param fileName
-     * @return The extension, trimmed and in lowercase.
+     * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
-        int pos = fileName.lastIndexOf('.');
-        if ((pos > 0) && (pos < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(pos + 1).trim().toLowerCase());
+        int dotPosition = fileName.lastIndexOf('.');
+        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
         } else {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getFileName(String fileNameWithExtension) {
+        int dotPosition = fileNameWithExtension.lastIndexOf('.');
+        if (dotPosition >= 0) {
+            return fileNameWithExtension.substring(0, dotPosition);
+        } else {
+            return fileNameWithExtension;
+        }
+    }
+
+    /**
+     * Adds an extension to the given file name. The original extension is not replaced. That means,
+     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     *
+     * @param path the path to add the extension to
+     * @param extension the extension to add
+     * @return the with the modified file name
+     */
+    public static Path addExtension(Path path, String extension) {
+        Path fileName = path.getFileName();
+        return path.resolveSibling(fileName + extension);
     }
 
     /**
@@ -127,46 +139,62 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source         File Source file
-     * @param dest           File Destination file
-     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
-     *                       exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the
-     * file already existing.
+     * @param pathToSourceFile      Path Source file
+     * @param pathToDestinationFile Path Destination file
+     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
-        if (dest.exists() && !deleteIfExists) {
+        if (!Files.exists(pathToSourceFile)) {
+            LOGGER.error("Path to the source file doesn't exist.");
             return false;
         }
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
-
-
-            int el;
-            while ((el = in.read()) >= 0) {
-                out.write(el);
-            }
-            out.flush();
+        if (Files.exists(pathToDestinationFile) && !replaceExisting) {
+            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            return false;
         }
-        return true;
+        try {
+            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+        } catch (IOException e) {
+            LOGGER.error("Copying Files failed.", e);
+            return false;
+        }
     }
 
     /**
-     * @param fileName
-     * @param destFilename
-     * @return
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fileName, String destFilename) {
-        // File (or directory) with old name
-        File fromFile = new File(fileName);
+    public static boolean renameFile(Path fromFile, Path toFile) {
+        return renameFile(fromFile, toFile, false);
+    }
 
-        // File (or directory) with new name
-        File toFile = new File(destFilename);
-
-        // Rename file (or directory)
-        return fromFile.renameTo(toFile);
+    /**
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @param replaceExisting Wether to replace existing files or not
+     * @return True if the rename was successful, false if an exception occurred
+     *
+     */
+    public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
+        try {
+            if (replaceExisting) {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile),
+                        StandardCopyOption.REPLACE_EXISTING) != null;
+            } else {
+                return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Renaming Files failed", e);
+            return false;
+        }
     }
 
     /**
@@ -182,12 +210,13 @@ public class FileUtil {
      * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory();
+        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -316,8 +345,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
-            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -335,8 +364,9 @@ public class FileUtil {
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                Optional<String> citeKey = entry.getCiteKeyOptional();
+                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
+                        && name.substring(0, dot).equals(citeKey.get())) {
                     result.get(entry).add(file);
                     continue nextFile;
                 }
@@ -345,8 +375,8 @@ public class FileUtil {
             // matches are allowed, try to find one:
             if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                    Optional<String> citeKey = entry.getCiteKeyOptional();
+                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
                         result.get(entry).add(file);
                         continue nextFile;
                     }
@@ -371,7 +401,7 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+            entry.getField(FieldName.FILE).ifPresent(fileField -> {
                 List<ParsedFileField> fileList = FileField.parse(fileField);
                 for (ParsedFileField file : fileList) {
                     expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
@@ -385,28 +415,32 @@ public class FileUtil {
     /**
      * Determines filename provided by an entry in a database
      *
-     * @param database the database, where the entry is located
-     * @param entry    the entry to which the file should be linked to
-     * @param repositoryLoader
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
-        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
-        StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
+        String targetName = null;
+
+        StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))
-                    .getLayoutFromText();
+            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
         }
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
     }
-
 }

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.xmp;
 
 import java.io.IOException;
@@ -24,13 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.transform.TransformerException;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -72,8 +58,10 @@ public class XMPSchemaBibtex extends XMPSchema {
      *
      * @param e
      *            The existing XML element.
+     * @param namespace
+     *            The name space considered. Must currently be there for compatibility reasons despite being unused.
      */
-    public XMPSchemaBibtex(Element e, String namespace) {
+    public XMPSchemaBibtex(Element e, @SuppressWarnings("unused") String namespace) {
         super(e, XMPSchemaBibtex.KEY);
     }
 
@@ -288,29 +276,29 @@ public class XMPSchemaBibtex extends XMPSchema {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
+        if ((xmpPreferences != null) && xmpPreferences.isUseXMPPrivacyFilter()) {
             Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
 
         for (String field : fields) {
-            String value = BibDatabase.getResolvedField(field, entry, database).orElse("");
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+            String value = entry.getResolvedFieldOrAlias(field, database).orElse("");
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextProperty(BibEntry.TYPE_HEADER, entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
-        BibEntry e = new BibEntry(IdGenerator.next(), type);
+        String type = getTextProperty(BibEntry.TYPE_HEADER);
+        BibEntry e = new BibEntry(type);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
-        text.remove("entrytype");
+        text.remove(BibEntry.TYPE_HEADER);
         e.setField(text);
         return e;
     }

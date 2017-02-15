@@ -2,6 +2,7 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ class PreferencesFilterDialog extends JDialog {
         panel.setLayout(new BorderLayout());
 
         JPanel northPanel = new JPanel();
-        northPanel.setLayout(new WrapLayout(WrapLayout.LEFT));
+        northPanel.setLayout(new WrapLayout(FlowLayout.LEFT));
         showOnlyDeviatingPreferenceOptions = new JCheckBox(Localization.lang("Show only preferences deviating from their default value"), false);
         showOnlyDeviatingPreferenceOptions.addChangeListener(x -> updateModel());
         northPanel.add(showOnlyDeviatingPreferenceOptions);
@@ -48,6 +49,7 @@ class PreferencesFilterDialog extends JDialog {
 
         table = new JTable();
         table.setAutoCreateRowSorter(true);
+
         updateModel();
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -102,7 +104,7 @@ class PreferencesFilterDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex - 1 > preferences.size()) {
+            if ((rowIndex < 0) || ((rowIndex - 1) > preferences.size())) {
                 return "n/a";
             }
 

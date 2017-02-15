@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic;
 
 import java.util.ArrayList;
@@ -20,18 +5,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.strings.StringUtil;
 
+/**
+ * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
+ */
 public class TypedBibEntry {
 
     private final BibEntry entry;
@@ -73,7 +60,7 @@ public class TypedBibEntry {
         if (entryType.isPresent()) {
             return entryType.get().getName();
         } else {
-            return EntryUtil.capitalizeFirst(entry.getType());
+            return StringUtil.capitalizeFirst(entry.getType());
         }
     }
 
@@ -84,7 +71,7 @@ public class TypedBibEntry {
      */
     public List<ParsedFileField> getFiles() {
         //Extract the path
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
             return new ArrayList<>();
         }
@@ -92,16 +79,4 @@ public class TypedBibEntry {
         return FileField.parse(oldValue.get());
     }
 
-    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
-
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
-        String newValue = FileField.getStringRepresentation(files);
-
-        if(oldValue.isPresent() && oldValue.get().equals(newValue)) {
-            return Optional.empty();
-        }
-
-        entry.setField(FieldName.FILE, newValue);
-        return Optional.of(new FieldChange(entry, FieldName.FILE, oldValue.orElse(""), newValue));
-    }
 }

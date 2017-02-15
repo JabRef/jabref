@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -20,7 +5,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -42,14 +31,18 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.importer.fileformat.ParseException;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.GroupsUtil;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.WordKeywordGroup;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -67,7 +60,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
-    private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
+    private final JCheckBox useCustomDelimiter = new JCheckBox(
+            Localization.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNodeViewModel m_groupsRoot;
     private final JabRefFrame frame;
@@ -86,58 +80,56 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.setText(defaultField);
         remove.setText(defaultRemove);
         deliminator.setText(defaultDeliminator);
-        nd.setSelected(true);
-        ActionListener okListener = new ActionListener() {
+        useCustomDelimiter.setSelected(true);
+        ActionListener okListener = e -> {
+            dispose();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
+            try {
+                GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
+                        new ExplicitGroup(Localization.lang("Automatically created groups"),
+                                GroupHierarchyType.INCLUDING,
+                                Globals.prefs.getKeywordDelimiter()));
+                Set<String> keywords;
+                String fieldText = field.getText().toLowerCase().trim();
+                if (this.keywords.isSelected()) {
+                    if (useCustomDelimiter.isSelected()) {
+                        keywords = findDeliminatedWordsInField(panel.getDatabase(), fieldText,
+                                deliminator.getText());
+                    } else {
+                        keywords = findAllWordsInField(panel.getDatabase(), fieldText, remove.getText());
 
-                try {
-                    GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
-                            new ExplicitGroup(Localization.lang("Automatically created groups"),
-                                    GroupHierarchyType.INCLUDING, Globals.prefs));
-                    Set<String> hs;
-                    String fieldText = field.getText();
-                    if (keywords.isSelected()) {
-                        if (nd.isSelected()) {
-                            hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(),
-                                    field.getText().toLowerCase().trim(), deliminator.getText());
-                        } else {
-                            hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
-                                    remove.getText());
-
-                        }
-                    } else if (authors.isSelected()) {
-                        List<String> fields = new ArrayList<>(2);
-                        fields.add(FieldName.AUTHOR);
-                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = FieldName.AUTHOR;
-                    } else { // editors.isSelected() as it is a radio button group.
-                        List<String> fields = new ArrayList<>(2);
-                        fields.add(FieldName.EDITOR);
-                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = FieldName.EDITOR;
                     }
-
-                    for (String keyword : hs) {
-                        KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
-                                GroupHierarchyType.INDEPENDENT, Globals.prefs);
-                        autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
-                    }
-
-                    autoGroupsRoot.moveTo(m_groupsRoot.getNode());
-                    NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
-                    UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot, new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
-                    ce.addEdit(undo);
-
-                    panel.markBaseChanged(); // a change always occurs
-                    frame.output(Localization.lang("Created groups."));
-                    ce.end();
-                    panel.getUndoManager().addEdit(ce);
-                } catch (ParseException exception) {
-                    frame.showMessage(exception.getLocalizedMessage());
+                } else if (authors.isSelected()) {
+                    List<String> fields = new ArrayList<>(2);
+                    fields.add(FieldName.AUTHOR);
+                    keywords = findAuthorLastNames(panel.getDatabase(), fields);
+                    fieldText = FieldName.AUTHOR;
+                } else { // editors.isSelected() as it is a radio button group.
+                    List<String> fields = new ArrayList<>(2);
+                    fields.add(FieldName.EDITOR);
+                    keywords = findAuthorLastNames(panel.getDatabase(), fields);
+                    fieldText = FieldName.EDITOR;
                 }
+
+                LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
+                for (String keyword : keywords) {
+                    WordKeywordGroup group = new WordKeywordGroup(
+                            formatter.format(keyword), GroupHierarchyType.INDEPENDENT, fieldText, keyword, false, Globals.prefs.getKeywordDelimiter(), false);
+                    autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
+                }
+
+                autoGroupsRoot.moveTo(m_groupsRoot.getNode());
+                NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot, new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
+                ce.addEdit(undo);
+
+                panel.markBaseChanged(); // a change always occurs
+                frame.output(Localization.lang("Created groups."));
+                ce.end();
+                panel.getUndoManager().addEdit(ce);
+            } catch (IllegalArgumentException exception) {
+                frame.showMessage(exception.getLocalizedMessage());
             }
         };
         remove.addActionListener(okListener);
@@ -174,7 +166,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.add(field).xy(5, 3);
         b.add(Localization.lang("Characters to ignore") + ":").xy(3, 5);
         b.add(remove).xy(5, 5);
-        b.add(nd).xy(3, 7);
+        b.add(useCustomDelimiter).xy(3, 7);
         b.add(deliminator).xy(5, 7);
         b.add(authors).xyw(1, 9, 5);
         b.add(editors).xyw(1, 11, 5);
@@ -197,6 +189,67 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         updateComponents();
         pack();
         setLocationRelativeTo(frame);
+    }
+
+    public static Set<String> findDeliminatedWordsInField(BibDatabase db, String field, String deliminator) {
+        Set<String> res = new TreeSet<>();
+
+        for (BibEntry be : db.getEntries()) {
+            be.getField(field).ifPresent(fieldValue -> {
+                StringTokenizer tok = new StringTokenizer(fieldValue.trim(), deliminator);
+                while (tok.hasMoreTokens()) {
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                }
+            });
+        }
+        return res;
+    }
+
+    /**
+     * Returns a Set containing all words used in the database in the given field type. Characters in
+     * <code>remove</code> are not included.
+     *
+     * @param db a <code>BibDatabase</code> value
+     * @param field a <code>String</code> value
+     * @param remove a <code>String</code> value
+     * @return a <code>Set</code> value
+     */
+    public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
+        Set<String> res = new TreeSet<>();
+        for (BibEntry be : db.getEntries()) {
+            be.getField(field).ifPresent(o -> {
+                StringTokenizer tok = new StringTokenizer(o, remove, false);
+                while (tok.hasMoreTokens()) {
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
+                }
+            });
+        }
+        return res;
+    }
+
+    /**
+     * Finds all authors' last names in all the given fields for the given database.
+     *
+     * @param db The database.
+     * @param fields The fields to look in.
+     * @return a set containing the names.
+     */
+    public static Set<String> findAuthorLastNames(BibDatabase db, List<String> fields) {
+        Set<String> res = new TreeSet<>();
+        for (BibEntry be : db.getEntries()) {
+            for (String field : fields) {
+                be.getField(field).ifPresent(val -> {
+                    if (!val.isEmpty()) {
+                        AuthorList al = AuthorList.parse(val);
+                        res.addAll(al.getAuthors().stream().map(Author::getLast).filter(Optional::isPresent)
+                                .map(Optional::get).filter(lastName -> !lastName.isEmpty())
+                                .collect(Collectors.toList()));
+                    }
+                });
+            }
+        }
+
+        return res;
     }
 
     @Override

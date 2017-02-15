@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.openoffice;
 
 import java.io.File;
@@ -41,12 +26,12 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -164,12 +149,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
-    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs)
-            throws IOException {
+    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
+        Objects.requireNonNull(resourcePath);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(OOBibStyle.class.getResource(resourcePath).openStream());
+        initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
         fromResource = true;
         path = resourcePath;
     }
@@ -231,6 +216,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private void initialize(InputStream stream) throws IOException {
+        Objects.requireNonNull(stream);
 
         try (Reader reader = new InputStreamReader(stream, encoding)) {
             readFormatFile(reader);
@@ -732,7 +718,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
-            Optional<String> content = BibDatabase.getResolvedField(s, entry, database);
+            Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
                 if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
@@ -758,12 +744,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         if (al.getNumberOfAuthors() > number) {
             Author a = al.getAuthor(number);
-            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
-                String von = a.getVon();
-                sb.append(von);
-                sb.append(' ');
-            }
-            sb.append(a.getLast());
+            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
+            sb.append(a.getLast().orElse(""));
         }
 
         return sb.toString();

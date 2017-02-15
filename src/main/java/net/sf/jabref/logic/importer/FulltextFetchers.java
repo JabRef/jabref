@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer;
 
 import java.io.IOException;
@@ -23,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.importer.fetcher.ACS;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.importer.fetcher.DoiResolution;
 import net.sf.jabref.logic.importer.fetcher.GoogleScholar;
 import net.sf.jabref.logic.importer.fetcher.IEEE;
@@ -46,17 +29,17 @@ public class FulltextFetchers {
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
-    public FulltextFetchers() {
+    public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
         // Ordering is important, authorities first!
         // Publisher
         finders.add(new DoiResolution());
         finders.add(new ScienceDirect());
         finders.add(new SpringerLink());
         finders.add(new ACS());
-        finders.add(new ArXiv());
+        finders.add(new ArXiv(importFormatPreferences));
         finders.add(new IEEE());
         // Meta search
-        finders.add(new GoogleScholar());
+        finders.add(new GoogleScholar(importFormatPreferences));
     }
 
     public FulltextFetchers(List<FulltextFetcher> fetcher) {
@@ -66,7 +49,7 @@ public class FulltextFetchers {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<String> doi = clonedEntry.getFieldOptional(FieldName.DOI);
+        Optional<String> doi = clonedEntry.getField(FieldName.DOI);
 
         if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
             CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
@@ -79,7 +62,7 @@ public class FulltextFetchers {
                 if (result.isPresent() && MimeTypeDetector.isPdfContentType(result.get().toString())) {
                     return result;
                 }
-            } catch (IOException e) {
+            } catch (IOException | FetcherException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
             }
         }

@@ -2,31 +2,31 @@ package net.sf.jabref.benchmarks;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.importer.ParseException;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -73,9 +73,8 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        StringReader bibtexStringReader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(bibtexStringReader);
-        return parser.parse();
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        return parser.parse(new StringReader(bibtexString));
     }
 
     @Benchmark
@@ -91,9 +90,14 @@ public class Benchmarks {
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
         SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
-        List<BibEntry> matchedEntries = new ArrayList<>();
-        matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
-        return matchedEntries;
+        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+    }
+
+    @Benchmark
+    public List<BibEntry> parallelSearch() {
+        // FIXME: Reuse SearchWorker here
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
+        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
     @Benchmark
@@ -121,14 +125,8 @@ public class Benchmarks {
 
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
-        KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, Globals.prefs);
+        KeywordGroup group = new WordKeywordGroup("testGroup", GroupHierarchyType.INDEPENDENT, "keyword", "testkeyword", false, ',', false);
         return group.containsAll(database.getEntries());
-    }
-
-    @Benchmark
-    public boolean keywordGroupContainsWord() throws ParseException {
-        return KeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
     }
 
     public static void main(String[] args) throws IOException, RunnerException {

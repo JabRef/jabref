@@ -5,3 +5,8 @@ gradlew eol=lf
 # ensure that line endings of *.java and *.properties are normalized
 *.properties text
 *.java text
+
+# disable after a release
+# CHANGELOG.md merge=union
+
+src/main/resources/l10n/*.properties merge=union

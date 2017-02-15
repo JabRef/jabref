@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
@@ -28,7 +13,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.gui.TableFormat;
 
@@ -95,21 +79,22 @@ public class MainTableFormat implements TableFormat<BibEntry> {
         // clear existing column configuration
         tableColumns.clear();
 
+        SpecialMainTableColumnsBuilder builder = new SpecialMainTableColumnsBuilder();
         // Add numbering column to tableColumns
-        tableColumns.add(SpecialMainTableColumns.NUMBER_COL);
+        tableColumns.add(builder.buildNumberColumn());
 
         // Add all file based columns
         if (Globals.prefs.getBoolean(JabRefPreferences.FILE_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns.FILE_COLUMN);
+            tableColumns.add(builder.buildFileColumn());
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.URL_COLUMN)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.PREFER_URL_DOI)) {
-                tableColumns.add(SpecialMainTableColumns
+                tableColumns.add(builder
                         .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.DOI_FIRST,
                                 new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon())));
             } else {
-                tableColumns.add(SpecialMainTableColumns
+                tableColumns.add(builder
                         .createIconColumn(JabRefPreferences.URL_COLUMN, MainTableFormat.URL_FIRST,
                                 new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
             }
@@ -117,7 +102,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.ARXIV_COLUMN)) {
-            tableColumns.add(SpecialMainTableColumns
+            tableColumns.add(builder
                     .createIconColumn(JabRefPreferences.ARXIV_COLUMN, MainTableFormat.ARXIV,
                             new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon())));
         }
@@ -125,7 +110,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
         if (Globals.prefs.getBoolean(JabRefPreferences.EXTRA_FILE_COLUMNS)) {
             List<String> desiredColumns = Globals.prefs.getStringList(JabRefPreferences.LIST_OF_FILE_COLUMNS);
             for (String desiredColumn : desiredColumns) {
-                tableColumns.add(SpecialMainTableColumns.createFileIconColumn(desiredColumn));
+                tableColumns.add(builder.createFileIconColumn(desiredColumn));
             }
         }
 
@@ -143,24 +128,24 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
 
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
-        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
-                tableColumns.add(SpecialMainTableColumns.RANKING_COLUMN);
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
+                tableColumns.add(builder.buildRankingColumn());
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
-                tableColumns.add(SpecialMainTableColumns.RELEVANCE_COLUMN);
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
+                tableColumns.add(builder.buildRelevanceColumn());
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
-                tableColumns.add(SpecialMainTableColumns.QUALITY_COLUMN);
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
+                tableColumns.add(builder.buildQualityColumn());
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
-                tableColumns.add(SpecialMainTableColumns.PRIORITY_COLUMN);
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
+                tableColumns.add(builder.buildPriorityColumn());
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
-                tableColumns.add(SpecialMainTableColumns.PRINTED_COLUMN);
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
+                tableColumns.add(builder.buildPrintedColumn());
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
-                tableColumns.add(SpecialMainTableColumns.READ_STATUS_COLUMN);
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
+                tableColumns.add(builder.buildReadStatusColumn());
             }
         }
 

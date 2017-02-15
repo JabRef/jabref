@@ -1,26 +1,11 @@
-/*  Copyright (C) 20013-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -41,9 +26,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -61,7 +46,6 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final boolean move;
     private List<BibEntry> selection;
     private JTree tree;
-    private JButton ok;
 
 
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
@@ -71,9 +55,9 @@ public class GroupAddRemoveDialog implements BaseAction {
     }
 
     @Override
-    public void action() throws Throwable {
-        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
-        if (groups == null) {
+    public void action() throws Exception {
+        Optional<GroupTreeNode> groups = panel.getBibDatabaseContext().getMetaData().getGroups();
+        if (!groups.isPresent()) {
             return;
         }
 
@@ -83,9 +67,9 @@ public class GroupAddRemoveDialog implements BaseAction {
                 (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
                         .lang("Remove from group")),
                 true);
-        ok = new JButton(Localization.lang("OK"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        tree = new JTree(new GroupTreeNodeViewModel(groups));
+        tree = new JTree(new GroupTreeNodeViewModel(groups.get()));
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
         tree.setVisibleRowCount(22);
 
@@ -151,31 +135,33 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     // If "expand" is true, all nodes in the tree area expanded
     // otherwise all nodes in the tree are collapsed:
-    private void expandAll(final JTree tree, final boolean expand) {
+    private void expandAll(final JTree subtree, final boolean expand) {
         SwingUtilities.invokeLater(() -> {
-            TreeNode root = ((TreeNode) tree.getModel().getRoot());
+            TreeNode root = ((TreeNode) subtree.getModel().getRoot());
             // walk through the tree, beginning at the root:
-            expandAll(tree, new TreePath(((DefaultTreeModel) tree.getModel()).getPathToRoot(root)), expand);
+            expandAll(subtree, new TreePath(((DefaultTreeModel) subtree.getModel()).getPathToRoot(root)), expand);
             tree.requestFocusInWindow();
         });
     }
 
-    private void expandAll(final JTree tree, final TreePath parent, final boolean expand) {
+    private void expandAll(final JTree subtree, final TreePath parent, final boolean expand) {
         // walk through the children:
         TreeNode node = (TreeNode) parent.getLastPathComponent();
-        if (node.getChildCount() >= 0) {
-            for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
-                TreeNode n = (TreeNode) e.nextElement();
-                TreePath path = parent.pathByAddingChild(n);
-                expandAll(tree, path, expand);
+        int numChildren = node.getChildCount();
+        if (numChildren > 0) {
+            for (int i = 0; i < numChildren; i++) {
+                TreeNode child = node.getChildAt(i);
+                TreePath path = parent.pathByAddingChild(child);
+                expandAll(subtree, path, expand);
             }
-
         }
         // "expand" / "collapse" occurs from bottom to top:
         if (expand) {
             tree.expandPath(parent);
         } else {
-            tree.collapsePath(parent);
+            if (node.getParent() != null) {
+                tree.collapsePath(parent);
+            }
         }
     }
 

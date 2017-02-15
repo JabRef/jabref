@@ -4,12 +4,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- *
  * Class for keeping properties of a single BibTeX/BibLatex field
- *
  */
 public class BibtexSingleField {
-
     // some field constants
     public static final double DEFAULT_FIELD_WEIGHT = 1;
     public static final double MAX_FIELD_WEIGHT = 2;
@@ -20,7 +17,6 @@ public class BibtexSingleField {
 
     public static final int DEFAULT_FIELD_LENGTH = 100;
 
-
     private enum Flag {
         STANDARD,
         PRIVATE,
@@ -28,9 +24,8 @@ public class BibtexSingleField {
         WRITEABLE
     }
 
-
     // the field name
-    private final String name;
+    private String name;
 
     // contains the standard, private, displayable, writable infos
     // default is: not standard, public, displayable and writable
@@ -39,10 +34,9 @@ public class BibtexSingleField {
     private int length = DEFAULT_FIELD_LENGTH;
     private double weight = DEFAULT_FIELD_WEIGHT;
 
-    // the extras data
-    // fieldExtras contains mappings to tell the EntryEditor to add a specific
-    // function to this field, for instance a "browse" button for the "pdf" field.
-    private Set<FieldProperties> extras = EnumSet.noneOf(FieldProperties.class);
+    // properties contains a set of FieldProperty to e.g. tell the EntryEditor to add a specific
+    // function to this field, to format names, or to control the integrity checks.
+    private Set<FieldProperty> properties = EnumSet.noneOf(FieldProperty.class);
 
     // a comma separated list of alternative bibtex-fieldnames, e.g.
     // "LCCN" is the same like "lib-congress"
@@ -95,6 +89,10 @@ public class BibtexSingleField {
         flags.add(Flag.PRIVATE);
     }
 
+    public void setPublic() {
+        flags.remove(Flag.PRIVATE);
+    }
+
     public boolean isPrivate() {
         return flags.contains(Flag.PRIVATE);
     }
@@ -115,14 +113,14 @@ public class BibtexSingleField {
         return flags.contains(Flag.WRITEABLE);
     }
 
-    public void setExtras(Set<FieldProperties> pExtras) {
-        extras = pExtras;
+    public void setExtras(Set<FieldProperty> pExtras) {
+        properties = pExtras;
     }
 
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    public Set<FieldProperties> getExtras() {
-        return extras;
+    public Set<FieldProperty> getFieldProperties() {
+        return properties;
     }
 
     public void setWeight(double value) {
@@ -153,15 +151,19 @@ public class BibtexSingleField {
      */
     public BibtexSingleField setNumeric(boolean numeric) {
         if (numeric) {
-            extras.add(FieldProperties.NUMERIC);
+            properties.add(FieldProperty.NUMERIC);
         } else {
-            extras.remove(FieldProperties.NUMERIC);
+            properties.remove(FieldProperty.NUMERIC);
         }
         return this;
     }
 
     public boolean isNumeric() {
-        return extras.contains(FieldProperties.NUMERIC);
+        return properties.contains(FieldProperty.NUMERIC);
+    }
+
+    public void setName(String fieldName) {
+        name = fieldName;
     }
 
 }

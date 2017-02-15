@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -24,25 +9,41 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.VerticalLayout;
 
 /**
@@ -50,19 +51,25 @@ import org.jdesktop.swingx.VerticalLayout;
  * Returns null if canceled.
  */
 public class EntryTypeDialog extends JDialog implements ActionListener {
+
+    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
+
     private EntryType type;
+    private SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new FetcherWorker();
+    private JButton generateButton;
+    private JTextField idTextField;
+    private JComboBox<String> comboBox;
+    private final JabRefFrame frame;
     private static final int COLUMN = 3;
-    private final boolean biblatexMode;
 
     private final CancelAction cancelAction = new CancelAction();
-    private final BibDatabaseContext bibDatabaseContext;
 
     static class TypeButton extends JButton implements Comparable<TypeButton> {
 
         private final EntryType type;
 
 
-        public TypeButton(String label, EntryType type) {
+        TypeButton(String label, EntryType type) {
             super(label);
             this.type = type;
         }
@@ -81,9 +88,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         // modal dialog
         super(frame, true);
 
-        bibDatabaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
-        biblatexMode = bibDatabaseContext.isBiblatexMode();
-
+        this.frame = frame;
 
         setTitle(Localization.lang("Select entry type"));
 
@@ -106,13 +111,24 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel panel = new JPanel();
         panel.setLayout(new VerticalLayout());
 
-        if(biblatexMode) {
-            panel.add(createEntryGroupPanel("BibLateX", EntryTypes.getAllValues(bibDatabaseContext.getMode())));
+        if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+            panel.add(createEntryGroupPanel("BibLateX", BibLatexEntryTypes.ALL));
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            if (!customTypes.isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
+            }
+
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
-            panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            if (!customTypes.isEmpty()) {
+                panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
+            }
         }
+        panel.add(createIdFetcherPanel());
 
         return panel;
     }
@@ -133,7 +149,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return buttons;
     }
 
-    private JPanel createEntryGroupPanel(String groupTitle, Collection<EntryType> entries) {
+    private JPanel createEntryGroupPanel(String groupTitle, Collection<? extends EntryType> entries) {
         JPanel panel = new JPanel();
         GridBagLayout bagLayout = new GridBagLayout();
         panel.setLayout(bagLayout);
@@ -163,11 +179,83 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return panel;
     }
 
+    private JPanel createIdFetcherPanel() {
+        JLabel fetcherLabel = new JLabel(Localization.lang("ID type"));
+        JLabel idLabel = new JLabel(Localization.lang("ID"));
+        generateButton = new JButton(Localization.lang("Generate"));
+        idTextField = new JTextField("");
+        comboBox = new JComboBox<>();
+
+        EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        // set DOI as default
+        comboBox.setSelectedItem(DoiFetcher.name);
+
+        generateButton.addActionListener(action -> {
+            fetcherWorker.execute();
+        });
+
+        comboBox.addActionListener(e -> {
+            idTextField.requestFocus();
+            idTextField.selectAll();
+        });
+
+        idTextField.addActionListener(event -> fetcherWorker.execute());
+
+        JPanel jPanel = new JPanel();
+
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(4,4,4,4);
+
+        GridBagLayout layout = new GridBagLayout();
+        jPanel.setLayout(layout);
+
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.weightx = 1;
+        jPanel.add(fetcherLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.weightx = 2;
+        jPanel.add(comboBox, constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.weightx = 1;
+        jPanel.add(idLabel, constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        constraints.weightx = 2;
+        jPanel.add(idTextField, constraints);
+
+        constraints.gridy = 2;
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        constraints.fill = GridBagConstraints.NONE;
+        jPanel.add(generateButton, constraints);
+
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
+
+        SwingUtilities.invokeLater(() -> idTextField.requestFocus());
+
+        return jPanel;
+    }
+
+    private void stopFetching() {
+        if (fetcherWorker.getState() == SwingWorker.StateValue.STARTED) {
+            fetcherWorker.cancel(true);
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TypeButton) {
             type = ((TypeButton) e.getSource()).getType();
         }
+        stopFetching();
         dispose();
     }
 
@@ -183,7 +271,64 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            stopFetching();
             dispose();
+        }
+    }
+
+    private class FetcherWorker extends SwingWorker<Optional<BibEntry>, Void> {
+        private boolean fetcherException = false;
+        private String fetcherExceptionMessage = "";
+        private IdBasedFetcher fetcher = null;
+        private String searchID = "";
+
+        @Override
+        protected Optional<BibEntry> doInBackground() throws Exception {
+            Optional<BibEntry> bibEntry = Optional.empty();
+            SwingUtilities.invokeLater(() -> {
+                generateButton.setEnabled(false);
+                generateButton.setText(Localization.lang("Searching..."));
+            });
+            searchID = idTextField.getText().trim();
+            fetcher = EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
+            if (!searchID.isEmpty()) {
+                try {
+                    bibEntry = fetcher.performSearchById(searchID);
+                } catch (FetcherException e) {
+                    LOGGER.error(e.getMessage(), e);
+                    fetcherException = true;
+                    fetcherExceptionMessage = e.getMessage();
+                }
+            }
+            return bibEntry;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                Optional<BibEntry> result = get();
+                if (result.isPresent()) {
+                    frame.getCurrentBasePanel().insertEntry(result.get());
+                    dispose();
+                } else if (searchID.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                } else if (!fetcherException) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) +"." + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                }
+                fetcherWorker = new FetcherWorker();
+                SwingUtilities.invokeLater(() -> {
+                    idTextField.requestFocus();
+                    idTextField.selectAll();
+                    generateButton.setText(Localization.lang("Generate"));
+                    generateButton.setEnabled(true);
+                });
+            } catch (ExecutionException | InterruptedException e) {
+                LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
+            }
         }
     }
 

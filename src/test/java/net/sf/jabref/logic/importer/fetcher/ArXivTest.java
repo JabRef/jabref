@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -23,17 +6,23 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class ArXivTest {
 
     @Rule public ExpectedException expectedException = ExpectedException.none();
@@ -43,7 +32,9 @@ public class ArXivTest {
 
     @Before
     public void setUp() {
-        finder = new ArXiv();
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        finder = new ArXiv(importFormatPreferences);
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();
@@ -81,6 +72,12 @@ public class ArXivTest {
     public void findByEprint() throws IOException {
         entry.setField("eprint", "1603.06570");
 
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
+    }
+
+    @Test
+    public void findByEprintWithPrefix() throws IOException {
+        entry.setField("eprint", "arXiv:1603.06570");
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
@@ -148,10 +145,15 @@ public class ArXivTest {
     }
 
     @Test
+    public void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv:1405.2249"));
+    }
+
+    @Test
     public void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
-                finder.performSearchById("1503.06747").flatMap(entry -> entry.getFieldOptional("title")));
+                finder.performSearchById("1503.06747").flatMap(entry -> entry.getField("title")));
     }
 
     @Test

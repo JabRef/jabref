@@ -1,34 +1,30 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.support.DevEnvironment;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+@Category(FetcherTests.class)
 public class GoogleScholarTest {
 
     private GoogleScholar finder;
@@ -36,25 +32,28 @@ public class GoogleScholarTest {
 
     @Before
     public void setUp() {
-        finder = new GoogleScholar();
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
+                mock(FieldContentParserPreferences.class));
+        finder = new GoogleScholar(importFormatPreferences);
         entry = new BibEntry();
     }
 
     @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
+    public void rejectNullParameter() throws IOException, FetcherException {
         finder.findFullText(null);
         Assert.fail();
     }
 
     @Test
-    public void requiresEntryTitle() throws IOException {
+    public void requiresEntryTitle() throws IOException, FetcherException {
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void linkFound() throws IOException {
+    public void linkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         entry.setField("title", "Towards Application Portability in Platform as a Service");
 
@@ -65,12 +64,40 @@ public class GoogleScholarTest {
     }
 
     @Test
-    public void noLinkFound() throws IOException {
+    public void noLinkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
-        Assume.assumeFalse(DevEnvironment.isCIServer());
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
 
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    public void findSingleEntry() throws FetcherException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
+
+        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
+        entry.setCiteKey("geiger2013detecting");
+        entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
+        entry.setField(FieldName.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
+        entry.setField(FieldName.BOOKTITLE, "ZEUS");
+        entry.setField(FieldName.YEAR, "2013");
+        entry.setField(FieldName.PAGES, "41--44");
+
+        List<BibEntry> foundEntries = finder.performSearch("info:RExzBa3OlkQJ:scholar.google.com");
+
+        Assert.assertEquals(Collections.singletonList(entry), foundEntries);
+    }
+
+    @Test
+    public void find20Entries() throws FetcherException {
+        // CI server is blocked by Google
+        Assume.assumeFalse(DevEnvironment.isCircleCI() || DevEnvironment.isSnapCI());
+
+        List<BibEntry> foundEntries = finder.performSearch("random test string");
+
+        Assert.assertEquals(20, foundEntries.size());
     }
 }

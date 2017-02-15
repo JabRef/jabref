@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.exporter;
 
 import java.awt.Toolkit;
@@ -43,13 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Dec 12, 2006
- * Time: 6:22:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExportToClipboardAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
@@ -92,9 +70,9 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select export format"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                new String[] {Localization.lang("Export with selected format"),
-                        Localization.lang("Return to JabRef")},
-                Localization.lang("Export with selected format"));
+                new String[] {Localization.lang("Export"),
+                        Localization.lang("Cancel")},
+                Localization.lang("Export"));
         if (answer == JOptionPane.NO_OPTION) {
             return;
         }
@@ -105,7 +83,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectory();
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         File tmp = null;
         try {
@@ -117,11 +95,14 @@ public class ExportToClipboardAction extends AbstractWorker {
 
             // Write to file:
             format.performExport(panel.getBibDatabaseContext(), tmp.getPath(),
-                    panel.getBibDatabaseContext().getMetaData().getEncoding(), entries);
+                    panel.getBibDatabaseContext().getMetaData().getEncoding()
+                            .orElse(Globals.prefs.getDefaultEncoding()),
+                    entries);
             // Read the file and put the contents on the clipboard:
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new InputStreamReader(new FileInputStream(tmp),
-                    panel.getBibDatabaseContext().getMetaData().getEncoding())) {
+                    panel.getBibDatabaseContext().getMetaData().getEncoding()
+                            .orElse(Globals.prefs.getDefaultEncoding()))) {
                 int s;
                 while ((s = reader.read()) != -1) {
                     sb.append((char) s);
@@ -130,7 +111,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            RtfSelection rs = new RtfSelection(sb.toString());
+            RtfTransferable rs = new RtfTransferable(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();

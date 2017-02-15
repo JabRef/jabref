@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.actions;
 
 import java.awt.BorderLayout;
@@ -154,9 +139,17 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         diag.pack();
 
         ok.addActionListener(e -> {
+            // Check that any field name is set
+            String fieldText = (String) field.getSelectedItem();
+            if ((fieldText == null) || fieldText.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
+                        JOptionPane.ERROR_MESSAGE);
+                return; // Do not close the dialog.
+            }
+
             // Check if the user tries to rename multiple fields:
             if (rename.isSelected()) {
-                String[] fields = getFieldNames((String) field.getSelectedItem());
+                String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
                     JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
                             "", JOptionPane.ERROR_MESSAGE);
@@ -229,6 +222,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (toSet.isEmpty()) {
             toSet = null;
         }
+
         String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
@@ -267,7 +261,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {
-            Optional<String> oldVal = entry.getFieldOptional(field);
+            Optional<String> oldVal = entry.getField(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
@@ -299,14 +293,14 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             boolean overwriteValues) {
         NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
         for (BibEntry entry : entries) {
-            Optional<String> valToMove = entry.getFieldOptional(field);
+            Optional<String> valToMove = entry.getField(field);
             // If there is no value, do nothing:
             if ((!valToMove.isPresent()) || valToMove.get().isEmpty()) {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
             // non-empty value already for this entry for the new field:
-            Optional<String> valInNewField = entry.getFieldOptional(newField);
+            Optional<String> valInNewField = entry.getField(newField);
             if (!overwriteValues && (valInNewField.isPresent()) && !valInNewField.get().isEmpty()) {
                 continue;
             }

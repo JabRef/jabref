@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.autocompleter;
 
 import java.awt.event.FocusEvent;
@@ -30,9 +15,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by Morten O. Alver, 16 Feb. 2007
- */
 public class AutoCompleteListener extends KeyAdapter implements FocusListener {
 
     //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
@@ -182,7 +164,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
      * @param wordSeperatorTyped indicates whether the user has typed a white space character or a
      */
     private void setUnmodifiedTypedLetters(JTextComponent comp, boolean lastBeginningContainsTypedCharacter,
-            boolean wordSeperatorTyped) {
+                                           boolean wordSeperatorTyped) {
         if (lastBeginning == null) {
             LOGGER.debug("No last beginning found");
             // There was no previous input (if the user typed a word, where no autocompletion is available)
@@ -286,7 +268,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         }
 
         // don't do auto completion inside words
-        if (!atEndOfWord((JTextComponent) e.getSource())) {
+        if (!(e.getSource() instanceof JTextComponent) || !atEndOfWord((JTextComponent) e.getSource())) {
             return;
         }
 
@@ -294,6 +276,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             if (Character.isLetter(ch) || Character.isDigit(ch)
                     || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
+
                 JTextComponent comp = (JTextComponent) e.getSource();
 
                 if (toSetIn == null) {

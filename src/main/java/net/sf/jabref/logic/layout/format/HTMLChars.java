@@ -1,25 +1,10 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout.format;
 
 import java.util.Map;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.
@@ -121,8 +106,6 @@ public class HTMLChars implements LayoutFormatter {
                     }
                 }
             } else {
-                String argument;
-
                 if (!incommand) {
                     sb.append(c);
                 } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
@@ -137,27 +120,23 @@ public class HTMLChars implements LayoutFormatter {
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
-                        String part = StringUtil.getPart(field, i, true);
-                        i += part.length();
-                        argument = part;
-                        if (argument != null) {
-                            // handle common case of general latex command
-                            String result = HTML_CHARS.get(command + argument);
-                            // If found, then use translated version. If not, then keep
-                            // the
-                            // text of the parameter intact.
+                        String argument = StringUtil.getPart(field, i, true);
+                        i += argument.length();
+                        // handle common case of general latex command
+                        String result = HTML_CHARS.get(command + argument);
+                        // If found, then use translated version. If not, then keep
+                        // the text of the parameter intact.
 
-                            if (result == null) {
-                                if (argument.length() == 0) {
-                                    // Maybe a separator, such as in \LaTeX{}, so use command
-                                    sb.append(command);
-                                } else {
-                                    // Otherwise, use argument
-                                    sb.append(argument);
-                                }
+                        if (result == null) {
+                            if (argument.isEmpty()) {
+                                // Maybe a separator, such as in \LaTeX{}, so use command
+                                sb.append(command);
                             } else {
-                                sb.append(result);
+                                // Otherwise, use argument
+                                sb.append(argument);
                             }
+                        } else {
+                            sb.append(result);
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
@@ -179,11 +158,7 @@ public class HTMLChars implements LayoutFormatter {
                         }
                         sb.append(' ');
                     }
-                }/* else if (c == '}') {
-                    System.out.printf("com term by }: '%s'\n", currentCommand.toString());
-
-                    argument = "";
-                 }*/else {
+                } else {
                     /*
                      * TODO: this point is reached, apparently, if a command is
                      * terminated in a strange way, such as with "$\omega$".

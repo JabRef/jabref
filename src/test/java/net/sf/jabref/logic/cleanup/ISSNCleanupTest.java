@@ -2,10 +2,10 @@ package net.sf.jabref.logic.cleanup;
 
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,8 +20,9 @@ public class ISSNCleanupTest {
 
     @Before
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class), mock(JournalAbbreviationLoader.class),
-                JabRefPreferences.getInstance());
+        worker = new CleanupWorker(mock(BibDatabaseContext.class),
+                new CleanupPreferences("", "", mock(LayoutFormatterPreferences.class),
+                        mock(FileDirectoryPreferences.class)));
     }
 
     @Test
@@ -31,7 +32,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "0123-4567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -41,7 +42,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "01234567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -51,7 +52,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "Banana");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("Banana"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("Banana"), entry.getField("issn"));
     }
 
 }

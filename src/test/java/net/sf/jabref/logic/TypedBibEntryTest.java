@@ -8,9 +8,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TypedBibEntryTest {
+
     @Test
     public void hasAllRequiredFieldsFail() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -21,7 +22,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFields() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
         e.setField("author", "abc");
         e.setField("title", "abc");
         e.setField("journal", "abc");
@@ -33,7 +34,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void hasAllRequiredFieldsForUnknownTypeReturnsTrue() {
-        BibEntry e = new BibEntry("id", "articlllleeeee");
+        BibEntry e = new BibEntry("articlllleeeee");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         Assert.assertTrue(typedEntry.hasAllRequiredFields());
@@ -41,7 +42,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void getTypeForDisplayReturnsTypeName() {
-        BibEntry e = new BibEntry("id", BibtexEntryTypes.INPROCEEDINGS.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INPROCEEDINGS.getName());
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         Assert.assertEquals("InProceedings", typedEntry.getTypeForDisplay());
@@ -49,7 +50,7 @@ public class TypedBibEntryTest {
 
     @Test
     public void getTypeForDisplayForUnknownTypeCapitalizeFirstLetter() {
-        BibEntry e = new BibEntry("id", "articlllleeeee");
+        BibEntry e = new BibEntry("articlllleeeee");
 
         TypedBibEntry typedEntry = new TypedBibEntry(e, BibDatabaseMode.BIBTEX);
         Assert.assertEquals("Articlllleeeee", typedEntry.getTypeForDisplay());

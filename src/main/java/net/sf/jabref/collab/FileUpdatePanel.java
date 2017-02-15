@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.collab;
 
 import java.awt.BorderLayout;
@@ -32,10 +17,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class FileUpdatePanel extends SidePaneComponent implements ActionListener,
-        ChangeScanner.DisplayResultCallback {
-
-    public static final String NAME = "fileUpdate";
+public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     private final SidePaneManager manager;
 
@@ -80,12 +62,17 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      */
     @Override
     public void componentClosing() {
-        manager.unregisterComponent(FileUpdatePanel.NAME);
+        manager.unregisterComponent(FileUpdatePanel.class);
     }
 
     @Override
     public int getRescalingWeight() {
         return 0;
+    }
+
+    @Override
+    public ToggleAction getToggleAction() {
+        throw new UnsupportedOperationException();
     }
 
     /**

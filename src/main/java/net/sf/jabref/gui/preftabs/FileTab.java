@@ -1,23 +1,11 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -25,21 +13,19 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -55,18 +41,14 @@ class FileTab extends JPanel implements PrefsTab {
     private final JabRefFrame frame;
 
     private final JCheckBox backup;
+    private final JCheckBox localAutoSave;
     private final JCheckBox openLast;
-    private final JCheckBox autoSave;
-    private final JCheckBox promptBeforeUsingAutoSave;
-    private final JComboBox<String> valueDelimiter;
     private final JComboBox<String> newlineSeparator;
     private final JCheckBox reformatFileOnSaveAndExport;
     private final JRadioButton resolveStringsStandard;
     private final JRadioButton resolveStringsAll;
     private final JTextField nonWrappableFields;
     private final JTextField doNotResolveStringsFor;
-    private final JSpinner autoSaveInterval;
-    private boolean origAutoSaveSetting;
 
     private final JTextField fileDir;
     private final JCheckBox bibLocAsPrimaryDir;
@@ -99,12 +81,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
-        autoSave = new JCheckBox(Localization.lang("Autosave"));
-        promptBeforeUsingAutoSave = new JCheckBox(Localization.lang("Prompt before recovering a database from an autosave file"));
-        autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox<>(new String[] {
-                Localization.lang("Quotes") + ": \", \"",
-                Localization.lang("Curly brackets") + ": {, }"});
+        localAutoSave = new JCheckBox(Localization.lang("Autosave local databases"));
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -118,11 +95,6 @@ class FileTab extends JPanel implements PrefsTab {
 
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
-
-        autoSave.addChangeListener(e -> {
-            autoSaveInterval.setEnabled(autoSave.isSelected());
-            promptBeforeUsingAutoSave.setEnabled(autoSave.isSelected());
-        });
 
         FormLayout layout = new FormLayout("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", ""); // left:pref, 4dlu, fill:pref
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
@@ -157,8 +129,14 @@ class FileTab extends JPanel implements PrefsTab {
         lab = new JLabel(Localization.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
-        BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
-        builder.append(new JButton(browse));
+
+        JButton browse = new JButton(Localization.lang("Browse"));
+        browse.addActionListener(e ->
+                new FileDialog(this.frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        builder.append(browse);
+
         builder.nextLine();
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
@@ -179,18 +157,13 @@ class FileTab extends JPanel implements PrefsTab {
         builder.nextLine();
 
         builder.appendSeparator(Localization.lang("Autosave"));
-        builder.append(autoSave, 1);
+        builder.append(localAutoSave, 1);
         JButton help = new HelpAction(HelpFile.AUTOSAVE).getHelpButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());
         hPan.add(help, BorderLayout.EAST);
         builder.append(hPan);
-        builder.nextLine();
-        builder.append(Localization.lang("Autosave interval (minutes)") + ":");
-        builder.append(autoSaveInterval);
-        builder.nextLine();
-        builder.append(promptBeforeUsingAutoSave);
         builder.nextLine();
 
         JPanel pan = builder.getPanel();
@@ -202,7 +175,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX));
+        fileDir.setText(prefs.get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -234,16 +207,12 @@ class FileTab extends JPanel implements PrefsTab {
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
         nonWrappableFields.setText(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS));
 
-        autoSave.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_SAVE));
-        promptBeforeUsingAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
-        autoSaveInterval.setValue(prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
-        origAutoSaveSetting = autoSave.isSelected();
-        valueDelimiter.setSelectedIndex(prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
+        localAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
@@ -269,40 +238,31 @@ class FileTab extends JPanel implements PrefsTab {
         // we also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = newline;
 
-        prefs.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, reformatFileOnSaveAndExport.isSelected());
         prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());
+
+        prefs.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, reformatFileOnSaveAndExport.isSelected());
         prefs.putBoolean(JabRefPreferences.OPEN_LAST_EDITED, openLast.isSelected());
         prefs.putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, resolveStringsAll.isSelected());
         prefs.put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, doNotResolveStringsFor.getText().trim());
-        prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
-        prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
-        prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
-        prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
-        boolean updateSpecialFields = false;
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
-            updateSpecialFields = true;
-        }
-        // If either of the two last entries were changed, run the update for special field handling:
-        if (updateSpecialFields) {
-            prefs.updateSpecialFieldHandling();
         }
 
-        // See if we should start or stop the auto save manager:
-        if (!origAutoSaveSetting && autoSave.isSelected()) {
-            Globals.startAutoSaveManager(frame);
-        }
-        else if (origAutoSaveSetting && !autoSave.isSelected()) {
-            Globals.stopAutoSaveManager();
-        }
-
+        prefs.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, localAutoSave.isSelected());
     }
 
     @Override
     public boolean validateSettings() {
-        return true;
+        Path path = Paths.get(fileDir.getText());
+        boolean valid = Files.exists(path) && Files.isDirectory(path);
+        if (!valid) {
+            String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                    Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
+            JOptionPane.showMessageDialog(this.frame, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        }
+        return valid;
     }
 
     @Override

@@ -9,6 +9,13 @@ import net.sf.jabref.model.entry.IdGenerator;
 
 public class BibDatabases {
 
+    /**
+     * Gets a collection of bibentries and sets an ID for every entry. After that
+     * all entries will be inserted into a new BibDatabase.
+     *
+     * @param bibentries a collection that contains {@link BibEntry}
+     * @return BibDatabase that contains the entries
+     */
     public static BibDatabase createDatabase(Collection<BibEntry> bibentries) {
         BibDatabase database = new BibDatabase();
 

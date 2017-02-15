@@ -2,6 +2,7 @@ package net.sf.jabref.gui.menus;
 
 import java.awt.Font;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JMenu;
@@ -13,7 +14,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.ChangeTypeAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -32,6 +32,7 @@ public class ChangeEntryTypeMenu {
         entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_INBOOK));
         entryShortCuts.put(BibtexEntryTypes.PROCEEDINGS.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_PROCEEDINGS));
         entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_UNPUBLISHED));
+        entryShortCuts.put(BibtexEntryTypes.TECHREPORT.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_TECHREPORT));
     }
 
     public JMenu getChangeEntryTypeMenu(BasePanel panel) {
@@ -56,19 +57,31 @@ public class ChangeEntryTypeMenu {
             for (EntryType type : EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX)) {
                 menu.add(new ChangeTypeAction(type, panel));
             }
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
+            if (!customTypes.isEmpty()) {
+                menu.addSeparator();
+                // custom types
+                createEntryTypeSection(panel, menu, "Custom Entries", customTypes);
+            }
         } else {
             // Bibtex
             createEntryTypeSection(panel, menu, "BibTeX Entries", BibtexEntryTypes.ALL);
             menu.addSeparator();
             // ieeetran
             createEntryTypeSection(panel, menu, "IEEETran Entries", IEEETranEntryTypes.ALL);
-            menu.addSeparator();
-            // custom types
-            createEntryTypeSection(panel, menu, "Custom Entries", CustomEntryTypesManager.ALL);
+
+
+            List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
+            if (!customTypes.isEmpty()) {
+                menu.addSeparator();
+                // custom types
+                createEntryTypeSection(panel, menu, "Custom Entries", customTypes);
+            }
         }
     }
 
-    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, java.util.List<EntryType> types) {
+    private void createEntryTypeSection(BasePanel panel, JMenu menu, String title, List<? extends EntryType> types) {
         // bibtex
         JMenuItem header = new JMenuItem(title);
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());

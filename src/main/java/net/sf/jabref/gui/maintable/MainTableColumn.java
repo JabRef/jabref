@@ -11,9 +11,8 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class MainTableColumn {
@@ -71,21 +70,6 @@ public class MainTableColumn {
         return joiner.toString();
     }
 
-    /**
-     * Checks whether the column should display names
-     * Relevant as name value format can be formatted.
-     *
-     * @return true if the bibtex fields contains author or editor
-     */
-    public boolean isNameColumn() {
-        for (String field : bibtexFields) {
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String getColumnName() {
         return columnName;
     }
@@ -106,35 +90,28 @@ public class MainTableColumn {
         if (bibtexFields.isEmpty()) {
             return null;
         }
+        boolean isNameColumn = false;
 
-        String content = null;
+        Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
-            if (field.equals(BibEntry.TYPE_HEADER)) {
-                content = EntryUtil.capitalizeFirst(entry.getType());
-            } else {
-                Optional<String> newContent = entry.getFieldOrAlias(field);
-                if (newContent.isPresent()) {
-                    if (database.isPresent() && "Author".equalsIgnoreCase(columnName)) {
-                        content = database.get().resolveForStrings(newContent.get());
-                    } else {
-                        content = newContent.get();
-                    }
-                }
-            }
-            if (content != null) {
+            content = entry.getResolvedFieldOrAlias(field, database.orElse(null));
+            if (content.isPresent()) {
+                isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
             }
         }
 
-        if (content != null) {
-            content = toUnicode.format(content);
+        String result = content.orElse(null);
+
+        if (isNameColumn) {
+            result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
-        if (isNameColumn()) {
-            return MainTableNameFormatter.formatName(content);
+        if (result != null) {
+            result = toUnicode.format(result).trim();
         }
-        return content;
 
+        return result;
     }
 
     public JLabel getHeaderLabel() {
@@ -143,5 +120,41 @@ public class MainTableColumn {
         } else {
             return new JLabel(getDisplayName());
         }
+    }
+
+    /**
+     * Check if the value returned by getColumnValue() is the same as a simple check of the entry's field(s) would give
+     * The reasons for being different are (combinations may also happen):
+     * - The entry has a crossref where the field content is obtained from
+     * - The field has a string in it (which getColumnValue() resolves)
+     * - There are some alias fields. For example, if the entry has a date field but no year field,
+     *   {@link BibEntry#getResolvedFieldOrAlias(String, BibDatabase)} will return the year value from the date field
+     *   when queried for year
+     *
+     * @param entry the BibEntry
+     * @return true if the value returned by getColumnValue() is resolved as outlined above
+     */
+    public boolean isResolved(BibEntry entry) {
+        if (bibtexFields.isEmpty()) {
+            return false;
+        }
+
+        Optional<String> resolvedFieldContent = Optional.empty();
+        Optional<String> plainFieldContent = Optional.empty();
+        for (String field : bibtexFields) {
+            // entry type or bibtex key will never be resolved
+            if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)
+                    || BibEntry.KEY_FIELD.equals(field)) {
+                return false;
+            } else {
+                plainFieldContent = entry.getField(field);
+                resolvedFieldContent = entry.getResolvedFieldOrAlias(field, database.orElse(null));
+            }
+
+            if (resolvedFieldContent.isPresent()) {
+                break;
+            }
+        }
+        return (!resolvedFieldContent.equals(plainFieldContent));
     }
 }

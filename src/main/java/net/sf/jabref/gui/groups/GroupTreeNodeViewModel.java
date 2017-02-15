@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.groups;
 
 import java.awt.datatransfer.DataFlavor;
@@ -20,6 +5,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
@@ -33,19 +19,25 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.MoveGroupChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupEntryChanger;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.groups.SearchGroup;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
+
+    private static final Log LOGGER = LogFactory.getLog(GroupTreeNodeViewModel.class);
 
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
@@ -58,9 +50,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         DataFlavor df = null;
         try {
             df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=net.sf.jabref.logic.groups.GroupTreeNode");
+                    + ";class="+GroupTreeNode.class.getCanonicalName());
         } catch (ClassNotFoundException e) {
-            // never happens
+            LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
         }
         FLAVOR = df;
         FLAVORS = new DataFlavor[] {GroupTreeNodeViewModel.FLAVOR};
@@ -157,11 +149,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     /** Collapse this node and all its children. */
     public void collapseSubtree(JTree tree) {
-        tree.collapsePath(this.getTreePath());
-
-        for(GroupTreeNodeViewModel child : getChildren()) {
+        for (GroupTreeNodeViewModel child : getChildren()) {
             child.collapseSubtree(tree);
         }
+        tree.collapsePath(this.getTreePath());
     }
 
     /** Expand this node and all its children. */
@@ -185,26 +176,20 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
     }
 
-    public String getText() {
-        AbstractGroup group = node.getGroup();
-        StringBuilder sb = new StringBuilder(60);
-        sb.append(group.getName());
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
-                && (JabRefGUI.getMainFrame() != null)) {
-            BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
-            if (currentBasePanel != null) {
-                sb.append(" [").append(node.numberOfHits(currentBasePanel.getDatabase().getEntries())).append(']');
-            }
-        }
-
-        return sb.toString();
-    }
-
     public String getDescription() {
-        return "<html>"
-                + node.getGroup().getShortDescription(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC))
-                + "</html>";
+        AbstractGroup group = node.getGroup();
+        String shortDescription = "";
+        boolean showDynamic = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC);
+        if (group instanceof ExplicitGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup((ExplicitGroup) group);
+        } else if (group instanceof KeywordGroup) {
+            shortDescription = GroupDescriptions.getShortDescriptionKeywordGroup((KeywordGroup) group, showDynamic);
+        } else if (group instanceof SearchGroup) {
+            shortDescription = GroupDescriptions.getShortDescription((SearchGroup) group, showDynamic);
+        } else {
+            shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
+        }
+        return "<html>" + shortDescription + "</html>";
     }
 
     public Icon getIcon() {
@@ -228,11 +213,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public boolean canAddEntries(List<BibEntry> entries) {
-        return getNode().getGroup().supportsAdd() && !getNode().getGroup().containsAll(entries);
+        return getNode().getGroup() instanceof GroupEntryChanger && !getNode().getGroup().containsAll(entries);
     }
 
     public boolean canRemoveEntries(List<BibEntry> entries) {
-        return getNode().getGroup().supportsRemove() && getNode().getGroup().containsAny(entries);
+        return getNode().getGroup() instanceof GroupEntryChanger && getNode().getGroup().containsAny(entries);
     }
 
     public void sortChildrenByName(boolean recursive) {
@@ -290,8 +275,8 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public void changeEntriesTo(List<BibEntry> entries, UndoManager undoManager) {
         AbstractGroup group = node.getGroup();
-        Optional<EntriesGroupChange> changesRemove = Optional.empty();
-        Optional<EntriesGroupChange> changesAdd = Optional.empty();
+        List<FieldChange> changesRemove = new ArrayList<>();
+        List<FieldChange> changesAdd = new ArrayList<>();
 
         // Sort entries into current members and non-members of the group
         // Current members will be removed
@@ -318,15 +303,15 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
 
         // Remember undo information
-        if (changesRemove.isPresent()) {
-            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove.get());
-            if (changesAdd.isPresent() && (undoRemove != null)) {
+        if (!changesRemove.isEmpty()) {
+            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);
+            if (!changesAdd.isEmpty() && (undoRemove != null)) {
                 // we removed and added entries
-                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
             }
             undoManager.addEdit(undoRemove);
-        } else if (changesAdd.isPresent()) {
-            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
+        } else if (!changesAdd.isEmpty()) {
+            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));
         }
     }
 
@@ -394,24 +379,24 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     /**
      * Adds the given entries to this node's group.
      */
-    public Optional<EntriesGroupChange> addEntriesToGroup(List<BibEntry> entries) {
-        if(node.getGroup().supportsAdd()) {
-            return node.getGroup().add(entries);
+    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+        if(node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger)node.getGroup()).add(entries);
         }
         else {
-            return Optional.empty();
+            return Collections.emptyList();
         }
     }
 
     /**
      * Removes the given entries from this node's group.
      */
-    public Optional<EntriesGroupChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if(node.getGroup().supportsRemove()) {
-            return node.getGroup().remove(entries);
+    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
+        if(node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger)node.getGroup()).remove(entries);
         }
         else {
-            return Optional.empty();
+            return Collections.emptyList();
         }
     }
 

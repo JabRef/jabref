@@ -1,35 +1,23 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.groups;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.GroupEntryChanger;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
+/**
+ * TODO: rework code and try to reuse some from {@link GroupTreeNode#setGroup(AbstractGroup, boolean, boolean, List)}.
+ */
 public class AddToGroupAction extends AbstractAction {
 
     private final boolean move;
@@ -84,41 +72,41 @@ public class AddToGroupAction extends AbstractAction {
         panel.getGroupSelector().valueChanged(null);
     }
 
-    public void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
-        List<GroupTreeNode> groupsContainingEntries =
-                node.getNode().getRoot().getContainingGroups(entries, false).stream().filter(node -> node.getGroup().supportsRemove()).collect(
-                        Collectors.toList());
-
-        List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
-                Collectors.toList());
+    private void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
+        List<AbstractGroup> affectedGroups =
+                node.getNode().getRoot().getContainingGroups(entries, false).stream()
+                        .map(GroupTreeNode::getGroup)
+                        .filter(group -> group instanceof GroupEntryChanger)
+                        .collect(Collectors.toList());
         affectedGroups.add(node.getNode().getGroup());
         if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
             return; // user aborted operation
         }
 
         // first remove
-        for (GroupTreeNode group : groupsContainingEntries) {
-            Optional<EntriesGroupChange> undoRemove = group.getGroup().remove(entries);
-            if (undoRemove.isPresent()) {
-                undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoRemove.get()));
+        for (AbstractGroup group : affectedGroups) {
+            GroupEntryChanger entryChanger = (GroupEntryChanger)group;
+            List<FieldChange> changes = entryChanger.remove(entries);
+            if (!changes.isEmpty()) {
+                undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, changes));
             }
         }
 
         // then add
-        Optional<EntriesGroupChange> undoAdd = node.addEntriesToGroup(entries);
-        if (undoAdd.isPresent()) {
-            undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
+        List<FieldChange> undoAdd = node.addEntriesToGroup(entries);
+        if (!undoAdd.isEmpty()) {
+            undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd));
         }
     }
 
-    public void addToGroup(List<BibEntry> entries, NamedCompound undo) {
+    private void addToGroup(List<BibEntry> entries, NamedCompound undo) {
         if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
             return; // user aborted operation
         }
 
-        Optional<EntriesGroupChange> undoAdd = node.addEntriesToGroup(entries);
-        if (undoAdd.isPresent()) {
-            undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd.get()));
+        List<FieldChange> undoAdd = node.addEntriesToGroup(entries);
+        if (!undoAdd.isEmpty()) {
+            undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd));
         }
     }
 

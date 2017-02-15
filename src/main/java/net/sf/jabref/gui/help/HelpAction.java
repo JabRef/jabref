@@ -1,26 +1,20 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.help;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.Globals;
@@ -31,16 +25,18 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
  * Dialog unless it is already visible, and shows the URL in it.
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
+    /**
+     * New languages of the help have to be added here
+     */
+    private static final Set<String> avaiableLangFiles = Stream.of("en", "de", "fr", "in", "ja")
+            .collect(Collectors.toCollection(HashSet::new));
+
     private HelpFile helpPage;
 
 
@@ -76,13 +72,40 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
+    public JLabel getHelpLabel(String labelText) {
+        JLabel helpLabel = new JLabel("<html><u>" + labelText + "</u></html>");
+        helpLabel.setForeground(Color.BLUE);
+        helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        helpLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openHelpPage();
+            }
+        });
+        return helpLabel;
+    }
+
     public void setHelpFile(HelpFile urlPart) {
         this.helpPage = urlPart;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
-        JabRefDesktop.openBrowserShowPopup(url);
+        openHelpPage();
+    }
+
+    private void openHelpPage() {
+        String lang = Globals.prefs.get(JabRefPreferences.LANGUAGE);
+        StringBuilder sb = new StringBuilder("https://help.jabref.org/");
+
+        if (avaiableLangFiles.contains(lang)) {
+            sb.append(lang);
+            sb.append("/");
+        } else {
+            sb.append("en/");
+        }
+        sb.append(helpPage.getPageName());
+        JabRefDesktop.openBrowserShowPopup(sb.toString());
     }
 }

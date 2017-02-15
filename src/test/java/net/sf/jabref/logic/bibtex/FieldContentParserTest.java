@@ -1,11 +1,10 @@
 package net.sf.jabref.logic.bibtex;
 
-import net.sf.jabref.Globals;
+import java.util.Collections;
+
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,15 +12,12 @@ import static org.junit.Assert.assertEquals;
 public class FieldContentParserTest {
 
     private FieldContentParser parser;
-
-    @BeforeClass
-    public static void loadPreferences() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
+    private FieldContentParserPreferences prefs;
 
     @Before
     public void setUp() throws Exception {
-        parser = new FieldContentParser(FieldContentParserPreferences.fromPreferences(Globals.prefs));
+        prefs = new FieldContentParserPreferences(Collections.emptyList());
+        parser = new FieldContentParser(prefs);
     }
 
     @Test

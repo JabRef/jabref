@@ -10,26 +10,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.StringJoiner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class LocalizationConsistencyTest {
 
     @Test
     public void allFilesMustHaveSameKeys() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            List<String> englishKeys = LocalizationParser
+            Set<String> englishKeys = LocalizationParser
                     .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
 
             List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l))
                     .collect(Collectors.toList());
             for (String lang : nonEnglishLanguages) {
-                List<String> nonEnglishKeys = LocalizationParser
+                Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
                 List<String> missing = new LinkedList<>(englishKeys);
@@ -91,7 +90,7 @@ public class LocalizationConsistencyTest {
 
                 List<String> duplicates = properties.getDuplicates();
 
-                assertEquals("Duplicate keys of " + lang, Collections.emptyList(), duplicates);
+                assertEquals("Duplicate keys inside bundle " + bundle + "_" + lang, Collections.emptyList(), duplicates);
             }
         }
     }
@@ -121,88 +120,52 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundle.LANG).stream().sorted()
+        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG).stream().sorted()
                 .distinct().collect(Collectors.toList());
 
-        printInfos(missingKeys);
-
-        String resultString = missingKeys.stream().map(Object::toString).collect(Collectors.joining("\n"));
-        assertEquals(
-                "source code contains language keys for the messages which are not in the corresponding properties file",
-                "", resultString);
+        assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
+                "1. PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
+                "2. EXECUTE: gradlew localizationUpdate\n" +
+                missingKeys.parallelStream()
+                        .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
+                        .collect(Collectors.toList()),
+                Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
 
     @Test
     public void findMissingMenuLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundle.MENU).stream()
+        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.MENU).stream()
                 .collect(Collectors.toList());
 
-        printInfos(missingKeys);
-
-        String resultString = missingKeys.stream().map(Object::toString).collect(Collectors.joining("\n"));
-        assertEquals(
-                "source code contains language keys for the menu which are not in the corresponding properties file",
-                "", resultString);
+        assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH MENU FILE\n" +
+                "1. PASTE THESE INTO THE ENGLISH MENU FILE\n" +
+                "2. EXECUTE: gradlew localizationUpdate\n" +
+                missingKeys.parallelStream()
+                        .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
+                        .collect(Collectors.toList()),
+                Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
 
     @Test
     public void findObsoleteLocalizationKeys() throws IOException {
-        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
 
-        if (!obsoleteKeys.isEmpty()) {
-            System.out.println();
-            System.out.println("Obsolete keys found:");
-            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
-            System.out.println();
-            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
-            System.out.println("2. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
-            System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys " + obsoleteKeys + " found in properties file which should be removed");
-        }
+        assertEquals("Obsolete keys found in language properties file: " + obsoleteKeys + "\n" +
+                "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n" +
+                "3. EXECUTE: gradlew localizationUpdate\n",
+                Collections.<String>emptySet(), obsoleteKeys);
     }
 
     @Test
     public void findObsoleteMenuLocalizationKeys() throws IOException {
-        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.MENU);
 
-        if (!obsoleteKeys.isEmpty()) {
-            System.out.println();
-            System.out.println("Obsolete menu keys found:");
-            System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
-            System.out.println();
-            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
-            System.out.println("2. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys" + " TO");
-            System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
-            fail("Obsolete keys " + obsoleteKeys + " found in menu properties file which should be removed");
-        }
-    }
-
-    private void printInfos(List<LocalizationEntry> missingKeys) {
-        if (!missingKeys.isEmpty()) {
-            System.out.println(convertToEnglishPropertiesFile(missingKeys));
-            System.out.println();
-            System.out.println();
-            System.out.println(convertPropertiesFile(missingKeys));
-        }
-    }
-
-    private String convertToEnglishPropertiesFile(List<LocalizationEntry> missingKeys) {
-        System.out.println("PASTE THIS INTO THE ENGLISH LANGUAGE FILE");
-        StringJoiner result = new StringJoiner("\n");
-        for (LocalizationEntry key : missingKeys) {
-            result.add(String.format("%s=%s", key.getKey(), key.getKey()));
-        }
-        return result.toString();
-    }
-
-    private String convertPropertiesFile(List<LocalizationEntry> missingKeys) {
-        System.out.println("EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
-        System.out.println("PASTE THIS INTO THE NON-ENGLISH LANGUAGE FILES");
-        StringJoiner result = new StringJoiner("\n");
-        for (LocalizationEntry key : missingKeys) {
-            result.add(String.format("%s=", key.getKey()));
-        }
-        return result.toString();
+        assertEquals("Obsolete keys found in the menu properties file: " + obsoleteKeys + "\n" +
+                "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
+                "3. EXECUTE: gradlew localizationUpdate\n",
+                Collections.<String>emptySet(), obsoleteKeys);
     }
 
 }

@@ -1,19 +1,3 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.datatransfer.Clipboard;
@@ -31,10 +15,10 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.logic.util.io.FileUtil;
 
@@ -42,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class FileListEditorTransferHandler extends TransferHandler {
+
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
@@ -58,7 +43,8 @@ class FileListEditorTransferHandler extends TransferHandler {
      * @param entryContainer
      * @param textTransferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
      */
-    public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
+    public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer,
+            TransferHandler textTransferHandler) {
         this.frame = frame;
         this.entryContainer = entryContainer;
         this.textTransferHandler = textTransferHandler;
@@ -96,7 +82,9 @@ class FileListEditorTransferHandler extends TransferHandler {
             List<File> files = new ArrayList<>();
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-                files.addAll((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor));
+                @SuppressWarnings("unchecked")
+                List<File> transferedFiles = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                files.addAll(transferedFiles);
             }
 
             if (t.isDataFlavorSupported(urlFlavor)) {
@@ -155,8 +143,7 @@ class FileListEditorTransferHandler extends TransferHandler {
 
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
-            if (inflav.match(urlFlavor) || inflav.match(stringFlavor)
-                    || inflav.match(DataFlavor.javaFileListFlavor)) {
+            if (inflav.match(urlFlavor) || inflav.match(stringFlavor) || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
             }
         }

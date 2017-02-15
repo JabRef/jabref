@@ -1,201 +1,258 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.TestEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.PreviewPreferences;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.factories.Paddings;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(PrefsTab.class);
+public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences prefs;
+    private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
 
-    private final JTextArea layout1 = new JTextArea("", 1, 1);
-    private final JTextArea layout2 = new JTextArea("", 1, 1);
+    private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
-    private final JButton testButton = new JButton(Localization.lang("Test"));
-    private final JButton defaultButton = new JButton(Localization.lang("Default"));
-    private final JButton testButton2 = new JButton(Localization.lang("Test"));
-    private final JButton defaultButton2 = new JButton(Localization.lang("Default"));
+    private final DefaultListModel<Object> availableModel = new DefaultListModel<>();
+    private final DefaultListModel<Object> chosenModel = new DefaultListModel<>();
 
-    private final JPanel firstPanel = new JPanel();
-    private final JScrollPane firstScrollPane = new JScrollPane(layout1);
+    private final JList<Object> available = new JList<>(availableModel);
+    private final JList<Object> chosen = new JList<>(chosenModel);
 
-    private final JPanel secondPanel = new JPanel();
-    private final JScrollPane secondScrollPane = new JScrollPane(layout2);
+    private final JButton btnRight = new JButton("»");
+    private final JButton btnLeft = new JButton("«");
+    private final JButton btnUp = new JButton(Localization.lang("Up"));
+    private final JButton btnDown = new JButton(Localization.lang("Down"));
 
 
-    public PreviewPrefsTab(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    private final JTextArea layout = new JTextArea("", 1, 1);
+    private final JButton btnTest = new JButton(Localization.lang("Test"));
+    private final JButton btnDefault = new JButton(Localization.lang("Default"));
+    private final JScrollPane scrollPane = new JScrollPane(layout);
 
-        GridBagLayout layout = new GridBagLayout();
-        firstPanel.setLayout(layout);
-        secondPanel.setLayout(layout);
 
-        setLayout(layout);
-        JLabel lab = new JLabel(Localization.lang("Preview") + " 1");
-        GridBagConstraints layoutConstraints = new GridBagConstraints();
-        layoutConstraints.anchor = GridBagConstraints.WEST;
-        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        layoutConstraints.fill = GridBagConstraints.BOTH;
-        layoutConstraints.weightx = 1;
-        layoutConstraints.weighty = 0;
-        layoutConstraints.insets = new Insets(2, 2, 2, 2);
-        layout.setConstraints(lab, layoutConstraints);
-        layoutConstraints.weighty = 1;
-        layout.setConstraints(firstScrollPane, layoutConstraints);
-        firstPanel.add(firstScrollPane);
-        layoutConstraints.weighty = 0;
-        layoutConstraints.gridwidth = 1;
-        layoutConstraints.weightx = 0;
-        layoutConstraints.fill = GridBagConstraints.NONE;
-        layoutConstraints.anchor = GridBagConstraints.WEST;
-        layout.setConstraints(testButton, layoutConstraints);
-        firstPanel.add(testButton);
-        layout.setConstraints(defaultButton, layoutConstraints);
-        firstPanel.add(defaultButton);
-        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        JPanel newPan = new JPanel();
-        layoutConstraints.weightx = 1;
-        layout.setConstraints(newPan, layoutConstraints);
-        firstPanel.add(newPan);
-        lab = new JLabel(Localization.lang("Preview") + " 2");
-        layout.setConstraints(lab, layoutConstraints);
-        // p2.add(lab);
-        layoutConstraints.weighty = 1;
-        layoutConstraints.fill = GridBagConstraints.BOTH;
-        layout.setConstraints(secondScrollPane, layoutConstraints);
-        secondPanel.add(secondScrollPane);
-        layoutConstraints.weighty = 0;
-        layoutConstraints.weightx = 0;
-        layoutConstraints.fill = GridBagConstraints.NONE;
-        layoutConstraints.gridwidth = 1;
-        layout.setConstraints(testButton2, layoutConstraints);
-        secondPanel.add(testButton2);
-        layout.setConstraints(defaultButton2, layoutConstraints);
-        secondPanel.add(defaultButton2);
-        layoutConstraints.gridwidth = 1;
-        newPan = new JPanel();
-        layoutConstraints.weightx = 1;
-        layout.setConstraints(newPan, layoutConstraints);
-        secondPanel.add(newPan);
+    public PreviewPrefsTab() {
+        setupLogic();
+        setupGui();
+    }
 
-        layoutConstraints.weightx = 1;
-        layoutConstraints.weighty = 0;
-        layoutConstraints.fill = GridBagConstraints.BOTH;
-        layoutConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        lab = new JLabel(Localization.lang("Preview") + " 1");
-        layout.setConstraints(lab, layoutConstraints);
-        add(lab);
-        layoutConstraints.weighty = 1;
-        layout.setConstraints(firstPanel, layoutConstraints);
-        add(firstPanel);
-        lab = new JLabel(Localization.lang("Preview") + " 2");
-        layoutConstraints.weighty = 0;
-        JSeparator sep = new JSeparator(SwingConstants.HORIZONTAL);
-        layout.setConstraints(sep, layoutConstraints);
-        add(sep);
-        layout.setConstraints(lab, layoutConstraints);
-        add(lab);
-        layoutConstraints.weighty = 1;
-        layout.setConstraints(secondPanel, layoutConstraints);
-        add(secondPanel);
-        layoutConstraints.weighty = 0;
-
-        defaultButton.addActionListener(e -> {
-            String tmp = layout1.getText().replace("\n", "__NEWLINE__");
-            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_0);
-            layout1.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
-            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_0, tmp);
+    private void setupLogic(){
+        chosen.getSelectionModel().addListSelectionListener(event -> {
+            boolean selectionEmpty = ((ListSelectionModel) event.getSource()).isSelectionEmpty();
+            btnLeft.setEnabled(!selectionEmpty);
+            btnDown.setEnabled(!selectionEmpty);
+            btnUp.setEnabled(!selectionEmpty);
         });
 
-        defaultButton2.addActionListener(e -> {
-            String tmp = layout2.getText().replace("\n", "__NEWLINE__");
-            PreviewPrefsTab.this.prefs.remove(JabRefPreferences.PREVIEW_1);
-            layout2.setText(PreviewPrefsTab.this.prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
-            PreviewPrefsTab.this.prefs.put(JabRefPreferences.PREVIEW_1, tmp);
-        });
+        available.getSelectionModel()
+                .addListSelectionListener(e -> btnRight.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()));
 
-        testButton.addActionListener(e -> {
-            try {
-                PreviewPanel testPanel = new PreviewPanel(null, TestEntry.getTestEntry(), null, layout1.getText());
-                testPanel.setPreferredSize(new Dimension(800, 350));
-                JOptionPane.showMessageDialog(null, testPanel, Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
-            } catch (StringIndexOutOfBoundsException ex) {
-                LOGGER.warn("Parsing error.", ex);
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
-                                + ".\n" + ex.getMessage(),
-                        Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
+        btnRight.addActionListener(event -> {
+            for (Object object : available.getSelectedValuesList()) {
+                availableModel.removeElement(object);
+                chosenModel.addElement(object);
             }
         });
 
-        testButton2.addActionListener(e -> {
+        btnLeft.addActionListener(event -> {
+            for (Object object : chosen.getSelectedValuesList()) {
+                availableModel.addElement(object);
+                chosenModel.removeElement(object);
+            }
+        });
+
+        btnUp.addActionListener(event -> {
+            List<Integer> newSelectedIndices = new ArrayList<>();
+            for (int oldIndex : chosen.getSelectedIndices()) {
+                boolean alreadyTaken = newSelectedIndices.contains(oldIndex - 1);
+                int newIndex = (oldIndex > 0 && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+                chosenModel.add(newIndex, chosenModel.remove(oldIndex));
+                newSelectedIndices.add(newIndex);
+            }
+            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
+        });
+
+        btnDown.addActionListener(event -> {
+            List<Integer> newSelectedIndices = new ArrayList<>();
+            int[] selectedIndices = chosen.getSelectedIndices();
+            for (int i = selectedIndices.length - 1; i >= 0; i--) {
+                int oldIndex = selectedIndices[i];
+                boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
+                int newIndex = (oldIndex < chosenModel.getSize() - 1 && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+                chosenModel.add(newIndex, chosenModel.remove(oldIndex));
+                newSelectedIndices.add(newIndex);
+            }
+            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
+        });
+
+
+        btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
+                .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
+
+        btnTest.addActionListener(event -> {
             try {
-                PreviewPanel testPanel = new PreviewPanel(null, TestEntry.getTestEntry(), null,
-                        layout2.getText());
-                testPanel.setPreferredSize(new Dimension(800, 350));
-                JOptionPane.showMessageDialog(null, new JScrollPane(testPanel), Localization.lang("Preview"),
-                        JOptionPane.PLAIN_MESSAGE);
-            } catch (StringIndexOutOfBoundsException ex) {
-                LOGGER.warn("Parsing error.", ex);
+                PreviewPanel testPane = new PreviewPanel(null, TestEntry.getTestEntry(), null)
+                        .setFixedLayout(layout.getText());
+                testPane.setPreferredSize(new Dimension(800, 350));
+                JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
+            } catch (StringIndexOutOfBoundsException exception) {
+                LOGGER.warn("Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
-                                + ".\n" + ex.getMessage(),
+                                + ".\n" + exception.getMessage(),
                         Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
     }
 
+    private void setupGui(){
+        JPanel chooseStyle = FormBuilder.create()
+                .columns("0:grow, $lcgap, pref, $lcgap, 0:grow")
+                .rows("pref, $lg, fill:pref:grow, $lg, pref:grow, $lg, pref:grow, $lg, pref:grow")
+                .padding(Paddings.DIALOG)
+
+                .addSeparator(Localization.lang("Current Preview")).xyw(1, 1, 5)
+                .add(available).xywh(1, 3, 1, 7)
+                .add(chosen).xywh(5, 3, 1, 7)
+
+                .add(btnRight).xy(3, 3, "fill, bottom")
+                .add(btnLeft).xy(3, 5, "fill, top")
+                .add(btnUp).xy(3, 7, "fill, bottom")
+                .add(btnDown).xy(3, 9, "fill, top")
+                .build();
+
+        JPanel preview = FormBuilder.create()
+                .columns("pref:grow, $lcgap, pref, $lcgap, pref")
+                .rows("pref, $lg, fill:pref:grow")
+                .padding(Paddings.DIALOG)
+
+                .addSeparator(Localization.lang("Preview")).xy(1, 1)
+                .add(btnTest).xy(3, 1)
+                .add(btnDefault).xy(5, 1)
+                .add(scrollPane).xyw(1, 3, 5)
+                .build();
+
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(chooseStyle, BorderLayout.CENTER);
+        add(preview, BorderLayout.PAGE_END);
+    }
 
     @Override
     public void setValues() {
-        layout1.setText(prefs.get(JabRefPreferences.PREVIEW_0).replace("__NEWLINE__", "\n"));
-        layout2.setText(prefs.get(JabRefPreferences.PREVIEW_1).replace("__NEWLINE__", "\n"));
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+
+        chosenModel.clear();
+        boolean isPreviewChosen = false;
+        for (String style : previewPreferences.getPreviewCycle()) {
+            if (CitationStyle.isCitationStyleFile(style)) {
+                chosenModel.addElement(CitationStyle.createCitationStyleFromFile(style));
+            } else {
+                if (isPreviewChosen) {
+                    LOGGER.error("Preview is already in the list, something went wrong");
+                    continue;
+                }
+                isPreviewChosen = true;
+                chosenModel.addElement(Localization.lang("Preview"));
+            }
+        }
+
+        availableModel.clear();
+        if (!isPreviewChosen){
+            availableModel.addElement(Localization.lang("Preview"));
+        }
+
+        btnLeft.setEnabled(!chosen.isSelectionEmpty());
+        btnRight.setEnabled(!available.isSelectionEmpty());
+        btnUp.setEnabled(!chosen.isSelectionEmpty());
+        btnDown.setEnabled(!chosen.isSelectionEmpty());
+
+        if (discoverCitationStyleWorker != null){
+            discoverCitationStyleWorker.cancel(true);
+        }
+
+        discoverCitationStyleWorker = new SwingWorker<List<CitationStyle>, Void>() {
+            @Override
+            protected List<CitationStyle> doInBackground() throws Exception {
+                return CitationStyle.discoverCitationStyles();
+            }
+
+            @Override
+            public void done(){
+                if (this.isCancelled()) {
+                    return;
+                }
+                try {
+                    get().stream()
+                            .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilepath()))
+                            .sorted((style0, style1) -> style0.getTitle().compareTo(style1.getTitle()))
+                            .forEach(availableModel::addElement);
+
+                    btnRight.setEnabled(!availableModel.isEmpty());
+                } catch (InterruptedException | ExecutionException e) {
+                    LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ");
+                }
+            }
+        };
+        discoverCitationStyleWorker.execute();
+
+        layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
 
     @Override
     public void storeSettings() {
-        prefs.put(JabRefPreferences.PREVIEW_0, layout1.getText().replace("\n", "__NEWLINE__"));
-        prefs.put(JabRefPreferences.PREVIEW_1, layout2.getText().replace("\n", "__NEWLINE__"));
+        List<String> styles = new ArrayList<>();
+        Enumeration<Object> elements = chosenModel.elements();
+        while (elements.hasMoreElements()) {
+            Object obj = elements.nextElement();
+            if (obj instanceof CitationStyle) {
+                styles.add(((CitationStyle) obj).getFilepath());
+            } else if (obj instanceof String) {
+                styles.add("Preview");
+            }
+        }
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCycle(styles)
+                .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
+
+        // update preview
+        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+            basePanel.getPreviewPanel().updateLayout();
+        }
     }
 
     @Override
     public boolean validateSettings() {
-        return true;
+        return !chosenModel.isEmpty();
     }
 
     @Override

@@ -1,24 +1,9 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.StringInt;
 import net.sf.jabref.logic.util.strings.RtfCharMap;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
  *   5.) Replace --- by \emdash and -- by \endash.
  */
 public class RTFChars implements LayoutFormatter {
+
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
@@ -129,7 +115,7 @@ public class RTFChars implements LayoutFormatter {
 
                     // Then look for italics etc.,
                     // but first check if we are already at the end of the string.
-                    if (i >= field.length() - 1) {
+                    if (i >= (field.length() - 1)) {
                         break testContent;
                     }
 
@@ -170,7 +156,7 @@ public class RTFChars implements LayoutFormatter {
             if (c < 128) {
                 sb.append(c);
             } else {
-                sb.append("\\u").append((long) c).append('?');
+                sb.append("\\u").append((long) c).append(transformSpecialCharacter(c));
             }
         }
 
@@ -213,5 +199,149 @@ public class RTFChars implements LayoutFormatter {
         String res = part.toString();
         // the wrong "}" at the end is removed by "format(res)"
         return new StringInt(format(res), part.length());
+    }
+
+    /**
+     * This method transforms the unicode of a special character into its base character: 233 (é) - > e
+     * @param c long
+     * @return returns the basic character of the given unicode
+     */
+    private String transformSpecialCharacter(long c) {
+        if (((192 <= c) && (c <= 197)) || (c == 256) || (c == 258) || (c == 260)) {
+            return "A";
+        }
+        if (((224 <= c) && (c <= 229)) || (c == 257) || (c == 259) || (c == 261)) {
+            return "a";
+        }
+        if ((199 == c) || (262 == c) || (264 == c) || (266 == c) || (268 == c)) {
+            return "C";
+        }
+        if ((231 == c) || (263 == c) || (265 == c) || (267 == c) || (269 == c)) {
+            return "c";
+        }
+        if ((208 == c) || (272 == c)) {
+            return "D";
+        }
+        if ((240 == c) || (273 == c)) {
+            return "d";
+        }
+        if (((200 <= c) && (c <= 203)) || (274 == c) || (276 == c) || (278 == c) || (280 == c) || (282 == c)) {
+            return "E";
+        }
+        if (((232 <= c) && (c <= 235)) || (275 == c) || (277 == c) || (279 == c) || (281 == c) || (283 == c)) {
+            return "e";
+        }
+        if (((284 == c) || (286 == c)) || (288 == c) || (290 == c) || (330 == c)) {
+            return "G";
+        }
+        if ((285 == c) || (287 == c) || (289 == c) || (291 == c) || (331 == c)) {
+            return "g";
+        }
+        if ((292 == c) || (294 == c)) {
+            return "H";
+        }
+        if ((293 == c) || (295 == c)) {
+            return "h";
+        }
+        if (((204 <= c) && (c <= 207)) || (296 == c) || (298 == c) || (300 == c) || (302 == c) || (304 == c)) {
+            return "I";
+        }
+        if (((236 <= c) && (c <= 239)) || (297 == c) || (299 == c) || (301 == c) || (303 == c)) {
+            return "i";
+        }
+        if (308 == c) {
+            return "J";
+        }
+        if (309 == c) {
+            return "j";
+        }
+        if (310 == c) {
+            return "K";
+        }
+        if (311 == c) {
+            return "k";
+        }
+        if ((313 == c) || (315 == c) || (319 == c)) {
+            return "L";
+        }
+        if ((314 == c) || (316 == c) || (320 == c) || (322 == c)) {
+            return "l";
+        }
+        if ((209 == c) || (323 == c) || (325 == c) || (327 == c)) {
+            return "N";
+        }
+        if ((241 == c) || (324 == c) || (326 == c) || (328 == c)) {
+            return "n";
+        }
+        if (((210 <= c) && (c <= 214)) || (c == 216) || (332 == c) || (334 == c)) {
+            return "O";
+        }
+        if (((242 <= c) && (c <= 248) && (247 != c)) || (333 == c) || (335 == c)) {
+            return "o";
+        }
+        if ((340 == c) || (342 == c) || (344 == c)) {
+            return "R";
+        }
+        if ((341 == c) || (343 == c) || (345 == c)) {
+            return "r";
+        }
+        if ((346 == c) || (348 == c) || (350 == c) || (352 == c)) {
+            return "S";
+        }
+        if ((347 == c) || (349 == c) || (351 == c) || (353 == c)) {
+            return "s";
+        }
+        if ((354 == c) || (356 == c) || (358 == c)) {
+            return "T";
+        }
+        if ((355 == c) || (359 == c)) {
+            return "t";
+        }
+        if (((217 <= c) && (c <= 220)) || (360 == c) || (362 == c) || (364 == c) || (366 == c) || (370 == c)) {
+            return "U";
+        }
+        if (((249 <= c) && (c <= 251)) || (361 == c) || (363 == c) || (365 == c) || (367 == c) || (371 == c)) {
+            return "u";
+        }
+        if (372 == c) {
+            return "W";
+        }
+        if (373 == c) {
+            return "w";
+        }
+        if ((374 == c) || (376 == c) || (221 == c)) {
+            return "Y";
+        }
+        if ((375 == c) || (255 == c)) {
+            return "y";
+        }
+        if ((377 == c) || (379 == c) || (381 == c)) {
+            return "Z";
+        }
+        if ((378 == c) || (380 == c) || (382 == c)) {
+            return "z";
+        }
+        if (198 == c) {
+            return "AE";
+        }
+        if (230 == c) {
+            return "ae";
+        }
+        if (338 == c) {
+            return "OE";
+        }
+        if (339 == c) {
+            return "oe";
+        }
+        if (222 == c) {
+            return "TH";
+        }
+        if (223 == c) {
+            return "ss";
+        }
+        if (161 == c) {
+            return "!";
+        }
+        return "?";
     }
 }

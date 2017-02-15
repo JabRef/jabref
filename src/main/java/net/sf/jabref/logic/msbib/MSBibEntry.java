@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.msbib;
 
 import java.util.HashMap;
@@ -22,9 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.mods.PageNumbers;
-import net.sf.jabref.logic.mods.PersonName;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -39,6 +22,7 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
  */
 class MSBibEntry {
+
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
 
@@ -69,23 +53,40 @@ class MSBibEntry {
     public String publicationTitle;
     public String albumTitle;
     public String broadcastTitle;
+    public String year;
+    public String month;
+    public String day;
+    public String number;
+    public String patentNumber;
+    public String journalName;
 
-    // reduced subset, supports only "CITY , STATE, COUNTRY"
-    // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
-    // WORD SPACE , SPACE WORD SPACE , SPACE WORD
-    // tested using http://www.javaregex.com/test.html
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w+)\\s?[,]?\\s?(\\w+)\\b");
+    private String bibtexEntryType;
 
-    // Allows 20.3-2007|||20/3-  2007 etc.
-    // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
-    // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-    // tested using http://www.javaregex.com/test.html
-    private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+    /**
+     * reduced subset, supports only "CITY , STATE, COUNTRY" <br>
+     *  <b>\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b</b> <br>
+     *  WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
+     *  Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+     *  tested using http://www.regexpal.com/
+     */
+    private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
+
+    /**
+     * Allows 20.3-2007|||20/3-  2007 etc.
+     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
+     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
+     */
+    private static final Pattern DATE_PATTERN = Pattern
+            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
     public MSBibEntry() {
-
+        //empty
     }
 
+    /**
+     * Createa new {@link MsBibEntry} to import from an xml element
+     * @param entry
+     */
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }
@@ -114,6 +115,9 @@ class MSBibEntry {
                 String key = node.getLocalName();
                 String value = node.getTextContent();
 
+                if ("SourceType".equals(key)) {
+                    this.bibtexEntryType = value;
+                }
                 fields.put(key, value);
             }
         }
@@ -129,14 +133,17 @@ class MSBibEntry {
         String city = getXmlElementTextContent("City", entry);
         String state = getXmlElementTextContent("StateProvince", entry);
         String country = getXmlElementTextContent("CountryRegion", entry);
+
         StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
-            addressBuffer.append(city).append(", ");
+            addressBuffer.append(city);
         }
-        if (state != null) {
-            addressBuffer.append(state).append(' ');
+        if (((state != null) && !state.isEmpty()) && ((city != null) && !city.isEmpty())) {
+            addressBuffer.append(",").append(' ');
+            addressBuffer.append(state);
         }
-        if (country != null) {
+        if ((country != null) && !country.isEmpty()) {
+            addressBuffer.append(",").append(' ');
             addressBuffer.append(country);
         }
         address = addressBuffer.toString().trim();
@@ -144,21 +151,30 @@ class MSBibEntry {
             address = null;
         }
 
+        if ("Patent".equalsIgnoreCase(bibtexEntryType)) {
+            number = getXmlElementTextContent("PatentNumber", entry);
+        }
+        journalName = getXmlElementTextContent("JournalName", entry);
+        month = getXmlElementTextContent("Month", entry);
         internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
-        String month = getXmlElementTextContent("MonthAccessed", entry);
-        String day = getXmlElementTextContent("DayAccessed", entry);
-        String year = getXmlElementTextContent("YearAccessed", entry);
-        dateAccessed = "";
-        if (month != null) {
-            dateAccessed += month + ' ';
+
+        String monthAccessed = getXmlElementTextContent("MonthAccessed", entry);
+        String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
+        String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
+
+        StringBuilder sbDateAccesed = new StringBuilder();
+        if (monthAccessed != null) {
+            sbDateAccesed.append(monthAccessed);
+            sbDateAccesed.append(' ');
         }
-        if (day != null) {
-            dateAccessed += day + ", ";
+        if (dayAccessed != null) {
+            sbDateAccesed.append(dayAccessed);
+            sbDateAccesed.append(", ");
         }
-        if (year != null) {
-            dateAccessed += year;
+        if (yearAccessed != null) {
+            sbDateAccesed.append(yearAccessed);
         }
-        dateAccessed = dateAccessed.trim();
+        dateAccessed = sbDateAccesed.toString().trim();
         if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
             dateAccessed = null;
         }
@@ -223,7 +239,12 @@ class MSBibEntry {
         return result;
     }
 
-    public Element getDOM(Document document) {
+    /**
+     * Gets the dom representation for one entry, used for export
+     * @param document XmlDocument
+     * @return XmlElement represenation of one entry
+     */
+    public Element getEntryDom(Document document) {
         Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
         for (Map.Entry<String, String> entry : fields.entrySet()) {
@@ -263,6 +284,14 @@ class MSBibEntry {
         if (pages != null) {
             addField(document, rootNode, "Pages", pages.toString("-"));
         }
+        addField(document, rootNode, "Year", year);
+        addField(document, rootNode, "Month", month);
+
+        addField(document, rootNode, "JournalName", journalName);
+        addField(document, rootNode, "PatentNumber", patentNumber);
+
+        addField(document, rootNode, "Number", number);
+
         addField(document, rootNode, "StandardNumber", standardNumber);
         addField(document, rootNode, "ConferenceName", conferenceName);
 
@@ -301,22 +330,21 @@ class MSBibEntry {
             nameList.appendChild(person);
         }
         authorTop.appendChild(nameList);
-
         allAuthors.appendChild(authorTop);
     }
 
-    private void addAddress(Document document, Element parent, String address) {
-        if (address == null) {
+    private void addAddress(Document document, Element parent, String addressToSplit) {
+        if (addressToSplit == null) {
             return;
         }
 
-        Matcher matcher = ADDRESS_PATTERN.matcher(address);
+        Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);
         if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
         } else {
-            addField(document, parent, "City", address);
+            addField(document, parent, "City", addressToSplit);
         }
     }
 }

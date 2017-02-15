@@ -1,10 +1,6 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -15,11 +11,6 @@ import static org.junit.Assert.assertEquals;
 public class HtmlToLatexFormatterTest {
 
     private HtmlToLatexFormatter formatter;
-
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Before
     public void setUp() {

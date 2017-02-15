@@ -11,13 +11,12 @@ import java.util.function.Predicate;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-
+import net.sf.jabref.model.strings.StringUtil;
 
 public class BibEntryWriter {
 
@@ -130,7 +129,7 @@ public class BibEntryWriter {
     }
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getCiteKey());
+        String keyField = StringUtil.shaveString(entry.getCiteKeyOptional().orElse(""));
         out.write(keyField + ',' + OS.NEWLINE);
     }
 
@@ -143,7 +142,7 @@ public class BibEntryWriter {
      * @throws IOException In case of an IO error
      */
     private void writeField(BibEntry entry, Writer out, String name, int indentation) throws IOException {
-        Optional<String> field = entry.getFieldOptional(name);
+        Optional<String> field = entry.getField(name);
         // only write field if is is not empty
         // field.ifPresent does not work as an IOException may be thrown
         if (field.isPresent() && !field.get().trim().isEmpty()) {

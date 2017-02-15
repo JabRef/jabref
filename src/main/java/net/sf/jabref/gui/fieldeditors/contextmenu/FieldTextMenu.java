@@ -6,22 +6,28 @@ import java.awt.event.MouseListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.actions.CopyAction;
+import net.sf.jabref.gui.actions.CopyDoiUrlAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
     private final CopyAction copyAction;
     private final PasteAction pasteAction;
+    private final JMenuItem doiMenuItem;
+
+    private ProtectedTermsMenu protectedTermsMenu;
 
     private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
 
@@ -30,6 +36,8 @@ public class FieldTextMenu implements MouseListener {
         field = fieldComponent;
         copyAction = new CopyAction((JTextComponent) field);
         pasteAction = new PasteAction((JTextComponent) field);
+        CopyDoiUrlAction copyDoiAction = new CopyDoiUrlAction((JTextComponent) field);
+        doiMenuItem = new JMenuItem(copyDoiAction);
         initMenu();
     }
 
@@ -82,6 +90,15 @@ public class FieldTextMenu implements MouseListener {
                 pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
             }
             pasteAction.setEnabled(pasteStatus);
+            if (protectedTermsMenu != null) {
+                protectedTermsMenu.updateFiles();
+            }
+
+            boolean isDOIField = field.getFieldName().equals(FieldName.DOI);
+            doiMenuItem.setVisible(isDOIField);
+            boolean isDoiFieldEmpty = field.getText().isEmpty();
+            doiMenuItem.setEnabled(!isDoiFieldEmpty);
+
             inputMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
@@ -89,12 +106,18 @@ public class FieldTextMenu implements MouseListener {
     private void initMenu() {
         inputMenu.add(pasteAction);
         inputMenu.add(copyAction);
+        if (field.getTextComponent() instanceof JTextComponent) {
+            inputMenu.add(doiMenuItem);
+        }
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
 
         if (field.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
             inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
+            inputMenu.addSeparator();
+            protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
+            inputMenu.add(protectedTermsMenu);
         }
     }
 

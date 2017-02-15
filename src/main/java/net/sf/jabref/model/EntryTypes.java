@@ -1,5 +1,6 @@
 package net.sf.jabref.model;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
@@ -16,18 +19,18 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
 public class EntryTypes {
-
     /**
      * This class is used to specify entry types for either BIBTEX and BIBLATEX.
      */
     private static class InternalEntryTypes {
-
         private final Map<String, EntryType> ALL_TYPES = new TreeMap<>();
         private final Map<String, EntryType> STANDARD_TYPES;
         private final EntryType defaultType;
 
-        public InternalEntryTypes(EntryType defaultType, List<EntryType>... entryTypes) {
+
+        public InternalEntryTypes(EntryType defaultType, List<List<EntryType>> entryTypes) {
             this.defaultType = defaultType;
+
             for (List<EntryType> list : entryTypes) {
                 for (EntryType type : list) {
                     ALL_TYPES.put(type.getName().toLowerCase(), type);
@@ -95,8 +98,11 @@ public class EntryTypes {
 
     }
 
-    public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.MISC, BibtexEntryTypes.ALL, IEEETranEntryTypes.ALL);
-    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BibLatexEntryTypes.MISC, BibLatexEntryTypes.ALL);
+
+    public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.MISC,
+            Arrays.asList(BibtexEntryTypes.ALL, IEEETranEntryTypes.ALL));
+    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BibLatexEntryTypes.MISC,
+            Arrays.asList(BibLatexEntryTypes.ALL));
 
     /**
      * This method returns the BibtexEntryType for the name of a type,
@@ -123,13 +129,12 @@ public class EntryTypes {
         return mode == BibDatabaseMode.BIBLATEX ? BIBLATEX.getStandardType(name) : BIBTEX.getStandardType(name);
     }
 
-    public static void addOrModifyCustomEntryType(CustomEntryType customEntryType) {
-        addOrModifyEntryType(customEntryType);
-    }
-
-    private static void addOrModifyEntryType(EntryType name) {
-        BIBLATEX.addOrModifyEntryType(name);
-        BIBTEX.addOrModifyEntryType(name);
+    public static void addOrModifyCustomEntryType(CustomEntryType customEntryType, BibDatabaseMode mode) {
+        if(BibDatabaseMode.BIBLATEX == mode) {
+            BIBLATEX.addOrModifyEntryType(customEntryType);
+        } else if (BibDatabaseMode.BIBTEX == mode) {
+            BIBTEX.addOrModifyEntryType(customEntryType);
+        }
     }
 
     public static Set<String> getAllTypes(BibDatabaseMode type) {
@@ -138,6 +143,40 @@ public class EntryTypes {
 
     public static Collection<EntryType> getAllValues(BibDatabaseMode type) {
         return type == BibDatabaseMode.BIBLATEX ? BIBLATEX.getAllValues() : BIBTEX.getAllValues();
+    }
+
+    /**
+     * Determine all CustomTypes which are not overwritten standard types but real custom types for a given BibDatabaseMode
+     *
+     * I.e., a modified "article" type will not be included in the list, but an EntryType like "MyCustomType" will be included.
+     *
+     * @param mode the BibDatabaseMode to be checked
+     * @return  the list of all found custom types
+     */
+    public static List<EntryType> getAllCustomTypes(BibDatabaseMode mode) {
+        Collection<EntryType> allTypes = getAllValues(mode);
+        if(mode == BibDatabaseMode.BIBTEX) {
+            return allTypes.stream().filter(entryType -> !BibtexEntryTypes.getType(entryType.getName()).isPresent())
+                    .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
+                    .collect(Collectors.toList());
+        } else {
+            return allTypes.stream().filter(entryType -> !BibLatexEntryTypes.getType(entryType.getName()).isPresent())
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public static List<EntryType> getAllModifiedStandardTypes(BibDatabaseMode mode) {
+        if (mode == BibDatabaseMode.BIBTEX) {
+            return getAllModifiedStandardTypes(BIBTEX);
+        } else {
+            return getAllModifiedStandardTypes(BIBLATEX);
+        }
+    }
+
+    private static List<EntryType> getAllModifiedStandardTypes(InternalEntryTypes internalTypes) {
+        return internalTypes.getAllValues().stream().filter(type -> type instanceof CustomEntryType)
+                .filter(type -> internalTypes.getStandardType(type.getName()).isPresent())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -164,5 +203,50 @@ public class EntryTypes {
                 });
             }
         }
+    }
+
+    /**
+     * Load given custom entry types for BibTeX and BibLatex mode
+     */
+    public static void loadCustomEntryTypes(List<CustomEntryType> customBibtexEntryTypes, List<CustomEntryType> customBibLatexEntryTypes) {
+        for (CustomEntryType type : customBibtexEntryTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBTEX);
+        }
+
+        for (CustomEntryType type : customBibLatexEntryTypes) {
+            EntryTypes.addOrModifyCustomEntryType(type, BibDatabaseMode.BIBLATEX);
+        }
+    }
+
+    /**
+     * Checks whether two EntryTypes are equal or not based on the equality of the type names and on the equality of
+     * the required and optional field lists
+     *
+     * @param type1 the first EntryType to compare
+     * @param type2 the secend EntryType to compare
+     * @return returns true if the two compared entry types have the same name and equal required and optional fields
+     */
+    public static boolean isEqualNameAndFieldBased(EntryType type1, EntryType type2) {
+        if (type1 == null && type2 == null) {
+            return true;
+        } else if (type1 == null || type2 == null) {
+            return false;
+        } else
+            return type1.getName().equals(type2.getName())
+                    && type1.getRequiredFields().equals(type2.getRequiredFields())
+                    && type1.getOptionalFields().equals(type2.getOptionalFields())
+                    && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
+    }
+
+    public static boolean isExclusiveBibLatex(String type) {
+        return filterEntryTypesNames(BibLatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase());
+    }
+
+    private static List<String> filterEntryTypesNames(List<EntryType> types, Predicate<EntryType> predicate) {
+        return types.stream().filter(predicate).map(type -> type.getName().toLowerCase()).collect(Collectors.toList());
+    }
+
+    private static Predicate<EntryType> isNotIncludedIn(List<EntryType> collection) {
+        return entry -> collection.stream().noneMatch(c -> c.getName().equalsIgnoreCase(entry.getName()));
     }
 }

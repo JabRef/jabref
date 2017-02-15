@@ -8,10 +8,13 @@ import java.util.stream.Collectors;
  * Converts Entry models from BibTex to BibLaTex and back.
  */
 public class EntryConverter {
-    // BibTex to BibLatex
+
+    // BibTeX to BibLaTeX
     public static Map<String, String> FIELD_ALIASES_TEX_TO_LTX;
-    // BibLatex to BibTex
+
+    // BibLaTeX to BibTeX
     public static Map<String, String> FIELD_ALIASES_LTX_TO_TEX;
+
     // All aliases
     public static Map<String, String> FIELD_ALIASES;
 
@@ -36,4 +39,5 @@ public class EntryConverter {
         FIELD_ALIASES.putAll(EntryConverter.FIELD_ALIASES_TEX_TO_LTX);
         FIELD_ALIASES.putAll(EntryConverter.FIELD_ALIASES_LTX_TO_TEX);
     }
+
 }

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -22,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -43,21 +29,21 @@ import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.Dialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.importer.fileformat.ParseException;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.KeywordGroup;
-import net.sf.jabref.logic.groups.SearchGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.RegexKeywordGroup;
+import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.groups.WordKeywordGroup;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -68,7 +54,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends JDialog {
+class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -111,23 +97,18 @@ class GroupDialog extends JDialog {
             return d;
         }
     };
-
-    private boolean isOkPressed;
-
-    private AbstractGroup resultingGroup;
-
     private final CardLayout optionsLayout = new CardLayout();
+    private boolean isOkPressed;
+    private AbstractGroup resultingGroup;
 
     /**
      * Shows a group add/edit dialog.
      *
      * @param jabrefFrame The parent frame.
-     * @param basePanel   The default grouping field.
      * @param editedGroup The group being edited, or null if a new group is to be
      *                    created.
      */
-    public GroupDialog(JabRefFrame jabrefFrame, BasePanel basePanel,
-            AbstractGroup editedGroup) {
+    public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
         super(jabrefFrame, Localization.lang("Edit group"), true);
 
         // set default values (overwritten if editedGroup != null)
@@ -158,7 +139,6 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(keywordGroupSearchTerm);
-        builderKG.append(new FieldContentSelector(jabrefFrame, basePanel, this, keywordGroupSearchTerm, null, true, ", "));
         builderKG.nextLine();
         builderKG.append(keywordGroupCaseSensitive, 3);
         builderKG.nextLine();
@@ -280,27 +260,33 @@ class GroupDialog extends JDialog {
                 isOkPressed = true;
             try {
                 if (explicitRadioButton.isSelected()) {
-                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(), Globals.prefs);
+                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
+                            Globals.prefs.getKeywordDelimiter());
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    resultingGroup = new KeywordGroup(nameField.getText().trim(), keywordGroupSearchField.getText().trim(),
-                            keywordGroupSearchTerm.getText().trim(), keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp
-                            .isSelected(),
-                            getContext(), Globals.prefs);
+                    if (keywordGroupRegExp.isSelected()) {
+                        resultingGroup = new RegexKeywordGroup(nameField.getText().trim(), getContext(),
+                                keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                keywordGroupCaseSensitive.isSelected());
+                    } else {
+                        resultingGroup = new WordKeywordGroup(nameField.getText().trim(), getContext(),
+                                keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                                keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
+                    }
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(nameField.getText().trim(), searchGroupSearchExpression.getText().trim(),
-                                isCaseSensitive(), isRegex(), getContext());
+                        resultingGroup = new SearchGroup(nameField.getText().trim(), getContext(), searchGroupSearchExpression.getText().trim(),
+                                isCaseSensitive(), isRegex());
                     } catch (Exception e1) {
                         // should never happen
                     }
                 }
                 dispose();
-            } catch (ParseException exception) {
+            } catch (IllegalArgumentException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
             }
         });
@@ -318,13 +304,22 @@ class GroupDialog extends JDialog {
         searchGroupCaseSensitive.addItemListener(itemListener);
 
         // configure for current type
-        if ((editedGroup != null) && (editedGroup.getClass() == KeywordGroup.class)) {
-            KeywordGroup group = (KeywordGroup) editedGroup;
+        if ((editedGroup != null) && (editedGroup.getClass() == WordKeywordGroup.class)) {
+            WordKeywordGroup group = (WordKeywordGroup) editedGroup;
             nameField.setText(group.getName());
             keywordGroupSearchField.setText(group.getSearchField());
             keywordGroupSearchTerm.setText(group.getSearchExpression());
             keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
-            keywordGroupRegExp.setSelected(group.isRegExp());
+            keywordGroupRegExp.setSelected(false);
+            keywordsRadioButton.setSelected(true);
+            setContext(editedGroup.getHierarchicalContext());
+        } else if ((editedGroup != null) && (editedGroup.getClass() == RegexKeywordGroup.class)) {
+            RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
+            nameField.setText(group.getName());
+            keywordGroupSearchField.setText(group.getSearchField());
+            keywordGroupSearchTerm.setText(group.getSearchExpression());
+            keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
+            keywordGroupRegExp.setSelected(true);
             keywordsRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == SearchGroup.class)) {
@@ -332,7 +327,7 @@ class GroupDialog extends JDialog {
             nameField.setText(group.getName());
             searchGroupSearchExpression.setText(group.getSearchExpression());
             searchGroupCaseSensitive.setSelected(group.isCaseSensitive());
-            searchGroupRegExp.setSelected(group.isRegExp());
+            searchGroupRegExp.setSelected(group.isRegularExpression());
             searchRadioButton.setSelected(true);
             setContext(editedGroup.getHierarchicalContext());
         } else if ((editedGroup != null) && (editedGroup.getClass() == ExplicitGroup.class)) {
@@ -343,6 +338,36 @@ class GroupDialog extends JDialog {
             explicitRadioButton.setSelected(true);
             setContext(GroupHierarchyType.INDEPENDENT);
         }
+    }
+
+    public GroupDialog() {
+        this(JabRefGUI.getMainFrame(), null);
+    }
+
+    private static String formatRegExException(String regExp, Exception e) {
+        String[] sa = e.getMessage().split("\\n");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sa.length; ++i) {
+            if (i > 0) {
+                sb.append("<br>");
+            }
+            sb.append(StringUtil.quoteForHTML(sa[i]));
+        }
+        String s = Localization.lang(
+                "The regular expression <b>%0</b> is invalid:",
+                StringUtil.quoteForHTML(regExp))
+                + "<p><tt>"
+                + sb
+                + "</tt>";
+        if (!(e instanceof PatternSyntaxException)) {
+            return s;
+        }
+        int lastNewline = s.lastIndexOf("<br>");
+        int hat = s.lastIndexOf('^');
+        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
+            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
+        }
+        return s;
     }
 
     public boolean okPressed() {
@@ -382,14 +407,14 @@ class GroupDialog extends JDialog {
                 if (keywordGroupRegExp.isSelected()) {
                     try {
                         Pattern.compile(s2);
-                        setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
+                        setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
                                 keywordGroupRegExp.isSelected()));
                     } catch (PatternSyntaxException e) {
                         okEnabled = false;
                         setDescription(formatRegExException(s2, e));
                     }
                 } else {
-                    setDescription(KeywordGroup.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
+                    setDescription(GroupDescriptions.getDescriptionForPreview(s1, s2, keywordGroupCaseSensitive.isSelected(),
                             keywordGroupRegExp.isSelected()));
                 }
             } else {
@@ -420,7 +445,7 @@ class GroupDialog extends JDialog {
             }
             setNameFontItalic(true);
         } else if (explicitRadioButton.isSelected()) {
-            setDescription(ExplicitGroup.getDescriptionForPreview());
+            setDescription(GroupDescriptions.getDescriptionForPreview());
             setNameFontItalic(false);
         }
         okButton.setEnabled(okEnabled);
@@ -436,32 +461,6 @@ class GroupDialog extends JDialog {
 
     private void setDescription(String description) {
         descriptionLabel.setText("<html>" + description + "</html>");
-    }
-
-    private static String formatRegExException(String regExp, Exception e) {
-        String[] sa = e.getMessage().split("\\n");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < sa.length; ++i) {
-            if (i > 0) {
-                sb.append("<br>");
-            }
-            sb.append(StringUtil.quoteForHTML(sa[i]));
-        }
-        String s = Localization.lang(
-                "The regular expression <b>%0</b> is invalid:",
-                StringUtil.quoteForHTML(regExp))
-                + "<p><tt>"
-                + sb
-                + "</tt>";
-        if (!(e instanceof PatternSyntaxException)) {
-            return s;
-        }
-        int lastNewline = s.lastIndexOf("<br>");
-        int hat = s.lastIndexOf('^');
-        if ((lastNewline >= 0) && (hat >= 0) && (hat > lastNewline)) {
-            return s.substring(0, lastNewline + 4) + s.substring(lastNewline + 4).replace(" ", "&nbsp;");
-        }
-        return s;
     }
 
     /**
@@ -498,6 +497,17 @@ class GroupDialog extends JDialog {
             unionButton.setSelected(true);
         } else {
             independentButton.setSelected(true);
+        }
+    }
+
+    @Override
+    public Optional<AbstractGroup> showAndWait() {
+        this.setVisible(true);
+        if (this.okPressed()) {
+            AbstractGroup newGroup = getResultingGroup();
+            return Optional.of(newGroup);
+        } else {
+            return Optional.empty();
         }
     }
 }

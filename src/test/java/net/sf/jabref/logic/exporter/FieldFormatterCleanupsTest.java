@@ -5,18 +5,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,13 +24,6 @@ public class FieldFormatterCleanupsTest {
 
     private BibEntry entry;
 
-
-    @BeforeClass
-    public static void setUpPreferences() {
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-    }
 
     @Before
     public void setUp() {
@@ -51,44 +43,44 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void checkSimpleUseCase() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[identity]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[identity]"));
 
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
         assertEquals(Collections.singletonList(identityInTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getField("title"));
     }
 
     @Test
     public void invalidSaveActionSting() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title"));
 
         assertEquals(Collections.emptyList(), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getField("title"));
     }
 
     @Test
     public void checkLowerCaseSaveAction() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         assertEquals(Collections.singletonList(lowerCaseTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
     public void checkTwoSaveActionsForOneField() {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case,identity]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
@@ -96,13 +88,13 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
     public void checkThreeSaveActionsForOneField() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity,normalize_date]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case,identity,normalize_date]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
@@ -111,13 +103,13 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
     public void checkMultipleSaveActions() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[normalize_page_numbers]title[lower_case]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("pages[normalize_page_numbers]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
@@ -126,15 +118,15 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
-        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
+        assertEquals(Optional.of("1--7"), entry.getField("pages"));
     }
 
     @Test
     public void checkMultipleSaveActionsWithMultipleFormatters() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
-                "pages[normalize_page_numbers,normalize_date]title[lower_case]");
+                Cleanups.parse("pages[normalize_page_numbers,normalize_date]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
@@ -144,15 +136,15 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
-        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
+        assertEquals(Optional.of("1--7"), entry.getField("pages"));
     }
 
     @Test
     public void clearFormatterRemovesField() {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[clear]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("mont[clear]"));
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.empty(), entry.getFieldOptional("mont"));
+        assertEquals(Optional.empty(), entry.getField("mont"));
     }
 }

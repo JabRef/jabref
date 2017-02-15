@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +23,15 @@ import org.apache.commons.logging.LogFactory;
  * LaTeX Aux to BibTeX Parser
  * <p>
  * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file.
+ * Also supports nested AUX files (latex \\include).
+ *
+ * There exists no specification of the AUX file.
+ * Every package, class or document can write to the AUX file.
+ * The AUX file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
+ *
+ * BibTeX citation: \citation{x,y,z}
+ * Biblatex citation: \abx@aux@cite{x,y,z}
+ * Nested AUX files: \@input{x}
  */
 public class AuxParser {
     private static final Log LOGGER = LogFactory.getLog(AuxParser.class);
@@ -54,18 +62,6 @@ public class AuxParser {
         return parseAuxFile();
     }
 
-    /*
-     * Parses the AUX file and extracts all BIB keys.
-     * Also supports nested AUX files (latex \\include).
-     *
-     * There exists no specification of the AUX file.
-     * Every package, class or document can write to the AUX file.
-     * The AUX file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
-     *
-     * BibTeX citation: \citation{x,y,z}
-     * Biblatex citation: \abx@aux@cite{x,y,z}
-     * Nested AUX files: \@input{x}
-     */
     private AuxParserResult parseAuxFile() {
         AuxParserResult result = new AuxParserResult(masterDatabase);
 
@@ -82,33 +78,8 @@ public class AuxParser {
                 String line;
 
                 while ((line = br.readLine()) != null) {
-                    Matcher citeMatch = CITE_PATTERN.matcher(line);
-
-                    while (citeMatch.find()) {
-                        String keyString = citeMatch.group(2);
-                        String[] keys = keyString.split(",");
-
-                        for (String key : keys) {
-                            result.getUniqueKeys().add(key.trim());
-                        }
-                    }
-
-                    Matcher inputMatch = INPUT_PATTERN.matcher(line);
-
-                    while (inputMatch.find()) {
-                        String inputString = inputMatch.group(1);
-
-                        String inputFile = inputString;
-                        Path rootPath = new File(auxFile).toPath().getParent();
-                        if (rootPath != null) {
-                            inputFile = rootPath.resolve(inputString).toString();
-                        }
-
-                        if (!fileList.contains(inputFile)) {
-                            fileList.add(inputFile);
-                            result.increaseNestedAuxFilesCounter();
-                        }
-                    }
+                    matchCitation(result, line);
+                    matchNestedAux(result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
                 LOGGER.info("Cannot locate input file", e);
@@ -123,6 +94,38 @@ public class AuxParser {
         return result;
     }
 
+    private void matchNestedAux(AuxParserResult result, List<String> fileList, String line) {
+        Matcher inputMatch = INPUT_PATTERN.matcher(line);
+
+        while (inputMatch.find()) {
+            String inputString = inputMatch.group(1);
+
+            String inputFile = inputString;
+            Path rootPath = new File(auxFile).toPath().getParent();
+            if (rootPath != null) {
+                inputFile = rootPath.resolve(inputString).toString();
+            }
+
+            if (!fileList.contains(inputFile)) {
+                fileList.add(inputFile);
+                result.increaseNestedAuxFilesCounter();
+            }
+        }
+    }
+
+    private void matchCitation(AuxParserResult result, String line) {
+        Matcher citeMatch = CITE_PATTERN.matcher(line);
+
+        while (citeMatch.find()) {
+            String keyString = citeMatch.group(2);
+            String[] keys = keyString.split(",");
+
+            for (String key : keys) {
+                result.getUniqueKeys().add(key.trim());
+            }
+        }
+    }
+
     /*
      * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
      */
@@ -130,7 +133,9 @@ public class AuxParser {
         for (String key : result.getUniqueKeys()) {
             Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
-            if (entry.isPresent()) {
+            if(result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
+                // do nothing, key has already been processed
+            } else if (entry.isPresent()) {
                 insertEntry(entry.get(), result);
                 resolveCrossReferences(entry.get(), result);
             } else {
@@ -149,8 +154,8 @@ public class AuxParser {
      * Resolves and adds CrossRef entries
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
-        entry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
-            if (!result.getUniqueKeys().contains(crossref)) {
+        entry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
+            if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
                 if (refEntry.isPresent()) {
@@ -168,7 +173,6 @@ public class AuxParser {
      */
     private void insertEntry(BibEntry entry, AuxParserResult result) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        clonedEntry.setId(IdGenerator.next());
         result.getGeneratedBibDatabase().insertEntry(clonedEntry);
     }
 }

@@ -1,19 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.gui;
 
 import java.awt.Color;
@@ -37,6 +21,10 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import javafx.scene.Node;
+import javafx.scene.image.Image;
+import javafx.scene.text.Text;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,9 +32,9 @@ public class IconTheme {
 
     public static Font FONT;
     public static Font FONT_16;
+    public static javafx.scene.text.Font FX_FONT;
 
     /* Colors */
-
     // JabRef's default colors
     public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
     public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
@@ -55,7 +43,6 @@ public class IconTheme {
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
 
-
     public static final int DEFAULT_SIZE = 24;
     public static final int SMALL_SIZE = 16;
 
@@ -63,13 +50,15 @@ public class IconTheme {
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
 
-
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
 
     static {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
+            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+                FX_FONT = javafx.scene.text.Font.loadFont(stream2, DEFAULT_SIZE);
+            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
@@ -165,12 +154,16 @@ public class IconTheme {
         FILE_MULTIPLE("\uf222"), /*css: file-multiple */
         KEY_BINDINGS("\uf30c"), /*css: keyboard */
         FIND_DUPLICATES("\uf16b"), /*css: code-equal */
-
+        PULL("\uf4c2"), /*source-pull*/
         OPEN_IN_NEW_WINDOW("\uf3cc"), /*css: open-in-new */
         CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
         REG_EX("\uf451"), /*css: mdi-regex */
         CONSOLE("\uf18d"), /*css: console */
-        FORUM("\uF28C"), /* css: forum */
+        FORUM("\uf28c"), /* css: forum */
+        FACEBOOK("\uf20c"), /* css: facebook */
+        BLOG("\uf46b"), /* css: rss */
+        GLOBAL_SEARCH("\uF1E7"), /* css: earth */
+        DATE_PICKER("\uF0ED;"), /* css: calendar */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 
@@ -192,6 +185,12 @@ public class IconTheme {
 
         public FontBasedIcon getSmallIcon() {
             return new FontBasedIcon(this.code, this.color, IconTheme.SMALL_SIZE);
+        }
+
+        public Node getGraphicNode() {
+            Text graphic = new Text(this.code);
+            graphic.getStyleClass().add("icon");
+            return graphic;
         }
 
         public String getCode() {
@@ -271,6 +270,22 @@ public class IconTheme {
     public static ImageIcon getImage(String name) {
         return new ImageIcon(getIconUrl(name));
     }
+
+    public static Image getJabRefImageFX() {
+        return getImageFX("jabrefIcon48");
+    }
+
+    /**
+     * Constructs an {@link Image} for the image representing the given function, in the resource
+     * file listing images.
+     *
+     * @param name The name of the icon, such as "open", "save", "saveAs" etc.
+     * @return The {@link Image} for the function.
+     */
+    public static Image getImageFX(String name) {
+        return new Image(getIconUrl(name).toString());
+    }
+
 
     /**
      * Looks up the URL for the image representing the given function, in the resource

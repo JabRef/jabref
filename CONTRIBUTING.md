@@ -1,5 +1,5 @@
 ## Understanding the basics
-We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch - not master**, and create a pull request.
+We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
 Be sure to create a **separate branch** for each improvement you implement.
 Take a look at GitHub's excellent [help documentation] for a detailed explanation.
 
@@ -8,7 +8,7 @@ We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) an
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.
 
-In case you have any questions, you can use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
+In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
 
 
 ## Formal requirements for a pull request
@@ -19,7 +19,6 @@ Nevertheless we aim to keep the code consistently formatted, therefore we additi
 ### Ensure consistent formatting
 Ensure your code is formatted according the JabRef formatting guidelines.
 When you use Eclipse, the required configuration is generated automatically by `gradlew cleanEclipse eclipse`.
-You can also run `gradlew format` to let the [Gradle Format plugin](https://github.com/youribonnaffe/gradle-format-plugin) do the formatting.
 
 
 ### Add your change to CHANGELOG.md
@@ -27,6 +26,17 @@ You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory o
 Add a line with your changes in the appropriate section.
 
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
+
+
+#### Key format
+Example: `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`
+
+In case you add keys to the changelog, please follow these rules:
+
+- `<kbd>` tag for each key
+- First letter of key capitalized
+- Combined keys separated by `+`
+- Spaces before and after separator `+`
 
 
 ### Author credits
@@ -39,25 +49,10 @@ Please make sure there are no duplicates or alternate spellings of your name lis
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
 More information on this can be found via `man git-shortlog`.
 
-
-### Modify the header
-The headers of each `.java` file states "JabRef contributors".
-Author credits are given using the `AUTHORS` file and by using the `git blame` functionality.
-
-For instance,
-
-```plain
-/*  Copyright (C) 2003-2011 JabRef contributors.
-```
-
-gets
-
-```plain
-/*  Copyright (C) 2003-2016 JabRef contributors.
-```
-
 Please, **do not add yourself at `@authors`**.
-We have track this information in the header only.
+The contribution information is tracked via the version control system.
+
+Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 
 
 ### Write a good commit message
@@ -96,14 +91,14 @@ because <additional rationale>.
 
 
 ### When adding a new Localization.lang entry
-Add new Localization.lang("KEY") to Java file.
+Add new `Localization.lang("KEY")` to Java file.
 Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
+With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
 Tests are green again.
 
 You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
-Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly)
+Find more information in the [JabRef Wiki](https://github.com/JabRef/jabref/wiki/Code-Howtos#using-localization-correctly).
 
 
 ### Create a pull request
@@ -115,4 +110,4 @@ You can add the prefix `[WIP]` to indicate that the pull request is not yet comp
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[help documentation]: https://help.github.com/articles/using-pull-requests/
+[help documentation]: https://help.github.com/articles/about-pull-requests/

@@ -1,22 +1,8 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.push;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -66,7 +52,7 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
         // If required, check that all entries have BibTeX keys defined:
         if (operation.requiresBibtexKeys()) {
             for (BibEntry entry : entries) {
-                if ((entry.getCiteKey() == null) || entry.getCiteKey().trim().isEmpty()) {
+                if (!(entry.getCiteKeyOptional().isPresent()) || entry.getCiteKeyOptional().get().trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
                                     .lang("This operation requires all selected entries to have BibTeX keys defined."),
@@ -91,19 +77,20 @@ class PushToApplicationAction extends AbstractAction implements Runnable {
 
     private static String getKeyString(List<BibEntry> bibentries) {
         StringBuilder result = new StringBuilder();
-        String citeKey;
+        Optional<String> citeKey;
         boolean first = true;
         for (BibEntry bes : bibentries) {
-            citeKey = bes.getCiteKey();
+            citeKey = bes.getCiteKeyOptional();
             // if the key is empty we give a warning and ignore this entry
-            if ((citeKey == null) || citeKey.isEmpty()) {
+            // TODO: Give warning
+            if (!(citeKey.isPresent()) || citeKey.get().isEmpty()) {
                 continue;
             }
             if (first) {
-                result.append(citeKey);
+                result.append(citeKey.get());
                 first = false;
             } else {
-                result.append(',').append(citeKey);
+                result.append(',').append(citeKey.get());
             }
         }
         return result.toString();

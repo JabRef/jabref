@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.collab;
 
 import java.io.File;
@@ -32,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
  * in the file's last modification time stamp. The
  */
 public class FileUpdateMonitor implements Runnable {
-
     private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
@@ -76,7 +60,7 @@ public class FileUpdateMonitor implements Runnable {
         }
         numberOfUpdateListener++;
         String key = String.valueOf(numberOfUpdateListener);
-        entries.put(key, new Entry(ul, file));
+        entries.put(key, new Entry(ul, file.toPath()));
         return key;
     }
 
@@ -122,7 +106,11 @@ public class FileUpdateMonitor implements Runnable {
     public void updateTimeStamp(String key) {
         Entry entry = entries.get(key);
         if (entry != null) {
-            entry.updateTimeStamp();
+            try {
+                entry.updateTimeStamp();
+            } catch (IOException e) {
+                LOGGER.error("Couldn't update timestamp", e);
+            }
         }
     }
 
@@ -148,17 +136,17 @@ public class FileUpdateMonitor implements Runnable {
     static class Entry {
 
         private final FileUpdateListener listener;
-        private final File file;
+        private final Path file;
         private final Path tmpFile;
         private long timeStamp;
         private long fileSize;
 
 
-        public Entry(FileUpdateListener ul, File f) {
+        public Entry(FileUpdateListener ul, Path f) throws IOException {
             listener = ul;
             file = f;
-            timeStamp = file.lastModified();
-            fileSize = file.length();
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
+            fileSize = Files.size(file);
             tmpFile = FileUpdateMonitor.getTempFile();
             if (tmpFile != null) {
                 tmpFile.toFile().deleteOnExit();
@@ -172,42 +160,37 @@ public class FileUpdateMonitor implements Runnable {
          * @return boolean true if the file has changed.
          */
         public boolean hasBeenUpdated() throws IOException {
-            long modified = file.lastModified();
+            long modified = Files.getLastModifiedTime(file).toMillis();
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            long fileSizeNow = file.length();
+            long fileSizeNow = Files.size(file);
             return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
-        public void updateTimeStamp() {
-            timeStamp = file.lastModified();
+        public void updateTimeStamp() throws IOException {
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
             if (timeStamp == 0L) {
                 notifyFileRemoved();
             }
-            fileSize = file.length();
+            fileSize = Files.size(file);
 
             copy();
         }
 
         public boolean copy() {
 
-            boolean res = false;
-            try {
-                res = FileUtil.copyFile(file, tmpFile.toFile(), true);
-            } catch (IOException ex) {
-                LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
-            }
-            return res;
+          return FileUtil.copyFile(file, tmpFile, true);
+          
         }
 
         /**
          * Call the listener method to signal that the file has changed.
          */
-        public void notifyListener() {
+        public void notifyListener() throws IOException {
             // Update time stamp.
-            timeStamp = file.lastModified();
-            fileSize = file.length();
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
+            fileSize = Files.size(file);
             listener.fileUpdated();
         }
 

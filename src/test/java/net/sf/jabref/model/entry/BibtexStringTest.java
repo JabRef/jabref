@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class BibtexStringTest {
@@ -36,4 +37,9 @@ public class BibtexStringTest {
 
     }
 
+    @Test
+    public void getContentNeverReturnsNull() {
+        BibtexString bs = new BibtexString("ID", "SomeName", null);
+        assertNotNull(bs.getContent());
+    }
 }

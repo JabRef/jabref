@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Color;
@@ -23,19 +8,14 @@ import java.util.Map;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
-
     private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
@@ -58,7 +37,7 @@ public class GUIGlobals {
     static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
-    public static Color activeBackground;
+    public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;
     public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
     public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
@@ -66,10 +45,7 @@ public class GUIGlobals {
     public static final int WIDTH_ICON_COL = 26;
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
-    static {
-        // Set up entry editor colors, first time:
-        GUIGlobals.updateEntryEditorColors();
-    }
+    public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
     public static JLabel getTableIcon(String fieldType) {
         JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
@@ -82,7 +58,7 @@ public class GUIGlobals {
     }
 
     public static void updateEntryEditorColors() {
-        GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
+        GUIGlobals.activeBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
         GUIGlobals.validFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR);
         GUIGlobals.invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR);
         GUIGlobals.editorTextColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR);
@@ -133,37 +109,50 @@ public class GUIGlobals {
             GUIGlobals.TABLE_ICONS.put(fileType.getName(), label);
         }
 
-        label = new JLabel(Relevance.getInstance().getRepresentingIcon());
-        label.setToolTipText(Relevance.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, label);
+        SpecialFieldViewModel relevanceViewModel = new SpecialFieldViewModel(SpecialField.RELEVANCE);
+        label = new JLabel(relevanceViewModel.getRepresentingIcon());
+        label.setToolTipText(relevanceViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.RELEVANCE.getFieldName(), label);
 
-        label = new JLabel(Quality.getInstance().getRepresentingIcon());
-        label.setToolTipText(Quality.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_QUALITY, label);
+        SpecialFieldViewModel qualityViewModel = new SpecialFieldViewModel(SpecialField.QUALITY);
+        label = new JLabel(qualityViewModel.getRepresentingIcon());
+        label.setToolTipText(qualityViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.QUALITY.getFieldName(), label);
 
         // Ranking item in the menu uses one star
-        label = new JLabel(Rank.getInstance().getRepresentingIcon());
-        label.setToolTipText(Rank.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RANKING, label);
+        SpecialFieldViewModel rankViewModel = new SpecialFieldViewModel(SpecialField.RANKING);
+        label = new JLabel(rankViewModel.getRepresentingIcon());
+        label.setToolTipText(rankViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.RANKING.getFieldName(), label);
 
         // Priority icon used for the menu
-        label = new JLabel(Priority.getInstance().getRepresentingIcon());
-        label.setToolTipText(Priority.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, label);
+        SpecialFieldViewModel priorityViewModel = new SpecialFieldViewModel(SpecialField.PRIORITY);
+        label = new JLabel(priorityViewModel.getRepresentingIcon());
+        label.setToolTipText(priorityViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.PRIORITY.getFieldName(), label);
 
         // Read icon used for menu
-        label = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
-        label.setToolTipText(ReadStatus.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_READ, label);
+        SpecialFieldViewModel readViewModel = new SpecialFieldViewModel(SpecialField.READ_STATUS);
+        label = new JLabel(readViewModel.getRepresentingIcon());
+        label.setToolTipText(readViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.READ_STATUS.getFieldName(), label);
 
         // Print icon used for menu
-        label = new JLabel(Printed.getInstance().getRepresentingIcon());
-        label.setToolTipText(Printed.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRINTED, label);
+        SpecialFieldViewModel printedViewModel = new SpecialFieldViewModel(SpecialField.PRINTED);
+        label = new JLabel(printedViewModel.getRepresentingIcon());
+        label.setToolTipText(printedViewModel.getLocalization());
+        GUIGlobals.TABLE_ICONS.put(SpecialField.PRINTED.getFieldName(), label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             EmacsKeyBindings.load();
         }
+
+        // Set up entry editor colors, first time:
+        GUIGlobals.updateEntryEditorColors();
+
+        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
+                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+
     }
 
 }

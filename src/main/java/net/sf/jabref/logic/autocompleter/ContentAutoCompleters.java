@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.metadata.MetaData;
 
 public class ContentAutoCompleters extends AutoCompleters {
 
@@ -23,10 +23,9 @@ public class ContentAutoCompleters extends AutoCompleters {
             AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(field);
             put(field, autoCompleter);
         }
+        addContentSelectorValuesToAutoCompleters(metaData);
 
         addDatabase(database);
-
-        addContentSelectorValuesToAutoCompleters(metaData);
     }
 
     /**
@@ -36,7 +35,7 @@ public class ContentAutoCompleters extends AutoCompleters {
     public void addContentSelectorValuesToAutoCompleters(MetaData metaData) {
         for (Map.Entry<String, AutoCompleter<String>> entry : this.autoCompleters.entrySet()) {
             AutoCompleter<String> ac = entry.getValue();
-            metaData.getContentSelectors(entry.getKey()).forEach(ac::addItemToIndex);
+            metaData.getContentSelectorValuesForField(entry.getKey()).forEach(ac::addItemToIndex);
         }
     }
 }

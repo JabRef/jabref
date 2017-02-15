@@ -1,73 +1,96 @@
-/*  Copyright (C) 2003-2011 Raik Nagel
- * 2016 JabRef Contributors
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-// function : wrapper and service class for the DatePicker handling at the
-//            EntryEditor
-
 package net.sf.jabref.gui.date;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.preferences.JabRefPreferences;
 
-import com.michaelbaranov.microba.calendar.DatePicker;
+import com.github.lgooddatepicker.components.DatePicker;
+import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.github.lgooddatepicker.optionalusertools.DateChangeListener;
+import com.github.lgooddatepicker.zinternaltools.DateChangeEvent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class DatePickerButton implements ActionListener {
+/**
+ * wrapper and service class for the DatePicker handling at the EntryEditor
+ */
+public class DatePickerButton implements DateChangeListener {
 
-    private final DatePicker datePicker = new DatePicker();
+    private static final Log LOGGER = LogFactory.getLog(DatePickerButton.class);
+
+    private final DatePicker datePicker;
     private final JPanel panel = new JPanel();
     private final FieldEditor editor;
-    private final boolean isoFormat;
+    private final DateTimeFormatter dateTimeFormatter;
 
 
-    public DatePickerButton(FieldEditor pEditor, Boolean isoFormat) {
-        this.isoFormat = isoFormat;
-        datePicker.showButtonOnly(true);
-        datePicker.addActionListener(this);
-        datePicker.setShowTodayButton(true);
+    public DatePickerButton(FieldEditor pEditor, boolean useIsoFormat) {
+        if (useIsoFormat) {
+            dateTimeFormatter = DateTimeFormatter.ISO_DATE;
+        } else {
+            dateTimeFormatter = DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT));
+        }
+
+        // Create a date picker with hidden text field (showing button only).
+        DatePickerSettings dateSettings = new DatePickerSettings();
+        dateSettings.setVisibleDateTextField(false);
+        dateSettings.setGapBeforeButtonPixels(0);
+
+        datePicker = new DatePicker(dateSettings);
+        datePicker.addDateChangeListener(this);
+        datePicker.getComponentToggleCalendarButton().setIcon(IconTheme.JabRefIcon.DATE_PICKER.getIcon());
+        datePicker.getComponentToggleCalendarButton().setText("");
+
         panel.setLayout(new BorderLayout());
         panel.add(datePicker, BorderLayout.WEST);
         editor = pEditor;
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        Date date = datePicker.getDate();
+    public void dateChanged(DateChangeEvent dateChangeEvent) {
+        LocalDate date = datePicker.getDate();
+        String newDate = "";
         if (date != null) {
-            if (isoFormat) {
-                editor.setText(EasyDateFormat.isoDateFormat().getDateAt(date));
-            } else {
-                editor.setText(EasyDateFormat.fromPreferences(Globals.prefs).getDateAt(date));
-            }
-            // Set focus to editor component after changing its text:
-            new FocusRequester(editor.getTextComponent());
+            newDate = dateTimeFormatter.format(date.atStartOfDay());
         }
+        if (!newDate.equals(editor.getText())) {
+            editor.setText(newDate);
+        }
+        // Set focus to editor component after changing its text:
+        editor.getTextComponent().requestFocus();
     }
 
     public JComponent getDatePicker() {
         //return datePicker;
         return panel;
+    }
+
+    /**
+     * Used to set the calender popup to the currently used Date
+     * @param dateString
+     */
+    public void updateDatePickerDate(String dateString) {
+        // unregister DateChangeListener before update to prevent circular calls resulting in IllegalStateExceptions
+        datePicker.removeDateChangeListener(this);
+
+        if(dateString!=null && !dateString.isEmpty()) {
+            try {
+                datePicker.setDate(LocalDate.parse(dateString, dateTimeFormatter));
+            } catch (DateTimeParseException exception) {
+                LOGGER.warn("Unable to parse stored date for field '"+editor.getFieldName()+"' with current settings. "
+                        + "Clear button in calender popup will not work.");
+            }
+        }
+
+        datePicker.addDateChangeListener(this);
     }
 }

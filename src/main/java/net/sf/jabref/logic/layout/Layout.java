@@ -1,28 +1,11 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -100,21 +83,17 @@ public class Layout {
         }
     }
 
-    public String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, Optional.empty());
-    }
-
     /**
      * Returns the processed bibtex entry. If the database argument is
      * null, no string references will be resolved. Otherwise all valid
      * string references will be replaced by the strings' contents. Even
      * recursive string references are resolved.
      */
-    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         StringBuilder sb = new StringBuilder(100);
 
         for (LayoutEntry layoutEntry : layoutEntries) {
-            String fieldText = layoutEntry.doLayout(bibtex, database, highlightPattern);
+            String fieldText = layoutEntry.doLayout(bibtex, database);
 
             // 2005.05.05 M. Alver
             // The following change means we treat null fields as "". This is to fix the

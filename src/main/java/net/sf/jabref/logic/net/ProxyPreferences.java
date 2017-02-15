@@ -2,8 +2,6 @@ package net.sf.jabref.logic.net;
 
 import java.util.Objects;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class ProxyPreferences {
 
     private final Boolean useProxy;
@@ -45,25 +43,6 @@ public class ProxyPreferences {
 
     public final String getPassword() {
         return password;
-    }
-
-    public void storeInPreferences(JabRefPreferences preferences) {
-        preferences.putBoolean(JabRefPreferences.PROXY_USE, isUseProxy());
-        preferences.put(JabRefPreferences.PROXY_HOSTNAME, getHostname());
-        preferences.put(JabRefPreferences.PROXY_PORT, getPort());
-        preferences.putBoolean(JabRefPreferences.PROXY_USE_AUTHENTICATION, isUseAuthentication());
-        preferences.put(JabRefPreferences.PROXY_USERNAME, getUsername());
-        preferences.put(JabRefPreferences.PROXY_PASSWORD, getPassword());
-    }
-
-    public static ProxyPreferences loadFromPreferences(JabRefPreferences preferences) {
-        Boolean useProxy = preferences.getBoolean(JabRefPreferences.PROXY_USE);
-        String hostname = preferences.get(JabRefPreferences.PROXY_HOSTNAME);
-        String port = preferences.get(JabRefPreferences.PROXY_PORT);
-        Boolean useAuthentication = preferences.getBoolean(JabRefPreferences.PROXY_USE_AUTHENTICATION);
-        String username = preferences.get(JabRefPreferences.PROXY_USERNAME);
-        String password = preferences.get(JabRefPreferences.PROXY_PASSWORD);
-        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
     }
 
     @Override

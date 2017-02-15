@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
@@ -46,30 +31,31 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -94,7 +80,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    private OOPanel comp;
+    private OpenOfficeSidePanel sidePane;
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -113,7 +99,6 @@ public class OpenOfficePanel extends AbstractWorker {
             HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
-    private SidePaneManager manager;
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
@@ -123,10 +108,8 @@ public class OpenOfficePanel extends AbstractWorker {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    private static OpenOfficePanel instance;
 
-
-    private OpenOfficePanel() {
+    public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         connect = new JButton(connectImage);
@@ -144,37 +127,13 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);
         loader = new StyleLoader(preferences,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
-    }
 
-    public static OpenOfficePanel getInstance() {
-        if (OpenOfficePanel.instance == null) {
-            OpenOfficePanel.instance = new OpenOfficePanel();
-        }
-        return OpenOfficePanel.instance;
-    }
-
-    public SidePaneComponent getSidePaneComponent() {
-        return comp;
-    }
-
-    public void init(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         this.frame = jabRefFrame;
-        this.manager = spManager;
-        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
+        sidePane = new OpenOfficeSidePanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", preferences);
         initPanel();
-        spManager.register(getName(), comp);
-    }
-
-    public JMenuItem getMenuItem() {
-        if (preferences.showPanel()) {
-            manager.show(getName());
-        }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
-                IconTheme.getImage("openoffice"));
-        item.addActionListener(event -> manager.show(getName()));
-        return item;
+        spManager.register(sidePane);
     }
 
     private void initPanel() {
@@ -337,7 +296,7 @@ public class OpenOfficePanel extends AbstractWorker {
         mainBuilder.add(settingsB).xy(1, 10);
 
         JPanel content = new JPanel();
-        comp.setContentContainer(content);
+        sidePane.setContentContainer(content);
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
@@ -368,8 +327,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         Localization.lang("Unable to generate new database"), JOptionPane.ERROR_MESSAGE);
             }
 
-            Defaults defaults = new Defaults(
-                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+            Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
 
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
             this.frame.addTab(databaseContext, true);
@@ -544,20 +502,31 @@ public class OpenOfficePanel extends AbstractWorker {
 
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
+
+        // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getOOPath());
-        browseOOPath.addActionListener(BrowseAction.buildForDir(ooPath));
+        browseOOPath.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
-        browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
+        browseOOExec.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooJars = new JTextField(30);
-        JButton browseOOJars = new JButton(Localization.lang("Browse"));
-        browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooJars.setText(preferences.getJarsPath());
+        JButton browseOOJars = new JButton(Localization.lang("Browse"));
+        browseOOJars.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
+        );
 
         FormBuilder builder = FormBuilder.create()
                 .layout(
@@ -571,15 +540,15 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.add(ooExec).xy(3, 1);
             builder.add(browseOOExec).xy(5, 1);
 
-            builder.appendColumns("4dlu, pref");
+            builder.appendRows("4dlu, pref");
             builder.add(Localization.lang("Path to OpenOffice/LibreOffice library dir")).xy(1, 3);
             builder.add(ooJars).xy(3, 3);
             builder.add(browseOOJars).xy(5, 3);
         }
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("OK"));
-        JButton cancel = new JButton(Localization.lang("Cancel"));
+
+        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
+
         ActionListener tfListener = e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
@@ -588,22 +557,28 @@ public class OpenOfficePanel extends AbstractWorker {
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
+
+        // Buttons
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+
         ok.addActionListener(e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
-
         cancel.addActionListener(e -> cDiag.dispose());
 
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addRelatedGap();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
         bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+
+        // Finish and show dialog
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);
@@ -622,15 +597,15 @@ public class OpenOfficePanel extends AbstractWorker {
         Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
-            AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
-            acd.showDialog();
-            if (acd.canceled()) {
+            AdvancedCiteDialog citeDialog = new AdvancedCiteDialog(frame);
+            citeDialog.showDialog();
+            if (citeDialog.canceled()) {
                 return;
             }
-            if (!acd.getPageInfo().isEmpty()) {
-                pageInfo = acd.getPageInfo();
+            if (!citeDialog.getPageInfo().isEmpty()) {
+                pageInfo = citeDialog.getPageInfo();
             }
-            inParenthesis = acd.isInParenthesisCite();
+            inParenthesis = citeDialog.isInParenthesisCite();
 
         }
 
@@ -638,7 +613,8 @@ public class OpenOfficePanel extends AbstractWorker {
         if (panel != null) {
             final BibDatabase database = panel.getDatabase();
             List<BibEntry> entries = panel.getSelectedEntries();
-            if (!entries.isEmpty()) {
+            if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
+
                 try {
                     if (style == null) {
                         style = loader.getUsedStyle();
@@ -667,6 +643,63 @@ public class OpenOfficePanel extends AbstractWorker {
 
         }
 
+    }
+
+    /**
+     * Check that all entries in the list have BibTeX keys, if not ask if they should be generated
+     *
+     * @param entries A list of entries to be checked
+     * @return true if all entries have BibTeX keys, if it so may be after generating them
+     */
+    private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
+        // Check if there are empty keys
+        boolean emptyKeys = false;
+        for (BibEntry entry : entries) {
+            if (!entry.getCiteKeyOptional().isPresent()) {
+                // Found one, no need to look further for now
+                emptyKeys = true;
+                break;
+            }
+        }
+
+        // If no empty keys, return true
+        if (!emptyKeys) {
+            return true;
+        }
+
+        // Ask if keys should be generated
+        String[] options = {Localization.lang("Generate keys"), Localization.lang("Cancel")};
+        int answer = JOptionPane.showOptionDialog(this.frame,
+                Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
+                Localization.lang("Cite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options,
+                null);
+        BasePanel panel = frame.getCurrentBasePanel();
+        if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
+            // Generate keys
+            BibtexKeyPatternPreferences prefs = Globals.prefs.getBibtexKeyPatternPreferences();
+            NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
+            for (BibEntry entry : entries) {
+                if (!entry.getCiteKeyOptional().isPresent()) {
+                    // Generate key
+                    BibtexKeyPatternUtil
+                            .makeAndSetLabel(
+                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
+                                    panel.getDatabase(), entry,
+                            prefs);
+                    // Add undo change
+                    undoCompound.addEdit(
+                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
+                }
+            }
+            undoCompound.end();
+            // Add all undos
+            panel.getUndoManager().addEdit(undoCompound);
+            // Now every entry has a key
+            return true;
+        } else {
+            // No, we canceled (or there is no panel to get the database from, highly unlikely)
+            return false;
+        }
     }
 
     private void showConnectionLostErrorMessage() {
@@ -742,40 +775,8 @@ public class OpenOfficePanel extends AbstractWorker {
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 
-    public String getName() {
-        return "OpenOffice/LibreOffice";
-    }
-
-
-    private class OOPanel extends SidePaneComponent {
-
-        private final OpenOfficePanel openOfficePanel;
-
-
-        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
-            super(sidePaneManager, url, s);
-            openOfficePanel = panel;
-        }
-
-        @Override
-        public String getName() {
-            return openOfficePanel.getName();
-        }
-
-        @Override
-        public void componentClosing() {
-            preferences.setShowPanel(false);
-        }
-
-        @Override
-        public void componentOpening() {
-            preferences.setShowPanel(true);
-        }
-
-        @Override
-        public int getRescalingWeight() {
-            return 0;
-        }
+    public SidePaneComponent.ToggleAction getToggleAction() {
+        return sidePane.getToggleAction();
     }
 
 }

@@ -19,17 +19,17 @@ public class FileHistoryTest {
     @Before
     public void setUp() {
         prefs = JabRefPreferences.getInstance();
-        oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_FILES);
+        oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_DATABASES);
     }
 
     @After
     public void restore() {
-        prefs.putStringList(JabRefPreferences.RECENT_FILES, oldFileNames);
+        prefs.putStringList(JabRefPreferences.RECENT_DATABASES, oldFileNames);
     }
 
     @Test
     public void testFileHistory() {
-        FileHistory fh = new FileHistory(prefs);
+        FileHistory fh = prefs.getFileHistory();
 
         fh.newFile("aa");
         assertEquals("aa", fh.getFileName(0));
@@ -63,9 +63,9 @@ public class FileHistoryTest {
         fh.removeItem("cc");
         fh.removeItem("cc");
         fh.removeItem("aa");
-        fh.storeHistory();
+        prefs.storeFileHistory(fh);
         assertArrayEquals(new String[] {"ii", "hh", "gg"},
-                prefs.getStringList(JabRefPreferences.RECENT_FILES).toArray(new String[0]));
+                prefs.getStringList(JabRefPreferences.RECENT_DATABASES).toArray(new String[0]));
     }
 
 }

@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -23,15 +23,10 @@ public class URLDownloadTest {
 
     @Test
     public void testStringDownload() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
-        try {
-            URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+        URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-            Assert.assertTrue("google.com should contain google",
-                    dl.downloadToString(Globals.prefs.getDefaultEncoding()).contains("Google"));
-        } finally {
-            Globals.prefs = null;
-        }
+        Assert.assertTrue("google.com should contain google",
+                dl.downloadToString(JabRefPreferences.getInstance().getDefaultEncoding()).contains("Google"));
     }
 
     @Test
@@ -54,6 +49,46 @@ public class URLDownloadTest {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         Assert.assertTrue(dl.determineMimeType().startsWith("text/html"));
+    }
+
+    @Test
+    public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
+        URLDownload google = new URLDownload(new URL("http://www.google.com"));
+
+        String path = google.downloadToTemporaryFile().toString();
+        Assert.assertTrue(path, path.endsWith(".tmp"));
+    }
+
+    @Test
+    public void downloadToTemporaryFileKeepsName() throws IOException {
+        URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
+
+        String path = google.downloadToTemporaryFile().toString();
+        Assert.assertTrue(path, path.contains("LICENSE") && path.endsWith(".md"));
+    }
+
+    @Test
+    public void downloadOfFTPSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
+    }
+
+    @Test
+    public void downloadOfHttpSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
+    }
+
+    @Test
+    public void downloadOfHttpsSucceeds() throws IOException {
+        URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
+
+        Path path = ftp.downloadToTemporaryFile();
+        Assert.assertNotNull(path);
     }
 
 }

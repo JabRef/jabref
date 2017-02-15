@@ -1,32 +1,15 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.exporter;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.EnumSet;
+import java.util.Set;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,8 +36,8 @@ public class FileSaveSession extends SaveSession {
     private static final String BACKUP_EXTENSION = ".bak";
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
-    private final boolean useLockFile;
     private final Path temporaryFile;
+
 
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
         this(encoding, backup, createTemporaryFile());
@@ -63,13 +46,12 @@ public class FileSaveSession extends SaveSession {
     public FileSaveSession(Charset encoding, boolean backup, Path temporaryFile) throws SaveException {
         super(encoding, backup, getWriterForFile(encoding, temporaryFile));
         this.temporaryFile = temporaryFile;
-        this.useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
     }
 
     private static VerifyingWriter getWriterForFile(Charset encoding, Path file) throws SaveException {
         try {
-            return new VerifyingWriter(new FileOutputStream(file.toFile()), encoding);
-        } catch (FileNotFoundException e) {
+            return new VerifyingWriter(Files.newOutputStream(file), encoding);
+        } catch (IOException e) {
             throw new SaveException(e);
         }
     }
@@ -88,44 +70,47 @@ public class FileSaveSession extends SaveSession {
             return;
         }
         if (backup && Files.exists(file)) {
-            Path fileName = file.getFileName();
-            Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
-            try {
-                FileUtil.copyFile(file.toFile(), backupFile.toFile(), true);
-            } catch (IOException ex) {
-                LOGGER.error("Problem copying file", ex);
-                throw SaveException.BACKUP_CREATION;
-            }
+            Path backupFile = FileUtil.addExtension(file, BACKUP_EXTENSION);
+            FileUtil.copyFile(file, backupFile, true);
         }
         try {
-            if (useLockFile) {
-                try {
-                    if (FileBasedLock.createLockFile(file)) {
-                        // Oops, the lock file already existed. Try to wait it out:
-                        if (!FileBasedLock.waitForFileLock(file, 10)) {
-                            throw SaveException.FILE_LOCKED;
-                        }
+            // Always use a lock file
+            try {
+                if (FileBasedLock.createLockFile(file)) {
+                    // Oops, the lock file already existed. Try to wait it out:
+                    if (!FileBasedLock.waitForFileLock(file)) {
+                        throw SaveException.FILE_LOCKED;
                     }
-                } catch (IOException ex) {
-                    LOGGER.error("Error when creating lock file.", ex);
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Error when creating lock file.", ex);
+            }
+
+            // Try to save file permissions to restore them later (by default: allow everything)
+            Set<PosixFilePermission> oldFilePermissions = EnumSet.allOf(PosixFilePermission.class);
+            if (FileUtil.isPosixCompilant && Files.exists(file)) {
+                try {
+                    oldFilePermissions = Files.getPosixFilePermissions(file);
+                } catch (IOException exception) {
+                    LOGGER.warn("Error getting file permissions.", exception);
                 }
             }
 
-            FileUtil.copyFile(temporaryFile.toFile(), file.toFile(), true);
-        } catch (IOException ex2) {
-            // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
-            // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
-            // repeating the action will have a different result.
-            // On the other hand, our temporary file should still be clean, and won't be deleted.
-            throw new SaveException("Save failed while committing changes: " + ex2.getMessage(),
-                    Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
-        } finally {
-            if (useLockFile) {
-                FileBasedLock.deleteLockFile(file);
+            FileUtil.copyFile(temporaryFile, file, true);
+
+            // Restore file permissions
+            if (FileUtil.isPosixCompilant) {
+                try {
+                    Files.setPosixFilePermissions(file, oldFilePermissions);
+                } catch (IOException exception) {
+                    throw new SaveException(exception);
+                }
             }
+        } finally {
+            FileBasedLock.deleteLockFile(file);
         }
         try {
-            Files.delete(temporaryFile);
+            Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
             LOGGER.warn("Cannot delete temporary file", e);
         }
@@ -134,7 +119,7 @@ public class FileSaveSession extends SaveSession {
     @Override
     public void cancel() {
         try {
-            Files.delete(temporaryFile);
+            Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
             LOGGER.warn("Cannot delete temporary file", e);
         }

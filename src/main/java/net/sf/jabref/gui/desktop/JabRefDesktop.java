@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.desktop;
 
 import java.io.File;
@@ -25,17 +10,9 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeEntryEditor;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.os.DefaultDesktop;
@@ -43,11 +20,19 @@ import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.gui.desktop.os.OSX;
 import net.sf.jabref.gui.desktop.os.Windows;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListEntryEditor;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -76,7 +61,7 @@ public class JabRefDesktop {
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectory(fieldName);
+            List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFileDirectoryPreferences());
 
             Optional<File> file = FileUtil.expandFilename(link, dir);
 
@@ -159,7 +144,8 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link);
+            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link,
+                    Globals.prefs.getFileDirectoryPreferences());
             if (tmp.isPresent()) {
                 file = tmp.get();
             }
@@ -229,7 +215,7 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> oldValue = entry.getField(FieldName.FILE);
             oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:
@@ -331,18 +317,12 @@ public class JabRefDesktop {
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
                 String[] subcommands = command.split(" ");
-                StringBuilder commandLoggingText = new StringBuilder();
 
-                for (int i = 0; i < subcommands.length; i++) {
-                    subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
-                    commandLoggingText.append(subcommands[i]);
-                    if (i < (subcommands.length - 1)) {
-                        commandLoggingText.append(" ");
-                    }
-                }
+                // replace the placeholder if used
+                String commandLoggingText = command.replace("%DIR", absolutePath);
 
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText.toString()));
-                LOGGER.info("Executing command \"" + commandLoggingText.toString() + "\"...");
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText));
+                LOGGER.info("Executing command \"" + commandLoggingText + "\"...");
 
                 try {
                     new ProcessBuilder(subcommands).start();
@@ -350,7 +330,7 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
-                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),
+                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);

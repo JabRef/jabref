@@ -34,6 +34,14 @@ public class BibEntryTest {
     public void getFieldIsCaseInsensitive() throws Exception {
         entry.setField("TeSt", "value");
 
-        Assert.assertEquals(Optional.of("value"), entry.getFieldOptional("tEsT"));
+        Assert.assertEquals(Optional.of("value"), entry.getField("tEsT"));
+    }
+
+    @Test
+    public void clonedBibentryHasUniqueID() throws Exception {
+        BibEntry entry = new BibEntry();
+        BibEntry entryClone = (BibEntry) entry.clone();
+
+        Assert.assertNotEquals(entry.getId(), entryClone.getId());
     }
 }

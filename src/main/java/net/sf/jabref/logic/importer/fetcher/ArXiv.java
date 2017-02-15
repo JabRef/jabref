@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -33,23 +16,22 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.importer.fetcher.OAI2Fetcher;
-import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
+import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.ArXivIdentifier;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.strings.StringUtil;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
@@ -69,17 +51,21 @@ import org.xml.sax.SAXException;
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
 
     private static final String API_URL = "http://export.arxiv.org/api/query";
+    private final ImportFormatPreferences importFormatPreferences;
+
+    public ArXiv(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
         // 1. Eprint
-        Optional<String> identifier = entry.getFieldOptional(FieldName.EPRINT);
+        Optional<String> identifier = entry.getField(FieldName.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
@@ -94,7 +80,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         // 2. DOI
-        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
         if (doi.isPresent()) {
             String doiString = doi.get().getDOI();
             // Search for an entry in the ArXiv which is linked to the doi
@@ -121,9 +107,14 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
     }
 
-    private Optional<ArXivEntry> searchForEntryById(String identifier) throws FetcherException {
-        List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier), 0, 1);
-        if (entries.size() == 1) {
+    private Optional<ArXivEntry> searchForEntryById(String id) throws FetcherException {
+        Optional<ArXivIdentifier> identifier = ArXivIdentifier.parse(id);
+        if (!identifier.isPresent()) {
+            return Optional.empty();
+        }
+
+        List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
+        if (entries.size() >= 1) {
             return Optional.of(entries.get(0));
         } else {
             return Optional.empty();
@@ -134,7 +125,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return queryApi(searchQuery, Collections.emptyList(), 0, 10);
     }
 
-    private List<ArXivEntry> queryApi(String searchQuery, List<String> ids, int start, int maxResults)
+    private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
             throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
@@ -158,7 +149,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
      * @return the response from the API as a XML document (Atom 1.0)
      * @throws FetcherException if there was a problem while building the URL or the API was not accessible
      */
-    private Document callApi(String searchQuery, List<String> ids, int start, int maxResults) throws FetcherException {
+    private Document callApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults) throws FetcherException {
         if (maxResults > 2000) {
             throw new IllegalArgumentException("The arXiv API limits the number of maximal results to be 2000");
         }
@@ -166,11 +157,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         try {
             URIBuilder uriBuilder = new URIBuilder(API_URL);
             // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
-            if (StringUtils.isNotBlank(searchQuery)) {
-                uriBuilder.addParameter("search_query", StringUtils.stripAccents(searchQuery));
+            if (StringUtil.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
             }
             if (!ids.isEmpty()) {
-                uriBuilder.addParameter("id_list", StringUtils.join(ids, ','));
+                uriBuilder.addParameter("id_list",
+                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -226,13 +218,16 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(ArXivEntry::toBibEntry).collect(Collectors.toList());
+        return searchForEntries(query).stream().map(
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator())).collect(Collectors.toList());
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
+        return searchForEntryById(identifier).map(
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
+
 
     private static class ArXivEntry {
 
@@ -247,12 +242,13 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         private final Optional<String> journalReferenceText;
         private final Optional<String> primaryCategory;
 
+
         public ArXivEntry(Node item) {
             // see http://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
 
             // Title of the article
             // The result from the arXiv contains hard line breaks, try to remove them
-            title = XMLUtil.getNodeContent(item, "title").map(OAI2Fetcher::correctLineBreaks);
+            title = XMLUtil.getNodeContent(item, "title").map(OAI2Handler::correctLineBreaks);
 
             // The url leading to the abstract page
             urlAbstractPage = XMLUtil.getNodeContent(item, "id");
@@ -261,8 +257,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Fetcher::correctLineBreaks).map(
-                    String::trim);
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Handler::correctLineBreaks)
+                    .map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();
@@ -302,8 +298,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
             // Primary category
             // Ex: <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
-            primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category").flatMap(
-                    node -> XMLUtil.getAttributeContent(node, "term"));
+            primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
+                    .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
         }
 
         /**
@@ -342,22 +338,21 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             });
         }
 
-        public BibEntry toBibEntry() {
+        public BibEntry toBibEntry(Character keywordDelimiter) {
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
             bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
-            bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
-            bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
+            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
+            bibEntry.addKeywords(categories, keywordDelimiter);
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
-            title.ifPresent(title -> bibEntry.setField(FieldName.TITLE, title));
-            doi.ifPresent(doi -> bibEntry.setField(FieldName.DOI, doi));
-            abstractText.ifPresent(abstractText -> bibEntry.setField(FieldName.ABSTRACT, abstractText));
+            title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
+            doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
+            abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
-            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX))
+            getPdfUrl().ifPresent(url -> bibEntry
                     .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
-
             return bibEntry;
         }
     }

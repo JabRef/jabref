@@ -28,18 +28,16 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.cli.XMPUtilMain;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.io.CharStreams;
@@ -57,14 +55,17 @@ import org.apache.pdfbox.util.XMLUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
  */
 public class XMPUtilTest {
 
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
     /**
      * The PDF file that basically all operations are done upon.
      */
@@ -79,6 +80,7 @@ public class XMPUtilTest {
     private XMPPreferences xmpPreferences;
 
 
+    private ImportFormatPreferences importFormatPreferences;
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
      *
@@ -138,16 +140,17 @@ public class XMPUtilTest {
         }
     }
 
-    public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader(s));
+    public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
+            throws IOException {
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
     }
 
-    public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
+    public static String bibtexEntry2BibtexString(BibEntry e, JabRefPreferences preferences) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+        new BibEntryWriter(new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()),
                 false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
@@ -161,7 +164,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t1BibtexEntry() throws IOException {
-        return XMPUtilTest.bibtexString2BibtexEntry(t1BibtexString());
+        return XMPUtilTest.bibtexString2BibtexEntry(t1BibtexString(), importFormatPreferences);
     }
 
     public String t2XMP() {
@@ -173,11 +176,11 @@ public class XMPUtilTest {
     }
 
     public String t2BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry(), prefs);
     }
 
     public BibEntry t2BibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
+        BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
         e.setField("year", "2003");
@@ -201,12 +204,12 @@ public class XMPUtilTest {
         e.setField("year", "1982");
         e.setField("month", "#jul#");
         e.setField("abstract",
-                "The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
+                "The success of the Linux operating system has demonstrated the viability of an alternative form of software development—open source software—that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.");
         return e;
     }
 
     public String t3BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry(), prefs);
     }
 
     public String t3XMP() {
@@ -220,7 +223,7 @@ public class XMPUtilTest {
                 + "<bibtex:keywords>peanut, butter, jelly</bibtex:keywords>"
                 + "<bibtex:entrytype>Inproceedings</bibtex:entrytype>" + "<bibtex:year>1982</bibtex:year>"
                 + "<bibtex:month>#jul#</bibtex:month>"
-                + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development � open source software � that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
+                + "<bibtex:abstract>The success of the Linux operating system has demonstrated the viability of an alternative form of software development—open source software—that challenges traditional assumptions about software markets. Understanding what drives open source developers to participate in open source projects is crucial for assessing the impact of open source software. This article identifies two broad types of motivations that account for their participation in open source projects. The first category includes internal factors such as intrinsic motivation and altruism, and the second category focuses on external rewards such as expected future returns and personal needs. This article also reports the results of a survey administered to open source programmers.</bibtex:abstract>");
     }
 
     /**
@@ -229,22 +232,12 @@ public class XMPUtilTest {
     @Before
     public void setUp() throws IOException, COSVisitorException {
 
-        pdfFile = File.createTempFile("JabRef", ".pdf");
-
-        // ensure that the file will be deleted upon exit
-        pdfFile.deleteOnExit();
+        pdfFile = tempFolder.newFile("JabRef.pdf");
 
         try (PDDocument pdf = new PDDocument()) {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
             pdf.save(pdfFile.getAbsolutePath());
         }
-
-        // Don't forget to initialize the preferences
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
-        xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
 
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
@@ -254,6 +247,9 @@ public class XMPUtilTest {
 
         // The code assumes privacy filters to be off
         prefs.putBoolean("useXmpPrivacyFilter", false);
+
+        importFormatPreferences = prefs.getImportFormatPreferences();
+        xmpPreferences = prefs.getXMPPreferences();
     }
 
     @After
@@ -281,10 +277,10 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
-        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
+        Assert.assertEquals(Optional.of("2003"), e.getField("year"));
         Assert.assertEquals(Optional.of("Beach sand convolution by surf-wave optimzation"),
-                e.getFieldOptional("title"));
+                e.getField("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -306,9 +302,9 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
-        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
+        Assert.assertEquals(Optional.of("2003"), e.getField("year"));
+        Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getField("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -327,9 +323,9 @@ public class XMPUtilTest {
             prefs.putBoolean("useXmpPrivacyFilter", true);
             prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, Arrays.asList("author", "title", "note"));
 
-            XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
+            XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
 
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
             Assert.assertEquals(1, l.size());
             BibEntry x = l.get(0);
 
@@ -345,9 +341,9 @@ public class XMPUtilTest {
 
         BibEntry e = t1BibtexEntry();
 
-        XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
+        XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
         Set<String> ts = x.getFieldNames();
@@ -380,9 +376,9 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("Clarkson06", e.getCiteKey());
-        Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getFieldOptional("author").get());
-        Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getFieldOptional("editor").get());
+        Assert.assertEquals(Optional.of("Clarkson06"), e.getCiteKeyOptional());
+        Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author").get());
+        Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getField("editor").get());
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -465,7 +461,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -501,9 +498,9 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("Hallo World this is not an exercise .", e.getFieldOptional("title").get());
-        Assert.assertEquals("Hallo World this is not an exercise .", e.getFieldOptional("tabs").get());
-        Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e.getFieldOptional("abstract").get());
+        Assert.assertEquals("Hallo World this is not an exercise .", e.getField("title").get());
+        Assert.assertEquals("Hallo World this is not an exercise .", e.getField("tabs").get());
+        Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e.getField("abstract").get());
     }
 
     /**
@@ -742,7 +739,8 @@ public class XMPUtilTest {
                         + "  title = {</bibtex:title> \" bla \" '' '' && &  for floss development: A model and propositions},"
                         + "\n" + "  booktitle = {<randomXML>}," + "\n" + "  year = {2005}," + "\n"
                         + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
-                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -761,19 +759,19 @@ public class XMPUtilTest {
     public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
         Assert.assertNotNull(expected);
         Assert.assertNotNull(actual);
-        Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
+        Assert.assertEquals(expected.getCiteKeyOptional(), actual.getCiteKeyOptional());
         Assert.assertEquals(expected.getType(), actual.getType());
 
         for (String field : expected.getFieldNames()) {
 
             if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
 
-                AuthorList expectedAuthors = AuthorList.parse(expected.getFieldOptional(field).get());
-                AuthorList actualAuthors = AuthorList.parse(actual.getFieldOptional(field).get());
+                AuthorList expectedAuthors = AuthorList.parse(expected.getField(field).get());
+                AuthorList actualAuthors = AuthorList.parse(actual.getField(field).get());
                 Assert.assertEquals(expectedAuthors, actualAuthors);
             } else {
-                Assert.assertEquals("comparing " + field, expected.getFieldOptional(field),
-                        actual.getFieldOptional(field));
+                Assert.assertEquals("comparing " + field, expected.getField(field),
+                        actual.getField(field));
             }
         }
 
@@ -788,7 +786,8 @@ public class XMPUtilTest {
 
         ParserResult result = BibtexParser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"));
+                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"),
+                        importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(2, c.size());
@@ -818,19 +817,19 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("foo")) {
+        if (a.getCiteKeyOptional().get().equals("foo")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
         }
 
-        Assert.assertEquals("canh05", a.getCiteKey());
-        Assert.assertEquals("K. Crowston and H. Annabi", a.getFieldOptional("author").get());
-        Assert.assertEquals("Title A", a.getFieldOptional("title").get());
+        Assert.assertEquals(Optional.of("canh05"), a.getCiteKeyOptional());
+        Assert.assertEquals("K. Crowston and H. Annabi", a.getField("author").get());
+        Assert.assertEquals("Title A", a.getField("title").get());
         Assert.assertEquals("article", a.getType());
 
-        Assert.assertEquals("foo", b.getCiteKey());
-        Assert.assertEquals("Norton Bar", b.getFieldOptional("author").get());
+        Assert.assertEquals(Optional.of("foo"), b.getCiteKeyOptional());
+        Assert.assertEquals("Norton Bar", b.getField("author").get());
         Assert.assertEquals("inproceedings", b.getType());
     }
 
@@ -853,7 +852,7 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("Clarkson06")) {
+        if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
@@ -884,7 +883,7 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("Clarkson06")) {
+        if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
@@ -970,7 +969,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
             Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+            Assert.assertTrue(dcSchema.getRelationships().contains("bibtex/bibtexkey/Clarkson06"));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
             Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
@@ -1015,6 +1014,7 @@ public class XMPUtilTest {
 
             if (metaRaw == null) {
                 Assert.fail();
+                return;
             }
 
             XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
@@ -1036,7 +1036,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
             Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+            Assert.assertTrue(dcSchema.getRelationships().contains("bibtex/bibtexkey/Clarkson06"));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
             Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
@@ -1060,7 +1060,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions},\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
                         + "  year = {2005},\n" + "  owner = {oezbek},\n" + "  timestamp = {2006.05.29},\n"
-                        + "  url = {http://james.howison.name/publications.html}}"));
+                        + "  url = {http://james.howison.name/publications.html}}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1109,7 +1110,7 @@ public class XMPUtilTest {
     public void testCommandLineSingleBib() throws IOException, TransformerException, COSVisitorException {
 
         // First check conversion from .bib to .xmp
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.close();
@@ -1127,10 +1128,6 @@ public class XMPUtilTest {
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
@@ -1156,7 +1153,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = BibtexParser.parse(new StringReader(bibtex));
+                ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtex));
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1203,51 +1200,44 @@ public class XMPUtilTest {
      * Test whether the command-line client can pick one of several entries from a bibtex file
      * @throws IOException
      * @throws TransformerException
-     *
      */
     @Test
-    @Ignore
     public void testCommandLineByKey() throws IOException, TransformerException {
-
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
+        }
 
-            { // First try canh05
-                PrintStream oldOut = System.out;
-                try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                    System.setOut(new PrintStream(s));
-                    XMPUtilMain.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
+        PrintStream sysOut = System.out;
 
-                // PDF should be annotated:
-                List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-                Assert.assertEquals(1, l.size());
-                assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
-            }
-            // Now try OezbekC06
-            try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
-                PrintStream oldOut = System.out;
-                System.setOut(new PrintStream(s));
-                try {
-                    XMPUtilMain.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
-                } finally {
-                    System.setOut(oldOut);
-                }
-            }
-
-            // PDF should be annotated:
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
-            Assert.assertEquals(1, l.size());
-            assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
+        // First try canh05
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            XMPUtilMain.main(new String[]{"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
         } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
+            System.setOut(sysOut);
+        }
+
+        // PDF should be annotated:
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
+
+        // Now try OezbekC06
+        try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
+            System.setOut(new PrintStream(s));
+            try {
+                XMPUtilMain.main(new String[]{"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+            } finally {
+                System.setOut(sysOut);
             }
         }
+
+        // PDF should be annotated:
+        l = XMPUtil.readXMP(pdfFile, xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
     }
 
     /**
@@ -1256,10 +1246,9 @@ public class XMPUtilTest {
      * @throws TransformerException
      */
     @Test
-    @Ignore
     public void testCommandLineSeveral() throws IOException, TransformerException {
 
-        File tempBib = File.createTempFile("JabRef", ".bib");
+        File tempBib =  tempFolder.newFile("JabRef.bib");
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
 
@@ -1280,7 +1269,7 @@ public class XMPUtilTest {
             BibEntry a = l.get(0);
             BibEntry b = l.get(1);
 
-            if (a.getCiteKey().equals("Clarkson06")) {
+            if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
                 BibEntry tmp = a;
                 a = b;
                 b = tmp;
@@ -1294,11 +1283,6 @@ public class XMPUtilTest {
 
             assertEqualsBibtexEntry(t1, a);
             assertEqualsBibtexEntry(t3, b);
-
-        } finally {
-            if (!tempBib.delete()) {
-                System.err.println("Cannot delete temporary file");
-            }
         }
     }
 
@@ -1318,7 +1302,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                        importFormatPreferences);
 
         Collection<BibEntry> c = original.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1332,7 +1317,7 @@ public class XMPUtilTest {
         BibEntry x = l.get(0);
 
         Assert.assertEquals(AuthorList.parse("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-                AuthorList.parse(x.getFieldOptional("author").get()));
+                AuthorList.parse(x.getField("author").get()));
     }
 
     @Test(expected = EncryptedPdfsNotSupportedException.class)
@@ -1361,7 +1346,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr);
+            ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 
@@ -1375,7 +1360,7 @@ public class XMPUtilTest {
                 // Test whether we the main function can load the bibtex correctly
                 BibEntry b = XMPUtil.readXMP(pdfFile, xmpPreferences).get(0);
                 Assert.assertNotNull(b);
-                Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
 
                 // Next check from Document Information
                 try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
@@ -1384,7 +1369,7 @@ public class XMPUtilTest {
                             AuthorList.parse(document.getDocumentInformation().getAuthor()));
 
                     b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get();
-                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
 
                     // Now check from Dublin Core
                     PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1392,6 +1377,7 @@ public class XMPUtilTest {
 
                     if (metaRaw == null) {
                         Assert.fail();
+                        return; // To avoid warnings
                     }
 
                     XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
@@ -1410,7 +1396,7 @@ public class XMPUtilTest {
 
                     b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema, xmpPreferences).get();
                     Assert.assertNotNull(b);
-                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
                 }
             } finally {
                 if (!pdfFile.delete()) {

@@ -8,10 +8,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -68,7 +69,7 @@ public class CleanupPresetPanel {
                 "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
         cleanUpFormatters = new FieldFormatterCleanupsPanel(Localization.lang("Run field formatter:"),
-                JabRefPreferences.CLEANUP_DEFAULT_PRESET.getFormatterCleanups());
+                Cleanups.DEFAULT_SAVE_ACTIONS);
 
         updateDisplay(cleanupPreset);
 
@@ -82,7 +83,7 @@ public class CleanupPresetPanel {
         builder.add(cleanUpMakePathsRelative).xyw(1, 4, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 5, 2);
         String currentPattern = Localization.lang("Filename format pattern").concat(": ")
-                .concat(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+                .concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 6);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);
         builder.add(cleanUpBibLatex).xyw(1, 8, 2);

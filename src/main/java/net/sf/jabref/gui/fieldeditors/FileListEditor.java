@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
@@ -47,26 +32,26 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.external.AutoSetLinks;
-import net.sf.jabref.external.DownloadExternalFile;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.MoveFileAction;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiles.AutoSetLinks;
+import net.sf.jabref.gui.externalfiles.DownloadExternalFile;
+import net.sf.jabref.gui.externalfiles.MoveFileAction;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListEntryEditor;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -74,11 +59,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by Morten O. Alver 2007.02.22
- */
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -206,7 +187,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                         path = Paths.get(entry.link).toString();
                     } else {
                         // relative to file folder
-                        for (String folder : databaseContext.getFileDirectory()) {
+                        for (String folder : databaseContext
+                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.link);
                             if (Files.exists(file)) {
                                 path = file.toString();
@@ -245,7 +227,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link);
+                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+                        Globals.prefs.getFileDirectoryPreferences());
 
                 // transactional delete and unlink
                 try {
@@ -355,26 +338,24 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         return null;
     }
 
-    private void addEntry(String initialLink) {
-        int row = getSelectedRow();
-        if (row == -1) {
-            row = 0;
+    /**
+     * Will append a new file link at the last position
+     */
+    private void addEntry() {
+        List<String> defaultDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+
+        FileListEntry entry;
+        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
+            entry = new FileListEntry("", "");
+        } else {
+            entry = new FileListEntry("", defaultDirectory.get(0));
         }
-        FileListEntry entry = new FileListEntry("", initialLink);
+
         if (editListEntry(entry, true)) {
-            tableModel.addEntry(row, entry);
+            tableModel.addEntry(tableModel.getRowCount(), entry);
         }
         entryEditor.updateField(this);
         adjustColumnWidth();
-    }
-
-    private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectory();
-        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
-            addEntry("");
-        } else {
-            addEntry(defaultDirectory.get(0));
-        }
     }
 
     private void removeEntries() {
@@ -433,7 +414,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        List<BibEntry> entries = new ArrayList<>(frame.getCurrentBasePanel().getSelectedEntries());
+        List<BibEntry> entries = new ArrayList<>();
+        entries.add(entryEditor.getEntry());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
@@ -461,8 +443,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      * Run a file download operation.
      */
     private void downloadFile() {
-        String bibtexKey = entryEditor.getEntry().getCiteKey();
-        if (bibtexKey == null) {
+        Optional<String> bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
+        if (!bibtexKey.isPresent()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("This entry has no BibTeX key. Generate key now?"),
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
@@ -470,11 +452,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (answer == JOptionPane.OK_OPTION) {
                 ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
-                bibtexKey = entryEditor.getEntry().getCiteKey();
+                bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext(), entryEditor.getEntry());
         try {
             def.download(this);
         } catch (IOException ex) {
@@ -490,14 +472,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      */
     @Override
     public void downloadComplete(FileListEntry file) {
-        tableModel.addEntry(tableModel.getRowCount(), file);
+        tableModel.addEntry(0, file);
         entryEditor.updateField(this);
         adjustColumnWidth();
     }
 
-
     class TableClickListener extends MouseAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {

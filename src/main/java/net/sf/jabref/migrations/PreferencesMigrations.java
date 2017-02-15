@@ -2,40 +2,21 @@ package net.sf.jabref.migrations;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PreferencesMigrations {
 
-    /**
-     * This method is called at startup, and makes necessary adaptations to
-     * preferences for users from an earlier version of Jabref.
-     */
-    public static void replaceAbstractField() {
-        // Make sure "abstract" is not in General fields, because
-        // Jabref 1.55 moves the abstract to its own tab.
-        String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
-
-        if (genFields.contains(FieldName.ABSTRACT)) {
-
-            String newGen;
-            if (FieldName.ABSTRACT.equals(genFields)) {
-                newGen = "";
-            } else if (genFields.contains(";abstract;")) {
-                newGen = genFields.replace(";abstract;", ";");
-            } else if (genFields.indexOf("abstract;") == 0) {
-                newGen = genFields.replace("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
-                newGen = genFields.replace(";abstract", "");
-            } else {
-                newGen = genFields;
-            }
-
-            Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
-        }
-    }
+    private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
 
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
@@ -104,6 +85,79 @@ public class PreferencesMigrations {
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             }
         }
+    }
+
+    /**
+     * Migrate all customized entry types from versions <=3.7
+     */
+    public static void upgradeStoredCustomEntryTypes() {
+
+        JabRefPreferences prefs = Globals.prefs;
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+        try {
+            if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
+                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES) ) {
+                // skip further processing as prefs already have been migrated
+            } else {
+                LOGGER.info("Migrating old custom entry types.");
+                CustomEntryTypePreferenceMigration.upgradeStoredCustomEntryTypes(prefs.getDefaultBibDatabaseMode());
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.error("Migrating old custom entry types failed.", ex);
+        }
+    }
+
+    /**
+     * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
+     */
+    public static void upgradeLabelPatternToBibtexKeyPattern() {
+
+        JabRefPreferences prefs = Globals.prefs;
+
+        try {
+            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+            // Migrate default pattern
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null)==null) {
+                // Check whether old defaultLabelPattern is set
+                String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
+                if(oldDefault!=null) {
+                    prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
+                    LOGGER.info("Upgraded old default key generator pattern '"+oldDefault+"' to new version.");
+                }
+
+            }
+            //Pref node already exists do not migrate from previous version
+            if (mainPrefsNode.nodeExists(JabRefPreferences.BIBTEX_KEY_PATTERNS_NODE)) {
+                return;
+            }
+
+            // Migrate type specific patterns
+            // Check for prefs node for Version 3.3-3.5
+            if (mainPrefsNode.nodeExists("logic/labelpattern")) {
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node("logic/labelpattern"));
+            } else if (mainPrefsNode.nodeExists("logic/labelPattern")) { // node used for version 3.0-3.2
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node("logic/labelPattern"));
+            } else if (mainPrefsNode.nodeExists("labelPattern")) { // node used for version <3.0
+                migrateTypedKeyPrefs(prefs, mainPrefsNode.node("labelPattern"));
+            }
+        } catch (BackingStoreException e) {
+            LOGGER.error("Migrating old bibtexKeyPatterns failed.", e);
+        }
+    }
+
+    private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
+            throws BackingStoreException {
+        LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
+
+        GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
+        );
+        for (String key : oldPatternPrefs.keys()) {
+            keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
+        }
+        prefs.putKeyPattern(keyPattern);
     }
 
 }

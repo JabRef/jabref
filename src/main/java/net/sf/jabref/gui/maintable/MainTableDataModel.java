@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.groups.GroupMatcher;
 import net.sf.jabref.gui.search.HitOrMissComparator;
 import net.sf.jabref.gui.search.matchers.EverythingMatcher;
 import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -193,6 +193,8 @@ public class MainTableDataModel {
 
         private final List<Comparator<BibEntry>> comparators;
 
+
+        @SafeVarargs
         public GenericCompositeComparator(Comparator<BibEntry>... comparators) {
             this.comparators = Arrays.asList(comparators).stream().filter(Objects::nonNull).collect(Collectors.toList());
         }
@@ -213,7 +215,7 @@ public class MainTableDataModel {
 
         private final Matcher<BibEntry> active;
         private final Matcher<BibEntry> inactive;
-        private FilterList<BibEntry> list;
+        private final FilterList<BibEntry> list;
 
         private StartStopListFilterAction(FilterList<BibEntry> list, Matcher<BibEntry> active, Matcher<BibEntry> inactive) {
             this.list = list;
@@ -241,33 +243,4 @@ public class MainTableDataModel {
         }
     }
 
-    private static class StartStopListSortAction {
-
-        private final Comparator<BibEntry> active;
-        private SortedList<BibEntry> list;
-
-        private StartStopListSortAction(SortedList<BibEntry> list, Comparator<BibEntry> active) {
-            this.list = Objects.requireNonNull(list);
-            this.active = Objects.requireNonNull(active);
-        }
-
-        public void start() {
-            update(active);
-        }
-
-        public void stop() {
-            update(null);
-        }
-
-        private void update(Comparator<BibEntry> comparator) {
-            list.getReadWriteLock().writeLock().lock();
-            try {
-                if (list.getComparator() != comparator) {
-                    list.setComparator(comparator);
-                }
-            } finally {
-                list.getReadWriteLock().writeLock().unlock();
-            }
-        }
-    }
 }

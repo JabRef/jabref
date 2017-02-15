@@ -1,22 +1,6 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
@@ -40,7 +24,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.JTree;
@@ -49,13 +32,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.MoveGroupChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.GroupEntryChanger;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -98,10 +79,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @param groupSelector the parent UI component
      */
     public GroupsTree(GroupSelector groupSelector) {
-        // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
-        FontMetrics metrics = getFontMetrics(getFont());
-        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
-
         this.groupSelector = groupSelector;
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
                 .createDefaultDragGestureRecognizer(this,
@@ -116,9 +93,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setToggleClickCount(0);
         ToolTipManager.sharedInstance().registerComponent(this);
         setShowsRootHandles(false);
-        setVisibleRowCount(Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS));
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        this.setFocusable(true);
     }
 
     @Override
@@ -187,7 +164,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         } else if (dtde
                 .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             // check if node accepts explicit assignment
-            if (path == null) {
+            if (target == null) {
                 dtde.rejectDrag();
             } else {
                 // this would be the place to check if the dragging entries
@@ -195,7 +172,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // worth the bother (DropTargetDragEvent does not provide
                 // access to the drag object)...
                 // it might even be irritating to the user.
-                if (target.getNode().supportsAddingEntries()) {
+                if (target.getNode().getGroup() instanceof GroupEntryChanger) {
                     // accept: assignment from EntryTable
                     dtde.acceptDrag(DnDConstants.ACTION_LINK);
                 } else {
@@ -283,7 +260,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
             } else if (transferable
                     .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
                 final AbstractGroup group = target.getNode().getGroup();
-                if (!target.getNode().supportsAddingEntries()) {
+                if (!(target.getNode().getGroup() instanceof GroupEntryChanger)) {
                     // this should never happen, because the same condition
                     // is checked in dragOver already
                     dtde.rejectDrop();
@@ -311,10 +288,10 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 // edit has to be stored:
                 groupSelector.getActiveBasePanel().storeCurrentEdit();
 
-                Optional<EntriesGroupChange> undo = target.addEntriesToGroup(selection.getSelection());
-                if (undo.isPresent()) {
+                List<FieldChange> undo = target.addEntriesToGroup(selection.getSelection());
+                if (!undo.isEmpty()) {
                     dtde.getDropTargetContext().dropComplete(true);
-                    groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo.get()),
+                    groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo),
                             target.getNode(), assignedEntries);
                 }
             } else {

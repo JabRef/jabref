@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.util.ISSN;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -14,7 +15,7 @@ public class ISSNCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        Optional<String> issnString = entry.getFieldOptional(FieldName.ISSN);
+        Optional<String> issnString = entry.getField(FieldName.ISSN);
         if (!issnString.isPresent()) {
             return Collections.emptyList();
         }

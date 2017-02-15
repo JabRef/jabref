@@ -1,50 +1,50 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
 
+    private static final Log LOGGER = LogFactory.getLog(RenamePdfCleanup.class);
+
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
-
+    private final String fileNamePattern;
+    private final String fileDirPattern;
+    private final LayoutFormatterPreferences prefs;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
 
-    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
+    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
+            String fileDirPattern, LayoutFormatterPreferences prefs,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
+        this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.prefs = Objects.requireNonNull(prefs);
+        this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     @Override
@@ -62,73 +62,94 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(
-                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs));
+            StringBuilder targetFileName = new StringBuilder(FileUtil
+                    .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, prefs).trim());
+
+            String targetDirName = "";
+            if (!fileDirPattern.isEmpty()) {
+                targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
+                        prefs);
+            }
 
             //Add extension to newFilename
-            newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+            targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
-                    databaseContext.getFileDirectory());
+                    databaseContext.getFileDirectories(fileDirectoryPreferences));
+
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR)
-                    .concat(newFilename.toString());
+            Path newPath = null;
+            Optional<Path> dir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+            if (dir.isPresent()) {
 
-            String expandedOldFilePath = expandedOldFile.get().toString();
-            boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
-                    expandedOldFilePath);
-            if (new File(newPath).exists() && ! pathsDifferOnlyByCase) {
-                // we do not overwrite files
-                // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
-                // nonetheless rename files to a new name which just differs by case.
-                // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-                newFileList.add(flEntry);
-                continue;
-            }
+                newPath = dir.get().resolve(targetDirName).resolve(targetFileName.toString());
 
-            //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
+                String expandedOldFilePath = expandedOldFile.get().toString();
+                boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)
+                        && !newPath.equals(expandedOldFilePath);
 
-            if (renameSuccessful) {
-                changed = true;
-
-                //Change the path for this entry
-                String description = flEntry.getDescription();
-                String type = flEntry.getFileType();
-
-                // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
-                File parent = (new File(realOldFilename)).getParentFile();
-                String newFileEntryFileName;
-                if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
-                    newFileEntryFileName = newFilename.toString();
-                } else {
-                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR)
-                            .concat(newFilename.toString());
+                if (Files.exists(newPath) && !pathsDifferOnlyByCase) {
+                    // we do not overwrite files
+                    // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+                    // nonetheless rename files to a new name which just differs by case.
+                    // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
+                    newFileList.add(flEntry);
+                    continue;
                 }
-                newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
-            } else {
-                unsuccessfulRenames++;
+
+                try {
+                    if (!Files.exists(newPath)) {
+                        Files.createDirectories(newPath);
+                    }
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    LOGGER.error("Could no create target necessary target directoires for renaming", e);
+                }
+                //do rename
+                boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
+                if (renameSuccessful) {
+                    changed = true;
+
+                    //Change the path for this entry
+                    String description = flEntry.getDescription();
+                    String type = flEntry.getFileType();
+
+                    Optional<Path> settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
+                    if (settingsDir.isPresent()) {
+
+                        Path parent = settingsDir.get();
+                        String newFileEntryFileName;
+                        if ((parent == null)) {
+                            newFileEntryFileName = targetFileName.toString();
+
+                        } else {
+                            newFileEntryFileName = parent.relativize(newPath).toString();
+                        }
+
+                        newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
+                    }
+                } else {
+                    unsuccessfulRenames++;
+                }
             }
         }
-
         if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            Optional<FieldChange> change = entry.setFiles(newFileList);
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            if(change.isPresent()) {
+            if (change.isPresent()) {
                 return Collections.singletonList(change.get());
             } else {
                 return Collections.emptyList();
             }
         }
-
         return Collections.emptyList();
     }
 

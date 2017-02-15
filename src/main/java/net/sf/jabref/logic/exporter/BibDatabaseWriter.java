@@ -1,24 +1,9 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -32,23 +17,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.bibtex.comparator.IdComparator;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 
 public abstract class BibDatabaseWriter<E extends SaveSession> {
 
@@ -79,20 +66,24 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         return changes;
     }
 
+    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData) {
+        return applySaveActions(Arrays.asList(entry), metaData);
+    }
+
     private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences preferences, MetaData metaData) {
 
         List<Comparator<BibEntry>> comparators = new ArrayList<>();
         Optional<SaveOrderConfig> saveOrder = getSaveOrder(preferences, metaData);
 
+        // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
+        // ones. This is a necessary requirement for BibTeX to be able to resolve referenced entries correctly.
+        comparators.add(new CrossRefEntryComparator());
+
         if (! saveOrder.isPresent()) {
-            // Take care, using CrossRefEntry-Comparator, that referred entries occur after referring
-            // ones. Apart from crossref requirements, entries will be sorted based on their creation order,
-            // utilizing the fact that IDs used for entries are increasing, sortable numbers.
-            comparators.add(new CrossRefEntryComparator());
+            // entries will be sorted based on their internal IDs
             comparators.add(new IdComparator());
         } else {
-            comparators.add(new CrossRefEntryComparator());
-
+            // use configured sorting strategy
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[0]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[1]));
             comparators.add(new FieldComparator(saveOrder.get().sortCriteria[2]));
@@ -167,6 +158,12 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         session = saveSessionFactory.createSaveSession(preferences.getEncodingOrDefault(), preferences.getMakeBackup());
 
+        Optional<String> sharedDatabaseIDOptional = bibDatabaseContext.getDatabase().getSharedDatabaseID();
+
+        if (sharedDatabaseIDOptional.isPresent()) {
+            writeDatabaseID(sharedDatabaseIDOptional.get());
+        }
+
         // Map to collect entry type definitions that we must save along with entries using them.
         Map<String, EntryType> typesToWrite = new TreeMap<>();
 
@@ -176,7 +173,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         }
 
         // Write preamble if there is one.
-        writePreamble(bibDatabaseContext.getDatabase().getPreamble());
+        writePreamble(bibDatabaseContext.getDatabase().getPreamble().orElse(""));
 
         // Write strings if there are any.
         writeStrings(bibDatabaseContext.getDatabase(), preferences.isReformatFile(),
@@ -204,7 +201,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -231,10 +228,11 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData) throws SaveException {
+    protected void writeMetaData(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) throws SaveException {
         Objects.requireNonNull(metaData);
 
-        Map<String, String> serializedMetaData = metaData.getAsStringMap();
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+                globalCiteKeyPattern);
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
@@ -244,6 +242,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException;
 
     protected abstract void writePreamble(String preamble) throws SaveException;
+
+    protected abstract void writeDatabaseID(String sharedDatabaseID) throws SaveException;
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for

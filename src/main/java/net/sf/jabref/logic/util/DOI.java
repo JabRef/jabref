@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.fetcher.CrossRef;
+import net.sf.jabref.logic.importer.fetcher.CrossRef;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -104,6 +104,16 @@ public class DOI {
         } catch (IllegalArgumentException | NullPointerException e) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Determines whether a DOI is valid or not
+     *
+     * @param doi the DOI string
+     * @return true if DOI is valid, false otherwise
+     */
+    public static boolean isValid(String doi ){
+        return build(doi).isPresent();
     }
 
     /**

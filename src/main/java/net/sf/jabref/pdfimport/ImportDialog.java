@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.pdfimport;
 
 import java.awt.BorderLayout;
@@ -23,8 +8,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -34,12 +23,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.xmp.XMPUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -87,7 +79,7 @@ public class ImportDialog extends JDialog {
         panel3.add(headLinePanel);
         panel3.add(labelSubHeadline);
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create blank entry linking the PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP data"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP-metadata"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create entry based on content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only attach PDF"));
         JButton buttonOK = new JButton(Localization.lang("OK"));
@@ -95,6 +87,15 @@ public class ImportDialog extends JDialog {
         checkBoxDoNotShowAgain = new JCheckBox(Localization.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow", ""));
+        List<BibEntry> foundEntries = getEntriesFromXMP(fileName);
+        JPanel entriesPanel = new JPanel();
+        entriesPanel.setLayout(new BoxLayout(entriesPanel, BoxLayout.Y_AXIS));
+        foundEntries.forEach(entry -> {
+            JTextArea entryArea = new JTextArea(entry.toString());
+            entryArea.setEditable(false);
+            entriesPanel.add(entryArea);
+        });
+
         b.appendSeparator(Localization.lang("Create new entry"));
         b.append(radioButtonNoMeta, 3);
         b.append(radioButtonXmp, 3);
@@ -104,6 +105,10 @@ public class ImportDialog extends JDialog {
         b.nextLine();
         b.append(checkBoxDoNotShowAgain);
         b.append(useDefaultPDFImportStyle);
+        if (!foundEntries.isEmpty()) {
+            b.appendSeparator(Localization.lang("XMP-metadata"));
+            b.append(entriesPanel, 3);
+        }
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -148,7 +153,7 @@ public class ImportDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        switch (Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
+        switch (Globals.prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
             radioButtonNoMeta.setSelected(true);
             break;
@@ -170,11 +175,21 @@ public class ImportDialog extends JDialog {
         this.setSize(555, 371);
     }
 
+    private List<BibEntry> getEntriesFromXMP(String fileName) {
+        List<BibEntry> foundEntries = new ArrayList<>();
+        try {
+            foundEntries =  XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return foundEntries;
+    }
+
     private void onOK() {
         this.result = JOptionPane.OK_OPTION;
-        Globals.prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
+        Globals.prefs.putInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
         if (useDefaultPDFImportStyle.isSelected()) {
-            Globals.prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, true);
+            Globals.prefs.putBoolean(JabRefPreferences.IMPORT_ALWAYSUSE, true);
         }
         // checkBoxDoNotShowAgain handled by local variable
         dispose();

@@ -26,6 +26,10 @@
         http://checkstyle.sourceforge.net/5.x/config.html#Checker
         <property name="basedir" value="${basedir}"/>
     -->
+    
+    <module name="Header">
+        <property name="header" value=""/>
+    </module>
 
     <module name="TreeWalker">
 
@@ -38,7 +42,7 @@
         <module name="IllegalImport"/>
 
         <module name="ImportOrder">
-            <property name="groups" value="java,javax,net.sf.jabref,*"/>
+            <property name="groups" value="java,javax,javafx,net.sf.jabref,*"/>
             <property name="ordered" value="true"/>
             <property name="separated" value="true"/>
             <property name="option" value="bottom"/>

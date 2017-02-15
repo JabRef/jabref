@@ -7,12 +7,8 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Charsets;
 import org.junit.Before;
@@ -21,7 +17,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
-
 
 public class MsBibExportFormatTest {
 
@@ -36,8 +31,7 @@ public class MsBibExportFormatTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
         msBibExportFormat = new MSBibExportFormat();
         tempFile = testFolder.newFile();

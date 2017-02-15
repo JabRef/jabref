@@ -1,25 +1,10 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.formatter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -41,6 +26,7 @@ import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.model.cleanup.Formatter;
 
 public class Formatters {
 
@@ -74,6 +60,22 @@ public class Formatters {
     );
 
     public static final List<Formatter> ALL = new ArrayList<>();
+
+    public static Optional<Formatter> getFormatterForModifier(String modifier) {
+        Objects.requireNonNull(modifier);
+        Optional<Formatter> formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();
+        if (formatter.isPresent()) {
+            return formatter;
+        }
+        switch (modifier) {
+            case "lower":
+                return Optional.of(new LowerCaseFormatter());
+            case "upper":
+                return Optional.of(new UpperCaseFormatter());
+            default:
+                return Optional.empty();
+        }
+    }
 
     static {
         ALL.addAll(CONVERTERS);

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout;
 
 import java.io.File;
@@ -23,9 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
@@ -56,6 +39,7 @@ import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
 import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.EntryTypeFormatter;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
 import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
@@ -77,7 +61,7 @@ import net.sf.jabref.logic.layout.format.Ordinal;
 import net.sf.jabref.logic.layout.format.RTFChars;
 import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.layout.format.RemoveBracketsAddComma;
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.logic.layout.format.RemoveTilde;
 import net.sf.jabref.logic.layout.format.RemoveWhitespace;
 import net.sf.jabref.logic.layout.format.Replace;
@@ -90,16 +74,17 @@ import net.sf.jabref.logic.layout.format.WrapContent;
 import net.sf.jabref.logic.layout.format.WrapFileLinks;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
-import net.sf.jabref.logic.search.MatchesHighlighter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class LayoutEntry {
-
+    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
+    
     private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:
@@ -113,10 +98,7 @@ class LayoutEntry {
 
     private final List<String> invalidFormatter = new ArrayList<>();
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
-
     private final LayoutFormatterPreferences prefs;
-
 
     public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
@@ -191,23 +173,18 @@ class LayoutEntry {
         for (LayoutEntry layoutEntry : layoutEntries) {
             invalidFormatter.addAll(layoutEntry.getInvalidFormatters());
         }
-
     }
 
     public void setPostFormatter(LayoutFormatter formatter) {
         this.postFormatter = formatter;
     }
 
-    private String doLayout(BibEntry bibtex, BibDatabase database) {
-        return doLayout(bibtex, database, Optional.empty());
-    }
-
-    public String doLayout(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    public String doLayout(BibEntry bibtex, BibDatabase database) {
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = BibDatabase.getResolvedField(text, bibtex, database).orElse("");
+            String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
 
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
@@ -216,7 +193,7 @@ class LayoutEntry {
             return value;
         case LayoutHelper.IS_FIELD_START:
         case LayoutHelper.IS_GROUP_START:
-            return handleFieldOrGroupStart(bibtex, database, highlightPattern);
+            return handleFieldOrGroupStart(bibtex, database);
         case LayoutHelper.IS_FIELD_END:
         case LayoutHelper.IS_GROUP_END:
             return "";
@@ -226,7 +203,7 @@ class LayoutEntry {
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
             // on a field called "encoding". We simply return this field instead:
-            return BibDatabase.getResolvedField("encoding", bibtex, database).orElse(null);
+            return bibtex.getResolvedFieldOrAlias("encoding", database).orElse(null);
         default:
             return "";
         }
@@ -235,13 +212,18 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if ("bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
+            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+                    + "' is an obsolete name for the entry type. Please update your layout to use '"
+                    + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            fieldEntry = text.startsWith("\\") ? BibDatabase
-                    .getResolvedField(text.substring(1), bibtex, database)
+            fieldEntry = text.startsWith("\\") ? bibtex
+                    .getResolvedFieldOrAlias(text.substring(1), database)
                     .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
@@ -260,16 +242,16 @@ class LayoutEntry {
         return fieldEntry;
     }
 
-    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
+    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
-            field = BibDatabase.getResolvedField(text, bibtex, database);
+            field = bibtex.getResolvedFieldOrAlias(text, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = BibDatabase.getResolvedField(part, bibtex, database);
+                field = bibtex.getResolvedFieldOrAlias(part, database);
                 if (!field.isPresent()) {
                     break;
                 }
@@ -279,7 +261,7 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = BibDatabase.getResolvedField(part, bibtex, database);
+                field = bibtex.getResolvedFieldOrAlias(part, database);
                 if (field.isPresent()) {
                     break;
                 }
@@ -324,17 +306,7 @@ class LayoutEntry {
                             sb.append(fieldText.substring(eol));
                         }
                     } else {
-                        /*
-                         * if fieldText is not null and the bibtexentry is marked
-                         * as a searchhit, try to highlight the searched words
-                         *
-                        */
-                        if (bibtex.isSearchHit()) {
-                            sb.append(MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern));
-                        } else {
-                            sb.append(fieldText);
-                        }
-
+                        sb.append(fieldText);
                     }
                 }
 
@@ -386,12 +358,10 @@ class LayoutEntry {
             return encoding.displayName();
 
         case LayoutHelper.IS_FILENAME:
-            File f = databaseContext.getDatabaseFile();
-            return f == null ? "" : f.getName();
+            return databaseContext.getDatabaseFile().map(File::getName).orElse("");
 
         case LayoutHelper.IS_FILEPATH:
-            File f2 = databaseContext.getDatabaseFile();
-            return f2 == null ? "" : f2.getPath();
+            return databaseContext.getDatabaseFile().map(File::getPath).orElse("");
 
         default:
             break;
@@ -418,7 +388,6 @@ class LayoutEntry {
             }
 
         }
-
     }
 
     private LayoutFormatter getLayoutFormatterByName(String name) throws Exception {
@@ -484,6 +453,8 @@ class LayoutEntry {
             return new DOICheck();
         case "DOIStrip":
             return new DOIStrip();
+        case "EntryTypeFormatter":
+            return new EntryTypeFormatter();
         case "FirstPage":
             return new FirstPage();
         case "FormatPagesForHTML":
@@ -519,7 +490,7 @@ class LayoutEntry {
         case "RemoveBracketsAddComma":
             return new RemoveBracketsAddComma();
         case "RemoveLatexCommands":
-            return new RemoveLatexCommands();
+            return new RemoveLatexCommandsFormatter();
         case "RemoveTilde":
             return new RemoveTilde();
         case "RemoveWhitespace":
@@ -574,22 +545,21 @@ class LayoutEntry {
 
         for (List<String> strings : formatterStrings) {
 
-            String className = strings.get(0).trim();
+            String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (prefs.getCustomExportNameFormatters() != null) {
-                String contents = prefs.getCustomExportNameFormatters().get(className);
-                if (contents != null) {
-                    NameFormatter nf = new NameFormatter();
-                    nf.setParameter(contents);
-                    results.add(nf);
-                    continue;
-                }
+
+            Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
+            if (contents.isPresent()) {
+                NameFormatter nf = new NameFormatter();
+                nf.setParameter(contents.get());
+                results.add(nf);
+                continue;
             }
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = getLayoutFormatterByName(className);
+                LayoutFormatter f = getLayoutFormatterByName(nameFormatterName);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
@@ -602,7 +572,7 @@ class LayoutEntry {
             }
 
             // Then check whether this is a user defined formatter
-            String formatterParameter = userNameFormatter.get(className);
+            String formatterParameter = userNameFormatter.get(nameFormatterName);
 
             if (formatterParameter != null) {
                 NameFormatter nf = new NameFormatter();
@@ -611,7 +581,7 @@ class LayoutEntry {
                 continue;
             }
 
-            results.add(new NotFoundFormatter(className));
+            results.add(new NotFoundFormatter(nameFormatterName));
         }
 
         return results;
@@ -628,7 +598,6 @@ class LayoutEntry {
         char[] c = calls.toCharArray();
 
         int i = 0;
-
         while (i < c.length) {
 
             int start = i;
@@ -643,6 +612,7 @@ class LayoutEntry {
 
                     // Skip the brace
                     i++;
+                    int bracelevel = 0;
 
                     if (i < c.length) {
                         if (c[i] == '"') {
@@ -654,9 +624,14 @@ class LayoutEntry {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (((i + 1) < c.length) && !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
+                            while (((i + 1) < c.length)
+                                    && !(!escaped && (c[i] == '"') && (c[i + 1] == ')') && (bracelevel == 0))) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
+                                } else if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
                                 } else {
                                     escaped = false;
                                 }
@@ -672,14 +647,18 @@ class LayoutEntry {
 
                             int startParam = i;
 
-                            while ((i < c.length) && (c[i] != ')')) {
+                            while ((i < c.length) && (!((c[i] == ')') && (bracelevel == 0)))) {
+                                if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
+                                }
                                 i++;
                             }
 
                             String param = calls.substring(startParam, i);
 
                             result.add(Arrays.asList(method, param));
-
                         }
                     } else {
                         // Incorrectly terminated open brace
