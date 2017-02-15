@@ -43,6 +43,7 @@ public enum KeyBinding {
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I", KeyBindingCategory.FILE),
     INCREASE_TABLE_FONT_SIZE("Increase table font size", Localization.lang("Increase table font size"), "ctrl PLUS", KeyBindingCategory.VIEW),
+    DEFAULT_TABLE_FONT_SIZE("Default table font size", Localization.lang("Default table font size"), "ctrl 0", KeyBindingCategory.VIEW),
     MARK_ENTRIES("Mark entries", Localization.lang("Mark entries"), "ctrl M", KeyBindingCategory.EDIT),
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl shift A", KeyBindingCategory.BIBTEX),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl shift B", KeyBindingCategory.BIBTEX),

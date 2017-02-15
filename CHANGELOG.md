@@ -28,6 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We improved the UI customization possibilities:
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405))
     - Resizing the menu and label sizes has been improved.
+- Font sizes can now be increased <kbd>CTRL</kbd> + <kbd>PLUS</kbd>, decreased <kbd>CTRL</kbd> + <kbd>MINUS</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table [#2534](https://github.com/JabRef/jabref/issues/2534)

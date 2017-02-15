@@ -155,4 +155,10 @@ public class GUIGlobals {
 
     }
 
+    public static void setFont(int size) {
+        currentFont = new Font(currentFont.getFamily(), currentFont.getStyle(), size);
+        // update preferences
+        Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, size);
+    }
+
 }

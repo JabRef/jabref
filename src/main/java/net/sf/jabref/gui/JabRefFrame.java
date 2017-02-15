@@ -395,6 +395,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Look up full text documents"),
             Localization.lang("Look up full text documents"));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
+    private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
             Localization.menuTitle("Resolve duplicate BibTeX keys"),
@@ -1130,6 +1131,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.addSeparator();
         view.add(increaseFontSize);
         view.add(decreseFontSize);
+        view.add(defaultFontSize);
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
@@ -1358,7 +1360,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
                 databaseProperties, abbreviateIso, abbreviateMedline,
-                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
+                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize, defaultFontSize,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
@@ -2194,6 +2196,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
+    private class DefaultTableFontSizeAction extends MnemonicAwareAction {
+
+        public DefaultTableFontSizeAction() {
+            putValue(Action.NAME, Localization.menuTitle("Default table font size"));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.DEFAULT_TABLE_FONT_SIZE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+            for (BasePanel basePanel : getBasePanelList()) {
+                basePanel.updateTableFont();
+            }
+            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        }
+    }
+
     private class IncreaseTableFontSizeAction extends MnemonicAwareAction {
 
         public IncreaseTableFontSizeAction() {
@@ -2203,10 +2222,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            int currentSize = GUIGlobals.currentFont.getSize();
-            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
-                    currentSize + 1);
-            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
+            GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
@@ -2227,9 +2243,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (currentSize < 2) {
                 return;
             }
-            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
-                    currentSize - 1);
-            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
+            GUIGlobals.setFont(currentSize - 1);
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
