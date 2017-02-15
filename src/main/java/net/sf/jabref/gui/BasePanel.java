@@ -110,6 +110,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.pdf.FileAnnotationCache;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
@@ -151,6 +152,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final MainTableDataModel tableModel;
 
     private final CitationStyleCache citationStyleCache;
+    private final FileAnnotationCache annotationCache;
+
     private final JabRefFrame frame;
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
@@ -161,6 +164,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Keeps track of the string dialog if it is open.
     private final Map<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
+
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
@@ -202,6 +206,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
         setupMainPanel();
 
@@ -2341,6 +2346,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             markChangedOrUnChanged();
         }
+    }
+
+    public FileAnnotationCache getAnnotationCache() {
+        return annotationCache;
     }
 
     private class PrintPreviewAction implements BaseAction {

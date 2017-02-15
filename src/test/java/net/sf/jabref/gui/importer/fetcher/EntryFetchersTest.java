@@ -12,6 +12,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
+import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +50,7 @@ public class EntryFetchersTest {
 
         Set<Class<? extends EntryBasedFetcher>> expected = reflections.getSubTypesOf(EntryBasedFetcher.class);
         expected.remove(EntryBasedParserFetcher.class);
+        expected.remove(MrDLibFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 

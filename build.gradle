@@ -118,6 +118,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
+    compile 'org.apache.commons:commons-collections4:4.0'
     compile 'org.apache.commons:commons-lang3:3.5'
 
     compile 'org.jsoup:jsoup:1.10.2'
