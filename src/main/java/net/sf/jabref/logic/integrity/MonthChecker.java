@@ -33,7 +33,7 @@ public class MonthChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
-        //BibLaTeX
+        //biblatex
         if (bibDatabaseContextMonth.isBiblatexMode()
                 && !(ONLY_AN_INTEGER.test(value.trim()) || MONTH_NORMALIZED.test(value.trim()))) {
             return Optional.of(Localization.lang("should be an integer or normalized"));

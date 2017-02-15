@@ -4,7 +4,7 @@ import java.util.Locale;
 
 /**
  * An enum which contains the possible {@link BibDatabase} Modes.
- * Possible are BibTeX and BibLaTeX.
+ * Possible are BibTeX and biblatex.
  */
 public enum BibDatabaseMode {
     BIBTEX,
@@ -17,14 +17,14 @@ public enum BibDatabaseMode {
         if (this == BIBTEX) {
             return "BibTeX";
         } else {
-            return "BibLaTeX";
+            return biblatex;
         }
     }
 
     /**
      * Returns the opposite mode of the current mode as {@link BibDatabaseMode}.
      *
-     * @return BibLaTeX if the current mode is BIBTEX, BibTeX else
+     * @return biblatex if the current mode is BIBTEX, BibTeX else
      */
     public BibDatabaseMode getOppositeMode() {
         if (this == BIBTEX) {

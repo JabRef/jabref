@@ -22,9 +22,9 @@ public class EditionChecker implements ValueChecker {
     }
 
     /**
-     * Checks, if field contains only an integer or a literal (BibLaTeX mode)
+     * Checks, if field contains only an integer or a literal (biblatex mode)
      * Checks, if the first letter is capitalized (BibTeX mode)
-     * BibLaTeX package documentation:
+     * biblatex package documentation:
      * The edition of a printed publication. This must be an integer, not an ordinal.
      * It is also possible to give the edition as a literal string, for example "Third, revised and expanded edition".
      * Official BibTeX specification:
@@ -33,7 +33,7 @@ public class EditionChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
-        //BibLaTeX
+        //biblatex
         if (bibDatabaseContextEdition.isBiblatexMode() && !ONLY_NUMERALS_OR_LITERALS.test(value.trim())) {
             return Optional.of(Localization.lang("should contain an integer or a literal"));
         }

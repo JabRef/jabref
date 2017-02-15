@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
  */
 public class EntryConverter {
 
-    // BibTeX to BibLaTeX
+    // BibTeX to biblatex
     public static Map<String, String> FIELD_ALIASES_TEX_TO_LTX;
 
-    // BibLaTeX to BibTeX
+    // biblatex to BibTeX
     public static Map<String, String> FIELD_ALIASES_LTX_TO_TEX;
 
     // All aliases

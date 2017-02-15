@@ -13,7 +13,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
- * This checker checks whether the entry does not contain any field appearing only in BibLaTeX (and not in BibTeX)
+ * This checker checks whether the entry does not contain any field appearing only in biblatex (and not in BibTeX)
  */
 public class NoBibtexFieldChecker implements Checker {
 
@@ -36,7 +36,7 @@ public class NoBibtexFieldChecker implements Checker {
         final List<String> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
         return entry.getFieldNames().stream()
                 .filter(name ->  allBiblatexOnlyFields.contains(name))
-                .map(name -> new IntegrityMessage(Localization.lang("BibLaTeX field only"), entry, name)).collect(Collectors.toList());
+                .map(name -> new IntegrityMessage(Localization.lang("biblatex field only"), entry, name)).collect(Collectors.toList());
     }
 
 }

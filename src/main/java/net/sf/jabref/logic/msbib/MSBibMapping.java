@@ -11,7 +11,7 @@ import net.sf.jabref.model.entry.FieldName;
 import com.google.common.collect.HashBiMap;
 
 /**
- * Mapping between Msbib and BibLaTeX
+ * Mapping between Msbib and biblatex
  * All Fields: <a href = "https://msdn.microsoft.com/de-de/library/office/documentformat.openxml.bibliography">List of all MSBib fields</a>
  *
  */

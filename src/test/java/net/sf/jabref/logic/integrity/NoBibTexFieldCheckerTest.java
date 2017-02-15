@@ -32,7 +32,7 @@ public class NoBibTexFieldCheckerTest {
     public void afterwordIsRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("afterword", "test");
-        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "afterword");
+        IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "afterword");
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
     }
@@ -40,7 +40,7 @@ public class NoBibTexFieldCheckerTest {
     @Test
     public void arbitraryNonBibLaTeXFieldIsNotRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
-        entry.setField("fieldNameNotDefinedInTheBibLaTeXManual", "test");
+        entry.setField("fieldNameNotDefinedInThebiblatexManual", "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
@@ -69,7 +69,7 @@ public class NoBibTexFieldCheckerTest {
     public void journaltitleIsRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("journaltitle", "test");
-        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "journaltitle");
+        IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "journaltitle");
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
     }
@@ -85,7 +85,7 @@ public class NoBibTexFieldCheckerTest {
     public void locationIsRecognizedAsBibLaTeXOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField("location", "test");
-        IntegrityMessage message = new IntegrityMessage("BibLaTeX field only", entry, "location");
+        IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, "location");
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
     }

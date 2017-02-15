@@ -1902,7 +1902,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public void initName() {
             if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));
+                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/biblatex"));
             } else {
                 BibDatabaseMode mode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode();
                 String modeName = mode.getOppositeMode().getFormattedName();
