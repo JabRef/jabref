@@ -580,7 +580,7 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_SIZE, 11);
+        defaults.put(MENU_FONT_SIZE, (int) javafx.scene.text.Font.getDefault().getSize());
         defaults.put(ICON_SIZE_LARGE, 24);
         defaults.put(ICON_SIZE_SMALL, 16);
         defaults.put(TABLE_ROW_PADDING, 9);

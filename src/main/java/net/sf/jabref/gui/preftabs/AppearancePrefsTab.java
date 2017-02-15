@@ -269,7 +269,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             int smallIconSize = Integer.parseInt(smallIconsTextField.getText());
             int largeIconSize = Integer.parseInt(largeIconsTextField.getText());
             int padding = Integer.parseInt(rowPadding.getText());
-            if (overrideFonts.isSelected() != oldOverrideFontSize) {
+            if (overrideFonts.isSelected()) {
                 boolean somethingIsChanged = false;
                 if (size != oldMenuFontSize) {
                     prefs.putInt(JabRefPreferences.MENU_FONT_SIZE, size);
@@ -289,6 +289,14 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                                     .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                             Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
                 }
+            } else if (overrideFonts.isSelected() != oldOverrideFontSize){
+                prefs.remove(JabRefPreferences.ICON_SIZE_SMALL);
+                prefs.remove(JabRefPreferences.ICON_SIZE_LARGE);
+                prefs.remove(JabRefPreferences.MENU_FONT_SIZE);
+                JOptionPane.showMessageDialog(null,
+                        Localization.lang("You have changed the menu and label font size.").concat(" ")
+                                .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
+                        Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
             }
 
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
