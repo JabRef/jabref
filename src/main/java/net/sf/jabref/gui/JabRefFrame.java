@@ -1194,8 +1194,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
         AbstractAction protectTerms = new ProtectedTermsAction();
         options.add(genFieldsCustomization);
-        options.add(customExpAction);
         options.add(customImpAction);
+        options.add(customExpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
         options.add(keyBindingAction);
