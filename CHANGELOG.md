@@ -122,7 +122,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Clicking on "Get Fulltext" button sets links correctly for the entry being edited. Fixes [#2391](https://github.com/JabRef/jabref/issues/2391).
-- The [integrity check](https://help.jabref.org/en/CheckIntegrity) now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
+- The [integrity check](https://help.jabref.org/en/CheckIntegrity) now determines the set of biblatex-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 - The integrity check filter works again. Fixes [#2406](https://github.com/JabRef/jabref/issues/2406).
 - The [ArXiv fetcher](http://help.jabref.org/en/arXiv) also accepts identifiers that include the "arXiv:" prefix. Fixes [#2427](https://github.com/JabRef/jabref/issues/2427).
 - We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
@@ -143,7 +143,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We enhanced the integrity checks testing for biblatex-only fields to be aware of more fields (e.g., `location`).
 - ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
 - When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
-- We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
+- We display both the field name `journaltitle` and `journal` in biblatex mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
 - We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [#1441](https://github.com/JabRef/jabref/issues/1441)
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
@@ -178,7 +178,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
 - We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
-- We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
+- We fixed an issue where the biblatex Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
 - Fixed [#2378](https://github.com/JabRef/jabref/issues/2378): Saving of the Backup-Option in the Preferences does now work.
 - We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 
@@ -187,7 +187,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - Implementation of eventbased autosave and backup functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
-- Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
+- Source tab in the entry editor displays "biblatex Source" when using biblatex mode
 - [koppor#171](https://github.com/koppor/jabref/issues/171): Add Shortcuts to context menu
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
@@ -213,7 +213,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
-- [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
+- [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (biblatex)
 - The dialog for choosing new entries additionally supports ID-based entry generation. For instance, when searching for a DOI or ISBN, you have to press <kbd>Ctrl</kbd> + <kbd>N</kbd> instead of using the web search (<kbd>Alt</kbd> + <kbd>4</kbd>).
 - `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
@@ -223,10 +223,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - <kbd>Pos1</kbd> / <kbd>Home</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>Up</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Importer for MODS format added
-- [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
+- [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (biblatex), Should be normalized (BibTeX)
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
 - Prohibit more than one connections to the same shared database.
-- Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
+- Implemented integrity check for `journaltitle` field: biblatex field only (BibTeX)
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 - [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
@@ -295,7 +295,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
-- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
+- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (biblatex)
 
 
 ## [3.6] – 2016-08-26
@@ -356,7 +356,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
 - Fixed [#1687](https://github.com/JabRef/jabref/issues/1687): "month" field ascending/descending sorting swapped
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
-- Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): BibLaTeX `date` field is now correctly exported as `year` in MS-Office 2007 xml format
+- Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): biblatex `date` field is now correctly exported as `year` in MS-Office 2007 xml format
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
 - Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
 - Fixed [#1804](https://github.com/JabRef/jabref/issues/1804): Integrity check no longer removes URL field by mistake
@@ -508,7 +508,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
 - Improved layout for OSX: Toolbar buttons and search field
-- BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
+- BibTeX and biblatex mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
