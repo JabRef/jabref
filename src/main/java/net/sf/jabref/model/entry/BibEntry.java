@@ -114,7 +114,9 @@ public class BibEntry implements Cloneable {
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
                                                  Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
-        keywordList.replaceAll(keywordsToReplace, newValue.get());
+        if (newValue.isPresent()) {
+            keywordList.replaceAll(keywordsToReplace, newValue.get());
+        }
 
         return putKeywords(keywordList, keywordDelimiter);
     }
