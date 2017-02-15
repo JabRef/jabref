@@ -17,6 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
@@ -43,7 +46,7 @@ public class BibDatabase {
     /**
      * State attributes
      */
-    private final List<BibEntry> entries = Collections.synchronizedList(new ArrayList<>());
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
 
     private String preamble;
     // All file contents below the last entry in the file
@@ -99,8 +102,8 @@ public class BibDatabase {
         return internalIDs.contains(id);
     }
 
-    public List<BibEntry> getEntries() {
-        return Collections.unmodifiableList(entries);
+    public ObservableList<BibEntry> getEntries() {
+        return FXCollections.unmodifiableObservableList(entries);
     }
 
     /**

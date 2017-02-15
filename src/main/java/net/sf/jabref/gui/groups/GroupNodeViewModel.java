@@ -1,21 +1,30 @@
 package net.sf.jabref.gui.groups;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.BindingsHelper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEvent;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.AutomaticGroup;
 import net.sf.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
@@ -41,7 +50,20 @@ public class GroupNodeViewModel {
         name = groupNode.getName();
         isRoot = groupNode.isRoot();
         iconCode = "";
-        children = EasyBind.map(groupNode.getChildren(), child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+        if (groupNode.getGroup().getClass() == AutomaticGroup.class) {
+            AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
+
+            // TODO: Update on changes to entry list (however: there is no flatMap and filter as observable TransformationLists)
+            children = databaseContext.getDatabase()
+                    .getEntries().stream()
+                    .flatMap(stream -> createSubgroups(databaseContext, stateManager, automaticGroup, stream))
+                    .filter(distinctByKey(GroupNodeViewModel::getName))
+                    .sorted((group1, group2) -> group1.getName().compareToIgnoreCase(group2.getName()))
+                    .collect(Collectors.toCollection(FXCollections::observableArrayList));
+        } else {
+            children = EasyBind.map(groupNode.getChildren(),
+                    child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+        }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
         hits = new SimpleIntegerProperty(0);
@@ -53,6 +75,16 @@ public class GroupNodeViewModel {
         ObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
         anySelectedEntriesMatched = BindingsHelper.any(selectedEntriesMatchStatus, matched -> matched);
         allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
+    }
+
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
+        return automaticGroup.createSubgroups(entry).stream()
+                .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
     }
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, AbstractGroup group) {
