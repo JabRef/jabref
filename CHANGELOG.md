@@ -30,7 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405))
     - Resizing the menu and label sizes has been improved.
     - Font sizes can now be increased <kbd>CTRL</kbd> + <kbd>PLUS</kbd>, decreased <kbd>CTRL</kbd> + <kbd>MINUS</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>
- - We integrated support for the paper recommender system MrDLib in a new tab in the entry editor
+- We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table [#2534](https://github.com/JabRef/jabref/issues/2534)
