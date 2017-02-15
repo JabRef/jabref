@@ -9,7 +9,9 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -26,8 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
- *  This class is responible to get the recommendations from MDL
- *
+ * This class is responible to get the recommendations from MDL
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
 
@@ -50,33 +51,39 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        String response = makeServerRequest(entry.getLatexFreeField(FieldName.TITLE).get());
-        MrDLibImporter importer = new MrDLibImporter();
-        ParserResult parserResult = new ParserResult();
-        try {
-            if (importer.isRecognizedFormat(new BufferedReader(new StringReader(response)))) {
-                parserResult = importer.importDatabase(new BufferedReader(new StringReader(response)));
-            } else {
-                // For displaying An ErrorMessage
-                BibEntry errorBibEntry = new BibEntry();
-                errorBibEntry.setField("html_representation",
-                        Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"));
-                BibDatabase errorBibDataBase = new BibDatabase();
-                errorBibDataBase.insertEntry(errorBibEntry);
-                parserResult = new ParserResult(errorBibDataBase);
+        Optional<String> title = entry.getLatexFreeField(FieldName.TITLE);
+        if (title.isPresent()) {
+            String response = makeServerRequest(title.get());
+            MrDLibImporter importer = new MrDLibImporter();
+            ParserResult parserResult = new ParserResult();
+            try {
+                if (importer.isRecognizedFormat(new BufferedReader(new StringReader(response)))) {
+                    parserResult = importer.importDatabase(new BufferedReader(new StringReader(response)));
+                } else {
+                    // For displaying An ErrorMessage
+                    BibEntry errorBibEntry = new BibEntry();
+                    errorBibEntry.setField("html_representation",
+                            Localization.lang("Error_while_fetching_from_%0", "Mr.DLib"));
+                    BibDatabase errorBibDataBase = new BibDatabase();
+                    errorBibDataBase.insertEntry(errorBibEntry);
+                    parserResult = new ParserResult(errorBibDataBase);
+                }
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+                throw new FetcherException("XML Parser IOException.");
             }
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-            throw new FetcherException("XML Parser IOException.");
+            return parserResult.getDatabase().getEntries();
+        } else {
+            // without a title there is no reason to ask MrDLib
+            return new ArrayList<>(0);
         }
-        return parserResult.getDatabase().getEntries();
     }
 
     /**
      * Contact the server with the title of the selected item
+     *
      * @param query: The query holds the title of the selected entry. Used to make a query to the MDL Server
      * @return Returns the server response. This is an XML document as a String.
-     * @throws FetcherException
      */
     private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
@@ -95,6 +102,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
 
     /**
      * Constructs the query based on title of the bibentry. Adds statistical stuff to the url.
+     *
      * @param query: the title of the bib entry.
      * @return the string used to make the query at mdl server
      */
@@ -118,5 +126,4 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         System.out.println("Query: " + uri.toString());
         return uri.toString();
     }
-
 }
