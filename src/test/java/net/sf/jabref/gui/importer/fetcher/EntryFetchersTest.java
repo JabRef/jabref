@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 public class EntryFetchersTest {
 
     Reflections reflections = new Reflections("net.sf.jabref");
-        ImportFormatPreferences importFormatPreferences;
+    ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() throws Exception {
