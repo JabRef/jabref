@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -55,8 +54,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-
-import javafx.application.Platform;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
@@ -136,6 +133,7 @@ import net.sf.jabref.preferences.SearchPreferences;
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+import javafx.application.Platform;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
