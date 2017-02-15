@@ -46,7 +46,7 @@ public class SharedDatabaseUIManager {
         jabRefFrame.output(Localization.lang("Connection lost."));
 
         String[] options = {Localization.lang("Reconnect"), Localization.lang("Work offline"),
-                Localization.lang("Close database")};
+                Localization.lang("Close library")};
 
         int answer = JOptionPane.showOptionDialog(jabRefFrame,
                 Localization.lang("The connection to the server has been terminated.") + "\n\n",

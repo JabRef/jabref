@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -56,7 +57,8 @@ public class Formatters {
             new NormalizePagesFormatter(),
             new OrdinalsToSuperscriptFormatter(),
             new RemoveBracesFormatter(),
-            new UnitsToLatexFormatter()
+            new UnitsToLatexFormatter(),
+            new EscapeUnderscoresFormatter()
     );
 
     public static final List<Formatter> ALL = new ArrayList<>();

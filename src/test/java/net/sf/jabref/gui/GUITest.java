@@ -100,7 +100,7 @@ public class GUITest extends AbstractUITest {
     public void testDatabasePropertiesDialog() throws IOException {
         newDatabase();
 
-        mainFrame.menuItemWithPath("File", "Database properties").click();
+        mainFrame.menuItemWithPath("File", "Library properties").click();
 
         robot().waitForIdle();
 

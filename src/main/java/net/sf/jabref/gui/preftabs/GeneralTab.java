@@ -86,8 +86,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
-        markImportedEntries = new JCheckBox(Localization.lang("Mark entries imported into an existing database"));
-        unmarkAllEntriesBeforeImporting = new JCheckBox(Localization.lang("Unmark all entries before importing new entries into an existing database"));
+        markImportedEntries = new JCheckBox(Localization.lang("Mark entries imported into an existing library"));
+        unmarkAllEntriesBeforeImporting = new JCheckBox(Localization.lang("Unmark all entries before importing new entries into an existing library"));
         defOwnerField = new JTextField();
         timeStampFormat = new JTextField();
         timeStampField = new JTextField();

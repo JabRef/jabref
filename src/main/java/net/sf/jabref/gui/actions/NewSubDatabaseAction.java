@@ -23,8 +23,8 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
     public NewSubDatabaseAction(JabRefFrame jabRefFrame) {
         super(IconTheme.JabRefIcon.NEW.getIcon());
         this.jabRefFrame = jabRefFrame;
-        putValue(Action.NAME, Localization.menuTitle("New subdatabase based on AUX file") + "...");
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX subdatabase"));
+        putValue(Action.NAME, Localization.menuTitle("New sublibrary based on AUX file") + "...");
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("New BibTeX sublibrary"));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class NewSubDatabaseAction extends MnemonicAwareAction {
             Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
             BasePanel bp = new BasePanel(jabRefFrame, new BibDatabaseContext(dialog.getGenerateDB(), defaults));
             jabRefFrame.addTab(bp, true);
-            jabRefFrame.output(Localization.lang("New database created."));
+            jabRefFrame.output(Localization.lang("New library created."));
         }
     }
 }

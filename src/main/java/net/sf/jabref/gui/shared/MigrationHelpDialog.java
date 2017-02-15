@@ -29,15 +29,15 @@ public class MigrationHelpDialog extends JDialog {
         setModal(true);
 
         String migrationMessage = Localization
-                .lang("Entered database has obsolete structure and is no longer supported.");
+                .lang("Entered library has obsolete structure and is no longer supported.");
         JLabel migrationLabel = new JLabel(migrationMessage);
         migrationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String helpMessage = Localization.lang("Click here to learn about the migration of pre-3.6 databases.");
+        String helpMessage = Localization.lang("Click here to learn about the migration of pre-3.6 libraries.");
         JLabel helpLabel = new HelpAction(HelpFile.SQL_DATABASE_MIGRATION).getHelpLabel(helpMessage);
         helpLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String informationMessage = Localization.lang("However, a new database was created alongside the pre-3.6 one.");
+        String informationMessage = Localization.lang("However, a new library was created alongside the pre-3.6 one.");
         JLabel informationLabel = new JLabel(informationMessage);
         informationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 

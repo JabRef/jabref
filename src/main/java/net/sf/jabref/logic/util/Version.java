@@ -18,7 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
+ * Represents the Application Version with the major and minor number, the full Version String and if it's a developer
+ * version
  */
 public class Version {
 
@@ -38,11 +39,15 @@ public class Version {
     private DevelopmentStage developmentStage = DevelopmentStage.UNKNOWN;
     private boolean isDevelopmentVersion;
 
-    /** Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION}) */
-    private Version() {}
+    /**
+     * Dummy constructor to create a local object (and  {@link Version#UNKNOWN_VERSION})
+     */
+    private Version() {
+    }
 
     /**
-     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
+     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?}
+     *                (e.g., 3.3; 3.4-dev)
      * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
     public static Version parse(String version) {
@@ -51,7 +56,7 @@ public class Version {
             return UNKNOWN_VERSION;
         }
 
-        Version parsedVersion= new Version();
+        Version parsedVersion = new Version();
 
         parsedVersion.fullVersion = version;
         Matcher matcher = VERSION_PATTERN.matcher(version);
@@ -84,22 +89,21 @@ public class Version {
 
     /**
      * Grabs all the available releases from the GitHub repository
-     *
-     * @throws IOException
      */
     public static List<Version> getAllAvailableVersions() throws IOException {
         URLConnection connection = new URL(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
-        BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
-        List<Version> versions = new ArrayList<>();
-        JSONArray objects = new JSONArray(rd.readLine());
-        for (int i = 0; i < objects.length(); i++) {
-            JSONObject jsonObject = objects.getJSONObject(i);
-            Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
-            versions.add(version);
+            List<Version> versions = new ArrayList<>();
+            JSONArray objects = new JSONArray(rd.readLine());
+            for (int i = 0; i < objects.length(); i++) {
+                JSONObject jsonObject = objects.getJSONObject(i);
+                Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
+                versions.add(version);
+            }
+            return versions;
         }
-        return versions;
     }
 
     /**
@@ -147,7 +151,7 @@ public class Version {
      *
      * @return The version this one should be updated to, or an empty Optional
      */
-    public Optional<Version> shouldBeUpdatedTo(List<Version> availableVersions ) {
+    public Optional<Version> shouldBeUpdatedTo(List<Version> availableVersions) {
         Optional<Version> newerVersion = Optional.empty();
         for (Version version : availableVersions) {
             if (this.shouldBeUpdatedTo(version)
@@ -163,7 +167,7 @@ public class Version {
      * Ignoring the other Version if this one is Stable and the other one is not.
      *
      * @return True if this version should be updated to the given one
-     * */
+     */
     public boolean shouldBeUpdatedTo(Version otherVersion) {
         // ignoring the other version if it is not stable, except if this version itself is not stable
         if (developmentStage == Version.DevelopmentStage.STABLE
@@ -196,8 +200,7 @@ public class Version {
     }
 
     /**
-     * @return The link to the changelog on GitHub to this specific version
-     * (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
+     * @return The link to the changelog on GitHub to this specific version (https://github.com/JabRef/jabref/blob/vX.X/CHANGELOG.md)
      */
     public String getChangelogUrl() {
         if (isDevelopmentVersion) {
@@ -253,7 +256,9 @@ public class Version {
         BETA("-beta", 2),
         STABLE("", 3);
 
-        /** describes how stable this stage is, the higher the better */
+        /**
+         * describes how stable this stage is, the higher the better
+         */
         private final int stability;
         private final String stage;
 
@@ -284,5 +289,4 @@ public class Version {
             return this.stability > otherStage.stability;
         }
     }
-
 }

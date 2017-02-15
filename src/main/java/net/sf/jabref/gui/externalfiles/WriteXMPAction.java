@@ -86,7 +86,7 @@ public class WriteXMPAction extends AbstractWorker {
 
             } else {
 
-                int response = JOptionPane.showConfirmDialog(panel, Localization.lang("Write XMP-metadata for all PDFs in current database?"),
+                int response = JOptionPane.showConfirmDialog(panel, Localization.lang("Write XMP-metadata for all PDFs in current library?"),
                         Localization.lang("Write XMP-metadata"), JOptionPane.YES_NO_CANCEL_OPTION,
                         JOptionPane.QUESTION_MESSAGE);
 

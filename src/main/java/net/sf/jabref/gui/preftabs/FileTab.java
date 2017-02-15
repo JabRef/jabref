@@ -79,9 +79,9 @@ class FileTab extends JPanel implements PrefsTab {
         buttonGroup.add(matchStartsWithKey);
         buttonGroup.add(useRegExpComboBox);
 
-        openLast = new JCheckBox(Localization.lang("Open last edited databases at startup"));
+        openLast = new JCheckBox(Localization.lang("Open last edited libraries at startup"));
         backup = new JCheckBox(Localization.lang("Backup old file when saving"));
-        localAutoSave = new JCheckBox(Localization.lang("Autosave local databases"));
+        localAutoSave = new JCheckBox(Localization.lang("Autosave local libraries"));
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
