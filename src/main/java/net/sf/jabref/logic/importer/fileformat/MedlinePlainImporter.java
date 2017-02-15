@@ -51,6 +51,11 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
+    public String getId() {
+        return "medlineplain";
+    }
+
+    @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
