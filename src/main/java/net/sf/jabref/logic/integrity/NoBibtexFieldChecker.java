@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -19,7 +19,7 @@ public class NoBibtexFieldChecker implements Checker {
 
     private List<String> getAllBiblatexOnlyFields() {
         Set<String> allBibtexFields = BibtexEntryTypes.ALL.stream().flatMap(type -> type.getAllFields().stream()).collect(Collectors.toSet());
-        return BibLatexEntryTypes.ALL.stream()
+        return BiblatexEntryTypes.ALL.stream()
                 .flatMap(type -> type.getAllFields().stream())
                 .filter(fieldName -> !allBibtexFields.contains(fieldName))
                 // these fields are displayed by JabRef as default

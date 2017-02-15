@@ -49,12 +49,12 @@ public class Cleanups {
         recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
-        List<FieldFormatterCleanup> recommendedBibLaTeXFormatters = new ArrayList<>();
-        recommendedBibLaTeXFormatters.addAll(defaultFormatters);
-        recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
-        recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
-        recommendedBibLaTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
-        RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibLaTeXFormatters);
+        List<FieldFormatterCleanup> recommendedBiblatexFormatters = new ArrayList<>();
+        recommendedBiblatexFormatters.addAll(defaultFormatters);
+        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
+        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
+        RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBiblatexFormatters);
     }
 
     public static List<Formatter> getAvailableFormatters() {

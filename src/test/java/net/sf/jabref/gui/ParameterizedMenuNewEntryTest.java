@@ -40,7 +40,7 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
     public static Collection<Object[]> instancesToTest() {
         // Create entry from menu
         // Structure:
-        // {"BibTeX"/"BibLaTeX", "type"}
+        // {"BibTeX"/"biblatex", "type"}
         // @formatter:off
         return Arrays.asList(
                 new Object[]{"BibTeX", "article"},
@@ -57,20 +57,20 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
                 new Object[]{"BibTeX", "techreport"},
                 new Object[]{"BibTeX", "unpublished"},
                 new Object[]{"BibTeX", "misc"},
-                new Object[]{"BibLaTeX", "article"},
-                new Object[]{"BibLaTeX", "inbook"},
-                new Object[]{"BibLaTeX", "book"},
-                new Object[]{"BibLaTeX", "booklet"},
-                new Object[]{"BibLaTeX", "incollection"},
-                new Object[]{"BibLaTeX", "conference"},
-                new Object[]{"BibLaTeX", "inproceedings"},
-                new Object[]{"BibLaTeX", "proceedings"},
-                new Object[]{"BibLaTeX", "manual"},
-                new Object[]{"BibLaTeX", "mastersthesis"},
-                new Object[]{"BibLaTeX", "phdthesis"},
-                new Object[]{"BibLaTeX", "techreport"},
-                new Object[]{"BibLaTeX", "unpublished"},
-                new Object[]{"BibLaTeX", "misc"}
+                new Object[]{"biblatex", "article"},
+                new Object[]{"biblatex", "inbook"},
+                new Object[]{"biblatex", "book"},
+                new Object[]{"biblatex", "booklet"},
+                new Object[]{"biblatex", "incollection"},
+                new Object[]{"biblatex", "conference"},
+                new Object[]{"biblatex", "inproceedings"},
+                new Object[]{"biblatex", "proceedings"},
+                new Object[]{"biblatex", "manual"},
+                new Object[]{"biblatex", "mastersthesis"},
+                new Object[]{"biblatex", "phdthesis"},
+                new Object[]{"biblatex", "techreport"},
+                new Object[]{"biblatex", "unpublished"},
+                new Object[]{"biblatex", "misc"}
         );
         // @formatter:on
     }

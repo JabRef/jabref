@@ -149,8 +149,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 - [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
 - Add the possibility to copy citations of multiple entries to the clipboard
-- Custom EntryTypes are now stored independently for BibTeX and BibLatex mode.
-  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to BibLatex)
+- Custom EntryTypes are now stored independently for BibTeX and biblatex mode.
+  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to biblatex)
 - Upon opening a file with customized entry types it is now possible to choose which customizations should be stored in local preferences.
 - The default emacs executable name on linux changed from `gnuclient` to `emacsclient`.
   [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
@@ -375,7 +375,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed NullPointerException when loading a style file that has not got a default style
-- Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Date fields in the biblatex standard are now always formatted in the correct way, independent of the preferences
 - The merge entry dialog showed wrong heading after merging from DOI
 - Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - When inserting a duplicate the right entry will be selected
@@ -639,7 +639,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#435](https://github.com/JabRef/jabref/issues/435): Retrieve non open access ScienceDirect PDFs via HTTP DOM
 - Fixed: Cleanup process aborts if linked file does not exists
 - Fixed [#420](https://github.com/JabRef/jabref/issues/420): Reenable preference changes
-- Fixed [#414](https://github.com/JabRef/jabref/issues/414): Rework BibLatex entry types with correct required and optional fields
+- Fixed [#414](https://github.com/JabRef/jabref/issues/414): Rework biblatex entry types with correct required and optional fields
 - Fixed [#413](https://github.com/JabRef/jabref/issues/413): Help links in released jar version are not working
 - Fixes [#412](https://github.com/JabRef/jabref/issues/412): Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
 - Fixed [#437](https://github.com/JabRef/jabref/issues/437): The toolbar after the search field is now correctly wrapped when using a small window size for JabRef

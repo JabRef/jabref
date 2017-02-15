@@ -36,7 +36,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
@@ -112,7 +112,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         panel.setLayout(new VerticalLayout());
 
         if (frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-            panel.add(createEntryGroupPanel("BibLateX", BibLatexEntryTypes.ALL));
+            panel.add(createEntryGroupPanel("biblatex", BiblatexEntryTypes.ALL));
 
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (!customTypes.isEmpty()) {

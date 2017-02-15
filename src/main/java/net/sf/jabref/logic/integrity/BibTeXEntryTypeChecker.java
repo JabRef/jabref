@@ -18,7 +18,7 @@ public class BibTeXEntryTypeChecker implements Checker {
      */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        if (EntryTypes.isExclusiveBibLatex(entry.getType())) {
+        if (EntryTypes.isExclusiveBiblatex(entry.getType())) {
             return Collections.singletonList(
                     new IntegrityMessage(Localization.lang("Entry type %0 is only defined for Biblatex but not for BibTeX", entry.getType()), entry, "bibtexkey")
             );

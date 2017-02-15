@@ -194,7 +194,7 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.MULTIPLE_ENTRY_LINK));
         add(dummy);
 
-        // some BibLatex fields
+        // some biblatex fields
         dummy = new BibtexSingleField(FieldName.GENDER, true, BibtexSingleField.SMALL_W);
         dummy.getFieldProperties().add(FieldProperty.GENDER);
         add(dummy);

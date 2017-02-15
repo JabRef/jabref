@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -80,19 +80,19 @@ public class MSBibMapping {
         biblatexToMsBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
 
-    public static String getBibLaTeXEntryType(String msbibType) {
+    public static String getBiblatexEntryType(String msbibType) {
         final String defaultType = BibtexEntryTypes.MISC.getName();
 
         Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        entryTypeMapping.put("Book", BibLatexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("BookSection", BibLatexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("JournalArticle", BibLatexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ArticleInAPeriodical", BibLatexEntryTypes.PERIODICAL.getName());
-        entryTypeMapping.put("ConferenceProceedings", BibLatexEntryTypes.INPROCEEDINGS.getName());
-        entryTypeMapping.put("Report", BibLatexEntryTypes.TECHREPORT.getName());
-        entryTypeMapping.put("Patent", BibLatexEntryTypes.PATENT.getName());
-        entryTypeMapping.put("InternetSite", BibLatexEntryTypes.ONLINE.getName());
+        entryTypeMapping.put("Book", BiblatexEntryTypes.BOOK.getName());
+        entryTypeMapping.put("BookSection", BiblatexEntryTypes.BOOK.getName());
+        entryTypeMapping.put("JournalArticle", BiblatexEntryTypes.ARTICLE.getName());
+        entryTypeMapping.put("ArticleInAPeriodical", BiblatexEntryTypes.PERIODICAL.getName());
+        entryTypeMapping.put("ConferenceProceedings", BiblatexEntryTypes.INPROCEEDINGS.getName());
+        entryTypeMapping.put("Report", BiblatexEntryTypes.TECHREPORT.getName());
+        entryTypeMapping.put("Patent", BiblatexEntryTypes.PATENT.getName());
+        entryTypeMapping.put("InternetSite", BiblatexEntryTypes.ONLINE.getName());
 
         return entryTypeMapping.getOrDefault(msbibType, defaultType);
     }

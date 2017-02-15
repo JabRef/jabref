@@ -143,7 +143,7 @@ public class CleanupPreset {
          */
         CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
         /**
-         * Converts to BibLatex format
+         * Converts to biblatex format
          */
         CONVERT_TO_BIBLATEX,
         MOVE_PDF,

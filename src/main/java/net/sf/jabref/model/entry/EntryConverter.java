@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Converts Entry models from BibTex to BibLaTex and back.
+ * Converts Entry models from BibTex to biblatex and back.
  */
 public class EntryConverter {
 

@@ -24,7 +24,7 @@ public class MonthChecker implements ValueChecker {
     }
 
     /**
-     * BibLaTeX package documentation (Section 2.3.9):
+     * biblatex package documentation (Section 2.3.9):
      * The month field is an integer field.
      * The bibliography style converts the month to a language-dependent string as required.
      * For backwards compatibility, you may also use the following three-letter abbreviations in the month field:

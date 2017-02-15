@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Abstract base class for all BibLaTex entry types.
+ * Abstract base class for all biblatex entry types.
  */
-public abstract class BibLatexEntryType implements EntryType {
+public abstract class BiblatexEntryType implements EntryType {
 
     private final List<String> requiredFields;
     private final List<String> optionalFields;
 
 
-    public BibLatexEntryType() {
+    public BiblatexEntryType() {
         requiredFields = new ArrayList<>();
         optionalFields = new ArrayList<>();
     }
