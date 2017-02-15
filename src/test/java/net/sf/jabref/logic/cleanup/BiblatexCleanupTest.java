@@ -25,7 +25,7 @@ public class BiblatexCleanupTest {
         entry.setField("month", "#jan#");
 
         worker.cleanup(entry);
-        Assert.assertEquals(Optional.of("2011-01"), entry.getField(FieldName.YEAR));
+        Assert.assertEquals(Optional.empty(), entry.getField(FieldName.YEAR));
         Assert.assertEquals(Optional.empty(), entry.getField(FieldName.MONTH));
         Assert.assertEquals(Optional.of("2011-01"), entry.getField(FieldName.DATE));
     }
