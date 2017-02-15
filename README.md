@@ -99,15 +99,13 @@ Sources for the integration test are kept in `src/integrationTest`.
 Building a release requires [install4j]. We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
 Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A full release howto is available [in our wiki](https://github.com/JabRef/jabref/wiki/Releasing-a-new-Version).
 
-## Rights of Loading Animation
-The loading animation during loading of recommendations from Mr. DLib is created by http://loading.io/ and is free of use under licence CC0 1.0.
 
 ## License
 
 Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
-JabRef also uses libraries distributed by other parties.
+JabRef also uses libraries, fonts, and icons distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
 
   [BibTeX]: https://www.ctan.org/pkg/bibtex
