@@ -126,7 +126,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testJournaltitleChecks() {
-        assertCorrect(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
     }
 
@@ -192,7 +192,7 @@ public class IntegrityCheckTest {
     @Test
     public void testAbbreviationChecks() {
         for (String field : Arrays.asList("booktitle", "journal")) {
-            assertCorrect(createContext(field, "Proceedings of the"));
+            assertCorrect(createContext(field, "IEEE SW"));
             assertWrong(createContext(field, "Proc. of the"));
         }
     }
@@ -336,7 +336,8 @@ public class IntegrityCheckTest {
 
         new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                createBibtexKeyPatternPreferences())
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
         
         assertEquals(clonedEntry, entry);
