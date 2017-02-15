@@ -29,9 +29,7 @@ We suggest [Eclipse](https://eclipse.org/) or [IntelliJ](https://www.jetbrains.c
 The community edition should be enough.
 If not, a developer key for the JabRef project for the full version is available upon request.
 
-Ensure that you configure the imports as follows:
-
-![image](https://cloud.githubusercontent.com/assets/375693/14460173/5113c518-00bc-11e6-89b8-e1f221001a7d.png)
+You can find a IntelliJ Codestyle configuration file in the folder `config`
 
 #### Eclipse
 Please install [EclEmma](http://eclemma.org/) for code coverage.
