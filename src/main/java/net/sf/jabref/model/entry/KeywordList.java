@@ -87,18 +87,6 @@ public class KeywordList implements Iterable<Keyword> {
         keywords.removeAll(keywordsToRemove.keywords);
     }
 
-    /**
-     * @deprecated use {@link #replaceAll(KeywordList, Keyword)} or {@link #removeAll(KeywordList)}
-     */
-    @Deprecated
-    public void replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue) {
-        if (newValue.isPresent()) {
-            replaceAll(keywordsToReplace, newValue.get());
-        } else {
-            removeAll(keywordsToReplace);
-        }
-    }
-
     public boolean add(Keyword keyword) {
         if (contains(keyword)) {
             return false; // Don't add duplicate keywords
