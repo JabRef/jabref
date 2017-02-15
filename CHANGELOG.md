@@ -25,6 +25,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
 - The MS-Office XML export now exports the field `volumes` and `pubstate`.
 - The integrity checker reports now if a journal is not found in the abbreviation list
+- Comments in PDF files can now be displayed inside JabRef in a separate tab
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table [#2534](https://github.com/JabRef/jabref/issues/2534)
