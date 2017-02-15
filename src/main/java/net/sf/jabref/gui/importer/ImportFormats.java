@@ -51,10 +51,10 @@ public class ImportFormats {
                 this.newDatabase = newDatabase;
 
                 if (newDatabase) {
-                    putValue(Action.NAME, Localization.menuTitle("Import into new database"));
+                    putValue(Action.NAME, Localization.menuTitle("Import into new library"));
                     putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE));
                 } else {
-                    putValue(Action.NAME, Localization.menuTitle("Import into current database"));
+                    putValue(Action.NAME, Localization.menuTitle("Import into current library"));
                     putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
                 }
             }

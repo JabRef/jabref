@@ -23,8 +23,8 @@ public class NewDatabaseAction extends MnemonicAwareAction {
         super(IconTheme.JabRefIcon.NEW.getIcon());
         this.jabRefFrame = jabRefFrame;
         this.mode = mode;
-        putValue(Action.NAME, Localization.menuTitle("New %0 database", mode.getFormattedName()));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("New %0 database", mode.getFormattedName()));
+        putValue(Action.NAME, Localization.menuTitle("New %0 library", mode.getFormattedName()));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("New %0 library", mode.getFormattedName()));
     }
 
     @Override
@@ -33,6 +33,6 @@ public class NewDatabaseAction extends MnemonicAwareAction {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX));
         bibDatabaseContext.setMode(mode);
         jabRefFrame.addTab(bibDatabaseContext, true);
-        jabRefFrame.output(Localization.lang("New %0 database created.", mode.getFormattedName()));
+        jabRefFrame.output(Localization.lang("New %0 library created.", mode.getFormattedName()));
     }
 }

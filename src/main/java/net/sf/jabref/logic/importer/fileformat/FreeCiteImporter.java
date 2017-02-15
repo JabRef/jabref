@@ -203,11 +203,14 @@ public class FreeCiteImporter extends Importer {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    BibtexKeyPatternUtil.makeAndSetLabel(
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData()
-                                    .getCiteKeyPattern(importFormatPreferences.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
-                            importFormatPreferences.getBibtexKeyPatternPreferences());
+                    if (JabRefGUI.getMainFrame() != null) {
+                        // only possible in GUI mode
+                        BibtexKeyPatternUtil.makeAndSetLabel(
+                                JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData()
+                                        .getCiteKeyPattern(importFormatPreferences.getBibtexKeyPatternPreferences().getKeyPattern()),
+                                JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
+                                importFormatPreferences.getBibtexKeyPatternPreferences());
+                    }
 
                     res.add(e);
                 }

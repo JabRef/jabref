@@ -1369,7 +1369,7 @@ class OOBibBase {
                     clonedEntry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
-                            // Add it if it is in the current database
+                            // Add it if it is in the current library
                             loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
                         }
                     });

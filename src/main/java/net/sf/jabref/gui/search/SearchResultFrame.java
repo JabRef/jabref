@@ -568,7 +568,7 @@ public class SearchResultFrame {
             if (column >= PAD) {
                 return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else if (column == DATABASE_COL){
-                return Localization.lang("Database");
+                return Localization.lang("Library");
             } else {
                 return "";
             }

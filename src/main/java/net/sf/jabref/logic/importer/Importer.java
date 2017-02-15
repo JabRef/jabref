@@ -42,7 +42,7 @@ public abstract class Importer implements Comparable<Importer> {
      * JabRef cycles through all available import formats. No error messages or feedback
      * is displayed from individual import formats in this case.
      *
-     * If importing in a specified format and an empty database is returned, JabRef reports
+     * If importing in a specified format and an empty library is returned, JabRef reports
      * that no entries were found.
      *
      * This method should never return null.

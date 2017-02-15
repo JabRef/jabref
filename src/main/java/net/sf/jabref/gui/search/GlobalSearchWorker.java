@@ -32,7 +32,7 @@ class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Voi
         this.searchQuery = Objects.requireNonNull(query);
 
         dialog = new SearchResultFrame(frame,
-                Localization.lang("Search results in all databases for %0",
+                Localization.lang("Search results in all libraries for %0",
                         this.searchQuery.localize()),
                 searchQuery, true);
         frame.getGlobalSearchBar().setSearchResultFrame(dialog);

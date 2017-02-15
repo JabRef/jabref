@@ -417,6 +417,8 @@ public class JabRefPreferences {
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
 
+    // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
+    private final static Integer UNSET_MENU_FONT_SIZE = -123;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -586,7 +588,7 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_SIZE, (int) javafx.scene.text.Font.getDefault().getSize());
+        defaults.put(MENU_FONT_SIZE, UNSET_MENU_FONT_SIZE);
         defaults.put(ICON_SIZE_LARGE, 24);
         defaults.put(ICON_SIZE_SMALL, 16);
         defaults.put(TABLE_ROW_PADDING, 9);
@@ -994,7 +996,16 @@ public class JabRefPreferences {
     }
 
     public int getIntDefault(String key) {
-        return (Integer) defaults.get(key);
+        if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
+            Integer menuFontSize = (Integer) defaults.get(key);
+            if (menuFontSize.equals(UNSET_MENU_FONT_SIZE)) {
+                menuFontSize = (int) javafx.scene.text.Font.getDefault().getSize();
+                defaults.put(key, menuFontSize);
+            }
+            return menuFontSize;
+        } else {
+            return (Integer) defaults.get(key);
+        }
     }
 
     public void put(String key, String value) {

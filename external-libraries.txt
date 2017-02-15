@@ -13,6 +13,8 @@ Note that the SPDX license identifiers are different from the ones used by debia
 
 # Fonts and Icons
 
+The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
+
 Id:      material-design-icons.font
 Project: Material Design Icons
 Version: v1.5.54
@@ -22,6 +24,7 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 
 
 # Libraries
+
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html

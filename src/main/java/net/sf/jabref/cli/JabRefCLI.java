@@ -186,7 +186,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("a").
                 longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from AUX"),
+                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Sublibrary from AUX"),
                         Localization.lang("file"),
                         Localization.lang("new"))).
                 hasArg().

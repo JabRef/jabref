@@ -89,7 +89,7 @@ public class JabRefGUI {
         // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
         setLookAndFeel();
 
-        // If the option is enabled, open the last edited databases, if any.
+        // If the option is enabled, open the last edited libraries, if any.
         if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             openLastEditedDatabases();
         }

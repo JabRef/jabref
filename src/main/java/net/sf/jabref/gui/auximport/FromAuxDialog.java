@@ -107,10 +107,10 @@ public class FromAuxDialog extends JDialog {
         this.setResizable(true);
         this.setTitle(Localization.lang("AUX file import"));
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
-                + Localization.lang("This feature generates a new database based on which entries "
+                + Localization.lang("This feature generates a new library based on which entries "
                         + "are needed in an existing LaTeX document.")
                 + "</p>" + "<p>"
-                + Localization.lang("You need to select one of your open databases from which to choose "
+                + Localization.lang("You need to select one of your open libraries from which to choose "
                         + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
                 + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -170,7 +170,7 @@ public class FromAuxDialog extends JDialog {
 
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
-        b.append(Localization.lang("Reference database") + ":");
+        b.append(Localization.lang("Reference library") + ":");
         b.append(dbChooser, 3);
         b.nextLine();
         b.append(Localization.lang("LaTeX AUX file") + ":");
@@ -207,7 +207,7 @@ public class FromAuxDialog extends JDialog {
 
             // the generated database contains no entries -> no active generate-button
             if (!result.getGeneratedBibDatabase().hasEntries()) {
-                statusInfos.append("\n" + Localization.lang("empty database"));
+                statusInfos.append("\n" + Localization.lang("empty library"));
                 generateButton.setEnabled(false);
             }
         } else {
