@@ -23,13 +23,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 - Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
-- The MS-Office XML export now exports the field `volumes` and `pubstate`.
+- The MS Office XML export now exports the field `volumes` and `pubstate`.
 - The integrity checker reports now if a journal is not found in the abbreviation list
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
 - We improved the UI customization possibilities:
-    - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405))
+    - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
     - Resizing the menu and label sizes has been improved.
-    - Font sizes can now be increased <kbd>CTRL</kbd> + <kbd>PLUS</kbd>, decreased <kbd>CTRL</kbd> + <kbd>MINUS</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>
+    - Font sizes can now be increased <kbd>Ctrl</kbd> + <kbd>Plus</kbd>, decreased <kbd>Ctrl</kbd> + <kbd>Minus</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>.
 - We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
 
 ### Fixed
