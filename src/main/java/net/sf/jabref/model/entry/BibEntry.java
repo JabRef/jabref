@@ -157,7 +157,7 @@ public class BibEntry implements Cloneable {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
             result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
         }
-        return result.map(resultText -> database.resolveForStrings(resultText));
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
 
     /**

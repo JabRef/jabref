@@ -519,6 +519,23 @@ public class BibDatabase {
         return res;
     }
 
+    /**
+     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
+     *
+     * Returns a text with references resolved according to an optionally given database.
+     *
+     * @param toResolve maybenull The text to resolve.
+     * @param database  maybenull The database to use for resolving the text.
+     * @return The resolved text or the original text if either the text or the database are null
+     */
+    @Deprecated
+    public static String getText(String toResolve, BibDatabase database) {
+        if ((toResolve != null) && (database != null)) {
+            return database.resolveForStrings(toResolve);
+        }
+        return toResolve;
+    }
+
     public void setEpilog(String epilog) {
         this.epilog = epilog;
     }

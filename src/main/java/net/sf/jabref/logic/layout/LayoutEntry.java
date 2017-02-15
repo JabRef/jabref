@@ -224,7 +224,7 @@ class LayoutEntry {
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? bibtex
                     .getResolvedFieldOrAlias(text.substring(1), database)
-                    .orElse("") : database.resolveForStrings(text);
+                    .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
 
@@ -341,7 +341,7 @@ class LayoutEntry {
             throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
 
         case LayoutHelper.IS_OPTION_FIELD:
-            String field = databaseContext.getDatabase().resolveForStrings(text);
+            String field = BibDatabase.getText(text, databaseContext.getDatabase());
             if (option != null) {
                 for (LayoutFormatter anOption : option) {
                     field = anOption.format(field);
