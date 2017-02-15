@@ -3,10 +3,16 @@ package net.sf.jabref.gui.desktop.os;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
+
+import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Windows implements NativeDesktop {
     private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
@@ -51,5 +57,21 @@ public class Windows implements NativeDesktop {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();
+    }
+
+    @Override
+    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
+        String pdfReaderPath = JabRefPreferences.getInstance().get(USE_PDF_READER);
+        if (pdfReaderPath.equals(SUMATRA_PDF_COMMAND) || pdfReaderPath.equals(ADOBE_ACROBAT_COMMAND)) {
+            String[] command = new String[parameters.size() + 2];
+            command[0] = "\"" + Paths.get(pdfReaderPath).toString() + "\"";
+            for (int i = 1; i < command.length - 1; i++) {
+                command[i] = "\"" + parameters.get(i - 1) + "\"";
+            }
+            command[command.length - 1] = "\"" + filePath + "\"";
+            new ProcessBuilder(command).start();
+        } else {
+            openFile(filePath, "PDF");
+        }
     }
 }
