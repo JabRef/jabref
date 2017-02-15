@@ -1,4 +1,4 @@
-# no need for databases for the integrationTest -> save memory
+# no need for databases for the integrationTest -> save memory overflow
 # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
 sudo service postgresql stop
 # following services identified by "sudo service --status-all" do not need to run, too
