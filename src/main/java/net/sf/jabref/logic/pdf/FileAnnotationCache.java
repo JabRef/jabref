@@ -34,8 +34,8 @@ public class FileAnnotationCache {
      */
     public Optional<Map<String, List<FileAnnotation>>> getFromCache(Optional<BibEntry> entry) {
         Optional<Map<String, List<FileAnnotation>>> cachedAnnotations = Optional.empty();
-        if(entry.isPresent() && annotationCache.containsKey(entry)){
-            return Optional.of(annotationCache.get(entry));
+        if(entry.isPresent() && annotationCache.containsKey(entry.get())){
+            return Optional.of(annotationCache.get(entry.get()));
         } else {
             return cachedAnnotations;
         }
