@@ -6,13 +6,15 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
+@Category(FetcherTests.class)
 public class IEEETest {
     private IEEE finder;
     private BibEntry entry;
@@ -35,7 +37,6 @@ public class IEEETest {
     }
 
     @Test
-    @Ignore("Fails both locally and on TravisCI")
     public void findByDOI() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
 
@@ -46,7 +47,6 @@ public class IEEETest {
     }
 
     @Test
-    @Ignore("Fails both locally and on TravisCI")
     public void findByURL() throws IOException {
         entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926");
 
@@ -57,7 +57,6 @@ public class IEEETest {
     }
 
     @Test
-    @Ignore("Fails both locally and on TravisCI")
     public void findByOldURL() throws IOException {
         entry.setField("url", "http://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
 
@@ -68,7 +67,6 @@ public class IEEETest {
     }
 
     @Test
-    @Ignore("Fails both locally and on TravisCI")
     public void findByDOIButNotURL() throws IOException {
         entry.setField("doi", "10.1109/ACCESS.2016.2535486");
         entry.setField("url", "http://dx.doi.org/10.1109/ACCESS.2016.2535486");

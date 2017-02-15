@@ -6,12 +6,16 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
+@Category(FetcherTests.class)
 public class IsbnFetcherTest {
 
     private IsbnFetcher fetcher;
@@ -27,11 +31,12 @@ public class IsbnFetcherTest {
         bibEntry.setField("title", "Effective Java");
         bibEntry.setField("publisher", "Addison Wesley");
         bibEntry.setField("year", "2008");
-        bibEntry.setField("author", "Joshua Bloch");
+        bibEntry.setField("author", "Bloch, Joshua");
         bibEntry.setField("date", "2008-05-08");
         bibEntry.setField("ean", "9780321356680");
         bibEntry.setField("isbn", "0321356683");
         bibEntry.setField("pagetotal", "384");
+        bibEntry.setField("url", "http://www.ebook.de/de/product/6441328/joshua_bloch_effective_java.html");
     }
 
     @Test
@@ -76,4 +81,15 @@ public class IsbnFetcherTest {
     public void searchByIdThrowsExceptionForInvalidISBN() throws FetcherException {
         fetcher.performSearchById("jabref-4-ever");
     }
+
+    /**
+     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21
+     * However, this ISBN is not available on ebook.de. The fetcher should something as it falls back to Chimbori
+     */
+    @Test
+    public void searchForIsbnAvailableAtChimboriButNonOnEbookDe() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3728128155");
+        assertNotEquals(Optional.empty(), fetchedEntry);
+    }
+
 }

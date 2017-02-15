@@ -42,7 +42,6 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
@@ -215,7 +214,6 @@ class StyleSelectDialog {
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        GUIUtil.correctRowHeight(table);
 
         selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedStyles);

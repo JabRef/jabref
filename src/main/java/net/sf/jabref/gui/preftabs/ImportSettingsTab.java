@@ -25,14 +25,9 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
 
-    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {
-            "bibtexkey",
-            "bibtexkey - title",
-    };
-    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {
-            "\\bibtexkey",
-            "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"
-    };
+    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
+    public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"\\bibtexkey",
+            "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
 
     private final JabRefPreferences prefs;
     private final JRadioButton radioButtonXmp;
@@ -44,6 +39,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     private final JTextField fileNamePattern;
     private final JButton selectFileNamePattern;
 
+    private final JTextField fileDirPattern;
+
 
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
@@ -51,7 +48,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         setLayout(new BorderLayout());
         FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP-metadata"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
         radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
         ButtonGroup bg = new ButtonGroup();
@@ -60,9 +57,11 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         bg.add(radioButtonPDFcontent);
         bg.add(radioButtononlyAttachPDF);
 
-        useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));
+        useDefaultPDFImportStyle = new JCheckBox(
+                Localization.lang("Always use this PDF import style (and do not ask for each import)"));
 
         fileNamePattern = new JTextField(50);
+        fileDirPattern = new JTextField(50);
         selectFileNamePattern = new JButton(Localization.lang("Choose pattern"));
         selectFileNamePattern.addActionListener(e -> openFilePatternMenu());
 
@@ -90,12 +89,22 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.appendSeparator(Localization.lang("Default PDF file link action"));
         builder.nextLine();
         builder.append(pan);
+
         JPanel pan2 = new JPanel();
         JLabel lab = new JLabel(Localization.lang("Filename format pattern").concat(":"));
         pan2.add(lab);
         pan2.add(fileNamePattern);
         pan2.add(selectFileNamePattern);
         builder.append(pan2);
+
+        JPanel pan3 = new JPanel();
+        JLabel lbfileDirPattern = new JLabel(Localization.lang("File directory pattern").concat(":"));
+        pan3.add(lbfileDirPattern);
+        pan3.add(fileDirPattern);
+
+        builder.nextLine();
+        builder.append(pan);
+        builder.append(pan3);
 
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -104,6 +113,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
+
         useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE));
         int style = prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
@@ -125,6 +135,9 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             break;
         }
         fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+
+        String pattern = "";
+        fileDirPattern.setText(prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
     }
 
     @Override
@@ -142,6 +155,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         }
         prefs.putInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
+        prefs.put(JabRefPreferences.IMPORT_FILEDIRPATTERN, fileDirPattern.getText());
     }
 
     @Override

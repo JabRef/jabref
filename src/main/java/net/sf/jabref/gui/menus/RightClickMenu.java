@@ -25,19 +25,18 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
+import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
+import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
+import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.specialfields.SpecialField;
+import net.sf.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.Printed;
-import net.sf.jabref.specialfields.Priority;
-import net.sf.jabref.specialfields.Quality;
-import net.sf.jabref.specialfields.Rank;
-import net.sf.jabref.specialfields.ReadStatus;
-import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialField;
-import net.sf.jabref.specialfields.SpecialFieldValue;
+import net.sf.jabref.preferences.PreviewPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,6 +69,22 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}"), KeyBinding.COPY_CITE_BIBTEX_KEY));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title"), KeyBinding.COPY_BIBTEX_KEY_AND_TITLE));
         copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_LINK, Localization.lang("Copy BibTeX key and link"), KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
+
+        // the submenu will behave dependent on what style is currently selected (citation/preview)
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+        String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
+        if (CitationStyle.isCitationStyleFile(style)) {
+            copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.menuTitle("Copy citation") + " (HTML)", KeyBinding.COPY_PREVIEW));
+            JMenu copyCitationMenu = new JMenu(Localization.menuTitle("Copy citation") + "...");
+            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_TEXT, "Text"));
+            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_RTF, "RTF"));
+            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_ASCII_DOC, "AsciiDoc"));
+            copyCitationMenu.add(new GeneralAction(Actions.COPY_CITATION_XSLFO, "XSL-FO"));
+            copySpecialMenu.add(copyCitationMenu);
+        } else {
+            copySpecialMenu.add(new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW));
+        }
+
         copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
                 IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
 
@@ -112,7 +127,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 JMenu rankingMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), frame);
+                RightClickMenu.populateSpecialFieldMenu(rankingMenu, SpecialField.RANKING, frame);
                 add(rankingMenu);
             }
 
@@ -120,24 +135,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
-                add(Relevance.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.RELEVANCE.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
-                add(Quality.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.QUALITY.getValues().get(0)), frame));
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
-                add(Printed.getInstance().getValues().get(0).getMenuAction(frame));
+                add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(SpecialField.PRINTED.getValues().get(0)), frame));
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 JMenu priorityMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), frame);
+                RightClickMenu.populateSpecialFieldMenu(priorityMenu, SpecialField.PRIORITY, frame);
                 add(priorityMenu);
             }
 
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 JMenu readStatusMenu = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), frame);
+                RightClickMenu.populateSpecialFieldMenu(readStatusMenu, SpecialField.READ_STATUS, frame);
                 add(readStatusMenu);
             }
 
@@ -210,10 +225,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      * Then cycle through all available values, and add them.
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
-        menu.setText(field.getMenuString());
-        menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
+        menu.setText(viewModel.getLocalization());
+        menu.setIcon(viewModel.getRepresentingIcon());
         for (SpecialFieldValue val : field.getValues()) {
-            menu.add(val.getMenuAction(frame));
+            menu.add(new SpecialFieldMenuAction(new SpecialFieldValueViewModel(val), frame));
         }
     }
 

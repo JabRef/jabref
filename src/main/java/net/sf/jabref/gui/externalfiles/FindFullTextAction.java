@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class FindFullTextAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
-    private static final int warningLimit = 10; // The minimum number of selected entries to ask the user for confirmation
+    private static final int warningLimit = 5; // The minimum number of selected entries to ask the user for confirmation
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -40,8 +40,12 @@ public class FindFullTextAction extends AbstractWorker {
     }
 
     @Override
-    public void init() throws Throwable {
-        basePanel.output(Localization.lang("Looking for full text document..."));
+    public void init() throws Exception {
+        if (!basePanel.getSelectedEntries().isEmpty()) {
+            basePanel.output(Localization.lang("Looking for full text document..."));
+        } else {
+            LOGGER.debug("No entry selected for fulltext download.");
+        }
     }
 
     @Override
@@ -52,9 +56,10 @@ public class FindFullTextAction extends AbstractWorker {
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                            + Localization.lang("JabRef will send at least one request per entry to a publisher.") + "\n"
                             + Localization.lang("Do you still want to continue?"),
                     Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
             if (answer != JOptionPane.OK_OPTION) {
                 basePanel.output(Localization.lang("Operation canceled."));
                 return;
@@ -74,7 +79,7 @@ public class FindFullTextAction extends AbstractWorker {
             Optional<URL> result = download.getKey();
             if (result.isPresent()) {
                 List<String> dirs = basePanel.getBibDatabaseContext()
-                        .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                        .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
                 if (dirs.isEmpty()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
@@ -86,10 +91,11 @@ public class FindFullTextAction extends AbstractWorker {
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
-                        FileListTableModel tm = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(tm::setContent);
-                        tm.addEntry(tm.getRowCount(), file);
-                        String newValue = tm.getStringRepresentation();
+                        FileListTableModel fileLinkModel = new FileListTableModel();
+                        entry.getField(FieldName.FILE).ifPresent(fileLinkModel::setContent);
+                        // add full text file link at first position
+                        fileLinkModel.addEntry(0, file);
+                        String newValue = fileLinkModel.getStringRepresentation();
                         UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
                                 entry.getField(FieldName.FILE).orElse(null), newValue);
                         entry.setField(FieldName.FILE, newValue);

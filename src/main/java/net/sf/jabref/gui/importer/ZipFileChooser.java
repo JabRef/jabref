@@ -27,7 +27,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -36,8 +35,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
- *
- * @author andreas_sf at rudert-home dot de
  */
 class ZipFileChooser extends JDialog {
 
@@ -47,7 +44,7 @@ class ZipFileChooser extends JDialog {
     /**
      * New ZIP file chooser.
      *
-     * @param owner  Owner of the file chooser
+     * @param importCustomizationDialog  Owner of the file chooser
      * @param zipFile  ZIP-Fle to choose from, must be readable
      */
     public ZipFileChooser(ImportCustomizationDialog importCustomizationDialog, ZipFile zipFile) {
@@ -67,7 +64,6 @@ class ZipFileChooser extends JDialog {
         if (table.getRowCount() > 0) {
             table.setRowSelectionInterval(0, 0);
         }
-        GUIUtil.correctRowHeight(table);
 
         // cancel: no entry is selected
         JButton cancelButton = new JButton(Localization.lang("Cancel"));

@@ -9,17 +9,20 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class ArXivTest {
 
     @Rule public ExpectedException expectedException = ExpectedException.none();
@@ -69,6 +72,12 @@ public class ArXivTest {
     public void findByEprint() throws IOException {
         entry.setField("eprint", "1603.06570");
 
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
+    }
+
+    @Test
+    public void findByEprintWithPrefix() throws IOException {
+        entry.setField("eprint", "arXiv:1603.06570");
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
@@ -133,6 +142,11 @@ public class ArXivTest {
     @Test
     public void searchEntryByIdWith4Digits() throws Exception {
         assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249"));
+    }
+
+    @Test
+    public void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("arXiv:1405.2249"));
     }
 
     @Test

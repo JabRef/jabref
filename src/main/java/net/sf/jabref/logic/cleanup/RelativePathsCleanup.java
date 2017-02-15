@@ -37,7 +37,7 @@ public class RelativePathsCleanup implements CleanupJob {
         for (ParsedFileField fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
             String newFileName = FileUtil
-                    .shortenFileName(new File(oldFileName), databaseContext.getFileDirectory(fileDirectoryPreferences))
+                    .shortenFileName(new File(oldFileName), databaseContext.getFileDirectories(fileDirectoryPreferences))
                     .toString();
 
             ParsedFileField newFileEntry = fileEntry;
@@ -49,7 +49,7 @@ public class RelativePathsCleanup implements CleanupJob {
         }
 
         if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            Optional<FieldChange> change = entry.setFiles(newFileList);
             if(change.isPresent()) {
                 return Collections.singletonList(change.get());
             } else {

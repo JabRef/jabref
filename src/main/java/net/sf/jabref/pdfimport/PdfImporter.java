@@ -35,7 +35,6 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -196,7 +195,7 @@ public class PdfImporter {
         File toLink = new File(fileName);
         // Get a list of file directories:
         List<String> dirsS = panel.getBibDatabaseContext()
-                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
@@ -236,12 +235,14 @@ public class PdfImporter {
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+        BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
                 .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
-        panel.highlightEntry(entry);
+
+        SwingUtilities.invokeLater(() -> panel.highlightEntry(entry));
+
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             EntryEditor editor = panel.getEntryEditor(entry);
             panel.showEntryEditor(editor);
@@ -258,8 +259,7 @@ public class PdfImporter {
         EntryType type = etd.getChoice();
 
         if (type != null) { // Only if the dialog was not canceled.
-            String id = IdGenerator.next();
-            final BibEntry bibEntry = new BibEntry(id, type.getName());
+            final BibEntry bibEntry = new BibEntry(type.getName());
             try {
                 panel.getDatabase().insertEntry(bibEntry);
 

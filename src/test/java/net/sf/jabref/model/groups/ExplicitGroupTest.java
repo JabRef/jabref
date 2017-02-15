@@ -1,36 +1,102 @@
 package net.sf.jabref.model.groups;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
+import java.util.Optional;
 
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ExplicitGroupTest {
 
+    private ExplicitGroup group;
+    private ExplicitGroup group2;
 
-    @Test
-     public void testToStringSimple() {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
+    private BibEntry entry;
+
+    @Before
+    public void setUp() {
+        group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        group2 = new ExplicitGroup("myExplicitGroup2", GroupHierarchyType.INCLUDING, ',');
+        entry = new BibEntry();
     }
 
     @Test
-    public void toStringDoesNotWriteAssignedEntries() {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ',');
-        group.add(makeBibtexEntry());
-        assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
+    public void addSingleGroupToEmptyBibEntryChangesGroupsField() {
+        group.add(entry);
+
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
-    private BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
-        e.setField("title", "Marine finfish larviculture in Europe");
-        e.setField("bibtexkey", "shields01");
-        e.setField("year", "2001");
-        e.setField("author", "Kevin Shields");
-        return e;
+    @Test
+    public void addSingleGroupToNonemptyBibEntryAppendsToGroupsField() {
+        entry.setField(FieldName.GROUPS, "some thing");
+        group.add(entry);
+
+        assertEquals(Optional.of("some thing, myExplicitGroup"), entry.getField(FieldName.GROUPS));
     }
 
+    @Test
+    public void addTwoGroupsToBibEntryChangesGroupsField() {
+        group.add(entry);
+        group2.add(entry);
+
+        assertEquals(Optional.of("myExplicitGroup, myExplicitGroup2"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    public void addDuplicateGroupDoesNotChangeGroupsField() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup");
+        group.add(entry);
+
+        assertEquals(Optional.of("myExplicitGroup"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsPart() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup_alternative");
+        group.remove(entry);
+
+        assertEquals(Optional.of("myExplicitGroup_alternative"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2334
+    public void removeDoesNotChangeFieldIfContainsNameAsWord() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup alternative");
+        group.remove(entry);
+
+        assertEquals(Optional.of("myExplicitGroup alternative"), entry.getField(FieldName.GROUPS));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithWhitespace() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup b");
+
+        assertFalse(group.contains(entry));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/1873
+    public void containsOnlyMatchesCompletePhraseWithSlash() throws Exception {
+        entry.setField(FieldName.GROUPS, "myExplicitGroup/b");
+
+        assertFalse(group.contains(entry));
+    }
+
+    @Test
+    // For https://github.com/JabRef/jabref/issues/2394
+    public void containsMatchesPhraseWithBrackets() throws Exception {
+        entry.setField(FieldName.GROUPS, "[aa] Subgroup1");
+        ExplicitGroup explicitGroup = new ExplicitGroup("[aa] Subgroup1", GroupHierarchyType.INCLUDING, ',');
+
+        assertTrue(explicitGroup.contains(entry));
+    }
 }

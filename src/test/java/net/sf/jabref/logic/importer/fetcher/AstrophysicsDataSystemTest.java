@@ -5,23 +5,24 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
-import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class AstrophysicsDataSystemTest {
 
     private AstrophysicsDataSystem fetcher;
@@ -169,10 +170,10 @@ public class AstrophysicsDataSystemTest {
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test(expected = FetcherException.class)
+    @Test
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        fetcher.performSearchById("this.doi.will.fail");
-        fail();
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("this.doi.will.fail");
+        assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test

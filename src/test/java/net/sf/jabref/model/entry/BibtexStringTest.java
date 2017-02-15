@@ -12,9 +12,9 @@ public class BibtexStringTest {
     @Test
     public void test() {
         // Instantiate
-        String id = IdGenerator.next();
-        BibtexString bs = new BibtexString(id, "AAA", "An alternative action");
-        assertEquals(id, bs.getId());
+        BibtexString bs = new BibtexString("AAA", "An alternative action");
+        bs.setId("ID");
+        assertEquals("ID", bs.getId());
         assertEquals("AAA", bs.getName());
         assertEquals("An alternative action", bs.getContent());
         assertEquals(BibtexString.Type.OTHER, bs.getType());
@@ -39,7 +39,7 @@ public class BibtexStringTest {
 
     @Test
     public void getContentNeverReturnsNull() {
-        BibtexString bs = new BibtexString("ID", "SomeName", null);
+        BibtexString bs = new BibtexString("SomeName", null);
         assertNotNull(bs.getContent());
     }
 }

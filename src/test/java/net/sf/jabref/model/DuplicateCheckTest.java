@@ -3,7 +3,6 @@ package net.sf.jabref.model;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Test;
 
@@ -11,20 +10,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Nov 9, 2007
- * Time: 7:04:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DuplicateCheckTest {
 
     @Test
     public void testDuplicateDetection() {
-        BibEntry one = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
+        BibEntry one = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
 
-        BibEntry two = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
+        BibEntry two = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
 
         one.setField("author", "Billy Bob");
         two.setField("author", "Billy Bob");

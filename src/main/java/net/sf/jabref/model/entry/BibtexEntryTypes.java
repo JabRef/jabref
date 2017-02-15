@@ -21,7 +21,7 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNAL, FieldName.YEAR);
-            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.PAGES, FieldName.MONTH, FieldName.NOTE);
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.PAGES, FieldName.MONTH, FieldName.ISSN, FieldName.NOTE);
         }
 
         @Override
@@ -40,7 +40,7 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
-            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.ISBN, FieldName.NOTE);
         }
 
         @Override
@@ -98,7 +98,7 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.orFields(FieldName.CHAPTER, FieldName.PAGES), FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
-            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.ISBN, FieldName.NOTE);
         }
 
         @Override
@@ -117,7 +117,7 @@ public class BibtexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.PUBLISHER, FieldName.YEAR);
             addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDRESS, FieldName.EDITION,
-                    FieldName.MONTH, FieldName.NOTE);
+                    FieldName.MONTH, FieldName.ISBN, FieldName.NOTE);
         }
 
         @Override
@@ -155,7 +155,7 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE);
-            addAllOptional(FieldName.AUTHOR, FieldName.ORGANIZATION, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.YEAR, FieldName.NOTE);
+            addAllOptional(FieldName.AUTHOR, FieldName.ORGANIZATION, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.YEAR, FieldName.ISBN, FieldName.NOTE);
         }
 
         @Override
@@ -230,8 +230,8 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.PUBLISHER, FieldName.NOTE, FieldName.MONTH,
-                    FieldName.ORGANIZATION);
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.PUBLISHER, FieldName.MONTH,
+                    FieldName.ORGANIZATION, FieldName.ISBN, FieldName.NOTE);
         }
 
         @Override

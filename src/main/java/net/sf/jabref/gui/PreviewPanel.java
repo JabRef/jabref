@@ -18,7 +18,6 @@ import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JEditorPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -71,7 +70,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     private boolean fixedLayout;
     private Optional<Layout> layout = Optional.empty();
-    private JEditorPane previewPane;
+    private JEditorPaneWithHighlighting previewPane;
 
     private final JScrollPane scrollPane;
 
@@ -140,7 +139,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         actionMap.put(close, this.closeAction);
 
         final String copy = "copy";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
+        getInputMap(JComponent.WHEN_FOCUSED).put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
         actionMap.put(copy, this.copyPreviewAction);
     }
 
@@ -154,7 +153,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     }
 
     private void createPreviewPane() {
-        previewPane = new JEditorPane() {
+        previewPane = new JEditorPaneWithHighlighting() {
             @Override
             public Dimension getPreferredScrollableViewportSize() {
                 return getPreferredSize();
@@ -273,13 +272,19 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         if (layout.isPresent()){
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
-                    .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null), highlightPattern)));
+                    .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
+            markHighlights();
         }
         else if (basePanel.isPresent()){
             citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
             citationStyleWorker.get().execute();
         }
+
+    }
+
+    public void markHighlights() {
+        previewPane.highlightPattern(highlightPattern);
     }
 
     public void setPreviewLabel(String text) {

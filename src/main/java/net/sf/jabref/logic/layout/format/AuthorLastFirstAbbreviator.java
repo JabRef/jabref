@@ -8,13 +8,6 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
  * This formater enables to abbreviate the authors name in the following way:
  * 
  * Ex: Someone, Van Something will be abbreviated as Someone, V.S.
- * 
- * @author Carlos Silla
- * @author Christopher Oezbek <oezi@oezi.de>
- * 
- * @version 1.0 Created on 12/10/2004
- * @version 1.1 Fixed bug
- *          http://sourceforge.net/tracker/index.php?func=detail&aid=1466924&group_id=92314&atid=600306
  */
 public class AuthorLastFirstAbbreviator implements LayoutFormatter {
 

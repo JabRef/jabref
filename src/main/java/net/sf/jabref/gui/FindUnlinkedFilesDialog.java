@@ -54,7 +54,6 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -74,7 +73,6 @@ import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -164,7 +162,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private final AtomicBoolean threadState = new AtomicBoolean();
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
-
 
     /**
      * For Unit-testing only. <i>Don't remove!</i> <br>
@@ -474,10 +471,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             } else {
                                 message = Localization.lang("%0 files found", Integer.toString(counter));
                             }
-                            SwingUtilities.invokeLater(() -> progressBarSearching.setString(message));
+                            progressBarSearching.setString(message);
                         }
                     });
-            SwingUtilities.invokeLater(() -> searchFinishedHandler(rootNode));
+            searchFinishedHandler(rootNode);
         });
 
     }
@@ -534,14 +531,12 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             counter++;
-                            SwingUtilities.invokeLater(() -> {
-                                progressBarImporting.setValue(counter);
-                                progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
-                                        Integer.toString(progressBarImporting.getMaximum())));
-                            });
+                            progressBarImporting.setValue(counter);
+                            progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
+                                    Integer.toString(progressBarImporting.getMaximum())));
                         }
                     }, errors);
-            SwingUtilities.invokeLater(() -> importFinishedHandler(errors));
+            importFinishedHandler(errors);
         });
     }
 
@@ -749,7 +744,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
         labelImportingInfo.setVisible(false);
 
         tree = new JTree();
-        GUIUtil.correctRowHeight(tree);
 
         scrollpaneTree = new JScrollPane(tree);
         scrollpaneTree.setWheelScrollingEnabled(true);

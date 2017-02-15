@@ -28,13 +28,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Dec 12, 2006
- * Time: 6:22:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExportToClipboardAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
@@ -90,7 +83,7 @@ public class ExportToClipboardAction extends AbstractWorker {
         // so formatters can resolve linked files correctly.
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         File tmp = null;
         try {
@@ -118,7 +111,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             ClipboardOwner owner = (clipboard, content) -> {
                 // Do nothing
             };
-            RtfSelection rs = new RtfSelection(sb.toString());
+            RtfTransferable rs = new RtfTransferable(sb.toString());
             Toolkit.getDefaultToolkit().getSystemClipboard()
                     .setContents(rs, owner);
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();

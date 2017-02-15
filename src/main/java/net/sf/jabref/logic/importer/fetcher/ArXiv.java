@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
@@ -26,7 +25,7 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.ArXivIdentifier;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
@@ -52,8 +51,8 @@ import org.xml.sax.SAXException;
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
+
     private static final String API_URL = "http://export.arxiv.org/api/query";
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -108,9 +107,14 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
     }
 
-    private Optional<ArXivEntry> searchForEntryById(String identifier) throws FetcherException {
-        List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier), 0, 1);
-        if (entries.size() == 1) {
+    private Optional<ArXivEntry> searchForEntryById(String id) throws FetcherException {
+        Optional<ArXivIdentifier> identifier = ArXivIdentifier.parse(id);
+        if (!identifier.isPresent()) {
+            return Optional.empty();
+        }
+
+        List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
+        if (entries.size() >= 1) {
             return Optional.of(entries.get(0));
         } else {
             return Optional.empty();
@@ -121,7 +125,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return queryApi(searchQuery, Collections.emptyList(), 0, 10);
     }
 
-    private List<ArXivEntry> queryApi(String searchQuery, List<String> ids, int start, int maxResults)
+    private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
             throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
         List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
@@ -145,7 +149,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
      * @return the response from the API as a XML document (Atom 1.0)
      * @throws FetcherException if there was a problem while building the URL or the API was not accessible
      */
-    private Document callApi(String searchQuery, List<String> ids, int start, int maxResults) throws FetcherException {
+    private Document callApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults) throws FetcherException {
         if (maxResults > 2000) {
             throw new IllegalArgumentException("The arXiv API limits the number of maximal results to be 2000");
         }
@@ -157,7 +161,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
                 uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
             }
             if (!ids.isEmpty()) {
-                uriBuilder.addParameter("id_list", String.join(",", ids));
+                uriBuilder.addParameter("id_list",
+                        ids.stream().map(ArXivIdentifier::getNormalized).collect(Collectors.joining(",")));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -346,9 +351,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
-            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX))
+            getPdfUrl().ifPresent(url -> bibEntry
                     .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
-
             return bibEntry;
         }
     }

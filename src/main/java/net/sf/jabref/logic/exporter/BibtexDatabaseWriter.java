@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.Objects;
 
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -146,18 +145,15 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     }
 
     @Override
-    protected void writeDatabaseID(String databaseID) throws SaveException {
+    protected void writeDatabaseID(String sharedDatabaseID) throws SaveException {
         try {
-            if (Objects.nonNull(databaseID)) {
-                StringBuilder stringBuilder = new StringBuilder()
-                        .append("% ")
-                        .append(DATABASE_ID_PREFIX)
-                        .append(" ")
-                        .append(databaseID)
-                        .append(OS.NEWLINE);
-
-                getWriter().write(stringBuilder.toString());
-            }
+            StringBuilder stringBuilder = new StringBuilder()
+                    .append("% ")
+                    .append(DATABASE_ID_PREFIX)
+                    .append(" ")
+                    .append(sharedDatabaseID)
+                    .append(OS.NEWLINE);
+            getWriter().write(stringBuilder.toString());
         } catch (IOException e) {
             throw new SaveException(e);
         }

@@ -5,9 +5,9 @@ import java.io.IOException;
 
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,9 +26,9 @@ public class OpenDatabase {
         LOGGER.info("Opening: " + name);
 
         if (!file.exists()) {
-            ParserResult pr = new ParserResult(null, null, null);
+            ParserResult pr = ParserResult.fromErrorMessage(Localization.lang("File not found"));
             pr.setFile(file);
-            pr.setInvalid(true);
+
             LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
         }
@@ -37,7 +37,7 @@ public class OpenDatabase {
             if (!FileBasedLock.waitForFileLock(file.toPath())) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
-                return ParserResult.getNullResult();
+                return new ParserResult();
             }
 
             ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences);
@@ -49,10 +49,8 @@ public class OpenDatabase {
             }
             return pr;
         } catch (IOException ex) {
-            ParserResult pr = new ParserResult(null, null, null);
+            ParserResult pr = ParserResult.fromError(ex);
             pr.setFile(file);
-            pr.setInvalid(true);
-            pr.setErrorMessage(ex.getMessage());
             LOGGER.error("Problem opening .bib-file", ex);
             return pr;
         }
@@ -68,7 +66,7 @@ public class OpenDatabase {
 
         if (importFormatPreferences.isKeywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
             }
             LOGGER.debug("Synchronized special fields based on keywords");
         }

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.swing.Icon;
-import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -24,15 +23,11 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM
- */
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
     private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
 
     private final JTextField additionalParams = new JTextField(30);
-    private final JCheckBox useEmacs23 = new JCheckBox();
 
 
     @Override
@@ -48,7 +43,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     @Override
     public JPanel getSettingsPanel() {
         additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
-        useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
         return super.getSettingsPanel();
     }
 
@@ -56,7 +50,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
     public void storeSettings() {
         super.storeSettings();
         Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
-        Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
     }
 
     @Override
@@ -65,8 +58,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
         builder.appendRows("2dlu, p, 2dlu, p");
         builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
         builder.add(additionalParams).xy(3, 3);
-        builder.add(Localization.lang("Use EMACS 23 insertion string") + ":").xy(1, 5);
-        builder.add(useEmacs23).xy(3, 5);
         settings = builder.build();
     }
 
@@ -93,21 +84,16 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             System.arraycopy(addParams, 0, com, 1, addParams.length);
             String prefix;
             String suffix;
-            if (Globals.prefs.getBoolean(JabRefPreferences.EMACS_23)) {
-                prefix = "(with-current-buffer (window-buffer) (insert ";
-                suffix = "))";
-            } else {
-                prefix = "(insert ";
-                suffix = ")";
-            }
+            prefix = "(with-current-buffer (window-buffer) (insert ";
+            suffix = "))";
 
             com[com.length - 1] = OS.WINDOWS ?
-            // Windows gnuclient escaping:
+            // Windows gnuclient/emacsclient escaping:
             // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
             // so cmd receives: (insert \"\\cite{Blah2001}\")
             // so emacs receives: (insert "\cite{Blah2001}")
             prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
-            // Linux gnuclient escaping:
+            // Linux gnuclient/emacslient escaping:
             // java string: "(insert \"\\\\cite{Blah2001}\")"
             // so sh receives: (insert "\\cite{Blah2001}")
             // so emacs receives: (insert "\cite{Blah2001}")

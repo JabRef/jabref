@@ -9,7 +9,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,7 +34,6 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.metadata.MetaData;
 
@@ -60,17 +58,16 @@ import org.apache.commons.logging.LogFactory;
 public class BibtexParser implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
-
+    private static final Integer LOOKAHEAD = 64;
+    private final FieldContentParser fieldContentParser;
+    private final Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser;
     private ParserResult parserResult;
-    private static final Integer LOOKAHEAD = 64;
-    private final Deque<Character> pureTextFromFile = new LinkedList<>();
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -85,27 +82,9 @@ public class BibtexParser implements Parser {
      * @throws IOException
      * @deprecated inline this method
      */
+    @Deprecated
     public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
         return new BibtexParser(importFormatPreferences).parse(in);
-    }
-
-    /**
-     * Parses BibtexEntries from the given string and returns the collection of all entries found.
-     *
-     * @param bibtexString
-     * @return Returns returns an empty collection if no entries where found or if an error occurred.
-     * @deprecated use parseEntries
-     */
-    @Deprecated
-    public static List<BibEntry> fromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
-
-        try {
-            return parser.parseEntries(bibtexString);
-        } catch (Exception e) {
-            LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
-            return Collections.emptyList();
-        }
     }
 
     /**
@@ -115,10 +94,11 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @throws ParseException
      */
     public static Optional<BibEntry> singleFromString(String bibtexString,
-            ImportFormatPreferences importFormatPreferences) {
-        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
+            ImportFormatPreferences importFormatPreferences) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -175,7 +155,7 @@ public class BibtexParser implements Parser {
     private void initializeParserResult() {
         database = new BibDatabase();
         entryTypes = new HashMap<>(); // To store custom entry types parsed.
-        parserResult = new ParserResult(database, null, entryTypes);
+        parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
 
@@ -191,7 +171,7 @@ public class BibtexParser implements Parser {
 
                 if (label.equals(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
                     skipWhitespace();
-                    database.setDatabaseID(parseTextToken().trim());
+                    database.setSharedDatabaseID(parseTextToken().trim());
                 }
             } else if (c == '@') {
                 unread(c);
@@ -236,7 +216,7 @@ public class BibtexParser implements Parser {
         try {
             parserResult.setMetaData(MetaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
-            parserResult.addWarning(exception.getLocalizedMessage());
+            parserResult.addException(exception);
         }
 
         parseRemainingContent();
@@ -275,7 +255,7 @@ public class BibtexParser implements Parser {
                         + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
         } catch (IOException ex) {
-            LOGGER.warn("Could not parse entry", ex);
+            LOGGER.debug("Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + Localization.lang("Skipped entry."));
 
@@ -354,24 +334,31 @@ public class BibtexParser implements Parser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
+        } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
+            return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
         } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
-            // purge the encoding line if it exists
-            int runningIndex = result.indexOf(SavePreferences.ENCODING_PREFIX);
-            while (runningIndex < indexOfAt) {
-                if (result.charAt(runningIndex) == '\n') {
-                    break;
-                } else if (result.charAt(runningIndex) == '\r') {
-                    if (result.charAt(runningIndex + 1) == '\n') {
-                        runningIndex++;
-                    }
-                    break;
-                }
-                runningIndex++;
-            }
-            return result.substring(runningIndex + 1);
+            return purge(result, SavePreferences.ENCODING_PREFIX);
         } else {
             return result;
         }
+    }
+
+    private String purge(String context, String stringToPurge) {
+        // purge the encoding line if it exists
+        int runningIndex = context.indexOf(stringToPurge);
+        int indexOfAt = context.indexOf("@");
+        while (runningIndex < indexOfAt) {
+            if (context.charAt(runningIndex) == '\n') {
+                break;
+            } else if (context.charAt(runningIndex) == '\r') {
+                if (context.charAt(runningIndex + 1) == '\n') {
+                    runningIndex++;
+                }
+                break;
+            }
+            runningIndex++;
+        }
+        return context.substring(runningIndex + 1);
     }
 
     private String getPureTextFromFile() {
@@ -521,8 +508,7 @@ public class BibtexParser implements Parser {
         skipOneNewline();
         LOGGER.debug("Finished string parsing.");
 
-        String id = IdGenerator.next();
-        return new BibtexString(id, name, content);
+        return new BibtexString(name, content);
     }
 
     private String parsePreamble() throws IOException {
@@ -532,8 +518,7 @@ public class BibtexParser implements Parser {
     }
 
     private BibEntry parseEntry(String entryType) throws IOException {
-        String id = IdGenerator.next();
-        BibEntry result = new BibEntry(id, entryType);
+        BibEntry result = new BibEntry(entryType);
         skipWhitespace();
         consume('{', '(');
         int character = peek();

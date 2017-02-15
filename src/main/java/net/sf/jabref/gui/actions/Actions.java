@@ -13,12 +13,16 @@ public class Actions {
     public static final String BACK = "back";
     public static final String CLEANUP = "Cleanup";
     public static final String COPY = "copy";
+    public static final String COPY_CITATION_ASCII_DOC = "copyCitaitonAsciidoc";
+    public static final String COPY_CITATION_XSLFO = "copyCitaitonFo";
+    public static final String COPY_CITATION_HTML = "copyCitaitonHtml";
+    public static final String COPY_CITATION_RTF = "copyCitaitonRtf";
+    public static final String COPY_CITATION_TEXT = "copyCitaitonText";
     public static final String COPY_KEY = "copyKey";
     public static final String COPY_CITE_KEY = "copyCiteKey";
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
     public static final String CUT = "cut";
-    public static final String DB_CONNECT = "dbConnect";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
@@ -29,6 +33,7 @@ public class Actions {
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
     public static final String MAKE_KEY = "makeKey";
+    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
@@ -55,9 +60,6 @@ public class Actions {
     public static final String GLOBAL_SEARCH = "globalSearch";
     public static final String SELECT_ALL = "selectAll";
     public static final String SEND_AS_EMAIL = "sendAsEmail";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL = "toggleHighlightGroupsMatchingAll";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY = "toggleHighlightGroupsMatchingAny";
-    public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE = "toggleHighlightGroupsMatchingDisable";
     public static final String TOGGLE_GROUPS = "toggleGroups";
     public static final String TOGGLE_PREVIEW = "togglePreview";
     public static final String UNABBREVIATE = "unabbreviate";

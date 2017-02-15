@@ -11,11 +11,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import net.sf.jabref.logic.cleanup.Cleanups;
-import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.metadata.ContentSelectors;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,28 +25,36 @@ public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
 
-    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        MetaData metaData = new MetaData();
 
+    /**
+     * Parses the given data map and returns a new resulting {@link MetaData} instance.
+     */
+    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator);
+    }
+
+    /**
+     * Parses the data map and changes the given {@link MetaData} instance respectively.
+     */
+    public static MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         for (Map.Entry<String, String> entry : data.entrySet()) {
             List<String> value = getAsList(entry.getValue());
 
-            if (entry.getKey().startsWith("selector_")) {
-                // Ignore old content selector metadata
-                continue;
-            }
+
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
                 continue;
-            }
-            if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
+            } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name comes directly after "FILE_DIRECTORY-"
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
+                continue;
+            } else if(entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)){
+                metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
             }
 

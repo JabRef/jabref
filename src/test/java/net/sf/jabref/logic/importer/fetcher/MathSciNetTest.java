@@ -7,20 +7,23 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.support.DevEnvironment;
+import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@Category(FetcherTests.class)
 public class MathSciNetTest {
 
     MathSciNet fetcher;
-    BibEntry ratiuEntry;
+    private BibEntry ratiuEntry;
 
     @Before
     public void setUp() throws Exception {
@@ -33,7 +36,7 @@ public class MathSciNetTest {
         ratiuEntry.setType(BibtexEntryTypes.ARTICLE);
         ratiuEntry.setCiteKey("MR3537908");
         ratiuEntry.setField("author", "Chechkin, Gregory A. and Ratiu, Tudor S. and Romanov, Maxim S. and Samokhin, Vyacheslav N.");
-        ratiuEntry.setField("title", "Existence and {U}niqueness {T}heorems for the {T}wo-{D}imensional {E}ricksen--{L}eslie {S}ystem");
+        ratiuEntry.setField("title", "Existence and uniqueness theorems for the two-dimensional {E}ricksen-{L}eslie system");
         ratiuEntry.setField("journal", "Journal of Mathematical Fluid Mechanics");
         ratiuEntry.setField("volume", "18");
         ratiuEntry.setField("year", "2016");

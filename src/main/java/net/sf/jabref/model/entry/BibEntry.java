@@ -27,7 +27,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
-import net.sf.jabref.model.strings.LatexToUnicode;
+import net.sf.jabref.model.strings.LatexToUnicodeAdapter;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
@@ -36,7 +36,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
-
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
@@ -64,11 +63,6 @@ public class BibEntry implements Cloneable {
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
 
-    /**
-     * Used to cleanse field values for internal LaTeX-free storage
-     */
-    private LatexToUnicode unicodeConverter = new LatexToUnicode();
-
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
@@ -86,22 +80,21 @@ public class BibEntry implements Cloneable {
 
     private final EventBus eventBus = new EventBus();
 
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
 
     public BibEntry() {
-        this(IdGenerator.next());
+        this(IdGenerator.next(), DEFAULT_TYPE);
     }
 
     /**
-     * Constructs a new BibEntry with the given ID and DEFAULT_TYPE
+     * Constructs a new BibEntry with the given type
      *
-     * @param id The ID to be used
+     * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id) {
-        this(id, DEFAULT_TYPE);
+    public BibEntry(String type) {
+        this(IdGenerator.next(), type);
     }
 
     /**
@@ -110,7 +103,7 @@ public class BibEntry implements Cloneable {
      * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
-    public BibEntry(String id, String type) {
+    private BibEntry(String id, String type) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
         this.id = id;
@@ -289,28 +282,17 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field or its alias as an Optional
-     * <p>
-     * The following aliases are considered (old bibtex <-> new biblatex) based
-     * on the BibLatex documentation, chapter 2.2.5:<br>
-     * address      <-> location <br>
-     * annote           <-> annotation <br>
-     * archiveprefix    <-> eprinttype <br>
-     * journal      <-> journaltitle <br>
-     * key              <-> sortkey <br>
-     * pdf          <-> file <br
-     * primaryclass     <-> eprintclass <br>
-     * school           <-> institution <br>
-     * These work bidirectional. <br>
-     * <p>
-     * Special attention is paid to dates: (see the BibLatex documentation,
-     * chapter 2.3.8)
-     * The fields 'year' and 'month' are used if the 'date'
-     * field is empty. Conversely, getFieldOrAlias("year") also tries to
-     * extract the year from the 'date' field (analogously for 'month').
+     * Internal method used to get the content of a field (or its alias)
+     *
+     * Used by {@link #getFieldOrAlias(String)} and {@link #getFieldOrAliasLatexFree(String)}
+     *
+     * @param name name of the field
+     * @param getFieldInterface
+     *
+     * @return determined field value
      */
-    public Optional<String> getFieldOrAlias(String name) {
-        Optional<String> fieldValue = getField(toLowerCase(name));
+    private Optional<String> genericGetFieldOrAlias(String name, GetFieldInterface getFieldInterface) {
+        Optional<String> fieldValue = getFieldInterface.getValueForField(toLowerCase(name));
 
         if (fieldValue.isPresent() && !fieldValue.get().isEmpty()) {
             return fieldValue;
@@ -320,14 +302,14 @@ public class BibEntry implements Cloneable {
         String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
         if (aliasForField != null) {
-            return getField(aliasForField);
+            return getFieldInterface.getValueForField(aliasForField);
         }
 
         // Finally, handle dates
         if (FieldName.DATE.equals(name)) {
-            Optional<String> year = getField(FieldName.YEAR);
+            Optional<String> year = getFieldInterface.getValueForField(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getField(FieldName.MONTH).orElse(""));
+                MonthUtil.Month month = MonthUtil.getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -336,7 +318,7 @@ public class BibEntry implements Cloneable {
             }
         }
         if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
-            Optional<String> date = getField(FieldName.DATE);
+            Optional<String> date = getFieldInterface.getValueForField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
             }
@@ -392,6 +374,50 @@ public class BibEntry implements Cloneable {
             }
         }
         return Optional.empty();
+    }
+
+    private interface GetFieldInterface {
+        Optional<String> getValueForField(String fieldName);
+    }
+
+    /**
+     * Return the LaTeX-free contents of the given field or its alias an an Optional
+     *
+     * For details see also {@link #getFieldOrAlias(String)}
+     *
+     * @param name the name of the field
+     * @return  the stored latex-free content of the field (or its alias)
+     */
+    public Optional<String> getFieldOrAliasLatexFree(String name) {
+        return genericGetFieldOrAlias(name, this::getLatexFreeField);
+    }
+
+    /**
+     * Returns the contents of the given field or its alias as an Optional
+     * <p>
+     * The following aliases are considered (old bibtex <-> new biblatex) based
+     * on the BibLatex documentation, chapter 2.2.5:<br>
+     * address        <-> location <br>
+     * annote         <-> annotation <br>
+     * archiveprefix  <-> eprinttype <br>
+     * journal        <-> journaltitle <br>
+     * key            <-> sortkey <br>
+     * pdf            <-> file <br
+     * primaryclass   <-> eprintclass <br>
+     * school         <-> institution <br>
+     * These work bidirectional. <br>
+     * </p>
+     *
+     * <p>
+     * Special attention is paid to dates: (see the BibLatex documentation,
+     * chapter 2.3.8)
+     * The fields 'year' and 'month' are used if the 'date'
+     * field is empty. Conversely, getFieldOrAlias("year") also tries to
+     * extract the year from the 'date' field (analogously for 'month').
+     * </p>
+     */
+    public Optional<String> getFieldOrAlias(String name) {
+        return genericGetFieldOrAlias(name, this::getField);
     }
 
     /**
@@ -540,10 +566,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns a clone of this entry. Useful for copying.
+     * This will set a new ID for the cloned entry to be able to distinguish both copies.
      */
     @Override
     public Object clone() {
-        BibEntry clone = new BibEntry(id, type);
+        BibEntry clone = new BibEntry(type);
         clone.fields = new HashMap<>(fields);
         return clone;
     }
@@ -732,7 +759,12 @@ public class BibEntry implements Cloneable {
     }
 
     public void unregisterListener(Object object) {
-        this.eventBus.unregister(object);
+        try {
+            this.eventBus.unregister(object);
+        } catch (IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
     }
 
     public BibEntry withField(String field, String value) {
@@ -789,9 +821,21 @@ public class BibEntry implements Cloneable {
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
         } else {
-            String latexFreeField = unicodeConverter.format(getField(name).get()).intern();
+            String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);
             return Optional.of(latexFreeField);
         }
     }
+
+    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+        Optional<String> oldValue = this.getField(FieldName.FILE);
+        String newValue = FileField.getStringRepresentation(files);
+
+        if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
+            return Optional.empty();
+        }
+
+        return this.setField(FieldName.FILE, newValue);
+    }
+
 }

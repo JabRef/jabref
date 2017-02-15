@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.autosaveandbackup;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,7 +30,9 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Backups the given bib database file from {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent}.
- * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while making backups and rejects all redundant backup tasks.
+ * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while making backups and
+ * rejects all redundant backup tasks.
+ * This class does not manage the .bak file which is created when opening a database.
  */
 public class BackupManager {
 
@@ -43,57 +44,19 @@ public class BackupManager {
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
-    private final BlockingQueue<Runnable> workerQueue;
     private final ExecutorService executor;
-    private final Charset charset;
-
-    private Path originalPath;
-    private Path backupPath;
+    private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
 
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.preferences = JabRefPreferences.getInstance();
-        this.workerQueue = new ArrayBlockingQueue<>(1);
+        BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
-        this.charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
-    }
 
-
-    private final Runnable backupTask = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding(charset).withMakeBackup(false);
-                new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, prefs).commit(backupPath);
-            } catch (SaveException e) {
-                LOGGER.error("Error while saving file.", e);
-            }
-        }
-    };
-
-    @Subscribe
-    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        try {
-            executor.submit(backupTask);
-        } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting while another backup process is already running.");
-        }
-    }
-
-    /**
-     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext} and deletes the backup file.
-     * This method should only be used when closing a database/JabRef legally.
-     */
-    private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
-        executor.shutdown();
-        try {
-            Files.delete(backupPath);
-        } catch (IOException e) {
-            LOGGER.error("Error while deleting the backup file.", e);
-        }
+        // Listen for change events
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
     }
 
     static Path getBackupPath(Path originalPath) {
@@ -102,37 +65,26 @@ public class BackupManager {
 
     /**
      * Starts the BackupManager which is associated with the given {@link BibDatabaseContext}.
-     * If no database file is present in {@link BibDatabaseContext}, {@link BackupManager} will do nothing.
+     * As long as no database file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static BackupManager start(BibDatabaseContext bibDatabaseContext) {
         BackupManager backupManager = new BackupManager(bibDatabaseContext);
-
-        Optional<File> originalFile = bibDatabaseContext.getDatabaseFile();
-
-        if (originalFile.isPresent()) {
-            backupManager.originalPath = originalFile.get().toPath();
-            backupManager.backupPath = getBackupPath(backupManager.originalPath);
-            bibDatabaseContext.getDatabase().registerListener(backupManager);
-            bibDatabaseContext.getMetaData().registerListener(backupManager);
-            runningInstances.add(backupManager);
-        }
-
+        backupManager.startBackupTask();
+        runningInstances.add(backupManager);
         return backupManager;
     }
 
     /**
-     * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}
+     * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                .ifPresent(instance -> {
-                    instance.shutdown();
-                    runningInstances.remove(instance);
-                });
+        runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(
+                BackupManager::shutdown);
+        runningInstances.removeIf(instance -> instance.bibDatabaseContext == bibDatabaseContext);
     }
 
     /**
@@ -156,6 +108,56 @@ public class BackupManager {
             Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.error("Error while restoring the backup file.", e);
+        }
+    }
+
+    private Optional<Path> determineBackupPath() {
+        return bibDatabaseContext.getDatabasePath().map(BackupManager::getBackupPath);
+    }
+
+    private void performBackup(Path backupPath) {
+        try {
+            Charset charset = bibDatabaseContext.getMetaData().getEncoding().orElse(preferences.getDefaultEncoding());
+            SavePreferences savePreferences = SavePreferences.loadForSaveFromPreferences(preferences).withEncoding
+                    (charset).withMakeBackup(false);
+            new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
+                    (backupPath);
+        } catch (SaveException e) {
+            LOGGER.error("Error while saving file.", e);
+        }
+    }
+
+    @Subscribe
+    public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
+        startBackupTask();
+    }
+
+    private void startBackupTask() {
+        try {
+            executor.submit(backupTask);
+        } catch (RejectedExecutionException e) {
+            LOGGER.debug("Rejecting while another backup process is already running.");
+        }
+    }
+
+    /**
+     * Unregisters the BackupManager from the eventBus of {@link BibDatabaseContext} and deletes the backup file.
+     * This method should only be used when closing a database/JabRef legally.
+     */
+    private void shutdown() {
+        bibDatabaseContext.getDatabase().unregisterListener(this);
+        bibDatabaseContext.getMetaData().unregisterListener(this);
+        executor.shutdown();
+        determineBackupPath().ifPresent(this::deleteBackupFile);
+    }
+
+    private void deleteBackupFile(Path backupPath) {
+        try {
+            if (Files.exists(backupPath) && !Files.isDirectory(backupPath)) {
+                Files.delete(backupPath);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while deleting the backup file.", e);
         }
     }
 }

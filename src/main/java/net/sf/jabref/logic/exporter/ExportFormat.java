@@ -179,18 +179,7 @@ public class ExportFormat implements IExportFormat {
         return reader;
     }
 
-    /**
-     * Perform the export of {@code database}.
-     *
-     * @param databaseContext the database to export from.
-     * @param file       the file to write the resulting export to
-     * @param encoding   The encoding of the database
-     * @param entries    Contains all entries that should be exported.
-     * @throws IOException if a problem occurred while trying to write to {@code writer}
-     *                     or read from required resources.
-     * @throws Exception   if any other error occurred during export.
-     * @see net.sf.jabref.logic.exporter.IExportFormat#performExport(BibDatabaseContext, String, Charset, List)
-     */
+
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
             final Charset encoding, List<BibEntry> entries) throws Exception {
@@ -207,7 +196,7 @@ public class ExportFormat implements IExportFormat {
             } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
-                LOGGER.warn("Can not get save session.", ex);
+                LOGGER.warn("Cannot get save session.", ex);
             }
         }
         if (ss == null) {

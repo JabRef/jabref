@@ -1,10 +1,11 @@
 package net.sf.jabref.model.entry;
 
+import java.util.Objects;
+
 /**
  * This class models a BibTex String ("@String")
  */
 public class BibtexString implements Cloneable {
-
     /**
      * Type of a \@String.
      * <p>
@@ -36,8 +37,6 @@ public class BibtexString implements Cloneable {
      * publisher   = pMIT
      * note        = "Just " # eg
      * }
-     *
-     * @author Jan Kubovy <jan@kubovy.eu>
      */
     public enum Type {
         AUTHOR("a"),
@@ -47,30 +46,29 @@ public class BibtexString implements Cloneable {
 
         private final String prefix;
 
-
         Type(String prefix) {
             this.prefix = prefix;
         }
 
-        public static Type get(String name) {
-            if (name.length() <= 1) {
+        public static Type get(String key) {
+            if (key.length() <= 1) {
                 return OTHER;
             }
-            // TODO: Figure out what the next check actually does and replace it with something more sensible
-            // Second character is not upper case? What about non-letters?
-            if (!(String.valueOf(name.charAt(1))).toUpperCase().equals(
-                    String.valueOf(name.charAt(1)))) {
+
+            // Second character is not upper case
+            // aStallman -> AUTHOR
+            // asdf -> OTHER
+            if (!(String.valueOf(key.charAt(1))).toUpperCase().equals(String.valueOf(key.charAt(1)))) {
                 return OTHER;
             }
             for (Type t : Type.values()) {
-                if (t.prefix.equals(String.valueOf(name.charAt(0)))) {
+                if (t.prefix.equals(String.valueOf(key.charAt(0)))) {
                     return t;
                 }
             }
             return OTHER;
         }
     }
-
 
     private String name;
     private String content;
@@ -79,9 +77,8 @@ public class BibtexString implements Cloneable {
     private String parsedSerialization;
     private boolean hasChanged;
 
-
-    public BibtexString(String id, String name, String content) {
-        this.id = id;
+    public BibtexString(String name, String content) {
+        this.id = IdGenerator.next();
         this.name = name;
         this.content = content;
         hasChanged = true;
@@ -117,11 +114,6 @@ public class BibtexString implements Cloneable {
     public void setContent(String content) {
         this.content = content;
         hasChanged = true;
-    }
-
-    @Override
-    public Object clone() {
-        return new BibtexString(id, name, content);
     }
 
     public Type getType() {
@@ -166,7 +158,34 @@ public class BibtexString implements Cloneable {
     }
 
     @Override
+    public Object clone() {
+        BibtexString clone = new BibtexString(name, content);
+        clone.setId(id);
+
+        return clone;
+    }
+
+    @Override
     public String toString() {
         return name + "=" + content;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BibtexString that = (BibtexString) o;
+        return hasChanged == that.hasChanged &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(id, that.id) &&
+                type == that.type &&
+                Objects.equals(parsedSerialization, that.parsedSerialization);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, content, id, type, parsedSerialization, hasChanged);
+    }
+
 }

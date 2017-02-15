@@ -18,7 +18,6 @@ import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.externalfiles.AutoSetLinks;
 import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
-import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -29,6 +28,7 @@ import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.importer.ImportException;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -36,43 +36,111 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
+
     private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
-
-    public enum Mode {
-        INITIAL_START,
-        REMOTE_START
-    }
-
     private final JabRefCLI cli;
-
     private final List<ParserResult> parserResults;
-
     private final Mode startupMode;
-
     private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args, Mode startupMode) {
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
+    }
+
+    /**
+     * Will open a file (like importFile), but will also request JabRef to focus on this database
+     *
+     * @param argument See importFile.
+     * @return ParserResult with setToOpenTab(true)
+     */
+    private static Optional<ParserResult> importToOpenBase(String argument) {
+        Optional<ParserResult> result = importFile(argument);
+
+        result.ifPresent(ParserResult::setToOpenTab);
+
+        return result;
+    }
+
+    private static Optional<ParserResult> importFile(String argument) {
+        String[] data = argument.split(",");
+
+        String address = data[0];
+        Path file;
+        if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
+            // Download web resource to temporary file
+            try {
+                file = new URLDownload(address).downloadToTemporaryFile();
+            } catch (IOException e) {
+                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
+                return Optional.empty();
+            }
+        } else {
+            if (OS.WINDOWS) {
+                file = Paths.get(address);
+            } else {
+                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+            }
+        }
+
+        String importFormat;
+        if (data.length > 1) {
+            importFormat = data[1];
+        } else {
+            importFormat = "*";
+        }
+
+        Optional<ParserResult> importResult = importFile(file, importFormat);
+        importResult.ifPresent(result -> {
+            OutputPrinter printer = new SystemOutputPrinter();
+            if (result.hasWarnings()) {
+                printer.showMessage(result.getErrorMessage());
+            }
+        });
+        return importResult;
+    }
+
+    private static Optional<ParserResult> importFile(Path file, String importFormat) {
+        try {
+            if (!"*".equals(importFormat)) {
+                System.out.println(Localization.lang("Importing") + ": " + file);
+                ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(importFormat, file);
+                return Optional.of(result);
+            } else {
+                // * means "guess the format":
+                System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
+
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+
+                System.out.println(Localization.lang("Format used") + ": " + importResult.format);
+                return Optional.of(importResult.parserResult);
+            }
+        } catch (ImportException ex) {
+            System.err
+                    .println(Localization.lang("Error opening file") + " '" + file + "': " + ex.getLocalizedMessage());
+            return Optional.empty();
+        }
     }
 
     public List<ParserResult> getParserResults() {
@@ -168,8 +236,7 @@ public class ArgumentProcessor {
         BibDatabase dataBase = pr.getDatabase();
 
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
-        SearchQuery query = new SearchQuery(searchTerm,
-                searchPreferences.isCaseSensitive(),
+        SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
@@ -206,7 +273,7 @@ public class ArgumentProcessor {
                             matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                            + ex.getMessage());
+                            + ExceptionUtils.getStackTrace(ex));
                 }
             }
         } else {
@@ -240,13 +307,12 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = ParserResult.getNullResult();
+                ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver,
-                            Globals.prefs.getImportFormatPreferences());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
                 }
 
-                if (!bibExtension || (pr.isNullResult())) {
+                if (!bibExtension || (pr.isEmpty())) {
                     // We will try to import this file. Normally we
                     // will import it into a new tab, but if this import has
                     // been initiated by another instance through the remote
@@ -256,7 +322,7 @@ public class ArgumentProcessor {
                     if (startupMode == Mode.INITIAL_START) {
                         toImport.add(aLeftOver);
                     } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(ParserResult.getNullResult()));
+                        loaded.add(importToOpenBase(aLeftOver).orElse(new ParserResult()));
                     }
                 } else {
                     loaded.add(pr);
@@ -294,12 +360,9 @@ public class ArgumentProcessor {
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
                     SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
-                            FileSaveSession::new);
-                    Defaults defaults = new Defaults(BibDatabaseMode
-                            .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
-                            prefs);
+                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
+                    Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
+                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
 
                     // Show just a warning message if encoding did not work for all characters:
                     if (!session.getWriter().couldEncodeAll()) {
@@ -311,8 +374,7 @@ public class ArgumentProcessor {
                     }
                     session.commit(subName);
                 } catch (SaveException ex) {
-                    System.err.println(
-                            Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                    System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                 }
 
                 notSavedMsg = true;
@@ -337,8 +399,7 @@ public class ArgumentProcessor {
                     try {
                         System.out.println(Localization.lang("Saving") + ": " + data[0]);
                         SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
-                                Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+                        Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
                         BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
                                 FileSaveSession::new);
                         SaveSession session = databaseWriter.saveDatabase(
@@ -354,8 +415,7 @@ public class ArgumentProcessor {
                         }
                         session.commit(data[0]);
                     } catch (SaveException ex) {
-                        System.err.println(
-                                Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+                        System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
                     }
                 }
             } else {
@@ -376,7 +436,7 @@ public class ArgumentProcessor {
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
             databaseContext.setDatabaseFile(theFile);
             Globals.prefs.fileDirForDatabase = databaseContext
-                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             IExportFormat format = ExportFormats.getExportFormat(data[1]);
             if (format == null) {
@@ -387,10 +447,11 @@ public class ArgumentProcessor {
                     format.performExport(pr.getDatabaseContext(), data[0],
                             pr.getDatabaseContext().getMetaData().getEncoding()
                                     .orElse(Globals.prefs.getDefaultEncoding()),
-                            null);
+                            pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
+
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                            + ex.getMessage());
+                            + ExceptionUtils.getStackTrace(ex));
                 }
             }
 
@@ -400,7 +461,8 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
+            EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
+                    Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
             Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                     Globals.journalAbbreviationLoader);
             LayoutFormatterPreferences layoutPreferences = Globals.prefs
@@ -452,10 +514,9 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    BibtexKeyPatternUtil.makeLabel(
+                    BibtexKeyPatternUtil.makeAndSetLabel(
                             metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            database, entry,
-                            Globals.prefs.getBibtexKeyPatternPreferences());
+                            database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
@@ -520,74 +581,12 @@ public class ArgumentProcessor {
         return cli.isBlank();
     }
 
-    /**
-     * Will open a file (like importFile), but will also request JabRef to focus on this database
-     *
-     * @param argument See importFile.
-     * @return ParserResult with setToOpenTab(true)
-     */
-    private static Optional<ParserResult> importToOpenBase(String argument) {
-        Optional<ParserResult> result = importFile(argument);
-
-        result.ifPresent(x -> x.setToOpenTab(true));
-
-        return result;
-    }
-
-    private static Optional<ParserResult> importFile(String argument) {
-        String[] data = argument.split(",");
-        OutputPrinter printer = new SystemOutputPrinter();
-
-        try {
-            if ((data.length > 1) && !"*".equals(data[1])) {
-                System.out.println(Localization.lang("Importing") + ": " + data[0]);
-                try {
-                    Path file;
-                    if (OS.WINDOWS) {
-                        file = Paths.get(data[0]);
-                    } else {
-                        file = Paths.get(data[0].replace("~", System.getProperty("user.home")));
-                    }
-                    ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
-
-                    if(result.hasWarnings()) {
-                        printer.showMessage(result.getErrorMessage());
-                    }
-
-                    return Optional.of(result);
-                } catch (IllegalArgumentException ex) {
-                    System.err.println(Localization.lang("Unknown import format") + ": " + data[1]);
-                    return Optional.empty();
-                }
-            } else {
-                // * means "guess the format":
-                System.out.println(Localization.lang("Importing in unknown format") + ": " + data[0]);
-
-                ImportFormatReader.UnknownFormatImport importResult;
-                if (OS.WINDOWS) {
-                    importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(data[0]);
-                } else {
-                    importResult = Globals.IMPORT_FORMAT_READER
-                            .importUnknownFormat(data[0].replace("~", System.getProperty("user.home")));
-                }
-
-                if (importResult == null) {
-                    System.out.println(Localization.lang("Could not find a suitable import format."));
-                } else {
-                    System.out.println(Localization.lang("Format used") + ": " + importResult.format);
-
-                    return Optional.of(importResult.parserResult);
-                }
-            }
-        } catch (IOException ex) {
-            System.err.println(
-                    Localization.lang("Error opening file") + " '" + data[0] + "': " + ex.getLocalizedMessage());
-        }
-        return Optional.empty();
-    }
-
     public boolean shouldShutDown() {
         return cli.isDisableGui() || cli.isShowVersion() || noGUINeeded;
+    }
+
+    public enum Mode {
+        INITIAL_START, REMOTE_START
     }
 
 }

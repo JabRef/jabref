@@ -49,7 +49,6 @@ import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListEntryEditor;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -87,8 +86,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
-
-        GUIUtil.correctRowHeight(this);
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
@@ -191,7 +188,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     } else {
                         // relative to file folder
                         for (String folder : databaseContext
-                                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences())) {
+                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.link);
                             if (Files.exists(file)) {
                                 path = file.toString();
@@ -341,26 +338,24 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         return null;
     }
 
-    private void addEntry(String initialLink) {
-        int row = getSelectedRow();
-        if (row == -1) {
-            row = 0;
+    /**
+     * Will append a new file link at the last position
+     */
+    private void addEntry() {
+        List<String> defaultDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+
+        FileListEntry entry;
+        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
+            entry = new FileListEntry("", "");
+        } else {
+            entry = new FileListEntry("", defaultDirectory.get(0));
         }
-        FileListEntry entry = new FileListEntry("", initialLink);
+
         if (editListEntry(entry, true)) {
-            tableModel.addEntry(row, entry);
+            tableModel.addEntry(tableModel.getRowCount(), entry);
         }
         entryEditor.updateField(this);
         adjustColumnWidth();
-    }
-
-    private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
-        if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
-            addEntry("");
-        } else {
-            addEntry(defaultDirectory.get(0));
-        }
     }
 
     private void removeEntries() {
@@ -419,7 +414,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        List<BibEntry> entries = new ArrayList<>(frame.getCurrentBasePanel().getSelectedEntries());
+        List<BibEntry> entries = new ArrayList<>();
+        entries.add(entryEditor.getEntry());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
@@ -476,14 +472,12 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      */
     @Override
     public void downloadComplete(FileListEntry file) {
-        tableModel.addEntry(tableModel.getRowCount(), file);
+        tableModel.addEntry(0, file);
         entryEditor.updateField(this);
         adjustColumnWidth();
     }
 
-
     class TableClickListener extends MouseAdapter {
-
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {

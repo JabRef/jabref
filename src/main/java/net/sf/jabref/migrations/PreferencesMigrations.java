@@ -7,7 +7,6 @@ import java.util.prefs.Preferences;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -89,7 +88,28 @@ public class PreferencesMigrations {
     }
 
     /**
-     * Migrate LabelPattern configuration from version 3.3-3.5 to new BibtexKeyPatterns
+     * Migrate all customized entry types from versions <=3.7
+     */
+    public static void upgradeStoredCustomEntryTypes() {
+
+        JabRefPreferences prefs = Globals.prefs;
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+        try {
+            if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
+                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES) ) {
+                // skip further processing as prefs already have been migrated
+            } else {
+                LOGGER.info("Migrating old custom entry types.");
+                CustomEntryTypePreferenceMigration.upgradeStoredCustomEntryTypes(prefs.getDefaultBibDatabaseMode());
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.error("Migrating old custom entry types failed.", ex);
+        }
+    }
+
+    /**
+     * Migrate LabelPattern configuration from versions <=3.5 to new BibtexKeyPatterns
      */
     public static void upgradeLabelPatternToBibtexKeyPattern() {
 
@@ -131,8 +151,9 @@ public class PreferencesMigrations {
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
-        GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern
-                .split(prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
+        );
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }

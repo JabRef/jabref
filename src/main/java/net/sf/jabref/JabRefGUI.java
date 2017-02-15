@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
@@ -20,7 +19,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.autosave.BackupUIManager;
+import net.sf.jabref.gui.autosaveandbackup.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
@@ -34,6 +33,7 @@ import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import net.sf.jabref.shared.exception.NotASharedDatabaseException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -57,11 +57,8 @@ public class JabRefGUI {
         this.isBlank = isBlank;
 
         // passed file (we take the first one) should be focused
-        if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
-        } else {
-            focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
-        }
+        focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
+                .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
 
         openWindow();
         JabRefGUI.checkForNewVersion(false);
@@ -115,12 +112,13 @@ public class JabRefGUI {
                 if (pr.isInvalid()) {
                     failed.add(pr);
                     parserResultIterator.remove();
-                } else if (Objects.nonNull(pr.getDatabase().getDatabaseID())) {
+                } else if (pr.getDatabase().isShared()) {
                     try {
                         new SharedDatabaseUIManager(mainFrame).openSharedDatabaseFromParserResult(pr);
-                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
-                        pr.getDatabaseContext().setDatabaseFile(null); // do not open the original file
-                        pr.getDatabase().setDatabaseID(null);
+                    } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException |
+                            NotASharedDatabaseException e) {
+                        pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
+                        pr.getDatabase().clearSharedDatabaseID();
 
                         LOGGER.error("Connection error", e);
                         JOptionPane.showMessageDialog(mainFrame,
@@ -212,7 +210,7 @@ public class JabRefGUI {
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
                     Globals.prefs.getImportFormatPreferences());
 
-            if (parsedDatabase.isNullResult()) {
+            if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
                 bibDatabases.add(parsedDatabase);

@@ -26,6 +26,7 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         if (isOpen()) {
             remoteListenerServerThread.interrupt();
             remoteListenerServerThread = null;
+            JabRefExecutorService.INSTANCE.stopRemoteThread();
         }
     }
 
@@ -56,7 +57,7 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
     public void start() {
         if (isOpen() && isNotStartedBefore()) {
             // threads can only be started when in state NEW
-            JabRefExecutorService.INSTANCE.executeInOwnThread(remoteListenerServerThread);
+            JabRefExecutorService.INSTANCE.manageRemoteThread(remoteListenerServerThread);
         }
     }
 

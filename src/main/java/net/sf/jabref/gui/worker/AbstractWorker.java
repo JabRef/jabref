@@ -11,19 +11,19 @@ import spin.Spin;
  * the CallBack interface. This procedure ensures that run() cannot freeze
  * the GUI, and that update() can safely update GUI components.
  */
-public abstract class AbstractWorker implements Worker, CallBack {
+public abstract class AbstractWorker implements Runnable, CallBack {
 
-    private final Worker worker;
+    private final Runnable worker;
     private final CallBack callBack;
 
 
     public AbstractWorker() {
-        worker = (Worker) Spin.off(this);
+        worker = (Runnable) Spin.off(this);
         callBack = (CallBack) Spin.over(this);
 
     }
 
-    public void init() throws Throwable {
+    public void init() throws Exception {
         // Do nothing
     }
 
@@ -31,7 +31,7 @@ public abstract class AbstractWorker implements Worker, CallBack {
      * This method returns a wrapped Worker instance of this AbstractWorker.
      * whose methods will automatically be run off the EDT (Swing) thread.
      */
-    public Worker getWorker() {
+    public Runnable getWorker() {
         return worker;
     }
 

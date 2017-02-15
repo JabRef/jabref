@@ -20,13 +20,6 @@ import net.sf.jabref.model.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Apr 12, 2008
- * Time: 1:46:44 PM
- * To change this template use File | Settings | File Templates.
- */
 public class RegExpFileSearch {
 
     private static final Log LOGGER = LogFactory.getLog(RegExpFileSearch.class);
@@ -323,8 +316,8 @@ public class RegExpFileSearch {
         }
 
         // If no field value was found, try to interpret it as a key generator field marker:
-        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
-                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon, keywordDelimiter));
+        String fieldValue = entry.getResolvedFieldOrAlias(beforeColon, database)
+                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon, keywordDelimiter, database));
 
         if (fieldValue == null) {
             return "";

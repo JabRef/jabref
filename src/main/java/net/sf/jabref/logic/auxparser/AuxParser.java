@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -134,7 +133,9 @@ public class AuxParser {
         for (String key : result.getUniqueKeys()) {
             Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
-            if (entry.isPresent()) {
+            if(result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
+                // do nothing, key has already been processed
+            } else if (entry.isPresent()) {
                 insertEntry(entry.get(), result);
                 resolveCrossReferences(entry.get(), result);
             } else {
@@ -145,7 +146,7 @@ public class AuxParser {
         // Copy database definitions
         if (result.getGeneratedBibDatabase().hasEntries()) {
             result.getGeneratedBibDatabase().copyPreamble(masterDatabase);
-            result.getGeneratedBibDatabase().copyStrings(masterDatabase);
+            result.insertStrings(masterDatabase.getUsedStrings(result.getGeneratedBibDatabase().getEntries()));
         }
     }
 
@@ -172,7 +173,6 @@ public class AuxParser {
      */
     private void insertEntry(BibEntry entry, AuxParserResult result) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        clonedEntry.setId(IdGenerator.next());
         result.getGeneratedBibDatabase().insertEntry(clonedEntry);
     }
 }

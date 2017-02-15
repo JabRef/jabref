@@ -23,7 +23,6 @@ import javax.swing.table.TableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.NameFormatter;
@@ -155,7 +154,6 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         };
 
         table = new JTable(tableModel);
-        GUIUtil.correctRowHeight(table);
 
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(140);

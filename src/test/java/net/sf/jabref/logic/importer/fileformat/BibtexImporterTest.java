@@ -61,7 +61,7 @@ public class BibtexImporterTest {
                 assertEquals(Optional.of("2006"), entry.getField("date"));
                 assertEquals(Optional.of("Effect of immobilization on catalytic characteristics"),
                         entry.getField("indextitle"));
-                assertEquals(Optional.of("#jomch#"), entry.getField("journaltitle"));
+                assertEquals(Optional.of("#jomch#"), entry.getField("journal"));
                 assertEquals(Optional.of("13"), entry.getField("number"));
                 assertEquals(Optional.of("3027-3036"), entry.getField("pages"));
                 assertEquals(Optional
@@ -125,8 +125,7 @@ public class BibtexImporterTest {
     @Test
     public void testRecognizesDatabaseID() throws Exception {
         Path file = Paths.get(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
-        String databaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getDatabaseID();
-        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", databaseID);
+        String sharedDatabaseID = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getSharedDatabaseID().get();
+        assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
     }
-
 }

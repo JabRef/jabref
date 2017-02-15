@@ -33,7 +33,7 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<String> paths = databaseContext.getFileDirectory(fileDirectoryPreferences);
+        List<String> paths = databaseContext.getFileDirectories(fileDirectoryPreferences);
         String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
         Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
         if(!targetDirectory.isPresent()) {
@@ -72,7 +72,7 @@ public class MoveFilesCleanup implements CleanupJob {
         }
 
         if (changed) {
-            Optional<FieldChange> change = typedEntry.setFiles(newFileList);
+            Optional<FieldChange> change = entry.setFiles(newFileList);
             if(change.isPresent()) {
                 return Collections.singletonList(change.get());
             } else {

@@ -1,5 +1,7 @@
 package net.sf.jabref.model.database;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,12 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -38,7 +38,6 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
-
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -63,7 +62,7 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
-    private String databaseID;
+    private String sharedDatabaseID;
 
 
     public BibDatabase() {
@@ -149,6 +148,16 @@ public class BibDatabase {
             });
         }
         return result;
+    }
+
+    /**
+     * Finds the entry with a specified ID.
+     *
+     * @param id
+     * @return The entry that has the given id
+     */
+    public synchronized Optional<BibEntry> getEntryById(String id) {
+        return entries.stream().filter(entry -> entry.getId().equals(id)).findFirst();
     }
 
     /**
@@ -330,7 +339,33 @@ public class BibDatabase {
      */
     public String resolveForStrings(String content) {
         Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
-        return resolveContent(content, new HashSet<>());
+        return resolveContent(content, new HashSet<>(), new HashSet<>());
+    }
+
+    /**
+     * Get all strings used in the entries.
+     */
+    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
+        List<BibtexString> result = new ArrayList<>();
+        Set<String> allUsedIds = new HashSet<>();
+
+        // All entries
+        for (BibEntry entry : entries) {
+            for (String fieldContent : entry.getFieldValues()) {
+                resolveContent(fieldContent, new HashSet<>(), allUsedIds);
+            }
+        }
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
+
+        for (String stringId : allUsedIds) {
+            result.add((BibtexString) bibtexStrings.get(stringId).clone());
+        }
+
+        return result;
     }
 
     /**
@@ -388,7 +423,11 @@ public class BibDatabase {
      * care not to follow a circular reference pattern.
      * If the string is undefined, returns null.
      */
-    private String resolveString(String label, Set<String> usedIds) {
+    private String resolveString(String label, Set<String> usedIds, Set<String> allUsedIds) {
+        Objects.requireNonNull(label);
+        Objects.requireNonNull(usedIds);
+        Objects.requireNonNull(allUsedIds);
+
         for (BibtexString string : bibtexStrings.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First check if this string label has been resolved
@@ -401,11 +440,14 @@ public class BibDatabase {
                 }
                 // If not, log this string's ID now.
                 usedIds.add(string.getId());
+                if (allUsedIds != null) {
+                    allUsedIds.add(string.getId());
+                }
 
                 // Ok, we found the string. Now we must make sure we
                 // resolve any references to other strings in this one.
                 String result = string.getContent();
-                result = resolveContent(result, usedIds);
+                result = resolveContent(result, usedIds, allUsedIds);
 
                 // Finished with recursing this branch, so we remove our
                 // ID again:
@@ -429,7 +471,7 @@ public class BibDatabase {
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
 
 
-    private String resolveContent(String result, Set<String> usedIds) {
+    private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
         String res = result;
         if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
@@ -447,7 +489,7 @@ public class BibDatabase {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
                     String refLabel = res.substring(next + 1, stringEnd);
-                    String resolved = resolveString(refLabel, usedIds);
+                    String resolved = resolveString(refLabel, usedIds, allUsedIds);
 
                     if (resolved == null) {
                         // Could not resolve string. Display the #
@@ -475,59 +517,6 @@ public class BibDatabase {
             res = newRes.toString();
         }
         return res;
-    }
-
-    /**
-     * Returns the text stored in the given field of the given bibtex entry
-     * which belongs to the given database.
-     * <p>
-     * If a database is given, this function will try to resolve any string
-     * references in the field-value.
-     * Also, if a database is given, this function will try to find values for
-     * unset fields in the entry linked by the "crossref" field, if any.
-     *
-     * @param field    The field to return the value of.
-     * @param entry    The bibtex entry which contains the field.
-     * @param database maybenull
-     *                 The database of the bibtex entry.
-     * @return The resolved field value or null if not found.
-     */
-    public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
-        Objects.requireNonNull(entry, "entry cannot be null");
-
-        if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)) {
-            Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
-            if (entryType.isPresent()) {
-                return Optional.of(entryType.get().getName());
-            } else {
-                return Optional.of(StringUtil.capitalizeFirst(entry.getType()));
-            }
-        }
-
-        if (BibEntry.KEY_FIELD.equals(field)) {
-            return entry.getCiteKeyOptional();
-        }
-
-        // Changed this to also consider alias fields, which is the expected
-        // behavior for the preview layout and for the check whatever all fields are present.
-        // TODO: But there might be unwanted side-effects?!
-        Optional<String> result = entry.getFieldOrAlias(field);
-
-        // If this field is not set, and the entry has a crossref, try to look up the
-        // field in the referred entry: Do not do this for the bibtex key.
-        if (!result.isPresent() && (database != null)) {
-            Optional<String> crossrefKey = entry.getField(FieldName.CROSSREF);
-            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
-                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
-                if (referred.isPresent()) {
-                    // Ok, we found the referred entry. Get the field value from that
-                    // entry. If it is unset there, too, stop looking:
-                    result = referred.get().getFieldOrAlias(field);
-                }
-            }
-        }
-
-        return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
 
     /**
@@ -574,7 +563,12 @@ public class BibDatabase {
      * @param listener listener (subscriber) to remove
      */
     public void unregisterListener(Object listener) {
-        this.eventBus.unregister(listener);
+        try {
+            this.eventBus.unregister(listener);
+        } catch (IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.debug(e);
+        }
     }
 
     @Subscribe
@@ -586,15 +580,30 @@ public class BibDatabase {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
     }
 
-    public String getDatabaseID() {
-        return this.databaseID;
+    public Optional<String> getSharedDatabaseID() {
+        return Optional.ofNullable(this.sharedDatabaseID);
+    }
+
+    public boolean isShared() {
+        return getSharedDatabaseID().isPresent();
+    }
+
+    public void setSharedDatabaseID(String sharedDatabaseID) {
+        this.sharedDatabaseID = sharedDatabaseID;
+    }
+
+    public void clearSharedDatabaseID() {
+        this.sharedDatabaseID = null;
     }
 
     /**
-     * @param databaseID use null to unset the id
+     * Generates and sets a random ID which is globally unique.
+     *
+     * @return The generated sharedDatabaseID
      */
-    public void setDatabaseID(String databaseID) {
-        this.databaseID = databaseID;
+    public String generateSharedDatabaseID() {
+        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);
+        return this.sharedDatabaseID;
     }
 
     public DuplicationChecker getDuplicationChecker() {

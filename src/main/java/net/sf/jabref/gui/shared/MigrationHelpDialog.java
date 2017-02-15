@@ -24,7 +24,7 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public class MigrationHelpDialog extends JDialog {
 
-    public MigrationHelpDialog(OpenSharedDatabaseDialog openSharedDatabaseDialog) {
+    public MigrationHelpDialog(ConnectToSharedDatabaseDialog openSharedDatabaseDialog) {
         super(openSharedDatabaseDialog, Localization.lang("Migration help information"));
         setModal(true);
 

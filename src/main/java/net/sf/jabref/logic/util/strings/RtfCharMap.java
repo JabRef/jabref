@@ -49,7 +49,7 @@ public class RtfCharMap {
         put("\"O", "\\'d6");
         put("\"U", "\\'dc");
 
-        // Use UNICODE characters for RTF-Chars which can not be found in the
+        // Use UNICODE characters for RTF-Chars which cannot be found in the
         // standard codepage
 
         put("S", "\\u167S"); // Section sign
@@ -161,7 +161,7 @@ public class RtfCharMap {
         put("kI", "\\u302I"); // "Iogon"
         put("ki", "\\u303i"); // "iogon"
         put(".I", "\\u304I"); // "Idot"
-        
+
         // Symbol #306 (IJ) has no special Latex command
         // Symbol #307 (ij) has no special Latex command
         put("^J", "\\u308J"); // "Jcirc"

@@ -38,7 +38,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
-import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
@@ -47,7 +46,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 class StringDialog extends JDialog {
@@ -108,7 +106,6 @@ class StringDialog extends JDialog {
         if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
-        GUIUtil.correctRowHeight(table);
 
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());
@@ -358,8 +355,7 @@ class StringDialog extends JDialog {
                 return;
             }
             try {
-                String newId = IdGenerator.next();
-                BibtexString bs = new BibtexString(newId, name, "");
+                BibtexString bs = new BibtexString(name, "");
 
                 // Store undo information:
                 panel.getUndoManager().addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));

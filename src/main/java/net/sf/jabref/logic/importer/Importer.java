@@ -16,15 +16,6 @@ import net.sf.jabref.logic.util.FileExtensions;
  * Role of an importer for JabRef.
  */
 public abstract class Importer implements Comparable<Importer> {
-
-    /**
-     * Using this when I have no database open or when I read
-     * non bibtex file formats (used by the ImportFormatReader.java)
-     *
-     * TODO: Is this field really needed or would calling IdGenerator.next() suffice?
-     */
-    public static final String DEFAULT_BIBTEXENTRY_ID = "__ID";
-
     /**
      * Check whether the source is in the correct format for this importer.
      *
@@ -78,11 +69,11 @@ public abstract class Importer implements Comparable<Importer> {
         }
     }
 
-    public static BufferedReader getUTF8Reader(Path filePath) throws IOException {
+    protected static BufferedReader getUTF8Reader(Path filePath) throws IOException {
         return getReader(filePath, StandardCharsets.UTF_8);
     }
 
-    public static BufferedReader getUTF16Reader(Path filePath) throws IOException {
+    protected static BufferedReader getUTF16Reader(Path filePath) throws IOException {
         return getReader(filePath, StandardCharsets.UTF_16);
     }
 

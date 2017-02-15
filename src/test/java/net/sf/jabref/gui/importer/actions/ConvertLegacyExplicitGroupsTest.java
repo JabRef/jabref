@@ -10,14 +10,17 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.mockito.Mock;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Category(GUITests.class)
 public class ConvertLegacyExplicitGroupsTest {
 
     private ConvertLegacyExplicitGroups action;

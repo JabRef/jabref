@@ -129,7 +129,11 @@ public class RisImporter extends Importer {
                         fields.put(FieldName.TITLE, fields.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("BT".equals(tag)) {
                         fields.put(FieldName.BOOKTITLE, value);
-                    } else if ("T2".equals(tag) || "JO".equals(tag)) {
+                    } else if ("T2".equals(tag) && (fields.get(FieldName.JOURNAL) == null || "".equals(fields.get(FieldName.JOURNAL)))) {
+                        //if there is no journal title, then put second title as journal title
+                        fields.put(FieldName.JOURNAL, value);
+                    } else if ("JO".equals(tag)) {
+                        //if this field appears then this should be the journal title
                         fields.put(FieldName.JOURNAL, value);
                     } else if ("T3".equals(tag)) {
                         fields.put(FieldName.SERIES, value);
@@ -233,12 +237,12 @@ public class RisImporter extends Importer {
                     fields.put(FieldName.EDITOR, editor);
                 }
                 if (!comment.isEmpty()) {
-                    fields.put("comment", comment);
+                    fields.put(FieldName.COMMENT, comment);
                 }
 
                 fields.put(FieldName.PAGES, startPage + endPage);
             }
-            BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
+            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());

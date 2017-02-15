@@ -96,6 +96,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     public void doPostCleanup(BibEntry entry) {
         new MoveFieldCleanup("fjournal", FieldName.JOURNAL).cleanup(entry);
         new MoveFieldCleanup("mrclass", FieldName.KEYWORDS).cleanup(entry);
+        new FieldFormatterCleanup("mrreviewer", new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
     }
 }
