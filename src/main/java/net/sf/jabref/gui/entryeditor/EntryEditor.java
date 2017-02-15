@@ -57,6 +57,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 
 import net.sf.jabref.Globals;
+
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.GUIGlobals;
@@ -114,6 +115,7 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
  * one that shows up, when you double click on an entry in the table)
@@ -162,6 +164,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     private final JPanel srcPanel = new JPanel();
+
+    private final JPanel relatedArticlePanel = new JPanel();
+
+    private EntryEditorTabRelatedArticles relatedArticlesTab;
 
     private JTextArea source;
 
@@ -254,6 +260,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
         Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
 
+
+
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
                 addOptionalTab(type);
@@ -326,7 +334,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addSpecialTabs();
         // source tab
         addSourceTab();
+        // pdf annotations tab
         addPdfTab();
+        //related articles
+        addRelatedArticlesTab();
     }
 
     private void addGeneralTabs() {
@@ -394,6 +405,29 @@ public class EntryEditor extends JPanel implements EntryContainer {
         return requiredFields;
     }
 
+
+    /**
+     * Creates the related Article Tab
+     */
+    private void addRelatedArticlesTab() {
+        relatedArticlePanel.setName(Localization.lang("Related articles"));
+        relatedArticlePanel.setLayout(new BorderLayout());
+
+        relatedArticlesTab = new EntryEditorTabRelatedArticles(entry);
+
+        JScrollPane relatedArticleScrollPane = new JScrollPane(relatedArticlesTab,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        relatedArticlePanel.add(relatedArticleScrollPane, BorderLayout.CENTER);
+
+        tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
+                relatedArticlePanel,
+                Localization.lang("Related articles"));
+        tabs.add(relatedArticlePanel);
+        relatedArticlePanel.setFocusCycleRoot(true);
+    }
+
     private void addOptionalTab(EntryType type) {
         EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                 false, true, Localization.lang("Optional fields"));
@@ -401,7 +435,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (optionalPanel.fileListEditor != null) {
             fileListEditor = optionalPanel.fileListEditor;
         }
-        tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
+        tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                optionalPanel
                 .getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
     }
@@ -1048,6 +1083,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
+                }
+
+                // When the tab "Related articles" gets selected, the request to get the recommendations is started.
+                if (((JTabbedPane) event.getSource()).getSelectedComponent().getName()
+                        .equals(Localization.lang("Related articles"))) {
+                    relatedArticlesTab.focus();
                 }
             });
         }

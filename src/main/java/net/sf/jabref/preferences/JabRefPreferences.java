@@ -225,12 +225,16 @@ public class JabRefPreferences {
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
     public static final String TABLE_BACKGROUND = "tableBackground";
+    public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
+    public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
+    public static final String ICON_SIZE_LARGE = "iconSizeLarge";
+    public static final String ICON_SIZE_SMALL = "iconSizeSmall";
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -579,7 +583,9 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_SIZE, 11);
+        defaults.put(MENU_FONT_SIZE, (int) javafx.scene.text.Font.getDefault().getSize());
+        defaults.put(ICON_SIZE_LARGE, 24);
+        defaults.put(ICON_SIZE_SMALL, 16);
         defaults.put(TABLE_ROW_PADDING, 9);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
@@ -603,6 +609,10 @@ public class JabRefPreferences {
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
         defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
+
+        // default icon colors
+        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 

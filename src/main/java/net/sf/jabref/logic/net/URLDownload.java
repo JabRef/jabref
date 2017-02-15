@@ -23,10 +23,17 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import net.sf.jabref.logic.util.io.FileUtil;
 
@@ -125,13 +132,13 @@ public class URLDownload {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                        || status == HttpURLConnection.HTTP_MOVED_PERM
-                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
+                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("Location");
                     // open the new connnection again
-                    connection = (HttpURLConnection) new URLDownload(newUrl).openConnection();
+                    connection = new URLDownload(newUrl).openConnection();
                 }
             }
         }
@@ -235,5 +242,42 @@ public class URLDownload {
     @Override
     public String toString() {
         return "URLDownload{" + "source=" + source + '}';
+    }
+
+    public void fixSSLVerification() {
+
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+
+            @Override
+            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
+                    throws java.security.cert.CertificateException {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
+                    throws java.security.cert.CertificateException {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                // TODO Auto-generated method stub
+                return new X509Certificate[0];
+            }
+
+        }};
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+            LOGGER.error("SSL problem", e);
+        }
     }
 }

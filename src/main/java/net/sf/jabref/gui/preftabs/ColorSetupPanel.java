@@ -36,7 +36,7 @@ public class ColorSetupPanel extends JPanel {
 
         FormLayout layout = new FormLayout(
                 "30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
-                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         buttons.add(new ColorButton(JabRefPreferences.TABLE_TEXT, Localization.lang("Table text color")));
@@ -71,6 +71,9 @@ public class ColorSetupPanel extends JPanel {
                 Localization.lang("Entry editor invalid field color")));
         buttons.add(new ColorButton(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND,
                 Localization.lang("Background color for resolved fields"), resolvedColorCodes));
+
+        buttons.add(new ColorButton(JabRefPreferences.ICON_ENABLED_COLOR, Localization.lang("Color for enabled icons")));
+        buttons.add(new ColorButton(JabRefPreferences.ICON_DISABLED_COLOR, Localization.lang("Color for disabled icons")));
 
         int rowcnt = 0;
         int col = 0;
