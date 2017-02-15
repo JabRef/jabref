@@ -17,6 +17,7 @@ env:
     - TEST_SUITE=check OPTIONS=modernizer
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
+    - TEST_SUITE=guiTest
 
 # JavaFX localization tests need a running X environment
 before_install:
@@ -32,22 +33,7 @@ before_script:
 
 script:
   - if [ "$TEST_SUITE" != "guiTest" ]; ./gradlew $TEST_SUITE $OPTIONS -Dscan
-  # no need for databases for the integrationTest -> save memory
-  # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service postgresql stop
-  # following services identified by "sudo service --status-all" do not need to run, too
-  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unknown instance" error)
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service acpid stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service atd stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service cron stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service memcached stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service ntp stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service rabbitmq-server stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service resolvconf stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service sshguard stop
-  - if [ "$TEST_SUITE" == "guiTest" ]; sudo service ssh stop
-  # Integration tests run in a timeout. Just start them and kill them after 60s.
-  - if [ "$TEST_SUITE" == "guiTest" ]; timeout 60 ./gradlew guiTest -Dscan --info || true
+  - if [ "$TEST_SUITE" == "guiTest" ]; ./buildres/gui-tests.sh
 
 after_script:
   # enable codecov report
