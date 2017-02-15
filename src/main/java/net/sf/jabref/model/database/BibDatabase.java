@@ -339,7 +339,7 @@ public class BibDatabase {
      */
     public String resolveForStrings(String content) {
         Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
-        return resolveContent(content, new HashSet<>(), null);
+        return resolveContent(content, new HashSet<>(), new HashSet<>());
     }
 
     /**
@@ -424,6 +424,10 @@ public class BibDatabase {
      * If the string is undefined, returns null.
      */
     private String resolveString(String label, Set<String> usedIds, Set<String> allUsedIds) {
+        Objects.requireNonNull(label);
+        Objects.requireNonNull(usedIds);
+        Objects.requireNonNull(allUsedIds);
+
         for (BibtexString string : bibtexStrings.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First check if this string label has been resolved

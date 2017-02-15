@@ -45,10 +45,6 @@ public class AuxParserResult {
         return unresolvedKeys.size();
     }
 
-    public int getInsertedStringsCount() {
-        return insertedStrings;
-    }
-
     /**
      * Query the number of extra entries pulled in due to crossrefs from other entries.
      *

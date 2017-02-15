@@ -1,10 +1,13 @@
 package net.sf.jabref.model.database;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -254,45 +257,45 @@ public class BibDatabaseTest {
     }
 
     @Test
-    public void getUsedStringsSingleStringWithString() {
+    public void getUsedStrings() {
         BibEntry entry = new BibEntry(IdGenerator.next());
         entry.setField("author", "#AAA#");
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other #BBB#");
-        BibtexString string2 = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
-        BibtexString string3 = new BibtexString(IdGenerator.next(), "CCC", "Even more text");
-        database.addString(string);
-        database.addString(string2);
-        database.addString(string3);
+        BibtexString tripleA = new BibtexString(IdGenerator.next(), "AAA", "Some other #BBB#");
+        BibtexString tripleB = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
+        BibtexString tripleC = new BibtexString(IdGenerator.next(), "CCC", "Even more text");
+        Set<BibtexString> stringSet = new HashSet<>();
+        stringSet.add(tripleA);
+        stringSet.add(tripleB);
+
+        database.addString(tripleA);
+        database.addString(tripleB);
+        database.addString(tripleC);
         database.insertEntry(entry);
-        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
-        assertEquals(2, usedStrings.size());
-        assertTrue((string.getName() == usedStrings.get(0).getName())
-                || (string.getName() == usedStrings.get(1).getName()));
-        assertTrue((string2.getName() == usedStrings.get(0).getName())
-                || (string2.getName() == usedStrings.get(1).getName()));
-        assertTrue((string.getContent() == usedStrings.get(0).getContent())
-                || (string.getContent() == usedStrings.get(1).getContent()));
-        assertTrue((string2.getContent() == usedStrings.get(0).getContent())
-                || (string2.getContent() == usedStrings.get(1).getContent()));
+
+        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(Arrays.asList(entry)));
+        assertEquals(stringSet, usedStrings);
     }
 
     @Test
     public void getUsedStringsSingleString() {
-        BibEntry entry = new BibEntry(IdGenerator.next());
+        BibEntry entry = new BibEntry();
         entry.setField("author", "#AAA#");
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other text");
-        BibtexString string2 = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
-        database.addString(string);
-        database.addString(string2);
+        BibtexString tripleA = new BibtexString(IdGenerator.next(), "AAA", "Some other text");
+        BibtexString tripleB = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
+        List<BibtexString> strings = new ArrayList<>(1);
+        strings.add(tripleA);
+
+        database.addString(tripleA);
+        database.addString(tripleB);
         database.insertEntry(entry);
+
         List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
-        assertEquals(string.getName(), usedStrings.get(0).getName());
-        assertEquals(string.getContent(), usedStrings.get(0).getContent());
+        assertEquals(strings, usedStrings);
     }
 
     @Test
     public void getUsedStringsNoString() {
-        BibEntry entry = new BibEntry(IdGenerator.next());
+        BibEntry entry = new BibEntry();
         entry.setField("author", "Oscar Gustafsson");
         BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other text");
         database.addString(string);

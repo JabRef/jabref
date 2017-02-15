@@ -1,9 +1,12 @@
 package net.sf.jabref.model.entry;
 
+import java.util.Objects;
+
 /**
  * This class models a BibTex String ("@String")
  */
 public class BibtexString implements Cloneable {
+
 
     /**
      * Type of a \@String.
@@ -169,4 +172,23 @@ public class BibtexString implements Cloneable {
     public String toString() {
         return name + "=" + content;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BibtexString that = (BibtexString) o;
+        return hasChanged == that.hasChanged &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(content, that.content) &&
+                Objects.equals(id, that.id) &&
+                type == that.type &&
+                Objects.equals(parsedSerialization, that.parsedSerialization);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, content, id, type, parsedSerialization, hasChanged);
+    }
+
 }
