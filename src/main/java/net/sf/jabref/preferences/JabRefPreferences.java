@@ -318,6 +318,7 @@ public class JabRefPreferences {
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
+    public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -388,6 +389,7 @@ public class JabRefPreferences {
     private static final String PREVIEW_ENABLED = "previewEnabled";
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -555,6 +557,7 @@ public class JabRefPreferences {
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
+        defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -752,6 +755,7 @@ public class JabRefPreferences {
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
+
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {

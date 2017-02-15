@@ -332,8 +332,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addSpecialTabs();
         // source tab
         addSourceTab();
-        //related articles
-        addRelatedArticlesTab();
+
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS)) {
+            //related articles
+            addRelatedArticlesTab();
+        }
     }
 
     private void addGeneralTabs() {
