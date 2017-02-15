@@ -1,11 +1,14 @@
 package net.sf.jabref.gui.maintable;
 
 import java.awt.Component;
+import java.awt.Font;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
+
+import net.sf.jabref.gui.GUIGlobals;
 
 public class MainTableHeaderRenderer implements TableCellRenderer {
 
@@ -27,6 +30,7 @@ public class MainTableHeaderRenderer implements TableCellRenderer {
             Icon icon = ((JLabel) value).getIcon();
             if (icon == null) {
                 ((JLabel) resultFromDelegate).setText(text);
+                resultFromDelegate.setFont(GUIGlobals.currentFont);
             } else {
                 ((JLabel) resultFromDelegate).setIcon(icon);
                 ((JLabel) resultFromDelegate).setText(null);
