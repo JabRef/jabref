@@ -25,7 +25,4 @@ public class IdGenerator {
         return result;
     }
 
-    public static int getMinimumIntegerDigits() {
-        return idFormat.getMinimumIntegerDigits();
-    }
 }
