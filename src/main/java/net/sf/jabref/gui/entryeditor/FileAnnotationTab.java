@@ -107,8 +107,8 @@ class FileAnnotationTab extends JPanel {
     }
 
     /**
-     * Adds pdf annotationsOfFiles from all attached pdf files belonging to the entry selected in the main table and
-     * shows those from the first file in the file annotationsOfFiles tab
+     * Adds pdf annotations from all attached pdf files belonging to the entry selected in the main table and
+     * shows those from the first file in the file annotations tab
      * @throws IOException
      */
     private void addAnnotations() throws IOException {
@@ -249,7 +249,7 @@ class FileAnnotationTab extends JPanel {
 
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());
-        reloadAnnotationsButton.setText(Localization.lang("Reload annotationsOfFiles"));
+        reloadAnnotationsButton.setText(Localization.lang("Reload annotations"));
         reloadAnnotationsButton.addActionListener(e -> reloadAnnotations());
 
         buttonConstraints.gridy = 10;
