@@ -1,4 +1,4 @@
-package net.sf.jabref.benchmarks;
+package org.jabref.benchmarks;
 
 import java.io.IOException;
 import java.io.StringReader;
