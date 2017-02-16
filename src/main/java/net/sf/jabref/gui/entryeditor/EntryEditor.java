@@ -1,16 +1,76 @@
 package net.sf.jabref.gui.entryeditor;
 
-import com.google.common.eventbus.Subscribe;
+import java.awt.AWTKeyStroke;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
+
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.*;
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.EntryContainer;
+import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
-import net.sf.jabref.gui.fieldeditors.*;
+import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
+import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
@@ -18,7 +78,11 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import net.sf.jabref.gui.specialfields.SpecialFieldUpdateListener;
-import net.sf.jabref.gui.undo.*;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableChangeType;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.logic.TypedBibEntry;
@@ -37,28 +101,19 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.*;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperty;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.MathSciNetId;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
+
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 
 /**
@@ -74,30 +129,50 @@ import java.util.stream.Collectors;
 public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
-    /** A reference to the entry this object works on. */
+    /**
+     * A reference to the entry this object works on.
+     */
     private final BibEntry entry;
-    /** The currently displayed type */
+    /**
+     * The currently displayed type
+     */
     private final String displayedBibEntryType;
 
-    /** The action concerned with closing the window. */
+    /**
+     * The action concerned with closing the window.
+     */
     private final CloseAction closeAction = new CloseAction();
-    /** The action that deletes the current entry, and closes the editor. */
+    /**
+     * The action that deletes the current entry, and closes the editor.
+     */
     private final DeleteAction deleteAction = new DeleteAction();
 
-    /** The action for switching to the next entry. */
+    /**
+     * The action for switching to the next entry.
+     */
     private final AbstractAction nextEntryAction = new NextEntryAction();
-    /** The action for switching to the previous entry. */
+    /**
+     * The action for switching to the previous entry.
+     */
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
-    /** The action concerned with storing a field value. */
+    /**
+     * The action concerned with storing a field value.
+     */
     private final StoreFieldAction storeFieldAction = new StoreFieldAction();
 
-    /** The action for switching to the next tab */
+    /**
+     * The action for switching to the next tab
+     */
     private final SwitchLeftAction switchLeftAction = new SwitchLeftAction();
-    /** The action for switching to the previous tab */
+    /**
+     * The action for switching to the previous tab
+     */
     private final SwitchRightAction switchRightAction = new SwitchRightAction();
 
-    /** The action which generates a BibTeX key for this entry. */
+    /**
+     * The action which generates a BibTeX key for this entry.
+     */
     private final GenerateKeyAction generateKeyAction = new GenerateKeyAction();
 
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
@@ -105,8 +180,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
 
     private final AbstractAction writeXmp;
-
-    private final SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction();
 
     private final JPanel srcPanel = new JPanel();
 
@@ -130,7 +203,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * source couldn't be parsed, and the user is given the option to edit it.
      */
     private boolean updateSource = true;
-    /** Indicates that we are about to go to the next or previous entry */
+    /**
+     * Indicates that we are about to go to the next or previous entry
+     */
     private boolean movingToDifferentEntry;
 
     private boolean validEntry = true;
@@ -140,16 +215,20 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private boolean lastFieldAccepted = true;
 
     /**
-     *  This indicates whether the last attempt at parsing the source was successful. It is used to determine whether
-     *  the dialog should close; it should stay open if the user received an error message about the source,
-     *  whatever he or she chose to do about it.
+     * This indicates whether the last attempt at parsing the source was successful. It is used to determine whether
+     * the dialog should close; it should stay open if the user received an error message about the source,
+     * whatever he or she chose to do about it.
      */
     private boolean lastSourceAccepted = true;
 
-    /** This is used to prevent double updates after editing source. */
+    /**
+     * This is used to prevent double updates after editing source.
+     */
     private String lastSourceStringAccepted;
 
-    /** The index the source panel has in tabbed. */
+    /**
+     * The index the source panel has in tabbed.
+     */
     private int sourceIndex = -1;
 
     private final HelpAction helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
@@ -161,6 +240,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final TabListener tabListener = new TabListener();
 
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+    private Action saveDatabaseAction;
 
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
@@ -187,7 +267,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         updateAllFields();
-        if (this.fileListEditor != null){
+        if (this.fileListEditor != null) {
             this.fileListEditor.adjustColumnWidth();
         }
     }
@@ -204,7 +284,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // optional fields
         Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
         Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
-
 
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
@@ -388,7 +467,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                 optionalPanel
-                .getPane(), Localization.lang("Show optional fields"));
+                        .getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
     }
 
@@ -401,11 +480,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
             fileAnnotationTab = new FileAnnotationTab(this);
-            tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.COMMENT.getSmallIcon(), fileAnnotationTab,
+            tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.ANNOTATION.getSmallIcon(), fileAnnotationTab,
                     Localization.lang("Show file annotations"));
             tabs.add(fileAnnotationTab);
         }
-
     }
 
     public String getDisplayedBibEntryType() {
@@ -478,7 +556,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         toolBar.add(writeXmp);
 
         JPopupMenu fetcherPopup = new JPopupMenu();
-        for(EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : EntryFetchers.getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
             fetcherPopup.add(new JMenuItem(new AbstractAction(fetcher.getName()) {
 
                 @Override
@@ -542,7 +620,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * @param editor Field editor
      * @return Component to show, or null if none.
      */
-    private Optional<JComponent> getExtra(final FieldEditor editor) {
+    Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
@@ -563,7 +641,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
@@ -608,7 +685,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         srcPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void addSearchListener(SearchQueryHighlightListener listener) {
+    void addSearchListener(SearchQueryHighlightListener listener) {
         searchListeners.add(listener);
         panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
     }
@@ -636,7 +713,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 source.setEditable(false);
                 LOGGER.debug("Incorrect entry", ex);
             }
-
         }
     }
 
@@ -702,7 +778,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).focus();
         } else if (activeTab instanceof FileAnnotationTab) {
-            ((FileAnnotationTab)activeTab).requestFocus();
+            ((FileAnnotationTab) activeTab).requestFocus();
         } else {
             source.requestFocus();
         }
@@ -727,7 +803,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
         }
         source.setEnabled(enabled);
-
     }
 
     /**
@@ -919,7 +994,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             for (FieldContentSelector contentSelector : contentSelectors) {
                 contentSelector.rebuildComboBox();
             }
-
         }
     }
 
@@ -949,6 +1023,38 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void unregisterListeners() {
         entry.unregisterListener(this);
         removeSearchListeners();
+    }
+
+    public GenerateKeyAction getGenerateKeyAction() {
+        return generateKeyAction;
+    }
+
+    AbstractAction getPrevEntryAction() {
+        return prevEntryAction;
+    }
+
+    AbstractAction getNextEntryAction() {
+        return nextEntryAction;
+    }
+
+    StoreFieldAction getStoreFieldAction() {
+        return storeFieldAction;
+    }
+
+    SwitchLeftAction getSwitchLeftAction() {
+        return switchLeftAction;
+    }
+
+    SwitchRightAction getSwitchRightAction() {
+        return switchRightAction;
+    }
+
+    HelpAction getHelpAction() {
+        return helpAction;
+    }
+
+    Action getSaveDatabaseAction() {
+        return saveDatabaseAction;
     }
 
     private class TypeButton extends JButton {
@@ -1105,7 +1211,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    private class StoreFieldAction extends AbstractAction {
+    class StoreFieldAction extends AbstractAction {
 
         StoreFieldAction() {
             super("Store field value");
@@ -1239,7 +1345,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                             ce.end();
 
                             panel.getUndoManager().addEdit(ce);
-
                         } else {
                             panel.getUndoManager().addEdit(undoableFieldChange);
                         }
@@ -1295,7 +1400,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             int i = tabbed.getSelectedIndex();
             tabbed.setSelectedIndex(i < (tabbed.getTabCount() - 1) ? i + 1 : 0);
             activateVisible();
-
         }
     }
 
@@ -1331,7 +1435,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
-
         }
 
         @Override
@@ -1367,7 +1470,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
             // Store undo information:
@@ -1442,8 +1545,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-
-
     private class AutoLinkAction extends AbstractAction {
         AutoLinkAction() {
             putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
@@ -1476,5 +1577,4 @@ public class EntryEditor extends JPanel implements EntryContainer {
         String timestamp = DateTimeFormatter.ofPattern(timeStampFormat).format(LocalDateTime.now());
         return UpdateField.updateField(entry, timeStampField, timestamp);
     }
-
 }

@@ -85,7 +85,7 @@ public class IconTheme {
         PASTE("\uf192") /*css: content-paste*/,
         CUT("\uf190") /*css: content-cut*/,
         COPY("\uf18f") /*css: content-copy */,
-        COMMENT("\uF188") /*css: comment*/,
+        ANNOTATION("\uF188") /*css: comment*/,
         REDO("\uf44e") /*css: redo*/,
         UNDO("\uf54c") /*css: undo*/,
         MARK_ENTRIES("\uf0c0") /*css: bookmark */,

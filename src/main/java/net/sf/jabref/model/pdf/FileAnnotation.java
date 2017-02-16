@@ -117,7 +117,7 @@ public class FileAnnotation {
         return annotationType;
     }
 
-    public boolean hasLinkedComment() {
+    public boolean hasLinkedAnnotation() {
         return linkedComment;
     }
 

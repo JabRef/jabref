@@ -1032,7 +1032,7 @@ public class BibtexParserTest {
     public void parseIgnoresUpercaseComments() throws IOException {
 
         ParserResult result = parser
-                .parse(new StringReader("@COMMENT{some text and \\latex}"));
+                .parse(new StringReader("@ANNOTATION{some text and \\latex}"));
         assertEquals(0, result.getDatabase().getEntries().size());
     }
 
