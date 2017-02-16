@@ -10,9 +10,9 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.bibtex.BibEntryWriter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 

@@ -3,7 +3,7 @@ package net.sf.jabref.gui.push;
 import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
 

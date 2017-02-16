@@ -7,7 +7,7 @@ import javax.swing.Action;
 import javafx.application.Platform;
 
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 public class ManageJournalsAction extends MnemonicAwareAction {
 

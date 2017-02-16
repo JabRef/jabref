@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * <p>Title: MergeDialog</p>

@@ -22,8 +22,8 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.CitationEntry;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.CitationEntry;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

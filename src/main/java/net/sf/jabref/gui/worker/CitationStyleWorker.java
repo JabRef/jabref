@@ -9,8 +9,8 @@ import javax.swing.SwingWorker;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;

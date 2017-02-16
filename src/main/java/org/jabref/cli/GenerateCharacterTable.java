@@ -3,7 +3,7 @@ package org.jabref.cli;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 public class GenerateCharacterTable {
 

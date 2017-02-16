@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.importer.EntryBasedFetcher;
-import net.sf.jabref.logic.importer.EntryBasedParserFetcher;
-import net.sf.jabref.logic.importer.IdBasedFetcher;
-import net.sf.jabref.logic.importer.IdBasedParserFetcher;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
-import net.sf.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
-import net.sf.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
-import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.EntryBasedParserFetcher;
+import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.IdBasedParserFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
+import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
+import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.Before;
 import org.junit.Test;

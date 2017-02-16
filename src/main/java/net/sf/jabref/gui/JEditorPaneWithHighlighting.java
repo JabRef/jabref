@@ -12,7 +12,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.LayeredHighlighter.LayerPainter;
 
 import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
-import net.sf.jabref.logic.search.SearchQueryHighlightListener;
+import org.jabref.logic.search.SearchQueryHighlightListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

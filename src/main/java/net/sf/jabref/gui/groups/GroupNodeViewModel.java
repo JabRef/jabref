@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
 
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.BindingsHelper;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;

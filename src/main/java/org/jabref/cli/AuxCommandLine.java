@@ -1,7 +1,7 @@
 package org.jabref.cli;
 
-import net.sf.jabref.logic.auxparser.AuxParser;
-import net.sf.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.strings.StringUtil;
 

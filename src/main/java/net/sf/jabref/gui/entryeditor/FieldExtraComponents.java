@@ -30,18 +30,18 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLUtil;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.logic.util.ISBN;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLUtil;
+import org.jabref.logic.util.DOI;
+import org.jabref.logic.util.ISBN;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.MonthUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class FieldExtraComponents {
 

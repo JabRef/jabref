@@ -19,8 +19,8 @@ import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
 
 public class MigrationHelpDialog extends JDialog {
 

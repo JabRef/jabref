@@ -28,11 +28,11 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;

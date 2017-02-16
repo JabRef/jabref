@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.logic.importer.util.OAI2Handler;
+import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.category.GUITests;
 

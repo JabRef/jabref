@@ -18,10 +18,10 @@ import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.MappedList;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.LogMessages;
-import net.sf.jabref.logic.util.BuildInfo;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.logging.LogMessages;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.OS;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -25,7 +25,7 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

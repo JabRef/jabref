@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 

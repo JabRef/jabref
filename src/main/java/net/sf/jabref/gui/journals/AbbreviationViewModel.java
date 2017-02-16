@@ -7,7 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import net.sf.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.Abbreviation;
 
 /**
  * This class provides a view model for abbreviation objects which can also

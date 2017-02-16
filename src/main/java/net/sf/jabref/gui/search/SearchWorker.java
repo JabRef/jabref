@@ -11,7 +11,7 @@ import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 

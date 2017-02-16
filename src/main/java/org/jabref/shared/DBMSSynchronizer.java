@@ -8,10 +8,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.logic.exporter.BibDatabaseWriter;
-import net.sf.jabref.logic.exporter.MetaDataSerializer;
-import net.sf.jabref.logic.importer.ParseException;
-import net.sf.jabref.logic.importer.util.MetaDataParser;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.MetaDataSerializer;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.util.MetaDataParser;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

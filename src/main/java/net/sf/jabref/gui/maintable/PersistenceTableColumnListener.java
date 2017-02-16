@@ -10,7 +10,7 @@ import javax.swing.event.TableColumnModelListener;
 
 import org.jabref.Globals;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Listens for TableColumnModelEvents to keep track of changes made to the

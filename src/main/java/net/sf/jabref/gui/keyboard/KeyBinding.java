@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.keyboard;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
 

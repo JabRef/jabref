@@ -12,11 +12,11 @@ import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.net.URLDownload;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

@@ -4,7 +4,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
-import net.sf.jabref.logic.exporter.IExportFormat;
+import org.jabref.logic.exporter.IExportFormat;
 
 /**
  * File filter that lets the user choose export format while choosing file to

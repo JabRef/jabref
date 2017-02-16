@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.ExplicitGroup;

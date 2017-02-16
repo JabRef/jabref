@@ -15,9 +15,9 @@ import javax.swing.event.MouseInputAdapter;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.Version;
-import net.sf.jabref.preferences.VersionPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.Version;
+import org.jabref.preferences.VersionPreferences;
 
 public class NewVersionDialog extends JDialog {
 

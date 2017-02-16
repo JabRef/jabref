@@ -16,8 +16,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.gui.WrapLayout;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferencesFilter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferencesFilter;
 
 class PreferencesFilterDialog extends JDialog {
 

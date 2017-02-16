@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
-import net.sf.jabref.logic.importer.Importer;
-import net.sf.jabref.logic.util.FileExtensions;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter {
 

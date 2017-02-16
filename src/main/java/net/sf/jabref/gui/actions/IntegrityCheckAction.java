@@ -23,9 +23,9 @@ import javax.swing.table.TableRowSorter;
 import org.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.integrity.IntegrityCheck;
-import net.sf.jabref.logic.integrity.IntegrityMessage;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.integrity.IntegrityCheck;
+import org.jabref.logic.integrity.IntegrityMessage;
+import org.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

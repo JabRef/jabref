@@ -14,10 +14,10 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
-import net.sf.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
-import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
+import org.jabref.logic.autocompleter.AutoCompletePreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;

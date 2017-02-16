@@ -16,8 +16,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.importer.FulltextFetchers;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.FulltextFetchers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

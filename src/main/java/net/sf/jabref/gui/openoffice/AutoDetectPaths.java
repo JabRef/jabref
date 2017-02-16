@@ -21,10 +21,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.OpenOfficeFileSearch;
-import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.OpenOfficeFileSearch;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.util.OS;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

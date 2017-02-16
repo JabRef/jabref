@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Class for holding the information about customizable entry editor tabs.

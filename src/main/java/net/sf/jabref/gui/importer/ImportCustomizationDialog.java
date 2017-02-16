@@ -32,10 +32,10 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileExtensions;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileExtensions;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;

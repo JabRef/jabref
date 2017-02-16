@@ -2,7 +2,7 @@ package net.sf.jabref.gui.maintable;
 
 import org.jabref.Globals;
 import org.jabref.model.entry.AuthorList;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class MainTableNameFormatter {
 

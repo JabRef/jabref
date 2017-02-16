@@ -3,8 +3,8 @@ package net.sf.jabref.gui.importer.fetcher;
 import java.util.Map;
 
 import net.sf.jabref.gui.importer.FetcherPreviewDialog;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
 
 /**
  *

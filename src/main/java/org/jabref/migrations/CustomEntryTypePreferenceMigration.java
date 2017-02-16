@@ -10,7 +10,7 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.CustomEntryType;
 import org.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 class CustomEntryTypePreferenceMigration {
 

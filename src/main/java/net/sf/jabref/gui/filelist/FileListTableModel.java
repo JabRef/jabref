@@ -13,7 +13,7 @@ import javax.swing.table.AbstractTableModel;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
-import net.sf.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
 

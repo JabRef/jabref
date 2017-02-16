@@ -6,7 +6,7 @@ import java.net.URL;
 
 import javax.swing.ProgressMonitorInputStream;
 
-import net.sf.jabref.logic.net.URLDownload;
+import org.jabref.logic.net.URLDownload;
 
 public class MonitoredURLDownload {
 

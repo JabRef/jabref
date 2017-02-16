@@ -6,7 +6,7 @@ import javax.swing.Action;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.shared.ConnectToSharedDatabaseDialog;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * The action concerned with opening a shared database.

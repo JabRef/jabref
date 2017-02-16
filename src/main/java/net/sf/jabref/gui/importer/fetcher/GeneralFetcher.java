@@ -29,9 +29,9 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.preferences.JabRefPreferences;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {

@@ -15,8 +15,8 @@ import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.CopyDoiUrlAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 

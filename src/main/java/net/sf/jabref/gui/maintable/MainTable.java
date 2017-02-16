@@ -40,15 +40,15 @@ import net.sf.jabref.gui.search.matchers.SearchMatcher;
 import net.sf.jabref.gui.util.comparator.FirstColumnComparator;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
-import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
+import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;

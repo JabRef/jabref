@@ -2,7 +2,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 
 public class AbstractUndoableJabRefEdit extends AbstractUndoableEdit {

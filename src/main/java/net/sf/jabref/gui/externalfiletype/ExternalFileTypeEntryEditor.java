@@ -21,9 +21,9 @@ import javax.swing.event.DocumentListener;
 import org.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;

@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 public class ImportInspectionCommandLine implements ImportInspector {

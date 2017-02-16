@@ -19,17 +19,17 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.importer.ImportException;
-import net.sf.jabref.logic.importer.ImportFormatReader;
-import net.sf.jabref.logic.importer.Importer;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.UpdateField;
+import org.jabref.logic.importer.ImportException;
+import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality

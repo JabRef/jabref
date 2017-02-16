@@ -6,12 +6,12 @@ import java.util.Objects;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.importer.SearchBasedFetcher;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;

@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
 import org.apache.commons.logging.Log;

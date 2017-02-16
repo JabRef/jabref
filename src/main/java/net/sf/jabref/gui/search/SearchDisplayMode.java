@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.search;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Collects the possible search modes

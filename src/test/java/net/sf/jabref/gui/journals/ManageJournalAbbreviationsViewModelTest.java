@@ -18,9 +18,9 @@ import org.jabref.JabRefException;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.util.CurrentThreadTaskExecutor;
 import net.sf.jabref.gui.util.TaskExecutor;
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.assertj.core.util.Files;
 import org.junit.Assert;
@@ -30,7 +30,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import static net.sf.jabref.logic.util.OS.NEWLINE;
+import static org.jabref.logic.util.OS.NEWLINE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;

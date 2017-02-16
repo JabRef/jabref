@@ -26,8 +26,8 @@ import javax.swing.table.TableModel;
 import org.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.l10n.Localization;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

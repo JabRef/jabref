@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import org.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 /**

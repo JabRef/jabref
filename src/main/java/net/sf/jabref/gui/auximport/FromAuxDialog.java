@@ -26,10 +26,10 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.auxparser.AuxParser;
-import net.sf.jabref.logic.auxparser.AuxParserResult;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileExtensions;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabase;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

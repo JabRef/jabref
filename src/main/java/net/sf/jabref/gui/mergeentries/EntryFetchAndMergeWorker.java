@@ -8,9 +8,9 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.importer.EntryBasedFetcher;
-import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;

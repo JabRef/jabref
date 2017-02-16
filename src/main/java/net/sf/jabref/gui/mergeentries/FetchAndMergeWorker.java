@@ -8,10 +8,10 @@ import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.IdBasedFetcher;
-import net.sf.jabref.logic.importer.WebFetchers;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

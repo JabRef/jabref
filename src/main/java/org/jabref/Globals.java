@@ -4,12 +4,12 @@ import org.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
-import net.sf.jabref.logic.importer.ImportFormatReader;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
-import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
-import net.sf.jabref.logic.util.BuildInfo;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
+import org.jabref.logic.util.BuildInfo;
+import org.jabref.preferences.JabRefPreferences;
 
 public class Globals {
 

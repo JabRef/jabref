@@ -11,10 +11,10 @@ import java.util.StringJoiner;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
-import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
+import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
     @Override

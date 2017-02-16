@@ -3,8 +3,8 @@ package net.sf.jabref.gui.journals;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 

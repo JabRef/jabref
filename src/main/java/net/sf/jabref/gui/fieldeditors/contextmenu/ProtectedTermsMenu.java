@@ -7,9 +7,9 @@ import javax.swing.text.JTextComponent;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 public class ProtectedTermsMenu extends JMenu {
 

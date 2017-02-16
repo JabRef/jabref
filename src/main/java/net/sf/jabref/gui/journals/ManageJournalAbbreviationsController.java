@@ -20,7 +20,7 @@ import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.util.TaskExecutor;
 import net.sf.jabref.gui.util.ValueTableCellFactory;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class ManageJournalAbbreviationsController extends AbstractController<ManageJournalAbbreviationsViewModel> {
 

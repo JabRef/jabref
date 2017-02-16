@@ -3,7 +3,7 @@ package net.sf.jabref;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.jabref.JabRefException;
 import org.junit.After;

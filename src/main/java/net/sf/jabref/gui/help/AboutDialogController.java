@@ -9,7 +9,7 @@ import javafx.scene.image.ImageView;
 import net.sf.jabref.gui.AbstractController;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.BuildInfo;
 
 import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 

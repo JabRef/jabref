@@ -22,7 +22,7 @@ import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.BindingsHelper;
 import net.sf.jabref.gui.util.RecursiveTreeItem;
 import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import org.fxmisc.easybind.EasyBind;
 

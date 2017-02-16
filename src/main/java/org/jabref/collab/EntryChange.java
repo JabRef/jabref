@@ -13,7 +13,7 @@ import javax.swing.JScrollPane;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;

@@ -9,8 +9,8 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.net.URLUtil;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLUtil;
 
 public class PasteAction extends AbstractAction {
     private final Component target;

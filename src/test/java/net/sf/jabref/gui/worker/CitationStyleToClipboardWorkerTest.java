@@ -7,7 +7,7 @@ import java.util.Arrays;
 import net.sf.jabref.gui.exporter.RtfTransferable;
 import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
 import net.sf.jabref.gui.fieldeditors.XmlTransferable;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.util.OS;
 
 import org.junit.Assert;
 import org.junit.Test;

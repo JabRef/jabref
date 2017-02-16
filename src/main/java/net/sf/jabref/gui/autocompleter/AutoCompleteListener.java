@@ -10,7 +10,7 @@ import java.util.List;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.logic.autocompleter.AutoCompleter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

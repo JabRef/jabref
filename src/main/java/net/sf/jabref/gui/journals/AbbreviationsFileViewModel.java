@@ -15,9 +15,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.AbbreviationWriter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.AbbreviationWriter;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 /**
  * This class provides a model for abbreviation files.

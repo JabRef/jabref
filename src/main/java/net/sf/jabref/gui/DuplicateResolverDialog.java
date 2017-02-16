@@ -13,10 +13,10 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.WindowLocation;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public class DuplicateResolverDialog extends JDialog {
 

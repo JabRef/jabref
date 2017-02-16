@@ -22,10 +22,10 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.TestEntry;
-import net.sf.jabref.preferences.PreviewPreferences;
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.TestEntry;
+import org.jabref.preferences.PreviewPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;

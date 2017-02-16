@@ -1,6 +1,6 @@
 package org.jabref.cli;
 
-import net.sf.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.OutputPrinter;
 
 public class SystemOutputPrinter implements OutputPrinter {
 

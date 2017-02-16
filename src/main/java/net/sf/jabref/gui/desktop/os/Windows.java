@@ -8,11 +8,11 @@ import java.util.Optional;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
-import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static net.sf.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
-import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
+import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static org.jabref.preferences.JabRefPreferences.SUMATRA_PDF_COMMAND;
+import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Windows implements NativeDesktop {
     private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";

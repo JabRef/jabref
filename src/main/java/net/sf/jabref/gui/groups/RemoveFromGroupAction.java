@@ -6,7 +6,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 
 public class RemoveFromGroupAction extends AbstractAction {

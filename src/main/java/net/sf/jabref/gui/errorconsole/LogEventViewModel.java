@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.util.OS;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.core.LogEvent;

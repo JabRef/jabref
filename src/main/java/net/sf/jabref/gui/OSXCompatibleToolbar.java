@@ -5,7 +5,7 @@ import java.awt.Component;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.util.OS;
 
 public class OSXCompatibleToolbar extends JToolBar {
 

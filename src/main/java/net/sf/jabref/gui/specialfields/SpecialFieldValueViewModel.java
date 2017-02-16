@@ -6,7 +6,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
 public class SpecialFieldValueViewModel {

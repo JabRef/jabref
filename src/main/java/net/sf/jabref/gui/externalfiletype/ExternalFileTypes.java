@@ -8,10 +8,10 @@ import java.util.TreeSet;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 public final class ExternalFileTypes {
 

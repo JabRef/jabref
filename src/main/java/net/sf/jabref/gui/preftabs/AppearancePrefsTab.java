@@ -18,9 +18,9 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.FormBuilder;

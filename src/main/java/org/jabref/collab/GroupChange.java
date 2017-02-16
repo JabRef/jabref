@@ -7,7 +7,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableModifySubtree;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.GroupTreeNode;

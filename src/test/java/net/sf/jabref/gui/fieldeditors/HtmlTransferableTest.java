@@ -2,7 +2,7 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.datatransfer.DataFlavor;
 
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.util.OS;
 
 import org.junit.Test;
 

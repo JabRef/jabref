@@ -6,8 +6,8 @@ import org.jabref.Globals;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 public class OpenOfficeSidePanel extends SidePaneComponent {
 

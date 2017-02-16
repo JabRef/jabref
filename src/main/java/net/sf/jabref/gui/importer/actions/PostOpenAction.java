@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.importer.actions;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.ParserResult;
 
 /**
  * This interface defines potential actions that may need to be taken after

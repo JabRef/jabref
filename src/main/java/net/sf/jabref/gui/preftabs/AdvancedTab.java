@@ -13,11 +13,11 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.remote.RemotePreferences;
-import net.sf.jabref.logic.remote.RemoteUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.remote.RemotePreferences;
+import org.jabref.logic.remote.RemoteUtil;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

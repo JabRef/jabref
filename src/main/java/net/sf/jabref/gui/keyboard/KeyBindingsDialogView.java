@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 import net.sf.jabref.gui.AbstractDialogView;
 import net.sf.jabref.gui.FXDialog;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 public class KeyBindingsDialogView extends AbstractDialogView {
 

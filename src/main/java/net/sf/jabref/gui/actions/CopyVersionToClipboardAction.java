@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.BuildInfo;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 
 public class CopyVersionToClipboardAction extends AbstractAction {
 

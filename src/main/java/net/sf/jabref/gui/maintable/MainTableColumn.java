@@ -7,8 +7,8 @@ import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

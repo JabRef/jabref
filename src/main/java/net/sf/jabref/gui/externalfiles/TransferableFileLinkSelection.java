@@ -11,7 +11,7 @@ import java.util.List;
 import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.filelist.FileListTableModel;
-import net.sf.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

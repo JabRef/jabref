@@ -19,17 +19,17 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.l10n.Encodings;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Encodings;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
+import static org.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends JPanel implements PrefsTab {
 

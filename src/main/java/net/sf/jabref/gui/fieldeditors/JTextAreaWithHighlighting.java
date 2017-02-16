@@ -20,8 +20,8 @@ import org.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.util.component.JTextAreaWithPlaceholder;
-import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.search.SearchQueryHighlightListener;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

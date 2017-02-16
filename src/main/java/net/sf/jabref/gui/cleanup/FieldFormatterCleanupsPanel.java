@@ -26,8 +26,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.jabref.JabRefGUI;
-import net.sf.jabref.logic.cleanup.Cleanups;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.cleanup.Formatter;

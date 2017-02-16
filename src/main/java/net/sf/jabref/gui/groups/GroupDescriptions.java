@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.groups;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;

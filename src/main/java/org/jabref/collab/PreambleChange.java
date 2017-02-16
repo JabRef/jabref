@@ -6,7 +6,7 @@ import javax.swing.JScrollPane;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
 class PreambleChange extends Change {

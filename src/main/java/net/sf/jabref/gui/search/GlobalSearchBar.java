@@ -31,14 +31,14 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithPlaceholder;
-import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
+import org.jabref.logic.search.SearchQueryHighlightObservable;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.SearchPreferences;
+import org.jabref.preferences.SearchPreferences;
 
 public class GlobalSearchBar extends JPanel {
 

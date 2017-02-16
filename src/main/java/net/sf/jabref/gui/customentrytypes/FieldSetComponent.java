@@ -33,9 +33,9 @@ import javax.swing.event.ListSelectionListener;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * @author alver

@@ -8,8 +8,8 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
 import net.sf.jabref.gui.fieldeditors.TextArea;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.jabref.Globals;
 import org.junit.Assert;

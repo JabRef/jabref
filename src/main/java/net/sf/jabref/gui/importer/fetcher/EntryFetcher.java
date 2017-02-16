@@ -3,9 +3,9 @@ package net.sf.jabref.gui.importer.fetcher;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
 
 /**
  * @Deprecated

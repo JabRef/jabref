@@ -5,7 +5,7 @@ import java.util.Optional;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
 

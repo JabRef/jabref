@@ -5,8 +5,8 @@ import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.l10n.Localization;
 
 public class JournalAbbreviationsUtil {
 

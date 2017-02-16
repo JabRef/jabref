@@ -20,7 +20,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
-import net.sf.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

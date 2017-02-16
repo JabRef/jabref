@@ -12,8 +12,8 @@ import javax.swing.SwingWorker;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.NewVersionDialog;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.Version;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.Version;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

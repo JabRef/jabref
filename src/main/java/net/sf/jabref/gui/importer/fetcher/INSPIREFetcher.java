@@ -13,13 +13,13 @@ import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.util.INSPIREBibtexFilterReader;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.util.INSPIREBibtexFilterReader;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
 import org.apache.commons.logging.Log;

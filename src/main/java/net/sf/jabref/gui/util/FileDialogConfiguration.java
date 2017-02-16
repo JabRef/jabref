@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
 
-import net.sf.jabref.logic.util.FileExtensions;
+import org.jabref.logic.util.FileExtensions;
 
 public class FileDialogConfiguration {
 

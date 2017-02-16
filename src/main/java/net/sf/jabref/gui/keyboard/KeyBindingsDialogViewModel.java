@@ -11,7 +11,7 @@ import javafx.scene.input.KeyEvent;
 
 import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 public class KeyBindingsDialogViewModel extends AbstractViewModel {
 

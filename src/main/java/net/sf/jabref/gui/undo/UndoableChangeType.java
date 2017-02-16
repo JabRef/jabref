@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.undo;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 

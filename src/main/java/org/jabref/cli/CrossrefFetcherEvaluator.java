@@ -10,14 +10,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fetcher.CrossRef;
-import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.util.DOI;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fetcher.CrossRef;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.util.DOI;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Useful for checking out new algorithm improvements and thresholds. Not used inside the JabRef code itself.

@@ -9,8 +9,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Class for generating a dialog showing warnings from ParserResult

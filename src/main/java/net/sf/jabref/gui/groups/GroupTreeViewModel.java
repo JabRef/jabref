@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;

@@ -7,11 +7,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
-import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportInspector;
-import net.sf.jabref.logic.importer.OutputPrinter;
-import net.sf.jabref.logic.importer.util.JSONEntryParser;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.ImportInspector;
+import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.util.JSONEntryParser;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 import com.mashape.unirest.http.HttpResponse;

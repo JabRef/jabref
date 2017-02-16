@@ -29,14 +29,14 @@ import net.sf.jabref.gui.specialfields.SpecialFieldMenuAction;
 import net.sf.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.citationstyle.CitationStyle;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.preferences.PreviewPreferences;
+import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreviewPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

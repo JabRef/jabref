@@ -9,12 +9,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.cleanup.CleanupPreset;
-import net.sf.jabref.logic.cleanup.Cleanups;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.cleanup.CleanupPreset;
+import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

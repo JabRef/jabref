@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.jabref.JabRefGUI;
 import org.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.remote.server.MessageHandler;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.remote.server.MessageHandler;
 
 public class JabRefMessageHandler implements MessageHandler {
 

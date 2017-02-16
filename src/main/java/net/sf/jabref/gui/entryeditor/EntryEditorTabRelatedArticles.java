@@ -13,11 +13,11 @@ import javax.swing.event.HyperlinkEvent;
 import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.fetcher.MrDLibFetcher;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

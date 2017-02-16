@@ -23,9 +23,9 @@ import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileExtensions;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

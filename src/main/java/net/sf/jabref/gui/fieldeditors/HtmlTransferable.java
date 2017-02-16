@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
-import net.sf.jabref.logic.util.OS;
+import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
+import org.jabref.logic.util.OS;
 
 
 /**

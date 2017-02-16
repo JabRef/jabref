@@ -26,9 +26,9 @@ import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.gui.util.WindowLocation;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.

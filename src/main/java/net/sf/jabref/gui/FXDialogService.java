@@ -11,7 +11,7 @@ import javafx.stage.FileChooser;
 
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import org.controlsfx.dialog.ExceptionDialog;
 

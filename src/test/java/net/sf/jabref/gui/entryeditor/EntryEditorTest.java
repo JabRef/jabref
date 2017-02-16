@@ -7,7 +7,7 @@ import java.util.List;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
-import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.TestUtils;
 import net.sf.jabref.testutils.category.GUITests;

@@ -20,12 +20,12 @@ import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.util.BackgroundTask;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
 import net.sf.jabref.gui.util.TaskExecutor;
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.FileExtensions;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

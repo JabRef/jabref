@@ -13,8 +13,8 @@ import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.BuildInfo;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.logging.Log;

@@ -7,23 +7,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.importer.EntryBasedFetcher;
-import net.sf.jabref.logic.importer.IdBasedFetcher;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.WebFetcher;
-import net.sf.jabref.logic.importer.fetcher.ArXiv;
-import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
-import net.sf.jabref.logic.importer.fetcher.DBLPFetcher;
-import net.sf.jabref.logic.importer.fetcher.DiVA;
-import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
-import net.sf.jabref.logic.importer.fetcher.GoogleScholar;
-import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
-import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
-import net.sf.jabref.logic.importer.fetcher.MathSciNet;
-import net.sf.jabref.logic.importer.fetcher.MedlineFetcher;
-import net.sf.jabref.logic.importer.fetcher.TitleFetcher;
-import net.sf.jabref.logic.importer.fetcher.zbMATH;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.importer.EntryBasedFetcher;
+import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.DBLPFetcher;
+import org.jabref.logic.importer.fetcher.DiVA;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.GoogleScholar;
+import org.jabref.logic.importer.fetcher.GvkFetcher;
+import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.MathSciNet;
+import org.jabref.logic.importer.fetcher.MedlineFetcher;
+import org.jabref.logic.importer.fetcher.TitleFetcher;
+import org.jabref.logic.importer.fetcher.zbMATH;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class EntryFetchers {
 

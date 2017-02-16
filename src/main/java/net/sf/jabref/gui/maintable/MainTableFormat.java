@@ -12,7 +12,7 @@ import net.sf.jabref.gui.IconTheme;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.gui.TableFormat;
 

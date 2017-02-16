@@ -3,7 +3,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 public class NamedCompound extends CompoundEdit {
 

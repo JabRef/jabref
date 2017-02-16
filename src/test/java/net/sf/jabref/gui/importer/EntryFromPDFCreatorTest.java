@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.importer.ImportDataTest;
+import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;

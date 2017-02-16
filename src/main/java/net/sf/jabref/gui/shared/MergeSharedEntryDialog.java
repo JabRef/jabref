@@ -15,7 +15,7 @@ import javax.swing.border.EmptyBorder;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.DBMSSynchronizer;

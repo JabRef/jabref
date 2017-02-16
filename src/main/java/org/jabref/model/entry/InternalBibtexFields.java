@@ -31,7 +31,7 @@ public class InternalBibtexFields {
 
     /**
      * These are the fields JabRef always displays as default
-     * {@link net.sf.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
+     * {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
      *
      * A user can change them. The change is currently stored in the preferences only and not explicitley exposed as separte preferences object
      */

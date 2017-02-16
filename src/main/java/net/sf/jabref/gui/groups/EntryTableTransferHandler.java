@@ -33,7 +33,7 @@ import net.sf.jabref.gui.importer.ImportMenuItem;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-import net.sf.jabref.logic.util.io.FileUtil;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 

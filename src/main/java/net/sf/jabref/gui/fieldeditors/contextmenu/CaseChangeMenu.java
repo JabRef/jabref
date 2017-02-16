@@ -6,8 +6,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.logic.formatter.Formatters;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
 public class CaseChangeMenu extends JMenu {

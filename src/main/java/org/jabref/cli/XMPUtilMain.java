@@ -12,16 +12,16 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.Globals;
-import net.sf.jabref.logic.bibtex.BibEntryWriter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.xmp.XMPPreferences;
-import net.sf.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;

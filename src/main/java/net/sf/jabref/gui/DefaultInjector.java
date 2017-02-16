@@ -6,7 +6,7 @@ import org.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.gui.util.DefaultTaskExecutor;
 import net.sf.jabref.gui.util.TaskExecutor;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;

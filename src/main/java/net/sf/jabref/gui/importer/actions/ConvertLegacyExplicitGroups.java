@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;

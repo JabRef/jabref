@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.logic.exporter.MetaDataSerializer;
-import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.exporter.MetaDataSerializer;
+import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;

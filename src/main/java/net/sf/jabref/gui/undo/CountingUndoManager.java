@@ -4,9 +4,9 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.undo.AddUndoableActionEvent;
-import net.sf.jabref.logic.undo.UndoRedoEvent;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.undo.AddUndoableActionEvent;
+import org.jabref.logic.undo.UndoRedoEvent;
 
 import com.google.common.eventbus.EventBus;
 

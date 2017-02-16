@@ -4,7 +4,7 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
+import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.event.FieldChangedEvent;

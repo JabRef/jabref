@@ -27,8 +27,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
