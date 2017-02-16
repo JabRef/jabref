@@ -18,8 +18,6 @@ import org.bibsonomy.model.Tag;
 
 /**
  * Fetch tags from the service and display them in a tag cloud
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 

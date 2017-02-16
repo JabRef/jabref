@@ -10,9 +10,7 @@ import org.bibsonomy.rest.client.RestLogicFactory;
 import org.bibsonomy.rest.client.util.FileFactory;
 
 /**
- * {@link AbstractBibSonomyWorker} is the base for all Workers which need to support stopping execution.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Is the base for all Workers which need to support stopping execution.
  */
 public abstract class AbstractBibSonomyWorker extends AbstractWorker {
 

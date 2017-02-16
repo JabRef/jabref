@@ -9,9 +9,7 @@ import net.sf.jabref.gui.bibsonomy.BibSonomySettingsDialog;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * {@link CloseBibSonomySettingsDialogByCancelAction} closes the {@link BibSonomySettingsDialog} without saving the properties
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Closes the {@link BibSonomySettingsDialog} without saving the properties
  */
 public class CloseBibSonomySettingsDialogByCancelAction extends AbstractAction {
 

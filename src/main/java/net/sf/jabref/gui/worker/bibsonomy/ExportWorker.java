@@ -24,8 +24,6 @@ import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
  * Export an entry to service
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class ExportWorker extends AbstractBibSonomyWorker {
 

@@ -29,8 +29,6 @@ import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
  * Import a posts from the service
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 

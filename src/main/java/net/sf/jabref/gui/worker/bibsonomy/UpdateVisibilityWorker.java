@@ -19,8 +19,6 @@ import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
  * Fetch the users groups and add them to the "import posts from..." field
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class UpdateVisibilityWorker extends AbstractBibSonomyWorker {
 

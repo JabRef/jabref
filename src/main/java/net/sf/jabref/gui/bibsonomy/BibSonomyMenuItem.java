@@ -15,9 +15,7 @@ import net.sf.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * {@link BibSonomyMenuItem} is the plugins menu item
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Is the plugins menu item
  */
 public class BibSonomyMenuItem extends JMenu {
 

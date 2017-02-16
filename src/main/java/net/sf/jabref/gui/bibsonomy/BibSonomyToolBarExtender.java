@@ -17,9 +17,7 @@ import net.sf.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
 
 
 /**
- * {@link BibSonomyToolBarExtender} add the service specific buttons to the tool bar
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Add the service specific buttons to the tool bar
  */
 public class BibSonomyToolBarExtender {
 

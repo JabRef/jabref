@@ -11,9 +11,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import static org.bibsonomy.util.ValidationUtils.present;
 
 /**
- * {@link CheckTagsUtil} check a list of posts, if a posts has no tags assigned
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Check a list of posts, if a posts has no tags assigned
  */
 public class CheckTagsUtil {
 
@@ -26,8 +24,6 @@ public class CheckTagsUtil {
 	private JabRefFrame jabRefFrame;
 
 	/**
-	 * Contstructor
-	 *
 	 * @param entries     - the entries to be checked
 	 * @param jabRefFrame - jabref frame
 	 */

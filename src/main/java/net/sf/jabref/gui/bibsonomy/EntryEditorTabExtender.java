@@ -7,9 +7,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 
 /**
- * {@link EntryEditorTabExtender} extends the {@link net.sf.jabref.gui.entryeditor.EntryEditor EntryEditor} with custom tabs.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Extends the {@link net.sf.jabref.gui.entryeditor.EntryEditor EntryEditor} with custom tabs.
  */
 public class EntryEditorTabExtender {
 

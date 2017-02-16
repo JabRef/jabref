@@ -13,9 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 /**
- * {@link TabbedPaneChangeListener} add a ChangeListener to the Database.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Adds a ChangeListener to the Database.
  */
 public class TabbedPaneChangeListener implements ChangeListener {
 

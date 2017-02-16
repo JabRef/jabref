@@ -12,8 +12,6 @@ import org.bibsonomy.model.logic.LogicInterface;
 
 /**
  * Upload documents from the file system directly to the service.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class UploadDocumentsWorker extends AbstractBibSonomyWorker {
 

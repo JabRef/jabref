@@ -7,9 +7,7 @@ import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 
 /**
- * {@link VisibilityItemListener} saves the current value of "import posts from..." combo box
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Saves the current value of "import posts from..." combo box
  */
 public class VisibilityItemListener implements ItemListener {
 

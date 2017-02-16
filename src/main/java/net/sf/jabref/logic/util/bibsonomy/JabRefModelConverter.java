@@ -40,9 +40,6 @@ import static org.bibsonomy.util.ValidationUtils.present;
 
 /**
  * Converts between BibSonomy's and JabRef's BibTeX model.
- *
- * @author Waldemar Biller <wbi@cs.uni-kassel.de>
- * @version $Id: JabRefModelConverter.java,v 1.4 2011-05-04 08:21:51 dbe Exp $
  */
 public class JabRefModelConverter {
 

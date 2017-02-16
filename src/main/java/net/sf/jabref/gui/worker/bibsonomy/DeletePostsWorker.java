@@ -14,8 +14,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Delete a Post from the service
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class DeletePostsWorker extends AbstractBibSonomyWorker {
 

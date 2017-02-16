@@ -27,9 +27,6 @@ import net.sf.jabref.model.entry.FieldName;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
 
-/**
- * @author Waldemar Biller <wbi@cs.uni-kassel.de>
- */
 public class CompareDialog extends JDialog {
 
     public static final int KEEP_LOCAL = 1000;

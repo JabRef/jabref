@@ -16,10 +16,8 @@ import net.sf.jabref.gui.bibsonomy.SearchType;
 import net.sf.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
 
 /**
- * {@link BibSonomyHyperLinkListener} runs the {@link ImportPostsByCriteriaWorker} as soon as
+ * Runs the {@link ImportPostsByCriteriaWorker} as soon as
  * the user clicks on a hyperlink in the tag cloud
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class BibSonomyHyperLinkListener extends AbstractBibSonomyAction implements HyperlinkListener {
 

@@ -1,10 +1,9 @@
 package net.sf.jabref.gui.bibsonomy;
 
 /**
- * {@link ComboBoxItem} is a simple class to represent a key-value store in a combo box
+ * Is a simple class to represent a key-value store in a combo box
  *
  * @param <K> Type of the key
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 class ComboBoxItem<K> {
 

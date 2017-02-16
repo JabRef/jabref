@@ -17,10 +17,8 @@ import net.sf.jabref.gui.bibsonomy.listener.TabbedPaneChangeListener;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * {@link BibSonomySidePaneComponent} holds the dimension of the {@link BibSonomySidePanel}.
+ * Holds the dimension of the {@link BibSonomySidePanel}.
  * Additionally it sets the icon and the name.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class BibSonomySidePaneComponent extends SidePaneComponent {
 

@@ -16,9 +16,7 @@ import net.sf.jabref.gui.bibsonomy.OrderComboBoxItem;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
- * {@link CloseBibSonomySettingsDialogBySaveAction} saves the properties and closes the {@link BibSonomySettingsDialog}.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Saves the properties and closes the {@link BibSonomySettingsDialog}.
  */
 public class CloseBibSonomySettingsDialogBySaveAction extends AbstractAction {
 
