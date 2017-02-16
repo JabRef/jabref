@@ -42,6 +42,7 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 		super(jabRefFrame);
 	}
 
+    @SuppressWarnings("FallThrough")
 	public void run() {
 
 		// Database Object. All operations are performed on this

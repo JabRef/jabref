@@ -23,6 +23,7 @@ public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
 
     private static final Log LOGGER = LogFactory.getLog(ExportSelectedEntriesAction.class);
 
+    @SuppressWarnings("FallThrough")
     public void actionPerformed(ActionEvent e) {
 
         List<BibEntry> entries = getJabRefFrame().getCurrentBasePanel().getSelectedEntries();
