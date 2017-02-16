@@ -1,4 +1,4 @@
-package net.sf.jabref.cleanup;
+package org.jabref.cleanup;
 
 import java.util.ArrayList;
 import java.util.Arrays;

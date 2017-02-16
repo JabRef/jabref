@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;

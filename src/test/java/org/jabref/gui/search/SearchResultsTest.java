@@ -7,8 +7,8 @@ import javax.swing.JFrame;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.TestUtils;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.TestUtils;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.ComponentFinder;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;

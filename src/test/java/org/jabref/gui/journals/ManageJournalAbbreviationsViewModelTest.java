@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import net.sf.jabref.CatchExceptionsFromThread;
+import org.jabref.CatchExceptionsFromThread;
 import org.jabref.JabRefException;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;

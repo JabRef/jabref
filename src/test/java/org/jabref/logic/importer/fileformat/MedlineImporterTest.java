@@ -36,7 +36,7 @@ public class MedlineImporterTest {
     private MedlineImporter importer;
 
     /**
-     * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/logic/importer/fileformat"
+     * Generates a List of all files in the package "/src/test/resources/org/jabref/logic/importer/fileformat"
      * @return A list of Names
      * @throws IOException
      */

@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.After;
 import org.junit.Assert;

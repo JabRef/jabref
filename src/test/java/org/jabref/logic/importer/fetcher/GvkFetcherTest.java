@@ -9,7 +9,7 @@ import java.util.List;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
 import org.junit.Test;

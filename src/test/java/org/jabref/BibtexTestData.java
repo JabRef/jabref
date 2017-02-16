@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package org.jabref;
 
 import java.io.IOException;
 import java.io.StringReader;

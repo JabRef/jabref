@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.jabref.model.strings.StringUtil;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.fixture.JTableFixture;
 import org.junit.Test;

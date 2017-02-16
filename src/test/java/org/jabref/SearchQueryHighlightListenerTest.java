@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package org.jabref;
 
 import java.util.Collections;
 import java.util.Optional;

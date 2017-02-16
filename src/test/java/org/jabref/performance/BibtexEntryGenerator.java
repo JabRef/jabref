@@ -1,4 +1,4 @@
-package net.sf.jabref.performance;
+package org.jabref.performance;
 
 public class BibtexEntryGenerator {
 

@@ -1,6 +1,6 @@
 package org.jabref.shared;
 
-import net.sf.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.Assert;
 import org.junit.Test;

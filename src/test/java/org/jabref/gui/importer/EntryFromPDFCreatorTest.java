@@ -9,7 +9,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Before;

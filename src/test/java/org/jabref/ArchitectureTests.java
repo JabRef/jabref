@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package org.jabref;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -23,10 +23,10 @@ public class ArchitectureTests {
 
     private static final String PACKAGE_JAVAX_SWING = "javax.swing";
     private static final String PACKAGE_JAVA_AWT = "java.awt";
-    private static final String PACKAGE_NET_SF_JABREF_GUI = "net.sf.jabref.gui";
-    private static final String PACKAGE_NET_SF_JABREF_LOGIC = "net.sf.jabref.logic";
-    private static final String PACKAGE_NET_SF_JABREF_MODEL = "net.sf.jabref.model";
-    private static final String CLASS_NET_SF_JABREF_GLOBALS = "net.sf.jabref.Globals";
+    private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
+    private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
+    private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
+    private static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
 
@@ -42,7 +42,7 @@ public class ArchitectureTests {
         //add exceptions for the architectural test here
         //Note that bending the architectural constraints should not be done inconsiderately
         exceptionStrings = new HashMap<>();
-        exceptionStrings.put(PACKAGE_NET_SF_JABREF_LOGIC,
+        exceptionStrings.put(PACKAGE_ORG_JABREF_LOGIC,
                 Arrays.asList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
     }
 
@@ -51,23 +51,22 @@ public class ArchitectureTests {
     public static Iterable<Object[]> data() {
         return Arrays.asList(
                 new Object[][] {
-                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVA_AWT},
-                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
-                        {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_NET_SF_JABREF_GUI},
-                        {PACKAGE_NET_SF_JABREF_LOGIC, CLASS_NET_SF_JABREF_GLOBALS},
+                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT},
+                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI},
+                        {PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS},
 
-                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVA_AWT},
-                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVAX_SWING},
-                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_GUI},
-                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_LOGIC},
-                        {PACKAGE_NET_SF_JABREF_MODEL, CLASS_NET_SF_JABREF_GLOBALS}
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT},
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI},
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC},
+                        {PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS}
                 }
         );
     }
 
     @Test
-    public void fistPackageIsIndependentOfSecondPackage() throws IOException {
-
+    public void firstPackageIsIndependentOfSecondPackage() throws IOException {
         Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage) && !(exceptionStrings.get(firstPackage).stream()
                 .filter(exception -> s.startsWith("import " + exception)).findAny().isPresent()
         );

@@ -11,7 +11,7 @@ import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.After;
 import org.junit.Assert;

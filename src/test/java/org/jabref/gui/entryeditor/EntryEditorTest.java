@@ -9,8 +9,8 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextArea;
 import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.TestUtils;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.TestUtils;
+import org.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Ignore;

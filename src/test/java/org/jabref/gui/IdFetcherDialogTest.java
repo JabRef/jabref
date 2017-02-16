@@ -9,7 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;

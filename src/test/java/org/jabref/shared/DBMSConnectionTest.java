@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.Assert;
 import org.junit.Test;

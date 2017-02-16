@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.jabref.JabRefMain;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.fixture.AbstractWindowFixture;
 import org.assertj.swing.fixture.FrameFixture;

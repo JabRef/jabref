@@ -3,7 +3,7 @@ package org.jabref.gui;
 import java.awt.event.KeyEvent;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;

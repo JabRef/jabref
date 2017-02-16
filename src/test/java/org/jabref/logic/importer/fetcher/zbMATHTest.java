@@ -7,8 +7,8 @@ import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.support.DevEnvironment;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.support.DevEnvironment;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assume;
 import org.junit.Before;

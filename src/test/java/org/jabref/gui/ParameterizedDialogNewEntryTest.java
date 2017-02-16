@@ -7,7 +7,7 @@ import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;

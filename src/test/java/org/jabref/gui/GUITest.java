@@ -6,7 +6,7 @@ import javax.swing.JButton;
 
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import org.jabref.gui.preftabs.PreferencesDialog;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;

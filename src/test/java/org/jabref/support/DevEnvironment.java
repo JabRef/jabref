@@ -1,4 +1,4 @@
-package net.sf.jabref.support;
+package org.jabref.support;
 
 /**
  * Checks whether we are on a local development environment and not on a CI server.

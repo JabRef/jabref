@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;

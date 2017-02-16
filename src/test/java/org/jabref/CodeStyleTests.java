@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package org.jabref;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

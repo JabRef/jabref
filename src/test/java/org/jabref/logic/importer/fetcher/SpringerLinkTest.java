@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;

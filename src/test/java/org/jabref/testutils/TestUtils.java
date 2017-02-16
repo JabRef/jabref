@@ -1,4 +1,4 @@
-package net.sf.jabref.testutils;
+package org.jabref.testutils;
 
 import org.jabref.JabRefGUI;
 import org.jabref.JabRefMain;

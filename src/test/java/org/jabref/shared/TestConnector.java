@@ -3,7 +3,7 @@ package org.jabref.shared;
 import java.sql.SQLException;
 
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.testutils.category.DatabaseTests;
+import org.jabref.testutils.category.DatabaseTests;
 
 import org.junit.experimental.categories.Category;
 

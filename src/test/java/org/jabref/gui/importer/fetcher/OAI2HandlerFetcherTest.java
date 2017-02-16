@@ -9,7 +9,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.category.GUITests;
+import org.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -9,7 +9,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import net.sf.jabref.testutils.category.FetcherTests;
+import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
 import org.junit.Before;
