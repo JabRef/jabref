@@ -3,13 +3,13 @@ package net.sf.jabref.gui.actions.bibsonomy;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.bibsonomy.BibSonomySettingsDialog;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.bibsonomy.OrderComboBoxItem;
@@ -76,7 +76,7 @@ public class CloseBibSonomySettingsDialogBySaveAction extends AbstractAction {
                                                     JCheckBox downloadDocuments, JComboBox<?> visibility,
                                                     JCheckBox morePosts, JTextField extraFields, JComboBox<?> order) {
 
-        super(Localization.lang("Save"), new ImageIcon(CloseBibSonomySettingsDialogBySaveAction.class.getResource("/images/bibsonomy/disk-black.png")));
+        super(Localization.lang("Save"), IconTheme.JabRefIcon.SAVE.getIcon());
         this.apiUrl = apiUrl;
         this.settingsDialog = settingsDialog;
         this.username = username;

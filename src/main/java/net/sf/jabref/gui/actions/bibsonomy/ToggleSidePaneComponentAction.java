@@ -3,9 +3,9 @@ package net.sf.jabref.gui.actions.bibsonomy;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 
 import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.bibsonomy.BibSonomySidePanel;
@@ -13,8 +13,6 @@ import net.sf.jabref.logic.l10n.Localization;
 
 /**
  * Display or hide the {@link BibSonomySidePanel}
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class ToggleSidePaneComponentAction extends AbstractAction {
 
@@ -31,11 +29,10 @@ public class ToggleSidePaneComponentAction extends AbstractAction {
         if (jabRefFrame.getTabbedPane().getTabCount() > 0) {
             manager.toggle(BibSonomySidePaneComponent.class);
         }
-
     }
 
     public ToggleSidePaneComponentAction(BibSonomySidePaneComponent sidePaneComponent) {
-        super(Localization.lang("Search entries"), new ImageIcon(ToggleSidePaneComponentAction.class.getResource("/images/bibsonomy/tag-label.png")));
+        super(Localization.lang("Toggle BibSonomy interface"), IconTheme.JabRefIcon.TAG_TEXT_OUTLINE.getIcon());
 
         this.sidePaneComponent = sidePaneComponent;
         this.manager = sidePaneComponent.getSidePaneManager();

@@ -119,6 +119,7 @@ public class IconTheme {
         GROUP_REFINING("\uf232") /*css: filter*/,
         AUTO_GROUP("\uf068"), /*css: auto-fix*/
         EMAIL("\uf1ee") /*css: email*/,
+        EXPORT("\uF207") /* css: export */,
         EXPORT_TO_CLIPBOARD("\uf14b") /*css: clipboard-arrow-left */,
         ATTACH_FILE("\uf3e2") /*css: paperclip*/,
         AUTO_FILE_LINK("\uf21e") /*css: file-find */,
@@ -164,7 +165,11 @@ public class IconTheme {
         FACEBOOK("\uf20c"), /* css: facebook */
         BLOG("\uf46b"), /* css: rss */
         GLOBAL_SEARCH("\uF1E7"), /* css: earth */
-        DATE_PICKER("\uF0ED;"), /* css: calendar */
+        DATE_PICKER("\uF0ED"), /* css: calendar */
+        CANCEL("\uF739") /* css: cancel */,
+        CLOUD_DOWNLOAD("\uF162") /* css: cloud-download */,
+        CLOUD_SYNC("\uF63F") /* css: cloud-sync */,
+        TAG_TEXT_OUTLINE("\uF4FD") /* css: tag-text-outline */,
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 

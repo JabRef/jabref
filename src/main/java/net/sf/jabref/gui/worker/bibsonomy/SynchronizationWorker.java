@@ -26,8 +26,6 @@ import org.bibsonomy.model.logic.LogicInterface;
 
 /**
  * Basic synchronization. The user decides which version of the post to keep
- *
- * @author Waldemar Biller <wbi@cs.uni-kassel.de>
  */
 public class SynchronizationWorker extends AbstractBibSonomyWorker {
 

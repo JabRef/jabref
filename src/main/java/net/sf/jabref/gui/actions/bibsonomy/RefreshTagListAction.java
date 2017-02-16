@@ -9,6 +9,7 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.worker.bibsonomy.RefreshTagListWorker;
@@ -18,9 +19,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.bibsonomy.common.enums.GroupingEntity;
 
 /**
- * {@link RefreshTagListAction} runs the {@link RefreshTagListWorker} to refresh the tag cloud
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Runs the {@link RefreshTagListWorker} to refresh the tag cloud
  */
 public class RefreshTagListAction extends AbstractBibSonomyAction {
 
@@ -41,7 +40,7 @@ public class RefreshTagListAction extends AbstractBibSonomyAction {
     }
 
     public RefreshTagListAction(JabRefFrame jabRefFrame, JEditorPane tagCloud, JComboBox<? super GroupingComboBoxItem> groupingComboBox) {
-        super(jabRefFrame, Localization.lang("Refresh"), new ImageIcon(RefreshTagListAction.class.getResource("/images/bibsonomy/arrow-circle-225.png")));
+        super(jabRefFrame, Localization.lang("Refresh"), IconTheme.JabRefIcon.REFRESH.getIcon());
         this.tagCloud = tagCloud;
 
         this.groupingComboBox = groupingComboBox;

@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.bibsonomy.SearchType;
@@ -22,7 +23,7 @@ public class SearchAction extends AbstractBibSonomyAction {
     private JComboBox<?> groupingComboBox;
 
     public SearchAction(JabRefFrame jabRefFrame, JTextField searchTextField, JComboBox<?> searchTypeComboBox, JComboBox<?> groupingComboBox) {
-        super(jabRefFrame, "", new ImageIcon(SearchAction.class.getResource("/images/bibsonomy/magnifier.png")));
+        super(jabRefFrame, "", IconTheme.JabRefIcon.SEARCH.getIcon());
 
         this.searchTextField = searchTextField;
         this.searchTypeComboBox = searchTypeComboBox;

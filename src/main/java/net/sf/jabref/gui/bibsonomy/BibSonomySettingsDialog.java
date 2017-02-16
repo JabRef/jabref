@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -27,6 +26,7 @@ import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogByCancelAction;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogBySaveAction;
@@ -155,7 +155,7 @@ public class BibSonomySettingsDialog extends JDialog {
     private JTabbedPane getSettingsPane() {
         if (settingsPane == null) {
             settingsPane = new JTabbedPane();
-            settingsPane.addTab(Localization.lang("General"), new ImageIcon(BibSonomySettingsDialog.class.getResource("/images/bibsonomy/wrench-screwdriver.png")), getGeneralSettingsPanel(), null);
+            settingsPane.addTab(Localization.lang("General"), IconTheme.JabRefIcon.PREFERENCES.getIcon(), getGeneralSettingsPanel(), null);
         }
         return settingsPane;
     }

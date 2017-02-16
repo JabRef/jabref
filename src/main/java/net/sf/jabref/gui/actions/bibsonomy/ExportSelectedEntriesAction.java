@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.bibsonomy.CheckTagsUtil;
 import net.sf.jabref.gui.worker.bibsonomy.ExportWorker;
@@ -16,10 +17,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * {@link ExportSelectedEntriesAction} checks for entries without keywords and does
+ * Checks for entries without keywords and does
  * an export of all selected entries to the service.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
 
@@ -47,6 +46,6 @@ public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
     }
 
     public ExportSelectedEntriesAction(JabRefFrame jabRefFrame) {
-        super(jabRefFrame, Localization.lang("Export selected entries"), new ImageIcon(ExportSelectedEntriesAction.class.getResource("/images/bibsonomy/document--arrow.png")));
+        super(jabRefFrame, Localization.lang("Export selected entries"), IconTheme.JabRefIcon.EXPORT.getIcon());
     }
 }

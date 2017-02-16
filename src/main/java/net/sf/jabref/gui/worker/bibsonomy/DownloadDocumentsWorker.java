@@ -22,8 +22,6 @@ import org.bibsonomy.util.file.FileUtil;
 
 /**
  * Download all private documents of a post from the service
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 

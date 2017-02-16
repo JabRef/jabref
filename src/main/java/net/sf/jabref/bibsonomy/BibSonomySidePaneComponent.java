@@ -2,9 +2,9 @@ package net.sf.jabref.bibsonomy;
 
 import java.awt.Dimension;
 
-import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
@@ -29,7 +29,7 @@ public class BibSonomySidePaneComponent extends SidePaneComponent {
 
 	public BibSonomySidePaneComponent(SidePaneManager manager, JabRefFrame jabRefFrame) {
 		// set the icon and the name
-		super(manager, new ImageIcon(BibSonomySidePaneComponent.class.getResource("/images/bibsonomy/tag-label.png")), Localization.lang("BibSonomy"));
+		super(manager, IconTheme.JabRefIcon.TAG_TEXT_OUTLINE.getIcon(), Localization.lang("BibSonomy"));
 
 		this.manager = manager;
 		this.jabRefFrame = jabRefFrame;
