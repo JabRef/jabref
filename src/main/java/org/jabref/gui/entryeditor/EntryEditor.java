@@ -1392,7 +1392,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Store the current edit in case this action is called during the editing of a field:
             storeCurrentEdit();
 
-            // This is a partial clone of net.sf.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
+            // This is a partial clone of org.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
 
             // this updates the table automatically, on close, but not within the tab
             Optional<String> oldValue = entry.getCiteKeyOptional();

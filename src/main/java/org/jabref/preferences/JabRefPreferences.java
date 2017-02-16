@@ -266,7 +266,7 @@ public class JabRefPreferences {
     public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
     public static final String USE_PDF_READER = "usePDFReader";
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
+    // When this should be made possible, the code to inspect is org.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
     public static final String CONFIRM_DELETE = "confirmDelete";
@@ -1188,7 +1188,7 @@ public class JabRefPreferences {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see net.sf.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
+                // see org.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }

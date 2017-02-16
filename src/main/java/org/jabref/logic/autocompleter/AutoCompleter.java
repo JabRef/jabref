@@ -27,7 +27,7 @@ public interface AutoCompleter<E> {
     /**
      * States whether the field consists of multiple values (false) or of a single value (true)
      *
-     * Symptom: if false, net.sf.jabref.gui.AutoCompleteListener#getCurrentWord(JTextComponent comp)
+     * Symptom: if false, org.jabref.gui.AutoCompleteListener#getCurrentWord(JTextComponent comp)
      * returns current word only, if true, it returns the text beginning from the buffer.
      */
     boolean isSingleUnitField();

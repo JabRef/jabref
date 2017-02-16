@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class RegExpFileSearchTests {
 
-    private static final String filesDirectory = "src/test/resources/net/sf/jabref/imports/unlinkedFilesTestFolder";
+    private static final String filesDirectory = "src/test/resources/org/jabref/imports/unlinkedFilesTestFolder";
     private BibDatabase database;
     private BibEntry entry;
 

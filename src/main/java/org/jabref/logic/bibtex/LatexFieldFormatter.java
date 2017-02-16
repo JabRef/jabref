@@ -8,7 +8,7 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
+ * Currently the only implementation of org.jabref.exporter.FieldFormatter
  * <p>
  * Obeys following settings:
  * * JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS

@@ -26,7 +26,7 @@ public class FieldContentParser {
         Objects.requireNonNull(prefs);
 
         multiLineFields = new HashSet<>();
-        // the following two are also coded in net.sf.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
+        // the following two are also coded in org.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add(FieldName.ABSTRACT);
         multiLineFields.add(FieldName.REVIEW);
         // the file field should not be formatted, therefore we treat it as a multi line field

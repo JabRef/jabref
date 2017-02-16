@@ -24,7 +24,7 @@ public class TestVM {
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/net/sf/jabref/logic/bst/abbrv.bst"));
+        VM vm = new VM(new File("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
@@ -658,7 +658,7 @@ public class TestVM {
 
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/net/sf/jabref/logic/bst/abbrv.bst"));
+        VM vm = new VM(new File("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
         Assert.assertTrue(vm.run(v).contains("J.-P. Sartre"));

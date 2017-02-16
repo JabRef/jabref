@@ -343,7 +343,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     /* (non-Javadoc)
-     * @see net.sf.jabref.gui.ImportInspection#setProgress(int, int)
+     * @see package org.jabref.logic.importer.ImportInspector#setProgress(int, int)
      */
     @Override
     public void setProgress(int current, int max) {
@@ -356,7 +356,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     /* (non-Javadoc)
-     * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibEntry)
+     * @see package org.jabref.logic.importer.ImportInspector#addEntry(org.jabref.model.entry.BibEntry)
      */
     @Override
     public void addEntry(BibEntry entry) {
@@ -365,9 +365,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         addEntries(list);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.gui.ImportInspection#addEntries(java.util.Collection)
-     */
     public void addEntries(Collection<BibEntry> entriesToAdd) {
 
         for (BibEntry entry : entriesToAdd) {
@@ -414,9 +411,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         return Optional.empty();
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.gui.ImportInspection#entryListComplete()
-     */
     public void entryListComplete() {
         SwingUtilities.invokeLater(() -> {
             progressBar.setIndeterminate(false);

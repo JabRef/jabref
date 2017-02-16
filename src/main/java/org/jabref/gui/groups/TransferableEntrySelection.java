@@ -26,7 +26,7 @@ public class TransferableEntrySelection implements Transferable {
         DataFlavor df2 = null;
         try {
             df1 = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=net.sf.jabref.gui.groups.TransferableEntrySelection");
+                    + ";class=org.jabref.gui.groups.TransferableEntrySelection");
             df2 = DataFlavor.getTextPlainUnicodeFlavor();
         } catch (ClassNotFoundException e) {
             // never happens

@@ -27,7 +27,7 @@ public class JabRefPreferencesTest {
     @Test
     public void testPreferencesImport() throws JabRefException {
         // the primary sort field has been changed to "editor" in this case
-        File importFile = new File("src/test/resources/net/sf/jabref/customPreferences.xml");
+        File importFile = new File("src/test/resources/org/jabref/customPreferences.xml");
 
         prefs.importPreferences(importFile.getAbsolutePath());
 

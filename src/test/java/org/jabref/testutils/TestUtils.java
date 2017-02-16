@@ -10,7 +10,7 @@ import org.jabref.JabRefMain;
  */
 public class TestUtils {
 
-    public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/net/sf/jabref/bibtexFiles/test.bib";
+    public static final String PATH_TO_TEST_BIBTEX = "src/test/resources/org/jabref/bibtexFiles/test.bib";
 
 
     /**

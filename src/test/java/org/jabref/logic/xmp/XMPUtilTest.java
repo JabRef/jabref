@@ -1344,7 +1344,7 @@ public class XMPUtilTest {
     @Test
     public void testResolveStrings2() throws IOException, TransformerException {
 
-        try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
+        try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/org/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences).parse(fr);
 

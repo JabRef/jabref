@@ -25,7 +25,7 @@ public class NoSpaceBetweenAbbreviations implements LayoutFormatter {
      *
      * Replace the match by removing the spaces.
      *
-     * @see net.sf.jabref.export.layout.LayoutFormatter#format(java.lang.String)
+     * @see org.jabref.export.layout.LayoutFormatter#format(java.lang.String)
      */
     @Override
     public String format(String fieldText) {

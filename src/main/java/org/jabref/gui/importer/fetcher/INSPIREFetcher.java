@@ -112,9 +112,6 @@ public class INSPIREFetcher implements EntryFetcher {
         }
     }
 
-    /*
-     * @see net.sf.jabref.imports.fetcher.EntryFetcher
-     */
     @Override
     public HelpFile getHelpPage() {
         return HelpFile.FETCHER_INSPIRE;

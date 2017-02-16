@@ -151,9 +151,6 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
         return selection;
     }
 
-    /* (non-Javadoc)
-    * @see net.sf.jabref.gui.ImportInspection#addEntry(net.sf.jabref.BibEntry)
-    */
     public void addEntry(String entryId, JLabel preview) {
         TableEntry entry = new TableEntry(entryId, preview);
         this.entries.getReadWriteLock().writeLock().lock();
