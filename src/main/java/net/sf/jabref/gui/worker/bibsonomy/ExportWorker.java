@@ -7,6 +7,7 @@ import java.util.Optional;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.bibsonomy.JabRefModelConverter;
@@ -20,6 +21,7 @@ import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
 import org.bibsonomy.model.User;
+import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
@@ -81,7 +83,8 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 	}
 
 	private void changePost(Post<? extends Resource> post) throws Exception {
-		final List<String> hashes = getLogic().updatePosts(Collections.singletonList(post), PostUpdateOperation.UPDATE_ALL);
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        final List<String> hashes = logic.updatePosts(Collections.singletonList(post), PostUpdateOperation.UPDATE_ALL);
 		if (hashes.size() != 1) {
 			throw new IllegalStateException("changePosts returned " + hashes.size() + " hashes");
 		}
@@ -89,7 +92,8 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 	}
 
 	private void createPost(Post<? extends Resource> post) throws Exception {
-		final List<String> hashes = getLogic().createPosts(Collections.singletonList(post));
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        final List<String> hashes = logic.createPosts(Collections.singletonList(post));
 		if (hashes.size() != 1) {
 			throw new IllegalStateException("createPosts returned " + hashes.size() + " hashes");
 		}

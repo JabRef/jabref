@@ -5,12 +5,14 @@ import java.util.Optional;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bibsonomy.model.logic.LogicInterface;
 
 /**
  * Delete a Post from the service
@@ -28,7 +30,8 @@ public class DeletePostsWorker extends AbstractBibSonomyWorker {
 
 			if ((intrahashOpt.isPresent()) || intrahashOpt.get().isEmpty() || (usernameOpt.isPresent() && !intrahashOpt.isPresent() && !(BibSonomyProperties.getUsername().equals(usernameOpt.get())))) {
 				try {
-					getLogic().deletePosts(BibSonomyProperties.getUsername(), Collections.singletonList(intrahashOpt.get()));
+                    LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+                    logic.deletePosts(BibSonomyProperties.getUsername(), Collections.singletonList(intrahashOpt.get()));
 					jabRefFrame.output(Localization.lang("Deleting post %0", intrahashOpt.get()));
 					entry.clearField(FieldName.INTRAHASH);
 				} catch (Exception ex) {

@@ -4,6 +4,7 @@ import java.io.File;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -35,7 +36,8 @@ public class UploadDocumentsWorker extends AbstractBibSonomyWorker {
 			return;
 		}
 
-		LogicInterface logic = getLogic();
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+
 		// split the filey by ; character
 		for (String file : files.split(";")) {
 			// get file name

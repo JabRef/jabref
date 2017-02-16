@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.CompareDialog;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.bibsonomy.BibtexEntryUtil;
@@ -52,7 +53,8 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 		// Set of id to be removed from the database
 		final HashSet<BibEntry> removeIds = new HashSet<>();
 
-		LogicInterface logic = getLogic();
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+
 		// Iterate over all entries in the database
 		for (final BibEntry entry : bibDatabase.getEntries()) {
 

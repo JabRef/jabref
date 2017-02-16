@@ -14,6 +14,7 @@ import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.bibsonomy.SearchType;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.util.bibsonomy.BibSonomyCallBack;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.bibsonomy.JabRefModelConverter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -25,6 +26,7 @@ import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
+import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
@@ -85,8 +87,8 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 			}
 
 			try {
-
-				final Collection<Post<BibTex>> result = getLogic().getPosts(BibTex.class, grouping, groupingValue, tags, null, search, null, null, null, null, null, start, end);
+                LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+				final Collection<Post<BibTex>> result = logic.getPosts(BibTex.class, grouping, groupingValue, tags, null, search, null, null, null, null, null, start, end);
 				for (Post<? extends Resource> post : result) {
 					dialog.setProgress(numberOfPosts++, numberOfPostsPerRequest);
 					Optional<BibEntry> entry = JabRefModelConverter.convertPostOptional(post);

@@ -8,12 +8,14 @@ import javax.swing.JEditorPane;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.metadata.MetaData;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Tag;
+import org.bibsonomy.model.logic.LogicInterface;
 
 
 /**
@@ -53,7 +55,8 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 		if (grouping == GroupingEntity.ALL && BibSonomyProperties.getTagCloudSize() > 100)
 			end = 100;
 
-		final List<Tag> result = getLogic().getTags(BibTex.class, grouping, groupingValue, null, null, null, null, null, BibSonomyProperties.getTagCloudOrder(), null, null, start, end);
+        LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+        final List<Tag> result = logic.getTags(BibTex.class, grouping, groupingValue, null, null, null, null, null, BibSonomyProperties.getTagCloudOrder(), null, null, start, end);
 		tags.addAll(result);
 
 		for (Tag tag : tags) {

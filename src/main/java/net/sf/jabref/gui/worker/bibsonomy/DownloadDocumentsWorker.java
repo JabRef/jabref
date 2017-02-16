@@ -6,6 +6,7 @@ import java.util.Optional;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -17,6 +18,7 @@ import org.bibsonomy.model.BibTex;
 import org.bibsonomy.model.Document;
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
+import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 import org.bibsonomy.util.file.FileUtil;
 
@@ -46,9 +48,10 @@ public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 
 		Optional<String> intrahashOpt = entry.getField(FieldName.INTRAHASH);
 		if (intrahashOpt.isPresent() && !intrahashOpt.get().isEmpty()) {
+            LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
 			final Post<? extends Resource> post;
 			try {
-				post = getLogic().getPostDetails(intrahashOpt.get(), BibSonomyProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);
+                post = logic.getPostDetails(intrahashOpt.get(), BibSonomyProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);
 			} catch (AuthenticationException e) {
 				(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
 				return;
@@ -66,7 +69,7 @@ public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 			for (Document document : ((BibTex) r).getDocuments()) {
 				jabRefFrame.output(Localization.lang("Downloading: %0", document.getFileName()));
 				try {
-					getLogic().getDocument(BibSonomyProperties.getUsername(), intrahashOpt.get(), URLEncoder.encode(document.getFileName(), "UTF-8"));
+					logic.getDocument(BibSonomyProperties.getUsername(), intrahashOpt.get(), URLEncoder.encode(document.getFileName(), "UTF-8"));
 				} catch (Exception ex) {
 					LOGGER.error("Failed downloading file: " + document.getFileName(), ex);
 				}

@@ -8,6 +8,7 @@ import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
+import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -15,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.Group;
 import org.bibsonomy.model.User;
+import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
@@ -44,7 +46,8 @@ public class UpdateVisibilityWorker extends AbstractBibSonomyWorker {
 		}
 
 		try {
-			User user = getLogic().getUserDetails(BibSonomyProperties.getUsername());
+            LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+            User user = logic.getUserDetails(BibSonomyProperties.getUsername());
 
 			for (Group g : user.getGroups()) {
 				visibility.addItem(new GroupingComboBoxItem(GroupingEntity.GROUP, g.getName()));

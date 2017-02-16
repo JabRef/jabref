@@ -171,7 +171,6 @@ public class BibDatabaseContext {
     * 3. preferences directory
     * 4. BIB file directory
     *
-    * @param
     * @param fieldName The field type
     * @return The default directory for this field type.
     */
