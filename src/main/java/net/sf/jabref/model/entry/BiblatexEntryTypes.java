@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * This class defines entry types for BibLatex support.
+ * This class defines entry types for biblatex support.
  * @see <a href="http://mirrors.concertpass.com/tex-archive/macros/latex/contrib/biblatex/doc/biblatex.pdf">biblatex documentation</a>
  */
-public class BibLatexEntryTypes {
+public class BiblatexEntryTypes {
 
-    public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
+    public static final BiblatexEntryType ARTICLE = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.EDITOR, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER,
@@ -43,7 +43,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
+    public static final BiblatexEntryType BOOK = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(FieldName.EDITOR,
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
@@ -76,7 +76,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType MVBOOK = new BibLatexEntryType() {
+    public static final BiblatexEntryType MVBOOK = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
                 Arrays.asList(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EDITION,
@@ -106,7 +106,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType INBOOK = new BibLatexEntryType() {
+    public static final BiblatexEntryType INBOOK = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
                 Arrays.asList(FieldName.BOOKAUTHOR, FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -141,7 +141,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType BOOKINBOOK = new BibLatexEntryType() {
+    public static final BiblatexEntryType BOOKINBOOK = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -151,21 +151,21 @@ public class BibLatexEntryTypes {
         // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.INBOOK.getRequiredFields();
+            return BiblatexEntryTypes.INBOOK.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.INBOOK.getOptionalFields();
+            return BiblatexEntryTypes.INBOOK.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.INBOOK.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType SUPPBOOK = new BibLatexEntryType() {
+    public static final BiblatexEntryType SUPPBOOK = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -175,21 +175,21 @@ public class BibLatexEntryTypes {
         // Same fields as "INBOOK" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.INBOOK.getRequiredFields();
+            return BiblatexEntryTypes.INBOOK.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.INBOOK.getOptionalFields();
+            return BiblatexEntryTypes.INBOOK.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.INBOOK.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.INBOOK.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType BOOKLET = new BibLatexEntryType() {
+    public static final BiblatexEntryType BOOKLET = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED,
@@ -217,7 +217,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType COLLECTION = new BibLatexEntryType() {
+    public static final BiblatexEntryType COLLECTION = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
@@ -250,7 +250,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType MVCOLLECTION = new BibLatexEntryType() {
+    public static final BiblatexEntryType MVCOLLECTION = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -280,7 +280,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType INCOLLECTION = new BibLatexEntryType() {
+    public static final BiblatexEntryType INCOLLECTION = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.TRANSLATOR, FieldName.SUBTITLE, FieldName.TITLEADDON,
@@ -315,7 +315,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType SUPPCOLLECTION = new BibLatexEntryType() {
+    public static final BiblatexEntryType SUPPCOLLECTION = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -325,21 +325,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getRequiredFields();
+            return BiblatexEntryTypes.INCOLLECTION.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getOptionalFields();
+            return BiblatexEntryTypes.INCOLLECTION.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType MANUAL = new BibLatexEntryType() {
+    public static final BiblatexEntryType MANUAL = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
                 Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EDITION, FieldName.PUBLISHER,
@@ -368,7 +368,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType MISC = new BibLatexEntryType() {
+    public static final BiblatexEntryType MISC = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED, FieldName.LOCATION, FieldName.DOI,
@@ -395,7 +395,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType ONLINE = new BibLatexEntryType() {
+    public static final BiblatexEntryType ONLINE = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.URLDATE));
@@ -420,7 +420,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
+    public static final BiblatexEntryType PATENT = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(FieldName.HOLDER,
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
@@ -447,7 +447,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType PERIODICAL = new BibLatexEntryType() {
+    public static final BiblatexEntryType PERIODICAL = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.ISSN, FieldName.DOI,
@@ -474,7 +474,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType SUPPPERIODICAL = new BibLatexEntryType() {
+    public static final BiblatexEntryType SUPPPERIODICAL = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -484,21 +484,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "ARTICLE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.ARTICLE.getRequiredFields();
+            return BiblatexEntryTypes.ARTICLE.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.ARTICLE.getOptionalFields();
+            return BiblatexEntryTypes.ARTICLE.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.ARTICLE.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.ARTICLE.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType PROCEEDINGS = new BibLatexEntryType() {
+    public static final BiblatexEntryType PROCEEDINGS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
@@ -530,7 +530,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType MVPROCEEDINGS = new BibLatexEntryType() {
+    public static final BiblatexEntryType MVPROCEEDINGS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
@@ -561,7 +561,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType INPROCEEDINGS = new BibLatexEntryType() {
+    public static final BiblatexEntryType INPROCEEDINGS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
@@ -595,7 +595,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType REFERENCE = new BibLatexEntryType() {
+    public static final BiblatexEntryType REFERENCE = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -605,21 +605,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "COLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.COLLECTION.getRequiredFields();
+            return BiblatexEntryTypes.COLLECTION.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.COLLECTION.getOptionalFields();
+            return BiblatexEntryTypes.COLLECTION.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.COLLECTION.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.COLLECTION.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType MVREFERENCE = new BibLatexEntryType() {
+    public static final BiblatexEntryType MVREFERENCE = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -629,21 +629,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "MVCOLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.MVCOLLECTION.getRequiredFields();
+            return BiblatexEntryTypes.MVCOLLECTION.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.MVCOLLECTION.getOptionalFields();
+            return BiblatexEntryTypes.MVCOLLECTION.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.MVCOLLECTION.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.MVCOLLECTION.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType INREFERENCE = new BibLatexEntryType() {
+    public static final BiblatexEntryType INREFERENCE = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -653,21 +653,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "INCOLLECTION" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getRequiredFields();
+            return BiblatexEntryTypes.INCOLLECTION.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getOptionalFields();
+            return BiblatexEntryTypes.INCOLLECTION.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.INCOLLECTION.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
+    public static final BiblatexEntryType REPORT = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
                 Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.NUMBER, FieldName.ISRN,
@@ -696,7 +696,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType SET = new BibLatexEntryType() {
+    public static final BiblatexEntryType SET = new BiblatexEntryType() {
 
         {
             addAllRequired(FieldName.ENTRYSET, FieldName.CROSSREF);
@@ -709,7 +709,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType THESIS = new BibLatexEntryType() {
+    public static final BiblatexEntryType THESIS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.CHAPTER,
@@ -737,7 +737,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType UNPUBLISHED = new BibLatexEntryType() {
+    public static final BiblatexEntryType UNPUBLISHED = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.HOWPUBLISHED,
@@ -764,7 +764,7 @@ public class BibLatexEntryTypes {
 
     // === Type aliases: ===
 
-    public static final BibLatexEntryType CONFERENCE = new BibLatexEntryType() {
+    public static final BiblatexEntryType CONFERENCE = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -774,21 +774,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "INPROCEEDINGS" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.INPROCEEDINGS.getRequiredFields();
+            return BiblatexEntryTypes.INPROCEEDINGS.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.INPROCEEDINGS.getOptionalFields();
+            return BiblatexEntryTypes.INPROCEEDINGS.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.INPROCEEDINGS.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.INPROCEEDINGS.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType ELECTRONIC = new BibLatexEntryType() {
+    public static final BiblatexEntryType ELECTRONIC = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -798,21 +798,21 @@ public class BibLatexEntryTypes {
         // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.ONLINE.getRequiredFields();
+            return BiblatexEntryTypes.ONLINE.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.ONLINE.getOptionalFields();
+            return BiblatexEntryTypes.ONLINE.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.ONLINE.getPrimaryOptionalFields();
         }
     };
 
-    public static final BibLatexEntryType MASTERSTHESIS = new BibLatexEntryType() {
+    public static final BiblatexEntryType MASTERSTHESIS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
@@ -841,7 +841,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType PHDTHESIS = new BibLatexEntryType() {
+    public static final BiblatexEntryType PHDTHESIS = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE,
@@ -870,7 +870,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType TECHREPORT = new BibLatexEntryType() {
+    public static final BiblatexEntryType TECHREPORT = new BiblatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE, FieldName.NUMBER, FieldName.ISRN,
@@ -900,7 +900,7 @@ public class BibLatexEntryTypes {
         }
     };
 
-    public static final BibLatexEntryType WWW = new BibLatexEntryType() {
+    public static final BiblatexEntryType WWW = new BiblatexEntryType() {
 
         @Override
         public String getName() {
@@ -910,17 +910,17 @@ public class BibLatexEntryTypes {
         // Treated as alias of "ONLINE" according to Biblatex 1.0:
         @Override
         public List<String> getRequiredFields() {
-            return BibLatexEntryTypes.ONLINE.getRequiredFields();
+            return BiblatexEntryTypes.ONLINE.getRequiredFields();
         }
 
         @Override
         public List<String> getOptionalFields() {
-            return BibLatexEntryTypes.ONLINE.getOptionalFields();
+            return BiblatexEntryTypes.ONLINE.getOptionalFields();
         }
 
         @Override
         public List<String> getPrimaryOptionalFields() {
-            return BibLatexEntryTypes.ONLINE.getPrimaryOptionalFields();
+            return BiblatexEntryTypes.ONLINE.getPrimaryOptionalFields();
         }
     };
 
@@ -928,7 +928,7 @@ public class BibLatexEntryTypes {
      * This type is used for IEEEtran.bst to control various
      * be repeated or not. Not a very elegant solution, but it works...
      */
-    public static final BibLatexEntryType IEEETRANBSTCTL = new BibLatexEntryType() {
+    public static final BiblatexEntryType IEEETRANBSTCTL = new BiblatexEntryType() {
 
         {
             addAllOptional(FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_FORCED_ETAL,

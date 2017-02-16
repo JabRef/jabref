@@ -226,12 +226,16 @@ public class JabRefPreferences {
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
     public static final String TABLE_BACKGROUND = "tableBackground";
+    public static final String ICON_ENABLED_COLOR = "iconEnabledColor";
+    public static final String ICON_DISABLED_COLOR = "iconDisabledColor";
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
+    public static final String ICON_SIZE_LARGE = "iconSizeLarge";
+    public static final String ICON_SIZE_SMALL = "iconSizeSmall";
     public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
@@ -259,6 +263,9 @@ public class JabRefPreferences {
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String CONSOLE_COMMAND = "consoleCommand";
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
+    public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
+    public static final String SUMATRA_PDF_COMMAND = "sumatraCommand";
+    public static final String USE_PDF_READER = "usePDFReader";
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -315,6 +322,7 @@ public class JabRefPreferences {
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
+    public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -385,6 +393,7 @@ public class JabRefPreferences {
     private static final String PREVIEW_ENABLED = "previewEnabled";
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -409,6 +418,8 @@ public class JabRefPreferences {
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
 
+    // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
+    private final static Integer UNSET_MENU_FONT_SIZE = -123;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -552,6 +563,7 @@ public class JabRefPreferences {
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
+        defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
@@ -577,7 +589,9 @@ public class JabRefPreferences {
         defaults.put(FONT_STYLE, Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
         defaults.put(OVERRIDE_DEFAULT_FONTS, Boolean.FALSE);
-        defaults.put(MENU_FONT_SIZE, 11);
+        defaults.put(MENU_FONT_SIZE, UNSET_MENU_FONT_SIZE);
+        defaults.put(ICON_SIZE_LARGE, 24);
+        defaults.put(ICON_SIZE_SMALL, 16);
         defaults.put(TABLE_ROW_PADDING, 9);
         defaults.put(TABLE_SHOW_GRID, Boolean.FALSE);
         // Main table color settings:
@@ -601,6 +615,10 @@ public class JabRefPreferences {
         defaults.put(INVALID_FIELD_BACKGROUND_COLOR, "255:0:0");
         defaults.put(ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, "220:220:255");
         defaults.put(FIELD_EDITOR_TEXT_COLOR, "0:0:0");
+
+        // default icon colors
+        defaults.put(ICON_ENABLED_COLOR, "79:95:143");
+        defaults.put(ICON_DISABLED_COLOR, "200:200:200");
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
@@ -744,11 +762,18 @@ public class JabRefPreferences {
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
 
+
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
+            defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
+            defaults.put(SUMATRA_PDF_COMMAND, "C:\\Program Files\\SumatraPDF");
+            defaults.put(USE_PDF_READER, ADOBE_ACROBAT_COMMAND);
         } else {
             defaults.put(CONSOLE_COMMAND, "");
+            defaults.put(ADOBE_ACROBAT_COMMAND, "");
+            defaults.put(SUMATRA_PDF_COMMAND, "");
+            defaults.put(USE_PDF_READER, "");
         }
 
         //versioncheck defaults
@@ -972,7 +997,16 @@ public class JabRefPreferences {
     }
 
     public int getIntDefault(String key) {
-        return (Integer) defaults.get(key);
+        if (key.equals(JabRefPreferences.MENU_FONT_SIZE)) {
+            Integer menuFontSize = (Integer) defaults.get(key);
+            if (menuFontSize.equals(UNSET_MENU_FONT_SIZE)) {
+                menuFontSize = (int) javafx.scene.text.Font.getDefault().getSize();
+                defaults.put(key, menuFontSize);
+            }
+            return menuFontSize;
+        } else {
+            return (Integer) defaults.get(key);
+        }
     }
 
     public void put(String key, String value) {

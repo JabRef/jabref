@@ -592,7 +592,11 @@ public class MainTable extends JTable {
      */
     public void updateFont() {
         setFont(GUIGlobals.currentFont);
-        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + GUIGlobals.currentFont.getSize());
+        int maxOfIconsAndFontSize = Math.max(GUIGlobals.currentFont.getSize(), Globals.prefs.getInt(JabRefPreferences.ICON_SIZE_SMALL));
+        setRowHeight(Globals.prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING) + maxOfIconsAndFontSize);
+        // Update Table header with new settings
+        this.getTableHeader().setDefaultRenderer(new MainTableHeaderRenderer(this.getTableHeader().getDefaultRenderer()));
+        this.getTableHeader().resizeAndRepaint();
     }
 
     public void ensureVisible(int row) {

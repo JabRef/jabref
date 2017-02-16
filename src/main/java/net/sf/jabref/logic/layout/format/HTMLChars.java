@@ -3,7 +3,7 @@ package net.sf.jabref.logic.layout.format;
 import java.util.Map;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
+import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.model.strings.StringUtil;
 
 /**

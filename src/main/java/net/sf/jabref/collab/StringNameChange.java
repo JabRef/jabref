@@ -11,7 +11,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,8 +48,7 @@ class StringNameChange extends Change {
 
         if (string == null) {
             // The string was removed or renamed locally. We guess that it was removed.
-            String newId = IdGenerator.next();
-            BibtexString bs = new BibtexString(newId, disk, content);
+            BibtexString bs = new BibtexString(disk, content);
             try {
                 panel.getDatabase().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
@@ -64,8 +62,7 @@ class StringNameChange extends Change {
 
         // Update tmp database:
         if (tmpString == null) {
-            String newId = IdGenerator.next();
-            BibtexString bs = new BibtexString(newId, disk, content);
+            BibtexString bs = new BibtexString(disk, content);
             secondary.addString(bs);
         } else {
             tmpString.setName(disk);

@@ -238,7 +238,7 @@ public class DroppedFileHandler {
         }
 
         JLabel confirmationMessage = new JLabel(Localization.lang("The PDF contains one or several BibTeX-records.")
-                + "\n" + Localization.lang("Do you want to import these as new entries into the current database?"));
+                + "\n" + Localization.lang("Do you want to import these as new entries into the current library?"));
         JPanel entriesPanel = new JPanel();
         entriesPanel.setLayout(new BoxLayout(entriesPanel, BoxLayout.Y_AXIS));
         xmpEntriesInFile.forEach(entry -> {

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.testutils.category.FetcherTests;
 
@@ -26,7 +26,7 @@ public class IsbnFetcherTest {
         fetcher = new IsbnFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         bibEntry = new BibEntry();
-        bibEntry.setType(BibLatexEntryTypes.BOOK);
+        bibEntry.setType(BiblatexEntryTypes.BOOK);
         bibEntry.setField("bibtexkey", "9780321356680");
         bibEntry.setField("title", "Effective Java");
         bibEntry.setField("publisher", "Addison Wesley");

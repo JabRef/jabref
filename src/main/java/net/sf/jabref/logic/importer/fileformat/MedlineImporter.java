@@ -100,7 +100,7 @@ public class MedlineImporter extends Importer implements Parser {
 
     @Override
     public String getName() {
-        return "Medline";
+        return "Medline/PubMed";
     }
 
     @Override

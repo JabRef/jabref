@@ -232,7 +232,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("MedlinePlain", importer.getName());
+        assertEquals("Medline/PubMed Plain", importer.getName());
     }
 
     @Test

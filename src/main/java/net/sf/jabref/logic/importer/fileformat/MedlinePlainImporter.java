@@ -37,7 +37,7 @@ public class MedlinePlainImporter extends Importer {
 
     @Override
     public String getName() {
-        return "MedlinePlain";
+        return "Medline/PubMed Plain";
     }
 
     @Override
@@ -48,6 +48,11 @@ public class MedlinePlainImporter extends Importer {
     @Override
     public String getDescription() {
         return "Importer for the MedlinePlain format.";
+    }
+
+    @Override
+    public String getId() {
+        return "medlineplain";
     }
 
     @Override

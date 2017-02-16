@@ -137,10 +137,10 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
 
         recommendButton = new JButton(Localization.lang("Recommended for %0", databaseContext.getMode().getFormattedName()));
-        boolean isBibLaTeX = databaseContext.isBiblatexMode();
+        boolean isBiblatex = databaseContext.isBiblatexMode();
 
         recommendButton.addActionListener(e -> {
-            if (isBibLaTeX) {
+            if (isBiblatex) {
                 ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBLATEX_ACTIONS);
             } else {
                 ((CleanupActionsListModel) actionsList.getModel()).reset(Cleanups.RECOMMEND_BIBTEX_ACTIONS);
@@ -209,7 +209,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, pref:grow, 4dlu, right:pref",
                         "pref, 2dlu, pref:grow, 2dlu"));
 
-        List<String> fieldNames = InternalBibtexFields.getAllPublicAndInteralFieldNames();
+        List<String> fieldNames = InternalBibtexFields.getAllPublicAndInternalFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);

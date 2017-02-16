@@ -114,7 +114,9 @@ public class BibEntry implements Cloneable {
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
                                                  Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
-        keywordList.replaceKeywords(keywordsToReplace, newValue);
+        if (newValue.isPresent()) {
+            keywordList.replaceAll(keywordsToReplace, newValue.get());
+        }
 
         return putKeywords(keywordList, keywordDelimiter);
     }
@@ -396,7 +398,7 @@ public class BibEntry implements Cloneable {
      * Returns the contents of the given field or its alias as an Optional
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
-     * on the BibLatex documentation, chapter 2.2.5:<br>
+     * on the biblatex documentation, chapter 2.2.5:<br>
      * address        <-> location <br>
      * annote         <-> annotation <br>
      * archiveprefix  <-> eprinttype <br>
@@ -409,7 +411,7 @@ public class BibEntry implements Cloneable {
      * </p>
      *
      * <p>
-     * Special attention is paid to dates: (see the BibLatex documentation,
+     * Special attention is paid to dates: (see the biblatex documentation,
      * chapter 2.3.8)
      * The fields 'year' and 'month' are used if the 'date'
      * field is empty. Conversely, getFieldOrAlias("year") also tries to

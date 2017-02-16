@@ -21,7 +21,7 @@ public class HandleDuplicateWarnings implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult pr) {
         int answer = JOptionPane.showConfirmDialog(null,
-                "<html><p>" + Localization.lang("This database contains one or more duplicated BibTeX keys.")
+                "<html><p>" + Localization.lang("This library contains one or more duplicated BibTeX keys.")
                         + "</p><p>" + Localization.lang("Do you want to resolve duplicate keys now?"),
                 Localization.lang("Duplicate BibTeX key"), JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {

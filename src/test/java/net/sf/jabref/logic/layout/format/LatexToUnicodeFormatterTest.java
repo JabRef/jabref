@@ -29,7 +29,7 @@ public class LatexToUnicodeFormatterTest {
     @Test
     public void testFormatTextit() {
         // See #1464
-        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
+        assertEquals("text", formatter.format("\\textit{text}"));
     }
 
 

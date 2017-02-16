@@ -168,7 +168,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         }
 
         if (frame.getCurrentBasePanel() == null) {
-            frame.output(Localization.lang("Please open or start a new database before searching"));
+            frame.output(Localization.lang("Please open or start a new library before searching"));
             return;
         }
 

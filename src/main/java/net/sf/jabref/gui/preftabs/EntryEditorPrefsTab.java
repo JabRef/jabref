@@ -31,6 +31,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox emacsRebindCtrlA;
     private final JCheckBox emacsRebindCtrlF;
     private final JCheckBox autoComplete;
+    private final JCheckBox recommendations;
     private final JRadioButton autoCompBoth;
     private final JRadioButton autoCompFF;
     private final JRadioButton autoCompLF;
@@ -55,6 +56,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
         emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
+        recommendations = new JCheckBox(Localization.lang("Show recommendations"));
 
         shortestToComplete = new JSpinner(
                 new SpinnerNumberModel(autoCompletePreferences.getShortestLengthToComplete(), 1, 5, 1));
@@ -97,7 +99,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 (// columns
                  "8dlu, left:pref, 8dlu, fill:150dlu, 4dlu, fill:pref", // 4dlu, left:pref, 4dlu",
                  // rows  1 to 10
-                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
+                 "pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
                 // rows 11 to 16
                         "pref, 6dlu, pref, 6dlu, pref, 6dlu, " +
                         // rows 17 to 27
@@ -110,9 +112,10 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(emacsMode, cc.xy(2, 7));
         builder.add(emacsRebindCtrlA, cc.xy(2, 9));
         builder.add(emacsRebindCtrlF, cc.xy(2, 11));
+        builder.add(recommendations, cc.xy(2,13));
 
-        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 13, 5));
-        builder.add(autoComplete, cc.xy(2, 15));
+        builder.addSeparator(Localization.lang("Autocompletion options"), cc.xyw(1, 15, 5));
+        builder.add(autoComplete, cc.xy(2, 17));
 
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
         JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields")+":");
@@ -122,17 +125,17 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         JLabel label2 = new JLabel(Localization.lang("Autocomplete after following number of characters") + ":");
         builder3.append(label2);
         builder3.append(shortestToComplete);
-        builder.add(builder3.getPanel(), cc.xyw(2, 17, 3));
+        builder.add(builder3.getPanel(), cc.xyw(2, 19, 3));
 
-        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 19, 4));
-        builder.add(autoCompFF, cc.xy(2, 20));
-        builder.add(autoCompLF, cc.xy(2, 21));
-        builder.add(autoCompBoth, cc.xy(2, 22));
+        builder.addSeparator(Localization.lang("Name format used for autocompletion"), cc.xyw(2, 21, 4));
+        builder.add(autoCompFF, cc.xy(2, 22));
+        builder.add(autoCompLF, cc.xy(2, 23));
+        builder.add(autoCompBoth, cc.xy(2, 24));
 
-        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 24, 4));
-        builder.add(firstNameModeAbbr, cc.xy(2, 25));
-        builder.add(firstNameModeFull, cc.xy(2, 26));
-        builder.add(firstNameModeBoth, cc.xy(2, 27));
+        builder.addSeparator(Localization.lang("Treatment of first names"), cc.xyw(2, 26, 4));
+        builder.add(firstNameModeAbbr, cc.xy(2, 27));
+        builder.add(firstNameModeFull, cc.xy(2, 28));
+        builder.add(firstNameModeBoth, cc.xy(2, 29));
 
         JPanel pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -157,6 +160,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsMode.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS));
         emacsRebindCtrlA.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
+        recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
         autoComplete.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
         shortestToComplete.setValue(autoCompletePreferences.getShortestLengthToComplete());
@@ -191,6 +195,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         prefs.putBoolean(JabRefPreferences.AUTO_OPEN_FORM, autoOpenForm.isSelected());
         prefs.putBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE, defSource.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS, recommendations.isSelected());
         boolean emacsModeChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS) != emacsMode.isSelected();
         boolean emacsRebindCtrlAChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA) != emacsRebindCtrlA.isSelected();
         boolean emacsRebindCtrlFChanged = prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF) != emacsRebindCtrlF.isSelected();

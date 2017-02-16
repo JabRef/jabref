@@ -12,6 +12,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
+import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,7 @@ import static org.mockito.Mockito.mock;
 public class EntryFetchersTest {
 
     Reflections reflections = new Reflections("net.sf.jabref");
-        ImportFormatPreferences importFormatPreferences;
+    ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() throws Exception {
@@ -49,6 +50,7 @@ public class EntryFetchersTest {
 
         Set<Class<? extends EntryBasedFetcher>> expected = reflections.getSubTypesOf(EntryBasedFetcher.class);
         expected.remove(EntryBasedParserFetcher.class);
+        expected.remove(MrDLibFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 

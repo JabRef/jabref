@@ -208,7 +208,7 @@ public class JSONEntryParser {
         // Date
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
-            entry.setField(FieldName.DATE, date); // For BibLatex
+            entry.setField(FieldName.DATE, date); // For biblatex
             String[] dateparts = date.split("-");
             entry.setField(FieldName.YEAR, dateparts[0]);
             entry.setField(FieldName.MONTH, MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);

@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
@@ -211,10 +210,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction focusTable = new GeneralAction(Actions.FOCUS_TABLE,
             Localization.menuTitle("Focus entry table"),
             Localization.lang("Move the keyboard focus to the entry table"), Globals.getKeyPrefs().getKey(KeyBinding.FOCUS_ENTRY_TABLE));
-    private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save database"),
-            Localization.lang("Save database"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
+    private final AbstractAction save = new GeneralAction(Actions.SAVE, Localization.menuTitle("Save library"),
+            Localization.lang("Save library"), Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), IconTheme.JabRefIcon.SAVE.getIcon());
     private final AbstractAction saveAs = new GeneralAction(Actions.SAVE_AS,
-            Localization.menuTitle("Save database as..."), Localization.lang("Save database as..."),
+            Localization.menuTitle("Save library as..."), Localization.lang("Save library as..."),
             Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE_AS));
     private final AbstractAction saveAll = new SaveAllAction(JabRefFrame.this);
     private final AbstractAction saveSelectedAs = new GeneralAction(Actions.SAVE_SELECTED_AS,
@@ -291,8 +290,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Copy BibTeX key and link"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
     private final AbstractAction mergeDatabaseAction = new GeneralAction(Actions.MERGE_DATABASE,
-            Localization.menuTitle("Append database"),
-            Localization.lang("Append contents from a BibTeX database into the currently viewed database"));
+            Localization.menuTitle("Append library"),
+            Localization.lang("Append contents from a BibTeX library into the currently viewed library"));
     private final AbstractAction selectAll = new GeneralAction(Actions.SELECT_ALL, Localization.menuTitle("Select all"),
             Globals.getKeyPrefs().getKey(KeyBinding.SELECT_ALL));
     private final AbstractAction replaceAll = new GeneralAction(Actions.REPLACE_ALL,
@@ -396,6 +395,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Look up full text documents"),
             Localization.lang("Look up full text documents"));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
+    private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
     private final AbstractAction resolveDuplicateKeys = new GeneralAction(Actions.RESOLVE_DUPLICATE_KEYS,
             Localization.menuTitle("Resolve duplicate BibTeX keys"),
@@ -535,7 +535,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         popupMenu.addSeparator();
 
-        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Database properties"));
+        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Library properties"));
         databasePropertiesMenu.addActionListener(this.databaseProperties);
         popupMenu.add(databasePropertiesMenu);
 
@@ -812,7 +812,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             if (saveAction.isCanceled() || !saveAction.isSuccess()) {
                                 // The action was either canceled or unsuccessful.
                                 // Break!
-                                output(Localization.lang("Unable to save database"));
+                                output(Localization.lang("Unable to save library"));
                                 close = false;
                             }
                         } catch (Throwable ex) {
@@ -1136,6 +1136,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.addSeparator();
         view.add(increaseFontSize);
         view.add(decreseFontSize);
+        view.add(defaultFontSize);
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
@@ -1201,8 +1202,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
         AbstractAction protectTerms = new ProtectedTermsAction();
         options.add(genFieldsCustomization);
-        options.add(customExpAction);
         options.add(customImpAction);
+        options.add(customExpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
         options.add(keyBindingAction);
@@ -1366,7 +1367,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
                 databaseProperties, abbreviateIso, abbreviateMedline,
-                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
+                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize, defaultFontSize,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
@@ -1749,7 +1750,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 Localization.lang("Return to JabRef")};
 
         return JOptionPane.showOptionDialog(JabRefFrame.this,
-                Localization.lang("Database '%0' has changed.", filename),
+                Localization.lang("Library '%0' has changed.", filename),
                 Localization.lang("Save before closing"), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.WARNING_MESSAGE, null, options, options[2]);
     }
@@ -1813,7 +1814,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         setWindowTitle();
         updateEnabledState();
-        output(Localization.lang("Closed database") + '.');
+        output(Localization.lang("Closed library") + '.');
         // update tab titles
         updateAllTabTitles();
     }
@@ -1909,7 +1910,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public void initName() {
             if (JabRefFrame.this.getCurrentBasePanel() == null) {
-                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/BibLaTeX"));
+                putValue(Action.NAME, Localization.menuTitle("Switch to %0 mode", "BibTeX/biblatex"));
             } else {
                 BibDatabaseMode mode = JabRefFrame.this.getCurrentBasePanel().getBibDatabaseContext().getMode();
                 String modeName = mode.getOppositeMode().getFormattedName();
@@ -2162,7 +2163,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         private DatabasePropertiesDialog propertiesDialog;
 
         public DatabasePropertiesAction() {
-            putValue(Action.NAME, Localization.menuTitle("Database properties"));
+            putValue(Action.NAME, Localization.menuTitle("Library properties"));
         }
 
         @Override
@@ -2202,6 +2203,23 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     }
 
+    private class DefaultTableFontSizeAction extends MnemonicAwareAction {
+
+        public DefaultTableFontSizeAction() {
+            putValue(Action.NAME, Localization.menuTitle("Default table font size"));
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.DEFAULT_TABLE_FONT_SIZE));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            GUIGlobals.setFont(Globals.prefs.getIntDefault(JabRefPreferences.FONT_SIZE));
+            for (BasePanel basePanel : getBasePanelList()) {
+                basePanel.updateTableFont();
+            }
+            setStatus(Localization.lang("Table font size is %0", String.valueOf(GUIGlobals.currentFont.getSize())));
+        }
+    }
+
     private class IncreaseTableFontSizeAction extends MnemonicAwareAction {
 
         public IncreaseTableFontSizeAction() {
@@ -2211,10 +2229,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            int currentSize = GUIGlobals.currentFont.getSize();
-            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
-                    currentSize + 1);
-            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize + 1);
+            GUIGlobals.setFont(GUIGlobals.currentFont.getSize() + 1);
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
@@ -2235,9 +2250,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (currentSize < 2) {
                 return;
             }
-            GUIGlobals.currentFont = new Font(GUIGlobals.currentFont.getFamily(), GUIGlobals.currentFont.getStyle(),
-                    currentSize - 1);
-            Globals.prefs.putInt(JabRefPreferences.FONT_SIZE, currentSize - 1);
+            GUIGlobals.setFont(currentSize - 1);
             for (BasePanel basePanel : getBasePanelList()) {
                 basePanel.updateTableFont();
             }
@@ -2249,8 +2262,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         public CloseDatabaseAction() {
             super(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-            putValue(Action.NAME, Localization.menuTitle("Close database"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current database"));
+            putValue(Action.NAME, Localization.menuTitle("Close library"));
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close the current library"));
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE));
         }
 

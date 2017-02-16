@@ -30,14 +30,14 @@ public class SaveAllAction extends MnemonicAwareAction implements Runnable {
         super(IconTheme.JabRefIcon.SAVE_ALL.getIcon());
         this.frame = frame;
         putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.SAVE_ALL));
-        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open databases"));
+        putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save all open libraries"));
         putValue(Action.NAME, Localization.menuTitle("Save all"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         databases = frame.getBasePanelCount();
-        frame.output(Localization.lang("Saving all databases..."));
+        frame.output(Localization.lang("Saving all libraries..."));
         Spin.off(this);
         run();
         frame.output(Localization.lang("Save all finished."));

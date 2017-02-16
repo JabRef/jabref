@@ -90,7 +90,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 return;
             }
 
-            panel.frame().output(Localization.lang("Saving database") + "...");
+            panel.frame().output(Localization.lang("Saving library") + "...");
             panel.setSaving(true);
         } else if (filePath.isPresent()) {
             // save as directly if the target file location is known
@@ -106,7 +106,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // Reset title of tab
             frame.setTabTitle(panel, panel.getTabTitle(),
                     panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
-            frame.output(Localization.lang("Saved database") + " '"
+            frame.output(Localization.lang("Saved library") + " '"
                     + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
             frame.setWindowTitle();
             frame.updateAllTabTitles();
@@ -195,7 +195,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not save file.")
                             + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
-                    Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
         } catch (SaveException ex) {
@@ -211,7 +211,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
-                    Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Save library"), JOptionPane.ERROR_MESSAGE);
             // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
         } finally {
@@ -229,14 +229,14 @@ public class SaveDatabaseAction extends AbstractWorker {
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
-            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
+            int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save library"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
                     new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
                 Object choice = JOptionPane.showInputDialog(frame, Localization.lang("Select encoding"),
-                        Localization.lang("Save database"), JOptionPane.QUESTION_MESSAGE, null,
+                        Localization.lang("Save library"), JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
                     success = false;
@@ -444,8 +444,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 if (panel.getBibDatabaseContext().getMetaData().isProtected()) {
                     JOptionPane.showMessageDialog(frame,
                             Localization
-                                    .lang("Database is protected. Cannot save until external changes have been reviewed."),
-                            Localization.lang("Protected database"), JOptionPane.ERROR_MESSAGE);
+                                    .lang("Library is protected. Cannot save until external changes have been reviewed."),
+                            Localization.lang("Protected library"), JOptionPane.ERROR_MESSAGE);
                     canceled = true;
                 } else {
                     panel.setUpdatedExternally(false);

@@ -6,8 +6,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
@@ -123,7 +126,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testJournaltitleChecks() {
-        assertCorrect(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
         assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
     }
 
@@ -153,8 +156,8 @@ public class IntegrityCheckTest {
     @Test
     public void testAuthorNameChecks() {
         for (String field : InternalBibtexFields.getPersonNameFields()) {
-            // getPersonNameFields returns fields that are available in BibLaTeX only
-            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a BibLaTeX only field
+            // getPersonNameFields returns fields that are available in biblatex only
+            // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
@@ -189,9 +192,15 @@ public class IntegrityCheckTest {
     @Test
     public void testAbbreviationChecks() {
         for (String field : Arrays.asList("booktitle", "journal")) {
-            assertCorrect(createContext(field, "Proceedings of the"));
+            assertCorrect(createContext(field, "IEEE SW"));
             assertWrong(createContext(field, "Proc. of the"));
         }
+    }
+
+    @Test
+    public void testJournalIsKnownInAbbreviationList() {
+        assertCorrect(createContext("journal", "IEEE Software"));
+        assertWrong(createContext("journal", "IEEE Whocares"));
     }
 
     @Test
@@ -308,6 +317,33 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testEntryIsUnchangedAfterChecks() {
+        BibEntry entry = new BibEntry();
+
+        // populate with all known fields
+        for (String fieldName : InternalBibtexFields.getAllPublicAndInternalFieldNames()) {
+            entry.setField(fieldName, UUID.randomUUID().toString());
+        }
+        // add a random field
+        entry.setField(UUID.randomUUID().toString(), UUID.randomUUID().toString());
+
+        // duplicate entry
+        BibEntry clonedEntry = (BibEntry) entry.clone();
+
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
+
+        new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
+                .checkBibtexDatabase();
+        
+        assertEquals(clonedEntry, entry);
+    }
+
+    @Test
     public void testASCIIChecks() {
         assertCorrect(createContext("title", "Only ascii characters!'@12"));
         assertWrong(createContext("month", "Umlauts are nöt ällowed"));
@@ -338,7 +374,8 @@ public class IntegrityCheckTest {
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                createBibtexKeyPatternPreferences())
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
@@ -346,7 +383,9 @@ public class IntegrityCheckTest {
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
                 JabRefPreferences.getInstance().getFileDirectoryPreferences(),
-                createBibtexKeyPatternPreferences()).checkBibtexDatabase();
+                createBibtexKeyPatternPreferences(),
+                new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"))
+                ).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

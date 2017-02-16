@@ -1,7 +1,13 @@
 package net.sf.jabref.model.database;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -91,7 +97,7 @@ public class BibDatabaseTest {
 
     @Test
     public void insertStringUpdatesStringList() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
         assertEquals(database.getStringKeySet().size(), 1);
@@ -103,7 +109,7 @@ public class BibDatabaseTest {
 
     @Test
     public void removeStringUpdatesStringList() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         database.removeString(string.getId());
         assertTrue(database.hasNoStrings());
@@ -116,7 +122,7 @@ public class BibDatabaseTest {
 
     @Test
     public void hasStringLabelFindsString() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString( "DSP", "Digital Signal Processing");
         database.addString(string);
         assertTrue(database.hasStringLabel("DSP"));
         assertFalse(database.hasStringLabel("VLSI"));
@@ -124,19 +130,20 @@ public class BibDatabaseTest {
 
     @Test(expected = KeyCollisionException.class)
     public void addSameStringLabelTwiceThrowsKeyCollisionException() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
-        string = new BibtexString(IdGenerator.next(), "DSP", "Digital Signal Processor");
+        string = new BibtexString("DSP", "Digital Signal Processor");
         database.addString(string);
         fail();
     }
 
     @Test(expected = KeyCollisionException.class)
     public void addSameStringIdTwiceThrowsKeyCollisionException() {
-        String id = IdGenerator.next();
-        BibtexString string = new BibtexString(id, "DSP", "Digital Signal Processing");
+        BibtexString string = new BibtexString( "DSP", "Digital Signal Processing");
+        string.setId("duplicateid");
         database.addString(string);
-        string = new BibtexString(id, "VLSI", "Very Large Scale Integration");
+        string = new BibtexString("VLSI", "Very Large Scale Integration");
+        string.setId("duplicateid");
         database.addString(string);
         fail();
     }
@@ -207,9 +214,9 @@ public class BibDatabaseTest {
 
     @Test
     public void circularStringResolving() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        BibtexString string = new BibtexString("AAA", "#BBB#");
         database.addString(string);
-        string = new BibtexString(IdGenerator.next(), "BBB", "#AAA#");
+        string = new BibtexString("BBB", "#AAA#");
         database.addString(string);
         assertEquals(database.resolveForStrings("#AAA#"), "AAA");
         assertEquals(database.resolveForStrings("#BBB#"), "BBB");
@@ -217,13 +224,13 @@ public class BibDatabaseTest {
 
     @Test
     public void circularStringResolvingLongerCycle() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        BibtexString string = new BibtexString("AAA", "#BBB#");
         database.addString(string);
-        string = new BibtexString(IdGenerator.next(), "BBB", "#CCC#");
+        string = new BibtexString( "BBB", "#CCC#");
         database.addString(string);
-        string = new BibtexString(IdGenerator.next(), "CCC", "#DDD#");
+        string = new BibtexString("CCC", "#DDD#");
         database.addString(string);
-        string = new BibtexString(IdGenerator.next(), "DDD", "#AAA#");
+        string = new BibtexString( "DDD", "#AAA#");
         database.addString(string);
         assertEquals(database.resolveForStrings("#AAA#"), "AAA");
         assertEquals(database.resolveForStrings("#BBB#"), "BBB");
@@ -238,19 +245,66 @@ public class BibDatabaseTest {
 
     @Test
     public void resolveForStringsSurroundingContent() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
         assertEquals(database.resolveForStrings("aa#AAA#AAA"), "aaaaaAAA");
     }
 
     @Test
     public void resolveForStringsOddHashMarkAtTheEnd() {
-        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
         assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
     }
 
     @Test
+    public void getUsedStrings() {
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField("author", "#AAA#");
+        BibtexString tripleA = new BibtexString( "AAA", "Some other #BBB#");
+        BibtexString tripleB = new BibtexString( "BBB", "Some more text");
+        BibtexString tripleC = new BibtexString( "CCC", "Even more text");
+        Set<BibtexString> stringSet = new HashSet<>();
+        stringSet.add(tripleA);
+        stringSet.add(tripleB);
+
+        database.addString(tripleA);
+        database.addString(tripleB);
+        database.addString(tripleC);
+        database.insertEntry(entry);
+
+        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(Arrays.asList(entry)));
+        assertEquals(stringSet, usedStrings);
+    }
+
+    @Test
+    public void getUsedStringsSingleString() {
+        BibEntry entry = new BibEntry();
+        entry.setField("author", "#AAA#");
+        BibtexString tripleA = new BibtexString("AAA", "Some other text");
+        BibtexString tripleB = new BibtexString("BBB", "Some more text");
+        List<BibtexString> strings = new ArrayList<>(1);
+        strings.add(tripleA);
+
+        database.addString(tripleA);
+        database.addString(tripleB);
+        database.insertEntry(entry);
+
+        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
+        assertEquals(strings, usedStrings);
+    }
+
+    @Test
+    public void getUsedStringsNoString() {
+        BibEntry entry = new BibEntry();
+        entry.setField("author", "Oscar Gustafsson");
+        BibtexString string = new BibtexString("AAA", "Some other text");
+        database.addString(string);
+        database.insertEntry(entry);
+        Collection<BibtexString> usedStrings = database.getUsedStrings(Arrays.asList(entry));
+        assertEquals(Collections.emptyList(), usedStrings);
+    }
+
     public void preambleIsEmptyIfNotSet() {
         assertEquals(Optional.empty(), database.getPreamble());
     }

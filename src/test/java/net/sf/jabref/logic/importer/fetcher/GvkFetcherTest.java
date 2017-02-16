@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class GvkFetcherTest {
         fetcher = new GvkFetcher();
 
         bibEntryPPN591166003 = new BibEntry();
-        bibEntryPPN591166003.setType(BibLatexEntryTypes.BOOK);
+        bibEntryPPN591166003.setType(BiblatexEntryTypes.BOOK);
         bibEntryPPN591166003.setField("title", "Effective Java");
         bibEntryPPN591166003.setField("publisher", "Addison-Wesley");
         bibEntryPPN591166003.setField("year", "2008");
@@ -45,7 +45,7 @@ public class GvkFetcherTest {
         bibEntryPPN591166003.setField("subtitle", "[revised and updated for JAVA SE 6]");
 
         bibEntryPPN66391437X = new BibEntry();
-        bibEntryPPN66391437X.setType(BibLatexEntryTypes.BOOK);
+        bibEntryPPN66391437X.setType(BiblatexEntryTypes.BOOK);
         bibEntryPPN66391437X.setField("title", "Effective unit testing");
         bibEntryPPN66391437X.setField("publisher", "Manning");
         bibEntryPPN66391437X.setField("year", "2013");

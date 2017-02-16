@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -85,18 +84,6 @@ public class KeywordList implements Iterable<Keyword> {
 
     public void removeAll(KeywordList keywordsToRemove) {
         keywords.removeAll(keywordsToRemove.keywords);
-    }
-
-    /**
-     * @deprecated use {@link #replaceAll(KeywordList, Keyword)} or {@link #removeAll(KeywordList)}
-     */
-    @Deprecated
-    public void replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue) {
-        if (newValue.isPresent()) {
-            replaceAll(keywordsToReplace, newValue.get());
-        } else {
-            removeAll(keywordsToReplace);
-        }
     }
 
     public boolean add(Keyword keyword) {

@@ -20,7 +20,7 @@ public class BackupUIManager {
                     .append("\n")
                     .append(Localization.lang("This could indicate that JabRef did not shut down cleanly last time the file was used."))
                     .append("\n\n")
-                    .append(Localization.lang("Do you want to recover the database from the backup file?")).toString(),
+                    .append(Localization.lang("Do you want to recover the library from the backup file?")).toString(),
                 Localization.lang("Backup found"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 
         if (answer == 0) {

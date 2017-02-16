@@ -194,7 +194,7 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.MULTIPLE_ENTRY_LINK));
         add(dummy);
 
-        // some BibLatex fields
+        // some biblatex fields
         dummy = new BibtexSingleField(FieldName.GENDER, true, BibtexSingleField.SMALL_W);
         dummy.getFieldProperties().add(FieldProperty.GENDER);
         add(dummy);
@@ -507,7 +507,7 @@ public class InternalBibtexFields {
     /**
      * returns a List with all fieldnames incl. internal fieldnames
      */
-    public static List<String> getAllPublicAndInteralFieldNames() {
+    public static List<String> getAllPublicAndInternalFieldNames() {
         //add the internal field names to public fields
         List<String> publicAndInternalFields = new ArrayList<>();
         publicAndInternalFields.addAll(InternalBibtexFields.getAllPublicFieldNames());

@@ -39,7 +39,6 @@ import org.apache.http.client.utils.URIBuilder;
  * See <a href="http://help.jabref.org/en/MedlineRIS">help.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
@@ -121,7 +120,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     @Override
     public String getName() {
-        return "Medline";
+        return "Medline/PubMed";
     }
 
     @Override

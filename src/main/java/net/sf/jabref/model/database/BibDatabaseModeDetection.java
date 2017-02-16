@@ -24,7 +24,7 @@ public class BibDatabaseModeDetection {
         final Stream<String> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 
         // type-based check
-        if (entryTypes.anyMatch(type -> EntryTypes.isExclusiveBibLatex(type.toLowerCase(Locale.ENGLISH)))) {
+        if (entryTypes.anyMatch(type -> EntryTypes.isExclusiveBiblatex(type.toLowerCase(Locale.ENGLISH)))) {
             return BibDatabaseMode.BIBLATEX;
         } else {
             // field-based check

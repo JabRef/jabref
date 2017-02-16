@@ -25,6 +25,8 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
+import net.sf.jabref.preferences.JabRefPreferences;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,15 +38,12 @@ public class IconTheme {
 
     /* Colors */
     // JabRef's default colors
-    public static final Color DEFAULT_COLOR = new Color(79, 95, 143); // The purple color of the logo
-    public static final Color DEFAULT_DISABLED_COLOR = new Color(200, 200, 200);
+    public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
+    public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
 
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
-
-    public static final int DEFAULT_SIZE = 24;
-    public static final int SMALL_SIZE = 16;
 
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
@@ -57,7 +56,7 @@ public class IconTheme {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
             try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
-                FX_FONT = javafx.scene.text.Font.loadFont(stream2, DEFAULT_SIZE);
+                FX_FONT = javafx.scene.text.Font.loadFont(stream2, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE));
             }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
@@ -86,9 +85,11 @@ public class IconTheme {
         PASTE("\uf192") /*css: content-paste*/,
         CUT("\uf190") /*css: content-cut*/,
         COPY("\uf18f") /*css: content-copy */,
+        COMMENT("\uF188") /*css: comment*/,
         REDO("\uf44e") /*css: redo*/,
         UNDO("\uf54c") /*css: undo*/,
         MARK_ENTRIES("\uf0c0") /*css: bookmark */,
+        MARKER("\uF524") /*css: marker */,
         UNMARK_ENTRIES("\uf0c3") /*css: bookmark-outline */,
         REFRESH("\uf450") /*css: refresh */,
         DELETE_ENTRY("\uf1c0") /*css: delete */,
@@ -184,7 +185,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon getSmallIcon() {
-            return new FontBasedIcon(this.code, this.color, IconTheme.SMALL_SIZE);
+            return new FontBasedIcon(this.code, this.color, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
         }
 
         public Node getGraphicNode() {
@@ -207,7 +208,7 @@ public class IconTheme {
         public FontBasedIcon(String code, Color iconColor) {
             this.iconCode = code;
             this.iconColor = iconColor;
-            this.size = IconTheme.DEFAULT_SIZE;
+            this.size = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE);
         }
 
         public FontBasedIcon(String code, Color iconColor, int size) {
@@ -250,7 +251,7 @@ public class IconTheme {
         }
 
         public FontBasedIcon createSmallIcon() {
-            return new FontBasedIcon(this.iconCode, this.iconColor, IconTheme.SMALL_SIZE);
+            return new FontBasedIcon(this.iconCode, this.iconColor, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
         }
 
         public FontBasedIcon createWithNewColor(Color newColor) {

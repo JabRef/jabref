@@ -13,6 +13,6 @@ public class LatexToUnicodeAdapter {
     public static String format(String inField) {
         Objects.requireNonNull(inField);
 
-        return Normalizer.normalize(LaTeX2Unicode.convert(inField), Normalizer.Form.NFC);
+        return Normalizer.normalize(LaTeX2Unicode.convert(inField), Normalizer.Form.NFKC);
     }
 }

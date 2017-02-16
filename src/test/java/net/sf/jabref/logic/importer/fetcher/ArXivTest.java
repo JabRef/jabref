@@ -8,7 +8,7 @@ import java.util.Optional;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
@@ -38,7 +38,7 @@ public class ArXivTest {
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();
-        sliceTheoremPaper.setType(BibLatexEntryTypes.ARTICLE);
+        sliceTheoremPaper.setType(BiblatexEntryTypes.ARTICLE);
         sliceTheoremPaper.setField("author", "Tobias Diez");
         sliceTheoremPaper.setField("title", "Slice theorem for Fréchet group actions and covariant symplectic field theory");
         sliceTheoremPaper.setField("date", "2014-05-09");
@@ -118,7 +118,7 @@ public class ArXivTest {
     @Test
     public void searchEntryByOldId() throws Exception {
         BibEntry expected = new BibEntry();
-        expected.setType(BibLatexEntryTypes.ARTICLE);
+        expected.setType(BiblatexEntryTypes.ARTICLE);
         expected.setField("author", "H1 Collaboration");
         expected.setField("title", "Multi-Electron Production at High Transverse Momenta in ep Collisions at HERA");
         expected.setField("date", "2003-07-07");

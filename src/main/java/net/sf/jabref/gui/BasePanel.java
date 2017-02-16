@@ -110,6 +110,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.pdf.FileAnnotationCache;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
@@ -151,6 +152,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final MainTableDataModel tableModel;
 
     private final CitationStyleCache citationStyleCache;
+    private final FileAnnotationCache annotationCache;
+
     private final JabRefFrame frame;
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
@@ -161,6 +164,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Keeps track of the string dialog if it is open.
     private final Map<String, Object> actions = new HashMap<>();
     private final SidePaneManager sidePaneManager;
+
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
@@ -202,6 +206,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
         setupMainPanel();
 
@@ -230,7 +235,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    // Returns a collection of AutoCompleters, which are populated from the current database
+    // Returns a collection of AutoCompleters, which are populated from the current library
     public ContentAutoCompleters getAutoCompleters() {
         return autoCompleters;
     }
@@ -980,7 +985,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
-        final String SAVE_DATABASE = Localization.lang("Save database");
+        final String SAVE_DATABASE = Localization.lang("Save library");
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
@@ -1618,7 +1623,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // If the status line states that the base has been saved, we
         // remove this message, since it is no longer relevant. If a
         // different message is shown, we leave it.
-        if (frame.getStatusLineText().startsWith(Localization.lang("Saved database"))) {
+        if (frame.getStatusLineText().startsWith(Localization.lang("Saved library"))) {
             frame.output(" ");
         }
     }
@@ -1629,7 +1634,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void rebuildAllEntryEditors() {
-        currentEditor.rebuildPanels();
+        if (currentEditor != null) {
+            currentEditor.rebuildPanels();
+        }
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -2339,6 +2346,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             markChangedOrUnChanged();
         }
+    }
+
+    public FileAnnotationCache getAnnotationCache() {
+        return annotationCache;
     }
 
     private class PrintPreviewAction implements BaseAction {

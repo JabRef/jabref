@@ -22,6 +22,7 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import net.sf.jabref.gui.push.PushToApplication;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -41,6 +42,12 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JTextField consoleCommand;
     private final JButton browseButton;
 
+    private final JRadioButton adobeAcrobatReader;
+    private final JRadioButton sumatraReader;
+    private final JTextField adobeAcrobatReaderPath;
+    private final JTextField sumatraReaderPath;
+    private final JButton browseAdobeAcrobatReader;
+    private final JButton browseSumatraReader;
 
     public ExternalTab(JabRefFrame frame, PreferencesDialog prefsDiag, JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -57,12 +64,27 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleCommand = new JTextField();
         browseButton = new JButton(Localization.lang("Browse"));
 
+        adobeAcrobatReader = new JRadioButton(Localization.lang("Adobe Acrobat Reader"));
+        adobeAcrobatReaderPath = new JTextField();
+        browseAdobeAcrobatReader = new JButton(Localization.lang("Browse"));
+
+        sumatraReader = new JRadioButton(Localization.lang("Sumatra Reader"));
+        sumatraReaderPath = new JTextField();
+        browseSumatraReader = new JButton(Localization.lang("Browse"));
+
+
         JLabel commandDescription = new JLabel(Localization.lang(
-                "Note: Use the placeholder %0 for the location of the opened database file.", "%DIR"));
+                "Note: Use the placeholder %0 for the location of the opened library file.", "%DIR"));
 
         ButtonGroup consoleOptions = new ButtonGroup();
         consoleOptions.add(defaultConsole);
         consoleOptions.add(executeConsole);
+
+        ButtonGroup  readerOptions = new ButtonGroup();
+        readerOptions.add(adobeAcrobatReader);
+
+        JPanel pdfOptionPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints pdfLayoutConstrains = new GridBagConstraints();
 
         JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
@@ -71,7 +93,11 @@ class ExternalTab extends JPanel implements PrefsTab {
         executeConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         browseButton.addActionListener(e -> showConsoleChooser());
 
+        browseAdobeAcrobatReader.addActionListener(e -> showAdobeChooser());
+
         layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+        pdfLayoutConstrains.fill = GridBagConstraints.HORIZONTAL;
 
         layoutConstraints.gridx = 0;
         layoutConstraints.gridy = 0;
@@ -91,6 +117,31 @@ class ExternalTab extends JPanel implements PrefsTab {
         layoutConstraints.gridx = 1;
         layoutConstraints.gridy = 2;
         consoleOptionPanel.add(commandDescription, layoutConstraints);
+
+        pdfLayoutConstrains.gridx = 0;
+        pdfLayoutConstrains.gridy = 0;
+        pdfLayoutConstrains.insets = new Insets(0, 0, 6, 0);
+        pdfOptionPanel.add(adobeAcrobatReader, pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 1;
+        pdfOptionPanel.add(adobeAcrobatReaderPath,pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 2;
+        pdfOptionPanel.add(browseAdobeAcrobatReader, pdfLayoutConstrains);
+
+        if(OS.WINDOWS){
+            readerOptions.add(sumatraReader);
+            browseSumatraReader.addActionListener(e -> showSumatraChooser());
+            pdfLayoutConstrains.gridy = 1;
+            pdfLayoutConstrains.gridx = 0;
+            pdfOptionPanel.add(sumatraReader,pdfLayoutConstrains);
+
+            pdfLayoutConstrains.gridx = 1;
+            pdfOptionPanel.add(sumatraReaderPath, pdfLayoutConstrains);
+
+            pdfLayoutConstrains.gridx = 2;
+            pdfOptionPanel.add(browseSumatraReader, pdfLayoutConstrains);
+        }
 
         FormLayout layout = new FormLayout(
                 "1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
@@ -136,6 +187,12 @@ class ExternalTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(new JPanel());
         builder.append(consoleOptionPanel);
+        builder.nextLine();
+
+        builder.appendSeparator(Localization.lang("Open PDF"));
+        builder.nextLine();
+        builder.append(new JPanel());
+        builder.append(pdfOptionPanel);
 
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -163,6 +220,17 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         consoleCommand.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND));
 
+        adobeAcrobatReaderPath.setText(Globals.prefs.get(JabRefPreferences.ADOBE_ACROBAT_COMMAND));
+        if(OS.WINDOWS){
+            sumatraReaderPath.setText(Globals.prefs.get(JabRefPreferences.SUMATRA_PDF_COMMAND));
+
+            if(Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(adobeAcrobatReaderPath.getText())){
+                adobeAcrobatReader.setSelected(true);
+            } else if (Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(sumatraReaderPath.getText())) {
+                sumatraReader.setSelected(true);
+            }
+        }
+
         updateExecuteConsoleButtonAndFieldEnabledState();
     }
 
@@ -173,6 +241,11 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
+        prefs.put(JabRefPreferences.ADOBE_ACROBAT_COMMAND, adobeAcrobatReaderPath.getText());
+        if(OS.WINDOWS) {
+            prefs.put(JabRefPreferences.SUMATRA_PDF_COMMAND, sumatraReaderPath.getText());
+        }
+        readerSelected();
     }
 
     @Override
@@ -195,6 +268,31 @@ class ExternalTab extends JPanel implements PrefsTab {
         int answer = consoleChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
             consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void showAdobeChooser(){
+        JFileChooser adobeChooser = new JFileChooser();
+        int answer = adobeChooser.showOpenDialog(ExternalTab.this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            adobeAcrobatReaderPath.setText(adobeChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void showSumatraChooser() {
+        JFileChooser adobeChooser = new JFileChooser();
+        int answer = adobeChooser.showOpenDialog(ExternalTab.this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            sumatraReaderPath.setText(adobeChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void readerSelected() {
+        if(adobeAcrobatReader.isSelected()) {
+            prefs.put(JabRefPreferences.USE_PDF_READER, adobeAcrobatReaderPath.getText());
+        }
+        else if (sumatraReader.isSelected()) {
+            prefs.put(JabRefPreferences.USE_PDF_READER, sumatraReaderPath.getText());
         }
     }
 }
