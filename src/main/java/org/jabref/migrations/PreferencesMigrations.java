@@ -19,6 +19,45 @@ public class PreferencesMigrations {
     private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
 
     /**
+     * Migrate all preferences from net/sf/jabref to org/jabref
+     */
+    public static void upgradePrefsToOrgJabRef() {
+
+        JabRefPreferences prefs = Globals.prefs;
+        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+        try {
+            if (mainPrefsNode.childrenNames().length!=0) {
+                // skip further processing as prefs already have been migrated
+                LOGGER.debug("New prefs node already exists with content - skipping migration");
+            } else {
+                if( mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
+                    LOGGER.info("Migrating old preferences.");
+                    Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
+                    copyPrefsRecursively(oldNode, mainPrefsNode);
+                }
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.error("Migrating old preferences failed.", ex);
+        }
+    }
+
+
+    private static void copyPrefsRecursively(Preferences from, Preferences to) throws BackingStoreException {
+        for(String key : from.keys()) {
+            String newValue = from.get(key, "");
+            if (newValue.contains("net.sf")) {
+                newValue = newValue.replaceAll("net\\.sf", "org");
+            }
+            to.put(key, newValue);
+        }
+        for (String child : from.childrenNames()) {
+            Preferences childNode = from.node(child);
+            Preferences newChildNode = to.node(child);
+            copyPrefsRecursively(childNode, newChildNode);
+        }
+    }
+
+    /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
      */
     public static void upgradeFaultyEncodingStrings() {

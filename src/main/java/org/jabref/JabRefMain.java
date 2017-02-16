@@ -71,6 +71,7 @@ public class JabRefMain extends Application {
 
         // Perform Migrations
         // Perform checks and changes for users with a preference set from an older JabRef version.
+        PreferencesMigrations.upgradePrefsToOrgJabRef();
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
