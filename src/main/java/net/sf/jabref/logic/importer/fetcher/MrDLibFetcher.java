@@ -110,7 +110,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", "convbckslsh");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https");
-        builder.setHost("api.mrdlib.org");
+        builder.setHost("api.mr-dlib.org");
         builder.setPath("/v1/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
