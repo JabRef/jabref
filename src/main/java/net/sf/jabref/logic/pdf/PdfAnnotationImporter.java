@@ -24,13 +24,10 @@ import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
-public class PdfAnnotationImporterImpl implements AnnotationImporterInterface {
+public class PdfAnnotationImporter implements AnnotationImporter {
 
-    private List pdfPages;
-    private PDPage page;
 
-    public PdfAnnotationImporterImpl() {
-
+    public PdfAnnotationImporter() {
     }
 
     /**
@@ -65,9 +62,9 @@ public class PdfAnnotationImporterImpl implements AnnotationImporterInterface {
             e.printStackTrace();
         }
 
-        pdfPages = document.getDocumentCatalog().getAllPages();
+        List pdfPages = document.getDocumentCatalog().getAllPages();
         for (int i = 0; i < pdfPages.size(); i++) {
-            page = (PDPage) pdfPages.get(i);
+            PDPage page = (PDPage) pdfPages.get(i);
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
 

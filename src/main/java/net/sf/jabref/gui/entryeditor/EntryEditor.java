@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -57,7 +58,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 
 import net.sf.jabref.Globals;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.GUIGlobals;
@@ -335,7 +335,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addSpecialTabs();
 
         // pdf annotations tab
-        addPdfTab();
+        addPDFAnnotationTab();
 
         //related articles
         if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS)) {
@@ -450,12 +450,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Add a tab for displaying comments from a PDF
      */
-    private void addPdfTab() {
+    private void addPDFAnnotationTab() {
         tabbed.remove(fileAnnotationTab);
         tabs.remove(fileAnnotationTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
-            fileAnnotationTab = new FileAnnotationTab(this, panel, tabbed);
+            fileAnnotationTab = new FileAnnotationTab(this);
             tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.COMMENT.getSmallIcon(), fileAnnotationTab,
                     Localization.lang("Show file annotations"));
             tabs.add(fileAnnotationTab);
@@ -597,7 +597,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * @param editor Field editor
      * @return Component to show, or null if none.
      */
-    public Optional<JComponent> getExtra(final FieldEditor editor) {
+    Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
@@ -1007,7 +1007,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class TypeButton extends JButton {
-        public TypeButton() {
+        TypeButton() {
             super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
             addActionListener(e -> showChangeEntryTypePopupMenu());
@@ -1020,7 +1020,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class TypeLabel extends JLabel {
-        public TypeLabel(String type) {
+        TypeLabel(String type) {
             super(type);
             setUI(new VerticalLabelUI(false));
             setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
@@ -1081,9 +1081,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof FileAnnotationTab && !((FileAnnotationTab) activeTab).isInitialized()) {
                     //Initialize by getting notes from cache if they are cached
-                    FileAnnotationTab.initializeTab((FileAnnotationTab) activeTab,
-                            panel.getAnnotationCache().getFromCache(Optional.of(entry)));
-                    panel.getAnnotationCache().addToCache(entry, ((FileAnnotationTab) activeTab).getAllNotes());
+
+                    FileAnnotationTab tab = (FileAnnotationTab) activeTab;
+                    try {
+                        tab.initializeTab(tab,
+                                panel.getAnnotationCache().getFromCache(entry));
+                    } catch (ExecutionException e) {
+                        tab.initializeTab((FileAnnotationTab) activeTab);
+                    }
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
@@ -1102,7 +1107,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
 
     class DeleteAction extends AbstractAction {
-        public DeleteAction() {
+        DeleteAction() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
         }
@@ -1144,7 +1149,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class CloseAction extends AbstractAction {
-        public CloseAction() {
+        CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
         }
@@ -1157,7 +1162,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     class StoreFieldAction extends AbstractAction {
 
-        public StoreFieldAction() {
+        StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
         }
@@ -1322,7 +1327,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class SwitchLeftAction extends AbstractAction {
-        public SwitchLeftAction() {
+        SwitchLeftAction() {
             super("Switch to the panel to the left");
         }
 
@@ -1336,7 +1341,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class SwitchRightAction extends AbstractAction {
-        public SwitchRightAction() {
+        SwitchRightAction() {
             super("Switch to the panel to the right");
         }
 
@@ -1350,7 +1355,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class NextEntryAction extends AbstractAction {
-        public NextEntryAction() {
+        NextEntryAction() {
             super(Localization.lang("Next entry"), IconTheme.JabRefIcon.DOWN.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Next entry"));
@@ -1363,7 +1368,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class PrevEntryAction extends AbstractAction {
-        public PrevEntryAction() {
+        PrevEntryAction() {
             super(Localization.lang("Previous entry"), IconTheme.JabRefIcon.UP.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Previous entry"));
@@ -1377,7 +1382,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     class GenerateKeyAction extends AbstractAction {
 
-        public GenerateKeyAction() {
+        GenerateKeyAction() {
             super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Generate BibTeX key"));
@@ -1434,7 +1439,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class UndoAction extends AbstractAction {
-        public UndoAction() {
+        UndoAction() {
             super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
         }
@@ -1446,7 +1451,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class RedoAction extends AbstractAction {
-        public RedoAction() {
+        RedoAction() {
             super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
         }
@@ -1458,7 +1463,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     class SaveDatabaseAction extends AbstractAction {
-        public SaveDatabaseAction() {
+        SaveDatabaseAction() {
             super("Save library");
         }
 
@@ -1492,32 +1497,32 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-    public AbstractAction getNextEntryAction() {
+    AbstractAction getNextEntryAction() {
         return nextEntryAction;
     }
 
 
-    public AbstractAction getPrevEntryAction() {
+    AbstractAction getPrevEntryAction() {
         return prevEntryAction;
     }
 
 
-    public SwitchLeftAction getSwitchLeftAction() {
+    SwitchLeftAction getSwitchLeftAction() {
         return switchLeftAction;
     }
 
 
-    public SwitchRightAction getSwitchRightAction() {
+    SwitchRightAction getSwitchRightAction() {
         return switchRightAction;
     }
 
 
-    public SaveDatabaseAction getSaveDatabaseAction() {
+    SaveDatabaseAction getSaveDatabaseAction() {
         return saveDatabaseAction;
     }
 
 
-    public HelpAction getHelpAction() {
+    HelpAction getHelpAction() {
         return helpAction;
     }
 
@@ -1527,13 +1532,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-    public StoreFieldAction getStoreFieldAction() {
+    StoreFieldAction getStoreFieldAction() {
         return storeFieldAction;
     }
 
 
     private class AutoLinkAction extends AbstractAction {
-        public AutoLinkAction() {
+        AutoLinkAction() {
             putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Automatically set file links for this entry") + " (Alt-F)");
         }

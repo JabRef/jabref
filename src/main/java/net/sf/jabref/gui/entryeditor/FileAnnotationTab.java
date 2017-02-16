@@ -6,12 +6,9 @@ import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -22,27 +19,23 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.pdf.PdfAnnotationImporterImpl;
+import net.sf.jabref.logic.pdf.EntryAnnotationImporter;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.pdf.FileAnnotation;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 
-public class FileAnnotationTab extends JPanel {
+class FileAnnotationTab extends JPanel {
 
     private final JList<FileAnnotation> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
@@ -66,78 +59,73 @@ public class FileAnnotationTab extends JPanel {
     private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton reloadAnnotationsButton = new JButton();
-    DefaultListModel<FileAnnotation> listModel;
+    private DefaultListModel<FileAnnotation> listModel;
 
     private final EntryEditor parent;
-    private final BasePanel basePanel;
-    private final JTabbedPane tabbed;
-    private int commentListSelectedIndex = 0;
 
+    private Map<String, List<FileAnnotation>> annotationsOfFiles;
     private boolean isInitialized;
 
-    private Map<String, List<FileAnnotation>> allNotes = new HashMap<>();
 
-
-    public FileAnnotationTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
+    FileAnnotationTab(EntryEditor parent) {
         this.parent = parent;
-        this.basePanel = basePanel;
-        this.tabbed = tabbed;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel  = new DefaultListModel<>();
         this.isInitialized = false;
 
     }
 
-    public static FileAnnotationTab initializeTab(FileAnnotationTab tab, Optional<Map<String, List<FileAnnotation>>> notes){
-
-        if(!tab.isInitialized) {
-            
-            try {
-                tab.addComments(notes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            tab.setUpGui();
-
-            tab.isInitialized = true;
-            tab.parent.repaint();
+    FileAnnotationTab initializeTab(FileAnnotationTab tab) {
+        if (tab.isInitialized) {
             return tab;
         }
+
+        tab.setUpGui();
+        tab.isInitialized = true;
+        tab.parent.repaint();
         return tab;
     }
 
+    FileAnnotationTab initializeTab(FileAnnotationTab tab, Map<String, List<FileAnnotation>> cachedFileAnnotations) {
+        this.annotationsOfFiles = cachedFileAnnotations;
+
+        if (tab.isInitialized) {
+            return tab;
+        }
+
+            try {
+                tab.addAnnotations();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            tab.setUpGui();
+            tab.isInitialized = true;
+            tab.parent.repaint();
+            return tab;
+
+    }
+
     /**
-     * Adds pdf comments from all attached pdf files belonging to the entry selected in the main table and
-     * shows those from the first file in the comments tab
+     * Adds pdf annotationsOfFiles from all attached pdf files belonging to the entry selected in the main table and
+     * shows those from the first file in the file annotationsOfFiles tab
      * @throws IOException
      */
-    public void addComments(Optional<Map<String, List<FileAnnotation>>> notes) throws IOException {
-        Optional<String> field = parent.getEntry().getField(FieldName.FILE);
-        if (field.isPresent()) {
+    private void addAnnotations() throws IOException {
+        if (parent.getEntry().getField(FieldName.FILE).isPresent()) {
             if (!commentList.getModel().equals(listModel)) {
                 commentList.setModel(listModel);
                 commentList.addListSelectionListener(new CommentListSelectionListener());
                 commentList.setCellRenderer(new CommentsListCellRenderer());
             }
 
-            PdfAnnotationImporterImpl annotationImporter;
-
-            if(notes.isPresent()) {
-                allNotes = notes.get();
-            } else {
-                annotationImporter = new PdfAnnotationImporterImpl();
-                //import notes if the selected file is a pdf
-                getFilteredFileList().forEach(parsedFileField -> allNotes.put(
-                        parsedFileField.getLink(),
-                        annotationImporter.importAnnotations(parsedFileField.getLink(), basePanel.getDatabaseContext())));
-            }
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
-            getFilteredFileList()
-                    .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
-            //show the annotations attached to the selected file
-            updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem() == null ?
-                    fileNameComboBox.getItemAt(0).toString() : fileNameComboBox.getSelectedItem().toString()));
+            new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().
+                    forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
+            //show the annotationsOfFiles attached to the selected file
+            updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem() == null ?
+                    fileNameComboBox.getItemAt(0) : fileNameComboBox.getSelectedItem().toString()));
             //select the first annotation
             if(commentList.isSelectionEmpty()){
                 commentList.setSelectedIndex(0);
@@ -147,15 +135,15 @@ public class FileAnnotationTab extends JPanel {
 
     /**
      * Updates the list model to show the given notes without those with no content
-     * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
+     * @param annotations value is the comments name and the value is a pdfComment object to add to the list model
      */
-    private void updateShownAnnotations(List<FileAnnotation> importedNotes){
+    private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
-        if(importedNotes.isEmpty()){
-            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotations"), ""));
+        if (annotations.isEmpty()) {
+            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotationsOfFiles"), ""));
         } else {
-            Comparator<FileAnnotation> byPage = (annotation1, annotation2) -> Integer.compare(annotation1.getPage(), annotation2.getPage());
-            importedNotes.stream()
+            Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
+            annotations.stream()
                     .filter(annotation -> !(null == annotation.getContent()))
                     .filter(annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
                             || (null == annotation.getLinkedFileAnnotation()))
@@ -187,10 +175,10 @@ public class FileAnnotationTab extends JPanel {
             indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
         }
         fileNameComboBox.removeAllItems();
-        getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
+        new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
                 .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
-        updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem().toString()));
+        updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem().toString()));
     }
 
     private void setUpGui() {
@@ -261,7 +249,7 @@ public class FileAnnotationTab extends JPanel {
 
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());
-        reloadAnnotationsButton.setText(Localization.lang("Reload annotations"));
+        reloadAnnotationsButton.setText(Localization.lang("Reload annotationsOfFiles"));
         reloadAnnotationsButton.addActionListener(e -> reloadAnnotations());
 
         buttonConstraints.gridy = 10;
@@ -293,10 +281,11 @@ public class FileAnnotationTab extends JPanel {
 
     private void reloadAnnotations() {
         isInitialized = false;
-        Arrays.stream(this.getComponents()).forEach(component -> this.remove(component));
-        initializeTab(this, Optional.empty());
+        Arrays.stream(this.getComponents()).forEach(this::remove);
+        initializeTab(this);
         this.repaint();
     }
+
 
     /**
      * Fills the highlight and comment texts and enables/disables the highlight area if there is no highlighted text
@@ -327,21 +316,13 @@ public class FileAnnotationTab extends JPanel {
         }
     }
 
-    /**
-     * Filter files with a web address containing "www."
-     * @return a list of file parsed files
-     */
-    private List<ParsedFileField> getFilteredFileList(){
-       return FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
-                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
-                .filter(parsedFileField -> !parsedFileField.getLink().contains("www.")).collect(Collectors.toList());
-    }
 
     private class CommentListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
 
             int index;
+            int commentListSelectedIndex;
             if (commentList.getSelectedIndex() >= 0) {
                 index = commentList.getSelectedIndex();
                 updateTextFields(listModel.get(index));
@@ -391,11 +372,7 @@ public class FileAnnotationTab extends JPanel {
         }
     }
 
-    public boolean isInitialized() {
+    boolean isInitialized() {
         return isInitialized;
-    }
-
-    public Map<String, List<FileAnnotation>> getAllNotes() {
-        return allNotes;
     }
 }
