@@ -3,8 +3,8 @@ package net.sf.jabref.logic.util.bibsonomy;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

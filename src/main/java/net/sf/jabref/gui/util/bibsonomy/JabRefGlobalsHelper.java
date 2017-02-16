@@ -2,8 +2,8 @@ package net.sf.jabref.gui.util.bibsonomy;
 
 import java.util.Vector;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.Globals;
+import org.jabref.gui.JabRefFrame;
 
 public class JabRefGlobalsHelper {
 

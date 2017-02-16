@@ -5,11 +5,11 @@ import java.util.List;
 import javax.swing.JComboBox;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

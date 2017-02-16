@@ -2,12 +2,11 @@ package net.sf.jabref.gui.actions.bibsonomy;
 
 import java.awt.event.ActionEvent;
 
-import javax.swing.ImageIcon;
-
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.worker.bibsonomy.SynchronizationWorker;
-import net.sf.jabref.logic.l10n.Localization;
+
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.l10n.Localization;
 
 
 /**

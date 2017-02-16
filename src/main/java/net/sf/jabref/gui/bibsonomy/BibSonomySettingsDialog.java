@@ -26,12 +26,12 @@ import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogByCancelAction;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogBySaveAction;
 import net.sf.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.enums.Order;

@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.bibsonomy.model.logic.LogicInterface;
 import org.bibsonomy.rest.client.RestLogicFactory;

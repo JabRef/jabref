@@ -5,9 +5,10 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
+
+import org.jabref.gui.JabRefFrame;
 
 /**
  * This runs the {@link UpdateVisibilityWorker}

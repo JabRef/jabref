@@ -9,11 +9,12 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.bibsonomy.BibSonomySettingsDialog;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.bibsonomy.OrderComboBoxItem;
-import net.sf.jabref.logic.l10n.Localization;
+
+import org.jabref.gui.IconTheme;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Saves the properties and closes the {@link BibSonomySettingsDialog}.

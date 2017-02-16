@@ -55,11 +55,6 @@ Project: Apache Commons Lang
 URL:     https://commons.apache.org/proper/commons-lang/
 License: Apache-2.0
 
-Id:      org.apache.commons:commons-collections4
-Project: Apache Commons Collections
-URL:     https://commons.apache.org/proper/commons-collections/
-License: Apache-2.0
-
 Id:      org.bibsonomy:bibsonomy-rest-client
 Project: Bibsonomy
 URL:     https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/Java%20API%20Examples

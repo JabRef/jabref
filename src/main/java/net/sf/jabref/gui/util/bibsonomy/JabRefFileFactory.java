@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.Globals;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.bibsonomy.rest.client.util.MultiDirectoryFileFactory;
 

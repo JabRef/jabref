@@ -3,10 +3,10 @@ package net.sf.jabref.gui.worker.bibsonomy;
 import java.io.File;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.bibsonomy.model.Document;
 import org.bibsonomy.model.logic.LogicInterface;

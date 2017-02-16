@@ -3,12 +3,12 @@ package net.sf.jabref.gui.actions.bibsonomy;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
-import net.sf.jabref.gui.worker.AbstractWorker;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.worker.AbstractWorker;
 
 /**
  * This is the base class for all actions.

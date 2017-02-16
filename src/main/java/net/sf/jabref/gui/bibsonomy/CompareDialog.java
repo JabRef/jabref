@@ -18,14 +18,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.bibsonomy.JabRefModelConverter;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 import org.bibsonomy.model.Post;
 import org.bibsonomy.model.Resource;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 public class CompareDialog extends JDialog {
 

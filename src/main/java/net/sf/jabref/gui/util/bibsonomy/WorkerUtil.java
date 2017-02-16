@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.worker.AbstractWorker;
 
 public class WorkerUtil {
 

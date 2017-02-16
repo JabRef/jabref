@@ -3,7 +3,7 @@ package net.sf.jabref.bibsonomy;
 import java.util.Optional;
 import java.util.Properties;
 
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.enums.Order;

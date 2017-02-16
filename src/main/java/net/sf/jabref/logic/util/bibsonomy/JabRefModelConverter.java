@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.strings.StringUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

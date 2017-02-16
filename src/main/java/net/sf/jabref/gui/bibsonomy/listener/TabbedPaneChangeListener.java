@@ -6,7 +6,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import net.sf.jabref.gui.BasePanel;
+import org.jabref.gui.BasePanel;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

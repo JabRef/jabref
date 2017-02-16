@@ -8,12 +8,12 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 
-import net.sf.jabref.gui.JabRefFrame;
-
 import net.sf.jabref.gui.actions.bibsonomy.AbstractBibSonomyAction;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.bibsonomy.SearchType;
 import net.sf.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
+
+import org.jabref.gui.JabRefFrame;
 
 /**
  * Runs the {@link ImportPostsByCriteriaWorker} as soon as

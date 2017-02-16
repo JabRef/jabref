@@ -19,14 +19,14 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.RefreshTagListAction;
 import net.sf.jabref.gui.actions.bibsonomy.SearchAction;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
 import net.sf.jabref.gui.bibsonomy.listener.BibSonomyHyperLinkListener;
 import net.sf.jabref.gui.bibsonomy.listener.VisibilityItemListener;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 

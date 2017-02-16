@@ -8,16 +8,16 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.CompareDialog;
 import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import net.sf.jabref.gui.util.bibsonomy.WorkerUtil;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.bibsonomy.BibtexEntryUtil;
 import net.sf.jabref.logic.util.bibsonomy.JabRefModelConverter;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

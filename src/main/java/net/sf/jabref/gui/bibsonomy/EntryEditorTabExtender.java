@@ -2,8 +2,8 @@ package net.sf.jabref.gui.bibsonomy;
 
 import net.sf.jabref.bibsonomy.BibSonomyGlobals;
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 
 /**

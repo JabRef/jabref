@@ -1,7 +1,8 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
-import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.worker.bibsonomy.AbstractBibSonomyWorker;
+
+import org.jabref.gui.importer.ImportInspectionDialog;
 
 /**
  * Is a util to stop execution of workers

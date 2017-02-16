@@ -3,11 +3,11 @@ package net.sf.jabref.gui.actions.bibsonomy;
 import java.awt.event.ActionEvent;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.SearchType;
 import net.sf.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
 
 import org.bibsonomy.common.enums.GroupingEntity;
+import org.jabref.gui.JabRefFrame;
 
 
 /**

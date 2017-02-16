@@ -3,16 +3,15 @@ package net.sf.jabref.gui.actions.bibsonomy;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+
 import net.sf.jabref.gui.util.bibsonomy.CheckTagsUtil;
 import net.sf.jabref.gui.worker.bibsonomy.ExportWorker;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

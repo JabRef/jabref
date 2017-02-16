@@ -4,10 +4,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.BibSonomySettingsDialog;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 
 /**

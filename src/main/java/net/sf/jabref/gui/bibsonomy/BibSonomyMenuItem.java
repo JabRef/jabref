@@ -12,7 +12,7 @@ import net.sf.jabref.gui.actions.bibsonomy.ImportAllMyPostsAction;
 import net.sf.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import net.sf.jabref.gui.actions.bibsonomy.SynchronizeAction;
 import net.sf.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Is the plugins menu item

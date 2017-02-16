@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.worker.bibsonomy;
 
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.worker.AbstractWorker;
 
 /**
  * Is the base for all Workers which need to support stopping execution.

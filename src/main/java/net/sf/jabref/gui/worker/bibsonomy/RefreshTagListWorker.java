@@ -7,10 +7,10 @@ import java.util.Vector;
 import javax.swing.JEditorPane;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.metadata.MetaData;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.BibTex;

@@ -4,19 +4,18 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 
 import net.sf.jabref.bibsonomy.BibSonomyProperties;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.worker.bibsonomy.RefreshTagListWorker;
 import net.sf.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
-import net.sf.jabref.logic.l10n.Localization;
 
 import org.bibsonomy.common.enums.GroupingEntity;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Runs the {@link RefreshTagListWorker} to refresh the tag cloud
