@@ -5,15 +5,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
-import org.jabref.gui.bibsonomy.SearchType;
-import org.jabref.gui.bibsonomy.SearchTypeComboBoxItem;
-import org.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
-
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.bibsonomy.SearchType;
+import org.jabref.gui.bibsonomy.SearchTypeComboBoxItem;
+import org.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
 
 /**
  * Runs the {@link ImportPostsByCriteriaWorker} with the values of the search text box

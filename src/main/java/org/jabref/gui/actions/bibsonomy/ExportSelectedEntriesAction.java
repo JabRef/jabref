@@ -12,8 +12,6 @@ import org.jabref.gui.worker.bibsonomy.ExportWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.jabref.gui.util.bibsonomy.CheckTagsUtil;
-import org.jabref.gui.worker.bibsonomy.ExportWorker;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

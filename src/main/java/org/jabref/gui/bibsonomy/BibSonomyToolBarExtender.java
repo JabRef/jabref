@@ -9,11 +9,7 @@ import javax.swing.JToolBar;
 
 import org.jabref.bibsonomy.BibSonomyGlobals;
 import org.jabref.bibsonomy.BibSonomySidePaneComponent;
-import org.jabref.bibsonomy.BibSonomyGlobals;
-import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
-import org.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
 import org.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
 import org.jabref.gui.actions.bibsonomy.ExportSelectedEntriesAction;
 import org.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;

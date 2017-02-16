@@ -9,13 +9,10 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.bibsonomy.BibSonomySettingsDialog;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.bibsonomy.OrderComboBoxItem;
-
-import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.logic.l10n.Localization;
 
 /**

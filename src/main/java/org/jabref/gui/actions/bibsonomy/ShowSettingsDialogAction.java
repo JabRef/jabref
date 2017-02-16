@@ -7,7 +7,6 @@ import javax.swing.AbstractAction;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.bibsonomy.BibSonomySettingsDialog;
-import org.jabref.gui.bibsonomy.BibSonomySettingsDialog;
 import org.jabref.logic.l10n.Localization;
 
 

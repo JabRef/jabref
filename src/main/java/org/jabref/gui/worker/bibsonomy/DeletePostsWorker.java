@@ -4,17 +4,15 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bibsonomy.model.logic.LogicInterface;
-
-import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 
 /**
  * Delete a Post from the service

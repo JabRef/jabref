@@ -8,11 +8,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 
-import org.jabref.gui.actions.bibsonomy.AbstractBibSonomyAction;
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
-import org.jabref.gui.bibsonomy.SearchType;
-import org.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
-
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.AbstractBibSonomyAction;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;

@@ -6,8 +6,6 @@ import java.util.concurrent.Executors;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
-import org.jabref.gui.util.bibsonomy.WorkerUtil;
-import org.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.BibEntry;
 

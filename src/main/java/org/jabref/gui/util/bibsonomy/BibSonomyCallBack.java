@@ -1,7 +1,5 @@
 package org.jabref.gui.util.bibsonomy;
 
-import org.jabref.gui.worker.bibsonomy.AbstractBibSonomyWorker;
-
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.worker.bibsonomy.AbstractBibSonomyWorker;
 

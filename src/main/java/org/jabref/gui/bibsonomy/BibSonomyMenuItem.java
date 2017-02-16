@@ -12,15 +12,6 @@ import org.jabref.gui.actions.bibsonomy.ImportAllMyPostsAction;
 import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.actions.bibsonomy.SynchronizeAction;
 import org.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
-import org.jabref.bibsonomy.BibSonomyGlobals;
-import org.jabref.bibsonomy.BibSonomySidePaneComponent;
-import org.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
-import org.jabref.gui.actions.bibsonomy.DownloadDocumentsAction;
-import org.jabref.gui.actions.bibsonomy.ExportSelectedEntriesAction;
-import org.jabref.gui.actions.bibsonomy.ImportAllMyPostsAction;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
-import org.jabref.gui.actions.bibsonomy.SynchronizeAction;
-import org.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
 import org.jabref.logic.l10n.Localization;
 
 /**

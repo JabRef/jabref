@@ -7,9 +7,7 @@ import java.util.Vector;
 import javax.swing.JEditorPane;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;

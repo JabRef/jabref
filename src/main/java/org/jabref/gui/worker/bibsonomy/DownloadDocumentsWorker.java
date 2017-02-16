@@ -4,7 +4,6 @@ import java.net.URLEncoder;
 import java.util.Optional;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;

@@ -6,7 +6,6 @@ import java.util.Collection;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
-import org.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

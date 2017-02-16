@@ -9,7 +9,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;

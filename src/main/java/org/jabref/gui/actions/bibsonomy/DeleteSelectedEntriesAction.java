@@ -2,10 +2,9 @@ package org.jabref.gui.actions.bibsonomy;
 
 import java.awt.event.ActionEvent;
 
-import org.jabref.gui.worker.bibsonomy.DeletePostsWorker;
-
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.worker.bibsonomy.DeletePostsWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

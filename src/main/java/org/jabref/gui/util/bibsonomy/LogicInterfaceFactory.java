@@ -1,7 +1,6 @@
 package org.jabref.gui.util.bibsonomy;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.bibsonomy.model.logic.LogicInterface;

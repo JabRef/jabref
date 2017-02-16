@@ -9,16 +9,13 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
-import org.jabref.gui.bibsonomy.SearchType;
 import org.jabref.gui.bibsonomy.SearchType;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.util.bibsonomy.BibSonomyCallBack;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.bibsonomy.JabRefModelConverter;
 import org.jabref.logic.util.bibsonomy.JabRefModelConverter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

@@ -3,9 +3,7 @@ package org.jabref.gui.worker.bibsonomy;
 import java.io.File;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;

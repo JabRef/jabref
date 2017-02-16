@@ -8,19 +8,14 @@ import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
-import org.jabref.gui.worker.bibsonomy.RefreshTagListWorker;
-import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
-
-import org.bibsonomy.common.enums.GroupingEntity;
-
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.worker.bibsonomy.RefreshTagListWorker;
 import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 import org.jabref.logic.l10n.Localization;
+
+import org.bibsonomy.common.enums.GroupingEntity;
 
 /**
  * Runs the {@link RefreshTagListWorker} to refresh the tag cloud

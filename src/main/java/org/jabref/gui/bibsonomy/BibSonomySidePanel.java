@@ -19,14 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.RefreshTagListAction;
-import org.jabref.gui.actions.bibsonomy.SearchAction;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
-import org.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
-import org.jabref.gui.bibsonomy.listener.BibSonomyHyperLinkListener;
-import org.jabref.gui.bibsonomy.listener.VisibilityItemListener;
 import org.jabref.gui.actions.bibsonomy.SearchAction;
 import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;

@@ -57,15 +57,9 @@ import javax.swing.WindowConstants;
 
 import javafx.application.Platform;
 
-import org.jabref.bibsonomy.BibSonomySidePaneComponent;
-
-import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
@@ -138,6 +132,12 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
+
+import com.google.common.eventbus.Subscribe;
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 /**

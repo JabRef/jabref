@@ -5,9 +5,6 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
-import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
-
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
