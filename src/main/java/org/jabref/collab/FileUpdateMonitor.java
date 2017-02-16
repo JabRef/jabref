@@ -1,4 +1,4 @@
-package net.sf.jabref.collab;
+package org.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
@@ -181,7 +181,7 @@ public class FileUpdateMonitor implements Runnable {
         public boolean copy() {
 
           return FileUtil.copyFile(file, tmpFile, true);
-          
+
         }
 
         /**

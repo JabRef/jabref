@@ -1,4 +1,4 @@
-package net.sf.jabref.pdfimport;
+package org.jabref.pdfimport;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package net.sf.jabref.collab;
+package org.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;

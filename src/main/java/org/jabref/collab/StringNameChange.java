@@ -1,4 +1,4 @@
-package net.sf.jabref.collab;
+package org.jabref.collab;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;

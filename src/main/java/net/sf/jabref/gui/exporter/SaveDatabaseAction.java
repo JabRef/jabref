@@ -13,8 +13,8 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import net.sf.jabref.collab.ChangeScanner;
-import net.sf.jabref.collab.FileUpdatePanel;
+import org.jabref.collab.ChangeScanner;
+import org.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;

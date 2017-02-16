@@ -41,9 +41,9 @@ import javax.swing.undo.CannotUndoException;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import net.sf.jabref.collab.ChangeScanner;
-import net.sf.jabref.collab.FileUpdateListener;
-import net.sf.jabref.collab.FileUpdatePanel;
+import org.jabref.collab.ChangeScanner;
+import org.jabref.collab.FileUpdateListener;
+import org.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;

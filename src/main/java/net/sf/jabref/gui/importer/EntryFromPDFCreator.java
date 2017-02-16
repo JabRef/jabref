@@ -16,8 +16,8 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.pdfimport.PdfImporter;
-import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
+import org.jabref.pdfimport.PdfImporter;
+import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;

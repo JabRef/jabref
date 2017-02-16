@@ -1,4 +1,4 @@
-package net.sf.jabref.pdfimport;
+package org.jabref.pdfimport;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

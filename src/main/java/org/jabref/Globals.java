@@ -1,6 +1,6 @@
 package org.jabref;
 
-import net.sf.jabref.collab.FileUpdateMonitor;
+import org.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
