@@ -28,16 +28,16 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.cli.XMPUtilMain;
+import org.jabref.cli.XMPUtilMain;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.io.CharStreams;

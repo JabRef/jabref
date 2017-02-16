@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.After;
 import org.junit.Before;

@@ -21,8 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefException;
+import org.jabref.Globals;
+import org.jabref.JabRefException;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;

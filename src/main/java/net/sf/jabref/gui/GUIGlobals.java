@@ -7,14 +7,14 @@ import java.util.Map;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

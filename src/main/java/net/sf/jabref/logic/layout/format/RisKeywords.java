@@ -2,8 +2,8 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.Keyword;
-import net.sf.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
 
 public class RisKeywords implements LayoutFormatter {
 

@@ -3,16 +3,16 @@ package net.sf.jabref.gui.specialfields;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.specialfields.SpecialField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

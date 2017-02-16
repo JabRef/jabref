@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
@@ -27,7 +27,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 class PreambleEditor extends JDialog {

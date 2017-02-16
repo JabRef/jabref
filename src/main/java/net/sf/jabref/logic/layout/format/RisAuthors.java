@@ -2,7 +2,7 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.AuthorList;
 
 public class RisAuthors implements ParamLayoutFormatter {
 

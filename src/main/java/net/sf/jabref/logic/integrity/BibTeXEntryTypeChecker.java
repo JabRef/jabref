@@ -5,8 +5,8 @@ import java.util.List;
 
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * BibTeX mode only checker

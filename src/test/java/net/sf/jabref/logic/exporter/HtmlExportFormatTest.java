@@ -9,8 +9,8 @@ import java.util.Map;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Charsets;

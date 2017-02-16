@@ -2,7 +2,7 @@ package net.sf.jabref.gui.autosaveandbackup;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.exporter.SaveDatabaseAction;
-import net.sf.jabref.model.database.event.AutosaveEvent;
+import org.jabref.model.database.event.AutosaveEvent;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;

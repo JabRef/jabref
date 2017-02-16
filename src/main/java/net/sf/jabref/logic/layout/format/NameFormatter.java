@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.AuthorList;
 
 /**
  * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:

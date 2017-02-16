@@ -15,7 +15,7 @@ import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class DuplicateResolverDialog extends JDialog {

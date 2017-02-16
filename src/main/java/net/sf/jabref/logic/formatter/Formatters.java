@@ -27,7 +27,7 @@ import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 public class Formatters {
 

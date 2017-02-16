@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupTreeNode;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
 

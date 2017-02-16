@@ -2,7 +2,7 @@ package net.sf.jabref.logic.autocompleter;
 
 import java.util.List;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string.

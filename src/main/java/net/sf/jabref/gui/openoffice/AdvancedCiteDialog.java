@@ -13,7 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;

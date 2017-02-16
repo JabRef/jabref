@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.ISSN;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.cleanup.CleanupJob;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.FieldChange;
+import org.jabref.model.cleanup.CleanupJob;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 
 public class ISSNCleanup implements CleanupJob {

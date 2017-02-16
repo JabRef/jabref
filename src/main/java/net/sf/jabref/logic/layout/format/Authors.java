@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
 /**
  * Versatile author name formatter that takes arguments to control the formatting style.

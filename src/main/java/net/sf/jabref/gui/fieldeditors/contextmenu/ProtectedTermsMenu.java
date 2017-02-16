@@ -4,8 +4,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;

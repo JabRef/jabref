@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;

@@ -25,16 +25,16 @@ import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

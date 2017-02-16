@@ -2,7 +2,7 @@ package net.sf.jabref.gui.openoffice;
 
 import javax.swing.Icon;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.keyboard.KeyBinding;

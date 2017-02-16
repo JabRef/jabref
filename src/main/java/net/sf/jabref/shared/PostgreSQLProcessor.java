@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.listener.PostgresSQLNotificationListener;
 
 import com.impossibl.postgres.api.jdbc.PGConnection;

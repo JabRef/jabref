@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseContext;
 
 public class TitleChecker implements ValueChecker {
 

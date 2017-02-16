@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.cleanup.CleanupPresetPanel;
@@ -16,8 +16,8 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupAction extends AbstractWorker {

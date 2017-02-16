@@ -1,6 +1,6 @@
 package net.sf.jabref.shared.exception;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * This exception is thrown if a BibEntry is going to be updated while it does not exist on the shared side.

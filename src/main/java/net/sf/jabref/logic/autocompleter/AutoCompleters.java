@@ -3,8 +3,8 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 class AutoCompleters {
 

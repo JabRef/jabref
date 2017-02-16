@@ -9,9 +9,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.event.AutosaveEvent;
-import net.sf.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.AutosaveEvent;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

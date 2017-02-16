@@ -11,7 +11,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.importer.EntryBasedFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

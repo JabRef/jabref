@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.OptionalUtil;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 public class FieldChecker implements IntegrityCheck.Checker {
     protected final String field;

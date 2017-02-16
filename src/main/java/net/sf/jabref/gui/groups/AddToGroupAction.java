@@ -9,11 +9,11 @@ import javax.swing.AbstractAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.GroupEntryChanger;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupEntryChanger;
+import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * TODO: rework code and try to reuse some from {@link GroupTreeNode#setGroup(AbstractGroup, boolean, boolean, List)}.

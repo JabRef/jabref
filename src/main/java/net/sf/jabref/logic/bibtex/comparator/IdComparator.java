@@ -2,7 +2,7 @@ package net.sf.jabref.logic.bibtex.comparator;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Comparator for sorting BibEntry objects based on their ID. This

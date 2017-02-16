@@ -12,11 +12,11 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.importer.ParseException;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.metadata.ContentSelectors;
-import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.metadata.SaveOrderConfig;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.metadata.ContentSelectors;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

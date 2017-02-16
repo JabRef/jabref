@@ -33,10 +33,10 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfAnnotationImporterImpl;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.model.pdf.FileAnnotation;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.pdf.FileAnnotation;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
@@ -91,7 +91,7 @@ public class FileAnnotationTab extends JPanel {
     public static FileAnnotationTab initializeTab(FileAnnotationTab tab, Optional<Map<String, List<FileAnnotation>>> notes){
 
         if(!tab.isInitialized) {
-            
+
             try {
                 tab.addComments(notes);
             } catch (IOException e) {

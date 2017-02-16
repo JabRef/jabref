@@ -3,9 +3,9 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.InternalBibtexFields;
 
 /**
  * Returns an autocompleter to a given fieldname.

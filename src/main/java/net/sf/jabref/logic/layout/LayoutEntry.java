@@ -74,17 +74,17 @@ import net.sf.jabref.logic.layout.format.WrapContent;
 import net.sf.jabref.logic.layout.format.WrapFileLinks;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class LayoutEntry {
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
-    
+
     private List<LayoutFormatter> option;
 
     // Formatter to be run after other formatters:

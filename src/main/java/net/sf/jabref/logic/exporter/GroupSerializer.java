@@ -6,14 +6,14 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.logic.util.MetadataSerializationConfiguration;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.KeywordGroup;
-import net.sf.jabref.model.groups.RegexKeywordGroup;
-import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
     private static String serializeAllEntriesGroup(AllEntriesGroup group) {

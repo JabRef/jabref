@@ -8,11 +8,11 @@ import java.util.TreeMap;
 
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.model.metadata.ContentSelector;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.MetaData;
 
 import org.junit.Before;
 import org.junit.Test;

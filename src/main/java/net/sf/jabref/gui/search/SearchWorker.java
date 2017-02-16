@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

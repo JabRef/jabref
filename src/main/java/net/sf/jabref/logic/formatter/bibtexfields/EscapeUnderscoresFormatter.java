@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 public class EscapeUnderscoresFormatter implements Formatter {
 

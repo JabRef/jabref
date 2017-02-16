@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.model.FieldChange;
+import org.jabref.model.FieldChange;
 
 public abstract class SaveSession {
 

@@ -22,7 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.JabRefExecutorService;
+import org.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.externalfiles.DroppedFileHandler;

@@ -26,8 +26,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
+import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -38,10 +38,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;

@@ -11,14 +11,14 @@ import java.util.UUID;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
-import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.Defaults;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Rule;
@@ -339,7 +339,7 @@ public class IntegrityCheckTest {
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
-        
+
         assertEquals(clonedEntry, entry);
     }
 

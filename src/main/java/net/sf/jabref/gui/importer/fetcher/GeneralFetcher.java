@@ -19,8 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
+import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;

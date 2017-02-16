@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.autocompleter;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string based on the key fields of the added items.

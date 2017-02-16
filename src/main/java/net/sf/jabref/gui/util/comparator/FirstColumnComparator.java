@@ -3,8 +3,8 @@ package net.sf.jabref.gui.util.comparator;
 import java.util.Comparator;
 
 import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 public class FirstColumnComparator implements Comparator<BibEntry> {
 

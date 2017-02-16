@@ -65,20 +65,20 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibtexEntryType;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibtexEntryType;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

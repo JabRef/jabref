@@ -6,11 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public final class ExternalFileTypes {

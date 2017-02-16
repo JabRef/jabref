@@ -2,8 +2,8 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.strings.LatexToUnicodeAdapter;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,

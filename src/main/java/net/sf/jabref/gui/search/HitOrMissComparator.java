@@ -3,7 +3,7 @@ package net.sf.jabref.gui.search;
 import java.util.Comparator;
 import java.util.Objects;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.matchers.Matcher;
 

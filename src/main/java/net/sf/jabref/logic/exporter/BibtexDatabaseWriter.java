@@ -9,13 +9,13 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.strings.StringUtil;
 
 public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWriter<E> {
 

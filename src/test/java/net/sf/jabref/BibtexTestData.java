@@ -6,8 +6,8 @@ import java.io.StringReader;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 public class BibtexTestData {
 

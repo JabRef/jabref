@@ -3,9 +3,9 @@ package net.sf.jabref.gui.customentrytypes;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.CustomEntryType;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {

@@ -3,10 +3,10 @@ package net.sf.jabref.logic.bibtex.comparator;
 import java.util.Comparator;
 import java.util.Objects;
 
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.InternalBibtexFields;
 
 /**
  * This implementation of Comparator takes care of most of the details of sorting BibTeX entries in JabRef. It is

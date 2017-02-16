@@ -12,7 +12,7 @@ import java.awt.event.ComponentEvent;
 
 import javax.swing.JFrame;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 
 /**
  * Restores and saves the position of non-modal windows inside the JabRef preferences.

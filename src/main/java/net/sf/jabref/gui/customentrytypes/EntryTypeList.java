@@ -10,13 +10,13 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.entry.EntryType;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.CustomEntryType;
+import org.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**

@@ -18,18 +18,18 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupEntryChanger;
-import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.KeywordGroup;
-import net.sf.jabref.model.groups.SearchGroup;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupEntryChanger;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.SearchGroup;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

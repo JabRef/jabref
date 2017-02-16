@@ -6,13 +6,13 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.rules.describer.SearchDescribers;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.search.SearchMatcher;
-import net.sf.jabref.model.search.rules.ContainBasedSearchRule;
-import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.model.search.rules.SearchRule;
-import net.sf.jabref.model.search.rules.SearchRules;
-import net.sf.jabref.model.search.rules.SentenceAnalyzer;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.SearchMatcher;
+import org.jabref.model.search.rules.ContainBasedSearchRule;
+import org.jabref.model.search.rules.GrammarBasedSearchRule;
+import org.jabref.model.search.rules.SearchRule;
+import org.jabref.model.search.rules.SearchRules;
+import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
 

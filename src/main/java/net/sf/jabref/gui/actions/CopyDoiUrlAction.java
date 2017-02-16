@@ -6,7 +6,7 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;

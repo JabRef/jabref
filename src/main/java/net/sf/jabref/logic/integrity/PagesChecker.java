@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseContext;
 
 public class PagesChecker implements ValueChecker {
 

@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.groups.AllEntriesGroup;
 
 import org.junit.Before;
 import org.junit.Test;

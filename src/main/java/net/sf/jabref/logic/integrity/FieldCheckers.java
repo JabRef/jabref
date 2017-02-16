@@ -3,10 +3,10 @@ package net.sf.jabref.logic.integrity;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

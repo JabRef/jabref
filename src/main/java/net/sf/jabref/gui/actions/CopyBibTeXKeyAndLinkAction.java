@@ -3,13 +3,13 @@ package net.sf.jabref.gui.actions;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 /**
  * This class will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard.

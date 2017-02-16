@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**

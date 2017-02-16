@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.jabref.JabRefException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

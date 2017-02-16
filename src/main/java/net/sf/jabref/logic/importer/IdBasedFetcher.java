@@ -2,7 +2,7 @@ package net.sf.jabref.logic.importer;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Searches web resources for bibliographic information based on an identifier.

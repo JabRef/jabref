@@ -36,8 +36,8 @@ import net.sf.jabref.logic.importer.fileformat.bibtexml.Phdthesis;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Proceedings;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Techreport;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Unpublished;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -5,7 +5,7 @@ import java.util.Optional;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FieldName;
 
 public class WebFetchers {
 

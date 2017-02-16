@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.InternalBibtexFields;
 
 public class HTMLCharacterChecker implements Checker {
     // Detect any HTML encoded character,

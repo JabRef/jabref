@@ -35,10 +35,10 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.metadata.ContentSelector;
-import net.sf.jabref.model.metadata.ContentSelectors;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.ContentSelectors;
+import org.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;

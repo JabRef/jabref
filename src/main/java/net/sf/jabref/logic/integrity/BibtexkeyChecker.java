@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Currently only checks the key if there is an author, year, and title present.

@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.importer.util;
 
 import net.sf.jabref.logic.importer.ParseException;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
 
 import org.junit.Test;
 

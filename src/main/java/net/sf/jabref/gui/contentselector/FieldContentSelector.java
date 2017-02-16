@@ -17,9 +17,9 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.Keyword;
-import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;

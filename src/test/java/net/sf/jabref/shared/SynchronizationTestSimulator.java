@@ -3,12 +3,12 @@ package net.sf.jabref.shared;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.Defaults;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.testutils.category.DatabaseTests;

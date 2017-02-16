@@ -9,7 +9,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.FileChooser;
 
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.util.FileDialogConfiguration;
 import net.sf.jabref.logic.l10n.Localization;
 

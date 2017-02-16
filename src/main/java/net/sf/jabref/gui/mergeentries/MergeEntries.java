@@ -27,7 +27,7 @@ import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.util.component.DiffHighlightingTextPane;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
@@ -35,9 +35,9 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.DiffHighlighting;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.layout.CellConstraints;

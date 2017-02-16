@@ -10,9 +10,9 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

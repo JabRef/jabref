@@ -6,8 +6,8 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.JabRefExecutorService;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverType;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -15,8 +15,8 @@ import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.DuplicateCheck;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.DuplicateCheck;
+import org.jabref.model.entry.BibEntry;
 
 import spin.Spin;
 

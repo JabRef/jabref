@@ -2,7 +2,7 @@ package net.sf.jabref.gui;
 
 import java.util.function.Function;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.gui.util.DefaultTaskExecutor;
 import net.sf.jabref.gui.util.TaskExecutor;

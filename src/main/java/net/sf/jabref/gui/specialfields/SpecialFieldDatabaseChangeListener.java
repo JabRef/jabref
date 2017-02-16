@@ -2,14 +2,14 @@ package net.sf.jabref.gui.specialfields;
 
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.database.event.EntryAddedEvent;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.FieldChange;
+import org.jabref.model.database.event.EntryAddedEvent;
+import org.jabref.model.entry.BibEntry;
 
 import com.google.common.eventbus.Subscribe;
 

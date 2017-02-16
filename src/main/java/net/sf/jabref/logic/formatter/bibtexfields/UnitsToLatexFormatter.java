@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 public class UnitsToLatexFormatter implements Formatter {
 

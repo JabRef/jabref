@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.pdf.FileAnnotation;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.pdf.FileAnnotation;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.strings.StringUtil;
 
 import org.junit.Assert;
 import org.junit.Test;

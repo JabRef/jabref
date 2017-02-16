@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..

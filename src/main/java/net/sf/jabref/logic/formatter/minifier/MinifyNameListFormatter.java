@@ -3,7 +3,7 @@ package net.sf.jabref.logic.formatter.minifier;
 import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 /**
  * Replaces three or more authors with and others

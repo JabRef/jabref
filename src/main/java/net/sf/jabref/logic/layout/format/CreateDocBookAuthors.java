@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.FieldName;
 
 /**
  * Create DocBook authors formatter.

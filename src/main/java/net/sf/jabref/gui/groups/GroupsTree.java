@@ -32,11 +32,11 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.GroupEntryChanger;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupEntryChanger;
+import org.jabref.model.groups.GroupTreeNode;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {

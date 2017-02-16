@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.JFrame;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.TestUtils;
 import net.sf.jabref.testutils.category.GUITests;
 

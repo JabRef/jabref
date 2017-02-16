@@ -21,7 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
@@ -32,9 +32,9 @@ import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.database.DatabaseLocation;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.metadata.SaveOrderConfig;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;

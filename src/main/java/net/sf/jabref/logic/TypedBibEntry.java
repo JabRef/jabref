@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results

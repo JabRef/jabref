@@ -3,8 +3,8 @@ package net.sf.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;

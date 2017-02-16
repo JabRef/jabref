@@ -3,7 +3,7 @@ package net.sf.jabref.logic.remote.server;
 import java.io.IOException;
 import java.net.BindException;
 
-import net.sf.jabref.JabRefExecutorService;
+import org.jabref.JabRefExecutorService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

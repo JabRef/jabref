@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import net.sf.jabref.JabRefMain;
+import org.jabref.JabRefMain;
 import net.sf.jabref.gui.shared.ConnectToSharedDatabaseDialog;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.security.Password;

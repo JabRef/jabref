@@ -25,7 +25,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
@@ -42,12 +42,12 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexSingleField;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexSingleField;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.specialfields.SpecialField;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.EventList;

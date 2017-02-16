@@ -10,7 +10,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Before;

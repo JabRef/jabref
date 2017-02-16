@@ -9,13 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.logic.xmp.XMPUtil;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 import net.sf.jabref.preferences.JabRefPreferences;

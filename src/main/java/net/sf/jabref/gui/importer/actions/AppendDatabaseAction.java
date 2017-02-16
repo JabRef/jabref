@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefExecutorService;
+import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
@@ -22,15 +22,15 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.KeyCollisionException;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupHierarchyType;
-import net.sf.jabref.model.metadata.ContentSelector;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.KeyCollisionException;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexString;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

@@ -9,8 +9,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:

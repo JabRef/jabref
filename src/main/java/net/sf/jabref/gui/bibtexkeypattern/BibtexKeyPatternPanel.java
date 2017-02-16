@@ -16,18 +16,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.EntryType;
+import org.jabref.model.EntryTypes;
+import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class BibtexKeyPatternPanel extends JPanel {

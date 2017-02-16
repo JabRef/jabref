@@ -4,8 +4,8 @@ import java.util.Stack;
 
 import net.sf.jabref.logic.bst.VM.BstEntry;
 import net.sf.jabref.logic.bst.VM.BstFunction;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
 /**
  * From Bibtex:

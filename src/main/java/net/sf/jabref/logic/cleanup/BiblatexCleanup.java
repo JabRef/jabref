@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.cleanup.CleanupJob;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryConverter;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.FieldChange;
+import org.jabref.model.cleanup.CleanupJob;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryConverter;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Converts the entry to biblatex format.

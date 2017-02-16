@@ -10,10 +10,10 @@ import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.MetaData;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 

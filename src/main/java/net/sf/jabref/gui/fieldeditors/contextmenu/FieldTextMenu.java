@@ -17,8 +17,8 @@ import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;

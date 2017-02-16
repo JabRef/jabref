@@ -22,10 +22,10 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;

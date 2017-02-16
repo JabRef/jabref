@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.event.EntryRemovedEvent;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 

@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.pdf.FileAnnotation;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.pdf.FileAnnotation;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.cos.COSArray;

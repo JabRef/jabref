@@ -6,15 +6,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 /**
  * The interface EntryFromFileCreator does twice: <br>

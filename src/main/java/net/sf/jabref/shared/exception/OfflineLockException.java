@@ -1,6 +1,6 @@
 package net.sf.jabref.shared.exception;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * This exception is thrown if a BibEntry with smaller version number is going to be used for an update on the shared side.

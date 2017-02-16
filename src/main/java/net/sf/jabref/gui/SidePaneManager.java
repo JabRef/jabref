@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.preferences.JabRefPreferences;
 

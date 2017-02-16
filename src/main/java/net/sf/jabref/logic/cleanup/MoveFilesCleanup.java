@@ -9,12 +9,12 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.cleanup.CleanupJob;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.FieldChange;
+import org.jabref.model.cleanup.CleanupJob;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class MoveFilesCleanup implements CleanupJob {
 

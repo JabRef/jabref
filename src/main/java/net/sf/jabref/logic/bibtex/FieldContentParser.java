@@ -6,8 +6,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted

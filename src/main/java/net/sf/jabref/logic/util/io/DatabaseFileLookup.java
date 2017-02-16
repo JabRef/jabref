@@ -8,13 +8,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 /**
  * Search class for files. <br>

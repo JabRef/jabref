@@ -7,10 +7,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.entry.MonthUtil.Month;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.MonthUtil.Month;
 
 public class BibTeXConverter {
 

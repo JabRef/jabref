@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.metadata.MetaData;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.metadata.MetaData;
 
 public class ContentAutoCompleters extends AutoCompleters {
 

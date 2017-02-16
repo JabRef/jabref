@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibtexString;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibtexString;
 
 public class AuxParserResult {
 

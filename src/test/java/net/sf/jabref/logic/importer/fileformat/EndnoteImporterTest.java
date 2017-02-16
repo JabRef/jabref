@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;

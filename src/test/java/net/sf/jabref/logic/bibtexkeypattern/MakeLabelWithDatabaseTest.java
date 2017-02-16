@@ -2,10 +2,10 @@ package net.sf.jabref.logic.bibtexkeypattern;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;

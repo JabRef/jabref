@@ -8,10 +8,10 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.KeywordGroup;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.KeywordGroup;
 
 public class WarnAssignmentSideEffects {
 

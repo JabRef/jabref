@@ -1,7 +1,7 @@
 package net.sf.jabref.testutils;
 
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefMain;
+import org.jabref.JabRefGUI;
+import org.jabref.JabRefMain;
 
 /**
  * UtilsClass for UnitTests.

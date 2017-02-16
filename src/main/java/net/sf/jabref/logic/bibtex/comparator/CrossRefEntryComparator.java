@@ -2,8 +2,8 @@ package net.sf.jabref.logic.bibtex.comparator;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 /**
  * Compares Bibtex entries based on their 'crossref' fields. Entries including

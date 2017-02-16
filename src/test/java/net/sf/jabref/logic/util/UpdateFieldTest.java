@@ -2,8 +2,8 @@ package net.sf.jabref.logic.util;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
 import org.junit.Test;

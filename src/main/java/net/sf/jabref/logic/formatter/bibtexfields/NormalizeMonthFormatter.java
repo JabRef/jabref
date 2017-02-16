@@ -3,8 +3,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.entry.MonthUtil;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.entry.MonthUtil;
 
 public class NormalizeMonthFormatter implements Formatter {
 

@@ -4,8 +4,8 @@ import java.util.List;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.support.DevEnvironment;
 import net.sf.jabref.testutils.category.FetcherTests;
 
@@ -64,7 +64,7 @@ public class MathSciNetTest {
     public void searchByQueryFindsEntry() throws Exception {
         // CI has no subscription to zbMath and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
-        
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(ratiuEntry, fetchedEntries.get(0));

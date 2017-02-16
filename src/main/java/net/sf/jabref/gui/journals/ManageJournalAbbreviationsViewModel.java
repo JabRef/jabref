@@ -30,7 +30,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static net.sf.jabref.Globals.journalAbbreviationLoader;
+import static org.jabref.Globals.journalAbbreviationLoader;
 
 /**
  * This class provides a model for managing journal abbreviation lists.

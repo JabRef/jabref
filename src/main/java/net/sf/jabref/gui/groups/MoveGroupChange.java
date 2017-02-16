@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.groups;
 
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupTreeNode;
 
 public class MoveGroupChange {
 

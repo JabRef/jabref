@@ -31,7 +31,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.l10n.Localization;

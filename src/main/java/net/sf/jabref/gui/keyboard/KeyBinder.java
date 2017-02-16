@@ -6,7 +6,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JRootPane;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 
 public class KeyBinder {
 

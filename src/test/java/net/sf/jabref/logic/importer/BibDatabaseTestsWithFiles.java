@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;

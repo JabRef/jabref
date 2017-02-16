@@ -12,11 +12,11 @@ import javafx.collections.ObservableList;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.BindingsHelper;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.event.EntryEvent;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.event.EntryEvent;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
 import org.fxmisc.easybind.EasyBind;

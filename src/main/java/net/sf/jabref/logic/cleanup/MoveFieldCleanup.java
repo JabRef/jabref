@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.OptionalUtil;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.cleanup.CleanupJob;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.FieldChange;
+import org.jabref.model.cleanup.CleanupJob;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Moves the content of one field to another field.

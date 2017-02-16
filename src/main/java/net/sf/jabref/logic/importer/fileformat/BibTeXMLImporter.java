@@ -26,8 +26,8 @@ import net.sf.jabref.logic.importer.fileformat.bibtexml.File;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Inbook;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

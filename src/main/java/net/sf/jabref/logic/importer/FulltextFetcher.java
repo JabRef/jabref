@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * This interface is used for classes that try to resolve a full-text PDF url for a BibTex entry.

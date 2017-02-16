@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.bst;
 
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.AuthorList;
 
 import org.junit.Assert;
 import org.junit.Test;

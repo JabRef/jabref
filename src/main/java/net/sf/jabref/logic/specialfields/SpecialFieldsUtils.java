@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.Keyword;
-import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.specialfields.SpecialField;
 
 /**
  * @deprecated the class should be refactored and partly integrated into BibEntry

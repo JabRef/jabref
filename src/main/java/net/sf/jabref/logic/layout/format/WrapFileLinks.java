@@ -10,8 +10,8 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

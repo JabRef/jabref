@@ -3,11 +3,11 @@ package net.sf.jabref.gui.importer;
 import java.io.File;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
+import org.jabref.Globals;
+import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.importer.ImportDataTest;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.testutils.category.GUITests;
 

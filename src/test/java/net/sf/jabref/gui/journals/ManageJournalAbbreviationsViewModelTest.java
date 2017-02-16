@@ -14,7 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import net.sf.jabref.CatchExceptionsFromThread;
-import net.sf.jabref.JabRefException;
+import org.jabref.JabRefException;
 import net.sf.jabref.gui.DialogService;
 import net.sf.jabref.gui.util.CurrentThreadTaskExecutor;
 import net.sf.jabref.gui.util.TaskExecutor;

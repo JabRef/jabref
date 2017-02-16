@@ -2,8 +2,8 @@ package net.sf.jabref.logic.citationstyle;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.TestEntry;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.Test;
 

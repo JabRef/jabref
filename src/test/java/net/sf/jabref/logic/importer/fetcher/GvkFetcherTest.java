@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;

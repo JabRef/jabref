@@ -48,8 +48,8 @@ import net.sf.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;

@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.Before;
 import org.junit.Test;

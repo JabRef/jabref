@@ -1,6 +1,6 @@
 package net.sf.jabref.shared.event;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * A new {@link SharedEntryNotPresentEvent} is fired, when the user tries to push changes of an obsolete

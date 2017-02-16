@@ -8,7 +8,7 @@ import java.time.format.DateTimeParseException;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.preferences.JabRefPreferences;

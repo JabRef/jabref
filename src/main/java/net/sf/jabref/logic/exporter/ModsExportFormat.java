@@ -43,9 +43,9 @@ import net.sf.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.TypeOfResourceDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 
 /**

@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.metadata.ContentSelector;
-import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.metadata.ContentSelector;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.model.strings.StringUtil;
 
 public class MetaDataSerializer {
 
@@ -61,7 +61,7 @@ public class MetaDataSerializer {
             StringBuilder stringBuilder = new StringBuilder();
             for (String dataItem : metaItem.getValue()) {
                 stringBuilder.append(StringUtil.quote(dataItem, MetaData.SEPARATOR_STRING, MetaData.ESCAPE_CHARACTER)).append(MetaData.SEPARATOR_STRING);
-                
+
                 //in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(MetaData.SAVE_ACTIONS)
                         && (FieldFormatterCleanups.ENABLED.equals(dataItem)

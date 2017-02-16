@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * @author jzieren

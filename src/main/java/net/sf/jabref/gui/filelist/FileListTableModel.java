@@ -14,8 +14,8 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.ParsedFileField;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.

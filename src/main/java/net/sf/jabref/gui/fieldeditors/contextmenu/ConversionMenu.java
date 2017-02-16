@@ -6,7 +6,7 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 /**
  * @author Oscar Gustafsson

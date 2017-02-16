@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import org.jabref.FallbackExceptionHandler;
 import org.junit.rules.ExternalResource;
 
 /**

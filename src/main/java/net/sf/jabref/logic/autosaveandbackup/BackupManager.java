@@ -20,8 +20,8 @@ import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;

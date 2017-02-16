@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.importer;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Looks for article identifier based on already present bibliographic information.

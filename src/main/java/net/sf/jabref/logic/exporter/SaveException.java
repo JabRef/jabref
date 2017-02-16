@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.exporter;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Exception thrown if saving goes wrong. If caused by a specific

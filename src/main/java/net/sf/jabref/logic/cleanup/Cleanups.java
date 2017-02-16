@@ -14,11 +14,11 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 public class Cleanups {
 

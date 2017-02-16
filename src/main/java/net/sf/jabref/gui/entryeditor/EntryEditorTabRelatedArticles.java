@@ -10,13 +10,13 @@ import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.importer.fetcher.MrDLibFetcher;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

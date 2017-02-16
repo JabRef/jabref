@@ -26,8 +26,8 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -11,6 +11,7 @@ import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.jabref.Globals;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

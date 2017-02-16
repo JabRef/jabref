@@ -7,7 +7,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.FieldChange;
+import org.jabref.model.FieldChange;
 
 public class UndoableChangeEntriesOfGroup {
 

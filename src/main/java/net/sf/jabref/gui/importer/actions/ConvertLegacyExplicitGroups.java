@@ -6,9 +6,9 @@ import java.util.Objects;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupTreeNode;
 
 /**
  * Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,

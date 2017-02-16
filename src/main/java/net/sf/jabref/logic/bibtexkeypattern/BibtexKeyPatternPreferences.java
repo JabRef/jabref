@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.bibtexkeypattern;
 
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 
 public class BibtexKeyPatternPreferences {
 

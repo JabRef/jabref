@@ -3,7 +3,7 @@ package net.sf.jabref.preferences;
 import java.util.List;
 import java.util.TreeSet;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 

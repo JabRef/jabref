@@ -7,9 +7,9 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.KeyCollisionException;
-import net.sf.jabref.model.entry.BibtexString;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.KeyCollisionException;
+import org.jabref.model.entry.BibtexString;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

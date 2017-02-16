@@ -7,8 +7,8 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

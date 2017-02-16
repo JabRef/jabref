@@ -11,8 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
 import org.apache.commons.logging.Log;

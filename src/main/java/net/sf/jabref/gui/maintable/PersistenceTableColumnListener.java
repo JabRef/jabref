@@ -8,8 +8,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.Globals;
+import org.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**

@@ -2,7 +2,7 @@ package net.sf.jabref.logic.bibtex.comparator;
 
 import java.util.Comparator;
 
-import net.sf.jabref.model.entry.BibtexString;
+import org.jabref.model.entry.BibtexString;
 
 public class BibtexStringComparator implements Comparator<BibtexString> {
 

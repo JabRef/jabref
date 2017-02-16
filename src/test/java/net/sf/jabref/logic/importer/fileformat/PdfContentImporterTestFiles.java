@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Test;

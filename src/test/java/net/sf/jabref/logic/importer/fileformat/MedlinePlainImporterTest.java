@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.codec.Charsets;
 import org.junit.Assert;

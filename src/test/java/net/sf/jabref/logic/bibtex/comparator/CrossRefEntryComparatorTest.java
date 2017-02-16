@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.bibtex.comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.After;
 import org.junit.Before;

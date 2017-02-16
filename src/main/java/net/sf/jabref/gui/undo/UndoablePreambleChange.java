@@ -2,7 +2,7 @@ package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabase;
 
 /**
  * This class represents a change in any field value. The relevant

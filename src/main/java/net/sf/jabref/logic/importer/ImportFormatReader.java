@@ -29,9 +29,9 @@ import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPPreferences;
-import net.sf.jabref.model.database.BibDatabases;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.database.BibDatabases;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 public class ImportFormatReader {
 

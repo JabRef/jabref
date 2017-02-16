@@ -1,12 +1,12 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 
 /**
  * Will return the Authors to match the OrgSci format:
- * 
+ *
  * <ul>
  * <li>That is the first author is LastFirst, but all others are FirstLast.</li>
  * <li>First names are abbreviated</li>
@@ -19,7 +19,7 @@ import net.sf.jabref.model.entry.AuthorList;
  * <p>
  * Idea from: http://stuermer.ch/blog/bibliography-reference-management-with-jabref.html
  * </p>
- * 
+ *
  */
 public class AuthorOrgSci implements LayoutFormatter {
 

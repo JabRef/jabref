@@ -15,8 +15,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import org.apache.commons.logging.Log;

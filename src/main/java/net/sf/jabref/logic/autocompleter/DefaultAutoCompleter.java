@@ -3,7 +3,7 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Objects;
 import java.util.StringTokenizer;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Delivers possible completions for a given string.

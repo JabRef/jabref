@@ -13,7 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.jabref.BibtexTestData;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;

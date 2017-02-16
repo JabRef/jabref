@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.FieldName;
 
 /**
  * Create DocBook editors formatter.

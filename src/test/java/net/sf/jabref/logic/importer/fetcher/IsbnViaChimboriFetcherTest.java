@@ -3,8 +3,8 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.testutils.category.FetcherTests;
 

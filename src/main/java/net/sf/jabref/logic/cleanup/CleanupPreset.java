@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupPreset {

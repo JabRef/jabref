@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FieldName;
 
 public class FieldNameLabel extends JLabel {
 

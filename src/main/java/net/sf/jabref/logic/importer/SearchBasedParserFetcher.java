@@ -9,8 +9,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.model.cleanup.Formatter;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.entry.BibEntry;
 
 import org.jsoup.helper.StringUtil;
 

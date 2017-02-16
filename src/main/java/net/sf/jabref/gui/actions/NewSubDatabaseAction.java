@@ -4,14 +4,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.auximport.FromAuxDialog;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.Defaults;
+import org.jabref.model.database.BibDatabaseContext;
 
 /**
  * The action concerned with generate a new (sub-)database from latex AUX file.

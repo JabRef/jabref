@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.strings.StringUtil;
+import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter

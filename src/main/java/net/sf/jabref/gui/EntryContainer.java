@@ -1,6 +1,6 @@
 package net.sf.jabref.gui;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * Entry containers work on a single entry, which can be asked for

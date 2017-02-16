@@ -2,8 +2,8 @@ package net.sf.jabref.logic.importer.util;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

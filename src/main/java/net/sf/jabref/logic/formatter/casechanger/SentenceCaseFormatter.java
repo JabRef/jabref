@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.cleanup.Formatter;
+import org.jabref.model.cleanup.Formatter;
 
 public class SentenceCaseFormatter implements Formatter {
 

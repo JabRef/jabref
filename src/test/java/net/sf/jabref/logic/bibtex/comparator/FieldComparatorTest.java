@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.bibtex.comparator;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
 

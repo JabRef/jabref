@@ -12,7 +12,7 @@ import net.sf.jabref.logic.bst.VM.BstEntry;
 import net.sf.jabref.logic.bst.VM.StackFunction;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.antlr.runtime.RecognitionException;

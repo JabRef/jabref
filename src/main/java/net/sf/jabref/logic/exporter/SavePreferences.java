@@ -4,8 +4,8 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import net.sf.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class SavePreferences {

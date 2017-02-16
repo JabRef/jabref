@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;

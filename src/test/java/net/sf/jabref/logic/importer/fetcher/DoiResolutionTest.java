@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
 import net.sf.jabref.testutils.category.FetcherTests;
 

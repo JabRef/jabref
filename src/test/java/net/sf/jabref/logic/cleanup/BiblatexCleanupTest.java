@@ -2,8 +2,8 @@ package net.sf.jabref.logic.cleanup;
 
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.Assert;
 import org.junit.Before;

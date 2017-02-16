@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.model.groups.AllEntriesGroup;
-import net.sf.jabref.model.groups.ExplicitGroup;
-import net.sf.jabref.model.groups.GroupHierarchyType;
-import net.sf.jabref.model.groups.GroupTreeNode;
-import net.sf.jabref.model.groups.GroupTreeNodeTest;
-import net.sf.jabref.model.groups.KeywordGroup;
-import net.sf.jabref.model.groups.RegexKeywordGroup;
-import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.GroupTreeNodeTest;
+import org.jabref.model.groups.KeywordGroup;
+import org.jabref.model.groups.RegexKeywordGroup;
+import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.WordKeywordGroup;
 
 import org.junit.Before;
 import org.junit.Test;

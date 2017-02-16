@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
@@ -20,7 +20,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.INSPIREBibtexFilterReader;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

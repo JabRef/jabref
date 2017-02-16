@@ -3,8 +3,8 @@ package net.sf.jabref.gui.util.comparator;
 import java.util.Comparator;
 import java.util.Optional;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.specialfields.SpecialField;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.specialfields.SpecialField;
 
 /**
  * Comparator that handles the ranking icon column

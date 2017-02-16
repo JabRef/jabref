@@ -1,6 +1,6 @@
 package net.sf.jabref.shared.event;
 
-import net.sf.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseContext;
 
 /**
  * A new {@link ConnectionLostEvent} is fired, when the connection to the shared database gets lost.

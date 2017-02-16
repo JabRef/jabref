@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 
 import org.junit.Assert;
 import org.junit.Before;

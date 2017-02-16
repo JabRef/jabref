@@ -3,10 +3,10 @@ package net.sf.jabref.logic.msbib;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.BiblatexEntryTypes;
-import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 
 import com.google.common.collect.HashBiMap;
 

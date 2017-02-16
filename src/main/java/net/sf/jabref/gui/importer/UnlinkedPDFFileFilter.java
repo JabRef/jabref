@@ -3,11 +3,11 @@ package net.sf.jabref.gui.importer;
 import java.io.File;
 import java.io.FileFilter;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 import net.sf.jabref.logic.util.io.DatabaseFileLookup;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not

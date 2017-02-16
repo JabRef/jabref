@@ -41,9 +41,9 @@ import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.openoffice.OOUtil;
 import net.sf.jabref.logic.openoffice.UndefinedBibtexEntry;
 import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;

@@ -2,8 +2,8 @@ package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntry;
 
 /*
  * Camel casing of entry type string, unknown entry types gets a leading capital

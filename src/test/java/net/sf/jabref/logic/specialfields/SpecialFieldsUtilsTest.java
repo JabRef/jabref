@@ -3,8 +3,8 @@ package net.sf.jabref.logic.specialfields;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
 
