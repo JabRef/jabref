@@ -19,7 +19,7 @@ public class JabRefLogger {
     private static void setLogLevelToDebugForJabRefClasses() {
         LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
         Configuration config = ctx.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig("net.sf.jabref");
+        LoggerConfig loggerConfig = config.getLoggerConfig("org.jabref");
         loggerConfig.setLevel(Level.DEBUG);
         ctx.updateLoggers();
     }
