@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
-import net.sf.jabref.search.SearchBaseVisitor;
-import net.sf.jabref.search.SearchLexer;
-import net.sf.jabref.search.SearchParser;
+import org.jabref.search.SearchBaseVisitor;
+import org.jabref.search.SearchLexer;
+import org.jabref.search.SearchParser;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;

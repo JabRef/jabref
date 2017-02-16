@@ -220,7 +220,7 @@ task generateSearchGrammarSource(type: JavaExec) {
 
     main = 'org.antlr.v4.Tool'
     classpath = configurations.antlr4
-    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
+    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "org.jabref.search", antlrSource]
 }
 
 compileJava {

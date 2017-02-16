@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;
 import org.jabref.model.strings.StringUtil;
-import net.sf.jabref.search.SearchBaseVisitor;
-import net.sf.jabref.search.SearchParser;
+import org.jabref.search.SearchBaseVisitor;
+import org.jabref.search.SearchParser;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
