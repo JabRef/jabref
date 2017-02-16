@@ -30,7 +30,6 @@ import net.sf.jabref.bibsonomy.BibSonomyProperties;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogByCancelAction;
 import net.sf.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogBySaveAction;
-import net.sf.jabref.gui.actions.bibsonomy.OpenDatabasePropertiesAction;
 import net.sf.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -208,10 +207,6 @@ public class BibSonomySettingsDialog extends JDialog {
             userNameLabel.setText(Localization.lang("Username"));
             apiUrlLabel = new JLabel();
             apiUrlLabel.setText(Localization.lang("Application URL"));
-
-            openDatabasePropertiesLabel = new JLabel();
-            openDatabasePropertiesLabel.setText(Localization.lang("Set file directories"));
-
 
             //y = 0
             GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
@@ -425,10 +420,6 @@ public class BibSonomySettingsDialog extends JDialog {
             generalSettingsPanel.add(tagCloudOrderLabel, gridBagConstraints16);
             generalSettingsPanel.add(getTagCloudOrderComboBox(), gridBagConstraints26);
             generalSettingsPanel.add(tagCloudOrderHintLabel, gridBagConstraints27);
-
-            generalSettingsPanel.add(openDatabasePropertiesLabel, gridBagConstraints31);
-            generalSettingsPanel.add(getOpenDatabasePropertiesButton(), gridBagConstraints32);
-
         }
         return generalSettingsPanel;
     }
@@ -641,17 +632,6 @@ public class BibSonomySettingsDialog extends JDialog {
             }
         }
         return tagCloudOrderComboBox;
-    }
-
-    /**
-     * This method initializes openDatabasePropertiesButton
-     */
-    private JButton getOpenDatabasePropertiesButton() {
-        if (openDatabasePropertiesButton == null) {
-            openDatabasePropertiesButton = new JButton(new OpenDatabasePropertiesAction(jabRefFrame));
-            openDatabasePropertiesButton.setText(Localization.lang("Database properties"));
-        }
-        return openDatabasePropertiesButton;
     }
 
 }
