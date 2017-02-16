@@ -140,7 +140,7 @@ class FileAnnotationTab extends JPanel {
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
         if (annotations.isEmpty()) {
-            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotations!"), ""));
+            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotations"), ""));
         } else {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
             annotations.stream()
