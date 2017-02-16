@@ -82,7 +82,7 @@ public class BibTeXMLImporter extends Importer {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.bibtexml");
+            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.bibtexml");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             File file = (File) unmarshaller.unmarshal(reader);
 

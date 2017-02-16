@@ -84,7 +84,7 @@ public class ModsImporter extends Importer {
 
         try {
             if (context == null) {
-                context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.mods");
+                context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.mods");
             }
             Unmarshaller unmarshaller = context.createUnmarshaller();
 

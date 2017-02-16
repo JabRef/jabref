@@ -141,7 +141,7 @@ public class MedlineImporter extends Importer implements Parser {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.medline");
+            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.medline");
             XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
