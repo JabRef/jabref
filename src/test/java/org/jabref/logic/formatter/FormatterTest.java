@@ -103,7 +103,7 @@ public class FormatterTest {
 
     @Parameterized.Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
-        // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
+        // all classes implementing {@link org.jabref.model.cleanup.Formatter}
         // sorted alphabetically
         // Alternative: Use reflection - https://github.com/ronmamo/reflections
         // @formatter:off

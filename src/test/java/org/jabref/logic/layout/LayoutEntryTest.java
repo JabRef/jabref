@@ -14,8 +14,8 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
 /**
- * The test class LayoutEntryTest test the net.sf.jabref.export.layout.LayoutEntry.
- * Indirectly the net.sf.jabref.export.layout.Layout is tested too.
+ * The test class LayoutEntryTest test the org.jabref.export.layout.LayoutEntry.
+ * Indirectly the org.jabref.export.layout.Layout is tested too.
  * <p/>
  * The LayoutEntry creates a human readable String assigned with HTML formatters.
  * To test the Highlighting Feature, an instance of LayoutEntry will be instantiated via Layout and LayoutHelper.

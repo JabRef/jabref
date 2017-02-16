@@ -11,7 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * Collects all entries of a the {@link net.sf.jabref.model.database.BibDatabase BibDatabase} and fetches all documents available for the post.
+ * Collects all entries of a the {@link org.jabref.model.database.BibDatabase BibDatabase} and fetches all documents available for the post.
  */
 public class DownloadDocumentsAction extends AbstractBibSonomyAction {
 
