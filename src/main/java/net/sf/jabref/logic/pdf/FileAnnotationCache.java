@@ -1,33 +1,29 @@
 package net.sf.jabref.logic.pdf;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.pdf.FileAnnotation;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.pdf.FileAnnotation;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class FileAnnotationCache {
 
     //cache size in entries
     private final static int CACHE_SIZE = 10;
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
-    LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
-    BibDatabaseContext bibDatabaseContext;
+    private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
 
-    public FileAnnotationCache(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContext = bibDatabaseContext;
+    public FileAnnotationCache() {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
-
             @Override
-            public Map<String, List<FileAnnotation>> load(BibEntry entry) throws Exception {
+            public Map<String, List<FileAnnotation>> load(BibEntry notUsed) throws Exception {
                 // Automated reloading of entries is not supported.
                 return new HashMap<>();
             }
