@@ -11,6 +11,67 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class DuplicateCheckTest {
+    @Test
+    public void noDuplicateForDifferentTypes() {
+        BibEntry e1 = new BibEntry("1", "article");
+        BibEntry e2 = new BibEntry("2", "journal");
+        assertFalse(DuplicateCheck.isDuplicate(e1, e2, BibDatabaseMode.BIBTEX));
+        assertFalse(DuplicateCheck.isDuplicate(e1, e2, BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void noStrictDuplicateForDifferentTypes() {
+        BibEntry e1 = new BibEntry("1", "article");
+        BibEntry e2 = new BibEntry("2", "journal");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void strictDuplicateForEqualFields() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "value1");
+        e1.setField("key2", "value2");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");
+        e2.setField("key2", "value2");
+        assertEquals(1, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateForDifferentKeys() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key", "value1");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");;
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateForDifferentValues() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateIsCaseInsensitiveForKey() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("KEY1", "value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value");
+        assertEquals(1, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateIsCaseSensitiveForValue() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "Value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
 
     @Test
     public void testDuplicateDetection() {
@@ -37,11 +98,9 @@ public class DuplicateCheckTest {
         one.setField("journal", "A");
         two.setField("journal", "A");
         assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
-        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "B");
         assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
-        assertEquals(0.75, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "A");
         one.setField("number", "1");
@@ -69,14 +128,31 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testWordCorrelation() {
-        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
-        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
-        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
-
-        assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d1, d3)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d2, d3)), 0.01);
+    public void wordCorrelationIsOneForEmptyStrings() {
+        assertEquals(1.0, DuplicateCheck.correlateByWords("", ""), 0.01);
     }
 
+    @Test
+    public void wordCorrelationForSmallerFirstString() {
+        String d1 = "a test";
+        String d2 = "this a test";
+
+        assertEquals(0.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
+
+    @Test
+    public void wordCorrelationForBiggerFirstString() {
+        String d1 = "Characterization of me";
+        String d2 = "Characterization";
+
+        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
+
+    @Test
+    public void wordCorrelationForEqualStrings() {
+        String d1 = "Characterization";
+        String d2 = "Characterization";
+
+        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
 }
