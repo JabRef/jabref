@@ -83,21 +83,21 @@ public class PreferencesDialog extends JDialog {
 
         List<PrefsTab> tabs = new ArrayList<>();
         tabs.add(new GeneralTab(prefs));
-        tabs.add(new NetworkTab(prefs));
         tabs.add(new FileTab(frame, prefs));
-        tabs.add(new FileSortTab(prefs));
-        tabs.add(new EntryEditorPrefsTab(prefs));
-        tabs.add(new GroupsPrefsTab(prefs));
-        tabs.add(new AppearancePrefsTab(prefs));
-        tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new PreviewPrefsTab());
-        tabs.add(new NameFormatterTab(prefs));
+        tabs.add(new ExternalTab(frame, this, prefs));
+        tabs.add(new GroupsPrefsTab(prefs));
+        tabs.add(new EntryEditorPrefsTab(prefs));
+        tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new ImportSettingsTab(prefs));
+        tabs.add(new ExportSortingPrefsTab(prefs));
+        tabs.add(new NameFormatterTab(prefs));
         tabs.add(new XmpPrefsTab(prefs));
+        tabs.add(new NetworkTab(prefs));
         tabs.add(new AdvancedTab(prefs));
+        tabs.add(new AppearancePrefsTab(prefs));
 
         // add all tabs
         tabs.forEach(tab -> main.add((Component) tab, tab.getTabName()));

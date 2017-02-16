@@ -19,7 +19,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * Preference tab for file sorting options.
  */
-class FileSortTab extends JPanel implements PrefsTab {
+class ExportSortingPrefsTab extends JPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
@@ -29,7 +29,7 @@ class FileSortTab extends JPanel implements PrefsTab {
     private final SaveOrderConfigDisplay exportOrderPanel;
 
 
-    public FileSortTab(JabRefPreferences prefs) {
+    public ExportSortingPrefsTab(JabRefPreferences prefs) {
         this.prefs = prefs;
         FormLayout layout = new FormLayout("4dlu, left:pref, 4dlu, fill:pref", "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);

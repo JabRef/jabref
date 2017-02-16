@@ -53,7 +53,7 @@ public class DatabasePropertiesDialog extends JDialog {
     private String oldFileIndvVal = "";
     private SaveOrderConfig oldSaveOrderConfig;
 
-    /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
+    /* The code for "Save sort order" is copied from ExportSortingPrefsTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
 
     private JRadioButton saveInSpecifiedOrder;
