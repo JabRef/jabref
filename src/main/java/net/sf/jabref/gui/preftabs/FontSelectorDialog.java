@@ -1,39 +1,5 @@
 package net.sf.jabref.gui.preftabs;
 
-/*
-  Taken from JpicEdt
-modified slightly by nizar batada for JabRef
-
- EepicViewFactory.java - February 11, 2002 - jPicEdt, a picture editor for LaTeX.
- copyright (C) 1999-2002 Sylvain Reynal
- Portions copyright (C) 2000, 2001 Slava Pestov
- Portions copyright (C) 1999 Jason Ginchereau
-
- D\uFFFDpartement de Physique
- Ecole Nationale Sup\uFFFDrieure de l'Electronique et de ses Applications (ENSEA)
- 6, avenue du Ponceau
- F-95014 CERGY CEDEX
-
- Tel : +33 130 736 245
- Fax : +33 130 736 667
- e-mail : reynal@ensea.fr
- jPicEdt web page : http://trashx.ensea.fr/jpicedt/
-
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License
- as published by the Free Software Foundation; either version 2
- of the License, or any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -64,53 +30,6 @@ import javax.swing.border.TitledBorder;
 
 import net.sf.jabref.logic.l10n.Localization;
 
-/**
- * A font chooser widget.
- * @author Slava Pestov (jEdit), Sylvain Reynal
- * @since jpicedt 1.3.2.beta-9
- * @version $Id$
- * <p>
- * $Log$
- * Revision 1.8  2007/07/19 01:35:35  coezbek
- * JabRef 2.4b1 Plug-In System established. Yeah!
- *
- * Revision 1.7  2006/04/26 08:46:57  kiar
- * fix dialog.show() deprecation messages, change build.xml
- *
- * Revision 1.6  2004/02/27 23:28:41  mortenalver
- * Some code tidying, no effect on behaviour (hopefully)
- *
- * Revision 1.5  2004/02/24 23:30:18  mortenalver
- * Added more translations, and started work on a Replace string feature
- *
- * Revision 1.4  2004/02/17 09:14:02  mortenalver
- * Similar update in Font selection preview.
- *
- * Revision 1.3  2004/02/17 07:35:22  mortenalver
- * Experimenting with antialiasing in table.
- *
- * Revision 1.2  2003/12/14 23:48:02  mortenalver
- * .
- *
- * Revision 1.1  2003/11/07 22:18:07  nbatada
- * modified it slightly from initial version
- *
- * Revision 1.1  2003/11/07 22:14:34  nbatada
- * modified it from initial version
- *
- * Revision 1.4  2003/11/02 01:51:06  reynal
- * Cleaned-up i18n labels
- *
- * Revision 1.3  2003/08/31 22:05:40  reynal
- *
- * Enhanced class interface for some widgets.
- *
-
- */
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 public class FontSelectorDialog extends JDialog {
 
     private static final String PLAIN = "plain";
@@ -122,7 +41,6 @@ public class FontSelectorDialog extends JDialog {
 
     private static final String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
 
-    // private members
     private boolean isOK;
     private final JTextField familyField = new JTextField();
     private final JList<String> familyList;
