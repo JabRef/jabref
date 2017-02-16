@@ -31,8 +31,8 @@ public class JabRefPreferencesTest {
 
         prefs.importPreferences(importFile.getAbsolutePath());
 
-        String expected = "my proxy host";
-        String actual = prefs.get(JabRefPreferences.PROXY_HOSTNAME);
+        String expected = "dummyvalue";
+        String actual = prefs.get("dummykey");
 
         assertEquals(expected, actual);
     }
