@@ -1,28 +1,7 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
-
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.factories.Paddings;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
@@ -30,10 +9,14 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.EntryAnnotationImporter;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.pdf.FileAnnotation;
-
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 class FileAnnotationTab extends JPanel {
 
@@ -93,25 +76,19 @@ class FileAnnotationTab extends JPanel {
             return tab;
         }
 
-            try {
-                tab.addAnnotations();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            tab.setUpGui();
-            tab.isInitialized = true;
-            tab.parent.repaint();
-            return tab;
+        tab.addAnnotations();
+        tab.setUpGui();
+        tab.isInitialized = true;
+        tab.parent.repaint();
+        return tab;
 
     }
 
     /**
      * Adds pdf annotations from all attached pdf files belonging to the entry selected in the main table and
      * shows those from the first file in the file annotations tab
-     * @throws IOException
      */
-    private void addAnnotations() throws IOException {
+    private void addAnnotations() {
         if (parent.getEntry().getField(FieldName.FILE).isPresent()) {
             if (!commentList.getModel().equals(listModel)) {
                 commentList.setModel(listModel);

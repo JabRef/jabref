@@ -1,76 +1,16 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
-
+import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
-
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.GUIGlobals;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
+import net.sf.jabref.gui.*;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.contentselector.FieldContentSelector;
 import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
-import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
-import net.sf.jabref.gui.fieldeditors.FileListEditor;
-import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
+import net.sf.jabref.gui.fieldeditors.*;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
@@ -78,11 +18,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
 import net.sf.jabref.gui.specialfields.SpecialFieldUpdateListener;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableChangeType;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.undo.UndoableKeyChange;
-import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.undo.*;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.logic.TypedBibEntry;
@@ -101,19 +37,28 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryConverter;
-import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.entry.MathSciNetId;
+import net.sf.jabref.model.entry.*;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
-
-import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.JTextComponent;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 
 /**
@@ -496,21 +441,21 @@ public class EntryEditor extends JPanel implements EntryContainer {
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", getStoreFieldAction());
+        actionMap.put("store", storeFieldAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
-        actionMap.put("generateKey", getGenerateKeyAction());
+        actionMap.put("generateKey", generateKeyAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
         actionMap.put("autoLink", autoLinkAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_ENTRY), "prev");
-        actionMap.put("prev", getPrevEntryAction());
+        actionMap.put("prev", prevEntryAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_ENTRY), "next");
-        actionMap.put("next", getNextEntryAction());
+        actionMap.put("next", nextEntryAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "undo");
         actionMap.put("undo", undoAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "redo");
         actionMap.put("redo", redoAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", getHelpAction());
+        actionMap.put("help", helpAction);
 
         toolBar.setFloatable(false);
 
@@ -527,7 +472,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);
-        toolBar.add(getGenerateKeyAction());
+        toolBar.add(generateKeyAction);
         toolBar.add(autoLinkAction);
 
         toolBar.add(writeXmp);
@@ -556,12 +501,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
         toolBar.addSeparator();
 
         toolBar.add(deleteAction);
-        toolBar.add(getPrevEntryAction());
-        toolBar.add(getNextEntryAction());
+        toolBar.add(prevEntryAction);
+        toolBar.add(nextEntryAction);
 
         toolBar.addSeparator();
 
-        toolBar.add(getHelpAction());
+        toolBar.add(helpAction);
 
         Component[] comps = toolBar.getComponents();
 
@@ -597,7 +542,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * @param editor Field editor
      * @return Component to show, or null if none.
      */
-    Optional<JComponent> getExtra(final FieldEditor editor) {
+    private Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
@@ -614,10 +559,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
-                    getStoreFieldAction());
+                    storeFieldAction);
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
-                    getStoreFieldAction());
+                    storeFieldAction);
 
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
@@ -626,7 +571,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.ISBN)) {
             return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
+            return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
@@ -663,7 +608,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         srcPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
-    void addSearchListener(SearchQueryHighlightListener listener) {
+    private void addSearchListener(SearchQueryHighlightListener listener) {
         searchListeners.add(listener);
         panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
     }
@@ -715,18 +660,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
         ActionMap actionMap = textComponent.getActionMap();
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", getStoreFieldAction());
+        actionMap.put("store", storeFieldAction);
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("right", getSwitchRightAction());
+        actionMap.put("right", switchRightAction);
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("left", getSwitchLeftAction());
+        actionMap.put("left", switchLeftAction);
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", getHelpAction());
+        actionMap.put("help", helpAction);
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
@@ -794,7 +739,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (comp instanceof FieldEditor) {
                 ((FieldEditor) comp).clearAutoCompleteSuggestion();
             }
-            getStoreFieldAction().actionPerformed(new ActionEvent(comp, 0, ""));
+            storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
         }
     }
 
@@ -993,7 +938,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void updateField(final Object sourceObject) {
-        getStoreFieldAction().actionPerformed(new ActionEvent(sourceObject, 0, ""));
+        storeFieldAction.actionPerformed(new ActionEvent(sourceObject, 0, ""));
     }
 
     public void setMovingToDifferentEntry() {
@@ -1106,7 +1051,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-    class DeleteAction extends AbstractAction {
+    private class DeleteAction extends AbstractAction {
         DeleteAction() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
@@ -1148,7 +1093,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class CloseAction extends AbstractAction {
+    private class CloseAction extends AbstractAction {
         CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
@@ -1160,7 +1105,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class StoreFieldAction extends AbstractAction {
+    private class StoreFieldAction extends AbstractAction {
 
         StoreFieldAction() {
             super("Store field value");
@@ -1326,7 +1271,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class SwitchLeftAction extends AbstractAction {
+    private class SwitchLeftAction extends AbstractAction {
         SwitchLeftAction() {
             super("Switch to the panel to the left");
         }
@@ -1340,7 +1285,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class SwitchRightAction extends AbstractAction {
+    private class SwitchRightAction extends AbstractAction {
         SwitchRightAction() {
             super("Switch to the panel to the right");
         }
@@ -1354,7 +1299,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class NextEntryAction extends AbstractAction {
+    private class NextEntryAction extends AbstractAction {
         NextEntryAction() {
             super(Localization.lang("Next entry"), IconTheme.JabRefIcon.DOWN.getIcon());
 
@@ -1367,7 +1312,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class PrevEntryAction extends AbstractAction {
+    private class PrevEntryAction extends AbstractAction {
         PrevEntryAction() {
             super(Localization.lang("Previous entry"), IconTheme.JabRefIcon.UP.getIcon());
 
@@ -1380,7 +1325,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class GenerateKeyAction extends AbstractAction {
+    private class GenerateKeyAction extends AbstractAction {
 
         GenerateKeyAction() {
             super(Localization.lang("Generate BibTeX key"), IconTheme.JabRefIcon.MAKE_KEY.getIcon());
@@ -1438,7 +1383,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class UndoAction extends AbstractAction {
+    private class UndoAction extends AbstractAction {
         UndoAction() {
             super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
@@ -1450,7 +1395,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class RedoAction extends AbstractAction {
+    private class RedoAction extends AbstractAction {
         RedoAction() {
             super("Redo", IconTheme.JabRefIcon.REDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Redo");
@@ -1462,7 +1407,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    class SaveDatabaseAction extends AbstractAction {
+    private class SaveDatabaseAction extends AbstractAction {
         SaveDatabaseAction() {
             super("Save library");
         }
@@ -1497,44 +1442,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
 
-    AbstractAction getNextEntryAction() {
-        return nextEntryAction;
-    }
-
-
-    AbstractAction getPrevEntryAction() {
-        return prevEntryAction;
-    }
-
-
-    SwitchLeftAction getSwitchLeftAction() {
-        return switchLeftAction;
-    }
-
-
-    SwitchRightAction getSwitchRightAction() {
-        return switchRightAction;
-    }
-
-
-    SaveDatabaseAction getSaveDatabaseAction() {
-        return saveDatabaseAction;
-    }
-
-
-    HelpAction getHelpAction() {
-        return helpAction;
-    }
-
-
-    public GenerateKeyAction getGenerateKeyAction() {
-        return generateKeyAction;
-    }
-
-
-    StoreFieldAction getStoreFieldAction() {
-        return storeFieldAction;
-    }
 
 
     private class AutoLinkAction extends AbstractAction {
