@@ -57,7 +57,7 @@ import javax.swing.WindowConstants;
 
 import javafx.application.Platform;
 
-import net.sf.jabref.bibsonomy.BibSonomySidePaneComponent;
+import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
