@@ -206,7 +206,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache();
 
         setupMainPanel();
 
@@ -2055,6 +2055,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return selectionListener.getPreview();
     }
 
+    public FileAnnotationCache getAnnotationCache() {
+        return annotationCache;
+    }
+
     private static class SearchAndOpenFile {
         private final BibEntry entry;
         private final BasePanel basePanel;
@@ -2346,10 +2350,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             markChangedOrUnChanged();
         }
-    }
-
-    public FileAnnotationCache getAnnotationCache() {
-        return annotationCache;
     }
 
     private class PrintPreviewAction implements BaseAction {
