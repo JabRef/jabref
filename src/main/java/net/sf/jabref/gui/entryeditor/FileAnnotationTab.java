@@ -288,8 +288,8 @@ class FileAnnotationTab extends JPanel {
     private void updateContentAndHighlightTextfields(final FileAnnotation annotation) {
 
         if (annotation.hasLinkedAnnotation()) {
-            String annotationText = "";
-            String highlightedText = "";
+            String annotationText;
+            String highlightedText;
 
             if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
                 highlightedText = annotation.getContent();
