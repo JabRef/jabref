@@ -60,6 +60,11 @@ Project: Apache Commons Collections
 URL:     https://commons.apache.org/proper/commons-collections/
 License: Apache-2.0
 
+Id:      org.bibsonomy:bibsonomy-rest-client
+Project: Bibsonomy
+URL:     https://bitbucket.org/bibsonomy/bibsonomy/wiki/documentation/api/Java%20API%20Examples
+License: LGPL-3.0+
+
 Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/bkromhout/java-diff-utils

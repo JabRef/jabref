@@ -57,6 +57,7 @@ install4j {
 
 repositories {
     jcenter()
+
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
     }
@@ -73,7 +74,7 @@ configurations {
 }
 
 dependencies {
-    compile 'org.bibsonomy:bibsonomy-rest-client:3.6.3'
+    compile 'org.bibsonomy:bibsonomy-rest-client:3.7.2'
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
