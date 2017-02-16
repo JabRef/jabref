@@ -84,7 +84,7 @@ public class BibSonomySettingsDialog extends JDialog {
 
     private void initialize() {
         this.setSize(677, 580);
-        this.setResizable(false);
+        this.setResizable(true);
         this.setPreferredSize(new Dimension(700, 460));
         this.setModal(true);
         this.setMaximumSize(new Dimension(700, 460));
