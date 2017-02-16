@@ -3,10 +3,10 @@ package org.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.groups.GroupTreeNodeViewModel;
-import org.jabref.gui.gui.groups.UndoableModifySubtree;
-import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.groups.GroupTreeNodeViewModel;
+import org.jabref.gui.groups.UndoableModifySubtree;
+import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.groups.AllEntriesGroup;

@@ -22,12 +22,12 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.FileDialog;
-import org.jabref.gui.gui.SaveOrderConfigDisplay;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.FileDialog;
+import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
-import org.jabref.gui.gui.help.HelpAction;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;

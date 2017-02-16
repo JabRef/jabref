@@ -10,12 +10,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.FileDialog;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.FileDialog;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
-import org.jabref.gui.gui.importer.actions.PostOpenAction;
-import org.jabref.gui.gui.undo.NamedCompound;
-import org.jabref.gui.gui.undo.UndoableFieldChange;
+import org.jabref.gui.importer.actions.PostOpenAction;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;

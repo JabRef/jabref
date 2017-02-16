@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.filelist.FileListTableModel;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

@@ -3,7 +3,7 @@ package org.jabref.preferences;
 import java.util.Map;
 import java.util.Objects;
 
-import org.jabref.gui.gui.search.SearchDisplayMode;
+import org.jabref.gui.search.SearchDisplayMode;
 
 
 public class SearchPreferences {

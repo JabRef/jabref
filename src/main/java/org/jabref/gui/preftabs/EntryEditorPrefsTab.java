@@ -13,7 +13,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import org.jabref.gui.gui.keyboard.EmacsKeyBindings;
+import org.jabref.gui.keyboard.EmacsKeyBindings;
 import org.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.l10n.Localization;

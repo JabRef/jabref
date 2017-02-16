@@ -3,7 +3,7 @@ package osx.macadapter;
 import java.io.File;
 import java.util.List;
 
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 
 import com.apple.eawt.AboutHandler;
 import com.apple.eawt.AppEvent;

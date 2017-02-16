@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 
 public class SpecialFieldMenuAction extends AbstractAction {
 

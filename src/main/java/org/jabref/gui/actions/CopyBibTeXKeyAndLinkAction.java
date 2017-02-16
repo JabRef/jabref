@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.JabRefGUI;
-import org.jabref.gui.gui.ClipBoardManager;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;

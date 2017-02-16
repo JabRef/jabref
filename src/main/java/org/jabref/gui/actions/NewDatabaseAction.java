@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;

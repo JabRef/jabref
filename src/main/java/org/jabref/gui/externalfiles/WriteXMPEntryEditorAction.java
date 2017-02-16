@@ -11,12 +11,12 @@ import javax.swing.Action;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.gui.filelist.FileListEntry;
-import org.jabref.gui.gui.filelist.FileListTableModel;
-import org.jabref.gui.gui.worker.AbstractWorker;
+import org.jabref.gui.filelist.FileListEntry;
+import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;

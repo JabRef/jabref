@@ -13,8 +13,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.Keyword;

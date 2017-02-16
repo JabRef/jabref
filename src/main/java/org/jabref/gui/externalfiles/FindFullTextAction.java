@@ -12,10 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.filelist.FileListTableModel;
-import org.jabref.gui.gui.undo.UndoableFieldChange;
-import org.jabref.gui.gui.worker.AbstractWorker;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;

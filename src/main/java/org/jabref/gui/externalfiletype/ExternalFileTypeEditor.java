@@ -30,10 +30,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

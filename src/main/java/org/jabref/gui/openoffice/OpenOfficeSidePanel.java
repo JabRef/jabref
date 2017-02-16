@@ -3,9 +3,9 @@ package org.jabref.gui.openoffice;
 import javax.swing.Icon;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.SidePaneComponent;
-import org.jabref.gui.gui.SidePaneManager;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.SidePaneComponent;
+import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 

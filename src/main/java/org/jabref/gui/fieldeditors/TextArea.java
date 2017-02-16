@@ -11,7 +11,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.GUIGlobals;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 

@@ -4,7 +4,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.IconTheme;
 
 /**
  * This class extends {@link AbstractAction} with the ability to set

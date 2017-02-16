@@ -9,7 +9,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.jabref.JabRefExecutorService;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.preferences.JabRefPreferences;

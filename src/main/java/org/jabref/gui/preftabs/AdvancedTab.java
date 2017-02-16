@@ -11,8 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.help.HelpAction;
-import org.jabref.gui.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.RemotePreferences;

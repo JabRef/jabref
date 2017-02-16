@@ -24,11 +24,11 @@ import javax.swing.JTextField;
 import javax.swing.undo.UndoableEdit;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
-import org.jabref.gui.gui.keyboard.KeyBinding;
-import org.jabref.gui.gui.undo.NamedCompound;
-import org.jabref.gui.gui.undo.UndoableFieldChange;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

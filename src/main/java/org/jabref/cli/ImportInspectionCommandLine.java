@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jabref.gui.gui.importer.fetcher.EntryFetcher;
+import org.jabref.gui.importer.fetcher.EntryFetcher;
 import org.jabref.logic.importer.ImportInspector;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;

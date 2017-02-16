@@ -30,11 +30,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutHelper;

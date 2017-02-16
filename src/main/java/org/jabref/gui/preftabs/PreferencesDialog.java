@@ -23,10 +23,10 @@ import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import org.jabref.gui.gui.FileDialog;
-import org.jabref.gui.gui.GUIGlobals;
-import org.jabref.gui.gui.JabRefFrame;
-import org.jabref.gui.gui.keyboard.KeyBinder;
+import org.jabref.gui.FileDialog;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.ExportFormats;

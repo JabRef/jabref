@@ -29,10 +29,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
-import org.jabref.gui.gui.help.HelpAction;
-import org.jabref.gui.gui.keyboard.KeyBinder;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FieldName;

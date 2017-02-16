@@ -17,10 +17,10 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
-import org.jabref.gui.gui.push.PushToApplication;
-import org.jabref.gui.gui.push.PushToApplicationButton;
+import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationButton;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;

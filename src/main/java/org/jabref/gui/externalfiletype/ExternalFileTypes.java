@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.strings.StringUtil;

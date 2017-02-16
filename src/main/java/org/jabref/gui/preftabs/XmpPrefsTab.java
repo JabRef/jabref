@@ -22,8 +22,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.OSXCompatibleToolbar;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 

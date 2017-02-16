@@ -11,8 +11,8 @@ import javax.swing.JEditorPane;
 import javax.swing.TransferHandler;
 import javax.swing.text.BadLocationException;
 
-import org.jabref.gui.gui.EntryContainer;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.EntryContainer;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;

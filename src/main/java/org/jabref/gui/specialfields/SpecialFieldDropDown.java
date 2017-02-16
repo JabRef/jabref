@@ -9,8 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;

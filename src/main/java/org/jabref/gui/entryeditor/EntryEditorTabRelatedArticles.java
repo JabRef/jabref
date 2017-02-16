@@ -11,7 +11,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.HyperlinkEvent;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;

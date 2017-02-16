@@ -9,7 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.preferences.JabRefPreferences;
 

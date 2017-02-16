@@ -6,7 +6,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import org.jabref.gui.gui.protectedterms.NewProtectedTermsFileDialog;
+import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;

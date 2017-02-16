@@ -25,15 +25,15 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.fieldeditors.EntryLinkListEditor;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.TextArea;
 import org.jabref.gui.fieldeditors.TextField;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;

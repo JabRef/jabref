@@ -6,8 +6,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.gui.gui.ClipBoardManager;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
 public class CopyAction extends AbstractAction {

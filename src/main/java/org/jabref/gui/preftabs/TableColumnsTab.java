@@ -30,13 +30,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.JabRefFrame;
-import org.jabref.gui.gui.OSXCompatibleToolbar;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.gui.help.HelpAction;
+import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibtexSingleField;

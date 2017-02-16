@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import javax.swing.JLabel;
 
-import org.jabref.gui.gui.GUIGlobals;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.gui.filelist.FileListTableModel;
+import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.model.entry.BibEntry;

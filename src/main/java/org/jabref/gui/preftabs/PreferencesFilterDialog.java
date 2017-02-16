@@ -15,7 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
-import org.jabref.gui.gui.WrapLayout;
+import org.jabref.gui.WrapLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferencesFilter;
 

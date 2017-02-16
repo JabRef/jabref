@@ -11,10 +11,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.SidePaneComponent;
-import org.jabref.gui.gui.SidePaneManager;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.SidePaneComponent;
+import org.jabref.gui.SidePaneManager;
 import org.jabref.logic.l10n.Localization;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {

@@ -27,10 +27,10 @@ import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.ClipBoardManager;
-import org.jabref.gui.gui.GUIGlobals;
-import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.PdfAnnotationImporterImpl;
 import org.jabref.model.entry.FieldName;

@@ -17,12 +17,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 
-import org.jabref.gui.gui.AbstractController;
-import org.jabref.gui.gui.ClipBoardManager;
-import org.jabref.gui.gui.DialogService;
-import org.jabref.gui.gui.IconTheme;
-import org.jabref.gui.gui.keyboard.KeyBinding;
-import org.jabref.gui.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.AbstractController;
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.IconTheme;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingPreferences;
 import org.jabref.logic.util.BuildInfo;
 
 public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {

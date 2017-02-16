@@ -14,12 +14,12 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.GUIGlobals;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.PasteAction;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import org.jabref.gui.gui.util.component.JTextFieldWithPlaceholder;
+import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -178,7 +178,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -204,7 +204,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -222,6 +222,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
         });
 
         // Bind the redo action to ctl-Y
-        getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.REDO), "Redo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.REDO), "Redo");
     }
 }

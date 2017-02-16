@@ -18,9 +18,9 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.PreviewPanel;
-import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.PreviewPanel;
+import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

@@ -14,9 +14,9 @@ import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
 import org.jabref.Globals;
-import org.jabref.gui.gui.BasePanel;
-import org.jabref.gui.gui.JabRefFrame;
-import org.jabref.gui.gui.keyboard.KeyBinder;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.metadata.MetaData;

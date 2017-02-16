@@ -20,7 +20,7 @@ import javax.swing.JRadioButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
-import org.jabref.gui.gui.worker.AbstractWorker;
+import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
