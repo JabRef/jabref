@@ -45,9 +45,6 @@ public class BibSonomyProperties extends Properties {
 	 */
 	private static BibSonomyProperties INSTANCE;
 
-	private static JabRefPreferences preferences = JabRefPreferences.getInstance();
-
-
 	/**
 	 * Get the singleton of {@link BibSonomyProperties}.
 	 * Will create one if INSTANCE is null
@@ -56,19 +53,20 @@ public class BibSonomyProperties extends Properties {
 	 */
 	public static BibSonomyProperties getInstance() {
 		if (INSTANCE == null) {
-			INSTANCE = new BibSonomyProperties();
-			loadProperties(INSTANCE);
+			INSTANCE = loadPropertiesFromJabRefPreferences(JabRefPreferences.getInstance());
 		}
 		return INSTANCE;
 	}
 
-	private static void loadProperties(BibSonomyProperties instance) {
+	private static BibSonomyProperties loadPropertiesFromJabRefPreferences(JabRefPreferences preferences) {
 
-		Optional<String> prefsOpt = Optional.of(preferences.get(JabRefPreferences.BIBSONOMY_PROPERTIES));
+		Optional<String> prefsOpt = Optional.ofNullable(preferences.get(JabRefPreferences.BIBSONOMY_PROPERTIES));
 
 		if (!prefsOpt.isPresent()) {
-			return;
+			return new BibSonomyProperties();
 		}
+
+        BibSonomyProperties bibSonomyProperties = new BibSonomyProperties();
 
 		String prefs = prefsOpt.get();
 		for (String property : propsArray) {
@@ -81,10 +79,11 @@ public class BibSonomyProperties extends Properties {
 				} else {
 					propertyValue = prefs.substring(lastIndexOf, prefs.indexOf("}", lastIndexOf));
 				}
-				instance.setProperty(property, propertyValue);
+                bibSonomyProperties.setProperty(property, propertyValue);
 			}
 		}
 
+		return bibSonomyProperties;
 	}
 
 	/**
@@ -101,10 +100,12 @@ public class BibSonomyProperties extends Properties {
 	public static void save() {
 		String apiKey = getApiKey();
 		if (!getStoreApiKey()) {
+		    // if the key shoujld not be stored in the preferences, store an empty key in the preferences.
 			setApiKey("");
 		}
 
-		preferences.clear(JabRefPreferences.BIBSONOMY_PROPERTIES);
+        JabRefPreferences preferences = JabRefPreferences.getInstance();
+        preferences.clear(JabRefPreferences.BIBSONOMY_PROPERTIES);
 		preferences.put(JabRefPreferences.BIBSONOMY_PROPERTIES, INSTANCE.toString());
 
 		setApiKey(apiKey);
