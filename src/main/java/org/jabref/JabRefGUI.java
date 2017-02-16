@@ -19,7 +19,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.autosaveandbackup.BackupUIManager;
+import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;

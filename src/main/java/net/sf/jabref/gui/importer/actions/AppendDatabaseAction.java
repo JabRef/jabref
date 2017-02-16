@@ -13,7 +13,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableInsertString;

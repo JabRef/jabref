@@ -21,7 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;

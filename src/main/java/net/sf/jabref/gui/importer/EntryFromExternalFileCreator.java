@@ -3,7 +3,7 @@ package net.sf.jabref.gui.importer;
 import java.io.File;
 import java.util.Optional;
 
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.model.entry.BibEntry;
 
 /** EntryCreator for any predefined ExternalFileType.

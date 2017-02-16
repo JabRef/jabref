@@ -35,9 +35,9 @@ import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
-import net.sf.jabref.gui.preftabs.ImportSettingsTab;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.preftabs.ImportSettingsTab;
 import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;

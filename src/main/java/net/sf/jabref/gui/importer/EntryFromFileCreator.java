@@ -8,8 +8,8 @@ import java.util.StringTokenizer;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
-import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import org.jabref.logic.util.io.FileUtil;

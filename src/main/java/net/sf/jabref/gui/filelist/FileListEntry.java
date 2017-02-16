@@ -3,7 +3,7 @@ package net.sf.jabref.gui.filelist;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 
 /**
  * This class represents a file link for a Bibtex entry.

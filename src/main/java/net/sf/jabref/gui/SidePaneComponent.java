@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.MnemonicAwareAction;
 
 import org.jdesktop.swingx.JXTitledPanel;
 import org.jdesktop.swingx.painter.MattePainter;

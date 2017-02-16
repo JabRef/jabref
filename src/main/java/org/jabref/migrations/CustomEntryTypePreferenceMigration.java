@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.customentrytypes.CustomEntryTypesManager;
+import org.jabref.gui.customentrytypes.CustomEntryTypesManager;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.CustomEntryType;

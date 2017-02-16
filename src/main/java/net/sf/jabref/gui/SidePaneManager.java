@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.maintable.MainTable;
+import org.jabref.gui.maintable.MainTable;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

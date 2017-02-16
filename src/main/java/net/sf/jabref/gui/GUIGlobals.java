@@ -8,10 +8,10 @@ import java.util.Map;
 import javax.swing.JLabel;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
-import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
-import net.sf.jabref.gui.specialfields.SpecialFieldViewModel;
+import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.specialfields.SpecialField;

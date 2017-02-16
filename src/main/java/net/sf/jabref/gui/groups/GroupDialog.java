@@ -32,7 +32,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.Dialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.fieldeditors.TextField;
+import org.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;

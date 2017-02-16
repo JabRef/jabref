@@ -3,7 +3,7 @@ package net.sf.jabref.gui.mergeentries;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.BaseAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

@@ -57,7 +57,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.help.HelpFile;

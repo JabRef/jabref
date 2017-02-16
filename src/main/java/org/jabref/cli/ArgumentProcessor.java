@@ -15,7 +15,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
-import net.sf.jabref.gui.externalfiles.AutoSetLinks;
+import org.jabref.gui.externalfiles.AutoSetLinks;
 import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;

@@ -19,8 +19,8 @@ import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;

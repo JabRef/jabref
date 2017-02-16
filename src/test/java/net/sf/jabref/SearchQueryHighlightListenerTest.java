@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
-import net.sf.jabref.gui.fieldeditors.TextArea;
+import org.jabref.gui.fieldeditors.TextArea;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.preferences.JabRefPreferences;
 

@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
 import org.jabref.preferences.VersionPreferences;

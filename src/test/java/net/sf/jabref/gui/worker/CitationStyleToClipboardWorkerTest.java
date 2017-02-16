@@ -4,9 +4,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 
-import net.sf.jabref.gui.exporter.RtfTransferable;
-import net.sf.jabref.gui.fieldeditors.HtmlTransferable;
-import net.sf.jabref.gui.fieldeditors.XmlTransferable;
+import org.jabref.gui.exporter.RtfTransferable;
+import org.jabref.gui.fieldeditors.HtmlTransferable;
+import org.jabref.gui.fieldeditors.XmlTransferable;
 import org.jabref.logic.util.OS;
 
 import org.junit.Assert;

@@ -11,7 +11,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.LayeredHighlighter.LayerPainter;
 
-import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
+import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 
 import org.apache.commons.logging.Log;

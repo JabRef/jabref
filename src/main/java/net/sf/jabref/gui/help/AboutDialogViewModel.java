@@ -12,7 +12,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import net.sf.jabref.gui.AbstractViewModel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 

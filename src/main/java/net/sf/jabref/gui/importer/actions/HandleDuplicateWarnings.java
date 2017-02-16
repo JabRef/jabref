@@ -3,7 +3,7 @@ package net.sf.jabref.gui.importer.actions;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.Actions;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 

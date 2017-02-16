@@ -68,7 +68,7 @@ import javax.swing.tree.TreePath;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;

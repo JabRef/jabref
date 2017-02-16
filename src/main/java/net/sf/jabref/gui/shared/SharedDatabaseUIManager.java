@@ -11,7 +11,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;

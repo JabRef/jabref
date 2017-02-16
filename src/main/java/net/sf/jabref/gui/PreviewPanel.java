@@ -28,8 +28,8 @@ import javax.swing.event.HyperlinkEvent;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.CitationStyleWorker;
 import org.jabref.logic.citationstyle.CitationStyle;

@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.gui.cleanup.CleanupActionsListModel;
+import org.jabref.gui.cleanup.CleanupActionsListModel;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.model.cleanup.FieldFormatterCleanup;

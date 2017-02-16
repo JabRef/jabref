@@ -13,8 +13,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
-import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;

@@ -24,7 +24,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;

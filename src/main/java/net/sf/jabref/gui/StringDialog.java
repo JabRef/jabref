@@ -32,7 +32,7 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.actions.Actions;
+import org.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;

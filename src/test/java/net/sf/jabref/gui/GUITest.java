@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.swing.JButton;
 
-import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
-import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.testutils.category.GUITests;
 
 import org.assertj.swing.core.GenericTypeMatcher;

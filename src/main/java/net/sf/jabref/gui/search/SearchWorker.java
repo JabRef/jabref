@@ -10,7 +10,7 @@ import javax.swing.SwingWorker;
 import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
-import net.sf.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;

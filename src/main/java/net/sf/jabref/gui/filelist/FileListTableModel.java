@@ -10,9 +10,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.gui.externalfiletype.ExternalFileType;
-import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;

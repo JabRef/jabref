@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.importer.actions.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;

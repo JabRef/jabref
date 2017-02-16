@@ -29,7 +29,7 @@ import javax.swing.JPopupMenu;
 import org.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;

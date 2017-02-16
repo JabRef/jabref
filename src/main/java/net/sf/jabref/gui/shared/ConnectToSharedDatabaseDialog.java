@@ -37,7 +37,7 @@ import org.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.exporter.SaveDatabaseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;

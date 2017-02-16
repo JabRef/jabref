@@ -1,7 +1,7 @@
 package net.sf.jabref.gui.filelist;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BaseAction;
+import org.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;

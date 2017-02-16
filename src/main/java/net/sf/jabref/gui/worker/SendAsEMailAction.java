@@ -12,7 +12,7 @@ import java.util.List;
 import org.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.l10n.Localization;

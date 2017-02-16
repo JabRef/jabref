@@ -7,7 +7,7 @@ import javax.swing.Icon;
 
 import javafx.application.Platform;
 
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.MnemonicAwareAction;
 
 public class AboutAction extends MnemonicAwareAction {
 

@@ -19,7 +19,7 @@ import javafx.stage.FileChooser;
 import org.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import org.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
