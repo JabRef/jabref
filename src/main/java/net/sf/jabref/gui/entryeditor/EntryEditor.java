@@ -330,18 +330,20 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // general fields from preferences
         addGeneralTabs();
+
         // special tabs (like MathSciNet Reviews)
         addSpecialTabs();
-        // source tab
-        addSourceTab();
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS)) {
-            //related articles
-            addRelatedArticlesTab();
-        }
         // pdf annotations tab
         addPdfTab();
 
+        //related articles
+        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS)) {
+            addRelatedArticlesTab();
+        }
+
+        // source tab
+        addSourceTab();
     }
 
     private void addGeneralTabs() {
@@ -972,7 +974,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             for (FieldContentSelector contentSelector : contentSelectors) {
                 contentSelector.rebuildComboBox();
             }
-            
+
         }
     }
 
