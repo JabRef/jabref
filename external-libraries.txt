@@ -55,11 +55,6 @@ Project: Apache Commons Lang
 URL:     https://commons.apache.org/proper/commons-lang/
 License: Apache-2.0
 
-Id:      org.apache.commons:commons-collections4
-Project: Apache Commons Collections
-URL:     https://commons.apache.org/proper/commons-collections/
-License: Apache-2.0
-
 Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/bkromhout/java-diff-utils
