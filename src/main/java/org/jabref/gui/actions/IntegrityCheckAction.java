@@ -21,8 +21,8 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;

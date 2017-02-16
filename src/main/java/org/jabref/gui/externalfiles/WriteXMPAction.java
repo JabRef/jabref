@@ -25,11 +25,11 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.filelist.FileListEntry;
-import net.sf.jabref.gui.filelist.FileListTableModel;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.filelist.FileListEntry;
+import org.jabref.gui.gui.filelist.FileListTableModel;
+import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;

@@ -36,9 +36,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;

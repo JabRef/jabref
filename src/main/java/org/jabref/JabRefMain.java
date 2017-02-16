@@ -10,7 +10,7 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import org.jabref.gui.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.exporter.SavePreferences;

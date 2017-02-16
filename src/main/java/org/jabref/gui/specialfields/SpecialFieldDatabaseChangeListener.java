@@ -3,8 +3,8 @@ package org.jabref.gui.specialfields;
 import java.util.List;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;

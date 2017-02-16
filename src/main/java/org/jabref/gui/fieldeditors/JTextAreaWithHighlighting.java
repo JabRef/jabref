@@ -19,7 +19,7 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.PasteAction;
-import net.sf.jabref.gui.util.component.JTextAreaWithPlaceholder;
+import org.jabref.gui.gui.util.component.JTextAreaWithPlaceholder;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -59,7 +59,7 @@ public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implemen
         //register "Paste" action
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
-        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
+        getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
 
     private void setupUndoRedo() {
@@ -85,7 +85,7 @@ public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implemen
         });
 
         // Bind the undo action to ctl-Z
-        getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.UNDO), "Undo");
+        getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.UNDO), "Undo");
 
         // Create a redo action and add it to the text component
         getActionMap().put("Redo", new AbstractAction(Actions.REDO) {
@@ -104,7 +104,7 @@ public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implemen
 
         // Bind the redo action to ctrl-Y
         boolean bind = true;
-        KeyStroke redoKey = Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.REDO);
+        KeyStroke redoKey = Globals.getKeyPrefs().getKey(org.jabref.gui.gui.keyboard.KeyBinding.REDO);
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             // If emacs is enabled, check if we have a conflict at keys
             // If yes, do not bind

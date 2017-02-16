@@ -8,7 +8,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import net.sf.jabref.gui.GUIGlobals;
+import org.jabref.gui.gui.GUIGlobals;
 import org.jabref.model.entry.FieldName;
 
 public class FieldNameLabel extends JLabel {

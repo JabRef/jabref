@@ -8,7 +8,7 @@ import java.util.List;
 import javax.swing.JLabel;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.IconTheme;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

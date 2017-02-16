@@ -14,9 +14,9 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.gui.worker.AbstractWorker;
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.exporter.IExportFormat;

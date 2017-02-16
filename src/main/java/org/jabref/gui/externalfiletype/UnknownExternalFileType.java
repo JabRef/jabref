@@ -1,6 +1,6 @@
 package org.jabref.gui.externalfiletype;
 
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.IconTheme;
 
 /**
  * This subclass of ExternalFileType is used to mark types that are unknown.

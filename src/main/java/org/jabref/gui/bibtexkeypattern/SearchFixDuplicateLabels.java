@@ -8,10 +8,10 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableKeyChange;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.gui.undo.UndoableKeyChange;
+import org.jabref.gui.gui.worker.AbstractWorker;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;

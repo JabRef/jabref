@@ -20,9 +20,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.OSXCompatibleToolbar;
-import net.sf.jabref.gui.help.HelpAction;
+import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.gui.OSXCompatibleToolbar;
+import org.jabref.gui.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.NameFormatter;

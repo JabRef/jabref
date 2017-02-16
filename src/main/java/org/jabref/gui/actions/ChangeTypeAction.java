@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import net.sf.jabref.gui.BasePanel;
+import org.jabref.gui.gui.BasePanel;
 import org.jabref.model.entry.EntryType;
 
 public class ChangeTypeAction extends AbstractAction {

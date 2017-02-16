@@ -4,8 +4,8 @@ import java.util.Objects;
 
 import javax.swing.Icon;
 
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;

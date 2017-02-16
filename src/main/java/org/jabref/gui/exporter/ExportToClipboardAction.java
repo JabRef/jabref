@@ -17,9 +17,9 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.worker.AbstractWorker;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.worker.AbstractWorker;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.exporter.IExportFormat;
 import org.jabref.logic.l10n.Localization;

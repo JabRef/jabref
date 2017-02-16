@@ -18,9 +18,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.help.HelpAction;
+import org.jabref.gui.gui.FileDialog;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;

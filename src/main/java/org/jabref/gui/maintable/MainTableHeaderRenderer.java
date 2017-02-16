@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.gui.GUIGlobals;
+import org.jabref.gui.gui.GUIGlobals;
 
 public class MainTableHeaderRenderer implements TableCellRenderer {
 

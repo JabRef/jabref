@@ -6,7 +6,7 @@ import javax.swing.AbstractAction;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.gui.ClipBoardManager;
+import org.jabref.gui.gui.ClipBoardManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 

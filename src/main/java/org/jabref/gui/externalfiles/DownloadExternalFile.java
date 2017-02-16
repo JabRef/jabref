@@ -13,12 +13,12 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.gui.filelist.FileListEntry;
-import net.sf.jabref.gui.filelist.FileListEntryEditor;
-import net.sf.jabref.gui.net.MonitoredURLDownload;
+import org.jabref.gui.gui.filelist.FileListEntry;
+import org.jabref.gui.gui.filelist.FileListEntryEditor;
+import org.jabref.gui.gui.net.MonitoredURLDownload;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;

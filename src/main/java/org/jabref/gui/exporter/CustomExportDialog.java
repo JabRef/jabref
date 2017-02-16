@@ -21,9 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.FileDialog;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;

@@ -17,9 +17,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.help.HelpAction;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;

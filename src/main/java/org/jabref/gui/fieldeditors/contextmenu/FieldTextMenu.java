@@ -10,7 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.gui.ClipBoardManager;
+import org.jabref.gui.gui.ClipBoardManager;
 import org.jabref.gui.actions.CopyAction;
 import org.jabref.gui.actions.CopyDoiUrlAction;
 import org.jabref.gui.actions.PasteAction;

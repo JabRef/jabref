@@ -26,12 +26,12 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.gui.undo.UndoableFieldChange;
 import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;

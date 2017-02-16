@@ -15,11 +15,11 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.EntryContainer;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.gui.groups.EntryTableTransferHandler;
+import org.jabref.gui.gui.groups.EntryTableTransferHandler;
 import org.jabref.logic.util.io.FileUtil;
 
 import org.apache.commons.logging.Log;

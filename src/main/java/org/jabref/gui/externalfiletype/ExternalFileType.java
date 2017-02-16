@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.IconTheme;
 
 /**
  * This class defines a type of external files that can be linked to from JabRef.

@@ -1,6 +1,6 @@
 package org.jabref.gui.autosaveandbackup;
 
-import net.sf.jabref.gui.BasePanel;
+import org.jabref.gui.gui.BasePanel;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 

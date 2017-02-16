@@ -23,9 +23,9 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.help.HelpAction;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;

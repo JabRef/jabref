@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.shared.ConnectToSharedDatabaseDialog;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.shared.ConnectToSharedDatabaseDialog;
 import org.jabref.logic.l10n.Localization;
 
 /**

@@ -13,12 +13,12 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.FileDialog;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.fieldeditors.FileListEditor;
-import net.sf.jabref.gui.filelist.FileListEntry;
-import net.sf.jabref.gui.util.component.CheckBoxMessage;
+import org.jabref.gui.gui.filelist.FileListEntry;
+import org.jabref.gui.gui.util.component.CheckBoxMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.preferences.JabRefPreferences;

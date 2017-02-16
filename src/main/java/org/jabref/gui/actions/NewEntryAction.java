@@ -5,9 +5,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.gui.EntryTypeDialog;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.EntryTypeDialog;
+import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;

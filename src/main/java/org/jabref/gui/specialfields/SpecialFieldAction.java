@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.actions.BaseAction;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;

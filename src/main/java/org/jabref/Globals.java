@@ -1,9 +1,9 @@
 package org.jabref;
 
 import org.jabref.collab.FileUpdateMonitor;
-import net.sf.jabref.gui.GlobalFocusListener;
-import net.sf.jabref.gui.StateManager;
-import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.gui.GlobalFocusListener;
+import org.jabref.gui.gui.StateManager;
+import org.jabref.gui.gui.keyboard.KeyBindingPreferences;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;

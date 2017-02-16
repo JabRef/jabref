@@ -9,7 +9,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import net.sf.jabref.gui.SaveOrderConfigDisplay;
+import org.jabref.gui.gui.SaveOrderConfigDisplay;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferences;
 

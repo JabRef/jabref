@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.gui.groups.GroupMatcher;
-import net.sf.jabref.gui.search.HitOrMissComparator;
-import net.sf.jabref.gui.search.matchers.EverythingMatcher;
-import net.sf.jabref.gui.search.matchers.SearchMatcher;
-import net.sf.jabref.gui.util.comparator.IsMarkedComparator;
+import org.jabref.gui.gui.groups.GroupMatcher;
+import org.jabref.gui.gui.search.HitOrMissComparator;
+import org.jabref.gui.gui.search.matchers.EverythingMatcher;
+import org.jabref.gui.gui.search.matchers.SearchMatcher;
+import org.jabref.gui.gui.util.comparator.IsMarkedComparator;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 

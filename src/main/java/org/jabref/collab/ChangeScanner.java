@@ -15,8 +15,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;

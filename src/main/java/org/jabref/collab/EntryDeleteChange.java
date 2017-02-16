@@ -3,10 +3,10 @@ package org.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.PreviewPanel;
+import org.jabref.gui.gui.undo.NamedCompound;
+import org.jabref.gui.gui.undo.UndoableRemoveEntry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;

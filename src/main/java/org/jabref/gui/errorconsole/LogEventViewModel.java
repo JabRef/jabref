@@ -3,7 +3,7 @@ package org.jabref.gui.errorconsole;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.IconTheme;
 import org.jabref.logic.util.OS;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;

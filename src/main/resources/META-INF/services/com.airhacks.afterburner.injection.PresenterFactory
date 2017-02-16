@@ -1,1 +1,1 @@
-net.sf.jabref.gui.DefaultInjector
+org.jabref.gui.gui.DefaultInjector

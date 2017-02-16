@@ -13,10 +13,10 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
 
-import net.sf.jabref.gui.AbstractViewModel;
-import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.DialogService;
-import net.sf.jabref.gui.MappedList;
+import org.jabref.gui.gui.AbstractViewModel;
+import org.jabref.gui.gui.ClipBoardManager;
+import org.jabref.gui.gui.DialogService;
+import org.jabref.gui.gui.MappedList;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.logging.LogMessages;

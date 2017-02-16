@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import javax.swing.Action;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 
 /**

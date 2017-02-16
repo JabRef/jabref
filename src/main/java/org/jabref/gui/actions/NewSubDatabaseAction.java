@@ -5,9 +5,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
+import org.jabref.gui.gui.BasePanel;
+import org.jabref.gui.gui.IconTheme;
+import org.jabref.gui.gui.JabRefFrame;
 import org.jabref.gui.auximport.FromAuxDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;

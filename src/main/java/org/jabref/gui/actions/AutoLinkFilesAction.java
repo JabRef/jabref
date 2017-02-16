@@ -10,10 +10,10 @@ import javax.swing.JDialog;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.IconTheme;
 import org.jabref.gui.externalfiles.AutoSetLinks;
-import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 

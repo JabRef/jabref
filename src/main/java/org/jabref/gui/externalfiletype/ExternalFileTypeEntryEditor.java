@@ -19,8 +19,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.IconTheme;
+import org.jabref.gui.gui.FileDialog;
+import org.jabref.gui.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;

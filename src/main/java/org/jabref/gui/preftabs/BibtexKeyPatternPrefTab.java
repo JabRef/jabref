@@ -10,7 +10,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
+import org.jabref.gui.gui.BasePanel;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;

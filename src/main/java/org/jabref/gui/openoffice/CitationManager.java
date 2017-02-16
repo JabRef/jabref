@@ -20,8 +20,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.JabRefFrame;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.CitationEntry;
 

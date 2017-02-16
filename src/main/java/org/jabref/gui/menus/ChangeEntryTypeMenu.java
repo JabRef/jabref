@@ -11,9 +11,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 
 import org.jabref.Globals;
-import net.sf.jabref.gui.BasePanel;
+import org.jabref.gui.gui.BasePanel;
 import org.jabref.gui.actions.ChangeTypeAction;
-import net.sf.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseMode;
