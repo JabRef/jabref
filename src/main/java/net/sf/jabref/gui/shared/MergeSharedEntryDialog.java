@@ -18,7 +18,7 @@ import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import net.sf.jabref.shared.DBMSSynchronizer;
+import org.jabref.shared.DBMSSynchronizer;
 
 public class MergeSharedEntryDialog {
 

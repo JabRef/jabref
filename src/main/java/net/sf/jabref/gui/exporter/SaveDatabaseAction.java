@@ -37,8 +37,8 @@ import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import org.jabref.shared.DBMSConnectionProperties;
+import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

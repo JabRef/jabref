@@ -31,9 +31,9 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
-import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.shared.exception.NotASharedDatabaseException;
+import org.jabref.shared.exception.DatabaseNotSupportedException;
+import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.shared.exception.NotASharedDatabaseException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;

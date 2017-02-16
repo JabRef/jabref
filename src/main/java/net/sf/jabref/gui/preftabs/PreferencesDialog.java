@@ -36,7 +36,7 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
-import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;

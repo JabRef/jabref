@@ -49,7 +49,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.SearchPreferences;
-import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;

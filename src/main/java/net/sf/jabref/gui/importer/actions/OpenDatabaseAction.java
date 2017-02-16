@@ -34,13 +34,13 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.FileBasedLock;
-import net.sf.jabref.migrations.FileLinksUpgradeWarning;
+import org.jabref.migrations.FileLinksUpgradeWarning;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
-import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.shared.exception.NotASharedDatabaseException;
+import org.jabref.shared.exception.DatabaseNotSupportedException;
+import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.shared.exception.NotASharedDatabaseException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

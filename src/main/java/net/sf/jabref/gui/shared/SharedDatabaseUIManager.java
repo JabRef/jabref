@@ -19,15 +19,15 @@ import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.DBMSSynchronizer;
-import net.sf.jabref.shared.event.ConnectionLostEvent;
-import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
-import net.sf.jabref.shared.event.UpdateRefusedEvent;
-import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
-import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
-import net.sf.jabref.shared.exception.NotASharedDatabaseException;
-import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import org.jabref.shared.DBMSConnectionProperties;
+import org.jabref.shared.DBMSSynchronizer;
+import org.jabref.shared.event.ConnectionLostEvent;
+import org.jabref.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.shared.event.UpdateRefusedEvent;
+import org.jabref.shared.exception.DatabaseNotSupportedException;
+import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.shared.exception.NotASharedDatabaseException;
+import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.google.common.eventbus.Subscribe;
 

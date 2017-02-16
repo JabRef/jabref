@@ -134,7 +134,7 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.PreviewPreferences;
-import net.sf.jabref.shared.DBMSSynchronizer;
+import org.jabref.shared.DBMSSynchronizer;
 
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.forms.builder.FormBuilder;

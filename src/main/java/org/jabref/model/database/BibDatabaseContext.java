@@ -14,7 +14,7 @@ import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import net.sf.jabref.shared.DBMSSynchronizer;
+import org.jabref.shared.DBMSSynchronizer;
 
 /**
  * Represents everything related to a BIB file.
