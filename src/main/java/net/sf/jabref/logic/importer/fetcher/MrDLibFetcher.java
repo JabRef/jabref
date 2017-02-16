@@ -31,9 +31,9 @@ import org.apache.http.client.utils.URIBuilder;
  * This class is responible to get the recommendations from MDL
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
+    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
 
     private static final String NAME = "MDL_FETCHER";
-    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
     private final String LANGUAGE;
     private final String VERSION;
 
@@ -47,7 +47,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     public String getName() {
         return NAME;
     }
-
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
@@ -111,7 +110,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         queryWithTitle = queryWithTitle.replaceAll("/", "convbckslsh");
         URIBuilder builder = new URIBuilder();
         builder.setScheme("https");
-        builder.setHost("api-dev.mr-dlib.org");
+        builder.setHost("api.mrdlib.org");
         builder.setPath("/v1/documents/" + queryWithTitle + "/related_documents");
         builder.addParameter("partner_id", "jabref");
         builder.addParameter("app_id", "jabref_desktop");
