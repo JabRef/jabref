@@ -11,9 +11,7 @@ import org.bibsonomy.common.enums.GroupingEntity;
 
 
 /**
- * {@link ImportAllMyPostsAction} runs the {@link ImportPostsByCriteriaWorker} to import all posts of the user.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Runs the {@link ImportPostsByCriteriaWorker} to import all posts of the user.
  */
 public class ImportAllMyPostsAction extends AbstractBibSonomyAction {
 

@@ -11,10 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * {@link AbstractBibSonomyAction} is the base class for all actions.
+ * This is the base class for all actions.
  * Provides a method to run workers asynchronously.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public abstract class AbstractBibSonomyAction extends AbstractAction {
 

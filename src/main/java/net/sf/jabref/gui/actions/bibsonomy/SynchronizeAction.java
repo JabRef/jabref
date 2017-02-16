@@ -16,13 +16,13 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class SynchronizeAction extends AbstractBibSonomyAction {
 
+    public SynchronizeAction(JabRefFrame jabRefFrame) {
+        super(jabRefFrame, Localization.lang("Synchronize"), new ImageIcon(SynchronizeAction.class.getResource("/images/bibsonomy/arrow-circle-double-135.png")));
+    }
+
     public void actionPerformed(ActionEvent e) {
         SynchronizationWorker worker = new SynchronizationWorker(getJabRefFrame());
         performAsynchronously(worker);
     }
 
-    public SynchronizeAction(JabRefFrame jabRefFrame) {
-        super(jabRefFrame, Localization.lang("Synchronize"), new ImageIcon(SynchronizeAction.class.getResource("/images/bibsonomy/arrow-circle-double-135.png")));
-
-    }
 }

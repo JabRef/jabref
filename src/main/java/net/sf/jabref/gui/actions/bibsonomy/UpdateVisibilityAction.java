@@ -10,9 +10,7 @@ import net.sf.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import net.sf.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 
 /**
- * {@link UpdateVisibilityAction} runs the {@link UpdateVisibilityWorker}
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * This runs the {@link UpdateVisibilityWorker}
  */
 public class UpdateVisibilityAction extends AbstractBibSonomyAction {
 

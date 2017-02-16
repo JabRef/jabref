@@ -13,15 +13,21 @@ import net.sf.jabref.gui.bibsonomy.SearchTypeComboBoxItem;
 import net.sf.jabref.gui.worker.bibsonomy.ImportPostsByCriteriaWorker;
 
 /**
- * {@link SearchAction} runs the {@link ImportPostsByCriteriaWorker} with the values of the search text box
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
+ * Runs the {@link ImportPostsByCriteriaWorker} with the values of the search text box
  */
 public class SearchAction extends AbstractBibSonomyAction {
 
     private JTextField searchTextField;
     private JComboBox<?> searchTypeComboBox;
     private JComboBox<?> groupingComboBox;
+
+    public SearchAction(JabRefFrame jabRefFrame, JTextField searchTextField, JComboBox<?> searchTypeComboBox, JComboBox<?> groupingComboBox) {
+        super(jabRefFrame, "", new ImageIcon(SearchAction.class.getResource("/images/bibsonomy/magnifier.png")));
+
+        this.searchTextField = searchTextField;
+        this.searchTypeComboBox = searchTypeComboBox;
+        this.groupingComboBox = groupingComboBox;
+    }
 
     public void actionPerformed(ActionEvent e) {
         SearchType searchType = ((SearchTypeComboBoxItem) searchTypeComboBox.getSelectedItem()).getKey();
@@ -33,11 +39,4 @@ public class SearchAction extends AbstractBibSonomyAction {
         }
     }
 
-    public SearchAction(JabRefFrame jabRefFrame, JTextField searchTextField, JComboBox<?> searchTypeComboBox, JComboBox<?> groupingComboBox) {
-        super(jabRefFrame, "", new ImageIcon(SearchAction.class.getResource("/images/bibsonomy/magnifier.png")));
-
-        this.searchTextField = searchTextField;
-        this.searchTypeComboBox = searchTypeComboBox;
-        this.groupingComboBox = groupingComboBox;
-    }
 }
