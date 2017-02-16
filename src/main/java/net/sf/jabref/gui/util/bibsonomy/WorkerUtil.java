@@ -1,24 +1,22 @@
 package net.sf.jabref.gui.util.bibsonomy;
 
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.gui.worker.CallBack;
 
 public class WorkerUtil {
 
     /**
      * @deprecated Duplicate code.
-     * See {@link net.sf.jabref.gui.exporter.SaveDatabaseAction}
+     *
+     * Somehow, this should be done using JabRefExecutorService or other ways.     *
+     * This is not that easy, as we play around with the EDT
+     *
+     * FIXME: This method does NOT execute asynchronously
      */
     @Deprecated
     public static void performAsynchronously(AbstractWorker worker) throws Throwable {
-        //TODO: Duplicate code. See SaveDatabaseAction - zellerdev
-        Runnable wrk = worker.getWorker();
-        CallBack cb = worker.getCallBack();
-
         worker.init();
-
-        wrk.run();
-
-        cb.update();
+        worker.getWorker().run();
+        worker.getCallBack().update();
     }
+
 }

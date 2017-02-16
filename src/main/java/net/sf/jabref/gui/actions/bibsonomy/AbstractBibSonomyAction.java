@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractBibSonomyAction extends AbstractAction {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchAction.class);
+    private static final Log LOGGER = LogFactory.getLog(AbstractAction.class);
 
     private JabRefFrame jabRefFrame;
 
@@ -34,7 +34,7 @@ public abstract class AbstractBibSonomyAction extends AbstractAction {
     }
 
     /**
-     * Runs a worker asynchronously. Includes exception handling.
+     * Runs a worker asynchronously. Includes catching exceptions and logging them
      *
      * @param worker the worker to be run asynchronously
      */
