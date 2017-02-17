@@ -76,7 +76,7 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
         // display warning in the case of default values
         if (BibSonomyProperties.getUsername().equals(BibSonomyGlobals.API_USERNAME))
             JOptionPane.showMessageDialog(this,
-                    Localization.lang("PLEASE_NOTE\\:_the_current_API_access_data_is_for_testing_purposes_only.\\nYou_can_upload_and_download_entries.\\nAfter_logging_in_you_can_see_and_edit_your_entries_on_www.bibsonomy.org.\\nDo_not_use_this_account_for_personal_data,_as_it_is_accessible_by_everyone.\\nTo_obtain_your_own_personal_API_key,_visit_%0.", "http://www.bibsonomy.org/help/doc/gettingaccess.html"),
+                    Localization.lang("PLEASE NOTE: the current API access data is for testing purposes only.\\nYou can upload and download entries.\\nAfter logging in you can see and edit your entries on www.bibsonomy.org.\\nDo not use this account for personal data, as it is accessible by everyone.\\nTo obtain your own personal API key, visit %0.", "http://www.bibsonomy.org/help/doc/gettingaccess.html").replaceAll("\\\\n", "<br>"),
                     Localization.lang("Demo mode"),
                     JOptionPane.INFORMATION_MESSAGE);
     }
