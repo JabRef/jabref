@@ -19,10 +19,13 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;

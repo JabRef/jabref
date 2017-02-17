@@ -1,9 +1,9 @@
-package net.sf.jabref.model.groups;
+package org.jabref.model.groups;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
 

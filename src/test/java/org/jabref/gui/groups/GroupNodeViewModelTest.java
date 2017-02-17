@@ -1,12 +1,12 @@
-package net.sf.jabref.gui.groups;
+package org.jabref.gui.groups;
 
 import javafx.collections.FXCollections;
 
-import net.sf.jabref.gui.StateManager;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.groups.AbstractGroup;
-import net.sf.jabref.model.groups.GroupHierarchyType;
-import net.sf.jabref.model.groups.WordKeywordGroup;
+import org.jabref.gui.StateManager;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.WordKeywordGroup;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -1,8 +1,8 @@
-package net.sf.jabref.model.groups;
+package org.jabref.model.groups;
 
 import java.util.Set;
 
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntry;
 
 public abstract class AutomaticGroup extends AbstractGroup {
     public AutomaticGroup(String name, GroupHierarchyType context) {

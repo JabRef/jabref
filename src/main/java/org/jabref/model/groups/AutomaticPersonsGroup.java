@@ -1,13 +1,13 @@
-package net.sf.jabref.model.groups;
+package org.jabref.model.groups;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.util.OptionalUtil;
-import net.sf.jabref.model.entry.Author;
-import net.sf.jabref.model.entry.AuthorList;
-import net.sf.jabref.model.entry.BibEntry;
+import org.jabref.logic.util.OptionalUtil;
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.BibEntry;
 
 public class AutomaticPersonsGroup extends AutomaticGroup {
 
