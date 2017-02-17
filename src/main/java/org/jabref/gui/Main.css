@@ -31,7 +31,7 @@
     /*
      * A dark gray as background
      */
-    -fx-dark-background: #757575
+    -fx-dark-background: #757575;
 }
 
 .hyperlink {
@@ -52,6 +52,6 @@
 }
 
 .tooltip {
-    -fx-background-color: -fx-dark-background;
+    -fx-background-color: #757575; /* For some reason it does not work if we use -fx-dark-background here */
     -fx-effect:none;
 }
