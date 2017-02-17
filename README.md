@@ -1,4 +1,4 @@
-# JabRef Version 3.8.2
+# JabRef Development Version
 
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
@@ -105,7 +105,7 @@ Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A ful
 Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
-JabRef also uses libraries distributed by other parties.
+JabRef also uses libraries, fonts, and icons distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
 
   [BibTeX]: https://www.ctan.org/pkg/bibtex

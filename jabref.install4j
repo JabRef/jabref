@@ -85,8 +85,9 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
-      <infoPlist mode="1" file="">
-        <content />
+      <infoPlist mode="3" file="">
+        <content>&lt;key&gt;NSSupportsAutomaticGraphicsSwitching&lt;/key&gt;
+&lt;string&gt;YES&lt;/string&gt;</content>
       </infoPlist>
       <iconImageFiles />
     </launcher>
