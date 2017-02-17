@@ -9,7 +9,6 @@ import org.jabref.gui.actions.bibsonomy.DeleteSelectedEntriesAction;
 import org.jabref.gui.actions.bibsonomy.DownloadDocumentsAction;
 import org.jabref.gui.actions.bibsonomy.ExportSelectedEntriesAction;
 import org.jabref.gui.actions.bibsonomy.ImportAllMyPostsAction;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.actions.bibsonomy.SynchronizeAction;
 import org.jabref.gui.actions.bibsonomy.ToggleSidePaneComponentAction;
 import org.jabref.logic.l10n.Localization;
@@ -33,8 +32,6 @@ public class BibSonomyMenuItem extends JMenu {
         add(getSynchronizeMenuItem());
         add(getDownloadDocumentsMenuItem());
         add(getAllMyPostsMenuItem());
-        addSeparator();
-        add(getSettingsMenuItem());
     }
 
     private JMenuItem getSidePaneComponentToggleMenuItem() {
@@ -51,10 +48,6 @@ public class BibSonomyMenuItem extends JMenu {
 
     private JMenuItem getSynchronizeMenuItem() {
         return new JMenuItem(new SynchronizeAction(sidePaneComponent.getJabRefFrame()));
-    }
-
-    private JMenuItem getSettingsMenuItem() {
-        return new JMenuItem(new ShowSettingsDialogAction(sidePaneComponent.getJabRefFrame()));
     }
 
     private JMenuItem getAllMyPostsMenuItem() {

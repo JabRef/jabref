@@ -89,6 +89,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new PreviewPrefsTab());
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new GroupsPrefsTab(prefs));
+        tabs.add(new BibSonomyPrefsTab(prefs));
         tabs.add(new EntryEditorPrefsTab(prefs));
         tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new ImportSettingsTab(prefs));

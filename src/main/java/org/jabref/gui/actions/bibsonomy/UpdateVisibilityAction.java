@@ -25,7 +25,7 @@ public class UpdateVisibilityAction extends AbstractBibSonomyAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        UpdateVisibilityWorker worker = new UpdateVisibilityWorker(getJabRefFrame(), visibility, defaultGroupings);
+        UpdateVisibilityWorker worker = new UpdateVisibilityWorker(visibility, defaultGroupings);
         performAsynchronously(worker);
     }
 

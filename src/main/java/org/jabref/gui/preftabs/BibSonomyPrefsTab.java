@@ -1,51 +1,42 @@
-package org.jabref.gui.bibsonomy;
+package org.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
 import org.jabref.bibsonomy.BibSonomyGlobals;
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogByCancelAction;
-import org.jabref.gui.actions.bibsonomy.CloseBibSonomySettingsDialogBySaveAction;
-import org.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
+import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
+import org.jabref.gui.preftabs.support.OrderComboBoxItem;
+import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.enums.Order;
 
-public class BibSonomySettingsDialog extends JDialog {
+public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefFrame jabRefFrame;
+    private final JabRefPreferences prefs;
 
-    private JPanel jContentPane = null;
-    private JPanel buttonsPanel = null;
-    private JButton saveButton = null;
-    private JPanel whitespacePanel = null;
-    private JButton cancelButton = null;
-    private JTabbedPane settingsPane = null;
     private JPanel generalSettingsPanel = null;
     private JPanel credentialsPanel = null;
     private JLabel apiUrlLabel = null;
@@ -69,95 +60,65 @@ public class BibSonomySettingsDialog extends JDialog {
     private JComboBox<?> tagCloudOrderComboBox = null;
     private JButton openDatabasePropertiesButton = null;
 
-    public BibSonomySettingsDialog(JabRefFrame jabRefFrame) {
-        super(jabRefFrame);
-        this.jabRefFrame = jabRefFrame;
+    public BibSonomyPrefsTab(JabRefPreferences prefs) {
+        this.prefs = Objects.requireNonNull(prefs);
+
+        setLayout(new BorderLayout());
+        JPanel pan = this.getGeneralSettingsPanel();
+        pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        add(pan, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void setValues() {
+        // automatically done by the getter methods
+
+        // display warning in the case of default values
         if (BibSonomyProperties.getUsername().equals(BibSonomyGlobals.API_USERNAME))
-            JOptionPane.showMessageDialog(this, Localization.lang("PLEASE NOTE: the current API access data is for testing purposes only.") + "\n"
-                    + Localization.lang("You can up- and download entries.") + "\n"
-                    + Localization.lang("After logging in you can see and_edit your entries on www.bibsonomy.org.") + "\n"
-                    + Localization.lang("Do not use this account for_personal data, as it is accessible by everyone.") + "\n\n"
-                    + Localization.lang("To obtain your own personal API key, visit") + "\n"
-                    + "http://www.bibsonomy.org/help/doc/gettingaccess.html.", Localization.lang("Demo mode"), JOptionPane.INFORMATION_MESSAGE);
-        initialize();
+            JOptionPane.showMessageDialog(this,
+                    Localization.lang("PLEASE_NOTE\\:_the_current_API_access_data_is_for_testing_purposes_only.\\nYou_can_upload_and_download_entries.\\nAfter_logging_in_you_can_see_and_edit_your_entries_on_www.bibsonomy.org.\\nDo_not_use_this_account_for_personal_data,_as_it_is_accessible_by_everyone.\\nTo_obtain_your_own_personal_API_key,_visit_%0.", "http://www.bibsonomy.org/help/doc/gettingaccess.html"),
+                    Localization.lang("Demo mode"),
+                    JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void initialize() {
-        this.setSize(677, 580);
-        this.setResizable(true);
-        this.setPreferredSize(new Dimension(700, 460));
-        this.setModal(true);
-        this.setMaximumSize(new Dimension(700, 460));
-        this.setMinimumSize(new Dimension(700, 460));
-        this.setContentPane(getJContentPane());
-        this.setLocationRelativeTo(jabRefFrame);
-    }
+    @Override
+    public void storeSettings() {
+        BibSonomyProperties.setApiUrl(getApiUrlTextField().getText());
+        BibSonomyProperties.setUsername(getUsernameTextField().getText());
+        BibSonomyProperties.setApiKey(getApiKeyTextField().getText());
+        BibSonomyProperties.setStoreApiKey(getStoreAPIKeyCheckBox().isSelected());
+        BibSonomyProperties.setNumberOfPostsPerRequest((Integer) getNumberOfPostsSpinner().getValue());
+        BibSonomyProperties.setTagCloudSize((Integer) getTagCloudSizeSpinner().getValue());
+        BibSonomyProperties.setIgnoreNoTagsAssigned(getIgnoreOneTagWarningCheckBox().isSelected());
+        BibSonomyProperties.setUpdateTagsOnStartup(getUpdateTagsCheckBox().isSelected());
+        BibSonomyProperties.setUploadDocumentsOnExport(getUploadDocumentsCheckBox().isSelected());
+        BibSonomyProperties.setDownloadDocumentsOnImport(getDownloadDocumentsCheckBox().isSelected());
+        BibSonomyProperties.setIgnoreMorePostsWarning(getNoWarningOnMorePostsCheckBox().isSelected());
+        BibSonomyProperties.setExtraFields(getExtraFieldsTextField().getText());
+        BibSonomyProperties.setTagCloudOrder(((OrderComboBoxItem) getTagCloudOrderComboBox().getSelectedItem()).getKey());
 
-    private JPanel getJContentPane() {
-        if (jContentPane == null) {
-            BorderLayout borderLayout = new BorderLayout();
-            borderLayout.setHgap(3);
-            borderLayout.setVgap(3);
-            jContentPane = new JPanel();
-            jContentPane.setLayout(borderLayout);
-            jContentPane.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            jContentPane.add(getButtonsPanel(), BorderLayout.SOUTH);
-            jContentPane.add(getSettingsPane(), BorderLayout.CENTER);
+        switch (((GroupingComboBoxItem) getDefaultVisibilityComboBox().getSelectedItem()).getKey()) {
+            case USER:
+                BibSonomyProperties.setDefaultVisisbility("private");
+                break;
+            case GROUP:
+                BibSonomyProperties.setDefaultVisisbility(((GroupingComboBoxItem) getDefaultVisibilityComboBox().getSelectedItem()).getValue());
+                break;
+            default:
+                BibSonomyProperties.setDefaultVisisbility("public");
         }
-        return jContentPane;
+
+        BibSonomyProperties.save();
     }
 
-    private JPanel getButtonsPanel() {
-        if (buttonsPanel == null) {
-            GridBagConstraints gridBagConstraints11 = new GridBagConstraints();
-            gridBagConstraints11.gridx = 2;
-            gridBagConstraints11.gridy = 0;
-            GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
-            gridBagConstraints1.gridx = 1;
-            gridBagConstraints1.gridy = 0;
-            gridBagConstraints1.insets = new Insets(0, 0, 0, 3);
-            GridBagConstraints gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.gridy = 0;
-            buttonsPanel = new JPanel();
-            buttonsPanel.setLayout(new GridBagLayout());
-            buttonsPanel.add(getWhitespacePanel(), gridBagConstraints);
-            buttonsPanel.add(getSaveButton(), gridBagConstraints1);
-            buttonsPanel.add(getCancelButton(), gridBagConstraints11);
-        }
-        return buttonsPanel;
+    @Override
+    public boolean validateSettings() {
+        return true;
     }
 
-    private JButton getSaveButton() {
-        if (saveButton == null) {
-            saveButton = new JButton(new CloseBibSonomySettingsDialogBySaveAction(this, getApiUrlTextField(), getUsernameTextField(), getApiKeyTextField(), getStoreAPIKeyCheckBox(), getNumberOfPostsSpinner(), getTagCloudSizeSpinner(), getIgnoreOneTagWarningCheckBox(), getUpdateTagsCheckBox(), getUploadDocumentsCheckBox(), getDownloadDocumentsCheckBox(), getDefaultVisibilityComboBox(), getNoWarningOnMorePostsCheckBox(), getExtraFieldsTextField(), getTagCloudOrderComboBox()));
-        }
-        return saveButton;
-    }
-
-    private JPanel getWhitespacePanel() {
-        if (whitespacePanel == null) {
-            whitespacePanel = new JPanel();
-            whitespacePanel.setLayout(new GridBagLayout());
-        }
-        return whitespacePanel;
-    }
-
-    private JButton getCancelButton() {
-        if (cancelButton == null) {
-            cancelButton = new JButton(new CloseBibSonomySettingsDialogByCancelAction(this));
-        }
-        return cancelButton;
-    }
-
-    private JTabbedPane getSettingsPane() {
-        if (settingsPane == null) {
-            settingsPane = new JTabbedPane();
-            settingsPane.addTab(Localization.lang("General"), IconTheme.JabRefIcon.PREFERENCES.getIcon(), getGeneralSettingsPanel(), null);
-        }
-        return settingsPane;
+    @Override
+    public String getTabName() {
+        return Localization.lang("BibSonomy");
     }
 
     private JPanel getGeneralSettingsPanel() {
@@ -555,18 +516,11 @@ public class BibSonomySettingsDialog extends JDialog {
 
             List<GroupingComboBoxItem> items = new LinkedList<>();
             items.add(new GroupingComboBoxItem(GroupingEntity.ALL, "Public"));
+            // TODO: Why is here written "Private", whereas org.jabref.gui.actions.bibsonomy.RefreshTagListAction.getDefaultGroupings() uses BibSonomyProperties.getUsername()
             items.add(new GroupingComboBoxItem(GroupingEntity.USER, "Private"));
 
             defaultVisibilityComboBox = new JComboBox<>();
-            (new UpdateVisibilityAction(jabRefFrame, defaultVisibilityComboBox, items)).actionPerformed(null);
-
-            //Set selected Value
-            int itemCount = defaultVisibilityComboBox.getItemCount();
-            for (int i = 0; i < itemCount; i++) {
-                if ((defaultVisibilityComboBox.getItemAt(i)).getValue().equals(BibSonomyProperties.getDefaultVisibilty())) {
-                    defaultVisibilityComboBox.setSelectedItem(defaultVisibilityComboBox.getItemAt(i));
-                }
-            }
+            new UpdateVisibilityWorker(defaultVisibilityComboBox, items, BibSonomyProperties.getDefaultVisibilty()).run();
         }
         return defaultVisibilityComboBox;
     }

@@ -1,10 +1,10 @@
-package org.jabref.gui.bibsonomy;
+package org.jabref.gui.preftabs.support;
 
 import org.bibsonomy.model.enums.Order;
 
 public class OrderComboBoxItem extends ComboBoxItem<Order> {
 
-    OrderComboBoxItem(Order key, String value) {
+    public OrderComboBoxItem(Order key, String value) {
         super(key, value);
     }
 }

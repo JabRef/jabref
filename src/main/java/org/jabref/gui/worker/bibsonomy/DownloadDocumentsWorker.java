@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -53,7 +52,8 @@ public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 			try {
                 post = logic.getPostDetails(intrahashOpt.get(), BibSonomyProperties.getUsername()); // client.executeQuery(getPostDetailsQuery);
 			} catch (AuthenticationException e) {
-				(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
+                LOGGER.error(e.getLocalizedMessage(), e);
+                // TODO: we could open the settings dialog here. This should be done via the eventbus somehow
 				return;
 			} catch (Exception e) {
 				LOGGER.error("Failed getting details for post " + intrahashOpt.get(), e);
@@ -91,7 +91,8 @@ public class DownloadDocumentsWorker extends AbstractBibSonomyWorker {
 					list.getReadWriteLock().writeLock().lock();
 
 				} catch (AuthenticationException e) {
-					(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
+                    LOGGER.error(e.getLocalizedMessage(), e);
+                    // TODO: we could open the settings dialog here. This should be done via the eventbus somehow
 				} catch (Exception e) {
 					if (citeKeyOpt.isPresent()) {
 						LOGGER.error("Failed adding file to entry " + citeKeyOpt.get(), e);

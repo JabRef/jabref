@@ -22,7 +22,6 @@ import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.bibsonomy.RefreshTagListAction;
 import org.jabref.gui.actions.bibsonomy.SearchAction;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.actions.bibsonomy.UpdateVisibilityAction;
 import org.jabref.gui.bibsonomy.listener.BibSonomyHyperLinkListener;
 import org.jabref.gui.bibsonomy.listener.VisibilityItemListener;
@@ -85,7 +84,6 @@ public class BibSonomySidePanel extends JPanel {
         this.add(getControlsPanel(), gridBagConstraints);
         this.add(getTagsPanel(), gridBagConstraints11);
         this.add(getVisibilityPanel(), gridBagConstraints31);
-        this.add(getSettingsButton(), gridBagConstraints13);
 
         searchTypeComboBox.addActionListener(action -> {
             searchTextField.requestFocus();
@@ -289,18 +287,6 @@ public class BibSonomySidePanel extends JPanel {
             tagListScrollPane.setViewportView(getTagCloudPanel());
         }
         return tagListScrollPane;
-    }
-
-    /**
-     * This method initializes settingsButton
-     *
-     * @return javax.swing.JButton
-     */
-    private JButton getSettingsButton() {
-        if (settingsButton == null) {
-            settingsButton = new JButton(new ShowSettingsDialogAction(jabRefFrame));
-        }
-        return settingsButton;
     }
 
     /**

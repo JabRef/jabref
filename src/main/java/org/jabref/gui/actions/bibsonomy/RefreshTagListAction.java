@@ -34,7 +34,7 @@ public class RefreshTagListAction extends AbstractBibSonomyAction {
         performAsynchronously(worker);
 
         // update the "import posts from.." combo box
-        UpdateVisibilityWorker visWorker = new UpdateVisibilityWorker(getJabRefFrame(), groupingComboBox, getDefaultGroupings());
+        UpdateVisibilityWorker visWorker = new UpdateVisibilityWorker(groupingComboBox, getDefaultGroupings());
         performAsynchronously(visWorker);
     }
 

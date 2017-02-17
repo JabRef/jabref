@@ -5,10 +5,9 @@ import java.util.List;
 import javax.swing.JComboBox;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
+import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -17,26 +16,36 @@ import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.Group;
 import org.bibsonomy.model.User;
 import org.bibsonomy.model.logic.LogicInterface;
-import org.bibsonomy.rest.exceptions.AuthenticationException;
 
 /**
  * Fetch the users groups and add them to the "import posts from..." field
  */
-public class UpdateVisibilityWorker extends AbstractBibSonomyWorker {
+public class UpdateVisibilityWorker extends AbstractWorker {
 
 	private static final Log LOGGER = LogFactory.getLog(UpdateVisibilityWorker.class);
 
-	private JComboBox<? super GroupingComboBoxItem> visibility;
-	private List<GroupingComboBoxItem> defaultGroupings;
+    private final JComboBox<? super GroupingComboBoxItem> visibility;
+	private final List<GroupingComboBoxItem> defaultGroupings;
+    private final String valueToSet;
 
-	public UpdateVisibilityWorker(JabRefFrame jabRefFrame, JComboBox<? super GroupingComboBoxItem> visibility, List<GroupingComboBoxItem> defaultGroupings) {
-		super(jabRefFrame);
-		this.visibility = visibility;
-		this.defaultGroupings = defaultGroupings;
+    public UpdateVisibilityWorker(JComboBox<? super GroupingComboBoxItem> visibility, List<GroupingComboBoxItem> defaultGroupings) {
+        this(visibility, defaultGroupings, null);
 	}
 
-	public void run() {
-		GroupingComboBoxItem item = (GroupingComboBoxItem) visibility.getSelectedItem();
+    public UpdateVisibilityWorker(JComboBox<? super GroupingComboBoxItem> visibility, List<GroupingComboBoxItem> defaultGroupings, String valueToSet) {
+        // super() is not called as multithreading is currently not implemented properly within BibSonomy
+        this.visibility = visibility;
+        this.defaultGroupings = defaultGroupings;
+        this.valueToSet = valueToSet;
+    }
+
+    public void run() {
+        String newValue;
+        if (valueToSet == null) {
+            newValue = ((GroupingComboBoxItem) visibility.getSelectedItem()).getValue();
+        } else {
+            newValue = valueToSet;
+        }
 
 		visibility.removeAllItems();
 		if (defaultGroupings != null) {
@@ -46,27 +55,24 @@ public class UpdateVisibilityWorker extends AbstractBibSonomyWorker {
 		}
 
 		try {
-            LogicInterface logic = LogicInterfaceFactory.getLogic(jabRefFrame.getCurrentBasePanel().getDatabaseContext());
+            LogicInterface logic = LogicInterfaceFactory.getLogicWithoutFileSupport();
             User user = logic.getUserDetails(BibSonomyProperties.getUsername());
 
 			for (Group g : user.getGroups()) {
 				visibility.addItem(new GroupingComboBoxItem(GroupingEntity.GROUP, g.getName()));
 			}
 
-			if (item != null) {
+			if (newValue != null) {
 				int count = visibility.getItemCount();
 				for (int i = 0; i < count; i++) {
 					GroupingComboBoxItem currentItem = (GroupingComboBoxItem) visibility.getItemAt(i);
-					if (currentItem.getValue().equals(item.getValue())) {
+					if (currentItem.getValue().equals(newValue)) {
 						visibility.setSelectedIndex(i);
 					}
 				}
-
 			}
-
-		} catch (AuthenticationException ex) {
-			(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
 		} catch (Exception ex) {
+		    // in case of an AuthenticationException, the settings dialog could be reopened
 			LOGGER.error(Localization.lang("Failed to get user details for user: %0", BibSonomyProperties.getUsername()), ex);
 		}
 	}

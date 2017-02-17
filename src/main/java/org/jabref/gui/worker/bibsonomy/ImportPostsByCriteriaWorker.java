@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.bibsonomy.SearchType;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.util.bibsonomy.BibSonomyCallBack;
@@ -138,8 +137,8 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 
 				cycle++;
 			} catch (AuthenticationException ex) {
-				LOGGER.warn(ex.getLocalizedMessage(), ex);
-				(new ShowSettingsDialogAction((JabRefFrame) dialog.getOwner())).actionPerformed(null);
+				LOGGER.error(ex.getLocalizedMessage(), ex);
+				// TODO: we could open the settings dialog here. This should be done via the eventbus somehow
 			}
 		} while (fetchNext() && numberOfPosts >= numberOfPostsPerRequest);
 

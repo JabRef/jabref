@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.bibsonomy.ShowSettingsDialogAction;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
 import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.logic.l10n.Localization;
@@ -75,7 +74,8 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 			jabRefFrame.output("Done.");
 			return;
 		} catch (AuthenticationException ex) {
-			(new ShowSettingsDialogAction(jabRefFrame)).actionPerformed(null);
+            LOGGER.error(ex.getLocalizedMessage(), ex);
+            // TODO: we could open the settings dialog here. This should be done via the eventbus somehow
 		} catch (Throwable ex) {
 			LOGGER.error("Failed to export post ", ex);
 		}

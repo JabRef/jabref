@@ -1,11 +1,11 @@
-package org.jabref.gui.bibsonomy;
+package org.jabref.gui.preftabs.support;
 
 /**
  * Is a simple class to represent a key-value store in a combo box
  *
  * @param <K> Type of the key
  */
-class ComboBoxItem<K> {
+public class ComboBoxItem<K> {
 
     private K key;
     private String value;
@@ -26,8 +26,7 @@ class ComboBoxItem<K> {
         return value;
     }
 
-    ComboBoxItem(K key, String value) {
-
+    public ComboBoxItem(K key, String value) {
         setKey(key);
         setValue(value);
     }
