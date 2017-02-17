@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.OptionalUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 

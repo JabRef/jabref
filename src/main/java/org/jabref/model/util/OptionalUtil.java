@@ -1,4 +1,4 @@
-package org.jabref.logic.util;
+package org.jabref.model.util;
 
 import java.util.Collection;
 import java.util.Collections;

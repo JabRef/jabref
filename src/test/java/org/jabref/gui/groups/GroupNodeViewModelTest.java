@@ -30,8 +30,8 @@ public class GroupNodeViewModelTest {
     @Test
     public void getDisplayNameConvertsLatexToUnicode() throws Exception {
         GroupNodeViewModel viewModel = getViewModelForGroup(
-                new WordKeywordGroup("\beta", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
-        assertEquals("baeiabb", viewModel.getDisplayName());
+                new WordKeywordGroup("\\beta", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
+        assertEquals("β", viewModel.getDisplayName());
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
