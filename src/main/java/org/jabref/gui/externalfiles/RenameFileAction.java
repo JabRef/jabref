@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.externalfiles;
+package org.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -12,17 +12,17 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.fieldeditors.FileListEditor;
-import net.sf.jabref.gui.filelist.FileListEntry;
-import net.sf.jabref.logic.cleanup.CleanupPreferences;
-import net.sf.jabref.logic.cleanup.RenamePdfCleanup;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.ParsedFileField;
+import org.jabref.Globals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.fieldeditors.FileListEditor;
+import org.jabref.gui.filelist.FileListEntry;
+import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.RenamePdfCleanup;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.entry.ParsedFileField;
 
 public class RenameFileAction extends AbstractAction {
 

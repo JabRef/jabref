@@ -43,6 +43,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.MoveFileAction;
+import org.jabref.gui.externalfiles.RenameFileAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
@@ -60,6 +61,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
+
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -74,7 +76,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final JPopupMenu menu = new JPopupMenu();
 
     public FileListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
-                          EntryEditor entryEditor) {
+            EntryEditor entryEditor) {
         this.frame = frame;
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
@@ -108,8 +110,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         download.addActionListener(e -> downloadFile());
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout
-                ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                .layout(new FormLayout("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
         builder.add(auto).xy(5, 1);
@@ -265,7 +266,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             try {
                 Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
                         .getExternalFileTypeByName(entry.type.get().getName());
-                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.link, type.isPresent() ? type : entry.type);
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.link,
+                        type.isPresent() ? type : entry.type);
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -436,7 +438,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     }
                     // reset
                     auto.setEnabled(true);
-                } , dialog));
+                }, dialog));
     }
 
     /**
@@ -478,6 +480,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     class TableClickListener extends MouseAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {

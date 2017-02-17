@@ -7,13 +7,15 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;

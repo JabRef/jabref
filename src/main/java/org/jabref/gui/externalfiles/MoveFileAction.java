@@ -13,15 +13,15 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.util.component.CheckBoxMessage;
+import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.MoveFilesCleanup;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
