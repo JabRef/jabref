@@ -68,7 +68,7 @@
           <versionLine x="20" y="40" text="version ${compiler:sys.version}" fontSize="8" fontColor="0,0,0" bold="false" />
         </text>
       </splashScreen>
-      <java mainClass="net.sf.jabref.JabRefMain" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
+      <java mainClass="org.jabref.JabRefMain" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="" bundleRuntime="true">
         <classPath>
           <archive location="${compiler:buildFileName}" failOnError="false" />
         </classPath>
@@ -85,8 +85,9 @@
       <customScript mode="1" file="">
         <content />
       </customScript>
-      <infoPlist mode="1" file="">
-        <content />
+      <infoPlist mode="3" file="">
+        <content>&lt;key&gt;NSSupportsAutomaticGraphicsSwitching&lt;/key&gt;
+&lt;string&gt;YES&lt;/string&gt;</content>
       </infoPlist>
       <iconImageFiles />
     </launcher>

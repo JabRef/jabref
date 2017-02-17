@@ -11,7 +11,13 @@ services:
   - mysql
 
 env:
-  - GRADLE_OPTS=-Dorg.gradle.daemon=false
+  global:
+    - GRADLE_OPTS=-Dorg.gradle.daemon=false
+  matrix:
+    - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=fetcherTest
+    - TEST_SUITE=databaseTest
+    - TEST_SUITE=guiTest
 
 # JavaFX localization tests need a running X environment
 before_install:
@@ -26,27 +32,12 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check modernizer -Dscan
-  - ./gradlew fetcherTest -Dscan
-  - ./gradlew databaseTest -Dscan
-  # no need for databases for the integrationTest -> save memory
-  # currently does not work: "stop: Unknown instance:" - sudo service mysql stop
-  - sudo service postgresql stop
-  # following services identified by "sudo service --status-all" do not need to run, too
-  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unknown instance" error)
-  - sudo service acpid stop
-  - sudo service atd stop
-  - sudo service cron stop
-  - sudo service memcached stop
-  - sudo service ntp stop
-  - sudo service rabbitmq-server stop
-  - sudo service resolvconf stop
-  - sudo service sshguard stop
-  - sudo service ssh stop
-  # Integration tests run in a timeout. Just start them and kill them after 60s.
-  - timeout 60 ./gradlew guiTest -Dscan --info || true
+  # -Dscan enables the Gradle build scan, which can be used to investiage the time each action consumes
+  # For more information see https://gradle.com/scans/get-started
+  - if [ "$TEST_SUITE" != "guiTest" ]; then ./gradlew $TEST_SUITE $OPTIONS -Dscan; fi
+  - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
 
-after_script:
+after_success:
   # enable codecov report
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
