@@ -1,11 +1,14 @@
 package org.jabref.gui.preftabs;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+
 /**
  * A prefsTab is a component displayed in the PreferenceDialog.
  *
  * It needs to extend from Component.
  */
-interface PrefsTab {
+interface PrefsTab extends FocusListener {
 
     /**
      * This method is called when the dialog is opened, or if it is made
@@ -39,4 +42,15 @@ interface PrefsTab {
      * @return Identifier for the tab (for instance "General", "Appearance" or "External Files").
      */
     String getTabName();
+
+    @Override
+    default void focusGained(FocusEvent fe) {
+        System.out.println("Focus gained in JPanel");
+    }
+
+    @Override
+    default public void focusLost(FocusEvent fe){
+        System.out.println("Focus lost in JPanel");
+    }
+
 }
