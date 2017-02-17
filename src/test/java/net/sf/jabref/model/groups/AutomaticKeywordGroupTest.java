@@ -1,20 +1,19 @@
 package net.sf.jabref.model.groups;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class AutomaticGroupTest {
+public class AutomaticKeywordGroupTest {
 
     @Test
     public void createSubgroupsForTwoKeywords() throws Exception {
-        AutomaticGroup keywordsGroup = new AutomaticGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',');
+        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',');
         BibEntry entry = new BibEntry().withField("keywords", "A, B");
 
         Set<GroupTreeNode> expected = new HashSet<>();

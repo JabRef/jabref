@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 import net.sf.jabref.gui.StateManager;
 import net.sf.jabref.gui.util.BindingsHelper;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEvent;
@@ -32,7 +33,7 @@ import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
 
-    private final String name;
+    private final String displayName;
     private final boolean isRoot;
     private final String iconCode;
     private final ObservableList<GroupNodeViewModel> children;
@@ -47,18 +48,19 @@ public class GroupNodeViewModel {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.groupNode = Objects.requireNonNull(groupNode);
 
-        name = groupNode.getName();
+        LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+        displayName = formatter.format(groupNode.getName());
         isRoot = groupNode.isRoot();
         iconCode = "";
-        if (groupNode.getGroup().getClass() == AutomaticGroup.class) {
+        if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
             // TODO: Update on changes to entry list (however: there is no flatMap and filter as observable TransformationLists)
             children = databaseContext.getDatabase()
                     .getEntries().stream()
                     .flatMap(stream -> createSubgroups(databaseContext, stateManager, automaticGroup, stream))
-                    .filter(distinctByKey(GroupNodeViewModel::getName))
-                    .sorted((group1, group2) -> group1.getName().compareToIgnoreCase(group2.getName()))
+                    .filter(distinctByKey(group -> group.getGroupNode().getName()))
+                    .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.map(groupNode.getChildren(),
@@ -77,22 +79,22 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
     }
 
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, AbstractGroup group) {
+        this(databaseContext, stateManager, new GroupTreeNode(group));
+    }
+
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object,Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
+        return new GroupNodeViewModel(newDatabase, stateManager, new AllEntriesGroup(Localization.lang("All entries")));
+    }
+
     private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
         return automaticGroup.createSubgroups(entry).stream()
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
-    }
-
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, AbstractGroup group) {
-        this(databaseContext, stateManager, new GroupTreeNode(group));
-    }
-
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
-        return new GroupNodeViewModel(newDatabase, stateManager, new AllEntriesGroup(Localization.lang("All entries")));
     }
 
     public BooleanBinding anySelectedEntriesMatchedProperty() {
@@ -107,8 +109,8 @@ public class GroupNodeViewModel {
         return hasChildren;
     }
 
-    public String getName() {
-        return name;
+    public String getDisplayName() {
+        return displayName;
     }
 
     public boolean isRoot() {
@@ -116,7 +118,7 @@ public class GroupNodeViewModel {
     }
 
     public String getDescription() {
-        return "Some group named " + getName();
+        return "Some group named " + getDisplayName();
     }
 
     public SimpleIntegerProperty getHits() {
@@ -131,7 +133,7 @@ public class GroupNodeViewModel {
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
         if (isRoot != that.isRoot) return false;
-        if (!name.equals(that.name)) return false;
+        if (!displayName.equals(that.displayName)) return false;
         if (!iconCode.equals(that.iconCode)) return false;
         if (!children.equals(that.children)) return false;
         if (!databaseContext.equals(that.databaseContext)) return false;
@@ -142,7 +144,7 @@ public class GroupNodeViewModel {
     @Override
     public String toString() {
         return "GroupNodeViewModel{" +
-                "name='" + name + '\'' +
+                "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
                 ", iconCode='" + iconCode + '\'' +
                 ", children=" + children +
@@ -154,7 +156,7 @@ public class GroupNodeViewModel {
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
+        int result = displayName.hashCode();
         result = 31 * result + (isRoot ? 1 : 0);
         result = 31 * result + iconCode.hashCode();
         result = 31 * result + children.hashCode();
