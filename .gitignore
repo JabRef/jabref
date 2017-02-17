@@ -33,6 +33,10 @@ ui/
 .classpath
 .project
 
+# markdown-toc
+node_modules/
+npm-debug.log
+
 # UNKNWON
 jabref.xml
 *.sonargraph
