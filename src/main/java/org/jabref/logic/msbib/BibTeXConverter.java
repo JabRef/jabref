@@ -83,11 +83,11 @@ public class BibTeXConverter {
         }
         if (entry.month != null) {
             Month month = MonthUtil.getMonth(entry.month);
-            //if we encouter an UnknownMonth/NULL_OBJECT month, the shortname returns null
-            if (month.shortName == null) {
-                fieldValues.put(FieldName.MONTH, "");
-            } else {
+            //if we encouter an invalid month shortname would be null
+            if (month.isValid()) {
                 fieldValues.put(FieldName.MONTH, month.shortName);
+            } else {
+                fieldValues.put(FieldName.MONTH, "");
             }
         }
         if (entry.number != null) {
