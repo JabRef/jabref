@@ -64,7 +64,7 @@ public class RenameFileAction extends AbstractAction {
                 .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
-                    Localization.lang("Rename_file"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Rename file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         Path file = Paths.get(ln);
@@ -83,7 +83,7 @@ public class RenameFileAction extends AbstractAction {
             String targetFileName = pdfCleanup.getTargetFileName(field, eEditor.getEntry());
             System.out.println("TargetFileName " + targetFileName);
 
-            String[] options = {Localization.lang("Rename_file"), Localization.lang("Cancel")};
+            String[] options = {Localization.lang("Rename file"), Localization.lang("Cancel")};
 
             JOptionPane.showOptionDialog(frame, "Rename file to " + targetFileName, "Rename",
                     JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);

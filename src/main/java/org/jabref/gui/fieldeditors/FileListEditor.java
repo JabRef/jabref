@@ -211,7 +211,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         });
 
-        JMenuItem rename = new JMenuItem(Localization.lang("Move/Rename file"));
+        JMenuItem rename = new JMenuItem(Localization.lang("Rename file"));
         menu.add(rename);
         rename.addActionListener(new RenameFileAction(frame, entryEditor, this));
 

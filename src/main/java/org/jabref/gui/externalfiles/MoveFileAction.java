@@ -40,7 +40,6 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
-    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
@@ -76,7 +75,7 @@ public class MoveFileAction extends AbstractAction {
                 .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
-                    Localization.lang("Move_file"), JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Move file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         Path file = Paths.get(ln);
@@ -93,7 +92,7 @@ public class MoveFileAction extends AbstractAction {
                     prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
                     prefs.getLayoutFormatterPreferences(), field);
 
-            String[] options = {Localization.lang("Move_file"), Localization.lang("Cancel")};
+            String[] options = {Localization.lang("Move file"), Localization.lang("Cancel")};
 
             JOptionPane.showOptionDialog(frame, "Move file to " + " ", "Move",
                     JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
