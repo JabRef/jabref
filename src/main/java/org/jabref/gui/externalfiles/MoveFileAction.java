@@ -22,6 +22,7 @@ import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
@@ -75,7 +76,7 @@ public class MoveFileAction extends AbstractAction {
                 .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
-                    MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Move_file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         Path file = Paths.get(ln);
@@ -92,7 +93,14 @@ public class MoveFileAction extends AbstractAction {
                     prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
                     prefs.getLayoutFormatterPreferences(), field);
 
-            moveFiles.cleanup((eEditor.getEntry()));
+            String[] options = {Localization.lang("Move_file"), Localization.lang("Cancel")};
+
+            JOptionPane.showOptionDialog(frame, "Move file to " + " ", "Move",
+                    JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+
+            List<FieldChange> fieldChanges = moveFiles.cleanup((eEditor.getEntry()));
+            fieldChanges.stream().findFirst().ifPresent(x -> System.out.println(x.getNewValue()));
+
             //myCleanUp.cleanup();
             /*  File newFile = null;
             boolean repeat = true;

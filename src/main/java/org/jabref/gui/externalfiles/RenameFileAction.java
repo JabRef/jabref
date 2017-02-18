@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
@@ -22,6 +21,7 @@ import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.ParsedFileField;
 
 public class RenameFileAction extends AbstractAction {
@@ -30,8 +30,6 @@ public class RenameFileAction extends AbstractAction {
     private final EntryEditor eEditor;
     private final FileListEditor editor;
     private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
-
-    private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
 
     public RenameFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
@@ -65,7 +63,7 @@ public class RenameFileAction extends AbstractAction {
                 .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
-                    MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
+                    Localization.lang("Rename_file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
         Path file = Paths.get(ln);
@@ -84,8 +82,13 @@ public class RenameFileAction extends AbstractAction {
             String targetFileName = pdfCleanup.getTargetFileName(field, eEditor.getEntry());
             System.out.println("TargetFileName " + targetFileName);
 
-            pdfCleanup.cleanup(eEditor.getEntry());
+            String[] options = {Localization.lang("Rename_file"), Localization.lang("Cancel")};
 
+            JOptionPane.showOptionDialog(frame, "Rename file to " + targetFileName, "Rename",
+                    JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+
+            List<FieldChange> fieldChanges = pdfCleanup.cleanup(eEditor.getEntry());
+            fieldChanges.stream().findFirst().ifPresent(System.out::println);
         }
     }
 

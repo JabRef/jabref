@@ -63,7 +63,7 @@ public class MoveFilesCleanup implements CleanupJob {
 
         List<String> paths = databaseContext.getFileDirectories(fileDirectoryPreferences);
         String defaultFileDirectory = firstExistingFileDir.get().toString();
-        Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
+        Optional<Path> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths).map(File::toPath);
 
         if (!targetDirectory.isPresent()) {
             return Collections.emptyList();
@@ -98,7 +98,7 @@ public class MoveFilesCleanup implements CleanupJob {
                         layoutPrefs);
             }
 
-            Path newTargetFile = targetDirectory.get().toPath().resolve(targetDirName).resolve(oldFile.get().getName());
+            Path newTargetFile = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getName());
             if (Files.exists(newTargetFile)) {
                 // We do not overwrite already existing files
                 newFileList.add(fileEntry);
@@ -138,4 +138,5 @@ public class MoveFilesCleanup implements CleanupJob {
 
         return Collections.emptyList();
     }
+
 }
