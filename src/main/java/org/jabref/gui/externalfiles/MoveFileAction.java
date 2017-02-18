@@ -40,7 +40,6 @@ public class MoveFileAction extends AbstractAction {
     private final FileListEditor editor;
     private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
-
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
         this.eEditor = eEditor;
@@ -94,11 +93,14 @@ public class MoveFileAction extends AbstractAction {
 
             String[] options = {Localization.lang("Move file"), Localization.lang("Cancel")};
 
-            JOptionPane.showOptionDialog(frame, "Move file to " + " ", "Move",
+            int dialogResult = JOptionPane.showOptionDialog(frame, "Move file to file directory" + fileDir.get(),
+                    "Move",
                     JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
 
-            List<FieldChange> fieldChanges = moveFiles.cleanup((eEditor.getEntry()));
-            fieldChanges.stream().findFirst().ifPresent(x -> System.out.println(x.getNewValue()));
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                List<FieldChange> fieldChanges = moveFiles.cleanup((eEditor.getEntry()));
+                fieldChanges.stream().findFirst().ifPresent(x -> System.out.println(x.getNewValue()));
+            }
 
             //myCleanUp.cleanup();
             /*  File newFile = null;

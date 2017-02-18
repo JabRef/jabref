@@ -85,11 +85,15 @@ public class RenameFileAction extends AbstractAction {
 
             String[] options = {Localization.lang("Rename file"), Localization.lang("Cancel")};
 
-            JOptionPane.showOptionDialog(frame, "Rename file to " + targetFileName, "Rename",
+            int dialogResult = JOptionPane.showOptionDialog(frame, "Rename file to " + targetFileName, "Rename",
                     JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
 
-            List<FieldChange> fieldChanges = pdfCleanup.cleanup(eEditor.getEntry());
-            fieldChanges.stream().findFirst().ifPresent(System.out::println);
+            //indicates Rename pressed
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                List<FieldChange> fieldChanges = pdfCleanup.cleanup(eEditor.getEntry());
+                fieldChanges.stream().findFirst().ifPresent(System.out::println);
+            }
+
         }
     }
 
