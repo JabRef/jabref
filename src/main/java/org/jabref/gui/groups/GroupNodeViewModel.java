@@ -31,9 +31,9 @@ public class GroupNodeViewModel {
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
     private final SimpleBooleanProperty hasChildren;
+    private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
-
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.groupNode = Objects.requireNonNull(groupNode);
@@ -61,6 +61,10 @@ public class GroupNodeViewModel {
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
         return new GroupNodeViewModel(newDatabase, stateManager, new AllEntriesGroup(Localization.lang("All entries")));
+    }
+
+    public SimpleBooleanProperty expandedProperty() {
+        return expandedProperty;
     }
 
     public BooleanBinding anySelectedEntriesMatchedProperty() {
@@ -164,5 +168,9 @@ public class GroupNodeViewModel {
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
         return groupNode.addSubgroup(subgroup);
+    }
+
+    void toggleExpansion() {
+        expandedProperty().set(!expandedProperty().get());
     }
 }
