@@ -109,7 +109,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
         FormBuilder builder = FormBuilder.create()
                 .layout(new FormLayout
-                ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                        ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
         builder.add(auto).xy(5, 1);
@@ -218,13 +218,18 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         menu.add(moveToFileDir);
         moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
 
-        JMenuItem deleteFile = new JMenuItem(Localization.lang("Delete local file"));
+        JMenuItem deleteFile = new JMenuItem(Localization.lang("Permanently delete local file"));
         menu.add(deleteFile);
         deleteFile.addActionListener(e -> {
             int row = getSelectedRow();
-            // no selection
-            if (row != -1) {
 
+            // no selection
+            if (row == -1) {
+                return;
+            }
+
+            int userConfirm = JOptionPane.showConfirmDialog(null, Localization.lang("Are you sure you want to delete this file?"), Localization.lang("Warning"), JOptionPane.YES_NO_OPTION);
+            if (userConfirm == JOptionPane.YES_OPTION) {
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
                 Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
@@ -436,7 +441,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     }
                     // reset
                     auto.setEnabled(true);
-                } , dialog));
+                }, dialog));
     }
 
     /**
