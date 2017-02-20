@@ -51,7 +51,7 @@ public class ArXivTest {
     }
 
     @Test
-    public void doiNotPresent() throws IOException {
+    public void noIdentifierPresent() throws IOException {
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
@@ -59,13 +59,6 @@ public class ArXivTest {
     public void rejectNullParameter() throws IOException {
         finder.findFullText(null);
         Assert.fail();
-    }
-
-    @Test
-    public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1529/biophysj.104.047340");
-
-        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
     }
 
     @Test

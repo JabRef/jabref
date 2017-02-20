@@ -79,22 +79,6 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             }
         }
 
-        // 2. DOI
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
-        if (doi.isPresent()) {
-            String doiString = doi.get().getDOI();
-            // Search for an entry in the ArXiv which is linked to the doi
-            try {
-                Optional<URL> pdfUrl = searchForEntry("doi:" + doiString).flatMap(ArXivEntry::getPdfUrl);
-                if (pdfUrl.isPresent()) {
-                    LOGGER.info("Fulltext PDF found @ arXiv.");
-                    return pdfUrl;
-                }
-            } catch (FetcherException e) {
-                LOGGER.warn("arXiv DOI API request failed", e);
-            }
-        }
-
         return Optional.empty();
     }
 
