@@ -3,7 +3,11 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -11,10 +15,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.util.DOI;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
