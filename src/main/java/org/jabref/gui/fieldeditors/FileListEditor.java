@@ -228,24 +228,34 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 return;
             }
 
-            int userConfirm = JOptionPane.showConfirmDialog(null, Localization.lang("Are you sure you want to delete this file?"), Localization.lang("Warning"), JOptionPane.YES_NO_OPTION);
-            if (userConfirm == JOptionPane.YES_OPTION) {
-                FileListEntry entry = tableModel.getEntry(row);
-                // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
-                        Globals.prefs.getFileDirectoryPreferences());
+            FileListEntry entry = tableModel.getEntry(row);
+            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+                    Globals.prefs.getFileDirectoryPreferences());
 
-                // transactional delete and unlink
-                try {
-                    if (file.isPresent()) {
+            if (file.isPresent()) {
+                String[] options = {Localization.lang("Delete"), Localization.lang("Cancel")};
+                int userConfirm = JOptionPane.showOptionDialog(frame,
+                        Localization.lang("Delete '%0'?", file.get().getName()),
+                        Localization.lang("Delete file"),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+
+                if (userConfirm == JOptionPane.YES_OPTION) {
+                    try {
                         Files.delete(file.get().toPath());
+                        removeEntries();
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
+                                Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.warn("File permission error while deleting: " + entry.link, ex);
                     }
-                    removeEntries();
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
-                            Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn("File permission error while deleting: " + entry.link, ex);
                 }
+            } else {
+                JOptionPane.showMessageDialog(frame, Localization.lang("File not found"),
+                        Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
             }
         });
         adjustColumnWidth();
