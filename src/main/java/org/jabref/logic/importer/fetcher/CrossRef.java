@@ -1,21 +1,20 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.util.DOI;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.logic.util.strings.StringSimilarity;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import info.debatty.java.stringsimilarity.Levenshtein;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import org.jabref.logic.util.DOI;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,10 +30,6 @@ public class CrossRef {
     private static final String API_URL = "http://api.crossref.org";
     // number of results to lookup from crossref API
     private static final int API_RESULTS = 5;
-
-    private static final Levenshtein METRIC_DISTANCE = new Levenshtein();
-    // edit distance threshold for entry title comnparison
-    private static final int METRIC_THRESHOLD = 4;
 
     private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
@@ -92,6 +87,7 @@ public class CrossRef {
 
     private static Optional<String> findMatchingEntry(BibEntry entry, JSONArray results) {
         final String entryTitle = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(FieldName.TITLE).orElse(""));
+        final StringSimilarity stringSimilarity = new StringSimilarity();
 
         for (int i = 0; i < results.length(); i++) {
             // currently only title-based
@@ -102,7 +98,7 @@ public class CrossRef {
                 JSONObject data = results.getJSONObject(i);
                 String dataTitle = data.getJSONArray("title").getString(0);
 
-                if (editDistanceIgnoreCase(entryTitle, dataTitle) <= METRIC_THRESHOLD) {
+                if (stringSimilarity.isSimilar(entryTitle, dataTitle)) {
                     return Optional.of(data.getString("DOI"));
                 }
 
@@ -111,7 +107,7 @@ public class CrossRef {
                 if (data.getJSONArray("subtitle").length() > 0) {
                     String dataWithSubTitle = dataTitle + " " + data.getJSONArray("subtitle").getString(0);
 
-                    if (editDistanceIgnoreCase(entryTitle, dataWithSubTitle) <= METRIC_THRESHOLD) {
+                    if (stringSimilarity.isSimilar(entryTitle, dataWithSubTitle)) {
                         return Optional.of(data.getString("DOI"));
                     }
                 }
@@ -122,10 +118,5 @@ public class CrossRef {
         }
 
         return Optional.empty();
-    }
-
-    private static double editDistanceIgnoreCase(String a, String b) {
-        // TODO: locale is dependent on the language of the strings?!
-        return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }
