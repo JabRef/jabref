@@ -71,7 +71,7 @@ public class MedlineFetcherTest {
         entryEndharti.setField("pmid", "27670445");
         entryEndharti.setField("pubmodel", "Electronic");
         entryEndharti.setField("pubstatus", "epublish");
-        entryEndharti.setField("revised", "2016-10-11");
+        entryEndharti.setField("revised", "2017-02-20");
         entryEndharti.setField("volume", "16");
         entryEndharti.setField("year", "2016");
 
