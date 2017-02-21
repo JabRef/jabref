@@ -75,7 +75,7 @@ class FileAnnotationTab extends JPanel {
 
     }
 
-    FileAnnotationTab initializeTab(FileAnnotationTab tab) {
+    public FileAnnotationTab initializeTab(FileAnnotationTab tab) {
         if (tab.isInitialized) {
             return tab;
         }
@@ -86,7 +86,7 @@ class FileAnnotationTab extends JPanel {
         return tab;
     }
 
-    FileAnnotationTab initializeTab(FileAnnotationTab tab, Map<String, List<FileAnnotation>> cachedFileAnnotations) {
+    public FileAnnotationTab initializeTab(FileAnnotationTab tab, Map<String, List<FileAnnotation>> cachedFileAnnotations) {
         this.annotationsOfFiles = cachedFileAnnotations;
 
         if (tab.isInitialized) {
@@ -363,7 +363,7 @@ class FileAnnotationTab extends JPanel {
         }
     }
 
-    boolean isInitialized() {
+    public boolean isInitialized() {
         return isInitialized;
     }
 }

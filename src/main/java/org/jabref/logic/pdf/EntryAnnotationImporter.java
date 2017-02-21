@@ -44,7 +44,7 @@ public class EntryAnnotationImporter {
      * @param context The context is needed for the importer.
      * @return Map from each PDF to a list of file annotations
      */
-    Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext context) {
+    public Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext context) {
         Map<String, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()

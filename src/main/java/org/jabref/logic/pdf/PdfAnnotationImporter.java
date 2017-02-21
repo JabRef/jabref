@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.util.io.FileUtil;
@@ -24,11 +25,10 @@ import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
+import static org.jabref.gui.importer.actions.OpenDatabaseAction.LOGGER;
+
 public class PdfAnnotationImporter implements AnnotationImporter {
 
-
-    public PdfAnnotationImporter() {
-    }
 
     /**
      * Imports the comments from a pdf specified by its path
@@ -59,7 +59,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(String.format("Failed to read file %s.", path) , e);
         }
 
         List pdfPages = document.getDocumentCatalog().getAllPages();
@@ -79,7 +79,10 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
                         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                         String highlightedText = null;
-                        for (int j = 1, k = 0; j <= (quadsArray.size() / 8); j++) {
+                        for (int j = 1,
+                             k = 0;
+                             j <= (quadsArray.size() / 8);
+                             j++) {
 
                             COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
                             COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
@@ -121,14 +124,13 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                         annotationsList.add(new FileAnnotation(annotation, i + 1));
                     }
                 }
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (IOException e) {
+                LOGGER.error(String.format("Failed to read file %s.", path) , e);
             }
         }
         try {
             document.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
         return annotationsList;
     }
@@ -141,7 +143,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      */
     public PDDocument importPdfFile(final String path) throws IOException {
 
-            if(path.toLowerCase().endsWith(".pdf")){
+            if(path.toLowerCase(Locale.ROOT).endsWith(".pdf")){
                return PDDocument.load("/"+ path);
             }
         return null;
