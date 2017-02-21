@@ -167,7 +167,7 @@ All labeled UI elements, descriptions and messages shown to the user should be l
 
 JabRef uses ResourceBundles ([see Oracle Tutorial](https://docs.oracle.com/javase/tutorial/i18n/resbundle/concept.html)) to store `key=value` pairs for each String to be localized. 
 
-To show an localized String the following `net.sf.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to optain translated strings:
+To show an localized String the following `org.jabref.logic.l10n.Localization` has to be used. The Class currently provides three methods to optain translated strings:
 
 ```java
     public static String lang(String key);
@@ -207,13 +207,13 @@ Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src
 
 ## Drag and Drop
 
-`net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
+`org.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
 
 ## Get the JabRef frame panel
 
 ```java
-net.sf.jabref.JabRefFrame jrf = JabRef.jrf;
-net.sf.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
+org.jabref.JabRefFrame jrf = JabRef.jrf;
+org.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
 ```
 
 ## Get Absolute Filename or Path
@@ -242,14 +242,14 @@ File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPre
 To store the configuration keys in constants, one has two options 
 
   * as constant in the own class 
-  * as constant in `net.sf.jabref.JaRefPreferences.java`
+  * as constant in `org.jabref.JaRefPreferences.java`
 
 There are JabRef classes existing, where the strings are hard-coded and where constants are not used. That way of configuration should be avoided. 
 
 When adding a new preference, following steps have to be taken: 
 
   * add a constant for the configuration key 
-  * in net.sf.jabref.JaRefPreferences.java put a “defaults.put(&lt;configuration key&gt;, &lt;value&gt;)” statement 
+  * in org.jabref.JaRefPreferences.java put a “defaults.put(&lt;configuration key&gt;, &lt;value&gt;)” statement 
 
 When accessing a preference value, the method Globals.prefs.getTYPE(key) has to be used.
 
@@ -391,7 +391,7 @@ Database.addDatabaseChangeListener does not work as the DatabaseChangedEvent doe
 
 ### Working with authors
 
-You can normalize the authors using `net.sf.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `net.sf.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the von parts or the junior information).
+You can normalize the authors using `org.jabref.model.entry.AuthorList.fixAuthor_firstNameFirst(String)`. Then the authors always look nice. The only alternative containing all data of the names is `org.jabref.model.entry.AuthorList.fixAuthor_lastNameFirst(String)`. The other `fix...` methods omit data (like the von parts or the junior information).
 
 ## Benchmarks
 - Benchmarks can be executed by running the `jmh` gradle task (this functionality uses the [JMH Gradle plugin]( https://github.com/melix/jmh-gradle-plugin))
