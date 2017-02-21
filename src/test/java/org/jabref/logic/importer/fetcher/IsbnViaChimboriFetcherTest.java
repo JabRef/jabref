@@ -63,7 +63,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("title", "Fundamentals of Business Process Management");
         bibEntry.setField("publisher", "Springer");
         bibEntry.setField("year", "2015");
-        bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo Reijers");
+        bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo A. Reijers");
         bibEntry.setField("isbn", "3642434738");
         bibEntry.setField("url", "https://www.amazon.com/Fundamentals-Business-Process-Management-Marlon/dp/3642434738%3FSubscriptionId%3D0JYN1NVW651KCA56C102%26tag%3Dtechkie-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D3642434738");
 

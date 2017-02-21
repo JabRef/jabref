@@ -191,7 +191,6 @@ public class JabRefPreferences {
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
     public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
-    public static final String EDIT_GROUP_MEMBERSHIP_MODE = "groupEditGroupMembershipMode";
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String LIST_OF_FILE_COLUMNS = "listOfFileColumns";
@@ -392,7 +391,8 @@ public class JabRefPreferences {
     private static final String PREVIEW_ENABLED = "previewEnabled";
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
-
+    // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
+    private final static Integer UNSET_MENU_FONT_SIZE = -123;
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
@@ -416,9 +416,6 @@ public class JabRefPreferences {
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
-
-    // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
-    private final static Integer UNSET_MENU_FONT_SIZE = -123;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -578,7 +575,6 @@ public class JabRefPreferences {
         defaults.put(GROUP_EXPAND_TREE, Boolean.TRUE);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
-        defaults.put(EDIT_GROUP_MEMBERSHIP_MODE, Boolean.FALSE);
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));

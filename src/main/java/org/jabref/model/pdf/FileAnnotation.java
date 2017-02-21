@@ -16,7 +16,7 @@ public class FileAnnotation {
     private FileAnnotation linkedFileAnnotation;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
-    private boolean linkedComment;
+    private boolean linkedAnnotation;
 
     public FileAnnotation(final String commentId, final String author, final String date, final int page,
                           final String content, final String annotationType) {
@@ -56,8 +56,8 @@ public class FileAnnotation {
     public void linkComments(FileAnnotation commentToLinkTo){
         linkedFileAnnotation = commentToLinkTo;
         commentToLinkTo.setLinkedFileAnnotation(this);
-        commentToLinkTo.setLinkedComment(true);
-        linkedComment = true;
+        commentToLinkTo.setLinkedAnnotation(true);
+        linkedAnnotation = true;
     }
 
     @Override
@@ -117,11 +117,11 @@ public class FileAnnotation {
         return annotationType;
     }
 
-    public boolean hasLinkedComment() {
-        return linkedComment;
+    public boolean hasLinkedAnnotation() {
+        return linkedAnnotation;
     }
 
-    public void setLinkedComment(boolean linkedComment) {
-        this.linkedComment = linkedComment;
+    public void setLinkedAnnotation(boolean linkedAnnotation) {
+        this.linkedAnnotation = linkedAnnotation;
     }
 }

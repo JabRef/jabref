@@ -206,7 +206,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
-        annotationCache = new FileAnnotationCache();
+        annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
         setupMainPanel();
 
