@@ -43,6 +43,18 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
  - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
  - We fixed the import of MS-Office XML files, when the `month` field contained an invalid value.
+ 
+ 
+ 
+ - Sciencedirect/Elsevier fetcher is now able to scrape new HTML structure [#2576](https://github.com/JabRef/jabref/issues/2576)
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 ### Removed
 
 
