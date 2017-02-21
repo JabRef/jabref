@@ -1,6 +1,6 @@
 # list compiled from http://tug.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/bibtex/IEEEabrv.bib (2015/08/26 V1.14)
 Canadian Journal of Electrical and Computer Engineering = Canadian J. Elect. Comput. Eng.
-China Communications Magazine = China Commun.
+China Communications = China Commun.
 Computer = Computer
 IEEE ASSP Magazine = IEEE ASSP Mag.
 IEEE Access = IEEE Access
