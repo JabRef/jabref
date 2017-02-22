@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -90,7 +91,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                                 GroupHierarchyType.INCLUDING,
                                 Globals.prefs.getKeywordDelimiter()));
                 Set<String> keywords;
-                String fieldText = field.getText().toLowerCase().trim();
+                String fieldText = field.getText().toLowerCase(Locale.ROOT).trim();
                 if (this.keywords.isSelected()) {
                     if (useCustomDelimiter.isSelected()) {
                         keywords = findDeliminatedWordsInField(panel.getDatabase(), fieldText,

@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 import java.util.Optional;
 
 import com.mashape.unirest.http.Unirest;
@@ -15,7 +16,7 @@ public class MimeTypeDetector {
     public static boolean isPdfContentType(String url) {
         Optional<String> contentType = getMimeType(url);
 
-        return contentType.isPresent() && contentType.get().toLowerCase().startsWith("application/pdf");
+        return contentType.isPresent() && contentType.get().toLowerCase(Locale.ROOT).startsWith("application/pdf");
     }
 
     private static Optional<String> getMimeType(String url) {

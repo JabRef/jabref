@@ -1,5 +1,6 @@
 package org.jabref.model.search.rules;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +27,7 @@ public class RegexBasedSearchRule implements SearchRule {
     public boolean validateSearchStrings(String query) {
         String searchString = query;
         if (!caseSensitive) {
-            searchString = searchString.toLowerCase();
+            searchString = searchString.toLowerCase(Locale.ROOT);
         }
 
         try {

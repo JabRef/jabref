@@ -1,5 +1,6 @@
 package org.jabref.logic.bst;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -190,17 +191,17 @@ public final class BibtexCaseChanger {
         case TITLE_LOWERS:
         case ALL_LOWERS:
             if ("L O OE AE AA".contains(s)) {
-                sb.append(s.toLowerCase());
+                sb.append(s.toLowerCase(Locale.ROOT));
             } else {
                 sb.append(s);
             }
             break;
         case ALL_UPPERS:
             if ("l o oe ae aa".contains(s)) {
-                sb.append(s.toUpperCase());
+                sb.append(s.toUpperCase(Locale.ROOT));
             } else if ("i j ss".contains(s)) {
                 sb.deleteCharAt(sb.length() - 1); // Kill backslash
-                sb.append(s.toUpperCase());
+                sb.append(s.toUpperCase(Locale.ROOT));
                 while ((pos < c.length) && Character.isWhitespace(c[pos])) {
                     pos++;
                 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -184,7 +185,7 @@ public class MrDLibImporter extends Importer {
         public void startElement(String uri, String localName, String qName, Attributes attributes)
                 throws SAXException {
 
-            switch (qName.toLowerCase()) {
+            switch (qName.toLowerCase(Locale.ROOT)) {
             case "related_article":
                 currentEntry = new BibEntry();
                 htmlSnippetSingle = null;

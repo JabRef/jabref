@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.Globals;
@@ -50,7 +51,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     @Override
     public boolean accept(File f) {
-        return (f != null) && f.getName().toUpperCase().endsWith(".PDF");
+        return (f != null) && f.getName().toUpperCase(Locale.ROOT).endsWith(".PDF");
     }
 
     @Override

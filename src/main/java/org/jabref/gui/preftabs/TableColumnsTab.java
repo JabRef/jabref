@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -617,7 +618,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             for (int i = 1; i < panel.getMainTable().getColumnCount(); i++) {
                 String name = panel.getMainTable().getColumnName(i);
                 if ((name != null) && !name.isEmpty()) {
-                    map.put(name.toLowerCase(), i);
+                    map.put(name.toLowerCase(Locale.ROOT), i);
                 }
             }
             Collections.sort(tableRows, (o1, o2) -> {
@@ -651,7 +652,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
                 try {
-                    String name = panel.getMainTable().getColumnName(i).toLowerCase();
+                    String name = panel.getMainTable().getColumnName(i).toLowerCase(Locale.ROOT);
                     int width = colMod.getColumn(i).getWidth();
                     if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);
@@ -770,7 +771,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
             prefs.putInt(JabRefPreferences.NUMBER_COL_WIDTH, ncWidth);
             for (TableRow tr : tableRows) {
-                names.add(tr.getName().toLowerCase());
+                names.add(tr.getName().toLowerCase(Locale.ROOT));
                 nWidths.add(tr.getLength());
                 widths.add(String.valueOf(tr.getLength()));
             }

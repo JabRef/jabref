@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -58,7 +59,7 @@ public class BibtexString implements Cloneable {
             // Second character is not upper case
             // aStallman -> AUTHOR
             // asdf -> OTHER
-            if (!(String.valueOf(key.charAt(1))).toUpperCase().equals(String.valueOf(key.charAt(1)))) {
+            if (!(String.valueOf(key.charAt(1))).toUpperCase(Locale.ROOT).equals(String.valueOf(key.charAt(1)))) {
                 return OTHER;
             }
             for (Type t : Type.values()) {

@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.Locale;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -32,13 +34,13 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                 String surname;
 
                 if (author.length == 1) {// Caso 1.0: Sólo un campo
-                    sb.append(author[0].trim().toUpperCase());
+                    sb.append(author[0].trim().toUpperCase(Locale.ROOT));
 
                 } else if (author.length == 2) {// Caso 1.1: Nombre Apellido
                     //primer campo Nombre
                     name = author[0].trim();
                     //Segundo campo Apellido
-                    surname = author[1].trim().toUpperCase();
+                    surname = author[1].trim().toUpperCase(Locale.ROOT);
 
                     //añadimos los campos modificados al string final
                     sb.append(surname);
@@ -49,7 +51,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     //primer campo Nombre
                     name = author[0].trim();
                     //Segundo y tercer campo Apellido1 Apellido2
-                    surname = author[1].trim().toUpperCase() + ' ' + author[2].trim().toUpperCase();
+                    surname = author[1].trim().toUpperCase(Locale.ROOT) + ' ' + author[2].trim().toUpperCase(Locale.ROOT);
 
                     //añadimos los campos modificados al string final
                     sb.append(surname);
@@ -60,7 +62,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
                     //primer y segundo campo Nombre SegundoNombre
                     name = author[0].trim() + ' ' + author[1].trim();
                     //tercer y cuarto campo Apellido1 Apellido2
-                    surname = author[2].trim().toUpperCase() + ' ' + author[3].trim().toUpperCase();
+                    surname = author[2].trim().toUpperCase(Locale.ROOT) + ' ' + author[3].trim().toUpperCase(Locale.ROOT);
 
                     //añadimos los campos modificados al string final
                     sb.append(surname);
@@ -70,7 +72,7 @@ public class Iso690NamesAuthors implements LayoutFormatter {
 
             } else { // Caso 2: Apellidos, Nombre
                 // Campo 1 apellidos, lo pasamos a mayusculas
-                String surname = author[0].trim().toUpperCase();
+                String surname = author[0].trim().toUpperCase(Locale.ROOT);
                 // campo 2 nombre
                 String name = author[1].trim();
                 //añadimos los campos modificados al string final

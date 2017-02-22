@@ -2,6 +2,7 @@ package org.jabref.logic.pdf;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class EntryAnnotationImporter {
      */
     public List<ParsedFileField> getFilteredFileList() {
         return FileField.parse(this.entry.getField(FieldName.FILE).get()).stream()
-                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
+                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf"))
                 .filter(parsedFileField -> !parsedFileField.getLink().contains("www.")).collect(Collectors.toList());
     }
 

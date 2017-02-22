@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -256,7 +257,7 @@ public class PdfContentImporter extends Importer {
                 } else {
                     // e.g. Copyright (c) 1998 by the Genetics Society of America
                     // future work: get year using RegEx
-                    String lower = curString.toLowerCase();
+                    String lower = curString.toLowerCase(Locale.ROOT);
                     if (lower.contains("copyright")) {
                         fillCurStringWithNonEmptyLines();
                         publisher = curString;
@@ -321,7 +322,7 @@ public class PdfContentImporter extends Importer {
                     fillCurStringWithNonEmptyLines();
                     keywords = removeNonLettersAtEnd(curString);
                 } else {
-                    String lower = curString.toLowerCase();
+                    String lower = curString.toLowerCase(Locale.ROOT);
 
                     int pos = lower.indexOf("technical");
                     if (pos >= 0) {
