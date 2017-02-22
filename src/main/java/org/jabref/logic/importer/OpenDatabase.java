@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.io.File;
 import java.io.IOException;
 
+import org.jabref.Globals;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
@@ -66,7 +67,9 @@ public class OpenDatabase {
 
         if (importFormatPreferences.isKeywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
+                if (Globals.prefs.isKeywordSyncEnabled()) {
+                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
+                }
             }
             LOGGER.debug("Synchronized special fields based on keywords");
         }
