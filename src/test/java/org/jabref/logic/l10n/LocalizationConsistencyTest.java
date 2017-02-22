@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LocalizationConsistencyTest {
 
@@ -166,6 +167,25 @@ public class LocalizationConsistencyTest {
                 "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
                 "3. EXECUTE: gradlew localizationUpdate\n",
                 Collections.<String>emptySet(), obsoleteKeys);
+    }
+
+    @Test
+    public void localizationMustOnlyUseConcatenatedStrings() throws IOException {
+        // Must start or end with "
+        // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
+        // TODO: Localization.lang(var1 + "test" + var2) not covered
+        // Localization.lang("Problem downloading from %1", address)
+        Set<LocalizationEntry> keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG);
+        for(LocalizationEntry e : keys) {
+            assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
+                    e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
+        }
+
+        keys = LocalizationParser.findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.MENU);
+        for(LocalizationEntry e : keys) {
+            assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
+                    e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
+        }
     }
 
 }
