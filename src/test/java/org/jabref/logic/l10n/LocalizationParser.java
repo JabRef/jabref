@@ -290,7 +290,10 @@ public class LocalizationParser {
                     } else if (c == ')') {
                         brackets--;
                     }
-                    buffer.append(c);
+                    // skip closing brackets
+                    if (brackets != 0) {
+                        buffer.append(c);
+                    }
                     index++;
                 }
                 // trim newlines and whitespace
