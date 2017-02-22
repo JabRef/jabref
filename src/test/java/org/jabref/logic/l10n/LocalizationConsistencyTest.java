@@ -170,7 +170,7 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void localizationMustOnlyUseConcatenatedStrings() throws IOException {
+    public void localizationParameterMustIncludeAString() throws IOException {
         // Must start or end with "
         // Localization.lang("test"), Localization.lang("test" + var), Localization.lang(var + "test")
         // TODO: Localization.lang(var1 + "test" + var2) not covered
