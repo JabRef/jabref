@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -53,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
 public class URLDownload {
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
-    private static final String USER_AGENT= "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0";
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0";
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
@@ -73,17 +74,12 @@ public class URLDownload {
      */
     public URLDownload(URL source) {
         this.source = source;
-        addParameters("User-Agent", USER_AGENT);
+        this.addHeader("User-Agent", URLDownload.USER_AGENT);
     }
-
-    public URL getSource() {
-        return source;
-    }
-
 
     public String determineMimeType() throws IOException {
         // this does not cause a real performance issue as the underlying HTTP/TCP connection is reused
-        URLConnection urlConnection = openConnection();
+        URLConnection urlConnection = this.openConnection();
         try {
             return urlConnection.getContentType();
         } finally {
@@ -95,8 +91,8 @@ public class URLDownload {
         }
     }
 
-    public void addParameters(String key, String value) {
-        parameters.put(key, value);
+    public void addHeader(String key, String value) {
+        this.parameters.put(key, value);
     }
 
     public void setPostData(String postData) {
@@ -106,14 +102,14 @@ public class URLDownload {
     }
 
     private URLConnection openConnection() throws IOException {
-        URLConnection connection = source.openConnection();
-        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+        URLConnection connection = this.source.openConnection();
+        for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
-        if (!postData.isEmpty()) {
+        if (!this.postData.isEmpty()) {
             connection.setDoOutput(true);
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-                wr.writeBytes(postData);
+                wr.writeBytes(this.postData);
             }
 
         }
@@ -122,9 +118,9 @@ public class URLDownload {
             // normally, 3xx is redirect
             int status = ((HttpURLConnection) connection).getResponseCode();
             if (status != HttpURLConnection.HTTP_OK) {
-                if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                        || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                        || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                        || status == HttpURLConnection.HTTP_MOVED_PERM
+                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
                     // get redirect url from "location" header field
                     String newUrl = connection.getHeaderField("Location");
                     // open the new connnection again
@@ -144,15 +140,14 @@ public class URLDownload {
      * @return the downloaded string
      * @throws IOException
      */
-
     public String downloadToString(Charset encoding) throws IOException {
 
-        try (InputStream input = new BufferedInputStream(openConnection().getInputStream());
+        try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream());
              Writer output = new StringWriter()) {
-            copy(input, output, encoding);
+            this.copy(input, output, encoding);
             return output.toString();
         } catch (IOException e) {
-            LOGGER.warn("Could not copy input", e);
+            URLDownload.LOGGER.warn("Could not copy input", e);
             throw e;
         }
     }
@@ -162,16 +157,15 @@ public class URLDownload {
         CookieHandler.setDefault(cookieManager);
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
-        URLConnection con = openConnection();
+        URLConnection con = this.openConnection();
         con.getHeaderFields(); // must be read to store the cookie
 
         try {
-            return cookieManager.getCookieStore().get(source.toURI());
+            return cookieManager.getCookieStore().get(this.source.toURI());
         } catch (URISyntaxException e) {
-            LOGGER.error("Unable to convert download URL to URI", e);
+            URLDownload.LOGGER.error("Unable to convert download URL to URI", e);
             return Collections.emptyList();
         }
-
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
@@ -189,10 +183,10 @@ public class URLDownload {
 
     public void downloadToFile(Path destination) throws IOException {
 
-        try (InputStream input = new BufferedInputStream(openConnection().getInputStream())) {
+        try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            LOGGER.warn("Could not copy input", e);
+            URLDownload.LOGGER.warn("Could not copy input", e);
             throw e;
         }
     }
@@ -204,7 +198,7 @@ public class URLDownload {
      */
     public Path downloadToTemporaryFile() throws IOException {
         // Determine file name and extension from source url
-        String sourcePath = source.getPath();
+        String sourcePath = this.source.getPath();
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
@@ -213,49 +207,39 @@ public class URLDownload {
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
-        downloadToFile(file);
+        this.downloadToFile(file);
         return file;
     }
 
     @Override
     public String toString() {
-        return "URLDownload{" + "source=" + source + '}';
+        return "URLDownload{" + "source=" + this.source + '}';
     }
 
-    public void fixSSLVerification() {
-
+    public void bypassSSLVerification() {
         // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
-
+        TrustManager[] trustAllCerts = { new X509TrustManager() {
             @Override
-            public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType)
-                    throws java.security.cert.CertificateException {
-                // TODO Auto-generated method stub
-
+            public void checkClientTrusted(X509Certificate[] chain, String authType) {
             }
 
             @Override
-            public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType)
-                    throws java.security.cert.CertificateException {
-                // TODO Auto-generated method stub
-
+            public void checkServerTrusted(X509Certificate[] chain, String authType) {
             }
 
             @Override
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                // TODO Auto-generated method stub
+            public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
             }
-
         }};
 
         // Install the all-trusting trust manager
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
         } catch (Exception e) {
-            LOGGER.error("SSL problem", e);
+            LOGGER.error("A problem occurred when bypassing SSL verification", e);
         }
     }
 }
