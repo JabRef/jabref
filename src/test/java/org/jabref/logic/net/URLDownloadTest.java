@@ -18,7 +18,7 @@ public class URLDownloadTest {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         Assert.assertTrue("google.com should contain google",
-                dl.downloadToString(StandardCharsets.UTF_8).contains("Google"));
+                dl.asString(StandardCharsets.UTF_8).contains("Google"));
     }
 
     @Test
@@ -26,7 +26,7 @@ public class URLDownloadTest {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         Assert.assertTrue("google.com should contain google",
-                dl.downloadToString(JabRefPreferences.getInstance().getDefaultEncoding()).contains("Google"));
+                dl.asString(JabRefPreferences.getInstance().getDefaultEncoding()).contains("Google"));
     }
 
     @Test

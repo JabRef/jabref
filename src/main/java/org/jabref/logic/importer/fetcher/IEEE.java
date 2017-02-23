@@ -54,7 +54,7 @@ public class IEEE implements FulltextFetcher {
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
                 // Download the HTML page from IEEE
                 String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())
-                        .downloadToString(StandardCharsets.UTF_8);
+                        .asString(StandardCharsets.UTF_8);
                 // Try to find the link
                 Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
                 if (matcher.find()) {
@@ -70,7 +70,7 @@ public class IEEE implements FulltextFetcher {
         }
 
         // Download the HTML page containing a frame with the PDF
-        String framePage = new URLDownload(BASE_URL + stampString).downloadToString(StandardCharsets.UTF_8);
+        String framePage = new URLDownload(BASE_URL + stampString).asString(StandardCharsets.UTF_8);
         // Try to find the direct PDF link
         Matcher matcher = PDF_PATTERN.matcher(framePage);
         if (matcher.find()) {

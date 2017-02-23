@@ -110,7 +110,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             dl.setPostData(postData);
 
             //retrieve the search results
-            String page = dl.downloadToString(StandardCharsets.UTF_8);
+            String page = dl.asString(StandardCharsets.UTF_8);
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
@@ -141,7 +141,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //fetch the raw Bibtex results from IEEEXplore
             String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson))
-                    .downloadToString(Globals.prefs.getDefaultEncoding());
+                    .asString(Globals.prefs.getDefaultEncoding());
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);

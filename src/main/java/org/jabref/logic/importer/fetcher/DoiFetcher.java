@@ -53,7 +53,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 // BibTeX data
                 URLDownload download = new URLDownload(doiURL);
                 download.addHeader("Accept", "application/x-bibtex");
-                String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
+                String bibtexString = download.asString(StandardCharsets.UTF_8);
 
                 // BibTeX entry
                 Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);

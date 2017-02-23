@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * Example:
  * URLDownload dl = new URLDownload(URL);
- * String content = dl.downloadToString(ENCODING);
+ * String content = dl.asString(ENCODING);
  * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
  *
@@ -132,53 +132,19 @@ public class URLDownload {
         }
     }
 
-    private URLConnection openConnection() throws IOException {
-        URLConnection connection = this.source.openConnection();
-        for (Entry<String, String> entry : this.parameters.entrySet()) {
-            connection.setRequestProperty(entry.getKey(), entry.getValue());
-        }
-        if (!this.postData.isEmpty()) {
-            connection.setDoOutput(true);
-            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-                wr.writeBytes(this.postData);
-            }
-
-        }
-
-        if (connection instanceof HttpURLConnection) {
-            // normally, 3xx is redirect
-            int status = ((HttpURLConnection) connection).getResponseCode();
-            if (status != HttpURLConnection.HTTP_OK) {
-                if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                        || status == HttpURLConnection.HTTP_MOVED_PERM
-                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
-                    // get redirect url from "location" header field
-                    String newUrl = connection.getHeaderField("Location");
-                    // open the new connnection again
-                    connection = new URLDownload(newUrl).openConnection();
-                }
-            }
-        }
-
-        // this does network i/o: GET + read returned headers
-        connection.connect();
-
-        return connection;
-    }
-
     /**
+     * Downloads the web resource to a String.
      *
+     * @param encoding the desired String encoding
      * @return the downloaded string
-     * @throws IOException
      */
-    public String downloadToString(Charset encoding) throws IOException {
-
+    public String asString(Charset encoding) throws IOException {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream());
              Writer output = new StringWriter()) {
-            this.copy(input, output, encoding);
+            copy(input, output, encoding);
             return output.toString();
         } catch (IOException e) {
-            URLDownload.LOGGER.warn("Could not copy input", e);
+            LOGGER.warn("Could not copy input", e);
             throw e;
         }
     }
@@ -194,24 +160,16 @@ public class URLDownload {
         try {
             return cookieManager.getCookieStore().get(this.source.toURI());
         } catch (URISyntaxException e) {
-            URLDownload.LOGGER.error("Unable to convert download URL to URI", e);
+            LOGGER.error("Unable to convert download URL to URI", e);
             return Collections.emptyList();
         }
     }
 
-    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
-        try (BufferedReader read = new BufferedReader(r)) {
-
-            String line;
-            while ((line = read.readLine()) != null) {
-                out.write(line);
-                out.write("\n");
-            }
-        }
-    }
-
+    /**
+     * Downloads the web resource to a file.
+     *
+     * @param destination the destination file path.
+     */
     public void toFile(Path destination) throws IOException {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
@@ -287,4 +245,52 @@ public class URLDownload {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
         }
     }
+
+    private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
+        InputStream monitoredInputStream = in;
+        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+        try (BufferedReader read = new BufferedReader(r)) {
+
+            String line;
+            while ((line = read.readLine()) != null) {
+                out.write(line);
+                out.write("\n");
+            }
+        }
+    }
+
+    private URLConnection openConnection() throws IOException {
+        URLConnection connection = this.source.openConnection();
+        for (Entry<String, String> entry : this.parameters.entrySet()) {
+            connection.setRequestProperty(entry.getKey(), entry.getValue());
+        }
+        if (!this.postData.isEmpty()) {
+            connection.setDoOutput(true);
+            try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+                wr.writeBytes(this.postData);
+            }
+
+        }
+
+        if (connection instanceof HttpURLConnection) {
+            // normally, 3xx is redirect
+            int status = ((HttpURLConnection) connection).getResponseCode();
+            if (status != HttpURLConnection.HTTP_OK) {
+                if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                        || status == HttpURLConnection.HTTP_MOVED_PERM
+                        || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                    // get redirect url from "location" header field
+                    String newUrl = connection.getHeaderField("Location");
+                    // open the new connnection again
+                    connection = new URLDownload(newUrl).openConnection();
+                }
+            }
+        }
+
+        // this does network i/o: GET + read returned headers
+        connection.connect();
+
+        return connection;
+    }
+
 }
