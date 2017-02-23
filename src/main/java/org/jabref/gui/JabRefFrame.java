@@ -1489,7 +1489,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
 
             if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getName())) {
+                if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
