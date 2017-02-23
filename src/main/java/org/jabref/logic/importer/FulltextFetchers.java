@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerLink;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -59,7 +60,7 @@ public class FulltextFetchers {
             try {
                 Optional<URL> result = finder.findFullText(clonedEntry);
 
-                if (result.isPresent() && MimeTypeDetector.isPdfContentType(result.get().toString())) {
+                if (result.isPresent() && new URLDownload(result.get().toString()).isMimeType("application/pdf")) {
                     return result;
                 }
             } catch (IOException | FetcherException e) {

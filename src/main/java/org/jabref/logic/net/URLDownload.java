@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * Example:
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.downloadToString(ENCODING);
- * dl.downloadToFile(Path); // available in FILE
+ * dl.toFile(Path); // available in FILE
  * String contentType = dl.getMimeType();
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
@@ -212,7 +212,7 @@ public class URLDownload {
         }
     }
 
-    public void downloadToFile(Path destination) throws IOException {
+    public void toFile(Path destination) throws IOException {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -224,11 +224,11 @@ public class URLDownload {
     /**
      * Downloads the web resource to a temporary file.
      *
-     * @return the path to the downloaded file.
+     * @return the path of the temporary file.
      */
-    public Path downloadToTemporaryFile() throws IOException {
+    public Path toTemporaryFile() throws IOException {
         // Determine file name and extension from source url
-        String sourcePath = this.source.getPath();
+        String sourcePath = source.getPath();
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
@@ -237,7 +237,8 @@ public class URLDownload {
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
-        this.downloadToFile(file);
+        toFile(file);
+
         return file;
     }
 

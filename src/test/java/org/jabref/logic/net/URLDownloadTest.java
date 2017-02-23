@@ -34,7 +34,7 @@ public class URLDownloadTest {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
-            dl.downloadToFile(destination.toPath());
+            dl.toFile(destination.toPath());
             Assert.assertTrue("file must exist", destination.exists());
         } finally {
             // cleanup
@@ -55,7 +55,7 @@ public class URLDownloadTest {
     public void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws IOException {
         URLDownload google = new URLDownload(new URL("http://www.google.com"));
 
-        String path = google.downloadToTemporaryFile().toString();
+        String path = google.toTemporaryFile().toString();
         Assert.assertTrue(path, path.endsWith(".tmp"));
     }
 
@@ -63,7 +63,7 @@ public class URLDownloadTest {
     public void downloadToTemporaryFileKeepsName() throws IOException {
         URLDownload google = new URLDownload(new URL("https://github.com/JabRef/jabref/blob/master/LICENSE.md"));
 
-        String path = google.downloadToTemporaryFile().toString();
+        String path = google.toTemporaryFile().toString();
         Assert.assertTrue(path, path.contains("LICENSE") && path.endsWith(".md"));
     }
 
@@ -71,7 +71,7 @@ public class URLDownloadTest {
     public void downloadOfFTPSucceeds() throws IOException {
         URLDownload ftp = new URLDownload(new URL("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
-        Path path = ftp.downloadToTemporaryFile();
+        Path path = ftp.toTemporaryFile();
         Assert.assertNotNull(path);
     }
 
@@ -79,7 +79,7 @@ public class URLDownloadTest {
     public void downloadOfHttpSucceeds() throws IOException {
         URLDownload ftp = new URLDownload(new URL("http://www.jabref.org"));
 
-        Path path = ftp.downloadToTemporaryFile();
+        Path path = ftp.toTemporaryFile();
         Assert.assertNotNull(path);
     }
 
@@ -87,7 +87,7 @@ public class URLDownloadTest {
     public void downloadOfHttpsSucceeds() throws IOException {
         URLDownload ftp = new URLDownload(new URL("https://www.jabref.org"));
 
-        Path path = ftp.downloadToTemporaryFile();
+        Path path = ftp.toTemporaryFile();
         Assert.assertNotNull(path);
     }
 

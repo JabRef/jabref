@@ -377,7 +377,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         File tmpfile = File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 
-        new URLDownload(dropLink).downloadToFile(tmpfile.toPath());
+        new URLDownload(dropLink).toFile(tmpfile.toPath());
 
         // Import into new if entryTable==null, otherwise into current library:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);

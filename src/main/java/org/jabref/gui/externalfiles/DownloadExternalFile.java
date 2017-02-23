@@ -116,7 +116,7 @@ public class DownloadExternalFile {
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                udlF.downloadToFile(tmp.toPath());
+                udlF.toFile(tmp.toPath());
             } catch (IOException e2) {
                 dontShowDialog = true;
                 if ((editor != null) && editor.isVisible()) {
