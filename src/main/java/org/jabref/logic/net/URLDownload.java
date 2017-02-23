@@ -3,7 +3,6 @@ package org.jabref.logic.net;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -185,7 +184,7 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = monitorInputStream(in);
+        InputStream monitoredInputStream = in;
         Reader r = new InputStreamReader(monitoredInputStream, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
 
@@ -199,7 +198,7 @@ public class URLDownload {
 
     public void downloadToFile(Path destination) throws IOException {
 
-        try (InputStream input = monitorInputStream(new BufferedInputStream(openConnection().getInputStream()))) {
+        try (InputStream input = new BufferedInputStream(openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LOGGER.warn("Could not copy input", e);
@@ -225,10 +224,6 @@ public class URLDownload {
         Path file = Files.createTempFile(fileName, extension);
         downloadToFile(file);
         return file;
-    }
-
-    protected InputStream monitorInputStream(InputStream in) {
-        return in;
     }
 
     @Override

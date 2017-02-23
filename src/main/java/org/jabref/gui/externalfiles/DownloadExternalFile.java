@@ -18,7 +18,6 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
-import org.jabref.gui.net.MonitoredURLDownload;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
@@ -100,7 +99,7 @@ public class DownloadExternalFile {
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
 
-        URLDownload udl = MonitoredURLDownload.buildMonitoredDownload(frame, url);
+        URLDownload udl = new URLDownload(url);
 
         try {
             // TODO: what if this takes long time?
