@@ -62,19 +62,33 @@ public class URLDownload {
     private String postData = "";
 
     /**
-     * @param address the URL to download from
-     * @throws MalformedURLException if no protocol is specified in the address, or an unknown protocol is found
+     * @param source the URL to download from
+     * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
      */
-    public URLDownload(String address) throws MalformedURLException {
-        this(new URL(address));
+    public URLDownload(String source) throws MalformedURLException {
+        this(new URL(source), true);
+    }
+
+    /**
+     * @param source the URL to download from
+     * @param validateSSL if set to false, bypasses the SSL vlaidation
+     * @throws MalformedURLException if no protocol is specified in the source, or an unknown protocol is found
+     */
+    public URLDownload(String source, boolean validateSSL) throws MalformedURLException {
+        this(new URL(source), validateSSL);
     }
 
     /**
      * @param source The URL to download.
+     * @param validateSSL if set to false, bypasses the SSL vlaidation
      */
-    public URLDownload(URL source) {
+    public URLDownload(URL source, boolean validateSSL) {
         this.source = source;
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
+
+        if (!validateSSL) {
+            bypassSSLVerification();
+        }
     }
 
     public String determineMimeType() throws IOException {
@@ -216,7 +230,7 @@ public class URLDownload {
         return "URLDownload{" + "source=" + this.source + '}';
     }
 
-    public void bypassSSLVerification() {
+    private void bypassSSLVerification() {
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = { new X509TrustManager() {
             @Override
