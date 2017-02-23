@@ -43,7 +43,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         // Set-up bindings
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
-                        group -> new RecursiveTreeItem<>(group, GroupNodeViewModel::getChildren))
+                        group -> new RecursiveTreeItem<>(group, GroupNodeViewModel::getChildren, GroupNodeViewModel::expandedProperty))
         );
         viewModel.selectedGroupProperty().bind(
                 EasyBind.monadic(groupTree.selectionModelProperty())
@@ -63,15 +63,15 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
         PseudoClass allSelected = PseudoClass.getPseudoClass("all-selected");
         numberColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
-                .withGraphic(viewModel -> {
+                .withGraphic(group -> {
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
-                    if (!viewModel.isRoot()) {
-                        BindingsHelper.includePseudoClassWhen(node, anySelected, viewModel.anySelectedEntriesMatchedProperty());
-                        BindingsHelper.includePseudoClassWhen(node, allSelected, viewModel.allSelectedEntriesMatchedProperty());
+                    if (!group.isRoot()) {
+                        BindingsHelper.includePseudoClassWhen(node, anySelected, group.anySelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, allSelected, group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    text.textProperty().bind(viewModel.getHits().asString());
+                    text.textProperty().bind(group.getHits().asString());
                     text.getStyleClass().setAll("text");
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
@@ -91,7 +91,8 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 disclosureNodeArrow.getStyleClass().setAll("arrow");
                 disclosureNode.getChildren().add(disclosureNodeArrow);
                 return disclosureNode;
-            }));
+            })
+                .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");

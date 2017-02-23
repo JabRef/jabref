@@ -1,8 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -32,7 +30,6 @@ import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
@@ -100,8 +97,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             Localization.lang("Highlight overlapping groups"));
     private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
             Localization.lang("Automatically assign new entry to selected groups"));
-    private final JCheckBoxMenuItem editModeCb = new JCheckBoxMenuItem(Localization.lang("Edit group membership"),
-            false);
     private final JMenu moveSubmenu = new JMenu(Localization.lang("Move"));
     private final JMenu sortSubmenu = new JMenu(Localization.lang("Sort alphabetically"));
     private final AbstractAction editGroupAction = new EditGroupAction();
@@ -124,8 +119,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final ToggleAction toggleAction;
     private DefaultTreeModel groupsTreeModel;
     private GroupTreeNodeViewModel groupsRoot;
-    private boolean editModeIndicator;
-
 
     /**
      * The first element for each group defines which field to use for the quicksearch. The next two define the name and
@@ -188,8 +181,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
-        editModeIndicator = Globals.prefs.getBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE);
-        editModeCb.setSelected(editModeIndicator);
         autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
         JButton openSettings = new JButton(IconTheme.JabRefIcon.PREFERENCES.getSmallIcon());
@@ -197,8 +188,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         settings.add(orCb);
         settings.addSeparator();
         settings.add(invCb);
-        settings.addSeparator();
-        settings.add(editModeCb);
         settings.addSeparator();
         settings.add(grayOut);
         settings.add(hideNonHits);
@@ -213,9 +202,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 settings.show(src, 0, openSettings.getHeight());
             }
         });
-
-        editModeCb.addActionListener(e -> setEditMode(editModeCb.getState()));
-
 
         JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFile.GROUP)
                 .getHelpButton();
@@ -238,7 +224,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 Localization.lang("Highlight groups that contain entries contained in any currently selected group"));
         floatCb.setToolTipText(Localization.lang("Move entries in group selection to the top"));
         highlCb.setToolTipText(Localization.lang("Gray out entries not in group selection"));
-        editModeCb.setToolTipText(Localization.lang("Click group to toggle membership of selected entries"));
         ButtonGroup bgr = new ButtonGroup();
         bgr.add(andCb);
         bgr.add(orCb);
@@ -285,7 +270,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         rootPanel.add(groupsTreePane);
 
         add(rootPanel, BorderLayout.CENTER);
-        setEditMode(editModeIndicator);
+        groupsTree.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 0));
+        this.setTitle(Localization.lang("Groups"));
         definePopup();
         NodeAction moveNodeUpAction = new MoveNodeUpAction();
         moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
@@ -369,8 +355,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 }
                 if ((e.getClickCount() == 2) && (e.getButton() == MouseEvent.BUTTON1)) { // edit
                     editGroupAction.actionPerformed(null); // dummy event
-                } else if ((e.getClickCount() == 1) && (e.getButton() == MouseEvent.BUTTON1)) {
-                    annotationEvent(node);
                 }
             }
         });
@@ -483,34 +467,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsContextMenu.show(groupsTree, e.getPoint().x, e.getPoint().y);
     }
 
-    private void setEditMode(boolean editMode) {
-        Globals.prefs.putBoolean(JabRefPreferences.EDIT_GROUP_MEMBERSHIP_MODE, editModeIndicator);
-        editModeIndicator = editMode;
-
-        if (editMode) {
-            groupsTree.setBorder(BorderFactory
-                    .createTitledBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED), "Edit mode",
-                            TitledBorder.RIGHT, TitledBorder.TOP, Font.getFont("Default"), Color.RED));
-            this.setTitle("<html><font color='red'>Groups Edit mode</font></html>");
-        } else {
-            groupsTree.setBorder(BorderFactory.createEmptyBorder(5,10,0,0));
-            this.setTitle(Localization.lang("Groups"));
-        }
-        groupsTree.revalidate();
-        groupsTree.repaint();
-    }
-
-    private void annotationEvent(GroupTreeNodeViewModel node) {
-        if (editModeIndicator) {
-            LOGGER.info("Performing annotation " + node.getName());
-            List<BibEntry> entries = panel.getSelectedEntries();
-            node.changeEntriesTo(entries, panel.getUndoManager());
-            panel.markBaseChanged();
-            panel.updateEntryEditorIfShowing();
-            updateShownEntriesAccordingToSelectedGroups();
-        }
-    }
-
     @Override
     public void valueChanged(TreeSelectionEvent e) {
         if (panel == null) {
@@ -525,9 +481,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return;
         }
 
-        if (!editModeIndicator) {
-            updateShownEntriesAccordingToSelectedGroups();
-        }
+        updateShownEntriesAccordingToSelectedGroups();
     }
 
     private void updateShownEntriesAccordingToSelectedGroups() {

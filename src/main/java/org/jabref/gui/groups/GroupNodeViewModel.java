@@ -41,9 +41,9 @@ public class GroupNodeViewModel {
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
     private final SimpleBooleanProperty hasChildren;
+    private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
-
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.groupNode = Objects.requireNonNull(groupNode);
@@ -95,6 +95,9 @@ public class GroupNodeViewModel {
     private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
         return automaticGroup.createSubgroups(entry).stream()
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+
+    public SimpleBooleanProperty expandedProperty() {
+        return expandedProperty;
     }
 
     public BooleanBinding anySelectedEntriesMatchedProperty() {
@@ -198,5 +201,9 @@ public class GroupNodeViewModel {
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
         return groupNode.addSubgroup(subgroup);
+    }
+
+    void toggleExpansion() {
+        expandedProperty().set(!expandedProperty().get());
     }
 }

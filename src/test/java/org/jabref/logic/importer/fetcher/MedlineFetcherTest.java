@@ -31,22 +31,24 @@ public class MedlineFetcherTest {
         entryWijedasa = new BibEntry();
         entryWijedasa.setType(BiblatexEntryTypes.ARTICLE);
         entryWijedasa.setField("author","Wijedasa, Lahiru S and Jauhiainen, Jyrki and Könönen, Mari and Lampela, Maija and Vasander, Harri and Leblanc, Marie-Claire and Evers, Stephanie and Smith, Thomas E L and Yule, Catherine M and Varkkey, Helena and Lupascu, Massimo and Parish, Faizal and Singleton, Ian and Clements, Gopalasamy R and Aziz, Sheema Abdul and Harrison, Mark E and Cheyne, Susan and Anshari, Gusti Z and Meijaard, Erik and Goldstein, Jenny E and Waldron, Susan and Hergoualc'h, Kristell and Dommain, Rene and Frolking, Steve and Evans, Christopher D and Posa, Mary Rose C and Glaser, Paul H and Suryadiputra, Nyoman and Lubis, Reza and Santika, Truly and Padfield, Rory and Kurnianto, Sofyan and Hadisiswoyo, Panut and Lim, Teck Wyn and Page, Susan E and Gauci, Vincent and Van Der Meer, Peter J and Buckland, Helen and Garnier, Fabien and Samuel, Marshall K and Choo, Liza Nuriati Lim Kim and O'Reilly, Patrick and Warren, Matthew and Suksuwan, Surin and Sumarga, Elham and Jain, Anuj and Laurance, William F and Couwenberg, John and Joosten, Hans and Vernimmen, Ronald and Hooijer, Aljosja and Malins, Chris and Cochrane, Mark A and Perumal, Balu and Siegert, Florian and Peh, Kelvin S-H and Comeau, Louis-Pierre and Verchot, Louis and Harvey, Charles F and Cobb, Alex and Jaafar, Zeehan and Wösten, Henk and Manuri, Solichin and Müller, Moritz and Giesen, Wim and Phelps, Jacob and Yong, Ding Li and Silvius, Marcel and Wedeux, Béatrice M M and Hoyt, Alison and Osaki, Mitsuru and Hirano, Takashi and Takahashi, Hidenori and Kohyama, Takashi S and Haraguchi, Akira and Nugroho, Nunung P and Coomes, David A and Quoi, Le Phat and Dohong, Alue and Gunawan, Haris and Gaveau, David L A and Langner, Andreas and Lim, Felix K S and Edwards, David P and Giam, Xingli and Van Der Werf, Guido and Carmenta, Rachel and Verwer, Caspar C and Gibson, Luke and Gandois, Laure and Graham, Laura Linda Bozena and Regalino, Jhanson and Wich, Serge A and Rieley, Jack and Kettridge, Nicholas and Brown, Chloe and Pirard, Romain and Moore, Sam and Capilla, B Ripoll and Ballhorn, Uwe and Ho, Hua Chew and Hoscilo, Agata and Lohberger, Sandra and Evans, Theodore A and Yulianti, Nina and Blackham, Grace and Onrizal and Husson, Simon and Murdiyarso, Daniel and Pangala, Sunita and Cole, Lydia E S and Tacconi, Luca and Segah, Hendrik and Tonoto, Prayoto and Lee, Janice S H and Schmilewski, Gerald and Wulffraat, Stephan and Putra, Erianto Indra and Cattau, Megan E and Clymo, R S and Morrison, Ross and Mujahid, Aazani and Miettinen, Jukka and Liew, Soo Chin and Valpola, Samu and Wilson, David and D'Arcy, Laura and Gerding, Michiel and Sundari, Siti and Thornton, Sara A and Kalisz, Barbara and Chapman, Stephen J and Su, Ahmad Suhaizi Mat and Basuki, Imam and Itoh, Masayuki and Traeholt, Carl and Sloan, Sean and Sayok, Alexander K and Andersen, Roxane");
-
         entryWijedasa.setField("created", "2016-09-27");
         entryWijedasa.setField("country", "England");
         entryWijedasa.setField("doi", "10.1111/gcb.13516");
         entryWijedasa.setField("issn", "1365-2486");
         entryWijedasa.setField("issn-linking", "1354-1013");
+        entryWijedasa.setField("issue", "3");
         entryWijedasa.setField("journal", "Global change biology");
-        entryWijedasa.setField("month", "#sep#");
+        entryWijedasa.setField("month", "#mar#");
         entryWijedasa.setField("nlm-id", "9888746");
         entryWijedasa.setField("owner", "NLM");
+        entryWijedasa.setField("pages", "977--982");
         entryWijedasa.setField("pmid", "27670948");
         entryWijedasa.setField("pubmodel", "Print-Electronic");
-        entryWijedasa.setField("pubstatus", "aheadofprint");
-        entryWijedasa.setField("revised", "2017-01-24");
+        entryWijedasa.setField("pubstatus", "ppublish");
+        entryWijedasa.setField("revised", "2017-02-17");
         entryWijedasa.setField("title", "Denial of long-term issues with agriculture on tropical peatlands will have devastating consequences.");
-        entryWijedasa.setField("year", "2016");
+        entryWijedasa.setField("volume", "23");
+        entryWijedasa.setField("year", "2017");
 
         entryEndharti = new BibEntry();
         entryEndharti.setType(BiblatexEntryTypes.ARTICLE);
@@ -69,7 +71,7 @@ public class MedlineFetcherTest {
         entryEndharti.setField("pmid", "27670445");
         entryEndharti.setField("pubmodel", "Electronic");
         entryEndharti.setField("pubstatus", "epublish");
-        entryEndharti.setField("revised", "2016-10-11");
+        entryEndharti.setField("revised", "2017-02-20");
         entryEndharti.setField("volume", "16");
         entryEndharti.setField("year", "2016");
 
