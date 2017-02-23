@@ -34,7 +34,7 @@ public class URLDownloadTest {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
-            dl.downloadToFile(destination);
+            dl.downloadToFile(destination.toPath());
             Assert.assertTrue("file must exist", destination.exists());
         } finally {
             // cleanup

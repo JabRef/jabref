@@ -117,7 +117,7 @@ public class DownloadExternalFile {
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                udlF.downloadToFile(tmp);
+                udlF.downloadToFile(tmp.toPath());
             } catch (IOException e2) {
                 dontShowDialog = true;
                 if ((editor != null) && editor.isVisible()) {
@@ -344,7 +344,6 @@ public class DownloadExternalFile {
      */
     @FunctionalInterface
     public interface DownloadCallback {
-
         void downloadComplete(FileListEntry file);
     }
 }

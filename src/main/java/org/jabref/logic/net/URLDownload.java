@@ -46,7 +46,7 @@ import org.apache.commons.logging.LogFactory;
  * Example:
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.downloadToString(ENCODING);
- * dl.downloadToFile(FILE); // available in FILE
+ * dl.downloadToFile(Path); // available in FILE
  * String contentType = dl.determineMimeType();
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
@@ -195,14 +195,6 @@ public class URLDownload {
                 out.write("\n");
             }
         }
-    }
-
-    /**
-     * @deprecated use {@link #downloadToFile(Path)}
-     */
-    @Deprecated
-    public void downloadToFile(File destination) throws IOException {
-        downloadToFile(destination.toPath());
     }
 
     public void downloadToFile(Path destination) throws IOException {
