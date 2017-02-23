@@ -35,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
  */
 @Deprecated
 public class FileDialog {
-
     private static final Log LOGGER = LogFactory.getLog(FileDialog.class);
 
     private final FileChooser fileChooser;
