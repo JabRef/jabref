@@ -49,25 +49,16 @@ import org.apache.commons.logging.LogFactory;
  * String contentType = dl.determineMimeType();
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
- *
- * @author Erik Putrycz erik.putrycz-at-nrc-cnrc.gc.ca
- * @author Simon Harrer
  */
 public class URLDownload {
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
-    private static final String USER_AGENT= "JabRef";
+    private static final String USER_AGENT= "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0";
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
 
     private String postData = "";
-
-    public static URLDownload createURLDownloadWithBrowserUserAgent(String address) throws MalformedURLException {
-        URLDownload downloader = new URLDownload(address);
-        downloader.addParameters("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-        return downloader;
-    }
 
     /**
      * @param address the URL to download from
