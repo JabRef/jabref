@@ -35,7 +35,7 @@ public class MoveFilesCleanup implements CleanupJob {
     private final String fileDirPattern;
     private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
-    private ParsedFileField singleFieldCleanup;
+    private ParsedFileField singleFileFieldCleanup;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
@@ -50,7 +50,7 @@ public class MoveFilesCleanup implements CleanupJob {
             ParsedFileField field) {
 
         this(databaseContext, fileDirPattern, fileDirectoryPreferences, prefs);
-        this.singleFieldCleanup = field;
+        this.singleFileFieldCleanup = field;
     }
 
     @Override
@@ -73,10 +73,10 @@ public class MoveFilesCleanup implements CleanupJob {
         List<ParsedFileField> fileList;
         List<ParsedFileField> newFileList;
 
-        if (singleFieldCleanup != null) {
-            fileList = Arrays.asList(singleFieldCleanup);
-
-            newFileList = typedEntry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
+        if (singleFileFieldCleanup != null) {
+            fileList = Arrays.asList(singleFileFieldCleanup);
+            //Add all other except the current selected file
+            newFileList = typedEntry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();

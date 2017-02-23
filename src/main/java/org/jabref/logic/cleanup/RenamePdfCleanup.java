@@ -163,12 +163,9 @@ public class RenamePdfCleanup implements CleanupJob {
         StringBuilder targetFileName = new StringBuilder(FileUtil
                 .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
                 .trim());
-
         //Add extension to newFilename
         targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
-
         return targetFileName.toString();
-
     }
 
     public int getUnsuccessfulRenames() {

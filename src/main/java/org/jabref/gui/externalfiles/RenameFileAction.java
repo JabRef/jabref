@@ -22,7 +22,6 @@ import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.FieldChange;
 import org.jabref.model.entry.ParsedFileField;
 
 public class RenameFileAction extends AbstractAction {
@@ -48,9 +47,7 @@ public class RenameFileAction extends AbstractAction {
         }
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
-
         ParsedFileField field = entry.toParsedFileField();
-        System.out.println("Parsed file Field " + field);
         // Check if the current file exists:
         String ln = entry.link;
         boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
@@ -63,7 +60,7 @@ public class RenameFileAction extends AbstractAction {
         Optional<Path> fileDir = frame.getCurrentBasePanel().getBibDatabaseContext()
                 .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
+            JOptionPane.showMessageDialog(frame, Localization.lang("File directory is not set or does not exist!"),
                     Localization.lang("Rename file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -73,7 +70,6 @@ public class RenameFileAction extends AbstractAction {
         }
 
         if ((file != null) && Files.exists(file)) {
-            System.out.println("Cleanup Rename of file " + file);
 
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
                     frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
@@ -81,17 +77,16 @@ public class RenameFileAction extends AbstractAction {
                     prefs.getFileDirectoryPreferences(), field);
 
             String targetFileName = pdfCleanup.getTargetFileName(field, eEditor.getEntry());
-            System.out.println("TargetFileName " + targetFileName);
 
             String[] options = {Localization.lang("Rename file"), Localization.lang("Cancel")};
-
-            int dialogResult = JOptionPane.showOptionDialog(frame, "Rename file to " + targetFileName, "Rename",
+            int dialogResult = JOptionPane.showOptionDialog(frame,
+                    Localization.lang("Rename file to") + " " + targetFileName,
+                    Localization.lang("Rename file"),
                     JOptionPane.INFORMATION_MESSAGE, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
 
             //indicates Rename pressed
             if (dialogResult == JOptionPane.YES_OPTION) {
-                List<FieldChange> fieldChanges = pdfCleanup.cleanup(eEditor.getEntry());
-                fieldChanges.stream().findFirst().ifPresent(System.out::println);
+                pdfCleanup.cleanup(eEditor.getEntry());
             }
 
         }
