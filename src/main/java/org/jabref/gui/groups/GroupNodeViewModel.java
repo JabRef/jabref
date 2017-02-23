@@ -95,6 +95,7 @@ public class GroupNodeViewModel {
     private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
         return automaticGroup.createSubgroups(entry).stream()
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+    }
 
     public SimpleBooleanProperty expandedProperty() {
         return expandedProperty;
