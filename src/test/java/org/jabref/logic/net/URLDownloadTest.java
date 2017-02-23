@@ -48,7 +48,7 @@ public class URLDownloadTest {
     public void testDetermineMimeType() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue(dl.determineMimeType().startsWith("text/html"));
+        Assert.assertTrue(dl.getMimeType().startsWith("text/html"));
     }
 
     @Test

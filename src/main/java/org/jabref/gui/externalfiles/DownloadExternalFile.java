@@ -104,7 +104,7 @@ public class DownloadExternalFile {
         try {
             // TODO: what if this takes long time?
             // TODO: stop editor dialog if this results in an error:
-            mimeType = udl.determineMimeType(); // Read MIME type
+            mimeType = udl.getMimeType(); // Read MIME type
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);

@@ -37,6 +37,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.jabref.logic.util.io.FileUtil;
 
+import com.mashape.unirest.http.Unirest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
  * URLDownload dl = new URLDownload(URL);
  * String content = dl.downloadToString(ENCODING);
  * dl.downloadToFile(Path); // available in FILE
- * String contentType = dl.determineMimeType();
+ * String contentType = dl.getMimeType();
  *
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  */
@@ -77,18 +78,48 @@ public class URLDownload {
         this.addHeader("User-Agent", URLDownload.USER_AGENT);
     }
 
-    public String determineMimeType() throws IOException {
-        // this does not cause a real performance issue as the underlying HTTP/TCP connection is reused
-        URLConnection urlConnection = this.openConnection();
+    public String getMimeType() throws IOException {
+        Unirest.setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        String contentType = "";
+        // Try to use HEAD request to avoid downloading the whole file
         try {
-            return urlConnection.getContentType();
-        } finally {
-            try {
-                urlConnection.getInputStream().close();
-            } catch (IOException ignored) {
-                // Ignored
-            }
+            contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+        } catch (Exception e) {
+            LOGGER.debug("Error getting MIME type of URL via HEAD request", e);
         }
+
+        // Use GET request as alternative if no HEAD request is available
+        try {
+            contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+        } catch (Exception e) {
+            LOGGER.debug("Error getting MIME type of URL via GET request", e);
+        }
+
+        // Try to resolve local URIs
+        try {
+            URLConnection connection = new URL(source.toString()).openConnection();
+
+            contentType = connection.getContentType();
+        } catch (IOException e) {
+            LOGGER.debug("Error trying to get MIME type of local URI", e);
+        }
+
+        if (contentType != null) {
+            return contentType;
+        } else {
+            return "";
+        }
+    }
+
+    public boolean isMimeType(String type) throws IOException {
+        String mime = getMimeType();
+
+        if (mime.isEmpty()) {
+            return false;
+        }
+
+        return mime.startsWith(type);
     }
 
     public void addHeader(String key, String value) {
@@ -182,11 +213,10 @@ public class URLDownload {
     }
 
     public void downloadToFile(Path destination) throws IOException {
-
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            URLDownload.LOGGER.warn("Could not copy input", e);
+            LOGGER.warn("Could not copy input", e);
             throw e;
         }
     }
