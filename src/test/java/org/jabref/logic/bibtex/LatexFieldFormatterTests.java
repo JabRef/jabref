@@ -18,7 +18,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void normalizeNewlineInAbstractField() {
+    public void normalizeNewlineInAbstractField() throws Exception {
         String fieldName = "abstract";
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
 
@@ -34,7 +34,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveNewlineInAbstractField() {
+    public void preserveNewlineInAbstractField() throws Exception {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
@@ -46,7 +46,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveMultipleNewlinesInAbstractField() {
+    public void preserveMultipleNewlinesInAbstractField() throws Exception {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum"
@@ -59,7 +59,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveNewlineInReviewField() {
+    public void preserveNewlineInReviewField() throws Exception {
         String fieldName = "review";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
