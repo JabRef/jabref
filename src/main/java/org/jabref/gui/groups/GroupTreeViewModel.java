@@ -94,4 +94,23 @@ public class GroupTreeViewModel extends AbstractViewModel {
             dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
         });
     }
+
+    /**
+     * Removes the specified group and its subgroups (after asking for confirmation).
+     */
+    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
+        boolean confirmed = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove group and subgroups"),
+                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                Localization.lang("Remove"));
+        if (confirmed) {
+            // TODO: Add undo
+            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+            //panel.getUndoManager().addEdit(undo);
+
+            group.getGroupNode().removeFromParent();
+
+            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+        }
+    }
 }
