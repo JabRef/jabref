@@ -102,7 +102,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final AbstractAction editGroupAction = new EditGroupAction();
     private final NodeAction editGroupPopupAction = new EditGroupAction();
     private final NodeAction addGroupPopupAction = new AddGroupAction();
-    private final NodeAction removeGroupAndSubgroupsPopupAction = new RemoveGroupAndSubgroupsAction();
     private final NodeAction removeSubgroupsPopupAction = new RemoveSubgroupsAction();
     private final NodeAction removeGroupKeepSubgroupsPopupAction = new RemoveGroupKeepSubgroupsAction();
     private final NodeAction moveNodeUpPopupAction = new MoveNodeUpAction();
@@ -307,7 +306,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsContextMenu.add(editGroupPopupAction);
         groupsContextMenu.add(addGroupPopupAction);
         groupsContextMenu.addSeparator();
-        groupsContextMenu.add(removeGroupAndSubgroupsPopupAction);
         groupsContextMenu.add(removeGroupKeepSubgroupsPopupAction);
         groupsContextMenu.add(removeSubgroupsPopupAction);
         groupsContextMenu.addSeparator();
@@ -383,7 +381,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         final TreePath path = groupsTree.getPathForLocation(e.getPoint().x, e.getPoint().y);
         addGroupPopupAction.setEnabled(true);
         editGroupPopupAction.setEnabled(path != null);
-        removeGroupAndSubgroupsPopupAction.setEnabled(path != null);
         removeGroupKeepSubgroupsPopupAction.setEnabled(path != null);
         moveSubmenu.setEnabled(path != null);
         expandSubtreePopupAction.setEnabled(path != null);
@@ -396,7 +393,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (path != null) { // some path dependent enabling/disabling
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             editGroupPopupAction.setNode(node);
-            removeGroupAndSubgroupsPopupAction.setNode(node);
             removeSubgroupsPopupAction.setNode(node);
             removeGroupKeepSubgroupsPopupAction.setNode(node);
             expandSubtreePopupAction.setNode(node);
@@ -407,13 +403,13 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (node.canBeEdited()) {
                 editGroupPopupAction.setEnabled(false);
                 addGroupPopupAction.setEnabled(false);
-                removeGroupAndSubgroupsPopupAction.setEnabled(false);
+                //removeGroupAndSubgroupsPopupAction.setEnabled(false);
                 removeGroupKeepSubgroupsPopupAction.setEnabled(false);
             } else {
                 editGroupPopupAction.setEnabled(true);
                 addGroupPopupAction.setEnabled(true);
                 addGroupPopupAction.setNode(node);
-                removeGroupAndSubgroupsPopupAction.setEnabled(true);
+                //removeGroupAndSubgroupsPopupAction.setEnabled(true);
                 removeGroupKeepSubgroupsPopupAction.setEnabled(true);
             }
             expandSubtreePopupAction
@@ -452,7 +448,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         } else {
             editGroupPopupAction.setNode(null);
             addGroupPopupAction.setNode(null);
-            removeGroupAndSubgroupsPopupAction.setNode(null);
             removeSubgroupsPopupAction.setNode(null);
             removeGroupKeepSubgroupsPopupAction.setNode(null);
             moveNodeUpPopupAction.setNode(null);
@@ -980,31 +975,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
-        }
-    }
-
-    private class RemoveGroupAndSubgroupsAction extends NodeAction {
-
-        public RemoveGroupAndSubgroupsAction() {
-            super(Localization.lang("Remove group and subgroups"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final GroupTreeNodeViewModel node = getNodeToUse();
-            final AbstractGroup group = node.getNode().getGroup();
-            int conf = JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("Remove group \"%0\" and its subgroups?", group.getName()),
-                    Localization.lang("Remove group and subgroups"), JOptionPane.YES_NO_OPTION);
-            if (conf == JOptionPane.YES_OPTION) {
-                final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node,
-                        UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-                node.getNode().removeFromParent();
-                // Store undo information.
-                panel.getUndoManager().addEdit(undo);
-                panel.markBaseChanged();
-                frame.output(Localization.lang("Removed group \"%0\" and its subgroups.", group.getName()));
-            }
         }
     }
 
