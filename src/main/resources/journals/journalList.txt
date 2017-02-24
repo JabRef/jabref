@@ -3211,7 +3211,6 @@ Chimica e l'Industria = Chim. Ind.
 Chimica Oggi = Chim. Oggi
 Chimie et Industrie, Genie Chimique = Chim. Ind. Genie Chim.
 Chimie Nouvelle = Chim. Nouv.
-China Communications = China Commun.
 China's Medicine = Chinas Med.
 Chinese Astronomy and Astrophysics = Chin. Astron. Astrophy
 Chinese Chemical Letters = Chin. Chem. Lett.

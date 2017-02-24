@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +15,9 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
@@ -39,35 +41,45 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibDatabase {
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
-
+    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
      * State attributes
      */
-    private final List<BibEntry> entries = Collections.synchronizedList(new ArrayList<>());
-
-    private String preamble;
-    // All file contents below the last entry in the file
-    private String epilog = "";
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
     private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
-
     /**
      * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
      */
     private final DuplicationChecker duplicationChecker = new DuplicationChecker();
-
     /**
      * contains all entry.getID() of the current database
      */
     private final Set<String> internalIDs = new HashSet<>();
-
     private final EventBus eventBus = new EventBus();
-
+    private String preamble;
+    // All file contents below the last entry in the file
+    private String epilog = "";
     private String sharedDatabaseID;
-
 
     public BibDatabase() {
         this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
+    }
+
+    /**
+     * @param toResolve maybenull The text to resolve.
+     * @param database  maybenull The database to use for resolving the text.
+     * @return The resolved text or the original text if either the text or the database are null
+     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
+     *
+     * Returns a text with references resolved according to an optionally given database.
+     */
+    @Deprecated
+    public static String getText(String toResolve, BibDatabase database) {
+        if ((toResolve != null) && (database != null)) {
+            return database.resolveForStrings(toResolve);
+        }
+        return toResolve;
     }
 
     /**
@@ -99,8 +111,8 @@ public class BibDatabase {
         return internalIDs.contains(id);
     }
 
-    public List<BibEntry> getEntries() {
-        return Collections.unmodifiableList(entries);
+    public ObservableList<BibEntry> getEntries() {
+        return FXCollections.unmodifiableObservableList(entries);
     }
 
     /**
@@ -223,13 +235,6 @@ public class BibDatabase {
     }
 
     /**
-     * Sets the database's preamble.
-     */
-    public synchronized void setPreamble(String preamble) {
-        this.preamble = preamble;
-    }
-
-    /**
      * Returns the database's preamble.
      * If the preamble text consists only of whitespace, then also an empty optional is returned.
      */
@@ -239,6 +244,13 @@ public class BibDatabase {
         } else {
             return Optional.of(preamble);
         }
+    }
+
+    /**
+     * Sets the database's preamble.
+     */
+    public synchronized void setPreamble(String preamble) {
+        this.preamble = preamble;
     }
 
     /**
@@ -467,10 +479,6 @@ public class BibDatabase {
         }
     }
 
-
-    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
-
-
     private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
         String res = result;
         if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
@@ -519,29 +527,12 @@ public class BibDatabase {
         return res;
     }
 
-    /**
-     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     *
-     * Returns a text with references resolved according to an optionally given database.
-     *
-     * @param toResolve maybenull The text to resolve.
-     * @param database  maybenull The database to use for resolving the text.
-     * @return The resolved text or the original text if either the text or the database are null
-     */
-    @Deprecated
-    public static String getText(String toResolve, BibDatabase database) {
-        if ((toResolve != null) && (database != null)) {
-            return database.resolveForStrings(toResolve);
-        }
-        return toResolve;
+    public String getEpilog() {
+        return epilog;
     }
 
     public void setEpilog(String epilog) {
         this.epilog = epilog;
-    }
-
-    public String getEpilog() {
-        return epilog;
     }
 
     /**
@@ -584,12 +575,12 @@ public class BibDatabase {
         return Optional.ofNullable(this.sharedDatabaseID);
     }
 
-    public boolean isShared() {
-        return getSharedDatabaseID().isPresent();
-    }
-
     public void setSharedDatabaseID(String sharedDatabaseID) {
         this.sharedDatabaseID = sharedDatabaseID;
+    }
+
+    public boolean isShared() {
+        return getSharedDatabaseID().isPresent();
     }
 
     public void clearSharedDatabaseID() {

@@ -75,6 +75,14 @@ public class LocalizationParser {
         }
     }
 
+    public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
+            throws IOException {
+        return Files.walk(Paths.get("src/main"))
+                .filter(LocalizationParser::isJavaFile)
+                .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
+                .collect(Collectors.toSet());
+    }
+
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
@@ -141,6 +149,26 @@ public class LocalizationParser {
         return result;
     }
 
+    private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
+        List<LocalizationEntry> result = new LinkedList<>();
+
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+            String content = String.join("\n", lines);
+
+            List<String> keys = JavaLocalizationEntryParser.getLocalizationParameter(content, type);
+
+            for (String key : keys) {
+                result.add(new LocalizationEntry(path, key, type));
+            }
+
+        } catch (IOException ignore) {
+            ignore.printStackTrace();
+        }
+
+        return result;
+    }
+
     /**
      * Loads the fxml file and returns all used language resources.
      */
@@ -192,31 +220,13 @@ public class LocalizationParser {
         private static final Pattern QUOTATION_SYMBOL = Pattern.compile("QUOTATIONPLACEHOLDER");
 
         public static List<String> getLanguageKeysInString(String content, LocalizationBundleForTest type) {
+            List<String> parameters = getLocalizationParameter(content, type);
+
             List<String> result = new LinkedList<>();
 
-            Matcher matcher;
-            if (type == LocalizationBundleForTest.LANG) {
-                matcher = LOCALIZATION_START_PATTERN.matcher(content);
-            } else {
-                matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
-            }
-            while (matcher.find()) {
-                // find contents between the brackets, covering multi-line strings as well
-                int index = matcher.end();
-                int brackets = 1;
-                StringBuilder buffer = new StringBuilder();
-                while (brackets != 0) {
-                    char c = content.charAt(index);
-                    if (c == '(') {
-                        brackets++;
-                    } else if (c == ')') {
-                        brackets--;
-                    }
-                    buffer.append(c);
-                    index++;
-                }
+            for (String param : parameters) {
 
-                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(buffer.toString()).replaceAll("QUOTATIONPLACEHOLDER");
+                String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(param).replaceAll("QUOTATIONPLACEHOLDER");
 
                 // only retain what is within quotation
                 StringBuilder b = new StringBuilder();
@@ -259,6 +269,39 @@ public class LocalizationParser {
             return result;
         }
 
+        public static List<String> getLocalizationParameter(String content, LocalizationBundleForTest type) {
+            List<String> result = new LinkedList<>();
+
+            Matcher matcher;
+            if (type == LocalizationBundleForTest.LANG) {
+                matcher = LOCALIZATION_START_PATTERN.matcher(content);
+            } else {
+                matcher = LOCALIZATION_MENU_START_PATTERN.matcher(content);
+            }
+            while (matcher.find()) {
+                // find contents between the brackets, covering multi-line strings as well
+                int index = matcher.end();
+                int brackets = 1;
+                StringBuilder buffer = new StringBuilder();
+                while (brackets != 0) {
+                    char c = content.charAt(index);
+                    if (c == '(') {
+                        brackets++;
+                    } else if (c == ')') {
+                        brackets--;
+                    }
+                    // skip closing brackets
+                    if (brackets != 0) {
+                        buffer.append(c);
+                    }
+                    index++;
+                }
+                // trim newlines and whitespace
+                result.add(buffer.toString().trim());
+            }
+
+            return result;
+        }
     }
 
 }

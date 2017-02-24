@@ -35,17 +35,15 @@ public class SpecialFieldsUtils {
         UpdateField.updateField(entry, field.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> fieldChanges.add(fieldChange));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, isKeywordSyncEnabled, keywordDelimiter));
+        if (isKeywordSyncEnabled) {
+            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, keywordDelimiter));
+        }
 
         return fieldChanges;
     }
 
-    private static List<FieldChange> exportFieldToKeywords(SpecialField specialField, BibEntry entry, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+    private static List<FieldChange> exportFieldToKeywords(SpecialField specialField, BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
-
-        if (!isKeywordSyncEnabled) {
-            return fieldChanges;
-        }
 
         Optional<Keyword> newValue = entry.getField(specialField.getFieldName()).map(Keyword::new);
         KeywordList keyWords = specialField.getKeyWords();
@@ -59,11 +57,11 @@ public class SpecialFieldsUtils {
     /**
      * Update keywords according to values of special fields
      */
-    public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry entry, boolean isKeywordSyncEnabled, Character keywordDelimiter) {
+    public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
         for(SpecialField field: SpecialField.values()) {
-            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, isKeywordSyncEnabled, keywordDelimiter));
+            fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, keywordDelimiter));
         }
 
         return fieldChanges;
@@ -71,6 +69,7 @@ public class SpecialFieldsUtils {
 
     private static List<FieldChange> importKeywordsForField(KeywordList keywordList, SpecialField field, BibEntry entry) {
         List<FieldChange> fieldChanges = new ArrayList<>();
+
         KeywordList values = field.getKeyWords();
         Optional<Keyword> newValue = Optional.empty();
         for (Keyword keyword : values) {
@@ -88,7 +87,7 @@ public class SpecialFieldsUtils {
     }
 
     /**
-     * updates field values according to keywords
+     * Updates special field values according to keywords
      */
     public static List<FieldChange> syncSpecialFieldsFromKeywords(BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();

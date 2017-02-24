@@ -29,21 +29,19 @@ public class ArchitectureTests {
     private static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
-
-    private Map<String, List<String>> exceptionStrings;
-
     private final String firstPackage;
     private final String secondPackage;
+    private Map<String, List<String>> exceptions;
 
     public ArchitectureTests(String firstPackage, String secondPackage) {
         this.firstPackage = firstPackage;
         this.secondPackage = secondPackage;
 
-        //add exceptions for the architectural test here
-        //Note that bending the architectural constraints should not be done inconsiderately
-        exceptionStrings = new HashMap<>();
-        exceptionStrings.put(PACKAGE_ORG_JABREF_LOGIC,
-                Arrays.asList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
+        // Add exceptions for the architectural test here
+        // Note that bending the architectural constraints should not be done inconsiderately
+        exceptions = new HashMap<>();
+        exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
+                Collections.singletonList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
     }
 
 
@@ -67,9 +65,10 @@ public class ArchitectureTests {
 
     @Test
     public void firstPackageIsIndependentOfSecondPackage() throws IOException {
-        Predicate<String> isExceptionPackage = (s) -> s.startsWith("import " + secondPackage) && !(exceptionStrings.get(firstPackage).stream()
-                .filter(exception -> s.startsWith("import " + exception)).findAny().isPresent()
-        );
+        Predicate<String> isExceptionPackage = (s) ->
+                s.startsWith("import " + secondPackage)
+                        && exceptions.getOrDefault(firstPackage, Collections.emptyList()).stream()
+                        .noneMatch(exception -> s.startsWith("import " + exception));
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 
@@ -77,22 +76,21 @@ public class ArchitectureTests {
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
-                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
-                                .filter(isPackage).findAny().isPresent();
+                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isPackage);
                     } catch (IOException e) {
                         return false;
                     }
                 })
                 .filter(p -> {
                     try {
-                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream()
-                                .filter(isExceptionPackage).findAny().isPresent();
+                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isExceptionPackage);
                     } catch (IOException e) {
                         return false;
                     }
                 }).collect(Collectors.toList());
 
-        Assert.assertEquals(Collections.emptyList(), files);
+        Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
+                Collections.emptyList(), files);
     }
 
 }
