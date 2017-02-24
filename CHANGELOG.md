@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned group panel.
       - Number of matched entries is always shown.
       - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
+      - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
       - Removed edit mode.
     - Redesigned about dialog.
     - Redesigned key bindings dialog.

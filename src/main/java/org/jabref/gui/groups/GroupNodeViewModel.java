@@ -27,6 +27,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.Subscribe;
 import org.fxmisc.easybind.EasyBind;
@@ -136,13 +137,8 @@ public class GroupNodeViewModel {
 
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
-        if (isRoot != that.isRoot) return false;
-        if (!displayName.equals(that.displayName)) return false;
-        if (!iconCode.equals(that.iconCode)) return false;
-        if (!children.equals(that.children)) return false;
-        if (!databaseContext.equals(that.databaseContext)) return false;
         if (!groupNode.equals(that.groupNode)) return false;
-        return hits.getValue().equals(that.hits.getValue());
+        return true;
     }
 
     @Override
@@ -160,14 +156,7 @@ public class GroupNodeViewModel {
 
     @Override
     public int hashCode() {
-        int result = displayName.hashCode();
-        result = 31 * result + (isRoot ? 1 : 0);
-        result = 31 * result + iconCode.hashCode();
-        result = 31 * result + children.hashCode();
-        result = 31 * result + databaseContext.hashCode();
-        result = 31 * result + groupNode.hashCode();
-        result = 31 * result + hits.hashCode();
-        return result;
+        return groupNode.hashCode();
     }
 
     public String getIconCode() {
@@ -206,5 +195,9 @@ public class GroupNodeViewModel {
 
     void toggleExpansion() {
         expandedProperty().set(!expandedProperty().get());
+    }
+
+    boolean isMatchedBy(String searchString) {
+        return StringUtil.isBlank(searchString) || getDisplayName().contains(searchString);
     }
 }

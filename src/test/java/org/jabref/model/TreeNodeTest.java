@@ -21,88 +21,7 @@ import static org.mockito.Mockito.verify;
 public class TreeNodeTest {
 
     @Mock
-    Consumer<TreeNodeMock> subscriber;
-
-    /**
-     * Gets the marked node in the following tree:
-     * Root
-     *      A
-     *      A (= parent)
-     *          B (<-- this)
-     */
-    private TreeNodeMock getNodeInSimpleTree(TreeNodeMock root) {
-        root.addChild(new TreeNodeMock());
-        TreeNodeMock parent = new TreeNodeMock();
-        root.addChild(parent);
-        TreeNodeMock node = new TreeNodeMock();
-        parent.addChild(node);
-        return node;
-    }
-
-    private TreeNodeMock getNodeInSimpleTree() {
-        return getNodeInSimpleTree(new TreeNodeMock());
-    }
-
-    /**
-     * Gets the marked node in the following tree:
-     * Root
-     *      A
-     *      A
-     *      A (= grand parent)
-     *          B
-     *          B (= parent)
-     *              C (<-- this)
-     *                  D (= child)
-     *              C
-     *              C
-     *              C
-     *          B
-     *          B
-     *      A
-     */
-    private TreeNodeMock getNodeInComplexTree(TreeNodeMock root) {
-        root.addChild(new TreeNodeMock());
-        root.addChild(new TreeNodeMock());
-        TreeNodeMock grandParent = new TreeNodeMock();
-        root.addChild(grandParent);
-        root.addChild(new TreeNodeMock());
-
-        grandParent.addChild(new TreeNodeMock());
-        TreeNodeMock parent = new TreeNodeMock();
-        grandParent.addChild(parent);
-        grandParent.addChild(new TreeNodeMock());
-        grandParent.addChild(new TreeNodeMock());
-
-        TreeNodeMock node = new TreeNodeMock();
-        parent.addChild(node);
-        parent.addChild(new TreeNodeMock());
-        parent.addChild(new TreeNodeMock());
-        parent.addChild(new TreeNodeMock());
-
-        node.addChild(new TreeNodeMock());
-        return node;
-    }
-
-    private TreeNodeMock getNodeInComplexTree() {
-        return getNodeInComplexTree(new TreeNodeMock());
-    }
-
-    /**
-     * Gets the marked in the following tree:
-     * Root
-     *      A
-     *      A
-     *      A (<- this)
-     *      A
-     */
-    private TreeNodeMock getNodeAsChild(TreeNodeMock root) {
-        root.addChild(new TreeNodeMock());
-        root.addChild(new TreeNodeMock());
-        TreeNodeMock node = new TreeNodeMock();
-        root.addChild(node);
-        root.addChild(new TreeNodeMock());
-        return node;
-    }
+    Consumer<TreeNodeTestData.TreeNodeMock> subscriber;
 
     @Test(expected = UnsupportedOperationException.class)
     public void constructorChecksThatClassImplementsCorrectInterface() {
@@ -111,13 +30,13 @@ public class TreeNodeTest {
 
     @Test
     public void constructorExceptsCorrectImplementation() {
-        TreeNodeMock treeNode = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock treeNode = new TreeNodeTestData.TreeNodeMock();
         assertNotNull(treeNode);
     }
 
     @Test
     public void newTreeNodeHasNoParentOrChildren() {
-        TreeNodeMock treeNode = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock treeNode = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Optional.empty(), treeNode.getParent());
         assertEquals(Collections.emptyList(), treeNode.getChildren());
         assertNotNull(treeNode);
@@ -125,126 +44,126 @@ public class TreeNodeTest {
 
     @Test
     public void getIndexedPathFromRootReturnsEmptyListForRoot() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Collections.emptyList(), root.getIndexedPathFromRoot());
     }
 
     @Test
     public void getIndexedPathFromRootSimplePath() {
-        assertEquals(Arrays.asList(1, 0), getNodeInSimpleTree().getIndexedPathFromRoot());
+        assertEquals(Arrays.asList(1, 0), TreeNodeTestData.getNodeInSimpleTree().getIndexedPathFromRoot());
     }
 
     @Test
     public void getIndexedPathFromRootComplexPath() {
-        assertEquals(Arrays.asList(2, 1, 0), getNodeInComplexTree().getIndexedPathFromRoot());
+        assertEquals(Arrays.asList(2, 1, 0), TreeNodeTestData.getNodeInComplexTree().getIndexedPathFromRoot());
     }
 
     @Test
     public void getDescendantSimplePath() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         assertEquals(node, root.getDescendant(Arrays.asList(1, 0)).get());
     }
 
     @Test
     public void getDescendantComplexPath() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
         assertEquals(node, root.getDescendant(Arrays.asList(2, 1, 0)).get());
     }
 
     @Test
     public void getDescendantNonExistentReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.getNodeInComplexTree(root);
         assertEquals(Optional.empty(), root.getDescendant(Arrays.asList(1, 100, 0)));
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void getPositionInParentForRootThrowsException() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         root.getPositionInParent();
     }
 
     @Test
     public void getPositionInParentSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
         assertEquals(2, node.getPositionInParent());
     }
 
     @Test
     public void getIndexOfNonExistentChildReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        assertEquals(Optional.empty(), root.getIndexOfChild(new TreeNodeMock()));
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        assertEquals(Optional.empty(), root.getIndexOfChild(new TreeNodeTestData.TreeNodeMock()));
     }
 
     @Test
     public void getIndexOfChild() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
         assertEquals((Integer)2, root.getIndexOfChild(node).get());
     }
 
     @Test
     public void getLevelOfRoot() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(0, root.getLevel());
     }
 
     @Test
     public void getLevelInSimpleTree() {
-        assertEquals(2, getNodeInSimpleTree().getLevel());
+        assertEquals(2, TreeNodeTestData.getNodeInSimpleTree().getLevel());
     }
 
     @Test
     public void getLevelInComplexTree() {
-        assertEquals(3, getNodeInComplexTree().getLevel());
+        assertEquals(3, TreeNodeTestData.getNodeInComplexTree().getLevel());
     }
 
     @Test
     public void getChildCountInSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.getNodeInSimpleTree(root);
         assertEquals(2, root.getNumberOfChildren());
     }
 
     @Test
     public void getChildCountInComplexTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.getNodeInComplexTree(root);
         assertEquals(4, root.getNumberOfChildren());
     }
 
     @Test
     public void moveToAddsAsLastChildInSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         node.moveTo(root);
         assertEquals((Integer)2, root.getIndexOfChild(node).get());
     }
 
     @Test
     public void moveToAddsAsLastChildInComplexTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
         node.moveTo(root);
         assertEquals((Integer)4, root.getIndexOfChild(node).get());
     }
 
     @Test
     public void moveToChangesParent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         node.moveTo(root);
         assertEquals(root, node.getParent().get());
     }
 
     @Test
     public void moveToInSameLevelAddsAtEnd() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock child1 = new TreeNodeMock();
-        TreeNodeMock child2 = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
         root.addChild(child1);
         root.addChild(child2);
 
@@ -255,10 +174,10 @@ public class TreeNodeTest {
 
     @Test
     public void getPathFromRootInSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
 
-        List<TreeNodeMock> path = node.getPathFromRoot();
+        List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(3, path.size());
         assertEquals(root, path.get(0));
         assertEquals(node, path.get(2));
@@ -266,10 +185,10 @@ public class TreeNodeTest {
 
     @Test
     public void getPathFromRootInComplexTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
 
-        List<TreeNodeMock> path = node.getPathFromRoot();
+        List<TreeNodeTestData.TreeNodeMock> path = node.getPathFromRoot();
         assertEquals(4, path.size());
         assertEquals(root, path.get(0));
         assertEquals(node, path.get(3));
@@ -277,149 +196,149 @@ public class TreeNodeTest {
 
     @Test
     public void getPreviousSiblingReturnsCorrect() {
-        TreeNodeMock root = new TreeNodeMock();
-        root.addChild(new TreeNodeMock());
-        TreeNodeMock previous = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
+        TreeNodeTestData.TreeNodeMock previous = new TreeNodeTestData.TreeNodeMock();
         root.addChild(previous);
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
-        root.addChild(new TreeNodeMock());
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
 
         assertEquals(previous, node.getPreviousSibling().get());
     }
 
     @Test
     public void getPreviousSiblingForRootReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Optional.empty(), root.getPreviousSibling());
     }
 
     @Test
     public void getPreviousSiblingForNonexistentReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
         assertEquals(Optional.empty(), node.getPreviousSibling());
     }
 
     @Test
     public void getNextSiblingReturnsCorrect() {
-        TreeNodeMock root = new TreeNodeMock();
-        root.addChild(new TreeNodeMock());
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
-        TreeNodeMock next = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock next = new TreeNodeTestData.TreeNodeMock();
         root.addChild(next);
-        root.addChild(new TreeNodeMock());
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
 
         assertEquals(next, node.getNextSibling().get());
     }
 
     @Test
     public void getNextSiblingForRootReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Optional.empty(), root.getNextSibling());
     }
 
     @Test
     public void getNextSiblingForNonexistentReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
         assertEquals(Optional.empty(), node.getPreviousSibling());
     }
 
     @Test
     public void getParentReturnsCorrect() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         assertEquals(root, node.getParent().get());
     }
 
     @Test
     public void getParentForRootReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Optional.empty(), root.getParent());
     }
 
     @Test
     public void getChildAtReturnsCorrect() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         assertEquals(node, root.getChildAt(2).get());
     }
 
     @Test
     public void getChildAtInvalidIndexReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        root.addChild(new TreeNodeMock());
-        root.addChild(new TreeNodeMock());
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
+        root.addChild(new TreeNodeTestData.TreeNodeMock());
         assertEquals(Optional.empty(), root.getChildAt(10));
     }
 
     @Test
     public void getRootReturnsTrueForRoot() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertTrue(root.isRoot());
     }
 
     @Test
     public void getRootReturnsFalseForChild() {
-        assertFalse(getNodeInSimpleTree().isRoot());
+        assertFalse(TreeNodeTestData.getNodeInSimpleTree().isRoot());
     }
 
     @Test
     public void nodeIsAncestorOfItself() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertTrue(root.isAncestorOf(root));
     }
 
     @Test
     public void isAncestorOfInSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         assertTrue(root.isAncestorOf(node));
     }
 
     @Test
     public void isAncestorOfInComplexTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
         assertTrue(root.isAncestorOf(node));
     }
 
     @Test
     public void getRootOfSingleNode() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertEquals(root, root.getRoot());
     }
 
     @Test
     public void getRootInSimpleTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
         assertEquals(root, node.getRoot());
     }
 
     @Test
     public void getRootInComplexTree() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
         assertEquals(root, node.getRoot());
     }
 
     @Test
     public void isLeafIsCorrectForRootWithoutChildren() {
-        TreeNodeMock root = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         assertTrue(root.isLeaf());
     }
 
     @Test
     public void removeFromParentSetsParentToEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         node.removeFromParent();
         assertEquals(Optional.empty(), node.getParent());
@@ -427,8 +346,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeFromParentRemovesNodeFromChildrenCollection() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         node.removeFromParent();
         assertFalse(root.getChildren().contains(node));
@@ -436,8 +355,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeAllChildrenSetsParentOfChildToEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.removeAllChildren();
         assertEquals(Optional.empty(), node.getParent());
@@ -445,8 +364,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeAllChildrenRemovesAllNodesFromChildrenCollection() {
-        TreeNodeMock root = new TreeNodeMock();
-        getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.getNodeAsChild(root);
 
         root.removeAllChildren();
         assertEquals(Collections.emptyList(), root.getChildren());
@@ -454,8 +373,8 @@ public class TreeNodeTest {
 
     @Test
     public void getFirstChildAtReturnsCorrect() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
 
         assertEquals(node, root.getFirstChild().get());
@@ -463,30 +382,30 @@ public class TreeNodeTest {
 
     @Test
     public void getFirstChildAtLeafReturnsEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock leaf = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock leaf = TreeNodeTestData.getNodeAsChild(root);
         assertEquals(Optional.empty(), leaf.getFirstChild());
     }
 
     @Test
     public void isNodeDescendantInFirstLevel() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock child = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child = TreeNodeTestData.getNodeAsChild(root);
         assertTrue(root.isNodeDescendant(child));
     }
 
     @Test
     public void isNodeDescendantInComplex() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock descendant = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock descendant = TreeNodeTestData.getNodeInComplexTree(root);
         assertTrue(root.isNodeDescendant(descendant));
     }
 
     @Test
     public void getChildrenReturnsAllChildren() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock child1 = new TreeNodeMock();
-        TreeNodeMock child2 = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
         root.addChild(child1);
         root.addChild(child2);
 
@@ -495,8 +414,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildSetsParentToEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.removeChild(node);
         assertEquals(Optional.empty(), node.getParent());
@@ -504,8 +423,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildRemovesNodeFromChildrenCollection() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.removeChild(node);
         assertFalse(root.getChildren().contains(node));
@@ -513,8 +432,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildIndexSetsParentToEmpty() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.removeChild(2);
         assertEquals(Optional.empty(), node.getParent());
@@ -522,8 +441,8 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildIndexRemovesNodeFromChildrenCollection() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.removeChild(2);
         assertFalse(root.getChildren().contains(node));
@@ -531,18 +450,18 @@ public class TreeNodeTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void addThrowsExceptionIfNodeHasParent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
         root.addChild(node);
     }
 
     @Test
     public void moveAllChildrenToAddsAtSpecifiedPosition() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
-        TreeNodeMock child1 = new TreeNodeMock();
-        TreeNodeMock child2 = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
         node.addChild(child1);
         node.addChild(child2);
 
@@ -552,11 +471,11 @@ public class TreeNodeTest {
 
     @Test
     public void moveAllChildrenToChangesParent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = new TreeNodeTestData.TreeNodeMock();
         root.addChild(node);
-        TreeNodeMock child1 = new TreeNodeMock();
-        TreeNodeMock child2 = new TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
         node.addChild(child1);
         node.addChild(child2);
 
@@ -567,18 +486,18 @@ public class TreeNodeTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void moveAllChildrenToDescendantThrowsException() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
         root.moveAllChildrenTo(node, 0);
     }
 
     @Test
     public void sortChildrenSortsInFirstLevel() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock child1 = new TreeNodeMock("a");
-        TreeNodeMock child2 = new TreeNodeMock("b");
-        TreeNodeMock child3 = new TreeNodeMock("c");
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock("a");
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock("b");
+        TreeNodeTestData.TreeNodeMock child3 = new TreeNodeTestData.TreeNodeMock("c");
         root.addChild(child2);
         root.addChild(child3);
         root.addChild(child1);
@@ -589,11 +508,11 @@ public class TreeNodeTest {
 
     @Test
     public void sortChildrenRecursiveSortsInDeeperLevel() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInSimpleTree(root);
-        TreeNodeMock child1 = new TreeNodeMock("a");
-        TreeNodeMock child2 = new TreeNodeMock("b");
-        TreeNodeMock child3 = new TreeNodeMock("c");
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock("a");
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock("b");
+        TreeNodeTestData.TreeNodeMock child3 = new TreeNodeTestData.TreeNodeMock("c");
         node.addChild(child2);
         node.addChild(child3);
         node.addChild(child1);
@@ -604,10 +523,10 @@ public class TreeNodeTest {
 
     @Test
     public void copySubtreeCopiesChildren() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeAsChild(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeAsChild(root);
 
-        TreeNodeMock copiedRoot = root.copySubtree();
+        TreeNodeTestData.TreeNodeMock copiedRoot = root.copySubtree();
         assertEquals(Optional.empty(), copiedRoot.getParent());
         assertFalse(copiedRoot.getChildren().contains(node));
         assertEquals(root.getNumberOfChildren(), copiedRoot.getNumberOfChildren());
@@ -615,20 +534,20 @@ public class TreeNodeTest {
 
     @Test
     public void addChildSomewhereInTreeInvokesChangeEvent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
 
         root.subscribeToDescendantChanged(subscriber);
 
-        node.addChild(new TreeNodeMock());
+        node.addChild(new TreeNodeTestData.TreeNodeMock());
         verify(subscriber).accept(node);
     }
 
     @Test
     public void moveNodeSomewhereInTreeInvokesChangeEvent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
-        TreeNodeMock oldParent = node.getParent().get();
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock oldParent = node.getParent().get();
 
         root.subscribeToDescendantChanged(subscriber);
 
@@ -639,9 +558,9 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildSomewhereInTreeInvokesChangeEvent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
-        TreeNodeMock child = node.addChild(new TreeNodeMock());
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
+        TreeNodeTestData.TreeNodeMock child = node.addChild(new TreeNodeTestData.TreeNodeMock());
 
         root.subscribeToDescendantChanged(subscriber);
 
@@ -651,9 +570,9 @@ public class TreeNodeTest {
 
     @Test
     public void removeChildIndexSomewhereInTreeInvokesChangeEvent() {
-        TreeNodeMock root = new TreeNodeMock();
-        TreeNodeMock node = getNodeInComplexTree(root);
-        node.addChild(new TreeNodeMock());
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInComplexTree(root);
+        node.addChild(new TreeNodeTestData.TreeNodeMock());
 
         root.subscribeToDescendantChanged(subscriber);
 
@@ -661,49 +580,16 @@ public class TreeNodeTest {
         verify(subscriber).accept(node);
     }
 
-    /**
-     * This is just a dummy class deriving from TreeNode<T> so that we can test the generic class
-     */
-    private static class TreeNodeMock extends TreeNode<TreeNodeMock> {
-
-        private final String name;
-
-        public TreeNodeMock() {
-            this("");
-        }
-
-        public TreeNodeMock(String name) {
-            super(TreeNodeMock.class);
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String toString() {
-            return "TreeNodeMock{" +
-                    "name='" + name + '\'' +
-                    '}';
-        }
-
-        @Override
-        public TreeNodeMock copyNode() {
-            return new TreeNodeMock(name);
-        }
-    }
-
-    private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
+    private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeTestData.TreeNodeMock> {
         // This class is a wrong derived class of TreeNode<T>
         // since it does not extends TreeNode<WrongTreeNodeImplementation>
         // See test constructorChecksThatClassImplementsCorrectInterface
         public WrongTreeNodeImplementation() {
-            super(TreeNodeMock.class);
+            super(TreeNodeTestData.TreeNodeMock.class);
         }
 
         @Override
-        public TreeNodeMock copyNode() {
+        public TreeNodeTestData.TreeNodeMock copyNode() {
             return null;
         }
     }
