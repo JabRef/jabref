@@ -1,7 +1,11 @@
 package org.jabref.gui.groups;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import javax.inject.Inject;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,6 +13,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionModel;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
@@ -24,14 +29,21 @@ import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
+
+    private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
 
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> mainColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> numberColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> disclosureNodeColumn;
+    @FXML private CustomTextField searchField;
 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
@@ -41,14 +53,22 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         viewModel = new GroupTreeViewModel(stateManager, dialogService);
 
         // Set-up bindings
-        groupTree.rootProperty().bind(
-                EasyBind.map(viewModel.rootGroupProperty(),
-                        group -> new RecursiveTreeItem<>(group, GroupNodeViewModel::getChildren, GroupNodeViewModel::expandedProperty))
-        );
         viewModel.selectedGroupProperty().bind(
                 EasyBind.monadic(groupTree.selectionModelProperty())
                         .flatMap(SelectionModel::selectedItemProperty)
                         .selectProperty(TreeItem::valueProperty)
+        );
+        viewModel.filterTextProperty().bind(searchField.textProperty());
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+        });
+
+        groupTree.rootProperty().bind(
+                EasyBind.map(viewModel.rootGroupProperty(),
+                        group -> new RecursiveTreeItem<>(
+                                group,
+                                GroupNodeViewModel::getChildren,
+                                GroupNodeViewModel::expandedProperty,
+                                viewModel.filterPredicateProperty()))
         );
 
         // Icon and group name
@@ -122,6 +142,9 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
             return row;
         });
+
+        // Filter text field
+        setupClearButtonField(searchField);
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
@@ -140,5 +163,18 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     public void addNewGroup(ActionEvent actionEvent) {
         viewModel.addNewGroupToRoot();
+    }
+
+    /**
+     * Workaround taken from https://bitbucket.org/controlsfx/controlsfx/issues/330/making-textfieldssetupclearbuttonfield
+     */
+    private void setupClearButtonField(CustomTextField customTextField) {
+        try {
+            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
+            m.setAccessible(true);
+            m.invoke(null, customTextField, customTextField.rightProperty());
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            LOGGER.error("Failed to decorate text field with clear button", ex);
+        }
     }
 }
