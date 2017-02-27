@@ -82,10 +82,13 @@ public class URLDownload {
     public String getMimeType() throws IOException {
         Unirest.setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
 
-        String contentType = "";
+        String contentType;
         // Try to use HEAD request to avoid downloading the whole file
         try {
             contentType = Unirest.head(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            if (contentType != null && !contentType.isEmpty()) {
+                return contentType;
+            }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via HEAD request", e);
         }
@@ -93,6 +96,9 @@ public class URLDownload {
         // Use GET request as alternative if no HEAD request is available
         try {
             contentType = Unirest.get(source.toString()).asString().getHeaders().get("Content-Type").get(0);
+            if (contentType != null && !contentType.isEmpty()) {
+                return contentType;
+            }
         } catch (Exception e) {
             LOGGER.debug("Error getting MIME type of URL via GET request", e);
         }
@@ -102,15 +108,14 @@ public class URLDownload {
             URLConnection connection = new URL(source.toString()).openConnection();
 
             contentType = connection.getContentType();
+            if (contentType != null && !contentType.isEmpty()) {
+                return contentType;
+            }
         } catch (IOException e) {
             LOGGER.debug("Error trying to get MIME type of local URI", e);
         }
 
-        if (contentType != null) {
-            return contentType;
-        } else {
-            return "";
-        }
+        return "";
     }
 
     public boolean isMimeType(String type) throws IOException {
