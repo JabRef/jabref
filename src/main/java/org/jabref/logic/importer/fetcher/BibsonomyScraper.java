@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -37,7 +36,7 @@ public class BibsonomyScraper {
                     .replace("&", "%26").replace("=", "%3D");
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
-            String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
+            String bibtex = new URLDownload(url).asString();
             return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
