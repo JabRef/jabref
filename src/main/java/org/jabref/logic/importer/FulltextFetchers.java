@@ -60,7 +60,7 @@ public class FulltextFetchers {
             try {
                 Optional<URL> result = finder.findFullText(clonedEntry);
 
-                if (result.isPresent() && new URLDownload(result.get().toString()).isMimeType("application/pdf")) {
+                if (result.isPresent() && new URLDownload(result.get().toString()).isPdf()) {
                     return result;
                 }
             } catch (IOException | FetcherException e) {

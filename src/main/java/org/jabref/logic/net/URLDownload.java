@@ -123,6 +123,10 @@ public class URLDownload {
         return mime.startsWith(type);
     }
 
+    public boolean isPdf() throws IOException {
+        return isMimeType("application/pdf");
+    }
+
     public void addHeader(String key, String value) {
         this.parameters.put(key, value);
     }
