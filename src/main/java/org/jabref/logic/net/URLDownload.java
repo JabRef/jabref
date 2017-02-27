@@ -19,6 +19,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -147,6 +148,16 @@ public class URLDownload {
             LOGGER.warn("Could not copy input", e);
             throw e;
         }
+    }
+
+    /**
+     * Downloads the web resource to a String.
+     * Uses UTF-8 as encoding.
+     *
+     * @return the downloaded string
+     */
+    public String asString() throws IOException {
+        return asString(StandardCharsets.UTF_8);
     }
 
     public List<HttpCookie> getCookieFromUrl() throws IOException {

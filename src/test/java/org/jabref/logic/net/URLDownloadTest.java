@@ -17,8 +17,7 @@ public class URLDownloadTest {
     public void testStringDownloadWithSetEncoding() throws IOException {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-        Assert.assertTrue("google.com should contain google",
-                dl.asString(StandardCharsets.UTF_8).contains("Google"));
+        Assert.assertTrue("google.com should contain google", dl.asString().contains("Google"));
     }
 
     @Test

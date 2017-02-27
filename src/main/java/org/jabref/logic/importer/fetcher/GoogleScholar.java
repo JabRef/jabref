@@ -142,7 +142,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
-        String content = new URLDownload(queryURL).asString(StandardCharsets.UTF_8);
+        String content = new URLDownload(queryURL).asString();
 
         Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
         while (matcher.find()) {
@@ -153,7 +153,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
-        String downloadedContent = new URLDownload(link).asString(StandardCharsets.UTF_8);
+        String downloadedContent = new URLDownload(link).asString();
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {

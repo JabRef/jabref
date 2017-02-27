@@ -127,7 +127,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
-        String cont = new URLDownload(urlString).asString(StandardCharsets.UTF_8);
+        String cont = new URLDownload(urlString).asString();
 
         // Find title, and create entry if we do. Otherwise assume we did not get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);

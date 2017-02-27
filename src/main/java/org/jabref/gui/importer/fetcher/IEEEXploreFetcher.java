@@ -110,7 +110,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             dl.setPostData(postData);
 
             //retrieve the search results
-            String page = dl.asString(StandardCharsets.UTF_8);
+            String page = dl.asString();
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
