@@ -3,7 +3,6 @@ package org.jabref.logic.net;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import org.jabref.preferences.JabRefPreferences;

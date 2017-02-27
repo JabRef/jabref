@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
