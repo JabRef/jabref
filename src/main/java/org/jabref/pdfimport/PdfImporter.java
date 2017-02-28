@@ -64,29 +64,24 @@ public class PdfImporter {
         this.dropRow = dropRow;
     }
 
-
     public class ImportPdfFilesResult {
 
         private final List<String> noPdfFiles;
         private final List<BibEntry> entries;
-
 
         public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
             this.noPdfFiles = noPdfFiles;
             this.entries = entries;
         }
 
-
         public List<String> getNoPdfFiles() {
             return noPdfFiles;
         }
-
 
         public List<BibEntry> getEntries() {
             return entries;
         }
     }
-
 
     /**
      *
@@ -128,7 +123,6 @@ public class PdfImporter {
         boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE);
         int globalChoice = Globals.prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
-
         List<BibEntry> res = new ArrayList<>();
 
         for (String fileName : fileNames) {
@@ -156,7 +150,11 @@ public class PdfImporter {
                     break;
                 case ImportDialog.ONLYATTACH:
                     DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-                    dfh.linkPdfToEntry(fileName, entryTable, dropRow);
+                    if (dropRow >= 0) {
+                        dfh.linkPdfToEntry(fileName, entryTable, dropRow);
+                    } else {
+                        dfh.linkPdfToEntry(fileName, entryTable, entryTable.getSelectedRow());
+                    }
                     break;
                 default:
                     break;
@@ -236,7 +234,8 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
+                .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(),
+                entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
