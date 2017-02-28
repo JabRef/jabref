@@ -259,11 +259,19 @@ public class LatexFieldFormatter {
         int current = -1;
 
         // First we collect all occurrences:
-        while ((current = text.indexOf('{', current + 1)) != -1) {
-            left.add(current);
-        }
-        while ((current = text.indexOf('}', current + 1)) != -1) {
-            right.add(current);
+        for (int i = 0; i < text.length(); i++) {
+            char item = text.charAt(i);
+
+            boolean charBeforeIsEscape = false;
+            if(i > 0 && text.charAt(i - 1) == '\\') {
+                charBeforeIsEscape = true;
+            }
+
+            if(!charBeforeIsEscape && item == '{') {
+                left.add(current);
+            } else if (!charBeforeIsEscape && item == '{') {
+                right.add(current);
+            }
         }
 
         // Then we throw an exception if the error criteria are met.

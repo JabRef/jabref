@@ -81,4 +81,18 @@ public class LatexFieldFormatterTests {
         assertEquals(expected, title);
         assertEquals(expected, any);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void reportUnbalancedBracing() {
+        String unbalanced = "{";
+
+        formatter.format(unbalanced, "anyfield");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void reportUnbalancedBracingWithEscapedBraces() {
+        String unbalanced = "{\\}";
+
+        formatter.format(unbalanced, "anyfield");
+    }
 }
