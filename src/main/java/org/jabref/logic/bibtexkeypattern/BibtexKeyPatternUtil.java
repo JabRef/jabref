@@ -24,14 +24,15 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.base.CaseFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 /**
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil {
+
     private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
@@ -128,8 +129,8 @@ public class BibtexKeyPatternUtil {
         return content.replaceAll(
                 "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
                 "{\\\"$1}").replaceAll(
-                "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
-                "{$1$2}");
+                        "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
+                        "{$1$2}");
     }
 
     /**
@@ -335,7 +336,7 @@ public class BibtexKeyPatternUtil {
                 if (part.size() < 3) {
                     for (String k : part) {
                         restSB.append(k);
-                    // More than 3 parts -> use 1st letter abbreviation
+                        // More than 3 parts -> use 1st letter abbreviation
                     }
                 } else {
                     for (String k : part) {
@@ -353,8 +354,7 @@ public class BibtexKeyPatternUtil {
         return (university == null ? rest : university)
                 + (school == null ? "" : school)
                 + ((department == null)
-                || ((school != null) && department.equals(school)) ?
-                        "" : department);
+                        || ((school != null) && department.equals(school)) ? "" : department);
     }
 
     /**
@@ -374,7 +374,8 @@ public class BibtexKeyPatternUtil {
         entry.setCiteKey(newKey);
     }
 
-    private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+    private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         String key;
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -395,7 +396,8 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(),
+                            database);
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -479,12 +481,13 @@ public class BibtexKeyPatternUtil {
                             abbreviateSB.append(word.charAt(0));
                         }
                     }
-                    resultingLabel =  abbreviateSB.toString();
+                    resultingLabel = abbreviateSB.toString();
                 } else {
                     Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                     if (formatter.isPresent()) {
                         resultingLabel = formatter.get().format(label);
-                    } else if (!modifier.isEmpty() && modifier.length()>= 2 && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                    } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(')
+                            && modifier.endsWith(")")) {
                         // Alternate text modifier in parentheses. Should be inserted if
                         // the label is empty:
                         if (label.isEmpty() && (modifier.length() > 2)) {
@@ -640,6 +643,15 @@ public class BibtexKeyPatternUtil {
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
+            } else if ("camel".equals(val)) {
+
+
+                System.out.println("Title " + entry.getField(FieldName.TITLE).orElse(""));
+                String camel = CaseFormat.LOWER_CAMEL
+                        .to(CaseFormat.UPPER_CAMEL, entry.getField(FieldName.TITLE).orElse("").replaceAll("\\s+", ""));
+                System.out.println("Camel  " + camel);
+                return camel;
+
             } else if ("shortyear".equals(val)) {
                 String yearString = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
                 if (yearString.isEmpty()) {
@@ -661,7 +673,7 @@ public class BibtexKeyPatternUtil {
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return separatedKeywords.get(num-1).toString();
+                    return separatedKeywords.get(num - 1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -742,7 +754,7 @@ public class BibtexKeyPatternUtil {
             if (word.isEmpty()) {
                 continue;
             }
-            for (String smallWord: Word.SMALLER_WORDS) {
+            for (String smallWord : Word.SMALLER_WORDS) {
                 if (word.equalsIgnoreCase(smallWord)) {
                     continue mainl;
                 }
@@ -768,7 +780,6 @@ public class BibtexKeyPatternUtil {
         }
         return stringBuilder.toString();
     }
-
 
     /**
      * Gets the last name of the first author/editor
@@ -1258,7 +1269,6 @@ public class BibtexKeyPatternUtil {
         return parts;
     }
 
-
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is
      * acceptable for bibtex.
@@ -1303,7 +1313,8 @@ public class BibtexKeyPatternUtil {
     public static String makeLabel(BibDatabaseContext bibDatabaseContext,
             BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
-        AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData().getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern());
+        AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
+                .getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern());
         return makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(), entry, bibtexKeyPatternPreferences);
     }
 }
