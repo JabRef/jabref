@@ -1,8 +1,5 @@
 package org.jabref.logic.bibtex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
