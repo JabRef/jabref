@@ -59,8 +59,9 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 
 ### Generating additional source codes and getting dependencies using Gradle:
 * Go to the jabref folder (the repo you just cloned, if you are following this tutorial, just execute `cd jabref`)
-* Run `gradlew clean check generateSource` (`./gradlew clean check generateSource`) 
-* If you use Eclipse: run `gradlew eclipse` (`./gradlew eclipse` in Linux)
+* On windows, execute the following steps from the git-bash:
+* Run `./gradlew build` 
+* If you use Eclipse: run `./gradlew eclipse` 
 * If you use IntelliJ: No extra setup is required
 * In rare cases you might encounter problems due to out-dated automatically generated source files. Running `gradlew clean` deletes these old copies.
 
@@ -71,7 +72,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 1. Choose General --> Existing projects in the workspace and "next"
 2. For "select root directory", browse until the root folder of your jabref just cloned from your repo (e.g., `/home/user/<YOU>/jabref`)
 3. Click on "Finish" and voilá!
-4. In Eclipse, right click on the project and choose Run as --> Java application (Forget about the existing errors)
+4. In Eclipse, right click on the project and choose Refresh workspace and then choose Run as --> Java application (Forget about the existing errors)
 5. Choose JabRefMain as the main class to be executed
 
 Got it running? GREAT! You are ready to lurk the code and contribute to JabRef :books: . In the latter case, please read [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md).
