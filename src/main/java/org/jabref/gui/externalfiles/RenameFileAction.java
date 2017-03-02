@@ -17,9 +17,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.ParsedFileField;
@@ -29,7 +27,6 @@ public class RenameFileAction extends AbstractAction {
     private final JabRefFrame frame;
     private final EntryEditor eEditor;
     private final FileListEditor editor;
-    private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
     public RenameFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
@@ -56,9 +53,9 @@ public class RenameFileAction extends AbstractAction {
             return;
         }
         List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         Optional<Path> fileDir = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
+                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File directory is not set or does not exist!"),
                     Localization.lang("Rename file"), JOptionPane.ERROR_MESSAGE);
@@ -72,9 +69,10 @@ public class RenameFileAction extends AbstractAction {
         if ((file != null) && Files.exists(file)) {
 
             RenamePdfCleanup pdfCleanup = new RenamePdfCleanup(false,
-                    frame.getCurrentBasePanel().getBibDatabaseContext(), prefs.getFileNamePattern(),
-                    prefs.getLayoutFormatterPreferences(),
-                    prefs.getFileDirectoryPreferences(), field);
+                    frame.getCurrentBasePanel().getBibDatabaseContext(),
+                    Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
+                    Globals.prefs.getFileDirectoryPreferences(), field);
 
             String targetFileName = pdfCleanup.getTargetFileName(field, eEditor.getEntry());
 

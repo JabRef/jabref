@@ -17,9 +17,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.ParsedFileField;
@@ -32,7 +30,6 @@ public class MoveFileAction extends AbstractAction {
     private final JabRefFrame frame;
     private final EntryEditor eEditor;
     private final FileListEditor editor;
-    private final CleanupPreferences prefs = Globals.prefs.getCleanupPreferences(new JournalAbbreviationLoader());
 
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor) {
         this.frame = frame;
@@ -61,9 +58,9 @@ public class MoveFileAction extends AbstractAction {
         }
         // Get an absolute path representation:
         List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         Optional<Path> fileDir = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFirstExistingFileDir(prefs.getFileDirectoryPreferences());
+                .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
             JOptionPane.showMessageDialog(frame, Localization.lang("File directory is not set or does not exist!"),
                     Localization.lang("Move file"), JOptionPane.ERROR_MESSAGE);
@@ -77,8 +74,9 @@ public class MoveFileAction extends AbstractAction {
         if ((file != null) && Files.exists(file)) {
 
             MoveFilesCleanup moveFiles = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
-                    prefs.getFileDirPattern(), prefs.getFileDirectoryPreferences(),
-                    prefs.getLayoutFormatterPreferences(), field);
+                    Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),
+                    Globals.prefs.getFileDirectoryPreferences(),
+                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader), field);
 
             String[] options = {Localization.lang("Move file"), Localization.lang("Cancel")};
 
