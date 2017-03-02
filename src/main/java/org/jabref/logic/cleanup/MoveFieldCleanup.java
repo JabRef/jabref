@@ -3,10 +3,10 @@ package org.jabref.logic.cleanup;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.OptionalUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.OptionalUtil;
 
 /**
  * Moves the content of one field to another field.

@@ -1,8 +1,5 @@
 package org.jabref.logic.bibtex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
@@ -254,26 +251,33 @@ public class LatexFieldFormatter {
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {
-        List<Integer> left = new ArrayList<>(5);
-        List<Integer> right = new ArrayList<>(5);
-        int current = -1;
+        int left = 0;
+        int right = 0;
 
         // First we collect all occurrences:
-        while ((current = text.indexOf('{', current + 1)) != -1) {
-            left.add(current);
-        }
-        while ((current = text.indexOf('}', current + 1)) != -1) {
-            right.add(current);
+        for (int i = 0; i < text.length(); i++) {
+            char item = text.charAt(i);
+
+            boolean charBeforeIsEscape = false;
+            if(i > 0 && text.charAt(i - 1) == '\\') {
+                charBeforeIsEscape = true;
+            }
+
+            if(!charBeforeIsEscape && item == '{') {
+                left++;
+            } else if (!charBeforeIsEscape && item == '}') {
+                right++;
+            }
         }
 
         // Then we throw an exception if the error criteria are met.
-        if (!right.isEmpty() && left.isEmpty()) {
+        if (!(right == 0) && (left == 0)) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
-        if (!right.isEmpty() && (right.get(0) < left.get(0))) {
+        if (!(right == 0) && (right < left)) {
             throw new IllegalArgumentException("'}' character ends string prematurely.");
         }
-        if (left.size() != right.size()) {
+        if (left != right) {
             throw new IllegalArgumentException("Braces don't match.");
         }
 

@@ -205,7 +205,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFile.GROUP)
                 .getHelpButton();
-        JButton autoGroup = new JButton(IconTheme.JabRefIcon.AUTO_GROUP.getSmallIcon());
         Insets butIns = new Insets(0, 0, 0, 0);
         helpButton.setMargin(butIns);
         openSettings.setMargin(butIns);
@@ -213,20 +212,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         orCb.addActionListener(e -> valueChanged(null));
         invCb.addActionListener(e -> valueChanged(null));
         showOverlappingGroups.addActionListener(e -> valueChanged(null));
-        autoGroup.addActionListener(e -> {
-            AutoGroupDialog gd = new AutoGroupDialog(frame, panel, groupsRoot,
-                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,",
-                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
-            gd.setVisible(true);
-            // gd does the operation itself
-        });
         floatCb.addActionListener(e -> valueChanged(null));
         highlCb.addActionListener(e -> valueChanged(null));
         hideNonHits.addActionListener(e -> valueChanged(null));
         grayOut.addActionListener(e -> valueChanged(null));
         andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
-        autoGroup.setToolTipText(Localization.lang("Automatically create groups for library."));
         openSettings.setToolTipText(Localization.lang("Settings"));
         invCb.setToolTipText("<html>" + Localization.lang("Show entries <b>not</b> in group selection") + "</html>");
         showOverlappingGroups.setToolTipText(
@@ -253,8 +244,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         con.gridx = 0;
 
         con.gridx = 1;
-        gbl.setConstraints(autoGroup, con);
-        rootPanel.add(autoGroup);
 
         con.gridx = 2;
         gbl.setConstraints(openSettings, con);

@@ -70,7 +70,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         if (viewModel.printInItalics()) {
             sb.append("<i>");
         }
-        sb.append("Group Name");
+        sb.append(viewModel.getName());
         if (viewModel.printInItalics()) {
             sb.append("</i>");
         }
