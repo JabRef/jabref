@@ -41,7 +41,6 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     private final JTextField fileDirPattern;
 
-
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
 
@@ -135,8 +134,6 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             break;
         }
         fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
-
-        String pattern = "";
         fileDirPattern.setText(prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN));
     }
 

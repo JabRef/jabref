@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -53,8 +52,7 @@ public class IEEE implements FulltextFetcher {
             Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
                 // Download the HTML page from IEEE
-                String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())
-                        .downloadToString(StandardCharsets.UTF_8);
+                String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL()).asString();
                 // Try to find the link
                 Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
                 if (matcher.find()) {
@@ -70,7 +68,7 @@ public class IEEE implements FulltextFetcher {
         }
 
         // Download the HTML page containing a frame with the PDF
-        String framePage = new URLDownload(BASE_URL + stampString).downloadToString(StandardCharsets.UTF_8);
+        String framePage = new URLDownload(BASE_URL + stampString).asString();
         // Try to find the direct PDF link
         Matcher matcher = PDF_PATTERN.matcher(framePage);
         if (matcher.find()) {

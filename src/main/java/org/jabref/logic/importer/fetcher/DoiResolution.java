@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.MimeTypeDetector;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -61,7 +61,7 @@ public class DoiResolution implements FulltextFetcher {
                         // Only check if pdf is included in the link or inside the text
                         // ACM uses tokens without PDF inside the link
                         // See https://github.com/lehner/LocalCopy for more scrape ideas
-                        if ((href.contains("pdf") || hrefText.contains("pdf")) && MimeTypeDetector.isPdfContentType(href)) {
+                        if ((href.contains("pdf") || hrefText.contains("pdf")) && new URLDownload(href).isPdf()) {
                             links.add(Optional.of(new URL(href)));
                         }
                     }

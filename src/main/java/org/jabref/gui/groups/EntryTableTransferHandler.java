@@ -32,7 +32,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportMenuItem;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
-import org.jabref.gui.net.MonitoredURLDownload;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
@@ -377,10 +377,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         File tmpfile = File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 
-        // System.out.println("Import url: " + dropLink.toString());
-        // System.out.println("Temp file: "+tmpfile.getAbsolutePath());
-
-        MonitoredURLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
+        new URLDownload(dropLink).toFile(tmpfile.toPath());
 
         // Import into new if entryTable==null, otherwise into current library:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);

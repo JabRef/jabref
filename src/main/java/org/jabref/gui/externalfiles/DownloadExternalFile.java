@@ -18,7 +18,6 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
-import org.jabref.gui.net.MonitoredURLDownload;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
@@ -100,12 +99,12 @@ public class DownloadExternalFile {
         final File tmp = File.createTempFile("jabref_download", "tmp");
         tmp.deleteOnExit();
 
-        URLDownload udl = MonitoredURLDownload.buildMonitoredDownload(frame, url);
+        URLDownload udl = new URLDownload(url);
 
         try {
             // TODO: what if this takes long time?
             // TODO: stop editor dialog if this results in an error:
-            mimeType = udl.determineMimeType(); // Read MIME type
+            mimeType = udl.getMimeType(); // Read MIME type
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -117,7 +116,7 @@ public class DownloadExternalFile {
 
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
-                udlF.downloadToFile(tmp);
+                udlF.toFile(tmp.toPath());
             } catch (IOException e2) {
                 dontShowDialog = true;
                 if ((editor != null) && editor.isVisible()) {
@@ -165,7 +164,7 @@ public class DownloadExternalFile {
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {
-            File f = directory == null ? new File(closeEntry.link) : expandFilename(directory, closeEntry.link);
+            File f = directory == null ? new File(closeEntry.getLink()) : expandFilename(directory, closeEntry.getLink());
             if (f.isDirectory()) {
                 JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
                         Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -186,8 +185,8 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory == null ? new File(fileListEntry.link) : expandFilename(directory,
-                    fileListEntry.link);
+            File toFile = directory == null ? new File(fileListEntry.getLink()) : expandFilename(directory,
+                    fileListEntry.getLink());
             String dirPrefix;
             if (directory == null) {
                 dirPrefix = null;
@@ -207,10 +206,10 @@ public class DownloadExternalFile {
 
             // If the local file is in or below the main file directory, change the
             // path to relative:
-            if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
-                    && (fileListEntry.link.length() > dirPrefix.length())) {
-                fileListEntry = new FileListEntry(fileListEntry.description,
-                        fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
+            if ((dirPrefix != null) && fileListEntry.getLink().startsWith(directory)
+                    && (fileListEntry.getLink().length() > dirPrefix.length())) {
+                fileListEntry = new FileListEntry(fileListEntry.getDescription(),
+                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getType());
             }
             callback.downloadComplete(fileListEntry);
 
@@ -344,7 +343,6 @@ public class DownloadExternalFile {
      */
     @FunctionalInterface
     public interface DownloadCallback {
-
         void downloadComplete(FileListEntry file);
     }
 }

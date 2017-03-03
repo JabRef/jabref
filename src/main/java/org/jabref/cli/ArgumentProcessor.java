@@ -91,7 +91,7 @@ public class ArgumentProcessor {
         if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
             // Download web resource to temporary file
             try {
-                file = new URLDownload(address).downloadToTemporaryFile();
+                file = new URLDownload(address).toTemporaryFile();
             } catch (IOException e) {
                 System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
                 return Optional.empty();

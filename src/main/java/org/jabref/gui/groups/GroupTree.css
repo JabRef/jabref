@@ -107,7 +107,7 @@
     -fx-translate-x: -5px;
 }
 
-#buttonBarBottom {
+#barBottom {
     -fx-background-color: #dadad8;
     -fx-border-color: dimgray;
     -fx-border-width: 1 0 0 0;
