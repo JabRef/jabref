@@ -48,8 +48,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
     private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
-        stateManager.activeGroupProperty().setValue(
-                Optional.ofNullable(newValue).map(GroupNodeViewModel::getGroupNode));
+        currentDatabase.ifPresent(database -> {
+            if (newValue == null) {
+                stateManager.clearSelectedGroup(database);
+            } else {
+                stateManager.setSelectedGroup(database, newValue.getGroupNode());
+            }
+        });
     }
 
     /**
@@ -66,6 +71,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
             rootGroup.setValue(newRoot);
+            stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
+                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
         }
     }
 

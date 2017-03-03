@@ -25,6 +25,7 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.PropertyBinding;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
@@ -45,11 +46,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 EasyBind.map(viewModel.rootGroupProperty(),
                         group -> new RecursiveTreeItem<>(group, GroupNodeViewModel::getChildren, GroupNodeViewModel::expandedProperty))
         );
-        viewModel.selectedGroupProperty().bind(
+        viewModel.selectedGroupProperty().bindBidirectional(
                 EasyBind.monadic(groupTree.selectionModelProperty())
                         .flatMap(SelectionModel::selectedItemProperty)
                         .selectProperty(TreeItem::valueProperty)
         );
+
 
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
