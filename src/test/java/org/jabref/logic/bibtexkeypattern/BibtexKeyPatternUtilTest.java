@@ -619,20 +619,29 @@ public class BibtexKeyPatternUtilTest {
         // veryShortTitle is getTitleWords with "1" as count
         int count = 1;
         assertEquals("application",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+                BibtexKeyPatternUtil.getTitleWords(count,
+                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
         assertEquals("BPEL", BibtexKeyPatternUtil.getTitleWords(count,
-                TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Process", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+                BibtexKeyPatternUtil.removeSmallWords(
+                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
+        assertEquals("Process", BibtexKeyPatternUtil.getTitleWords(count,
+                BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED)));
         assertEquals("BPMN",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+                BibtexKeyPatternUtil.getTitleWords(count,
+                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
         assertEquals("Difference", BibtexKeyPatternUtil.getTitleWords(count,
-                TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
+                BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
         assertEquals("Cloud",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+                BibtexKeyPatternUtil.getTitleWords(count,
+                        BibtexKeyPatternUtil
+                                .removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
         assertEquals("Towards",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+                BibtexKeyPatternUtil.getTitleWords(count,
+                        BibtexKeyPatternUtil.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
         assertEquals("Measurement",
-                BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+                BibtexKeyPatternUtil.getTitleWords(count,
+                        BibtexKeyPatternUtil
+                                .removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
     }
 
     /**
@@ -644,19 +653,75 @@ public class BibtexKeyPatternUtilTest {
         int count = 3;
         assertEquals("applicationmigrationeffort",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPELconformanceopen", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("BPELconformancein", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("ProcessViewingPatterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
-        assertEquals("BPMNConformanceOpen",
+        assertEquals("BPMNConformancein",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("DifferenceGraphBased", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("TheDifferenceBetween", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("CloudComputingNext",
+        assertEquals("CloudComputingThe",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
         assertEquals("TowardsChoreographybased",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("MeasurementDesignTime",
+        assertEquals("OntheMeasurement",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+    }
+
+    /**
+    * Tests [camel]
+    */
+    @Test
+    public void camel() {
+        // camel capitalises and concatenates all the words of the title
+        assertEquals("ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms",
+                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        assertEquals("BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis",
+                BibtexKeyPatternUtil.getCamelizedTitle(
+                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        assertEquals("ProcessViewingPatterns", BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED));
+        assertEquals("BPMNConformanceInOpenSourceEngines",
+                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        assertEquals("TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages",
+                BibtexKeyPatternUtil.getCamelizedTitle(
+                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
+        assertEquals("CloudComputingTheNextRevolutionInIT",
+                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        assertEquals("TowardsChoreographyBasedProcessDistributionInTheCloud",
+                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+        assertEquals("OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems",
+                BibtexKeyPatternUtil.getCamelizedTitle(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+    }
+
+    /**
+     * Tests [title]
+     */
+    @Test
+    public void title() {
+        // title capitalises the significant words and concatenates all the words of the title
+        assertEquals("ApplicationMigrationEffortintheCloudtheCaseofCloudPlatforms",
+                BibtexKeyPatternUtil
+                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        assertEquals("BPELConformanceinOpenSourceEnginestheCaseofStaticAnalysis",
+                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        assertEquals("ProcessViewingPatterns",
+                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED));
+        assertEquals("BPMNConformanceinOpenSourceEngines",
+                BibtexKeyPatternUtil
+                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        assertEquals("TheDifferencebetweenGraphBasedandBlockStructuredBusinessProcessModellingLanguages",
+                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
+        assertEquals("CloudComputingtheNextRevolutioninIT",
+                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
+        assertEquals("TowardsChoreographyBasedProcessDistributionintheCloud",
+                BibtexKeyPatternUtil
+                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+        assertEquals("OntheMeasurementofDesignTimeAdaptabilityforProcessBasedSystems",
+                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
     @Test
@@ -718,8 +783,8 @@ public class BibtexKeyPatternUtilTest {
     public void testApplyModifiers() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
-        assertEquals("GSW", BibtexKeyPatternUtil.makeLabel(entry, "shorttitleINI", ',', new BibDatabase()));
-        assertEquals("GreenSchedulingWhatever", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
+        assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry, "shorttitleINI", ',', new BibDatabase()));
+        assertEquals("GreenSchedulingof", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
                 ',', new BibDatabase()));
     }
 
