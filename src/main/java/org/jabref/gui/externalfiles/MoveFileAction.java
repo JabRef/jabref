@@ -48,7 +48,7 @@ public class MoveFileAction extends AbstractAction {
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
         // Check if the current file exists:
-        String ln = entry.link;
+        String ln = entry.getLink();
         ParsedFileField field = entry.toParsedFileField();
 
         boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
@@ -91,7 +91,7 @@ public class MoveFileAction extends AbstractAction {
 
         } else {
             // File doesn't exist, so we can't move it.
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", entry.link),
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not find file '%0'.", entry.getLink()),
                     Localization.lang("File not found"), JOptionPane.ERROR_MESSAGE);
         }
 

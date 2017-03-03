@@ -46,7 +46,7 @@ public class RenameFileAction extends AbstractAction {
         FileListEntry entry = editor.getTableModel().getEntry(selected);
         ParsedFileField field = entry.toParsedFileField();
         // Check if the current file exists:
-        String ln = entry.link;
+        String ln = entry.getLink();
         boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
         if (httpLink) {
             // TODO: notify that this operation cannot be done on remote links
