@@ -472,8 +472,8 @@ public class SearchResultFrame {
                             return;
                         }
                         FileListEntry fl = tableModel.getEntry(0);
-                        (new ExternalFileMenuItem(frame, entry, "", fl.link, null,
-                                p.getBibDatabaseContext(), fl.type)).actionPerformed(null);
+                        (new ExternalFileMenuItem(frame, entry, "", fl.getLink(), null,
+                                p.getBibDatabaseContext(), fl.getType())).actionPerformed(null);
                     }
                     break;
                 case URL_COL:
@@ -511,12 +511,12 @@ public class SearchResultFrame {
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
-                    String description = flEntry.description;
+                    String description = flEntry.getDescription();
                     if ((description == null) || (description.trim().isEmpty())) {
-                        description = flEntry.link;
+                        description = flEntry.getLink();
                     }
-                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.link,
-                            flEntry.type.get().getIcon(), p.getBibDatabaseContext(), flEntry.type));
+                    menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.getLink(),
+                            flEntry.getType().get().getIcon(), p.getBibDatabaseContext(), flEntry.getType()));
                     count++;
                 }
 
@@ -586,8 +586,8 @@ public class SearchResultFrame {
                         entry.getField(FieldName.FILE).ifPresent(tmpModel::setContent);
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
-                            if (tmpModel.getEntry(0).type.isPresent()) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.get().getIcon());
+                            if (tmpModel.getEntry(0).getType().isPresent()) {
+                                fileLabel.setIcon(tmpModel.getEntry(0).getType().get().getIcon());
                             } else {
                                 fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
                             }

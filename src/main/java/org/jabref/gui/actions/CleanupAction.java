@@ -34,7 +34,6 @@ public class CleanupAction extends AbstractWorker {
     private int modifiedEntriesCount;
     private final JabRefPreferences preferences;
 
-
     public CleanupAction(BasePanel panel, JabRefPreferences preferences) {
         this.panel = panel;
         this.frame = panel.frame();

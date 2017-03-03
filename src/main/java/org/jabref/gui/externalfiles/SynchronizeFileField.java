@@ -150,7 +150,7 @@ public class SynchronizeFileField extends AbstractWorker {
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
                         // See if the link looks like an URL:
-                        boolean httpLink = flEntry.link.toLowerCase(Locale.ENGLISH).startsWith("http");
+                        boolean httpLink = flEntry.getLink().toLowerCase(Locale.ENGLISH).startsWith("http");
                         if (httpLink) {
                             continue; // Don't check the remote file.
                             // TODO: should there be an option to check remote links?
@@ -160,7 +160,7 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        Optional<File> file = FileUtil.expandFilename(flEntry.link, dirsS);
+                        Optional<File> file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
                         if ((!file.isPresent()) || !file.get().exists()) {
                             int answer;
                             if (removeAllBroken) {
@@ -168,7 +168,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             } else {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                flEntry.link,
+                                                flEntry.getLink(),
                                                 aSel.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
@@ -202,15 +202,15 @@ public class SynchronizeFileField extends AbstractWorker {
                         }
 
                         // Unless we deleted this link, see if its file type is recognized:
-                        if (!deleted && flEntry.type.isPresent()
-                                && (flEntry.type.get() instanceof UnknownExternalFileType)) {
+                        if (!deleted && flEntry.getType().isPresent()
+                                && (flEntry.getType().get() instanceof UnknownExternalFileType)) {
                             String[] options = new String[] {
-                                    Localization.lang("Define '%0'", flEntry.type.get().getName()),
+                                    Localization.lang("Define '%0'", flEntry.getType().get().getName()),
                                     Localization.lang("Change file type"),
                                     Localization.lang("Cancel")};
                             String defOption = options[0];
                             int answer = JOptionPane.showOptionDialog(panel.frame(), Localization.lang("One or more file links are of the type '%0', which is undefined. What do you want to do?",
-                                    flEntry.type.get().getName()),
+                                    flEntry.getType().get().getName()),
                                     Localization.lang("Undefined file type"), JOptionPane.YES_NO_CANCEL_OPTION,
                                     JOptionPane.QUESTION_MESSAGE, null, options, defOption
                                     );
@@ -218,7 +218,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User doesn't want to handle this unknown link type.
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
-                                ExternalFileType newType = new ExternalFileType(flEntry.type.get().getName(), "", "",
+                                ExternalFileType newType = new ExternalFileType(flEntry.getType().get().getName(), "", "",
                                         "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
