@@ -2,6 +2,7 @@ package org.jabref.logic.importer.util;
 
 import java.util.List;
 
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
@@ -148,7 +149,7 @@ public class GroupsParser {
         if (!s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
-        return new AllEntriesGroup(Localization.lang("All entries"));
+        return DefaultGroupsFactory.getAllEntriesGroup();
     }
 
     /**

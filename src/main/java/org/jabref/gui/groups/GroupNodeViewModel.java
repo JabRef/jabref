@@ -18,6 +18,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -90,7 +91,7 @@ public class GroupNodeViewModel {
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
-        return new GroupNodeViewModel(newDatabase, stateManager, new AllEntriesGroup(Localization.lang("All entries")));
+        return new GroupNodeViewModel(newDatabase, stateManager, DefaultGroupsFactory.getAllEntriesGroup());
     }
 
     private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
