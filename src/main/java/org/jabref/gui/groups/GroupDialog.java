@@ -28,6 +28,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.event.CaretListener;
 
+import javafx.scene.paint.Color;
+
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.Dialog;
@@ -80,6 +82,10 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
             Localization.lang("Refine supergroup: When selected, view entries contained in both this group and its supergroup"));
     private final JRadioButton unionButton = new JRadioButton(
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
+    private final JTextField colorField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
+    private final JTextField descriptionField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
+    private final JTextField iconField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
+
     // for KeywordGroup
     private final JTextField keywordGroupSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
     private final TextField keywordGroupSearchTerm = new TextField(FieldName.KEYWORDS, "", false);
@@ -209,7 +215,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         // create layout
         FormLayout layoutAll = new FormLayout(
                 "right:pref, 4dlu, fill:600px, 4dlu, fill:pref",
-                "p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, p, "
+                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 0dlu, p, 0dlu, p, 0dlu, p, 3dlu, p, 3dlu, p, "
                         + "0dlu, p, 0dlu, p, 3dlu, p, 3dlu, "
                         + "p, 3dlu, p, 3dlu, top:80dlu, 9dlu, p, 9dlu, p");
 
@@ -219,6 +225,18 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         builderAll.nextLine();
         builderAll.append(Localization.lang("Name"));
         builderAll.append(nameField);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(Localization.lang("Description"));
+        builderAll.append(descriptionField);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(Localization.lang("Color"));
+        builderAll.append(colorField);
+        builderAll.nextLine();
+        builderAll.nextLine();
+        builderAll.append(Localization.lang("Icon"));
+        builderAll.append(iconField);
         builderAll.nextLine();
         builderAll.nextLine();
         builderAll.append(explicitRadioButton, 5);
@@ -339,6 +357,14 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
                                 autoGroupPersonsField.getText().trim());
                     }
                 }
+                try {
+                    resultingGroup.setColor(Color.valueOf(colorField.getText()));
+                } catch (IllegalArgumentException ex) {
+                    // Ignore invalid color (we should probably notify the user instead...)
+                }
+                resultingGroup.setDescription(descriptionField.getText());
+                resultingGroup.setIconCode(iconField.getText());
+
                 dispose();
             } catch (IllegalArgumentException exception) {
                 jabrefFrame.showMessage(exception.getLocalizedMessage());
@@ -349,6 +375,9 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         ItemListener itemListener = e -> updateComponents();
 
         nameField.addCaretListener(caretListener);
+        colorField.addCaretListener(caretListener);
+        descriptionField.addCaretListener(caretListener);
+        iconField.addCaretListener(caretListener);
         keywordGroupSearchField.addCaretListener(caretListener);
         keywordGroupSearchTerm.addCaretListener(caretListener);
         keywordGroupCaseSensitive.addItemListener(itemListener);
@@ -363,9 +392,13 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
             explicitRadioButton.setSelected(true);
             setContext(GroupHierarchyType.INDEPENDENT);
         } else {
+            nameField.setText(editedGroup.getName());
+            colorField.setText(editedGroup.getColor().map(Color::toString).orElse(""));
+            descriptionField.setText(editedGroup.getDescription().orElse(""));
+            iconField.setText(editedGroup.getIconCode().orElse(""));
+
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
-                nameField.setText(group.getName());
                 keywordGroupSearchField.setText(group.getSearchField());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
@@ -374,7 +407,6 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == RegexKeywordGroup.class) {
                 RegexKeywordGroup group = (RegexKeywordGroup) editedGroup;
-                nameField.setText(group.getName());
                 keywordGroupSearchField.setText(group.getSearchField());
                 keywordGroupSearchTerm.setText(group.getSearchExpression());
                 keywordGroupCaseSensitive.setSelected(group.isCaseSensitive());
@@ -383,18 +415,15 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == SearchGroup.class) {
                 SearchGroup group = (SearchGroup) editedGroup;
-                nameField.setText(group.getName());
                 searchGroupSearchExpression.setText(group.getSearchExpression());
                 searchGroupCaseSensitive.setSelected(group.isCaseSensitive());
                 searchGroupRegExp.setSelected(group.isRegularExpression());
                 searchRadioButton.setSelected(true);
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == ExplicitGroup.class) {
-                nameField.setText(editedGroup.getName());
                 explicitRadioButton.setSelected(true);
                 setContext(editedGroup.getHierarchicalContext());
             } else if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
-                nameField.setText(editedGroup.getName());
                 autoRadioButton.setSelected(true);
                 setContext(editedGroup.getHierarchicalContext());
 
