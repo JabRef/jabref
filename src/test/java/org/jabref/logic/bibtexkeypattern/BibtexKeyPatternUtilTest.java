@@ -640,7 +640,7 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void shortTitle() {
-        // veryShortTitle is getTitleWords with "3" as count
+        // shortTitle is getTitleWords with "3" as count
         int count = 3;
         assertEquals("applicationmigrationeffort",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));

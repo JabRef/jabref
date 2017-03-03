@@ -436,10 +436,10 @@ public class DroppedFileHandler {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
                 String absName;
-                if (new File(flEntry.link).isAbsolute() || dirs.isEmpty()) {
-                    absName = flEntry.link;
+                if (new File(flEntry.getLink()).isAbsolute() || dirs.isEmpty()) {
+                    absName = flEntry.getLink();
                 } else {
-                    Optional<File> file = FileUtil.expandFilename(flEntry.link, dirs);
+                    Optional<File> file = FileUtil.expandFilename(flEntry.getLink(), dirs);
                     if (file.isPresent()) {
                         absName = file.get().getAbsolutePath();
                     } else {
