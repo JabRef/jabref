@@ -34,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.monadic.PropertyBinding;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
@@ -54,7 +53,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         viewModel = new GroupTreeViewModel(stateManager, dialogService);
 
         // Set-up bindings
-        viewModel.selectedGroupProperty().bindBidirectional(
+        viewModel.selectedGroupProperty().bind(
                 EasyBind.monadic(groupTree.selectionModelProperty())
                         .flatMap(SelectionModel::selectedItemProperty)
                         .selectProperty(TreeItem::valueProperty)
@@ -154,7 +153,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> viewModel.addNewSubgroup(group));
 
+        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
+        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
+
         menu.getItems().add(addSubgroup);
+        menu.getItems().add(removeGroupAndSubgroups);
         return menu;
     }
 
