@@ -22,10 +22,10 @@ public abstract class AbstractGroup implements SearchMatcher {
      * The hierarchical context of the group.
      */
     protected final GroupHierarchyType context;
-    protected Optional<Color> color;
+    protected Optional<Color> color = Optional.empty();
     protected boolean isExpanded = true;
-    protected Optional<String> description;
-    protected Optional<String> iconCode;
+    protected Optional<String> description = Optional.empty();
+    protected Optional<String> iconCode = Optional.empty();
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;

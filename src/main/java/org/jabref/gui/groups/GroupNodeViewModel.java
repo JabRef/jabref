@@ -15,17 +15,17 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
+import org.jabref.gui.IconTheme;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.groups.DefaultGroupsFactory;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;
-import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
@@ -37,7 +37,6 @@ public class GroupNodeViewModel {
 
     private final String displayName;
     private final boolean isRoot;
-    private final String iconCode;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
     private final GroupTreeNode groupNode;
@@ -53,7 +52,6 @@ public class GroupNodeViewModel {
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
         displayName = formatter.format(groupNode.getName());
         isRoot = groupNode.isRoot();
-        iconCode = "";
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
@@ -72,6 +70,8 @@ public class GroupNodeViewModel {
         hasChildren.bind(Bindings.isNotEmpty(children));
         hits = new SimpleIntegerProperty(0);
         calculateNumberOfMatches();
+        expandedProperty.set(groupNode.getGroup().isExpanded());
+        expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
         databaseContext.getDatabase().registerListener(this);
@@ -124,7 +124,7 @@ public class GroupNodeViewModel {
     }
 
     public String getDescription() {
-        return "Some group named " + getDisplayName();
+        return groupNode.getGroup().getDescription().orElse("");
     }
 
     public SimpleIntegerProperty getHits() {
@@ -147,7 +147,7 @@ public class GroupNodeViewModel {
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
-                ", iconCode='" + iconCode + '\'' +
+                ", iconCode='" + getIconCode() + '\'' +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -161,7 +161,7 @@ public class GroupNodeViewModel {
     }
 
     public String getIconCode() {
-        return iconCode;
+        return groupNode.getGroup().getIconCode().orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode());
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -200,5 +200,9 @@ public class GroupNodeViewModel {
 
     boolean isMatchedBy(String searchString) {
         return StringUtil.isBlank(searchString) || getDisplayName().contains(searchString);
+    }
+
+    public Color getColor() {
+        return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultColor());
     }
 }
