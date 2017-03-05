@@ -223,6 +223,13 @@ public class MakeLabelWithDatabaseTest {
     }
 
     @Test
+    public void generateKeyCamel() {
+        bibtexKeyPattern.setDefaultValue("[camel]");
+        BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
+        assertEquals(Optional.of("AnAwesomePaperOnJabRef"), entry.getCiteKeyOptional());
+    }
+
+    @Test
     public void generateKeyAuthNM() {
         bibtexKeyPattern.setDefaultValue("[auth4_3]");
         entry.setField("author", "John Doe and Donald Smith and Will Wonder");
