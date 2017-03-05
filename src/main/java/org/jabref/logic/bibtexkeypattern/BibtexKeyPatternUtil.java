@@ -634,7 +634,7 @@ public class BibtexKeyPatternUtil {
             } else if ("lastpage".equals(val)) {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("title".equals(val)) {
-                return getTitleWithSignificantWordsCamelized(entry.getField(FieldName.TITLE).orElse(""));
+                return camelizeSignificantWordsInTitle(entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
@@ -766,13 +766,6 @@ public class BibtexKeyPatternUtil {
         return keepLettersAndDigitsOnly(camelizeTitle(title));
     }
 
-    /**
-     * Capitalises the significant words and concatenates all the words out of the "title" field in the given BibTeX entry
-     */
-    public static String getTitleWithSignificantWordsCamelized(String title) {
-        return keepLettersAndDigitsOnly(camelizeSignificantWordsInTitle(title));
-    }
-
     private static String camelizeTitle(String title) {
         StringBuilder stringBuilder = new StringBuilder();
         String formattedTitle = formatTitle(title);
@@ -794,7 +787,10 @@ public class BibtexKeyPatternUtil {
         return stringBuilder.toString();
     }
 
-    private static String camelizeSignificantWordsInTitle(String title) {
+    /**
+     * Capitalises the significant words of the "title" field in the given BibTeX entry
+     */
+    public static String camelizeSignificantWordsInTitle(String title) {
         StringBuilder stringBuilder = new StringBuilder();
         String formattedTitle = formatTitle(title);
         Boolean camelize;

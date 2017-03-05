@@ -698,29 +698,30 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void title() {
-        // title capitalises the significant words and concatenates all the words of the title
-        assertEquals("ApplicationMigrationEffortintheCloudtheCaseofCloudPlatforms",
+        // title capitalises the significant words of the title
+        // for the title case the concatenation happens at formatting, which is tested in MakeLabelWithDatabaseTest.java
+        assertEquals("Application Migration Effort in the Cloud the Case of Cloud Platforms",
                 BibtexKeyPatternUtil
-                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPELConformanceinOpenSourceEnginestheCaseofStaticAnalysis",
-                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        .camelizeSignificantWordsInTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
+        assertEquals("BPEL Conformance in Open Source Engines: the Case of Static Analysis",
+                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
                         TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("ProcessViewingPatterns",
-                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED));
-        assertEquals("BPMNConformanceinOpenSourceEngines",
+        assertEquals("Process Viewing Patterns",
+                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(TITLE_STRING_CASED));
+        assertEquals("BPMN Conformance in Open Source Engines",
                 BibtexKeyPatternUtil
-                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("TheDifferencebetweenGraphBasedandBlockStructuredBusinessProcessModellingLanguages",
-                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
+        assertEquals("The Difference between Graph Based and Block Structured Business Process Modelling Languages",
+                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("CloudComputingtheNextRevolutioninIT",
-                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+        assertEquals("Cloud Computing: the Next Revolution in IT",
+                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("TowardsChoreographyBasedProcessDistributionintheCloud",
+        assertEquals("Towards Choreography Based Process Distribution in the Cloud",
                 BibtexKeyPatternUtil
-                        .getTitleWithSignificantWordsCamelized(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("OntheMeasurementofDesignTimeAdaptabilityforProcessBasedSystems",
-                BibtexKeyPatternUtil.getTitleWithSignificantWordsCamelized(
+                        .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
+        assertEquals("On the Measurement of Design Time Adaptability for Process Based Systems",
+                BibtexKeyPatternUtil.camelizeSignificantWordsInTitle(
                         TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 

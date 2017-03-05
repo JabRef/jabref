@@ -191,21 +191,21 @@ public class MakeLabelWithDatabaseTest {
     public void generateKeyTitle() {
         bibtexKeyPattern.setDefaultValue("[title]");
         BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
-        assertEquals(Optional.of("AnawesomepaperonJabRef"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("AnAwesomePaperonJabRef"), entry.getCiteKeyOptional());
     }
 
     @Test
     public void generateKeyTitleAbbr() {
         bibtexKeyPattern.setDefaultValue("[title:abbr]");
         BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
-        assertEquals(Optional.of("AapoJ"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("AAPoJ"), entry.getCiteKeyOptional());
     }
 
     @Test
     public void generateKeyShorttitle() {
         bibtexKeyPattern.setDefaultValue("[shorttitle]");
         BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
-        assertEquals(Optional.of("awesomepaperJabRef"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("Anawesomepaper"), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -219,7 +219,7 @@ public class MakeLabelWithDatabaseTest {
     public void generateKeyShorttitleINI() {
         bibtexKeyPattern.setDefaultValue("[shorttitleINI]");
         BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
-        assertEquals(Optional.of("apJ"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("Aap"), entry.getCiteKeyOptional());
     }
 
     @Test
