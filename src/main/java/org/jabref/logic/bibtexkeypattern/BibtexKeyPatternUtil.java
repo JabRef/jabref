@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -791,7 +792,7 @@ public class BibtexKeyPatternUtil {
      * Capitalises the significant words of the "title" field in the given BibTeX entry
      */
     public static String camelizeSignificantWordsInTitle(String title) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
         Boolean camelize;
 
@@ -808,25 +809,22 @@ public class BibtexKeyPatternUtil {
                     }
                 }
                 // We want to capitalize significant words and the first word of the title
-                if (camelize || (stringBuilder.length() == 0)) {
+                if (camelize || (stringJoiner.length() == 0)) {
                     word = word.substring(0, 1).toUpperCase() + word.substring(1);
                 } else {
                     word = word.substring(0, 1).toLowerCase() + word.substring(1);
                 }
 
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(' ');
-                }
-                stringBuilder.append(word);
+                stringJoiner.add(word);
             }
         }
 
-        return stringBuilder.toString();
+        return stringJoiner.toString();
     }
 
 
     public static String removeSmallWords(String title) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
@@ -839,18 +837,15 @@ public class BibtexKeyPatternUtil {
                     }
                 }
 
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(' ');
-                }
-                stringBuilder.append(word);
+                stringJoiner.add(word);
             }
         }
 
-        return stringBuilder.toString();
+        return stringJoiner.toString();
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
         int words = 0;
 
@@ -858,15 +853,12 @@ public class BibtexKeyPatternUtil {
             while (titleScanner.hasNext() && (words < number)) {
                 String word = titleScanner.next();
 
-                if (stringBuilder.length() > 0) {
-                    stringBuilder.append(' ');
-                }
-                stringBuilder.append(word);
+                stringJoiner.add(word);
                 words++;
             }
         }
 
-        return stringBuilder.toString();
+        return stringJoiner.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
