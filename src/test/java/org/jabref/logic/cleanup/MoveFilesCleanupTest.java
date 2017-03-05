@@ -2,16 +2,20 @@ package org.jabref.logic.cleanup;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,6 +25,8 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MoveFilesCleanupTest {
 
@@ -30,15 +36,22 @@ public class MoveFilesCleanupTest {
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
     private MoveFilesCleanup cleanup;
+    private BibEntry entry;
+    private FileDirectoryPreferences fileDirPrefs;
 
     @Before
     public void setUp() throws IOException {
-        pdfFolder = bibFolder.newFolder();
         MetaData metaData = new MetaData();
+        pdfFolder = bibFolder.newFolder();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
+        databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        databaseContext.setDatabaseFile(bibFolder.newFile("test.bib"));
+        entry = new BibEntry();
+        entry.setCiteKey("Toot");
+        entry.setField("title", "test title");
 
-        cleanup = new MoveFilesCleanup(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences());
+        fileDirPrefs = mock(FileDirectoryPreferences.class);
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false); //Biblocation as Primary overwrites all other dirs, therefore we set it to false here
     }
 
     @Test
@@ -48,10 +61,10 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(new File(subfolder, "test.pdf").exists());
 
-        BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
-
+        cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
@@ -69,10 +82,12 @@ public class MoveFilesCleanupTest {
         assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
-        BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""), fileField, new ParsedFileField("","",""))));
+        entry.setField("file", FileField.getStringRepresentation(
+                Arrays.asList(new ParsedFileField("", "", ""), fileField, new ParsedFileField("", "", ""))));
 
+        cleanup = new MoveFilesCleanup(databaseContext, "", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         assertFalse(fileBefore.exists());
@@ -82,6 +97,31 @@ public class MoveFilesCleanupTest {
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
+                entry.getField("file"));
+    }
+
+    @Test
+    public void movesFileFromSubfolderWithFileDirPattern() throws IOException {
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
+        entry.setField("file", FileField.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("Misc").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileField.getStringRepresentation(new ParsedFileField("", relativefileDir.toString(), ""))),
                 entry.getField("file"));
     }
 }

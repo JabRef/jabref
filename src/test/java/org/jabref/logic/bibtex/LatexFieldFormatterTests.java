@@ -95,4 +95,18 @@ public class LatexFieldFormatterTests {
 
         formatter.format(unbalanced, "anyfield");
     }
+
+    @Test
+    public void tolerateBalancedBrace() {
+        String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
+
+        assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
+    }
+
+    @Test
+    public void tolerateEscapeCharacters() {
+        String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
+
+        assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
+    }
 }

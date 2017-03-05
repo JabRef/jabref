@@ -164,7 +164,7 @@ public class DownloadExternalFile {
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {
-            File f = directory == null ? new File(closeEntry.link) : expandFilename(directory, closeEntry.link);
+            File f = directory == null ? new File(closeEntry.getLink()) : expandFilename(directory, closeEntry.getLink());
             if (f.isDirectory()) {
                 JOptionPane.showMessageDialog(frame, Localization.lang("Target file cannot be a directory."),
                         Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
@@ -185,8 +185,8 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory == null ? new File(fileListEntry.link) : expandFilename(directory,
-                    fileListEntry.link);
+            File toFile = directory == null ? new File(fileListEntry.getLink()) : expandFilename(directory,
+                    fileListEntry.getLink());
             String dirPrefix;
             if (directory == null) {
                 dirPrefix = null;
@@ -206,10 +206,10 @@ public class DownloadExternalFile {
 
             // If the local file is in or below the main file directory, change the
             // path to relative:
-            if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
-                    && (fileListEntry.link.length() > dirPrefix.length())) {
-                fileListEntry = new FileListEntry(fileListEntry.description,
-                        fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
+            if ((dirPrefix != null) && fileListEntry.getLink().startsWith(directory)
+                    && (fileListEntry.getLink().length() > dirPrefix.length())) {
+                fileListEntry = new FileListEntry(fileListEntry.getDescription(),
+                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getType());
             }
             callback.downloadComplete(fileListEntry);
 

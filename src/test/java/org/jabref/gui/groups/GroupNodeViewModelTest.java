@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -19,12 +20,17 @@ public class GroupNodeViewModelTest {
 
     private StateManager stateManager;
     private BibDatabaseContext databaseContext;
+    private GroupNodeViewModel viewModel;
 
     @Before
     public void setUp() throws Exception {
         stateManager = mock(StateManager.class);
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
+
+        viewModel = getViewModelForGroup(
+                new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
+
     }
 
     @Test
@@ -32,6 +38,16 @@ public class GroupNodeViewModelTest {
         GroupNodeViewModel viewModel = getViewModelForGroup(
                 new WordKeywordGroup("\\beta", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
         assertEquals("β", viewModel.getDisplayName());
+    }
+
+    @Test
+    public void alwaysMatchedByEmptySearchString() throws Exception {
+        assertTrue(viewModel.isMatchedBy(""));
+    }
+
+    @Test
+    public void isMatchedIfContainsPartOfSearchString() throws Exception {
+        assertTrue(viewModel.isMatchedBy("est"));
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {

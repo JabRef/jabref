@@ -1,7 +1,9 @@
 package org.jabref.gui.cleanup;
 
+import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
@@ -35,8 +37,6 @@ public class CleanupPresetPanel {
     private JPanel panel;
     private CleanupPreset cleanupPreset;
 
-
-
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
         this.cleanupPreset = Objects.requireNonNull(cleanupPreset);
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -47,15 +47,17 @@ public class CleanupPresetPanel {
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
         cleanUpISSN = new JCheckBox(Localization.lang("Reformat ISSN"));
-        if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
+
+        Optional<Path> firstExistingDir = databaseContext
+                .getFirstExistingFileDir(JabRefPreferences.getInstance().getFileDirectoryPreferences());
+        if (firstExistingDir.isPresent()) {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
-                    databaseContext.getMetaData().getDefaultFileDirectory().get()));
+                    firstExistingDir.get().toString()));
         } else {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0", "..."));
             cleanUpMovePDF.setEnabled(false);
             cleanUpMovePDF.setSelected(false);
         }
-
 
         cleanUpMakePathsRelative = new JCheckBox(
                 Localization.lang("Make paths of linked files relative (if possible)"));
@@ -73,8 +75,8 @@ public class CleanupPresetPanel {
 
         updateDisplay(cleanupPreset);
 
-        FormLayout layout = new FormLayout("left:15dlu, pref:grow",
-                "pref, pref, pref, pref, pref, pref, pref,pref, pref,190dlu, fill:pref:grow,");
+        FormLayout layout = new FormLayout("left:15dlu, fill:pref:grow",
+                "pref, pref, pref, pref, pref, fill:pref:grow, pref,pref, pref,190dlu, fill:pref:grow,");
 
         FormBuilder builder = FormBuilder.create().layout(layout);
         builder.add(cleanUpDOI).xyw(1, 1, 2);
@@ -82,8 +84,8 @@ public class CleanupPresetPanel {
         builder.add(cleanUpMovePDF).xyw(1, 3, 2);
         builder.add(cleanUpMakePathsRelative).xyw(1, 4, 2);
         builder.add(cleanUpRenamePDF).xyw(1, 5, 2);
-        String currentPattern = Localization.lang("Filename format pattern").concat(": ")
-                .concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+        String currentPattern = Localization.lang("Filename format pattern").concat(": ");
+        currentPattern = currentPattern.concat(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         builder.add(new JLabel(currentPattern)).xy(2, 6);
         builder.add(cleanUpRenamePDFonlyRelativePaths).xy(2, 7);
         builder.add(cleanUpBiblatex).xyw(1, 8, 2);

@@ -48,11 +48,11 @@ public class FileListTableModel extends AbstractTableModel {
             FileListEntry entry = list.get(rowIndex);
             switch (columnIndex) {
             case 0:
-                return entry.description;
+                return entry.getDescription();
             case 1:
-                return entry.link;
+                return entry.getLink();
             default:
-                return entry.type.isPresent() ? entry.type.get().getName() : "";
+                return entry.getType().isPresent() ? entry.getType().get().getName() : "";
             }
         }
     }
@@ -155,10 +155,10 @@ public class FileListTableModel extends AbstractTableModel {
     public static JLabel getFirstLabel(String content) {
         FileListTableModel tm = new FileListTableModel();
         FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (!entry.type.isPresent())) {
+        if ((entry == null) || (!entry.getType().isPresent())) {
             return null;
         }
-        return entry.type.get().getIconLabel();
+        return entry.getType().get().getIconLabel();
     }
 
     private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
@@ -212,7 +212,7 @@ public class FileListTableModel extends AbstractTableModel {
 
         synchronized (list) {
             for (FileListEntry entry : list) {
-                sb.add(String.format("%s (%s)", entry.description, entry.link));
+                sb.add(String.format("%s (%s)", entry.getDescription(), entry.getLink()));
             }
         }
 
