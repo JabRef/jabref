@@ -1148,7 +1148,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
-                if (activeTab instanceof EntryEditorTabRelatedArticles) {
+                if (activeTab == relatedArticlePanel) {
                     relatedArticlesTab.focus();
                 }
             });
