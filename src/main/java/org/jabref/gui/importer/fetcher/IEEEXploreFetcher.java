@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -296,7 +297,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         // clean up month
         entry.getField(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(dirtyMonth -> {
             String month = dirtyMonth.replace(".", "");
-            month = month.toLowerCase();
+            month = month.toLowerCase(Locale.ROOT);
 
             Matcher mm = MONTH_PATTERN.matcher(month);
             StringBuilder date = new StringBuilder(month);

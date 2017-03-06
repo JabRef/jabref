@@ -5,6 +5,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -49,7 +50,7 @@ public class LayoutHelper {
             if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
                     || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
                     || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
-                parsedEntry.s = parsedEntry.s.trim().toLowerCase();
+                parsedEntry.s = parsedEntry.s.trim().toLowerCase(Locale.ROOT);
             }
         }
 

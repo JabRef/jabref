@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -49,7 +50,7 @@ public class Linux implements NativeDesktop {
 
     @Override
     public void openFolderAndSelectFile(String filePath) throws IOException {
-        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase();
+        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase(Locale.ROOT);
 
         String cmd;
 

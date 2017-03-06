@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.jabref.Globals;
 import org.jabref.logic.cleanup.CleanupPreset;
@@ -35,6 +36,7 @@ public class CleanupPresetPanel {
     private FieldFormatterCleanupsPanel cleanUpFormatters;
 
     private JPanel panel;
+    private JScrollPane scrollPane;
     private CleanupPreset cleanupPreset;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset) {
@@ -92,6 +94,10 @@ public class CleanupPresetPanel {
         builder.add(cleanUpISSN).xyw(1, 9, 2);
         builder.add(cleanUpFormatters).xyw(1, 10, 2);
         panel = builder.build();
+        scrollPane = new JScrollPane(panel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVisible(true);
+        scrollPane.setBorder(null);
     }
 
     private void updateDisplay(CleanupPreset preset) {
@@ -109,8 +115,8 @@ public class CleanupPresetPanel {
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
     }
 
-    public JPanel getPanel() {
-        return panel;
+    public JScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     public CleanupPreset getCleanupPreset() {

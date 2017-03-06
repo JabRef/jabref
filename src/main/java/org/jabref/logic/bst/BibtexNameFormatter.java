@@ -1,6 +1,7 @@
 package org.jabref.logic.bst;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -85,7 +86,7 @@ public class BibtexNameFormatter {
                     i++;
                 }
                 i--; // unskip last brace (for last i++ at the end)
-                String control = level1Chars.toString().toLowerCase();
+                String control = level1Chars.toString().toLowerCase(Locale.ROOT);
 
                 if (control.isEmpty()) {
                     continue;

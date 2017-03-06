@@ -3,6 +3,7 @@ package org.jabref.logic.autocompleter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.jabref.model.entry.Author;
@@ -93,7 +94,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
      */
     private String determinePrefixAndReturnRemainder(String str, String delimiter) {
         String result = str;
-        int index = result.toLowerCase().lastIndexOf(delimiter);
+        int index = result.toLowerCase(Locale.ROOT).lastIndexOf(delimiter);
         if (index >= 0) {
             prefix = result.substring(0, index + delimiter.length());
             result = result.substring(index + delimiter.length());

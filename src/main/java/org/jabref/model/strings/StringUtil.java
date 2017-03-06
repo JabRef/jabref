@@ -3,6 +3,7 @@ package org.jabref.model.strings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -168,7 +169,7 @@ public class StringUtil {
         }
 
 
-        if (orgName.toLowerCase().endsWith("." + defaultExtension.toLowerCase())) {
+        if (orgName.toLowerCase(Locale.ROOT).endsWith("." + defaultExtension.toLowerCase(Locale.ROOT))) {
             return orgName;
         }
 
@@ -687,10 +688,10 @@ public class StringUtil {
      */
     public static String capitalizeFirst(String toCapitalize) {
         if (toCapitalize.length() > 1) {
-            return toCapitalize.substring(0, 1).toUpperCase()
-                    + toCapitalize.substring(1, toCapitalize.length()).toLowerCase();
+            return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)
+                    + toCapitalize.substring(1, toCapitalize.length()).toLowerCase(Locale.ROOT);
         } else {
-            return toCapitalize.toUpperCase();
+            return toCapitalize.toUpperCase(Locale.ROOT);
         }
 
     }

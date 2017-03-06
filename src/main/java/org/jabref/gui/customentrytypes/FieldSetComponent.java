@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.swing.Box;
@@ -235,7 +236,7 @@ class FieldSetComponent extends JPanel {
     protected void addField(String str) {
         String s = str.trim();
         if (forceLowerCase) {
-            s = s.toLowerCase();
+            s = s.toLowerCase(Locale.ROOT);
         }
         if ("".equals(s) || listModel.contains(s)) {
             return;

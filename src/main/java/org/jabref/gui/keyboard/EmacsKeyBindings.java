@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.JEditorPane;
@@ -731,7 +732,7 @@ public class EmacsKeyBindings
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);
-                    jtc.replaceSelection(word.toLowerCase());
+                    jtc.replaceSelection(word.toLowerCase(Locale.ROOT));
 
                     /* actual capitalize code */
                     int offs = Utilities.getWordStart(jtc, start);
@@ -747,7 +748,7 @@ public class EmacsKeyBindings
                     if (Character.isLetter(c.charAt(0))) {
                         jtc.setSelectionStart(offs);
                         jtc.setSelectionEnd(offs + 1);
-                        jtc.replaceSelection(c.toUpperCase());
+                        jtc.replaceSelection(c.toUpperCase(Locale.ROOT));
                     }
                     end = Utilities.getWordEnd(jtc, offs);
                     jtc.setCaretPosition(end);
@@ -782,7 +783,7 @@ public class EmacsKeyBindings
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);
-                    jtc.replaceSelection(word.toLowerCase());
+                    jtc.replaceSelection(word.toLowerCase(Locale.ROOT));
                     jtc.setCaretPosition(end);
                 } catch (BadLocationException ble) {
                     jtc.getToolkit().beep();
@@ -815,7 +816,7 @@ public class EmacsKeyBindings
                     jtc.setSelectionStart(start);
                     jtc.setSelectionEnd(end);
                     String word = jtc.getText(start, end - start);
-                    jtc.replaceSelection(word.toUpperCase());
+                    jtc.replaceSelection(word.toUpperCase(Locale.ROOT));
                     jtc.setCaretPosition(end);
                 } catch (BadLocationException ble) {
                     jtc.getToolkit().beep();

@@ -84,7 +84,7 @@ public abstract class DBMSProcessor {
         // ...getTables(null, ...): no restrictions
         try (ResultSet databaseMetaDataResultSet = databaseMetaData.getTables(null, null, null, null)) {
             while (databaseMetaDataResultSet.next()) {
-                String tableName = databaseMetaDataResultSet.getString("TABLE_NAME").toUpperCase();
+                String tableName = databaseMetaDataResultSet.getString("TABLE_NAME").toUpperCase(Locale.ROOT);
                 requiredTables.remove(tableName); // Remove matching tables to check requiredTables for emptiness
             }
             return requiredTables.isEmpty();

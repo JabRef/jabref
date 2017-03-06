@@ -1,4 +1,4 @@
-package org.jabref.logic.exporter;
+package org.jabref.preferences;
 
 import java.util.Comparator;
 import java.util.List;

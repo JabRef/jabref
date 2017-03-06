@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
@@ -269,7 +270,7 @@ public class PdfImporter {
 
                 // Create an UndoableInsertEntry object.
                 panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry, panel));
-                panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
+                panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase(Locale.ROOT) + "' "
                         + Localization.lang("entry") + ".");
 
                 // We are going to select the new entry. Before that, make sure that we are in

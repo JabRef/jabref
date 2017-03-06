@@ -1,11 +1,13 @@
 package org.jabref.logic.util;
 
+import java.util.Locale;
+
 /***
  * Operating system (OS) detection
  */
 public class OS {
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
-    private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase();
+    private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
 
     public static final boolean LINUX = OS_NAME.startsWith("linux");
     public static final boolean WINDOWS = OS_NAME.startsWith("win");

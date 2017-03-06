@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +65,7 @@ public class FileUtil {
     public static Optional<String> getFileExtension(String fileName) {
         int dotPosition = fileName.lastIndexOf('.');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
         }
@@ -326,8 +327,8 @@ public class FileUtil {
         String longName;
         if (OS.WINDOWS) {
             // case-insensitive matching on Windows
-            longName = fileName.toString().toLowerCase();
-            dir = dir.toLowerCase();
+            longName = fileName.toString().toLowerCase(Locale.ROOT);
+            dir = dir.toLowerCase(Locale.ROOT);
         } else {
             longName = fileName.toString();
         }

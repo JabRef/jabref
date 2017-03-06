@@ -3,6 +3,7 @@ package org.jabref.logic.formatter.casechanger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
@@ -83,7 +84,7 @@ public final class Word {
 
     public boolean isSmallerWord() {
         // "word:" is still a small "word"
-        return SMALLER_WORDS.contains(this.toString().replace(":", "").toLowerCase());
+        return SMALLER_WORDS.contains(this.toString().replace(":", "").toLowerCase(Locale.ROOT));
     }
 
     public boolean isLargerWord() {

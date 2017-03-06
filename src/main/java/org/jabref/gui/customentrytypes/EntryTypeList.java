@@ -3,6 +3,7 @@ package org.jabref.gui.customentrytypes;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.JButton;
@@ -50,7 +51,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
     protected void addField(String str) {
         String s = str.trim();
         if (forceLowerCase) {
-            s = s.toLowerCase();
+            s = s.toLowerCase(Locale.ROOT);
         }
         if ("".equals(s) || listModel.contains(s)) {
             return;

@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
 
@@ -168,7 +169,7 @@ class FileAnnotationTab extends JPanel {
             indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
         }
         fileNameComboBox.removeAllItems();
-        new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
+        new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf"))
                 .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
         updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem().toString()));
