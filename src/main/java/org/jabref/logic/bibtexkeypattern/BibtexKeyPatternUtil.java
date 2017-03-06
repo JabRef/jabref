@@ -776,7 +776,7 @@ public class BibtexKeyPatternUtil {
                 String word = titleScanner.next();
 
                 // Camelize the word
-                word = word.substring(0, 1).toUpperCase() + word.substring(1);
+                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
 
                 if (stringBuilder.length() > 0) {
                     stringBuilder.append(' ');
@@ -810,9 +810,9 @@ public class BibtexKeyPatternUtil {
                 }
                 // We want to capitalize significant words and the first word of the title
                 if (camelize || (stringJoiner.length() == 0)) {
-                    word = word.substring(0, 1).toUpperCase() + word.substring(1);
+                    word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
                 } else {
-                    word = word.substring(0, 1).toLowerCase() + word.substring(1);
+                    word = word.substring(0, 1).toLowerCase(Locale.ROOT) + word.substring(1);
                 }
 
                 stringJoiner.add(word);
