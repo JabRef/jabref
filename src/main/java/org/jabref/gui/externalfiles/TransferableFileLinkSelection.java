@@ -35,7 +35,7 @@ public class TransferableFileLinkSelection implements Transferable {
             // Find the default directory for this field type, if any:
             List<String> dirs = panel.getBibDatabaseContext()
                     .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-            FileUtil.expandFilename(tm.getEntry(0).link, dirs).ifPresent(fileList::add);
+            FileUtil.expandFilename(tm.getEntry(0).getLink(), dirs).ifPresent(fileList::add);
         }
 
     }

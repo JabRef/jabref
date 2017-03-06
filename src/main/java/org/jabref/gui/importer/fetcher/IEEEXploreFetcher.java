@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -104,14 +103,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
             URLDownload dl = new URLDownload(IEEEXploreFetcher.URL_SEARCH);
 
             //add request header
-            dl.addParameters("Accept", "application/json");
-            dl.addParameters("Content-Type", "application/json");
+            dl.addHeader("Accept", "application/json");
+            dl.addHeader("Content-Type", "application/json");
 
             // set post data
             dl.setPostData(postData);
 
             //retrieve the search results
-            String page = dl.downloadToString(StandardCharsets.UTF_8);
+            String page = dl.asString();
 
             //the page can be blank if the search did not work (not sure the exact conditions that lead to this, but declaring it an invalid search for now)
             if (page.isEmpty()) {
@@ -142,7 +141,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //fetch the raw Bibtex results from IEEEXplore
             String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson))
-                    .downloadToString(Globals.prefs.getDefaultEncoding());
+                    .asString(Globals.prefs.getDefaultEncoding());
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);

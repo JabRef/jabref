@@ -222,7 +222,7 @@ public class JabRefDesktop {
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
                 FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.link.equals(link)) {
+                if (iEntry.getLink().equals(link)) {
                     flEntry = iEntry;
                     break;
                 }
@@ -243,7 +243,7 @@ public class JabRefDesktop {
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
+                return openExternalFileAnyFormat(databaseContext, flEntry.getLink(), flEntry.getType());
             } else {
                 // Canceled:
                 frame.output(cancelMessage);

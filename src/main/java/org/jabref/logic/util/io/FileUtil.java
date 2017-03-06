@@ -351,7 +351,7 @@ public class FileUtil {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
-        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+        Set<Path> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
         for (BibEntry entry : entries) {
@@ -359,16 +359,16 @@ public class FileUtil {
         }
 
         // Now look for keys
-        nextFile: for (File file : filesWithExtension) {
+        nextFile: for (Path file : filesWithExtension) {
 
-            String name = file.getName();
+            String name = file.getFileName().toString();
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
                 Optional<String> citeKey = entry.getCiteKeyOptional();
                 if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
                         && name.substring(0, dot).equals(citeKey.get())) {
-                    result.get(entry).add(file);
+                    result.get(entry).add(file.toFile());
                     continue nextFile;
                 }
             }
@@ -378,7 +378,7 @@ public class FileUtil {
                 for (BibEntry entry : entries) {
                     Optional<String> citeKey = entry.getCiteKeyOptional();
                     if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
-                        result.get(entry).add(file);
+                        result.get(entry).add(file.toFile());
                         continue nextFile;
                     }
                 }

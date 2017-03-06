@@ -2,9 +2,13 @@ package org.jabref.gui.groups;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -21,18 +25,23 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ObjectProperty<GroupNodeViewModel> selectedGroup = new SimpleObjectProperty<>();
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
+    private final StringProperty filterText = new SimpleStringProperty();
     private Optional<BibDatabaseContext> currentDatabase;
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
 
-        // Init
-        onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
-
         // Register listener
         stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+
+        // Set-up bindings
+        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+
+        // Init
+        onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
     }
 
     public ObjectProperty<GroupNodeViewModel> rootGroupProperty() {
@@ -43,13 +52,26 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return selectedGroup;
     }
 
+    public ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicateProperty() {
+        return filterPredicate;
+    }
+
+    public StringProperty filterTextProperty() {
+        return filterText;
+    }
+
     /**
      * Gets invoked if the user selects a different group.
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
     private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
-        stateManager.activeGroupProperty().setValue(
-                Optional.ofNullable(newValue).map(GroupNodeViewModel::getGroupNode));
+        currentDatabase.ifPresent(database -> {
+            if (newValue == null) {
+                stateManager.clearSelectedGroup(database);
+            } else {
+                stateManager.setSelectedGroup(database, newValue.getGroupNode());
+            }
+        });
     }
 
     /**
@@ -66,6 +88,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
             rootGroup.setValue(newRoot);
+            stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
+                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
         }
     }
 
@@ -93,5 +117,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
         });
+    }
+
+    /**
+     * Removes the specified group and its subgroups (after asking for confirmation).
+     */
+    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
+        boolean confirmed = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove group and subgroups"),
+                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                Localization.lang("Remove"));
+        if (confirmed) {
+            // TODO: Add undo
+            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+            //panel.getUndoManager().addEdit(undo);
+
+            group.getGroupNode().removeFromParent();
+
+            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+        }
     }
 }

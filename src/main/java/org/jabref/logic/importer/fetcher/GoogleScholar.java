@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -142,8 +141,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
-        String content = URLDownload.createURLDownloadWithBrowserUserAgent(queryURL)
-                .downloadToString(StandardCharsets.UTF_8);
+        String content = new URLDownload(queryURL).asString();
 
         Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
         while (matcher.find()) {
@@ -154,7 +152,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
-        String downloadedContent = URLDownload.createURLDownloadWithBrowserUserAgent(link).downloadToString(StandardCharsets.UTF_8);
+        String downloadedContent = new URLDownload(link).asString();
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
@@ -173,7 +171,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private void obtainAndModifyCookie() throws FetcherException {
         try {
-            URLDownload downloader = URLDownload.createURLDownloadWithBrowserUserAgent("https://scholar.google.com");
+            URLDownload downloader = new URLDownload("https://scholar.google.com");
             List<HttpCookie> cookies = downloader.getCookieFromUrl();
             for (HttpCookie cookie : cookies) {
                 // append "CF=4" which represents "Citation format bibtex"

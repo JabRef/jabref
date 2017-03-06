@@ -15,6 +15,7 @@ public class FileDirectoryPreferences {
     private final Map<String, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
 
+
     public FileDirectoryPreferences(String user, Map<String, String> fieldFileDirectories, boolean bibLocationAsPrimary) {
         this.user = user;
         this.fieldFileDirectories = fieldFileDirectories;
@@ -29,7 +30,7 @@ public class FileDirectoryPreferences {
         try {
             String value = fieldFileDirectories.get(field);
             // filter empty paths
-            if (value != null && !value.isEmpty()) {
+            if ((value != null) && !value.isEmpty()) {
                 Path path = Paths.get(value);
                 return Optional.of(path);
             }

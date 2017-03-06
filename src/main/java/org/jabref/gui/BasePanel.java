@@ -932,8 +932,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
             }
             FileListEntry flEntry = fileListTableModel.getEntry(0);
-            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                    flEntry.type.get().getIcon(), bibDatabaseContext, flEntry.type);
+            ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.getLink(),
+                    flEntry.getType().get().getIcon(), bibDatabaseContext, flEntry.getType());
             item.openLink();
         });
     }
@@ -2305,9 +2305,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
-                        if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
-                                || FieldName.PS.equalsIgnoreCase(flEntry.type.get().getName())
-                                || FieldName.PDF.equalsIgnoreCase(flEntry.type.get().getName())) {
+                        if (FieldName.URL.equalsIgnoreCase(flEntry.getType().get().getName())
+                                || FieldName.PS.equalsIgnoreCase(flEntry.getType().get().getName())
+                                || FieldName.PDF.equalsIgnoreCase(flEntry.getType().get().getName())) {
                             entry = flEntry;
                             break;
                         }
@@ -2316,7 +2316,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         output(Localization.lang("No URL defined") + '.');
                     } else {
                         try {
-                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.link, entry.type);
+                            JabRefDesktop.openExternalFileAnyFormat(bibDatabaseContext, entry.getLink(), entry.getType());
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
