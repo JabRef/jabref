@@ -48,7 +48,6 @@
  .icon {
  	-fx-font-family: 'Material Design Icons';
 	-fx-font-size: 16.0;
-	-fx-fill : -fx-mid-text-color;
 }
 
 .tooltip {

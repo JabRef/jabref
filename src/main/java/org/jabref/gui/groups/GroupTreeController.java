@@ -75,7 +75,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
-                .withIcon(GroupNodeViewModel::getIconCode)
+                .withIcon(GroupNodeViewModel::getIconCode, GroupNodeViewModel::getColor)
                 .withTooltip(GroupNodeViewModel::getDescription)
         );
 

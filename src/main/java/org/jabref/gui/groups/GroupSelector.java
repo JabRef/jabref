@@ -57,6 +57,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.worker.AbstractWorker;
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
@@ -285,7 +286,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_MASK));
 
 
-        setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup(Localization.lang("All entries"))));
+        setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
 
 
         JFXPanel groupsPane = new JFXPanel();
@@ -601,7 +602,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         // We ignore the set group since this is handled via JavaFX
-        this.groupsRoot = new GroupTreeNodeViewModel(new GroupTreeNode(new AllEntriesGroup("DUMMY")));
+        this.groupsRoot = new GroupTreeNodeViewModel(new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup()));
         //this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
@@ -773,7 +774,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             setGroups(metaData.getGroups().get());
         } else {
             GroupTreeNode newGroupsRoot = GroupTreeNode
-                    .fromGroup(new AllEntriesGroup(Localization.lang("All entries")));
+                    .fromGroup(DefaultGroupsFactory.getAllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
         }
