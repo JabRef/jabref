@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -101,7 +102,7 @@ public class SilverPlatterImporter extends Importer {
                 } else if ("AB".equals(f3)) {
                     h.put(FieldName.ABSTRACT, frest);
                 } else if ("DE".equals(f3)) {
-                    String kw = frest.replace("-;", ",").toLowerCase();
+                    String kw = frest.replace("-;", ",").toLowerCase(Locale.ROOT);
                     h.put(FieldName.KEYWORDS, kw.substring(0, kw.length() - 1));
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
@@ -154,7 +155,7 @@ public class SilverPlatterImporter extends Importer {
                         type = "book";
                     } else if (frest.startsWith("Dissertation")) {
                         type = "phdthesis";
-                    } else if (frest.toLowerCase().contains(FieldName.JOURNAL)) {
+                    } else if (frest.toLowerCase(Locale.ROOT).contains(FieldName.JOURNAL)) {
                         type = "article";
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
                         type = "incollection";

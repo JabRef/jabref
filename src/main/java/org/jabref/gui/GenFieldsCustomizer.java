@@ -6,6 +6,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -131,7 +132,7 @@ public class GenFieldsCustomizer extends JDialog {
             }
 
             Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_NAME + i), parts[0]);
-            Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase());
+            Globals.prefs.put((JabRefPreferences.CUSTOM_TAB_FIELDS + i), parts[1].toLowerCase(Locale.ROOT));
         }
         Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_NAME, i);
         Globals.prefs.purgeSeries(JabRefPreferences.CUSTOM_TAB_FIELDS, i);

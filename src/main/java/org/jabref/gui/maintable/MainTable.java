@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -372,7 +373,7 @@ public class MainTable extends JTable {
             //TODO OLD
             // String name = tableFormat.getColumnType(i);
             if (name != null) {
-                fields.add(name.toLowerCase());
+                fields.add(name.toLowerCase(Locale.ROOT));
             }
         }
         return fields;
@@ -403,7 +404,7 @@ public class MainTable extends JTable {
             } else {
                 comparators = comparatorChooser.getComparatorsForColumn(i);
                 comparators.clear();
-                comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase()));
+                comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase(Locale.ROOT)));
             }
         }
 
@@ -483,7 +484,7 @@ public class MainTable extends JTable {
             }
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
             if (type.isPresent()) {
-                String columnName = getColumnName(col).toLowerCase();
+                String columnName = getColumnName(col).toLowerCase(Locale.ROOT);
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
                     return CellRendererMode.REQUIRED;
                 }

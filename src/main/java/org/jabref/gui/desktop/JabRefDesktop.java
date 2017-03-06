@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -136,7 +137,7 @@ public class JabRefDesktop {
             final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
-        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             httpLink = true;
         }
 

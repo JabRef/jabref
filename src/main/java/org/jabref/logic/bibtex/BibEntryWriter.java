@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -183,6 +184,6 @@ public class BibEntryWriter {
             actualField = "UNKNOWN";
         }
 
-        return actualField.toLowerCase() + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
+        return actualField.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
     }
 }

@@ -1,5 +1,6 @@
 package org.jabref.logic.bst;
 
+import java.util.Locale;
 import java.util.Stack;
 
 import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
@@ -57,7 +58,7 @@ public class ChangeCaseFunction implements BstFunction {
             throw new VMException("A string is needed as second parameter for change.case$");
         }
 
-        char format = ((String) o1).toLowerCase().charAt(0);
+        char format = ((String) o1).toLowerCase(Locale.ROOT).charAt(0);
         String s = (String) o2;
 
         stack.push(BibtexCaseChanger.changeCase(s, FORMAT_MODE.getFormatModeForBSTFormat(format)));

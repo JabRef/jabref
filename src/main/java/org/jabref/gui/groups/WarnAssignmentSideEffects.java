@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JOptionPane;
 
@@ -30,7 +31,7 @@ public class WarnAssignmentSideEffects {
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
                 KeywordGroup keywordGroup = (KeywordGroup) group;
-                String field = keywordGroup.getSearchField().toLowerCase();
+                String field = keywordGroup.getSearchField().toLowerCase(Locale.ROOT);
                 if (FieldName.KEYWORDS.equals(field) || FieldName.GROUPS.equals(field)) {
                     continue; // this is not undesired
                 }
@@ -62,7 +63,7 @@ public class WarnAssignmentSideEffects {
 
         // if (groups instanceof KeywordGroup) {
         // KeywordGroup kg = (KeywordGroup) groups;
-        // String field = kg.getSearchField().toLowerCase();
+        // String field = kg.getSearchField().toLowerCase(Locale.ROOT);
         // if (field.equals("keywords"))
         // return true; // this is not undesired
         // for (int i = 0; i < GUIGlobals.ALL_FIELDS.length; ++i) {

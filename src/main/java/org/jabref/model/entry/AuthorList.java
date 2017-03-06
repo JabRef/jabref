@@ -191,7 +191,7 @@ public class AuthorList {
                 Collection<Integer> avoidIndex = new HashSet<>();
 
                 for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase())) {
+                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
                         avoidIndex.add(i);
                         valuePartsCount--;
                     }
