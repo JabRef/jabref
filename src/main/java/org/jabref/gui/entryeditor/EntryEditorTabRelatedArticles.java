@@ -48,7 +48,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
     /**
      * Takes the selected entry, runs a request to Mr. DLib and returns the recommendations as a JEditorPane
-     * @param The entry selected by the user
+     * @param selectedEntry The entry selected by the user
      */
     public EntryEditorTabRelatedArticles(BibEntry selectedEntry) {
         this.selectedEntry = selectedEntry;
@@ -60,8 +60,9 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
 
     /**
-     * Takes a List of HTML snippets and sets it in the JEditorPane
-     * @param list of HTML Strings
+     * Takes a List of HTML snippets stored in the field "html_representation" of a list of bibentries and sets it in the JEditorPane
+     *
+     * @param list of bib entries having a field html_representation
      */
     public void setHtmlText(List<BibEntry> list) {
         StringBuilder htmlContent = new StringBuilder();
@@ -71,13 +72,11 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append("<ul style='list-style-image:(");
         htmlContent.append(url);
         htmlContent.append(")'>");
-        for (BibEntry bibEntry : list) {
-            if (bibEntry != null) {
-                htmlContent.append("<li style='margin: 5px'>");
-                bibEntry.getField("html_representation").ifPresent(htmlContent::append);
-                htmlContent.append("</li>");
-            }
-        }
+        list.stream()
+                .map(bibEntry -> bibEntry.getField("html_representation"))
+                .filter(Optional::isPresent)
+                .map(o -> "<li style='margin: 5px'>" + o.get() + "</li>")
+                .forEach(html -> htmlContent.append(html));
         htmlContent.append("</ul>");
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
@@ -100,12 +99,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         htmlContent.append(Localization.lang("Loading_Recommendations_for"));
         htmlContent.append(": ");
         htmlContent.append("<b>");
-        Optional<String> title = selectedEntry.getLatexFreeField(FieldName.TITLE);
-        if(title.isPresent()) {
-            htmlContent.append(title.get());
-        } else {
-            htmlContent.append("");
-        }
+        htmlContent.append(selectedEntry.getLatexFreeField(FieldName.TITLE).orElseGet(() -> ""));
         htmlContent.append("<div>");
         htmlContent.append(
                 "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");

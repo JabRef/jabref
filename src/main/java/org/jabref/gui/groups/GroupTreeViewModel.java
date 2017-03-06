@@ -65,8 +65,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
     private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
-        stateManager.activeGroupProperty().setValue(
-                Optional.ofNullable(newValue).map(GroupNodeViewModel::getGroupNode));
+        currentDatabase.ifPresent(database -> {
+            if (newValue == null) {
+                stateManager.clearSelectedGroup(database);
+            } else {
+                stateManager.setSelectedGroup(database, newValue.getGroupNode());
+            }
+        });
     }
 
     /**
@@ -83,6 +88,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
             rootGroup.setValue(newRoot);
+            stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
+                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
         }
     }
 
@@ -110,5 +117,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
         });
+    }
+
+    /**
+     * Removes the specified group and its subgroups (after asking for confirmation).
+     */
+    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
+        boolean confirmed = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove group and subgroups"),
+                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+                Localization.lang("Remove"));
+        if (confirmed) {
+            // TODO: Add undo
+            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+            //panel.getUndoManager().addEdit(undo);
+
+            group.getGroupNode().removeFromParent();
+
+            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+        }
     }
 }

@@ -110,7 +110,7 @@ class SpecialMainTableColumnsBuilder {
                 if (fileList.getRowCount() > 1) {
                     return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                 } else if (fileList.getRowCount() == 1) {
-                    Optional<ExternalFileType> type = fileList.getEntry(0).type;
+                    Optional<ExternalFileType> type = fileList.getEntry(0).getType();
                     if (type.isPresent()) {
                         return type.get().getIconLabel();
                     } else {
@@ -186,13 +186,13 @@ class SpecialMainTableColumnsBuilder {
                 FileListTableModel fileList = new FileListTableModel();
                 entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                    if ((fileList.getEntry(i).type.isPresent())
-                            && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).type.get().getName())) {
+                    if ((fileList.getEntry(i).getType().isPresent())
+                            && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).getType().get().getName())) {
                         if (iconFound) {
                             // already found another file of the desired type - show FILE_MULTIPLE Icon
                             return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                         } else {
-                            iconLabel = fileList.getEntry(i).type.get().getIconLabel();
+                            iconLabel = fileList.getEntry(i).getType().get().getIconLabel();
                             iconFound = true;
                         }
                     }

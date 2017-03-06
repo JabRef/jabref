@@ -277,17 +277,17 @@ public class FileListEntryEditor {
     }
 
     private void setValues(FileListEntry entry) {
-        description.setText(entry.description);
-        link.setText(entry.link);
+        description.setText(entry.getDescription());
+        link.setText(entry.getLink());
 
         Collection<ExternalFileType> list = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
 
         types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        if ((entry.type.isPresent()) && !(entry.type.get() instanceof UnknownExternalFileType)) {
-            types.setSelectedItem(entry.type.get());
-        } else if ((entry.link != null) && (!entry.link.isEmpty())) {
+        if ((entry.getType().isPresent()) && !(entry.getType().get() instanceof UnknownExternalFileType)) {
+            types.setSelectedItem(entry.getType().get());
+        } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {
             checkExtension();
         }
     }
@@ -325,9 +325,9 @@ public class FileListEntryEditor {
 
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
-        listEntry.description = descriptionText;
-        listEntry.type = Optional.ofNullable(type);
-        listEntry.link = fileLink;
+        listEntry.setDescription(descriptionText);
+        listEntry.setType(Optional.ofNullable(type));
+        listEntry.setLink(fileLink);
     }
 
     public boolean okPressed() {

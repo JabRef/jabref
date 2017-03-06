@@ -102,7 +102,7 @@ dependencies {
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.40'
 
-    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.6'
+    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -122,11 +122,11 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.21'
+    compile 'info.debatty:java-string-similarity:0.23'
 
-    compile 'org.apache.logging.log4j:log4j-jcl:2.7'
-    compile 'org.apache.logging.log4j:log4j-api:2.7'
-    compile 'org.apache.logging.log4j:log4j-core:2.7'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.8'
+    compile 'org.apache.logging.log4j:log4j-api:2.8'
+    compile 'org.apache.logging.log4j:log4j-core:2.8'
     compile 'org.xmlunit:xmlunit-core:2.3.0'
     compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
@@ -140,8 +140,8 @@ dependencies {
     compile 'com.github.tomtung:latex2unicode_2.12:0.2-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.6.2'
-    testCompile 'com.github.tomakehurst:wiremock:2.5.0'
+    testCompile 'org.mockito:mockito-core:2.7.12'
+    testCompile 'com.github.tomakehurst:wiremock:2.5.1'
     testCompile 'org.assertj:assertj-swing-junit:3.5.0'
     testCompile 'org.reflections:reflections:0.9.10'
 }

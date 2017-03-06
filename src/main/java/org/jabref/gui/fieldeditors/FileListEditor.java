@@ -43,6 +43,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.MoveFileAction;
+import org.jabref.gui.externalfiles.RenameFileAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
@@ -60,6 +61,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
+
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -74,7 +76,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final JPopupMenu menu = new JPopupMenu();
 
     public FileListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
-                          EntryEditor entryEditor) {
+            EntryEditor entryEditor) {
         this.frame = frame;
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
@@ -108,8 +110,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         download.addActionListener(e -> downloadFile());
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout
-                ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                .layout(new FormLayout("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
         builder.add(auto).xy(5, 1);
@@ -183,13 +184,13 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 try {
                     String path = "";
                     // absolute path
-                    if (Paths.get(entry.link).isAbsolute()) {
-                        path = Paths.get(entry.link).toString();
+                    if (Paths.get(entry.getLink()).isAbsolute()) {
+                        path = Paths.get(entry.getLink()).toString();
                     } else {
                         // relative to file folder
                         for (String folder : databaseContext
                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
-                            Path file = Paths.get(folder, entry.link);
+                            Path file = Paths.get(folder, entry.getLink());
                             if (Files.exists(file)) {
                                 path = file.toString();
                                 break;
@@ -210,13 +211,13 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         });
 
-        JMenuItem rename = new JMenuItem(Localization.lang("Move/Rename file"));
+        JMenuItem rename = new JMenuItem(Localization.lang("Rename file"));
         menu.add(rename);
-        rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
+        rename.addActionListener(new RenameFileAction(frame, entryEditor, this));
 
         JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
         menu.add(moveToFileDir);
-        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
+        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this));
 
         JMenuItem deleteFile = new JMenuItem(Localization.lang("Permanently delete local file"));
         menu.add(deleteFile);
@@ -229,7 +230,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
 
             FileListEntry entry = tableModel.getEntry(row);
-            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.getLink(),
                     Globals.prefs.getFileDirectoryPreferences());
 
             if (file.isPresent()) {
@@ -250,7 +251,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
                                 Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-                        LOGGER.warn("File permission error while deleting: " + entry.link, ex);
+                        LOGGER.warn("File permission error while deleting: " + entry.getLink(), ex);
                     }
                 }
             } else {
@@ -279,8 +280,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             FileListEntry entry = tableModel.getEntry(row);
             try {
                 Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
-                        .getExternalFileTypeByName(entry.type.get().getName());
-                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.link, type.isPresent() ? type : entry.type);
+                        .getExternalFileTypeByName(entry.getType().get().getName());
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.getLink(),
+                        type.isPresent() ? type : entry.getType());
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -451,7 +453,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     }
                     // reset
                     auto.setEnabled(true);
-                } , dialog));
+                }, dialog));
     }
 
     /**
@@ -493,6 +495,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     class TableClickListener extends MouseAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {

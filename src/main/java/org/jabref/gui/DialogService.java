@@ -66,9 +66,19 @@ public interface DialogService {
      * a OK and Cancel Button. To create a confirmation dialog with custom
      * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
      *
-     * @return Optional with the pressed Button as ButtonType
+     * @return true if the use clicked "OK" otherwise false
      */
-    Optional<ButtonType> showConfirmationDialogAndWait(String title, String content);
+    boolean showConfirmationDialogAndWait(String title, String content);
+
+    /**
+     * Create and display a new confirmation dialog.
+     * It will include a blue question icon on the left and
+     * a OK (with given label) and Cancel Button. To create a confirmation dialog with custom
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+     *
+     * @return true if the use clicked "OK" otherwise false
+     */
+    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
 
     /**
      * This will create and display a new dialog of the specified
