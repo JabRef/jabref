@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.JOptionPane;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
