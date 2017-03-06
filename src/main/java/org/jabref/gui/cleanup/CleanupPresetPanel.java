@@ -114,10 +114,6 @@ public class CleanupPresetPanel {
         cleanUpFormatters.setValues(preset.getFormatterCleanups());
     }
 
-    public JPanel getPanel() {
-        return panel;
-    }
-
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
