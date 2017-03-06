@@ -135,13 +135,13 @@ class FileAnnotationTab extends JPanel {
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
         if (annotations.isEmpty()) {
-            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotations"), ""));
+            listModel.addElement(new FileAnnotation("", "", 0, Localization.lang("File has no attached annotations"), ""));
         } else {
-            Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
+            Comparator<FileAnnotation> byPage = Comparator.comparingInt(fa -> fa.page);
             annotations.stream()
-                    .filter(annotation -> !(null == annotation.getContent()))
-                    .filter(annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
-                            || (null == annotation.getLinkedFileAnnotation()))
+                    .filter(annotation -> !(null == annotation.content))
+                    .filter(annotation -> annotation.annotationType.equals(FDFAnnotationHighlight.SUBTYPE)
+                            || (!annotation.linkedFileAnnotation.isPresent()))
                     .sorted(byPage)
                     .forEach(listModel::addElement);
         }
@@ -152,9 +152,9 @@ class FileAnnotationTab extends JPanel {
      * @param annotation pdf annotation which data should be shown in the text fields
      */
     private void updateTextFields(FileAnnotation annotation) {
-        authorArea.setText(annotation.getAuthor());
-        dateArea.setText(annotation.getDate());
-        pageArea.setText(String.valueOf(annotation.getPage()));
+        authorArea.setText(annotation.author);
+        dateArea.setText(annotation.date);
+        pageArea.setText(String.valueOf(annotation.page));
         updateContentAndHighlightTextfields(annotation);
     }
 
@@ -292,19 +292,19 @@ class FileAnnotationTab extends JPanel {
             String annotationText;
             String highlightedText;
 
-            if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
-                highlightedText = annotation.getContent();
-                annotationText = annotation.getLinkedFileAnnotation().getContent();
+            if (annotation.annotationType.equals(FDFAnnotationHighlight.SUBTYPE)) {
+                highlightedText = annotation.content;
+                annotationText = annotation.linkedFileAnnotation.get().content;
             } else {
-                highlightedText = annotation.getLinkedFileAnnotation().getContent();
-                annotationText = annotation.getContent();
+                highlightedText = annotation.linkedFileAnnotation.get().content;
+                annotationText = annotation.content;
             }
             highlightTxtArea.setEnabled(true);
             contentTxtArea.setText(annotationText);
             highlightTxtArea.setText(highlightedText);
 
         } else {
-            contentTxtArea.setText(annotation.getContent());
+            contentTxtArea.setText(annotation.content);
             highlightTxtArea.setText("N/A");
             highlightTxtArea.setEnabled(false);
         }
@@ -348,7 +348,7 @@ class FileAnnotationTab extends JPanel {
             label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             //If more different annotation types should be reflected by icons in the list, add them here
-            switch (annotation.getAnnotationType()) {
+            switch (annotation.annotationType) {
                 case FDFAnnotationHighlight.SUBTYPE:
                     label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
                     break;
@@ -357,7 +357,7 @@ class FileAnnotationTab extends JPanel {
                     break;
             }
 
-            label.setToolTipText(annotation.getAnnotationType());
+            label.setToolTipText(annotation.annotationType);
             label.setText(annotation.toString());
 
             return label;

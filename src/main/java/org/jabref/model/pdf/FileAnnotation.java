@@ -1,127 +1,116 @@
 package org.jabref.model.pdf;
 
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
-public class FileAnnotation {
+public final class FileAnnotation {
 
-    private String commentId;
-    private String author;
-    private String date;
-    private int page;
-    private String content;
-    private String annotationType;
-    private FileAnnotation linkedFileAnnotation;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+    private final static String ANNOTATION_DATE_REGEX = "D:\\d+";
+    public final String author;
+    public final String date;
+    public final int page;
+    public final String content;
+    public final String annotationType;
+    public final Optional<FileAnnotation> linkedFileAnnotation;
 
-    private boolean linkedAnnotation;
 
-    public FileAnnotation(final String commentId, final String author, final String date, final int page,
+    /**
+     * A flexible constructor, mainly used as dummy if there is actually no annotation.
+     *
+     * @param author         The authors of the annotation
+     * @param date           The last modified date of the annotation
+     * @param pageNumber     The page of the pdf where the annotation occurs
+     * @param content        the actual content of the annotation
+     * @param annotationType the type of the annotation
+     */
+    public FileAnnotation(final String author, final String date, final int pageNumber,
                           final String content, final String annotationType) {
         this.author = author;
-        this.date = date;
-        this.page = page;
+        this.date = prettyPrint(date);
+        this.page = pageNumber;
         this.content = content;
-        this.commentId = commentId;
         this.annotationType = annotationType;
+        this.linkedFileAnnotation = Optional.empty();
     }
 
-    public FileAnnotation(final PDAnnotation annotation, final int page ){
+    /**
+     * Creating a normal FileAnnotation from a PDAnnotation.
+     *
+     * @param annotation The actual annotation that holds the information
+     * @param pageNumber The page of the pdf where the annotation occurs
+     */
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         COSDictionary dict = annotation.getDictionary();
         this.author = dict.getString(COSName.T);
-        this.commentId = annotation.getAnnotationName();
-        this.date = annotation.getModifiedDate();
-        this.page = page;
+        this.date = prettyPrint(annotation.getModifiedDate());
+        this.page = pageNumber;
         this.content = annotation.getContents();
         this.annotationType = annotation.getSubtype();
+        this.linkedFileAnnotation = Optional.empty();
+    }
 
+    /**
+     * For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
+     * highlight annotation with a sticky note.
+     *
+     * @param annotation           The actual annotation that holds the information
+     * @param pageNumber           The page of the pdf where the annotation occurs
+     * @param linkedFileAnnotation The corresponding note of a highlighted text area.
+     */
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
+        COSDictionary dict = annotation.getDictionary();
+        this.author = dict.getString(COSName.T);
+        this.date = prettyPrint(annotation.getModifiedDate());
+        this.page = pageNumber;
+        this.content = annotation.getContents();
+        this.annotationType = annotation.getSubtype();
+        this.linkedFileAnnotation = Optional.of(linkedFileAnnotation);
+    }
+
+    private String prettyPrint(String date) {
+        // Sometimes this is null, not sure why.
+        if (date == null) {
+            return date;
+        }
+
+        // normal case for an imported annotation
+        if (date.matches(ANNOTATION_DATE_REGEX)) {
+            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.parse(date.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        }
+
+        return date;
     }
 
     /**
      * Abbreviate annotation names when they are longer than {@code ABBREVIATED_ANNOTATION_NAME_LENGTH} chars
-     * @param annotationName
+     *
+     * @param annotationName annotation to be shortened
      * @return the abbreviated name
      */
-    private String abbreviateAnnotationName(final String annotationName ){
+    private String abbreviateAnnotationName(final String annotationName) {
 
-            int abbreviatedContentLengthForName = ABBREVIATED_ANNOTATION_NAME_LENGTH;
-            if (annotationName.length() > abbreviatedContentLengthForName) {
-                return annotationName.subSequence(0, abbreviatedContentLengthForName).toString() + "...";
-            }
+        int abbreviatedContentLengthForName = ABBREVIATED_ANNOTATION_NAME_LENGTH;
+        if (annotationName.length() > abbreviatedContentLengthForName) {
+            return annotationName.subSequence(0, abbreviatedContentLengthForName).toString() + "...";
+        }
         return annotationName;
     }
 
-    public void linkComments(FileAnnotation commentToLinkTo){
-        linkedFileAnnotation = commentToLinkTo;
-        commentToLinkTo.setLinkedFileAnnotation(this);
-        commentToLinkTo.setLinkedAnnotation(true);
-        linkedAnnotation = true;
-    }
 
     @Override
     public String toString() {
         return abbreviateAnnotationName(content);
     }
 
-    public FileAnnotation getLinkedFileAnnotation() {
-        return linkedFileAnnotation;
-    }
-
-    public void setLinkedFileAnnotation(FileAnnotation linkedFileAnnotation) {
-        this.linkedFileAnnotation = linkedFileAnnotation;
-    }
-
-    public String getCommentId() {
-        return commentId;
-    }
-
-    public void setCommentId(String commentId) {
-        this.commentId = commentId;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getAnnotationType() {
-        return annotationType;
-    }
 
     public boolean hasLinkedAnnotation() {
-        return linkedAnnotation;
-    }
-
-    public void setLinkedAnnotation(boolean linkedAnnotation) {
-        this.linkedAnnotation = linkedAnnotation;
+        return this.linkedFileAnnotation.isPresent();
     }
 }
