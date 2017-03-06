@@ -16,6 +16,7 @@ import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -30,7 +31,7 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetches data from the MathSciNet (http://www.ams.org/mathscinet)
  */
-public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher {
+public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;
 
@@ -67,6 +68,15 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         uriBuilder.addParameter("s7", query); // query
         uriBuilder.addParameter("r", "1"); // start index
         uriBuilder.addParameter("extend", "1"); // should return up to 100 items (instead of default 10)
+        uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder("http://www.ams.org/mathscinet/search/publications.html");
+        uriBuilder.addParameter("pg1", "MR"); // search MR number
+        uriBuilder.addParameter("s1", identifier); // identifier
         uriBuilder.addParameter("fmt", "bibtex"); // BibTeX format
         return uriBuilder.build().toURL();
     }
