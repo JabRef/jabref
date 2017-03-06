@@ -14,6 +14,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSName;
@@ -25,10 +27,10 @@ import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
-import static org.jabref.gui.importer.actions.OpenDatabaseAction.LOGGER;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
+    private static final Log LOGGER = LogFactory.getLog(PdfAnnotationImporter.class);
 
     /**
      * Imports the comments from a pdf specified by its path
@@ -139,9 +141,9 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      *
      * @param path the absolute path to the pdf file
      * @return a PDDocument representing the pdf file
-     * @throws IOException
+     * @throws IOException if the document cannot be read from path
      */
-    public PDDocument importPdfFile(final String path) throws IOException {
+    private PDDocument importPdfFile(final String path) throws IOException {
 
             if(path.toLowerCase(Locale.ROOT).endsWith(".pdf")){
                return PDDocument.load("/"+ path);
