@@ -44,18 +44,18 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      * @return a list with the all the annotations found in the file of the path
      */
     @Override
-    public List<FileAnnotation> importAnnotations(Path path, final BibDatabaseContext context) {
+    public List<FileAnnotation> importAnnotations(final Path path, final BibDatabaseContext context) {
 
         Optional<Path> validatePath = validatePath(path, context);
         if (!validatePath.isPresent()) {
             // Path could not be validated, return default result
             return Collections.emptyList();
-        } else {
-            path = validatePath.get();
         }
 
+        Path validPath = validatePath.get();
+
         List<FileAnnotation> annotationsList = new LinkedList<>();
-        try (PDDocument document = PDDocument.load(path.toString())) {
+        try (PDDocument document = PDDocument.load(validPath.toString())) {
             List pdfPages = document.getDocumentCatalog().getAllPages();
             for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
@@ -68,7 +68,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(String.format("Failed to read file '%s'.", path), e);
+            LOGGER.error(String.format("Failed to read file '%s'.", validPath), e);
         }
         return annotationsList;
     }
