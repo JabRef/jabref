@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- JabRef has a new logo!
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - Partly switched to a new UI technology (JavaFX).
     - Redesigned group panel.
