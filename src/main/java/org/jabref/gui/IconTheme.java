@@ -32,8 +32,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class IconTheme {
 
-    /* Colors */
-    // JabRef's default colors
+    /**
+     * JabRef's default color
+     */
     public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
@@ -45,8 +46,8 @@ public class IconTheme {
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
-    public static Font FONT_16;
-    public static javafx.scene.text.Font FX_FONT;
+    private static Font FONT_16;
+    private static javafx.scene.text.Font FX_FONT;
 
     static {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
