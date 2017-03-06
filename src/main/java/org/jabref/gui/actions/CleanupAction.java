@@ -132,8 +132,7 @@ public class CleanupAction extends AbstractWorker {
 
     private int showDialog(CleanupPresetPanel presetPanel) {
         String dialogTitle = Localization.lang("Cleanup entries");
-
-        Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getPanel()};
+        Object[] messages = {Localization.lang("What would you like to clean up?"), presetPanel.getScrollPane()};
         return JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
     }
