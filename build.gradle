@@ -42,13 +42,13 @@ apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
-group = "net.sf.jabref"
+group = "org.jabref"
 version = "4.0.0-dev"
 project.ext.threeDotVersion = "4.0.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-mainClassName = "net.sf.jabref.JabRefMain"
+mainClassName = "org.jabref.JabRefMain"
 
 install4j {
     installDir = file(project.ext.install4jDir)
@@ -102,7 +102,7 @@ dependencies {
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.40'
 
-    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.6'
+    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -118,16 +118,15 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.apache.commons:commons-collections4:4.0'
     compile 'org.apache.commons:commons-lang3:3.5'
 
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.21'
+    compile 'info.debatty:java-string-similarity:0.23'
 
-    compile 'org.apache.logging.log4j:log4j-jcl:2.7'
-    compile 'org.apache.logging.log4j:log4j-api:2.7'
-    compile 'org.apache.logging.log4j:log4j-core:2.7'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.8'
+    compile 'org.apache.logging.log4j:log4j-api:2.8'
+    compile 'org.apache.logging.log4j:log4j-core:2.8'
     compile 'org.xmlunit:xmlunit-core:2.3.0'
     compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
@@ -141,8 +140,8 @@ dependencies {
     compile 'com.github.tomtung:latex2unicode_2.12:0.2-SNAPSHOT'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.6.2'
-    testCompile 'com.github.tomakehurst:wiremock:2.5.0'
+    testCompile 'org.mockito:mockito-core:2.7.12'
+    testCompile 'com.github.tomakehurst:wiremock:2.5.1'
     testCompile 'org.assertj:assertj-swing-junit:3.5.0'
     testCompile 'org.reflections:reflections:0.9.10'
 }
@@ -187,15 +186,15 @@ task generateBstGrammarSource(type: JavaExec) {
     group 'JabRef'
     description 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
-    File antlrSource = file('src/main/antlr3/net/sf/jabref/bst/Bst.g')
+    File antlrSource = file('src/main/antlr3/org/jabref/bst/Bst.g')
 
     inputs.file antlrSource
-    outputs.file file('src/main/gen/net/sf/jabref/logic/bst/BstLexer.java')
-    outputs.file file('src/main/gen/net/sf/jabref/logic/bst/BstParser.java')
+    outputs.file file('src/main/gen/org/jabref/logic/bst/BstLexer.java')
+    outputs.file file('src/main/gen/org/jabref/logic/bst/BstParser.java')
 
     main = 'org.antlr.Tool'
     classpath = configurations.antlr3
-    args = ["-o", file('src/main/gen/net/sf/jabref/logic/bst/'), antlrSource]
+    args = ["-o", file('src/main/gen/org/jabref/logic/bst/'), antlrSource]
 }
 
 task generateSearchGrammarSource(type: JavaExec) {
@@ -204,7 +203,7 @@ task generateSearchGrammarSource(type: JavaExec) {
     group 'JabRef'
     description "Generates java files for ${grammarFile}.g antlr4."
 
-    String packagePath = "net/sf/jabref/search"
+    String packagePath = "org/jabref/search"
     File antlrPath = file("src/main/antlr4")
     File genPath = file("src/main/gen")
 
@@ -221,7 +220,7 @@ task generateSearchGrammarSource(type: JavaExec) {
 
     main = 'org.antlr.v4.Tool'
     classpath = configurations.antlr4
-    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "net.sf.jabref.search", antlrSource]
+    args = ["-o", destinationDir, "-visitor", "-no-listener", "-package", "org.jabref.search", antlrSource]
 }
 
 compileJava {
@@ -244,9 +243,9 @@ javadoc {
 
 test {
     useJUnit {
-        excludeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
-        excludeCategories 'net.sf.jabref.testutils.category.FetcherTests'
-        excludeCategories 'net.sf.jabref.testutils.category.GUITests'
+        excludeCategories 'org.jabref.testutils.category.DatabaseTests'
+        excludeCategories 'org.jabref.testutils.category.FetcherTests'
+        excludeCategories 'org.jabref.testutils.category.GUITests'
     }
     testLogging {
         events "failed"
@@ -256,19 +255,19 @@ test {
 
 task databaseTest(type: Test) {
     useJUnit {
-        includeCategories 'net.sf.jabref.testutils.category.DatabaseTests'
+        includeCategories 'org.jabref.testutils.category.DatabaseTests'
     }
 }
 
 task fetcherTest(type: Test) {
     useJUnit {
-        includeCategories 'net.sf.jabref.testutils.category.FetcherTests'
+        includeCategories 'org.jabref.testutils.category.FetcherTests'
     }
 }
 
 task guiTest(type: Test) {
     useJUnit {
-        includeCategories 'net.sf.jabref.testutils.category.GUITests'
+        includeCategories 'org.jabref.testutils.category.GUITests'
     }
 }
 

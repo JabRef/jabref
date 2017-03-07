@@ -17,6 +17,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned group panel.
       - Number of matched entries is always shown.
       - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
+      - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
+      - Removed edit mode.
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
@@ -32,6 +34,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Font sizes can now be increased <kbd>Ctrl</kbd> + <kbd>Plus</kbd>, decreased <kbd>Ctrl</kbd> + <kbd>Minus</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>.
 - We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
 - We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
+- We added MathSciNet as a ID-based fetcher in the `BibTeX -> New entry` dialog (implements a [feature request in the forum](http://discourse.jabref.org/t/allow-to-search-by-mr-number-mathscinet))
+- Removed the apache.commons.collections library
+- We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
+- The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
+- We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
+- A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
@@ -40,7 +48,21 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
  - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
  - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
-
+ - We fixed the import of MS-Office XML files, when the `month` field contained an invalid value.
+ - ArXiV fetcher now checks similarity of entry when using DOI retrieval to avoid false positives [#2575](https://github.com/JabRef/jabref/issues/2575)
+ - Sciencedirect/Elsevier fetcher is now able to scrape new HTML structure [#2576](https://github.com/JabRef/jabref/issues/2576)
+ - Fixed the synchronization logic of keywords and special fields and vice versa [#2580](https://github.com/JabRef/jabref/issues/2580)
+ - Fixed a display issue when removing a group with a long name [#1407](https://github.com/JabRef/jabref/issues/1407)
+ - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
+ - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
+ - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
+ - We fixed an issue introduced with Version 3.8.2 where executing the `Rename PDFs`-cleanup operation moved the files to the file directory. [#2526](https://github.com/JabRef/jabref/issues/2526)
+ - We fixed an issue where the `Move linked files to default file directory`- cleanup operation did not move the files to the location of the bib-file. [#2454](https://github.com/JabRef/jabref/issues/2454)
+ - We fixed an issue where executing `Move file` on a selected file in the `general`-tab could overwrite an existing file. [#2385](https://github.com/JabRef/jabref/issues/2358)
+ - We fixed an issue with importing groups and subgroups [#2600](https://github.com/JabRef/jabref/issues/2600)
+ - Fixed an issue where title-related key patterns did not correspond to the documentation [#2604](https://github.com/JabRef/jabref/issues/2604) [#2589](https://github.com/JabRef/jabref/issues/2589)
+ - We fixed an issue which prohibited the citation export to external programms on MacOS  [#2613](https://github.com/JabRef/jabref/issues/2613)
+ 
 ### Removed
 
 

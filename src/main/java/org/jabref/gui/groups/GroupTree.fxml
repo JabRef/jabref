@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
+<?import org.controlsfx.glyphfont.Glyph?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
+            xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeController">
+    <center>
+        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane">
+            <columns>
+                <TreeTableColumn fx:id="mainColumn" prefWidth="150.0"/>
+                <TreeTableColumn fx:id="numberColumn" maxWidth="60.0" minWidth="40.0" prefWidth="50.0"
+                                 styleClass="numberColumn"/>
+                <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0"
+                                 styleClass="disclosureNodeColumn" text="Column X"/>
+            </columns>
+            <columnResizePolicy>
+                <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+            </columnResizePolicy>
+        </TreeTableView>
+    </center>
+    <bottom>
+        <HBox fx:id="barBottom" alignment="CENTER">
+            <ButtonBar fx:id="buttonBarBottom">
+                <buttons>
+                    <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
+                            ButtonBar.buttonData="LEFT">
+                        <graphic>
+                            <Glyph fontFamily="FontAwesome" icon="PLUS"/>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="%New group"/>
+                        </tooltip>
+                    </Button>
+                </buttons>
+            </ButtonBar>
+            <CustomTextField fx:id="searchField" promptText="Filter groups"/>
+        </HBox>
+    </bottom>
+</BorderPane>
