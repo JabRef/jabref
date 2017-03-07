@@ -11,6 +11,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FileDialog;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
@@ -66,7 +67,12 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
         // Execute command
         try {
-            Runtime.getRuntime().exec(getCommandLine(keyString));
+            if (OS.OS_X) {
+                String[] commands = getCommandLine(keyString);
+                Runtime.getRuntime().exec("open -a " + commands[0] + " -n --args " + commands[1] + " " + commands[2]);
+            } else {
+                Runtime.getRuntime().exec(getCommandLine(keyString));
+            }
         }
 
         // In case it did not work
