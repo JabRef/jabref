@@ -346,7 +346,7 @@ public class FileListEntryEditor {
             workingDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
+        Optional<Path> path = new FileDialog(this.frame, filePath).saveNewFile();
 
         path.ifPresent(selection -> {
             File newFile = selection.toFile();
