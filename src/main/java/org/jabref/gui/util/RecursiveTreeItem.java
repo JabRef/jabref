@@ -1,11 +1,17 @@
 package org.jabref.gui.util;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.util.Callback;
@@ -17,20 +23,29 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
 
     private final Callback<T, BooleanProperty> expandedProperty;
     private Callback<T, ObservableList<T>> childrenFactory;
+    private ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
+    private FilteredList<T> children;
 
     public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func) {
-        this(value, func, null);
+        this(value, func, null, null);
     }
 
-    public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func, Callback<T, BooleanProperty> expandedProperty) {
-        this(value, (Node) null, func, expandedProperty);
+    public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func, Callback<T, BooleanProperty> expandedProperty, ObservableValue<Predicate<T>> filter) {
+        this(value, null, func, expandedProperty, filter);
     }
 
-    public RecursiveTreeItem(final T value, Node graphic, Callback<T, ObservableList<T>> func, Callback<T, BooleanProperty> expandedProperty) {
+    public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func, ObservableValue<Predicate<T>> filter) {
+        this(value, null, func, null, filter);
+    }
+
+    private RecursiveTreeItem(final T value, Node graphic, Callback<T, ObservableList<T>> func, Callback<T, BooleanProperty> expandedProperty, ObservableValue<Predicate<T>> filter) {
         super(value, graphic);
 
         this.childrenFactory = func;
         this.expandedProperty = expandedProperty;
+        if (filter != null) {
+            this.filter.bind(filter);
+        }
 
         if(value != null) {
             addChildrenListener(value);
@@ -40,7 +55,7 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
         valueProperty().addListener((obs, oldValue, newValue)->{
             if(newValue != null){
                 addChildrenListener(newValue);
-                bindExpandedProperty(value, expandedProperty);
+                bindExpandedProperty(newValue, expandedProperty);
             }
         });
     }
@@ -52,16 +67,13 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
     }
 
     private void addChildrenListener(T value){
-        final ObservableList<T> children = childrenFactory.call(value);
+        children = new FilteredList<>(childrenFactory.call(value));
+        children.predicateProperty().bind(Bindings.createObjectBinding(() -> this::showNode, filter));
 
-        children.forEach(child -> RecursiveTreeItem.this.getChildren().add(new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty)));
+        children.forEach(this::addAsChild);
 
         children.addListener((ListChangeListener<T>) change -> {
             while(change.next()){
-
-                if(change.wasAdded()){
-                    change.getAddedSubList().forEach(t -> RecursiveTreeItem.this.getChildren().add(new RecursiveTreeItem<>(t, getGraphic(), childrenFactory, expandedProperty)));
-                }
 
                 if(change.wasRemoved()){
                     change.getRemoved().forEach(t->{
@@ -71,7 +83,28 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
                     });
                 }
 
+                if (change.wasAdded()) {
+                    change.getAddedSubList().forEach(this::addAsChild);
+                }
             }
         });
+    }
+
+    private boolean addAsChild(T child) {
+        return RecursiveTreeItem.this.getChildren().add(new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty, filter));
+    }
+
+    private boolean showNode(T t) {
+        if (filter.get() == null) {
+            return true;
+        }
+
+        if (filter.get().test(t)) {
+            // Node is directly matched -> so show it
+            return true;
+        }
+
+        // Are there children (or children of children...) that are matched? If yes we also need to show this node
+        return childrenFactory.call(t).stream().anyMatch(this::showNode);
     }
 }

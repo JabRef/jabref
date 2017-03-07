@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -64,7 +65,7 @@ public class FileUtil {
     public static Optional<String> getFileExtension(String fileName) {
         int dotPosition = fileName.lastIndexOf('.');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase());
+            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
         } else {
             return Optional.empty();
         }
@@ -326,8 +327,8 @@ public class FileUtil {
         String longName;
         if (OS.WINDOWS) {
             // case-insensitive matching on Windows
-            longName = fileName.toString().toLowerCase();
-            dir = dir.toLowerCase();
+            longName = fileName.toString().toLowerCase(Locale.ROOT);
+            dir = dir.toLowerCase(Locale.ROOT);
         } else {
             longName = fileName.toString();
         }
@@ -350,7 +351,7 @@ public class FileUtil {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
-        Set<File> filesWithExtension = FileFinder.findFiles(extensions, directories);
+        Set<Path> filesWithExtension = FileFinder.findFiles(extensions, directories);
 
         // Initialize Result-Set
         for (BibEntry entry : entries) {
@@ -358,16 +359,16 @@ public class FileUtil {
         }
 
         // Now look for keys
-        nextFile: for (File file : filesWithExtension) {
+        nextFile: for (Path file : filesWithExtension) {
 
-            String name = file.getName();
+            String name = file.getFileName().toString();
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
                 Optional<String> citeKey = entry.getCiteKeyOptional();
                 if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
                         && name.substring(0, dot).equals(citeKey.get())) {
-                    result.get(entry).add(file);
+                    result.get(entry).add(file.toFile());
                     continue nextFile;
                 }
             }
@@ -377,7 +378,7 @@ public class FileUtil {
                 for (BibEntry entry : entries) {
                     Optional<String> citeKey = entry.getCiteKeyOptional();
                     if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
-                        result.get(entry).add(file);
+                        result.get(entry).add(file.toFile());
                         continue nextFile;
                     }
                 }

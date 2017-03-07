@@ -1,4 +1,4 @@
-package org.jabref.logic.exporter;
+package org.jabref.preferences;
 
 import java.util.Comparator;
 import java.util.List;
@@ -7,9 +7,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.jabref.logic.exporter.ExportFormat;
+import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class EntryTypes {
 
             for (List<EntryType> list : entryTypes) {
                 for (EntryType type : list) {
-                    ALL_TYPES.put(type.getName().toLowerCase(), type);
+                    ALL_TYPES.put(type.getName().toLowerCase(Locale.ROOT), type);
                 }
             }
             STANDARD_TYPES = new TreeMap<>(ALL_TYPES);
@@ -44,7 +45,7 @@ public class EntryTypes {
          * or null if it does not exist.
          */
         public Optional<EntryType> getType(String name) {
-            return Optional.ofNullable(ALL_TYPES.get(name.toLowerCase()));
+            return Optional.ofNullable(ALL_TYPES.get(name.toLowerCase(Locale.ROOT)));
         }
 
         /**
@@ -61,11 +62,11 @@ public class EntryTypes {
          * name of a type, or null if it does not exist.
          */
         public Optional<EntryType> getStandardType(String name) {
-            return Optional.ofNullable(STANDARD_TYPES.get(name.toLowerCase()));
+            return Optional.ofNullable(STANDARD_TYPES.get(name.toLowerCase(Locale.ROOT)));
         }
 
         private void addOrModifyEntryType(EntryType type) {
-            ALL_TYPES.put(type.getName().toLowerCase(), type);
+            ALL_TYPES.put(type.getName().toLowerCase(Locale.ROOT), type);
         }
 
         public Set<String> getAllTypes() {
@@ -83,7 +84,7 @@ public class EntryTypes {
          * @param name The customized entry type to remove.
          */
         public void removeType(String name) {
-            String toLowerCase = name.toLowerCase();
+            String toLowerCase = name.toLowerCase(Locale.ROOT);
 
             if (!ALL_TYPES.get(toLowerCase).equals(STANDARD_TYPES.get(toLowerCase))) {
                 ALL_TYPES.remove(toLowerCase);
@@ -239,11 +240,11 @@ public class EntryTypes {
     }
 
     public static boolean isExclusiveBiblatex(String type) {
-        return filterEntryTypesNames(BiblatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase());
+        return filterEntryTypesNames(BiblatexEntryTypes.ALL, isNotIncludedIn(BibtexEntryTypes.ALL)).contains(type.toLowerCase(Locale.ROOT));
     }
 
     private static List<String> filterEntryTypesNames(List<EntryType> types, Predicate<EntryType> predicate) {
-        return types.stream().filter(predicate).map(type -> type.getName().toLowerCase()).collect(Collectors.toList());
+        return types.stream().filter(predicate).map(type -> type.getName().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
     }
 
     private static Predicate<EntryType> isNotIncludedIn(List<EntryType> collection) {

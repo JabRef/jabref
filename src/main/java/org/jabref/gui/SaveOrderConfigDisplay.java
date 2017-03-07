@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.awt.Component;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.swing.JCheckBox;
@@ -104,6 +105,6 @@ public class SaveOrderConfigDisplay {
     }
 
     private String getSelectedItemAsLowerCaseTrim(JComboBox<String> sortBox) {
-        return sortBox.getSelectedItem().toString().toLowerCase().trim();
+        return sortBox.getSelectedItem().toString().toLowerCase(Locale.ROOT).trim();
     }
 }

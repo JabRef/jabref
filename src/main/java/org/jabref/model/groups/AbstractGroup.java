@@ -2,6 +2,9 @@ package org.jabref.model.groups;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import javafx.scene.paint.Color;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
@@ -15,15 +18,50 @@ public abstract class AbstractGroup implements SearchMatcher {
      * The group's name.
      */
     protected final String name;
-
     /**
      * The hierarchical context of the group.
      */
     protected final GroupHierarchyType context;
+    protected Optional<Color> color = Optional.empty();
+    protected boolean isExpanded = true;
+    protected Optional<String> description = Optional.empty();
+    protected Optional<String> iconCode = Optional.empty();
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;
         this.context = Objects.requireNonNull(context);
+    }
+
+    public Optional<Color> getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = Optional.of(color);
+    }
+
+    public boolean isExpanded() {
+        return isExpanded;
+    }
+
+    public void setExpanded(boolean expanded) {
+        isExpanded = expanded;
+    }
+
+    public Optional<String> getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = Optional.of(description);
+    }
+
+    public Optional<String> getIconCode() {
+        return iconCode;
+    }
+
+    public void setIconCode(String iconCode) {
+        this.iconCode = Optional.of(iconCode);
     }
 
     /**

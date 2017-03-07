@@ -13,6 +13,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -192,7 +193,7 @@ public class BibtexParser implements Parser {
             skipWhitespace();
 
             // Try to read the entry type
-            String entryType = parseTextToken().toLowerCase().trim();
+            String entryType = parseTextToken().toLowerCase(Locale.ROOT).trim();
 
             if ("preamble".equals(entryType)) {
                 database.setPreamble(parsePreamble());
@@ -557,7 +558,7 @@ public class BibtexParser implements Parser {
     }
 
     private void parseField(BibEntry entry) throws IOException {
-        String key = parseTextToken().toLowerCase();
+        String key = parseTextToken().toLowerCase(Locale.ROOT);
 
         skipWhitespace();
         consume('=');

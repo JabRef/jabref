@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiletype;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -178,7 +179,7 @@ public final class ExternalFileTypes {
         int longestFound = -1;
         ExternalFileType foundType = null;
         for (ExternalFileType type : externalFileTypes) {
-            if (!type.getExtension().isEmpty() && filename.toLowerCase().endsWith(type.getExtension().toLowerCase())
+            if (!type.getExtension().isEmpty() && filename.toLowerCase(Locale.ROOT).endsWith(type.getExtension().toLowerCase(Locale.ROOT))
                     && (type.getExtension().length() > longestFound)) {
                 longestFound = type.getExtension().length();
                 foundType = type;

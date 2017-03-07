@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.Locale;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -13,7 +15,7 @@ public class ToUpperCase implements LayoutFormatter {
             return null;
         }
 
-        return fieldText.toUpperCase();
+        return fieldText.toUpperCase(Locale.ROOT);
     }
 
 }

@@ -23,6 +23,11 @@ public class SpecialFieldUpdateListener {
 
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
+        // only sync if keyword sync is enabled
+        if (!Globals.prefs.isKeywordSyncEnabled()) {
+            return;
+        }
+
         final BibEntry entry = fieldChangedEvent.getBibEntry();
         final String fieldName = fieldChangedEvent.getFieldName();
         // Source editor cycles through all entries
@@ -32,15 +37,10 @@ public class SpecialFieldUpdateListener {
         SwingUtilities.invokeLater(() -> {
             if (FieldName.KEYWORDS.equals(fieldName)) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, Globals.prefs.getKeywordDelimiter());
-                SwingUtilities
-                        .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
-            } else {
-                if (SpecialField.isSpecialField(fieldName)) {
-                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, Globals.prefs.isKeywordSyncEnabled(), Globals.prefs.getKeywordDelimiter());
-                    SwingUtilities.invokeLater(
-                            () -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
-                }
+            } else if (SpecialField.isSpecialField(fieldName)) {
+                SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, Globals.prefs.getKeywordDelimiter());
             }
+            SwingUtilities.invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
         });
     }
 

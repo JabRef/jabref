@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
@@ -111,7 +112,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         }
 
         for (EntryType type : EntryTypes.getAllValues(mode)) {
-            textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
+            textFields.put(type.getName().toLowerCase(Locale.ROOT), addEntryType(pan, type, y));
             y++;
         }
 
@@ -194,7 +195,7 @@ public class BibtexKeyPatternPanel extends JPanel {
         con.anchor = GridBagConstraints.CENTER;
         con.insets = new Insets(0, 5, 0, 5);
         gbl.setConstraints(but, con);
-        but.setActionCommand(type.getName().toLowerCase());
+        but.setActionCommand(type.getName().toLowerCase(Locale.ROOT));
         but.addActionListener(e -> {
             JTextField tField = textFields.get(e.getActionCommand());
             tField.setText("");

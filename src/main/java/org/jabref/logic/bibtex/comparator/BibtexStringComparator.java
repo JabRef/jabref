@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.Comparator;
+import java.util.Locale;
 
 import org.jabref.model.entry.BibtexString;
 
@@ -24,8 +25,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
         int res;
 
         // First check their names:
-        String name1 = s1.getName().toLowerCase();
-        String name2 = s2.getName().toLowerCase();
+        String name1 = s1.getName().toLowerCase(Locale.ROOT);
+        String name2 = s2.getName().toLowerCase(Locale.ROOT);
 
         res = name1.compareTo(name2);
 
@@ -50,8 +51,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
             // Then see if "pre" refers to "post", which is the only
             // situation when we must change the ordering:
-            String namePost = post.getName().toLowerCase();
-            String textPre = pre.getContent().toLowerCase();
+            String namePost = post.getName().toLowerCase(Locale.ROOT);
+            String textPre = pre.getContent().toLowerCase(Locale.ROOT);
 
             // If that is the case, reverse the order found:
             if (textPre.contains("#" + namePost + "#")) {

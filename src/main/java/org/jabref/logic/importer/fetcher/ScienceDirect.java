@@ -36,7 +36,6 @@ public class ScienceDirect implements FulltextFetcher {
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
         Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
@@ -46,21 +45,35 @@ public class ScienceDirect implements FulltextFetcher {
             try {
                 String sciLink = getUrlByDoi(doi.get().getDOI());
 
+                // scrape the web page not as mobile client!
                 if (!sciLink.isEmpty()) {
-                    // Retrieve PDF link
-                    Document html = Jsoup.connect(sciLink).ignoreHttpErrors(true).get();
+                    Document html = Jsoup.connect(sciLink)
+                            .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                            .referrer("http://www.google.com")
+                            .ignoreHttpErrors(true).get();
+
+                    // Retrieve PDF link (old page)
                     Element link = html.getElementById("pdfLink");
 
                     if (link != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect.");
-                        pdfLink = Optional.of(new URL(link.attr("pdfurl")));
+                        LOGGER.info("Fulltext PDF found @ ScienceDirect (old page).");
+                        Optional<URL> pdfLink = Optional.of(new URL(link.attr("pdfurl")));
+                        return pdfLink;
+                    }
+                    // Retrieve PDF link (new page)
+                    String url = html.getElementsByClass("pdf-download-btn-link").attr("href");
+
+                    if (url != null) {
+                        LOGGER.info("Fulltext PDF found @ ScienceDirect (new page).");
+                        Optional<URL> pdfLink = Optional.of(new URL("http://www.sciencedirect.com" + url));
+                        return pdfLink;
                     }
                 }
             } catch(UnirestException e) {
                 LOGGER.warn("ScienceDirect API request failed", e);
             }
         }
-        return pdfLink;
+        return Optional.empty();
     }
 
     private String getUrlByDoi(String doi) throws UnirestException {

@@ -83,7 +83,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private void buildLayout(List<FieldFormatterCleanup> actionsToDisplay) {
         FormBuilder builder = FormBuilder.create().layout(new FormLayout(
                 "left:pref, 13dlu, left:pref:grow, 4dlu, pref, 4dlu, pref",
-                "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, fill:pref:grow, 2dlu"));
+                "pref, 2dlu, pref, 2dlu, pref, 4dlu, pref, 2dlu, fill:pref:grow, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu"));
         builder.add(cleanupEnabled).xyw(1, 1, 7);
 
         actionsList = new JList<>(new CleanupActionsListModel(actionsToDisplay));
@@ -206,8 +206,8 @@ public class FieldFormatterCleanupsPanel extends JPanel {
      */
     private JPanel getSelectorPanel() {
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, pref:grow, 4dlu, right:pref",
-                        "pref, 2dlu, pref:grow, 2dlu"));
+                .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, fill:pref:grow, 4dlu, right:pref",
+                        "fill:pref:grow, 2dlu, pref, 2dlu"));
 
         List<String> fieldNames = InternalBibtexFields.getAllPublicAndInternalFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);

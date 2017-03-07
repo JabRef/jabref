@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -65,8 +66,17 @@ public class MathSciNetTest {
         // CI has no subscription to zbMath and thus gets 401 response
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Two-Dimensional Ericksen Leslie System");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Existence and uniqueness theorems Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(ratiuEntry, fetchedEntries.get(0));
+    }
+
+    @Test
+    public void searchByIdFindsEntry() throws Exception {
+        // CI has no subscription to zbMath and thus gets 401 response
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3537908");
+        assertEquals(Optional.of(ratiuEntry), fetchedEntry);
     }
 }

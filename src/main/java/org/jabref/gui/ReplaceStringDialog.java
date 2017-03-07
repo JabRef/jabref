@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -59,7 +60,7 @@ class ReplaceStringDialog extends JDialog {
                 return;
             }
             okPressed = true;
-            fieldStrings = fieldsField.getText().toLowerCase().split(";");
+            fieldStrings = fieldsField.getText().toLowerCase(Locale.ROOT).split(";");
             dispose();
         };
         JButton ok = new JButton(Localization.lang("OK"));

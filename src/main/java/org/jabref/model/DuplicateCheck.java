@@ -3,6 +3,7 @@ package org.jabref.model;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -136,8 +137,8 @@ public class DuplicateCheck {
         if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
-            String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase();
-            String authorTwo = AuthorList.fixAuthorLastNameOnlyCommas(stringTwo, false).replace(" and ", " ").toLowerCase();
+            String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
+            String authorTwo = AuthorList.fixAuthorLastNameOnlyCommas(stringTwo, false).replace(" and ", " ").toLowerCase(Locale.ROOT);
             double similarity = DuplicateCheck.correlateByWords(authorOne, authorTwo);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -157,16 +158,16 @@ public class DuplicateCheck {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:
-            stringOne = stringOne.replace(".", "").toLowerCase();
-            stringTwo = stringTwo.replace(".", "").toLowerCase();
+            stringOne = stringOne.replace(".", "").toLowerCase(Locale.ROOT);
+            stringTwo = stringTwo.replace(".", "").toLowerCase(Locale.ROOT);
             double similarity = DuplicateCheck.correlateByWords(stringOne, stringTwo);
             if (similarity > 0.8) {
                 return EQUAL;
             }
             return NOT_EQUAL;
         } else {
-            stringOne = stringOne.toLowerCase();
-            stringTwo = stringTwo.toLowerCase();
+            stringOne = stringOne.toLowerCase(Locale.ROOT);
+            stringTwo = stringTwo.toLowerCase(Locale.ROOT);
             double similarity = DuplicateCheck.correlateByWords(stringOne, stringTwo);
             if (similarity > 0.8) {
                 return EQUAL;
@@ -265,8 +266,8 @@ public class DuplicateCheck {
     * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
     */
     private static int editDistance(String s1, String s2) {
-        String s1LowerCase = s1.toLowerCase();
-        String s2LowerCase = s2.toLowerCase();
+        String s1LowerCase = s1.toLowerCase(Locale.ROOT);
+        String s2LowerCase = s2.toLowerCase(Locale.ROOT);
 
         int[] costs = new int[s2LowerCase.length() + 1];
         for (int i = 0; i <= s1LowerCase.length(); i++) {

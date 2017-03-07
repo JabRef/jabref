@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Properties;
 
 public class BuildInfo {
@@ -11,9 +12,9 @@ public class BuildInfo {
     public static final String UNKNOWN_VERSION = "*unknown*";
 
     public static final String OS = System.getProperty("os.name", UNKNOWN_VERSION);
-    public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase();
-    public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase();
-    public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase();
+    public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+    public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+    public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
 
     private final Version version;
     private final String authors;

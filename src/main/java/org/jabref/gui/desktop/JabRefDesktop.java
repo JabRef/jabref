@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -136,7 +137,7 @@ public class JabRefDesktop {
             final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
-        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             httpLink = true;
         }
 
@@ -221,7 +222,7 @@ public class JabRefDesktop {
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
                 FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.link.equals(link)) {
+                if (iEntry.getLink().equals(link)) {
                     flEntry = iEntry;
                     break;
                 }
@@ -242,7 +243,7 @@ public class JabRefDesktop {
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
+                return openExternalFileAnyFormat(databaseContext, flEntry.getLink(), flEntry.getType());
             } else {
                 // Canceled:
                 frame.output(cancelMessage);

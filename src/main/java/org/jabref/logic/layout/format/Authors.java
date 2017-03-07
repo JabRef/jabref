@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
@@ -115,7 +116,7 @@ public class Authors extends AbstractParamLayoutFormatter {
     }
 
     private void handleArgument(String key, String value) {
-        if (Authors.AUTHOR_ORDER.contains(key.trim().toLowerCase())) {
+        if (Authors.AUTHOR_ORDER.contains(key.trim().toLowerCase(Locale.ROOT))) {
             if (comp(key, "FirstFirst")) {
                 flMode = Authors.FIRST_FIRST;
             } else if (comp(key, "LastFirst")) {
@@ -123,7 +124,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             } else if (comp(key, "LastFirstFirstFirst")) {
                 flMode = Authors.LF_FF;
             }
-        } else if (Authors.AUTHOR_ABRV.contains(key.trim().toLowerCase())) {
+        } else if (Authors.AUTHOR_ABRV.contains(key.trim().toLowerCase(Locale.ROOT))) {
             if (comp(key, "FullName")) {
                 abbreviate = false;
             } else if (comp(key, "Initials")) {
@@ -141,7 +142,7 @@ public class Authors extends AbstractParamLayoutFormatter {
                 abbreviate = true;
                 abbrSpaces = false;
             }
-        } else if (Authors.AUTHOR_PUNC.contains(key.trim().toLowerCase())) {
+        } else if (Authors.AUTHOR_PUNC.contains(key.trim().toLowerCase(Locale.ROOT))) {
             if (comp(key, "FullPunc")) {
                 abbrDots = true;
                 lastFirstSeparator = ", ";
@@ -159,7 +160,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
         // AuthorSep = [Comma | And | Colon | Semicolon | sep=<string>]
         // AuthorLastSep = [And | Comma | Colon | Semicolon | Amp | Oxford | lastsep=<string>]
-        else if (Authors.SEPARATORS.contains(key.trim().toLowerCase()) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase())) {
+        else if (Authors.SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT)) || Authors.LAST_SEPARATORS.contains(key.trim().toLowerCase(Locale.ROOT))) {
             if (comp(key, "Comma")) {
                 if (setSep) {
                     lastSeparator = Authors.COMMA;

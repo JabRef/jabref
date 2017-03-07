@@ -3,15 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Objects;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -20,6 +12,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -32,7 +25,6 @@ import org.apache.http.client.utils.URIBuilder;
  * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
  */
 public class zbMATH implements SearchBasedParserFetcher {
-
     private static final Log LOGGER = LogFactory.getLog(zbMATH.class);
 
     private final ImportFormatPreferences preferences;
@@ -65,54 +57,9 @@ public class zbMATH implements SearchBasedParserFetcher {
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
 
-        fixSSLVerification();
+        URLDownload.bypassSSLVerification();
 
         return uriBuilder.build().toURL();
-    }
-
-    /**
-     * Older java VMs does not automatically trust the zbMATH certificate. In this case the following exception is thrown:
-     *  sun.security.validator.ValidatorException: PKIX path building failed:
-     *  sun.security.provider.certpath.SunCertPathBuilderException: unable to find
-     *  valid certification path to requested target
-     * JM > 8u101 may trust the certificate by default according to http://stackoverflow.com/a/34111150/873661
-     *
-     * We will fix this issue by accepting all (!) certificates. This is ugly; but as JabRef does not rely on
-     * security-relevant information this is kind of OK (no, actually it is not...).
-     *
-     * Taken from http://stackoverflow.com/a/6055903/873661
-     */
-    private void fixSSLVerification() {
-
-        LOGGER.warn("Fix SSL exception by accepting ALL certificates");
-
-        // Create a trust manager that does not validate certificate chains
-        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-            @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-        } };
-
-        // Install the all-trusting trust manager
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
-            LOGGER.error("SSL problem", e);
-        }
     }
 
     @Override

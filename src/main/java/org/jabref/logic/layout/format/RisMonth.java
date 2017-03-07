@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.Locale;
+
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.MonthUtil;
 
@@ -15,7 +17,7 @@ public class RisMonth implements LayoutFormatter {
         if (m.isValid()) {
             return m.twoDigitNumber;
         } else {
-            return month.toLowerCase();
+            return month.toLowerCase(Locale.ROOT);
         }
     }
 

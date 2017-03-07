@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.Locale;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -12,6 +14,6 @@ public class ToLowerCase implements LayoutFormatter {
         if (fieldText == null) {
             return null;
         }
-        return fieldText.toLowerCase();
+        return fieldText.toLowerCase(Locale.ROOT);
     }
 }

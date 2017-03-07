@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -337,7 +338,7 @@ public class FieldExtraComponents {
         final String[] options = {"", "Yes", "No"};
         JComboBox<String> yesno = new JComboBox<>(options);
         yesno.addActionListener(actionEvent -> {
-            fieldEditor.setText(((String) yesno.getSelectedItem()).toLowerCase());
+            fieldEditor.setText(((String) yesno.getSelectedItem()).toLowerCase(Locale.ROOT));
             entryEditor.updateField(fieldEditor);
         });
         return Optional.of(yesno);

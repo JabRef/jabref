@@ -49,10 +49,6 @@ public class EntryFetchers {
         entryFetchers.add(new SearchBasedEntryFetcher(new GoogleScholar(Globals.prefs.getImportFormatPreferences())));
     }
 
-    public List<EntryFetcher> getEntryFetchers() {
-        return Collections.unmodifiableList(this.entryFetchers);
-    }
-
     public static List<IdBasedFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
@@ -62,6 +58,7 @@ public class EntryFetchers {
         list.add(new DoiFetcher(importFormatPreferences));
         list.add(new MedlineFetcher());
         list.add(new TitleFetcher(importFormatPreferences));
+        list.add(new MathSciNet(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }
@@ -73,5 +70,9 @@ public class EntryFetchers {
         list.add(new MathSciNet(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
+    }
+
+    public List<EntryFetcher> getEntryFetchers() {
+        return Collections.unmodifiableList(this.entryFetchers);
     }
 }

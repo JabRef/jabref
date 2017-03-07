@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.Icon;
@@ -73,7 +74,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                     String name = file.getName();
                     int pos = name.indexOf('.');
                     String extension = (pos >= 0) && (pos < (name.length() - 1)) ? name.substring(pos + 1)
-                            .trim().toLowerCase() : null;
+                            .trim().toLowerCase(Locale.ROOT) : null;
                     // Now we know the extension, check if it is one we know about:
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
                     fileType = type;

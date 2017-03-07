@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -56,7 +57,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
                 if (FieldName.NUMBER_COL.equals(name)) {
                     ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
                 } else {
-                    storedColumns.add(name.toLowerCase());
+                    storedColumns.add(name.toLowerCase(Locale.ROOT));
                     columnsWidths.add(String.valueOf(mainTable.getColumnModel().getColumn(i).getWidth()));
                 }
             }

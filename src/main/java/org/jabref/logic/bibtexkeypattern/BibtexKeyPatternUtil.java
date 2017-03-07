@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -484,7 +486,7 @@ public class BibtexKeyPatternUtil {
                     Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                     if (formatter.isPresent()) {
                         resultingLabel = formatter.get().format(label);
-                    } else if (!modifier.isEmpty() && modifier.length()>= 2 && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                    } else if (!modifier.isEmpty() && (modifier.length()>= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                         // Alternate text modifier in parentheses. Should be inserted if
                         // the label is empty:
                         if (label.isEmpty() && (modifier.length() > 2)) {
@@ -632,6 +634,8 @@ public class BibtexKeyPatternUtil {
                 return firstPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
+            } else if ("title".equals(val)) {
+                return camelizeSignificantWordsInTitle(entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
@@ -639,7 +643,10 @@ public class BibtexKeyPatternUtil {
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE).orElse("")),
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
-                return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
+                return getTitleWords(1,
+                        removeSmallWords(entry.getField(FieldName.TITLE).orElse("")));
+            } else if ("camel".equals(val)) {
+                return getCamelizedTitle(entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shortyear".equals(val)) {
                 String yearString = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
                 if (yearString.isEmpty()) {
@@ -719,16 +726,16 @@ public class BibtexKeyPatternUtil {
         return keepLettersAndDigitsOnly(getTitleWordsWithSpaces(number, title));
     }
 
-    private static String getTitleWordsWithSpaces(int number, String title) {
+    /**
+     * Removes any '-', unnecessary whitespace and latex commands formatting
+     */
+    private static String formatTitle(String title) {
         String ss = new RemoveLatexCommandsFormatter().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
         int piv = 0;
-        int words = 0;
 
-        // sorry for being English-centric. I guess these
-        // words should really be an editable preference.
-        mainl: while ((piv < ss.length()) && (words < number)) {
+        while (piv < ss.length()) {
             current = new StringBuilder();
             // Get the next word:
             while ((piv < ss.length()) && !Character.isWhitespace(ss.charAt(piv))
@@ -742,21 +749,116 @@ public class BibtexKeyPatternUtil {
             if (word.isEmpty()) {
                 continue;
             }
-            for (String smallWord: Word.SMALLER_WORDS) {
-                if (word.equalsIgnoreCase(smallWord)) {
-                    continue mainl;
-                }
-            }
 
             // If we get here, the word was accepted.
             if (stringBuilder.length() > 0) {
                 stringBuilder.append(' ');
             }
             stringBuilder.append(word);
-            words++;
         }
 
         return stringBuilder.toString();
+    }
+
+    /**
+     * Capitalises and concatenates the words out of the "title" field in the given BibTeX entry
+     */
+    public static String getCamelizedTitle(String title) {
+        return keepLettersAndDigitsOnly(camelizeTitle(title));
+    }
+
+    private static String camelizeTitle(String title) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String formattedTitle = formatTitle(title);
+
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            while (titleScanner.hasNext()) {
+                String word = titleScanner.next();
+
+                // Camelize the word
+                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
+
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(' ');
+                }
+                stringBuilder.append(word);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Capitalises the significant words of the "title" field in the given BibTeX entry
+     */
+    public static String camelizeSignificantWordsInTitle(String title) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        String formattedTitle = formatTitle(title);
+        Boolean camelize;
+
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            while (titleScanner.hasNext()) {
+                String word = titleScanner.next();
+                camelize = true;
+
+                // Camelize the word if it is significant
+                for (String smallWord : Word.SMALLER_WORDS) {
+                    if (word.equalsIgnoreCase(smallWord)) {
+                        camelize = false;
+                        continue;
+                    }
+                }
+                // We want to capitalize significant words and the first word of the title
+                if (camelize || (stringJoiner.length() == 0)) {
+                    word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
+                } else {
+                    word = word.substring(0, 1).toLowerCase(Locale.ROOT) + word.substring(1);
+                }
+
+                stringJoiner.add(word);
+            }
+        }
+
+        return stringJoiner.toString();
+    }
+
+
+    public static String removeSmallWords(String title) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        String formattedTitle = formatTitle(title);
+
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            mainl: while (titleScanner.hasNext()) {
+                String word = titleScanner.next();
+
+                for (String smallWord : Word.SMALLER_WORDS) {
+                    if (word.equalsIgnoreCase(smallWord)) {
+                        continue mainl;
+                    }
+                }
+
+                stringJoiner.add(word);
+            }
+        }
+
+        return stringJoiner.toString();
+    }
+
+    private static String getTitleWordsWithSpaces(int number, String title) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        String formattedTitle = formatTitle(title);
+        int words = 0;
+
+        try (Scanner titleScanner = new Scanner(formattedTitle)) {
+            while (titleScanner.hasNext() && (words < number)) {
+                String word = titleScanner.next();
+
+                stringJoiner.add(word);
+                words++;
+            }
+        }
+
+        return stringJoiner.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {

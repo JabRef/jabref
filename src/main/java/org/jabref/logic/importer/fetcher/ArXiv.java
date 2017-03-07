@@ -25,6 +25,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.io.XMLUtil;
+import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.ArXivIdentifier;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -63,13 +64,14 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
+        Optional<URL> pdfUrl = Optional.empty();
 
         // 1. Eprint
         Optional<String> identifier = entry.getField(FieldName.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
-                Optional<URL> pdfUrl = searchForEntryById(identifier.get()).flatMap(ArXivEntry::getPdfUrl);
+                pdfUrl = searchForEntryById(identifier.get()).flatMap(ArXivEntry::getPdfUrl);
                 if (pdfUrl.isPresent()) {
                     LOGGER.info("Fulltext PDF found @ arXiv.");
                     return pdfUrl;
@@ -85,17 +87,28 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             String doiString = doi.get().getDOI();
             // Search for an entry in the ArXiv which is linked to the doi
             try {
-                Optional<URL> pdfUrl = searchForEntry("doi:" + doiString).flatMap(ArXivEntry::getPdfUrl);
-                if (pdfUrl.isPresent()) {
-                    LOGGER.info("Fulltext PDF found @ arXiv.");
-                    return pdfUrl;
+                Optional<ArXivEntry> arxivEntry = searchForEntry("doi:" + doiString);
+
+                if (arxivEntry.isPresent()) {
+                    // Check if entry is a match
+                    StringSimilarity match = new StringSimilarity();
+                    String arxivTitle = arxivEntry.get().title.orElse("");
+                    String entryTitle = entry.getField(FieldName.TITLE).orElse("");
+
+                    if (match.isSimilar(arxivTitle, entryTitle)) {
+                        pdfUrl = arxivEntry.get().getPdfUrl();
+                        if (pdfUrl.isPresent()) {
+                            LOGGER.info("Fulltext PDF found @ arXiv.");
+                            return pdfUrl;
+                        }
+                    }
                 }
             } catch (FetcherException e) {
                 LOGGER.warn("arXiv DOI API request failed", e);
             }
         }
 
-        return Optional.empty();
+        return pdfUrl;
     }
 
     private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
