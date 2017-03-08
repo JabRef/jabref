@@ -3,11 +3,14 @@ package org.jabref.gui.entryeditor;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import javax.swing.BoxLayout;
@@ -135,7 +138,7 @@ class FileAnnotationTab extends JPanel {
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
         if (annotations.isEmpty()) {
-            listModel.addElement(new FileAnnotation("", "", 0, Localization.lang("File has no attached annotations"), ""));
+            listModel.addElement(new FileAnnotation("", LocalDateTime.now(), 0, Localization.lang("File has no attached annotations"), "", Optional.empty()));
         } else {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(fa -> fa.page);
             annotations.stream()
@@ -153,7 +156,7 @@ class FileAnnotationTab extends JPanel {
      */
     private void updateTextFields(FileAnnotation annotation) {
         authorArea.setText(annotation.author);
-        dateArea.setText(annotation.date);
+        dateArea.setText(annotation.timeModified.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         pageArea.setText(String.valueOf(annotation.page));
         updateContentAndHighlightTextfields(annotation);
     }

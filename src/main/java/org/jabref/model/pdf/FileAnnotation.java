@@ -11,9 +11,8 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 public final class FileAnnotation {
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
-    private final static String ANNOTATION_DATE_REGEX = "D:\\d+";
     public final String author;
-    public final String date;
+    public final LocalDateTime timeModified;
     public final int page;
     public final String content;
     public final String annotationType;
@@ -24,19 +23,19 @@ public final class FileAnnotation {
      * A flexible constructor, mainly used as dummy if there is actually no annotation.
      *
      * @param author         The authors of the annotation
-     * @param date           The last modified date of the annotation
+     * @param timeModified   The last time this annotation was modified
      * @param pageNumber     The page of the pdf where the annotation occurs
      * @param content        the actual content of the annotation
      * @param annotationType the type of the annotation
      */
-    public FileAnnotation(final String author, final String date, final int pageNumber,
-                          final String content, final String annotationType) {
+    public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
+                          final String content, final String annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
-        this.date = prettyPrint(date);
+        this.timeModified = timeModified;
         this.page = pageNumber;
         this.content = content;
         this.annotationType = annotationType;
-        this.linkedFileAnnotation = Optional.empty();
+        this.linkedFileAnnotation = linkedFileAnnotation;
     }
 
     /**
@@ -46,7 +45,9 @@ public final class FileAnnotation {
      * @param pageNumber The page of the pdf where the annotation occurs
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
-        this(annotation.getDictionary().getString(COSName.T), prettyPrint(annotation.getModifiedDate()), pageNumber, annotation.getContents(), annotation.getSubtype());
+        this(annotation.getDictionary().getString(COSName.T),
+                extractModifiedTime(annotation.getModifiedDate()),
+                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.empty());
     }
 
     /**
@@ -58,26 +59,15 @@ public final class FileAnnotation {
      * @param linkedFileAnnotation The corresponding note of a highlighted text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
-        this.author = annotation.getDictionary().getString(COSName.T);
-        this.date = prettyPrint(annotation.getModifiedDate());
-        this.page = pageNumber;
-        this.content = annotation.getContents();
-        this.annotationType = annotation.getSubtype();
-        this.linkedFileAnnotation = Optional.of(linkedFileAnnotation);
+        this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
+                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.of(linkedFileAnnotation));
     }
 
-    private static String prettyPrint(String date) {
-        // Sometimes this is null, not sure why.
-        if (date == null) {
-            return date;
+    public static LocalDateTime extractModifiedTime(String dateTimeString) {
+        if (dateTimeString == null) {
+            return LocalDateTime.now();
         }
-
-        // normal case for an imported annotation
-        if (date.matches(ANNOTATION_DATE_REGEX)) {
-            return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.parse(date.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
-        }
-
-        return date;
+        return LocalDateTime.parse(dateTimeString.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     }
 
     /**
@@ -87,10 +77,8 @@ public final class FileAnnotation {
      * @return the abbreviated name
      */
     private String abbreviateAnnotationName(final String annotationName) {
-
-        int abbreviatedContentLengthForName = ABBREVIATED_ANNOTATION_NAME_LENGTH;
-        if (annotationName.length() > abbreviatedContentLengthForName) {
-            return annotationName.subSequence(0, abbreviatedContentLengthForName).toString() + "...";
+        if (annotationName.length() > ABBREVIATED_ANNOTATION_NAME_LENGTH) {
+            return annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH).toString() + "...";
         }
         return annotationName;
     }

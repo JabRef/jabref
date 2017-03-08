@@ -76,8 +76,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     private Collection<FileAnnotation> createHighlightAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
         Collection<FileAnnotation> highlightAnnotations = new LinkedList<>();
         FileAnnotation annotationBelongingToHighlighting = new FileAnnotation(
-                annotation.getDictionary().getString(COSName.T), annotation.getModifiedDate(),
-                pageIndex + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE);
+                annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
+                pageIndex + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE, Optional.empty());
         highlightAnnotations.add(annotationBelongingToHighlighting);
 
         try {
