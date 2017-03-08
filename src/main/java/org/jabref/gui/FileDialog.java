@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Deprecated
 public class FileDialog {
+
     private static final Log LOGGER = LogFactory.getLog(FileDialog.class);
 
     private final FileChooser fileChooser;
@@ -69,9 +70,9 @@ public class FileDialog {
             dir = null;
         }
         fileChooser = new FileChooser();
-
         configurationBuilder = new FileDialogConfiguration.Builder();
         configurationBuilder = configurationBuilder.withInitialDirectory(dir);
+
     }
 
     /**
@@ -114,6 +115,14 @@ public class FileDialog {
     }
 
     /**
+     * Sets the initial file name, useful for saving dialogs
+     * @param fileName
+     */
+    public void setInitialFileName(String fileName) {
+        fileChooser.setInitialFileName(fileName);
+    }
+
+    /**
      * Sets a custom file filter.
      * Only use when withExtension() does not suffice.
      *
@@ -122,6 +131,7 @@ public class FileDialog {
     public void setFileFilter(FileChooser.ExtensionFilter filter) {
         fileChooser.getExtensionFilters().add(filter);
         fileChooser.setSelectedExtensionFilter(filter);
+
     }
 
     /**
