@@ -37,14 +37,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
-
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
-    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
-            "posix");
+    public static final boolean isPosixCompliant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -81,6 +79,28 @@ public class FileUtil {
         } else {
             return fileNameWithExtension;
         }
+    }
+
+    /**
+     * Returns a valid filename for most operating systems.
+     *
+     * Currently, only the length is restricted to 255 chars.
+     */
+    public static String getValidFileName(String fileName) {
+        String nameWithoutExtension = getFileName(fileName);
+
+        if (nameWithoutExtension.length() > 255) {
+            Optional<String> extension = getFileExtension(fileName);
+            String shortName = nameWithoutExtension.substring(0, 255);
+
+            if (extension.isPresent()) {
+                return shortName + "." + extension.get();
+            } else {
+                return shortName;
+            }
+        }
+
+        return fileName;
     }
 
     /**

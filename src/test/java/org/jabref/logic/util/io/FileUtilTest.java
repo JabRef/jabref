@@ -10,6 +10,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -299,6 +301,30 @@ public class FileUtilTest {
         System.out.println(temp);
         FileUtil.renameFile(existingTestFile, temp);
         assertFalse(Files.exists(existingTestFile));
+    }
+
+    @Test
+    public void validFilenameShouldNotAlterValidFilename() {
+        assertEquals("somename.pdf", FileUtil.getValidFileName("somename.pdf"));
+    }
+
+    @Test
+    public void validFilenameWithoutExtension() {
+        assertEquals("somename", FileUtil.getValidFileName("somename"));
+    }
+
+    @Test
+    public void validFilenameShouldBeMaximum255Chars() {
+        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(255).collect(Collectors.joining()) + ".pdf";
+        String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining()) + ".pdf";
+        assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
+    }
+
+    @Test
+    public void invalidFilenameWithoutExtension() {
+        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(255).collect(Collectors.joining());
+        String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining());
+        assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
 
     private Path createTemporaryTestFile(String name) throws IOException {

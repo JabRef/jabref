@@ -115,7 +115,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     Files.createDirectories(newPath);
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not create necessary target directoires for renaming", e);
+                LOGGER.error("Could not create necessary target directories for renaming", e);
             }
 
             boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
@@ -165,7 +165,10 @@ public class RenamePdfCleanup implements CleanupJob {
                 .trim());
         //Add extension to newFilename
         targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
-        return targetFileName.toString();
+        // Only create valid filenames
+        String result = FileUtil.getValidFileName(targetFileName.toString());
+
+        return result;
     }
 
     public int getUnsuccessfulRenames() {

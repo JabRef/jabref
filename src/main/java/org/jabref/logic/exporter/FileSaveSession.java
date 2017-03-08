@@ -88,7 +88,7 @@ public class FileSaveSession extends SaveSession {
 
             // Try to save file permissions to restore them later (by default: allow everything)
             Set<PosixFilePermission> oldFilePermissions = EnumSet.allOf(PosixFilePermission.class);
-            if (FileUtil.isPosixCompilant && Files.exists(file)) {
+            if (FileUtil.isPosixCompliant && Files.exists(file)) {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
@@ -99,7 +99,7 @@ public class FileSaveSession extends SaveSession {
             FileUtil.copyFile(temporaryFile, file, true);
 
             // Restore file permissions
-            if (FileUtil.isPosixCompilant) {
+            if (FileUtil.isPosixCompliant) {
                 try {
                     Files.setPosixFilePermissions(file, oldFilePermissions);
                 } catch (IOException exception) {
