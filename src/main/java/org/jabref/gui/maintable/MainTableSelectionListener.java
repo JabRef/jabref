@@ -294,10 +294,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
                                         flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).orElse(null),
                                         panel.getBibDatabaseContext(), flEntry.getType());
-                                boolean success = item.openLink();
-                                if (!success) {
-                                    panel.output(Localization.lang("Unable to open link."));
-                                }
+                                item.doClick();
                             }
                         } else {
                             try {
