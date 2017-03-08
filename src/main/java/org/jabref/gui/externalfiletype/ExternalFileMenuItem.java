@@ -2,9 +2,7 @@ package org.jabref.gui.externalfiletype;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.Icon;
