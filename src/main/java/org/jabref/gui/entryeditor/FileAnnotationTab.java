@@ -141,7 +141,7 @@ class FileAnnotationTab extends JPanel {
         } else {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(fa -> fa.page);
             annotations.stream()
-                    .filter(annotation -> !(null == annotation.content))
+                    .filter(annotation -> (null != annotation.content))
                     .filter(annotation -> annotation.annotationType.equals(FDFAnnotationHighlight.SUBTYPE)
                             || (!annotation.linkedFileAnnotation.isPresent()))
                     .sorted(byPage)

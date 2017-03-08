@@ -63,7 +63,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                         annotationsList.add(createHighlightAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
-                        if (!(fileAnnotation.content == null) && !fileAnnotation.content.isEmpty()) {
+                        if (fileAnnotation.content != null && !fileAnnotation.content.isEmpty()) {
                             annotationsList.add(fileAnnotation);
                         }
                     }

@@ -171,9 +171,9 @@ public class BibDatabaseContext {
     * 3. preferences directory
     * 4. BIB file directory
     *
-    * @param
     * @param fieldName The field type
-    * @return The default directory for this field type.
+     * @param preferences The fileDirectory preferences
+     * @return The default directory for this field type.
     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
