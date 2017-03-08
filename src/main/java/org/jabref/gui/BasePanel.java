@@ -934,7 +934,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             FileListEntry flEntry = fileListTableModel.getEntry(0);
             ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.getLink(),
                     flEntry.getType().get().getIcon(), bibDatabaseContext, flEntry.getType());
-            item.openLink();
+            item.doClick();
         });
     }
 
