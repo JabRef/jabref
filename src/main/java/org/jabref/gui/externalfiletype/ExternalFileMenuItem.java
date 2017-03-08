@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -68,9 +69,9 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             if (!this.fileType.isPresent()) {
                 if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
-                    String extension = inferFileTypeFromExtension(link);
+                    Optional<String> extension = FileUtil.getFileExtension(link);
                     // Now we know the extension, check if it is one we know about:
-                    type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension);
+                    type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(null));
                     fileType = type;
                 } else {
                     JabRefDesktop.openExternalViewer(databaseContext, link, fieldName);
@@ -103,17 +104,5 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             LOGGER.warn("Unable to open link", ex);
         }
         return false;
-    }
-
-    private String inferFileTypeFromExtension(String pathname) {
-        File file = new File(pathname);
-        String name = file.getName();
-        int pos = name.indexOf('.');
-
-        if ((pos >= 0) && (pos < (name.length() - 1))) {
-            return name.substring(pos + 1).trim().toLowerCase(Locale.ROOT);
-        } else {
-            return null;
-        }
     }
 }

@@ -126,7 +126,6 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
-
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
