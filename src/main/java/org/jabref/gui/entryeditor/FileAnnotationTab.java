@@ -293,7 +293,13 @@ class FileAnnotationTab extends JPanel {
 
         if (annotation.hasLinkedAnnotation()) {
             // isPresent() of the optional is already checked in annotation.hasLinkedAnnotation()
-            contentTxtArea.setText(annotation.linkedFileAnnotation.get().content);
+            if (!annotation.linkedFileAnnotation.get().content.isEmpty()) {
+                contentTxtArea.setText(annotation.linkedFileAnnotation.get().content);
+                contentTxtArea.setEnabled(true);
+            } else {
+                contentTxtArea.setText("N/A");
+                contentTxtArea.setEnabled(false);
+            }
 
             if (annotation.content.isEmpty()) {
                 highlightTxtArea.setEnabled(false);
@@ -302,7 +308,6 @@ class FileAnnotationTab extends JPanel {
                 highlightTxtArea.setEnabled(true);
                 highlightTxtArea.setText(annotation.content);
             }
-
 
         } else {
             contentTxtArea.setText(annotation.content);

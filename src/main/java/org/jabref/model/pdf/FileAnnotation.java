@@ -33,7 +33,7 @@ public final class FileAnnotation {
         this.author = author;
         this.timeModified = timeModified;
         this.page = pageNumber;
-        this.content = content;
+        this.content = parseContent(content);
         this.annotationType = annotationType;
         this.linkedFileAnnotation = linkedFileAnnotation;
     }
@@ -63,11 +63,29 @@ public final class FileAnnotation {
                 pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.of(linkedFileAnnotation));
     }
 
+    /**
+     * Parses a String into a LocalDateTime.
+     *
+     * @param dateTimeString In this case of format yyyyMMddHHmmss.
+     * @return a LocalDateTime parsed from the dateTimeString
+     */
     public static LocalDateTime extractModifiedTime(String dateTimeString) {
         if (dateTimeString == null) {
             return LocalDateTime.now();
         }
+
         return LocalDateTime.parse(dateTimeString.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+    }
+
+    private String parseContent(final String content) {
+        if (content == null) {
+            return "";
+        }
+        if (content.trim().equals("þÿ")) {
+            return "";
+        }
+
+        return content.trim();
     }
 
     /**
