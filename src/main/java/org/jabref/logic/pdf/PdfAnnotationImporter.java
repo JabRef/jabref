@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,7 +60,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
                     if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE)) {
-                        annotationsList.addAll(createHighlightAnnotations(pageIndex, page, annotation));
+                        annotationsList.add(createHighlightAnnotations(pageIndex, page, annotation));
                     } else {
                         annotationsList.add(new FileAnnotation(annotation, pageIndex + 1));
                     }
@@ -73,12 +72,10 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return annotationsList;
     }
 
-    private Collection<FileAnnotation> createHighlightAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
-        Collection<FileAnnotation> highlightAnnotations = new LinkedList<>();
+    private FileAnnotation createHighlightAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
         FileAnnotation annotationBelongingToHighlighting = new FileAnnotation(
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
                 pageIndex + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE, Optional.empty());
-        highlightAnnotations.add(annotationBelongingToHighlighting);
 
         try {
             annotation.setContents(extractHighlightedText(page, annotation));
@@ -87,8 +84,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         }
 
         //highlighted text that has a sticky note on it should be linked to the sticky note
-        highlightAnnotations.add(new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToHighlighting));
-        return highlightAnnotations;
+        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToHighlighting);
     }
 
     private String extractHighlightedText(PDPage page, PDAnnotation annotation) throws IOException {
@@ -130,11 +126,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             }
         }
 
-        if (highlightedText.trim().isEmpty()) {
-            highlightedText = "JabRef: The highlighted area does not contain any legible text!";
-        }
-
-        return highlightedText;
+        return highlightedText.trim();
     }
 
     private Optional<Path> validatePath(Path path, BibDatabaseContext context) {

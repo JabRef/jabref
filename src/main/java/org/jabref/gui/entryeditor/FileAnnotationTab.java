@@ -43,7 +43,7 @@ class FileAnnotationTab extends JPanel {
 
     private final JList<FileAnnotation> annotationList = new JList<>();
     private final JScrollPane annotationScrollPane = new JScrollPane();
-    private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"),JLabel.CENTER);
+    private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"), JLabel.CENTER);
     private final JComboBox<String> fileNameComboBox = new JComboBox<>();
     private final JScrollPane fileNameScrollPane = new JScrollPane();
     private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
@@ -74,9 +74,8 @@ class FileAnnotationTab extends JPanel {
     FileAnnotationTab(EntryEditor parent) {
         this.parent = parent;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        listModel  = new DefaultListModel<>();
+        listModel = new DefaultListModel<>();
         this.isInitialized = false;
-
     }
 
     public FileAnnotationTab initializeTab(FileAnnotationTab tab) {
@@ -102,7 +101,6 @@ class FileAnnotationTab extends JPanel {
         tab.isInitialized = true;
         tab.parent.repaint();
         return tab;
-
     }
 
     /**
@@ -133,6 +131,7 @@ class FileAnnotationTab extends JPanel {
 
     /**
      * Updates the list model to show the given notes without those with no content
+     *
      * @param annotations value is the annotation name and the value is a pdfAnnotation object to add to the list model
      */
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
@@ -152,13 +151,14 @@ class FileAnnotationTab extends JPanel {
 
     /**
      * Updates the text fields showing meta data and the content from the selected annotation
+     *
      * @param annotation pdf annotation which data should be shown in the text fields
      */
     private void updateTextFields(FileAnnotation annotation) {
         authorArea.setText(annotation.author);
         dateArea.setText(annotation.timeModified.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         pageArea.setText(String.valueOf(annotation.page));
-        updateContentAndHighlightTextfields(annotation);
+        updateContentAndHighlightTextAreas(annotation);
     }
 
     /**
@@ -183,22 +183,22 @@ class FileAnnotationTab extends JPanel {
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, fill:pref:grow, $lg, pref")
                 .padding(Paddings.DIALOG)
-                .add(fileNameLabel).xy(1,1, "left, top")
+                .add(fileNameLabel).xy(1, 1, "left, top")
                 .add(fileNameScrollPane).xyw(2, 1, 2)
                 .add(annotationScrollPane).xyw(1, 3, 3)
                 .build();
         annotationScrollPane.setViewportView(annotationList);
 
-        JPanel informationPanel  = FormBuilder.create()
+        JPanel informationPanel = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref:grow, $lg, pref:grow, $lg, fill:pref")
                 .padding(Paddings.DIALOG)
-                .add(authorLabel).xy(1,3, "left, top")
-                .add(authorScrollPane).xy(3,3)
-                .add(dateLabel).xy(1,5, "left, top")
-                .add(dateScrollPane).xy(3,5)
-                .add(pageLabel).xy(1,7, "left, top")
-                .add(pageScrollPane).xy(3,7)
+                .add(authorLabel).xy(1, 3, "left, top")
+                .add(authorScrollPane).xy(3, 3)
+                .add(dateLabel).xy(1, 5, "left, top")
+                .add(dateScrollPane).xy(3, 5)
+                .add(pageLabel).xy(1, 7, "left, top")
+                .add(pageScrollPane).xy(3, 7)
                 .add(annotationTextLabel).xy(1, 9, "left, top")
                 .add(annotationTextScrollPane).xywh(3, 9, 1, 2)
                 .add(highlightTxtLabel).xy(1, 11, "left, top")
@@ -240,7 +240,7 @@ class FileAnnotationTab extends JPanel {
                 .build());
     }
 
-    private JPanel setUpButtons(){
+    private JPanel setUpButtons() {
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints buttonConstraints = new GridBagConstraints();
 
@@ -265,7 +265,7 @@ class FileAnnotationTab extends JPanel {
     /**
      * Copies the meta and content information of the pdf annotation to the clipboard
      */
-    private void copyToClipboard(){
+    private void copyToClipboard() {
         StringJoiner sj = new StringJoiner(System.getProperty("line.separator"));
         sj.add("Author: " + authorArea.getText());
         sj.add("Date: " + dateArea.getText());
@@ -289,22 +289,20 @@ class FileAnnotationTab extends JPanel {
      *
      * @param annotation either a text annotation or a highlighting from a pdf
      */
-    private void updateContentAndHighlightTextfields(final FileAnnotation annotation) {
+    private void updateContentAndHighlightTextAreas(final FileAnnotation annotation) {
 
         if (annotation.hasLinkedAnnotation()) {
-            String annotationText;
-            String highlightedText;
+            // isPresent() of the optional is already checked in annotation.hasLinkedAnnotation()
+            contentTxtArea.setText(annotation.linkedFileAnnotation.get().content);
 
-            if (annotation.annotationType.equals(FDFAnnotationHighlight.SUBTYPE)) {
-                highlightedText = annotation.content;
-                annotationText = annotation.linkedFileAnnotation.get().content;
+            if (annotation.content.isEmpty()) {
+                highlightTxtArea.setEnabled(false);
+                highlightTxtArea.setText("JabRef: The highlighted area does not contain any legible text!");
             } else {
-                highlightedText = annotation.linkedFileAnnotation.get().content;
-                annotationText = annotation.content;
+                highlightTxtArea.setEnabled(true);
+                highlightTxtArea.setText(annotation.content);
             }
-            highlightTxtArea.setEnabled(true);
-            contentTxtArea.setText(annotationText);
-            highlightTxtArea.setText(highlightedText);
+
 
         } else {
             contentTxtArea.setText(annotation.content);
@@ -348,7 +346,7 @@ class FileAnnotationTab extends JPanel {
             FileAnnotation annotation = (FileAnnotation) value;
 
             //call the super method so that the cell selection is done as usual
-            label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             //If more different annotation types should be reflected by icons in the list, add them here
             switch (annotation.annotationType) {

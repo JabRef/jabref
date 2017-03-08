@@ -86,6 +86,13 @@ public final class FileAnnotation {
 
     @Override
     public String toString() {
+        if (this.hasLinkedAnnotation()) {
+            if (this.content.isEmpty()) {
+                return "Empty Highlight";
+            }
+            return abbreviateAnnotationName("Highlight: " + content);
+        }
+
         return abbreviateAnnotationName(content);
     }
 
