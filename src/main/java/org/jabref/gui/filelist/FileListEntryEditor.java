@@ -83,7 +83,7 @@ public class FileListEntryEditor {
 
     //Do not make this variable final, as then the lambda action listener will fail on compile
     private JabRefFrame frame;
-    private boolean showSaveDialog = false;
+    private boolean showSaveDialog;
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
