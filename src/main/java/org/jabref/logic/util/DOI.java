@@ -22,7 +22,7 @@ public class DOI {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
     // DOI resolver
-    public static final URI RESOLVER = URI.create("http://doi.org");
+    private static final URI RESOLVER = URI.create("http://doi.org");
 
     // DOI
     private final String doi;
