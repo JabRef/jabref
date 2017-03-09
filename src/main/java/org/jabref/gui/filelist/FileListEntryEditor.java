@@ -12,6 +12,9 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
@@ -31,14 +34,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import javafx.application.Platform;
+
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -350,6 +357,17 @@ public class FileListEntryEditor {
         return okPressed;
     }
 
+    private <V> V runInJavaFXThread(Callable<V> callable) {
+        FutureTask<V> task = new FutureTask<>(callable);
+        Platform.runLater(task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e);
+            return null;
+        }
+    }
+
     private final ActionListener browsePressed = e -> {
         String fileText = link.getText().trim();
         Optional<File> file = FileUtil.expandFilename(this.databaseContext, fileText,
@@ -364,13 +382,17 @@ public class FileListEntryEditor {
 
         String fileName = Paths.get(fileText).getFileName().toString();
 
-        FileDialog fileDlg = new FileDialog(this.frame, workingDir);
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(Paths.get(workingDir))
+                .withInitialFileName(fileName).build();
+        DialogService ds = new FXDialogService();
+
         Optional<Path> path;
+
         if (showSaveDialog) {
-            fileDlg.setInitialFileName(fileName);
-            path = fileDlg.saveNewFile();
+            path = runInJavaFXThread(() -> ds.showSaveDialog(fileDialogConfiguration));
         } else {
-            path = fileDlg.showDialogAndGetSelectedFile();
+            path = runInJavaFXThread(() -> ds.showOpenDialog(fileDialogConfiguration));
         }
 
         path.ifPresent(selection -> {

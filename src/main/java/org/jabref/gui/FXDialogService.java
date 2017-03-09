@@ -124,6 +124,7 @@ public class FXDialogService implements DialogService {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
         chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());
+        chooser.setInitialFileName(fileDialogConfiguration.getInitialFileName());
         fileDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
         return chooser;
     }
