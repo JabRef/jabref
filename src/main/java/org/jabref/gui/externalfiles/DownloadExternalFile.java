@@ -160,7 +160,7 @@ public class DownloadExternalFile {
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
         FileListEntry fileListEntry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
-        editor = new FileListEntryEditor(frame, fileListEntry, true, false, databaseContext);
+        editor = new FileListEntryEditor(frame, fileListEntry, true, false, databaseContext, true);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {

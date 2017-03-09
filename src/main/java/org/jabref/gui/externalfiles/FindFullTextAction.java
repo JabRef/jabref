@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
+
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private static final int warningLimit = 5; // The minimum number of selected entries to ask the user for confirmation
@@ -51,12 +52,14 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void run() {
         if (basePanel.getSelectedEntries().size() >= warningLimit) {
-            String[] options = new String[]{Localization.lang("Look up full text documents"), Localization.lang("Cancel")};
+            String[] options = new String[] {Localization.lang("Look up full text documents"),
+                    Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(basePanel.frame(),
                     Localization.lang(
                             "You are about to look up full text documents for %0 entries.",
                             String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
-                            + Localization.lang("JabRef will send at least one request per entry to a publisher.") + "\n"
+                            + Localization.lang("JabRef will send at least one request per entry to a publisher.")
+                            + "\n"
                             + Localization.lang("Do you still want to continue?"),
                     Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
