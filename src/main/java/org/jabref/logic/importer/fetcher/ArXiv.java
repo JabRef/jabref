@@ -55,6 +55,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
 
     private static final String API_URL = "http://export.arxiv.org/api/query";
+
     private final ImportFormatPreferences importFormatPreferences;
 
     public ArXiv(ImportFormatPreferences importFormatPreferences) {
