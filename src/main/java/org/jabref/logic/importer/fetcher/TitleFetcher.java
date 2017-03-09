@@ -6,7 +6,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.DOI;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

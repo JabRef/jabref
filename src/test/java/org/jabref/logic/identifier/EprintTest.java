@@ -1,4 +1,6 @@
-package org.jabref.logic.util;
+package org.jabref.logic.identifier;
+
+import org.jabref.logic.identifier.Eprint;
 
 import org.junit.Assert;
 import org.junit.Test;

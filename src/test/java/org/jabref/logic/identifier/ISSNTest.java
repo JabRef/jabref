@@ -1,4 +1,6 @@
-package org.jabref.logic.util;
+package org.jabref.logic.identifier;
+
+import org.jabref.logic.identifier.ISSN;
 
 import org.junit.Test;
 

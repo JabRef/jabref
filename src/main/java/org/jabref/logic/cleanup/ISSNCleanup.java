@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.util.ISSN;
+import org.jabref.logic.identifier.ISSN;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;

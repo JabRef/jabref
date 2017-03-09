@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.util.DOI;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 

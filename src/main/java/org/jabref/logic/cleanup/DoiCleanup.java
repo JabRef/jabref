@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
-import org.jabref.logic.util.DOI;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.cleanup.FieldFormatterCleanup;

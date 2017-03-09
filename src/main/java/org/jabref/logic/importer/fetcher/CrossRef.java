@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.util.DOI;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

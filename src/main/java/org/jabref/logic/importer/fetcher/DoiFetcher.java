@@ -17,7 +17,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.DOI;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

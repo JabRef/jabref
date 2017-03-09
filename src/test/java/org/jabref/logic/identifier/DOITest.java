@@ -1,6 +1,8 @@
-package org.jabref.logic.util;
+package org.jabref.logic.identifier;
 
 import java.util.Optional;
+
+import org.jabref.logic.identifier.DOI;
 
 import org.junit.Assert;
 import org.junit.Test;
