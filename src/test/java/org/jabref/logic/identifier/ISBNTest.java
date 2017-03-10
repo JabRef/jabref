@@ -1,15 +1,11 @@
 package org.jabref.logic.identifier;
 
-import org.jabref.logic.identifier.ISBN;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 public class ISBNTest {
-
 
     @Test
     public void testIsValidFormat10Correct() {
