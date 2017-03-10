@@ -25,7 +25,7 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
         viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
 
         SvgImageLoaderFactory.install();
-        Image icon = new Image(this.getClass().getResourceAsStream("/images/icons/JabRef-icon.svg"));
+        Image icon = new Image(this.getClass().getResourceAsStream("/icons/jabref.svg"));
         iconImage.setImage(icon);
     }
 
