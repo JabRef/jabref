@@ -8,8 +8,8 @@ import javax.swing.text.JTextComponent;
 
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.identifier.DOI;
+import org.jabref.logic.l10n.Localization;
 
 /**
  * Copies the doi url to the clipboard

@@ -10,10 +10,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.Globals;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

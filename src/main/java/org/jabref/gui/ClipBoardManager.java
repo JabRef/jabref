@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
+import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 

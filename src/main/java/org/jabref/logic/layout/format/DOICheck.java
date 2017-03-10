@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.identifier.DOI;
+import org.jabref.logic.layout.LayoutFormatter;
 
 /**
  * Used to fix [ 1588028 ] export HTML table DOI URL.
