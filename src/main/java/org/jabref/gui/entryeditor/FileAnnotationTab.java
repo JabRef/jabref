@@ -139,11 +139,11 @@ class FileAnnotationTab extends JPanel {
         if (annotations.isEmpty()) {
             listModel.addElement(new FileAnnotation("", LocalDateTime.now(), 0, Localization.lang("File has no attached annotations"), "", Optional.empty()));
         } else {
-            Comparator<FileAnnotation> byPage = Comparator.comparingInt(fa -> fa.page);
+            Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
             annotations.stream()
-                    .filter(annotation -> (null != annotation.content))
-                    .filter(annotation -> annotation.annotationType.equals(FDFAnnotationHighlight.SUBTYPE)
-                            || (!annotation.linkedFileAnnotation.isPresent()))
+                    .filter(annotation -> (null != annotation.getContent()))
+                    .filter(annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
+                            || !annotation.hasLinkedAnnotation())
                     .sorted(byPage)
                     .forEach(listModel::addElement);
         }
@@ -155,9 +155,9 @@ class FileAnnotationTab extends JPanel {
      * @param annotation pdf annotation which data should be shown in the text fields
      */
     private void updateTextFields(FileAnnotation annotation) {
-        authorArea.setText(annotation.author);
-        dateArea.setText(annotation.timeModified.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        pageArea.setText(String.valueOf(annotation.page));
+        authorArea.setText(annotation.getAuthor());
+        dateArea.setText(annotation.getTimeModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+        pageArea.setText(String.valueOf(annotation.getPage()));
         updateContentAndHighlightTextAreas(annotation);
     }
 
@@ -293,24 +293,24 @@ class FileAnnotationTab extends JPanel {
 
         if (annotation.hasLinkedAnnotation()) {
             // isPresent() of the optional is already checked in annotation.hasLinkedAnnotation()
-            if (!annotation.linkedFileAnnotation.get().content.isEmpty()) {
-                contentTxtArea.setText(annotation.linkedFileAnnotation.get().content);
+            if (!annotation.getLinkedFileAnnotation().getContent().isEmpty()) {
+                contentTxtArea.setText(annotation.getLinkedFileAnnotation().getContent());
                 contentTxtArea.setEnabled(true);
             } else {
                 contentTxtArea.setText("N/A");
                 contentTxtArea.setEnabled(false);
             }
 
-            if (annotation.content.isEmpty()) {
+            if (annotation.getContent().isEmpty()) {
                 highlightTxtArea.setEnabled(false);
                 highlightTxtArea.setText("JabRef: The highlighted area does not contain any legible text!");
             } else {
                 highlightTxtArea.setEnabled(true);
-                highlightTxtArea.setText(annotation.content);
+                highlightTxtArea.setText(annotation.getContent());
             }
 
         } else {
-            contentTxtArea.setText(annotation.content);
+            contentTxtArea.setText(annotation.getContent());
             highlightTxtArea.setText("N/A");
             highlightTxtArea.setEnabled(false);
         }
@@ -354,7 +354,7 @@ class FileAnnotationTab extends JPanel {
             label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
             //If more different annotation types should be reflected by icons in the list, add them here
-            switch (annotation.annotationType) {
+            switch (annotation.getAnnotationType()) {
                 case FDFAnnotationHighlight.SUBTYPE:
                     label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
                     break;
@@ -363,7 +363,7 @@ class FileAnnotationTab extends JPanel {
                     break;
             }
 
-            label.setToolTipText(annotation.annotationType);
+            label.setToolTipText(annotation.getAnnotationType());
             label.setText(annotation.toString());
 
             return label;

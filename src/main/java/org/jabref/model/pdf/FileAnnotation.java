@@ -11,12 +11,12 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 public final class FileAnnotation {
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
-    public final String author;
-    public final LocalDateTime timeModified;
-    public final int page;
-    public final String content;
-    public final String annotationType;
-    public final Optional<FileAnnotation> linkedFileAnnotation;
+    private final String author;
+    private final LocalDateTime timeModified;
+    private final int page;
+    private final String content;
+    private final String annotationType;
+    private final Optional<FileAnnotation> linkedFileAnnotation;
 
 
     /**
@@ -115,7 +115,31 @@ public final class FileAnnotation {
     }
 
 
+    public String getAuthor() {
+        return author;
+    }
+
+    public LocalDateTime getTimeModified() {
+        return timeModified;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getAnnotationType() {
+        return annotationType;
+    }
+
     public boolean hasLinkedAnnotation() {
         return this.linkedFileAnnotation.isPresent();
+    }
+
+    public FileAnnotation getLinkedFileAnnotation() {
+        return linkedFileAnnotation.get();
     }
 }
