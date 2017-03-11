@@ -199,8 +199,8 @@ public class FileUtil {
     }
 
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.<br/>
+     * Converts a relative filename to an absolute one, if necessary. Returns an empty optional if the file does not
+     * exist.<br/>
      * <p>
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
