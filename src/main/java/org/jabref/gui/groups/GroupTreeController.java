@@ -2,12 +2,12 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import javax.inject.Inject;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
@@ -18,6 +18,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.input.DataFormat;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -28,7 +32,6 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
@@ -39,14 +42,21 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
 
-    @FXML private TreeTableView<GroupNodeViewModel> groupTree;
-    @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> mainColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> numberColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel,GroupNodeViewModel> disclosureNodeColumn;
-    @FXML private CustomTextField searchField;
+    @FXML
+    private TreeTableView<GroupNodeViewModel> groupTree;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
+    @FXML
+    private CustomTextField searchField;
 
-    @Inject private StateManager stateManager;
-    @Inject private DialogService dialogService;
+    @Inject
+    private StateManager stateManager;
+    @Inject
+    private DialogService dialogService;
 
     @FXML
     public void initialize() {
@@ -56,8 +66,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         viewModel.selectedGroupProperty().bind(
                 EasyBind.monadic(groupTree.selectionModelProperty())
                         .flatMap(SelectionModel::selectedItemProperty)
-                        .selectProperty(TreeItem::valueProperty)
-        );
+                        .selectProperty(TreeItem::valueProperty));
         viewModel.filterTextProperty().bind(searchField.textProperty());
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
         });
@@ -68,16 +77,14 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                                 group,
                                 GroupNodeViewModel::getChildren,
                                 GroupNodeViewModel::expandedProperty,
-                                viewModel.filterPredicateProperty()))
-        );
+                                viewModel.filterPredicateProperty())));
 
         // Icon and group name
         mainColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         mainColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
                 .withText(GroupNodeViewModel::getDisplayName)
                 .withIcon(GroupNodeViewModel::getIconCode, GroupNodeViewModel::getColor)
-                .withTooltip(GroupNodeViewModel::getDescription)
-        );
+                .withTooltip(GroupNodeViewModel::getDescription));
 
         // Number of hits
         PseudoClass anySelected = PseudoClass.getPseudoClass("any-selected");
@@ -87,8 +94,10 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                     final StackPane node = new StackPane();
                     node.getStyleClass().setAll("hits");
                     if (!group.isRoot()) {
-                        BindingsHelper.includePseudoClassWhen(node, anySelected, group.anySelectedEntriesMatchedProperty());
-                        BindingsHelper.includePseudoClassWhen(node, allSelected, group.allSelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, anySelected,
+                                group.anySelectedEntriesMatchedProperty());
+                        BindingsHelper.includePseudoClassWhen(node, allSelected,
+                                group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
                     text.textProperty().bind(group.getHits().asString());
@@ -96,22 +105,21 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                     node.getChildren().add(text);
                     node.setMaxWidth(Control.USE_PREF_SIZE);
                     return node;
-                })
-        );
+                }));
 
         // Arrow indicating expanded status
         disclosureNodeColumn.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
         disclosureNodeColumn.setCellFactory(new ViewModelTreeTableCellFactory<GroupNodeViewModel, GroupNodeViewModel>()
-            .withGraphic(viewModel -> {
-                final StackPane disclosureNode = new StackPane();
-                disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
-                disclosureNode.getStyleClass().setAll("tree-disclosure-node");
+                .withGraphic(viewModel -> {
+                    final StackPane disclosureNode = new StackPane();
+                    disclosureNode.visibleProperty().bind(viewModel.hasChildrenProperty());
+                    disclosureNode.getStyleClass().setAll("tree-disclosure-node");
 
-                final StackPane disclosureNodeArrow = new StackPane();
-                disclosureNodeArrow.getStyleClass().setAll("arrow");
-                disclosureNode.getChildren().add(disclosureNodeArrow);
-                return disclosureNode;
-            })
+                    final StackPane disclosureNodeArrow = new StackPane();
+                    disclosureNodeArrow.getStyleClass().setAll("arrow");
+                    disclosureNode.getChildren().add(disclosureNodeArrow);
+                    return disclosureNode;
+                })
                 .withOnMouseClickedEvent(group -> event -> group.toggleExpansion()));
 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
@@ -123,7 +131,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
-                boolean isFirstLevel = newTreeItem != null && newTreeItem.getParent() == treeTable.getRoot();
+                boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
                 row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
 
             });
@@ -136,11 +144,36 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             row.contextMenuProperty().bind(
                     EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
-                            .orElse((ContextMenu) null)
-            );
-
+                            .orElse((ContextMenu) null));
 
             return row;
+        });
+
+        groupTree.setOnDragOver(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+                System.out.println("OnDragDOver");
+
+                event.acceptTransferModes(TransferMode.ANY);
+                event.consume();
+
+            }
+        });
+        groupTree.setOnDragDropped(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+
+                Dragboard db = event.getDragboard();
+
+                for (DataFormat df1 : db.getContentTypes()) {
+                    System.out.println("GetContent DragDropped " + db.getContent(df1));
+
+                }
+
+            }
+
         });
 
         // Filter text field
@@ -170,7 +203,8 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
      */
     private void setupClearButtonField(CustomTextField customTextField) {
         try {
-            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class, ObjectProperty.class);
+            Method m = TextFields.class.getDeclaredMethod("setupClearButtonField", TextField.class,
+                    ObjectProperty.class);
             m.setAccessible(true);
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {

@@ -84,9 +84,12 @@ public class ClipBoardManager implements ClipboardOwner {
         if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
             // We have determined that the clipboard data is a set of entries.
             try  {
+
+
                 @SuppressWarnings("unchecked")
                 List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
                 result = contents;
+
             } catch (UnsupportedFlavorException | ClassCastException ex) {
                 LOGGER.warn("Could not paste this type", ex);
             } catch (IOException ex) {

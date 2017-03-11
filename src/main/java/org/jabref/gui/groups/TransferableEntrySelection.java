@@ -9,9 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.scene.input.DataFormat;
+
 import org.jabref.model.entry.BibEntry;
 
 public class TransferableEntrySelection implements Transferable {
+
+    public static DataFormat FORMAT = new DataFormat("application/x-java-jvm-local-objectref");
 
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;
@@ -25,17 +29,19 @@ public class TransferableEntrySelection implements Transferable {
         DataFlavor df1 = null;
         DataFlavor df2 = null;
         try {
+
             df1 = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
                     + ";class=org.jabref.gui.groups.TransferableEntrySelection");
             df2 = DataFlavor.getTextPlainUnicodeFlavor();
+
         } catch (ClassNotFoundException e) {
             // never happens
         }
         FLAVOR_INTERNAL = df1;
         FLAVOR_EXTERNAL = df2;
-        FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL, TransferableEntrySelection.FLAVOR_EXTERNAL};
+        FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL,
+                TransferableEntrySelection.FLAVOR_EXTERNAL};
     }
-
 
     public TransferableEntrySelection(List<BibEntry> list) {
         this.selectedEntries = list;
@@ -58,20 +64,29 @@ public class TransferableEntrySelection implements Transferable {
     @Override
     public Object getTransferData(DataFlavor someFlavor)
             throws UnsupportedFlavorException, IOException {
+
+        String s = includeCiteKeyword ? "\\cite{" + selectedEntriesCiteKeys + "}" : selectedEntriesCiteKeys;
+
         if (!isDataFlavorSupported(someFlavor)) {
-            throw new UnsupportedFlavorException(someFlavor);
+            //because we have incompatible text/plain types with javafx
+            //we just don't do anything here
+
         }
         if (someFlavor.equals(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             return this;
         }
-        String s = includeCiteKeyword ?
-                "\\cite{" + selectedEntriesCiteKeys + "}"
-                : selectedEntriesCiteKeys;
-        String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
-        if (charset == null) {
-            charset = "";
+
+        else if (someFlavor.equals(DataFlavor.getTextPlainUnicodeFlavor())) {
+
+            String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
+            if (charset == null) {
+                charset = "";
+            }
+            return new ByteArrayInputStream(s.getBytes(charset.trim()));
         }
-        return new ByteArrayInputStream(s.getBytes(charset.trim()));
+
+        //The text/plain DataFormat of javafx has the String.class directly as representive class and no longer an InputStream
+        return s;
     }
 
     public List<BibEntry> getSelection() {
