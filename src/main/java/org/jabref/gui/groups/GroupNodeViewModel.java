@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -15,8 +16,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
@@ -39,6 +42,7 @@ public class GroupNodeViewModel {
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
+    private final StateManager stateManager;
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
     private final SimpleBooleanProperty hasChildren;
@@ -47,6 +51,7 @@ public class GroupNodeViewModel {
     private final BooleanBinding allSelectedEntriesMatched;
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
@@ -58,7 +63,7 @@ public class GroupNodeViewModel {
             // TODO: Update on changes to entry list (however: there is no flatMap and filter as observable TransformationLists)
             children = databaseContext.getDatabase()
                     .getEntries().stream()
-                    .flatMap(stream -> createSubgroups(databaseContext, stateManager, automaticGroup, stream))
+                    .flatMap(stream -> createSubgroups(automaticGroup, stream))
                     .filter(distinctByKey(group -> group.getGroupNode().getName()))
                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
@@ -94,7 +99,7 @@ public class GroupNodeViewModel {
         return new GroupNodeViewModel(newDatabase, stateManager, DefaultGroupsFactory.getAllEntriesGroup());
     }
 
-    private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
+    private Stream<GroupNodeViewModel> createSubgroups(AutomaticGroup automaticGroup, BibEntry entry) {
         return automaticGroup.createSubgroups(entry).stream()
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
     }
@@ -204,5 +209,33 @@ public class GroupNodeViewModel {
 
     public Color getColor() {
         return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultColor());
+    }
+
+    public String getPath() {
+        return groupNode.getPath();
+    }
+
+    public Optional<GroupNodeViewModel> getChildByPath(String pathToSource) {
+        return groupNode.getChildByPath(pathToSource).map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+    }
+
+    /**
+     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row
+     */
+    public boolean acceptableDrop(Dragboard dragboard) {
+        return dragboard.hasContent(DragAndDropDataFormats.GROUP);
+        // TODO: we should also check isNodeDescendant
+    }
+
+    public void moveTo(GroupNodeViewModel target) {
+        // TODO: Add undo and display message
+        //MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+        //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
+
+        getGroupNode().moveTo(target.getGroupNode());
+        //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        //panel.markBaseChanged();
+        //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+
     }
 }

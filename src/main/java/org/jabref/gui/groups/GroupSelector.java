@@ -56,7 +56,6 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
@@ -490,8 +489,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
         SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
         GroupingWorker worker = new GroupingWorker(searchRule);
-        worker.getWorker().run();
-        worker.getCallBack().update();
+        worker.run();
+        worker.update();
     }
 
     private void updateShownEntriesAccordingToSelectedGroups(Optional<GroupTreeNode> selectedGroup) {
@@ -501,8 +500,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
         SearchMatcher searchRule = selectedGroup.get().getSearchMatcher();
         GroupingWorker worker = new GroupingWorker(searchRule);
-        worker.getWorker().run();
-        worker.getCallBack().update();
+        worker.run();
+        worker.update();
     }
 
     private List<GroupTreeNodeViewModel> getLeafsOfSelection() {
@@ -833,7 +832,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         return toggleAction;
     }
 
-    class GroupingWorker extends AbstractWorker {
+    class GroupingWorker {
 
         private final SearchMatcher matcher;
         private final List<BibEntry> matches = new ArrayList<>();
@@ -844,7 +843,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             showOverlappingGroupsP = showOverlappingGroups.isSelected();
         }
 
-        @Override
         public void run() {
             for (BibEntry entry : panel.getDatabase().getEntries()) {
                 boolean hit = matcher.isMatch(entry);
@@ -855,7 +853,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             }
         }
 
-        @Override
         public void update() {
             // Show the result in the chosen way:
             if (hideNonHits.isSelected()) {

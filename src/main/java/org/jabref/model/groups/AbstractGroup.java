@@ -32,6 +32,18 @@ public abstract class AbstractGroup implements SearchMatcher {
         this.context = Objects.requireNonNull(context);
     }
 
+    @Override
+    public String toString() {
+        return "AbstractGroup{" +
+                "name='" + name + '\'' +
+                ", context=" + context +
+                ", color=" + color +
+                ", isExpanded=" + isExpanded +
+                ", description=" + description +
+                ", iconCode=" + iconCode +
+                '}';
+    }
+
     public Optional<Color> getColor() {
         return color;
     }

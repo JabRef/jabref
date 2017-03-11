@@ -3,6 +3,7 @@ package org.jabref.model.groups;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.model.FieldChange;
@@ -18,6 +19,7 @@ import org.jabref.model.search.matchers.MatcherSets;
  */
 public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
+    private static final String PATH_DELEMITER = " > ";
     private AbstractGroup group;
 
     /**
@@ -223,5 +225,47 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public boolean matches(BibEntry entry) {
         return getSearchMatcher().isMatch(entry);
+    }
+
+    /**
+     * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELEMITER}.
+     *
+     * The name of the root is not included.
+     */
+    public String getPath() {
+        return getPathFromRoot().stream()
+                .skip(1) // Skip root
+                .map(GroupTreeNode::getName)
+                .collect(Collectors.joining(PATH_DELEMITER));
+    }
+
+    @Override
+    public String toString() {
+        return "GroupTreeNode{" +
+                "group=" + group +
+                '}';
+    }
+
+    /**
+     * Finds a children using the given path.
+     * Each group name should be separated by {@link #PATH_DELEMITER}.
+     *
+     * The path should be generated using {@link #getPath()}.
+     */
+    public Optional<GroupTreeNode> getChildByPath(String pathToSource) {
+        GroupTreeNode present = this;
+        for (String groupName : pathToSource.split(PATH_DELEMITER)) {
+            Optional<GroupTreeNode> childWithName = present.getChildren().stream()
+                    .filter(group -> Objects.equals(group.getName(), groupName))
+                    .findFirst();
+            if (childWithName.isPresent()) {
+                present = childWithName.get();
+            } else {
+                // No child with that name found -> path seems to be invalid
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(present);
     }
 }
