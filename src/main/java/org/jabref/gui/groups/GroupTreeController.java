@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import javax.inject.Inject;
 
 import javafx.beans.property.ObjectProperty;
@@ -31,6 +32,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
