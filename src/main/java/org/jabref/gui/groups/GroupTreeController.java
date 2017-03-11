@@ -18,7 +18,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
-import javafx.scene.input.DataFormat;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -153,11 +152,8 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
             @Override
             public void handle(DragEvent event) {
-                System.out.println("OnDragDOver");
-
                 event.acceptTransferModes(TransferMode.ANY);
                 event.consume();
-
             }
         });
         groupTree.setOnDragDropped(new EventHandler<DragEvent>() {
@@ -167,10 +163,9 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
                 Dragboard db = event.getDragboard();
 
-                for (DataFormat df1 : db.getContentTypes()) {
-                    System.out.println("GetContent DragDropped " + db.getContent(df1));
-
-                }
+                TransferableEntrySelection entrySelection = (TransferableEntrySelection) db
+                        .getContent(TransferableEntrySelection.DATAFORMAT);
+                System.out.println(entrySelection.getSelection()); //list of bib entries
 
             }
 

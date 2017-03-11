@@ -15,7 +15,7 @@ import org.jabref.model.entry.BibEntry;
 
 public class TransferableEntrySelection implements Transferable {
 
-    public static DataFormat FORMAT = new DataFormat("application/x-java-jvm-local-objectref");
+    public static DataFormat DATAFORMAT = new DataFormat("application/x-java-jvm-local-objectref");
 
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;
