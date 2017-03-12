@@ -5,6 +5,8 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
 
 /**
  * Specifies how metadata is read and written.
@@ -45,4 +47,14 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link SearchGroup}.
      */
     public static final String SEARCH_GROUP_ID = "SearchGroup:";
+
+    /**
+     * Identifier for {@link AutomaticPersonsGroup}.
+     */
+    public static final String AUTOMATIC_PERSONS_GROUP_ID = "AutomaticPersonsGroup:";
+
+    /**
+     * Identifier for {@link AutomaticKeywordGroup}.
+     */
+    public static final String AUTOMATIC_KEYWORD_GROUP_ID = "AutomaticKeywordGroup:";
 }

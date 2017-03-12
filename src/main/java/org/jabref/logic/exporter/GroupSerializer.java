@@ -8,6 +8,9 @@ import javafx.scene.paint.Color;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
@@ -117,8 +120,41 @@ public class GroupSerializer {
             return serializeKeywordGroup((KeywordGroup)group);
         } else if (group instanceof SearchGroup) {
             return serializeSearchGroup((SearchGroup)group);
+        } else if (group instanceof AutomaticKeywordGroup) {
+            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup)group);
+        } else if (group instanceof AutomaticPersonsGroup) {
+            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup)group);
         } else {
             throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         }
+    }
+
+    private String serializeAutomaticPersonsGroup(AutomaticPersonsGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID);
+        appendAutomaticGroupDetails(sb, group);
+        sb.append(StringUtil.quote(group.getField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        appendGroupDetails(sb, group);
+        return sb.toString();
+    }
+
+    private void appendAutomaticGroupDetails(StringBuilder builder, AutomaticGroup group) {
+        builder.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        builder.append(group.getHierarchicalContext().ordinal());
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+    }
+
+    private String serializeAutomaticKeywordGroup(AutomaticKeywordGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID);
+        appendAutomaticGroupDetails(sb, group);
+        sb.append(StringUtil.quote(group.getField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(group.getKeywordSeperator());
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        appendGroupDetails(sb, group);
+        return sb.toString();
     }
 }

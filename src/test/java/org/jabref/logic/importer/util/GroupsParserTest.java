@@ -1,12 +1,16 @@
 package org.jabref.logic.importer.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
@@ -69,5 +73,24 @@ public class GroupsParserTest {
         AbstractGroup parsed = GroupsParser.fromString("StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;", ',');
 
         assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void fromStringParsesAutomaticKeywordGroup() throws Exception {
+        AutomaticGroup expected = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "keywords", ',');
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;1;;;;", ',');
+        assertEquals(expected, parsed);
+    }
+
+    @Test
+    public void fromStringParsesAutomaticPersonGroup() throws Exception {
+        AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "authors");
+        AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;authors;1;;;;", ',');
+        assertEquals(expected, parsed);
+    }
+
+    @Test(expected = ParseException.class)
+    public void fromStringUnknownGroupThrowsException() throws Exception {
+        GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',');
     }
 }
