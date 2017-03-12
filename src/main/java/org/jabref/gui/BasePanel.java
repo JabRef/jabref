@@ -822,7 +822,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 be.getTitle().ifPresent(titles::add);
             }
             if (titles.isEmpty()) {
-                output(Localization.lang("None of the selected entries have titles"));
+                output(Localization.lang("None of the selected entries have titles."));
                 return;
             }
             StringSelection ss = new StringSelection(String.join("\n", titles));

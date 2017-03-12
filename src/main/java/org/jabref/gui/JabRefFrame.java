@@ -276,7 +276,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
-    private final AbstractAction copyTitle = new GeneralAction(Actions.COPY_TITLE, Localization.lang("Copy title"),
+    private final AbstractAction copyTitle = new GeneralAction(Actions.COPY_TITLE, Localization.menuTitle("Copy title"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_TITLE));
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
