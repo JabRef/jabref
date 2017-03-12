@@ -37,6 +37,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
 - We added MathSciNet as a ID-based fetcher in the `BibTeX -> New entry` dialog (implements a [feature request in the forum](http://discourse.jabref.org/t/allow-to-search-by-mr-number-mathscinet))
 - Removed the apache.commons.collections library
+- We added a few properties to a group:
+    - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
+    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword). Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173).
+- Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
 - We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
 - The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
 - We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
