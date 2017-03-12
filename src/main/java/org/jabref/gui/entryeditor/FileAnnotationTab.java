@@ -311,6 +311,7 @@ class FileAnnotationTab extends JPanel {
 
         } else {
             contentTxtArea.setText(annotation.getContent());
+            contentTxtArea.setEnabled(true);
             highlightTxtArea.setText("N/A");
             highlightTxtArea.setEnabled(false);
         }
