@@ -474,6 +474,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> copyKey());
 
+        // The action for copying the selected entry's title.
+        actions.put(Actions.COPY_TITLE, (BaseAction) () -> copyTitle());
+
         // The action for copying a cite for the selected entry.
         actions.put(Actions.COPY_CITE_KEY, (BaseAction) () -> copyCiteKey());
 
@@ -804,6 +807,33 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 selectionListener.editSignalled(firstBE);
+            }
+        }
+    }
+
+    private void copyTitle() {
+        List<BibEntry> bes = mainTable.getSelectedEntries();
+        if (!bes.isEmpty()) {
+            storeCurrentEdit();
+            List<String> titles = new ArrayList<>(bes.size());
+
+            // Collect all non-null keys.
+            for (BibEntry be : bes) {
+                be.getTitle().ifPresent(titles::add);
+            }
+            if (titles.isEmpty()) {
+                output(Localization.lang("None of the selected entries have titles"));
+                return;
+            }
+            StringSelection ss = new StringSelection(String.join("\n", titles));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+
+            if (titles.size() == bes.size()) {
+                // All entries had titles.
+                output((bes.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
+            } else {
+                output(Localization.lang("Warning: %0 out of %1 entries have undefined title.",
+                        Integer.toString(bes.size() - titles.size()), Integer.toString(bes.size())));
             }
         }
     }

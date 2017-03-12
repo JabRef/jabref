@@ -622,6 +622,15 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * Returns the title of the given BibTeX entry as an optional.
+     *
+     * @return the title of a BibTeX entry or null if no title was found.
+     */
+    public Optional<String> getTitle() {
+        return getField(FieldName.TITLE);
+    }
+
+    /**
      * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
      *
      * @return will return the publication date of the entry or null if no year was found.
