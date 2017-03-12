@@ -59,6 +59,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
  - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
  - We fixed an issue introduced with Version 3.8.2 where executing the `Rename PDFs`-cleanup operation moved the files to the file directory. [#2526](https://github.com/JabRef/jabref/issues/2526)
+ - We improved the performance when opening a big database that still used the old groups format. Fixes an [issue raised in the forum](http://discourse.jabref.org/t/v3-8-2-x64-windows-problem-saving-large-bib-libraries/456).
  - We fixed an issue where the `Move linked files to default file directory`- cleanup operation did not move the files to the location of the bib-file. [#2454](https://github.com/JabRef/jabref/issues/2454)
  - We fixed an issue where executing `Move file` on a selected file in the `general`-tab could overwrite an existing file. [#2385](https://github.com/JabRef/jabref/issues/2358)
  - We fixed an issue with importing groups and subgroups [#2600](https://github.com/JabRef/jabref/issues/2600)
