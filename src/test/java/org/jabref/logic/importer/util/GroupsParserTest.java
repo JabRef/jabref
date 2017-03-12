@@ -3,6 +3,8 @@ package org.jabref.logic.importer.util;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.scene.paint.Color;
+
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
@@ -57,4 +59,15 @@ public class GroupsParserTest {
 
     }
 
+    @Test
+    public void fromStringParsesExplicitGroupWithIconAndDesrcitpion() throws Exception {
+        ExplicitGroup expected = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
+        expected.setIconCode("test icon");
+        expected.setExpanded(true);
+        expected.setColor(Color.ALICEBLUE);
+        expected.setDescription("test description");
+        AbstractGroup parsed = GroupsParser.fromString("StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;", ',');
+
+        assertEquals(expected, parsed);
+    }
 }

@@ -2,8 +2,8 @@ package org.jabref.logic.exporter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+
+import javafx.scene.paint.Color;
 
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.model.groups.AbstractGroup;
@@ -28,14 +28,8 @@ public class GroupSerializer {
         sb.append(group.getHierarchicalContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
 
-        // write legacy entry keys in well-defined order for CVS compatibility
-        Set<String> sortedKeys = new TreeSet<>();
-        sortedKeys.addAll(group.getLegacyEntryKeys());
+        appendGroupDetails(sb, group);
 
-        for (String sortedKey : sortedKeys) {
-            sb.append(StringUtil.quote(sortedKey, MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
-            sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        }
         return sb.toString();
     }
 
@@ -55,6 +49,9 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(isRegex));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+
+        appendGroupDetails(sb, group);
+
         return sb.toString();
     }
 
@@ -71,9 +68,22 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.booleanToBinaryString(group.isRegularExpression()));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+
+        appendGroupDetails(sb, group);
+
         return sb.toString();
     }
 
+    private void appendGroupDetails(StringBuilder builder, AbstractGroup group) {
+        builder.append(StringUtil.booleanToBinaryString(group.isExpanded()));
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        builder.append(group.getColor().map(Color::toString).orElse(""));
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        builder.append(group.getIconCode().orElse(""));
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        builder.append(group.getDescription().orElse(""));
+        builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+    }
 
     /**
      * Returns a textual representation of this node and its children. This

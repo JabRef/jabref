@@ -84,6 +84,9 @@ public class GroupsParser {
         if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             return GroupsParser.explicitGroupFromString(s, keywordSeparator);
         }
+        if (s.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
+            return GroupsParser.legacyExplicitGroupFromString(s, keywordSeparator);
+        }
         return null; // unknown group
     }
 
@@ -118,6 +121,24 @@ public class GroupsParser {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + input + "\".");
         }
         QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID.length()),
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = tok.nextToken();
+        try {
+            int context = Integer.parseInt(tok.nextToken());
+            ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
+            addGroupDetails(tok, newGroup);
+            return newGroup;
+        } catch (NumberFormatException exception) {
+            throw new ParseException("Could not parse context in " + input);
+        }
+    }
+
+    private static ExplicitGroup legacyExplicitGroupFromString(String input, Character keywordSeparator) throws ParseException {
+        if (!input.startsWith(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID)) {
+            throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + input + "\".");
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.LEGACY_EXPLICIT_GROUP_ID.length()),
                 MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
 
         String name = tok.nextToken();
@@ -174,5 +195,12 @@ public class GroupsParser {
         return new SearchGroup(StringUtil.unquote(name, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR),
                 GroupHierarchyType.getByNumberOrDefault(context), StringUtil.unquote(expression, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR), caseSensitive, regExp
         );
+    }
+
+    private static void addGroupDetails(QuotedStringTokenizer tokenizer, AbstractGroup group) {
+        group.setExpanded(Integer.parseInt(tokenizer.nextToken()) == 1);
+        group.setColor(tokenizer.nextToken());
+        group.setIconCode(tokenizer.nextToken());
+        group.setDescription(tokenizer.nextToken());
     }
 }
