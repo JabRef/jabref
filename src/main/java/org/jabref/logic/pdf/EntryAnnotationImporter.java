@@ -1,18 +1,22 @@
 package org.jabref.logic.pdf;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.preferences.JabRefPreferences;
 
 
 /**
@@ -49,9 +53,13 @@ public class EntryAnnotationImporter {
     public Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext context) {
         Map<String, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
+
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
-        this.getFilteredFileList().forEach(parsedFileField -> annotations.put(parsedFileField.getLink(),
-                importer.importAnnotations(Paths.get(parsedFileField.getLink()), context)));
+        for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
+            Optional<File> expandedFileName = FileUtil.expandFilename(context, parsedFileField.getLink(),
+                    JabRefPreferences.getInstance().getFileDirectoryPreferences());
+            expandedFileName.ifPresent(file -> annotations.put(file.toString(), importer.importAnnotations(Paths.get(file.toString()))));
+        }
         return annotations;
     }
 }

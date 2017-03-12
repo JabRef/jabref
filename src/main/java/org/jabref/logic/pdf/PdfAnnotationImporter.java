@@ -1,11 +1,9 @@
 package org.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,10 +11,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.FileAnnotation;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,18 +38,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      * @return a list with the all the annotations found in the file of the path
      */
     @Override
-    public List<FileAnnotation> importAnnotations(final Path path, final BibDatabaseContext context) {
+    public List<FileAnnotation> importAnnotations(final Path path) {
 
-        Optional<Path> validatePath = validatePath(path, context);
-        if (!validatePath.isPresent()) {
+        if (!validatePath(path)) {
             // Path could not be validated, return default result
             return Collections.emptyList();
         }
 
-        Path validPath = validatePath.get();
+
 
         List<FileAnnotation> annotationsList = new LinkedList<>();
-        try (PDDocument document = PDDocument.load(validPath.toString())) {
+        try (PDDocument document = PDDocument.load(path.toString())) {
             List pdfPages = document.getDocumentCatalog().getAllPages();
             for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
@@ -70,7 +64,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(String.format("Failed to read file '%s'.", validPath), e);
+            LOGGER.error(String.format("Failed to read file '%s'.", path), e);
         }
         return annotationsList;
     }
@@ -132,30 +126,24 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return highlightedText.trim();
     }
 
-    private Optional<Path> validatePath(Path path, BibDatabaseContext context) {
+    private boolean validatePath(Path path) {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(String.format("File %s does not end with .pdf!", path.toString()));
-            return Optional.empty();
+            LOGGER.warn(String.format("File %s does not end with .pdf!", path));
+            return false;
         }
 
         if (!Files.exists(path)) {
-            Optional<File> importedFile = FileUtil.expandFilename(context, path.toString(),
-                    JabRefPreferences.getInstance().getFileDirectoryPreferences());
-            if (importedFile.isPresent()) {
-                // No need to check file existence again, because it is done in FileUtil.expandFilename()
-                return Optional.of(Paths.get(importedFile.get().getAbsolutePath()));
-            } else {
-                //return empty list to recognize invalid import
-                return Optional.empty();
-            }
+            LOGGER.warn(String.format("File %s does not exist!", path));
+            return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn(String.format("File %s is not readable!", path.toString()));
-            return Optional.empty();
+            LOGGER.warn(String.format("File %s is not readable!", path));
+            return false;
         }
-        return Optional.of(path);
+
+        return true;
     }
 }

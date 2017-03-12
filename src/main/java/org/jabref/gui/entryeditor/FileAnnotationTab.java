@@ -117,8 +117,8 @@ class FileAnnotationTab extends JPanel {
 
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
-            new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().
-                    forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
+            this.annotationsOfFiles.keySet().forEach(annotation -> fileNameComboBox.addItem(annotation));
+
             //show the annotationsOfFiles attached to the selected file
             updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem() == null ?
                     fileNameComboBox.getItemAt(0) : fileNameComboBox.getSelectedItem().toString()));

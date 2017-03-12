@@ -2,7 +2,6 @@ package org.jabref.logic.pdf;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,7 +34,7 @@ public class FileAnnotationCache {
      * @param entry entry for which to get the annotations
      * @return Map containing a list of annotations in a list for each file
      */
-    public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) throws ExecutionException {
-        return annotationCache.get(entry);
+    public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
+        return annotationCache.getUnchecked(entry);
     }
 }
