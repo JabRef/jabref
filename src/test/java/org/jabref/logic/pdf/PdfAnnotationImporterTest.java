@@ -29,6 +29,12 @@ public class PdfAnnotationImporterTest {
         assertEquals(0, annotations.size());
     }
 
+    @Test
+    public void twoAnnotationsThesisExample() {
+
+        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/thesis-example.pdf"));
+        assertEquals(2, annotations.size());
+    }
 
     @Test
     public void noAnnotationsMinimal() {

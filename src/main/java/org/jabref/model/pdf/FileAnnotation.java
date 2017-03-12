@@ -11,6 +11,10 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 public final class FileAnnotation {
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+    private static final String DATE_TIME_STRING = "^D:\\d{14}$";
+    private static final String DATE_TIME_STRING_WITH_TIME_ZONE = "^D:\\d{14}\\+\\d{4}$";
+    private static final String ANNOTATION_DATE_FORMAT = "yyyyMMddHHmmss";
+
     private final String author;
     private final LocalDateTime timeModified;
     private final int page;
@@ -74,14 +78,22 @@ public final class FileAnnotation {
             return LocalDateTime.now();
         }
 
-        return LocalDateTime.parse(dateTimeString.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        if (dateTimeString.matches(DATE_TIME_STRING_WITH_TIME_ZONE)) {
+            dateTimeString = dateTimeString.substring(2, 16);
+        } else if (dateTimeString.matches(DATE_TIME_STRING)) {
+            dateTimeString = dateTimeString.substring(2);
+        }
+
+        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
     }
 
     private String parseContent(final String content) {
         if (content == null) {
             return "";
         }
-        if (content.trim().equals("þÿ")) {
+
+        final String unreadableContent = "þÿ";
+        if (content.trim().equals(unreadableContent)) {
             return "";
         }
 
@@ -139,6 +151,11 @@ public final class FileAnnotation {
         return this.linkedFileAnnotation.isPresent();
     }
 
+    /**
+     * Before this getter is called the presence of the linked annotation must be checked via hasLinkedAnnotation()!
+     *
+     * @return the note attached to the annotation
+     */
     public FileAnnotation getLinkedFileAnnotation() {
         return linkedFileAnnotation.get();
     }
