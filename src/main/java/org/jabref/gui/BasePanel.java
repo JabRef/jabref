@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -815,12 +816,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         List<BibEntry> bes = mainTable.getSelectedEntries();
         if (!bes.isEmpty()) {
             storeCurrentEdit();
-            List<String> titles = new ArrayList<>(bes.size());
 
-            // Collect all non-null keys.
-            for (BibEntry be : bes) {
-                be.getTitle().ifPresent(titles::add);
-            }
+            // Collect all non-null titles.
+            List<String> titles = bes.stream()
+                    .filter(be -> be.getTitle().isPresent())
+                    .map(be -> be.getTitle().get())
+                    .collect(Collectors.toList());
+
             if (titles.isEmpty()) {
                 output(Localization.lang("None of the selected entries have titles."));
                 return;
