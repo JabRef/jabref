@@ -12,7 +12,7 @@ import org.jabref.logic.importer.ParserResult;
  * This interface is introduced in an attempt to add such functionality in a
  * flexible manner.
  */
-public interface PostOpenAction {
+public interface GUIPostOpenAction {
 
     /**
      * This method is queried in order to find out whether the action needs to be
