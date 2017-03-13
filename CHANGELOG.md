@@ -12,7 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- JabRef has a new logo! The logo was designed by "AikTheOne" - who was the winner of a design contest at 99designs.com
+- JabRef has a new logo! The logo was designed by "[AikTheOne](https://99designs.de/profiles/theonestudio)" - who was the winner of a design contest at 99designs.com
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - Partly switched to a new UI technology (JavaFX).
     - Redesigned group panel.
