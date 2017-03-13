@@ -813,14 +813,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private void copyTitle() {
-        List<BibEntry> bes = mainTable.getSelectedEntries();
-        if (!bes.isEmpty()) {
+        List<BibEntry> selectedBibEntries = mainTable.getSelectedEntries();
+        if (!selectedBibEntries.isEmpty()) {
             storeCurrentEdit();
 
             // Collect all non-null titles.
-            List<String> titles = bes.stream()
-                    .filter(be -> be.getTitle().isPresent())
-                    .map(be -> be.getTitle().get())
+            List<String> titles = selectedBibEntries.stream()
+                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                    .map(bibEntry -> bibEntry.getTitle().get())
                     .collect(Collectors.toList());
 
             if (titles.isEmpty()) {
@@ -830,12 +830,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             StringSelection ss = new StringSelection(String.join("\n", titles));
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
 
-            if (titles.size() == bes.size()) {
+            if (titles.size() == selectedBibEntries.size()) {
                 // All entries had titles.
-                output((bes.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
+                output((selectedBibEntries.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined title.",
-                        Integer.toString(bes.size() - titles.size()), Integer.toString(bes.size())));
+                        Integer.toString(selectedBibEntries.size() - titles.size()),
+                        Integer.toString(selectedBibEntries.size())));
             }
         }
     }

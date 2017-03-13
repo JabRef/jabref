@@ -622,9 +622,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the title of the given BibTeX entry as an optional.
+     * Returns the title of the given BibTeX entry as an Optional.
      *
-     * @return the title of a BibTeX entry or null if no title was found.
+     * @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.
      */
     public Optional<String> getTitle() {
         return getField(FieldName.TITLE);
