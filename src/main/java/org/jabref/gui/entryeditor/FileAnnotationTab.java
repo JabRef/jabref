@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Predicate;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -37,6 +38,7 @@ import org.jabref.model.pdf.FileAnnotation;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationUnderline;
 
 
 class FileAnnotationTab extends JPanel {
@@ -57,10 +59,10 @@ class FileAnnotationTab extends JPanel {
     private final JScrollPane pageScrollPane = new JScrollPane();
     private final JLabel annotationTextLabel = new JLabel(Localization.lang("Content"), JLabel.CENTER);
     private final JTextArea contentTxtArea = new JTextArea();
-    private final JLabel highlightTxtLabel = new JLabel(Localization.lang("Highlight"), JLabel.CENTER);
-    private final JTextArea highlightTxtArea = new JTextArea();
+    private final JLabel markedTextLabel = new JLabel(Localization.lang("Marking"), JLabel.CENTER);
+    private final JTextArea markedTxtArea = new JTextArea();
     private final JScrollPane annotationTextScrollPane = new JScrollPane();
-    private final JScrollPane highlightScrollPane = new JScrollPane();
+    private final JScrollPane markedTextScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton reloadAnnotationsButton = new JButton();
     private DefaultListModel<FileAnnotation> listModel;
@@ -78,7 +80,7 @@ class FileAnnotationTab extends JPanel {
         this.isInitialized = false;
     }
 
-    public FileAnnotationTab initializeTab(FileAnnotationTab tab) {
+    private FileAnnotationTab initializeTab(FileAnnotationTab tab) {
         if (tab.isInitialized) {
             return tab;
         }
@@ -117,7 +119,7 @@ class FileAnnotationTab extends JPanel {
 
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
-            this.annotationsOfFiles.keySet().forEach(annotation -> fileNameComboBox.addItem(annotation));
+            this.annotationsOfFiles.keySet().forEach(fileNameComboBox::addItem);
 
             //show the annotationsOfFiles attached to the selected file
             updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem() == null ?
@@ -142,11 +144,41 @@ class FileAnnotationTab extends JPanel {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
             annotations.stream()
                     .filter(annotation -> (null != annotation.getContent()))
-                    .filter(annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
-                            || !annotation.hasLinkedAnnotation())
+                    .filter(isSupportedAnnotationType())
                     .sorted(byPage)
-                    .forEach(listModel::addElement);
+                    .forEach(annotation -> listModel.addElement(
+                            new FileAnnotation(annotation.getAuthor(), annotation.getTimeModified(), annotation.getPage(),
+                                    localizeContent(annotation), annotation.getAnnotationType(),
+                                    annotation.hasLinkedAnnotation() ? Optional.of(annotation.getLinkedFileAnnotation()) : Optional.empty())));
         }
+    }
+
+    private String localizeContent(FileAnnotation annotation) {
+        if (annotation.hasLinkedAnnotation()) {
+            if (annotation.getContent().isEmpty()) {
+                if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
+                    return Localization.lang("Empty Underline");
+                }
+                if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
+                    return Localization.lang("Empty Highlight");
+                }
+            }
+        }
+
+        if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
+            return Localization.lang("Underline") + ": " + annotation.getContent();
+        }
+        if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
+            return Localization.lang("Highlight") + ": " + annotation.getContent();
+        }
+
+        return annotation.toString();
+    }
+
+    private Predicate<FileAnnotation> isSupportedAnnotationType() {
+        return annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE) ||
+                annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE) ||
+                !annotation.hasLinkedAnnotation();
     }
 
     /**
@@ -158,7 +190,7 @@ class FileAnnotationTab extends JPanel {
         authorArea.setText(annotation.getAuthor());
         dateArea.setText(annotation.getTimeModified().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
         pageArea.setText(String.valueOf(annotation.getPage()));
-        updateContentAndHighlightTextAreas(annotation);
+        updateContentAndMarkedTextAreas(annotation);
     }
 
     /**
@@ -201,8 +233,8 @@ class FileAnnotationTab extends JPanel {
                 .add(pageScrollPane).xy(3, 7)
                 .add(annotationTextLabel).xy(1, 9, "left, top")
                 .add(annotationTextScrollPane).xywh(3, 9, 1, 2)
-                .add(highlightTxtLabel).xy(1, 11, "left, top")
-                .add(highlightScrollPane).xywh(3, 11, 1, 2)
+                .add(markedTextLabel).xy(1, 11, "left, top")
+                .add(markedTextScrollPane).xywh(3, 11, 1, 2)
                 .add(this.setUpButtons()).xyw(1, 13, 3)
                 .build();
 
@@ -212,7 +244,7 @@ class FileAnnotationTab extends JPanel {
         dateLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         pageLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         annotationTextLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-        highlightTxtLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        markedTextLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         fileNameScrollPane.setBorder(null);
         authorScrollPane.setViewportView(authorArea);
         authorScrollPane.setBorder(null);
@@ -221,14 +253,14 @@ class FileAnnotationTab extends JPanel {
         pageScrollPane.setViewportView(pageArea);
         pageScrollPane.setBorder(null);
         annotationTextScrollPane.setViewportView(contentTxtArea);
-        highlightScrollPane.setViewportView(highlightTxtArea);
+        markedTextScrollPane.setViewportView(markedTxtArea);
         authorArea.setEditable(false);
         dateArea.setEditable(false);
         pageArea.setEditable(false);
         contentTxtArea.setEditable(false);
         contentTxtArea.setLineWrap(true);
-        highlightTxtArea.setEditable(false);
-        highlightTxtArea.setLineWrap(true);
+        markedTxtArea.setEditable(false);
+        markedTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
 
@@ -267,11 +299,11 @@ class FileAnnotationTab extends JPanel {
      */
     private void copyToClipboard() {
         StringJoiner sj = new StringJoiner(System.getProperty("line.separator"));
-        sj.add("Author: " + authorArea.getText());
-        sj.add("Date: " + dateArea.getText());
-        sj.add("Page: " + pageArea.getText());
-        sj.add("Content: " + contentTxtArea.getText());
-        sj.add("Highlighted: " + highlightTxtArea.getText());
+        sj.add(Localization.lang("Author") + ": " + authorArea.getText());
+        sj.add(Localization.lang("Date") + ": " + dateArea.getText());
+        sj.add(Localization.lang("Page") + ": " + pageArea.getText());
+        sj.add(Localization.lang("Content") + ": " + contentTxtArea.getText());
+        sj.add(Localization.lang("Marking") + ": " + markedTxtArea.getText());
 
         new ClipBoardManager().setClipboardContents(sj.toString());
     }
@@ -285,35 +317,72 @@ class FileAnnotationTab extends JPanel {
 
 
     /**
-     * Fills the highlight and annotation texts and enables/disables the highlight area if there is no highlighted text
+     * Fills the TextAreas of the content and the highlighted or underlined text with the corresponding text and also
+     * changes the label accordingly.
      *
-     * @param annotation either a text annotation or a highlighting from a pdf
+     * @param annotation either a text annotation or a marking from a PDF
      */
-    private void updateContentAndHighlightTextAreas(final FileAnnotation annotation) {
+    private void updateContentAndMarkedTextAreas(final FileAnnotation annotation) {
+        updateMarkingType(annotation);
 
         if (annotation.hasLinkedAnnotation()) {
             // isPresent() of the optional is already checked in annotation.hasLinkedAnnotation()
-            if (!annotation.getLinkedFileAnnotation().getContent().isEmpty()) {
-                contentTxtArea.setText(annotation.getLinkedFileAnnotation().getContent());
+            if (!delocalize(annotation.getLinkedFileAnnotation().getContent()).isEmpty()) {
+                contentTxtArea.setText(delocalize(annotation.getLinkedFileAnnotation().getContent()));
                 contentTxtArea.setEnabled(true);
             } else {
                 contentTxtArea.setText("N/A");
                 contentTxtArea.setEnabled(false);
             }
 
-            if (annotation.getContent().isEmpty()) {
-                highlightTxtArea.setEnabled(false);
-                highlightTxtArea.setText("JabRef: The highlighted area does not contain any legible text!");
+            if (delocalize(annotation.getContent()).isEmpty()) {
+                markedTxtArea.setEnabled(false);
+                markedTxtArea.setText(Localization.lang("The marked area does not contain any legible text!"));
             } else {
-                highlightTxtArea.setEnabled(true);
-                highlightTxtArea.setText(annotation.getContent());
+                markedTxtArea.setEnabled(true);
+                markedTxtArea.setText(delocalize(annotation.getContent()));
             }
-
         } else {
-            contentTxtArea.setText(annotation.getContent());
+            contentTxtArea.setText(delocalize(annotation.getContent()));
             contentTxtArea.setEnabled(true);
-            highlightTxtArea.setText("N/A");
-            highlightTxtArea.setEnabled(false);
+            markedTxtArea.setText("N/A");
+            markedTxtArea.setEnabled(false);
+        }
+    }
+
+    private String delocalize(String content) {
+        if (content.startsWith(Localization.lang("Marking"))) {
+            return content.substring(Localization.lang("Marking").length() + 1).trim();
+        }
+        if (content.startsWith(Localization.lang("Underline"))) {
+            return content.substring(Localization.lang("Underline").length() + 1).trim();
+        }
+        if (content.startsWith(Localization.lang("Highlight"))) {
+            return content.substring(Localization.lang("Highlight").length() + 1).trim();
+        }
+        if (content.startsWith(Localization.lang("Empty Marking"))) {
+            return "";
+        }
+        if (content.startsWith(Localization.lang("Empty Underline"))) {
+            return "";
+        }
+        if (content.startsWith(Localization.lang("Empty Highlight"))) {
+            return "";
+        }
+        return content;
+    }
+
+    private void updateMarkingType(FileAnnotation annotation) {
+        switch (annotation.getAnnotationType()) {
+            case FDFAnnotationUnderline.SUBTYPE:
+                markedTextLabel.setText(Localization.lang("Underline"));
+                break;
+            case FDFAnnotationHighlight.SUBTYPE:
+                markedTextLabel.setText(Localization.lang("Highlight"));
+                break;
+            default:
+                markedTextLabel.setText(Localization.lang("Marking"));
+                break;
         }
     }
 
@@ -330,7 +399,7 @@ class FileAnnotationTab extends JPanel {
                 annotationListSelectedIndex = index;
             }
             annotationList.setSelectedIndex(annotationListSelectedIndex);
-            //repaint the list to refresh the linked annotation highlighting
+            //repaint the list to refresh the linked annotation
             annotationList.repaint();
         }
     }
@@ -357,6 +426,9 @@ class FileAnnotationTab extends JPanel {
             //If more different annotation types should be reflected by icons in the list, add them here
             switch (annotation.getAnnotationType()) {
                 case FDFAnnotationHighlight.SUBTYPE:
+                    label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
+                    break;
+                case FDFAnnotationUnderline.SUBTYPE:
                     label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
                     break;
                 default:

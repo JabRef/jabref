@@ -56,11 +56,11 @@ public final class FileAnnotation {
 
     /**
      * For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
-     * highlight annotation with a sticky note.
+     * highlighted or underlined annotation with a sticky note.
      *
      * @param annotation           The actual annotation that holds the information
      * @param pageNumber           The page of the pdf where the annotation occurs
-     * @param linkedFileAnnotation The corresponding note of a highlighted text area.
+     * @param linkedFileAnnotation The corresponding note of a marked text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
@@ -116,13 +116,6 @@ public final class FileAnnotation {
 
     @Override
     public String toString() {
-        if (this.hasLinkedAnnotation()) {
-            if (this.content.isEmpty()) {
-                return "Empty Highlight";
-            }
-            return abbreviateAnnotationName("Highlight: " + content);
-        }
-
         return abbreviateAnnotationName(content);
     }
 

@@ -22,7 +22,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationUnderline;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
@@ -45,16 +45,15 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             return Collections.emptyList();
         }
 
-
-
         List<FileAnnotation> annotationsList = new LinkedList<>();
         try (PDDocument document = PDDocument.load(path.toString())) {
             List pdfPages = document.getDocumentCatalog().getAllPages();
             for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE)) {
-                        annotationsList.add(createHighlightAnnotations(pageIndex, page, annotation));
+                    if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE) ||
+                            annotation.getSubtype().equals(FDFAnnotationUnderline.SUBTYPE)) {
+                        annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
                         if (fileAnnotation.getContent() != null && !fileAnnotation.getContent().isEmpty()) {
@@ -69,26 +68,29 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return annotationsList;
     }
 
-    private FileAnnotation createHighlightAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
-        FileAnnotation annotationBelongingToHighlighting = new FileAnnotation(
+    private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
+        FileAnnotation annotationBelongingToMarking = new FileAnnotation(
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
-                pageIndex + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE, Optional.empty());
+                pageIndex + 1, annotation.getContents(), annotation.getSubtype(), Optional.empty());
 
         try {
-            annotation.setContents(extractHighlightedText(page, annotation));
+            if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE) || annotation.getSubtype().equals(FDFAnnotationUnderline.SUBTYPE)) {
+                annotation.setContents(extractMarkedText(page, annotation));
+            }
         } catch (IOException e) {
-            annotation.setContents("JabRef: Could not extract any highlighted text!");
+            annotation.setContents("JabRef: Could not extract any marked text!");
         }
 
-        //highlighted text that has a sticky note on it should be linked to the sticky note
-        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToHighlighting);
+        //Marked text that has a sticky note on it should be linked to the sticky note
+        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
-    private String extractHighlightedText(PDPage page, PDAnnotation annotation) throws IOException {
-        //highlighted text has to be extracted by the rectangle calculated from the highlighting
+
+    private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
+        //highlighted or underlined text has to be extracted by the rectangle calculated from the marking
         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
-        String highlightedText = "";
+        String markedText = "";
         for (int j = 1,
              k = 0;
              j <= (quadsArray.size() / 8);
@@ -112,18 +114,18 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             uly = pageSize.getHeight() - uly;
 
             Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-            stripperByArea.addRegion("highlightedRegion", rectangle);
+            stripperByArea.addRegion("markedRegion", rectangle);
             stripperByArea.extractRegions(page);
-            String highlightedTextInLine = stripperByArea.getTextForRegion("highlightedRegion");
+            String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
 
             if (j > 1) {
-                highlightedText = highlightedText.concat(highlightedTextInLine);
+                markedText = markedText.concat(markedTextInLine);
             } else {
-                highlightedText = highlightedTextInLine;
+                markedText = markedTextInLine;
             }
         }
 
-        return highlightedText.trim();
+        return markedText.trim();
     }
 
     private boolean validatePath(Path path) {

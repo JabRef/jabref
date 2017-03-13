@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.jabref.model.pdf.FileAnnotation;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -100,7 +99,6 @@ public class PdfAnnotationImporterTest {
         assertEquals("Linus Dietz", note.getLinkedFileAnnotation().getAuthor());
     }
 
-    @Ignore //Not yet supported
     @Test
     public void underlineWithNoteMinimal() {
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-underline.pdf"));
