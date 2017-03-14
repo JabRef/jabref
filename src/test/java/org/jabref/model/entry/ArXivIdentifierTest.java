@@ -2,6 +2,8 @@ package org.jabref.model.entry;
 
 import java.util.Optional;
 
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

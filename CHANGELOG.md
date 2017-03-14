@@ -29,6 +29,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The MS Office XML export now exports the field `volumes` and `pubstate`.
 - The integrity checker reports now if a journal is not found in the abbreviation list
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
+- We are happy to welcome [CrossRef](https://www.crossref.org/) as a new member of our fetcher family. [#2455](https://github.com/JabRef/jabref/issues/2455)
 - We improved the UI customization possibilities:
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
     - Resizing the menu and label sizes has been improved.

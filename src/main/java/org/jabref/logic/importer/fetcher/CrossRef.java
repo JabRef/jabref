@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -21,6 +20,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.commons.logging.Log;

@@ -31,8 +31,6 @@ import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.identifier.DOI;
-import org.jabref.logic.identifier.ISBN;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -44,6 +42,8 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
