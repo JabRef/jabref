@@ -21,16 +21,19 @@ import org.jabref.preferences.JabRefPreferences;
 public class OpenOfficePreferences {
 
     private final JabRefPreferences preferences;
+
     public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
-    public static final String DEFAULT_WIN_EXECUTABLE = "\\program\\soffice.exe";
+    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
+
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
-    public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
+    public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin";
     public static final String OSX_EXECUTABLE = "soffice.bin";
-    public static final String LINUX_EXECUTABLE = "soffice";
+
     public static final String DEFAULT_LINUX_PATH = "/opt/openoffice.org3";
     public static final String DEFAULT_LINUX_JARS = "/opt/openoffice.org/basis3.0";
     public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/openoffice/program/soffice";
+    public static final String LINUX_EXECUTABLE = "soffice";
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
