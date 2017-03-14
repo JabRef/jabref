@@ -126,8 +126,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
 
-        Globals.stateManager.activeGroupProperty().addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
-
+        Globals.stateManager.activeGroupProperty()
+                .addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
 
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
@@ -142,9 +142,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         ButtonGroup nonHits = new ButtonGroup();
         nonHits.add(hideNonHits);
         nonHits.add(grayOut);
-        floatCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected()));
-        andCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected()));
-        invCb.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected()));
+        floatCb.addChangeListener(
+                event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected()));
+        andCb.addChangeListener(
+                event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected()));
+        invCb.addChangeListener(
+                event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected()));
         showOverlappingGroups.addChangeListener(new ChangeListener() {
 
             @Override
@@ -156,7 +159,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             }
         });
 
-        grayOut.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
+        grayOut.addChangeListener(
+                event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
@@ -176,7 +180,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             andCb.setSelected(false);
         }
 
-        autoAssignGroup.addChangeListener(event -> Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected()));
+        autoAssignGroup.addChangeListener(
+                event -> Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected()));
 
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
         showOverlappingGroups.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_OVERLAPPING));
@@ -258,8 +263,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         JScrollPane groupsTreePane = new JScrollPane(groupsTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
-        groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+        groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
         con.gridx = 0;
@@ -284,9 +289,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_MASK));
 
-
         setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
-
 
         JFXPanel groupsPane = new JFXPanel();
         add(groupsPane);
@@ -483,7 +486,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         final MatcherSet searchRules = MatcherSets
                 .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
-        for(GroupTreeNodeViewModel node : getLeafsOfSelection()) {
+        for (GroupTreeNodeViewModel node : getLeafsOfSelection()) {
             SearchMatcher searchRule = node.getNode().getSearchMatcher();
             searchRules.addRule(searchRule);
         }
@@ -506,7 +509,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private List<GroupTreeNodeViewModel> getLeafsOfSelection() {
         TreePath[] selection = groupsTree.getSelectionPaths();
-        if((selection == null) || (selection.length == 0)) {
+        if ((selection == null) || (selection.length == 0)) {
             return new ArrayList<>();
         }
 
@@ -916,7 +919,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 boolean keepPreviousAssignments = (i == JOptionPane.YES_OPTION) &&
                         WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-                boolean removePreviousAssignents = (oldGroup instanceof ExplicitGroup) && (newGroup instanceof ExplicitGroup);
+                boolean removePreviousAssignents = (oldGroup instanceof ExplicitGroup)
+                        && (newGroup instanceof ExplicitGroup);
 
                 AbstractUndoableEdit undoAddPreviousEntries = null;
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
@@ -964,7 +968,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (node == null) {
                 groupsRoot.getNode().addChild(newNode);
             } else {
-                ((GroupTreeNodeViewModel)node.getParent()).getNode().addChild(newNode, node.getNode().getPositionInParent() + 1);
+                ((GroupTreeNodeViewModel) node.getParent()).getNode().addChild(newNode,
+                        node.getNode().getPositionInParent() + 1);
             }
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
                     new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
@@ -1016,7 +1021,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             if (conf == JOptionPane.YES_OPTION) {
                 final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node,
                         UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-                final GroupTreeNodeViewModel parent = (GroupTreeNodeViewModel)node.getParent();
+                final GroupTreeNodeViewModel parent = (GroupTreeNodeViewModel) node.getParent();
                 node.getNode().removeFromParent();
                 node.getNode().moveAllChildrenTo(parent.getNode(), parent.getIndex(node));
 

@@ -34,11 +34,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
 
         // Register listener
-        stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
+        stateManager.activeDatabaseProperty()
+                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate
+                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
 
         // Init
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
@@ -100,7 +102,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             rootGroup.setValue(newRoot);
             stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
-                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
+                    selectedGroup -> this.selectedGroup
+                            .setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
         }
 
         currentDatabase = newDatabase;

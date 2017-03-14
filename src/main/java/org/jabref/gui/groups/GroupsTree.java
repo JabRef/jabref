@@ -59,7 +59,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
     private long idleStartTime;
     private GroupTreeNodeViewModel dragNode;
 
-
     /**
      * @param groupSelector the parent UI component
      */
@@ -90,7 +89,8 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
     /** This is for moving of nodes within myself */
     @Override
-    public void dragOver(DragSourceDragEvent dsde) {}
+    public void dragOver(DragSourceDragEvent dsde) {
+    }
 
     @Override
     public void dropActionChanged(DragSourceDragEvent dsde) {
@@ -228,7 +228,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @return Refreshed paths that are all valid.
      */
     public Enumeration<TreePath> refreshPaths(Enumeration<TreePath> paths) {
-        if(paths == null) {
+        if (paths == null) {
             return new Vector<TreePath>().elements();
         }
 
@@ -298,8 +298,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     public boolean hasExpandedDescendant(TreePath path) {
         GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
         for (GroupTreeNodeViewModel child : node.getChildren()) {
-            if (child.isLeaf())
-             {
+            if (child.isLeaf()) {
                 continue; // don't care about this case
             }
             TreePath pathToChild = path.pathByAddingChild(child);
@@ -317,8 +316,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
     public boolean hasCollapsedDescendant(TreePath path) {
         GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
         for (GroupTreeNodeViewModel child : node.getChildren()) {
-            if (child.isLeaf())
-             {
+            if (child.isLeaf()) {
                 continue; // don't care about this case
             }
             TreePath pathToChild = path.pathByAddingChild(child);

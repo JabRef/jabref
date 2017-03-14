@@ -50,7 +50,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         DataFlavor df = null;
         try {
             df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class="+GroupTreeNode.class.getCanonicalName());
+                    + ";class=" + GroupTreeNode.class.getCanonicalName());
         } catch (ClassNotFoundException e) {
             LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
         }
@@ -108,11 +108,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     @Override
     public int getIndex(TreeNode child) {
-        if(! (child instanceof GroupTreeNodeViewModel)) {
+        if (!(child instanceof GroupTreeNodeViewModel)) {
             return -1;
         }
 
-        GroupTreeNodeViewModel childViewModel = (GroupTreeNodeViewModel)child;
+        GroupTreeNodeViewModel childViewModel = (GroupTreeNodeViewModel) child;
         return node.getIndexOfChild(childViewModel.getNode()).orElse(-1);
     }
 
@@ -127,7 +127,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     @Override
-    public Enumeration children() {
+    public Enumeration<GroupTreeNodeViewModel> children() {
         Iterable<GroupTreeNode> children = node.getChildren();
         return new Enumeration<GroupTreeNodeViewModel>() {
 
@@ -159,21 +159,21 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     public void expandSubtree(JTree tree) {
         tree.expandPath(this.getTreePath());
 
-        for(GroupTreeNodeViewModel child : getChildren()) {
+        for (GroupTreeNodeViewModel child : getChildren()) {
             child.expandSubtree(tree);
         }
     }
 
     public List<GroupTreeNodeViewModel> getChildren() {
         List<GroupTreeNodeViewModel> children = new ArrayList<>();
-        for(GroupTreeNode child : node.getChildren()) {
+        for (GroupTreeNode child : node.getChildren()) {
             children.add(new GroupTreeNodeViewModel(child));
         }
         return children;
     }
 
     protected boolean printInItalics() {
-        return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) &&  node.getGroup().isDynamic();
+        return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) && node.getGroup().isDynamic();
     }
 
     public String getDescription() {
@@ -213,11 +213,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public boolean canAddEntries(List<BibEntry> entries) {
-        return getNode().getGroup() instanceof GroupEntryChanger && !getNode().getGroup().containsAll(entries);
+        return (getNode().getGroup() instanceof GroupEntryChanger) && !getNode().getGroup().containsAll(entries);
     }
 
     public boolean canRemoveEntries(List<BibEntry> entries) {
-        return getNode().getGroup() instanceof GroupEntryChanger && getNode().getGroup().containsAny(entries);
+        return (getNode().getGroup() instanceof GroupEntryChanger) && getNode().getGroup().containsAny(entries);
     }
 
     public void sortChildrenByName(boolean recursive) {
@@ -355,7 +355,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         final Optional<GroupTreeNode> grandParent = parent.getParent();
         final int index = node.getPositionInParent();
 
-        if (! grandParent.isPresent()) {
+        if (!grandParent.isPresent()) {
             return Optional.empty();
         }
         final int indexOfParent = grandParent.get().getIndexOfChild(parent).get();
@@ -380,10 +380,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
      * Adds the given entries to this node's group.
      */
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
-        if(node.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger)node.getGroup()).add(entries);
-        }
-        else {
+        if (node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger) node.getGroup()).add(entries);
+        } else {
             return Collections.emptyList();
         }
     }
@@ -392,10 +391,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
      * Removes the given entries from this node's group.
      */
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if(node.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger)node.getGroup()).remove(entries);
-        }
-        else {
+        if (node.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger) node.getGroup()).remove(entries);
+        } else {
             return Collections.emptyList();
         }
     }
