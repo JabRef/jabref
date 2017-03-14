@@ -16,6 +16,7 @@ public enum KeyBinding {
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE", KeyBindingCategory.FILE),
     CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "ESCAPE", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl C", KeyBindingCategory.EDIT),
+    COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl shift alt T", KeyBindingCategory.EDIT),
     COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl K", KeyBindingCategory.EDIT),
     COPY_BIBTEX_KEY("Copy BibTeX key", Localization.lang("Copy BibTeX key"), "ctrl shift K", KeyBindingCategory.EDIT),
     COPY_BIBTEX_KEY_AND_TITLE("Copy BibTeX key and title", Localization.lang("Copy BibTeX key and title"), "ctrl shift alt K", KeyBindingCategory.EDIT),
