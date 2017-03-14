@@ -7,6 +7,7 @@ import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -32,7 +33,7 @@ public class TitleFetcher implements IdBasedFetcher {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         BibEntry entry = new BibEntry();
         entry.setField(FieldName.TITLE, identifier);
-        Optional<DOI> doi = DOI.fromBibEntry(entry);
+        Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entry);
         if (!doi.isPresent()) {
             return Optional.empty();
         }

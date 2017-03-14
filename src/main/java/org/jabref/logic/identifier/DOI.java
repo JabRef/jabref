@@ -7,9 +7,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.importer.fetcher.CrossRef;
-import org.jabref.model.entry.BibEntry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,10 +20,6 @@ public class DOI {
 
     // DOI resolver
     private static final URI RESOLVER = URI.create("http://doi.org");
-
-    // DOI
-    private final String doi;
-
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -38,7 +31,6 @@ public class DOI {
             + "[/:]"                            // divider
             + "(?:.+)"                          // suffix alphanumeric string
             + ")";                              // end group \1
-
     private static final String FIND_DOI_EXP = ""
             + "(?:urn:)?"                       // optional urn
             + "(?:doi:)?"                       // optional doi
@@ -48,11 +40,12 @@ public class DOI {
             + "[/:]"                            // divider
             + "(?:[^\\s]+)"                     // suffix alphanumeric without space
             + ")";                              // end group \1
-
     private static final String HTTP_EXP = "https?://[^\\s]+?" + DOI_EXP;
     // Pattern
     private static final Pattern EXACT_DOI_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + DOI_EXP + "$", Pattern.CASE_INSENSITIVE);
     private static final Pattern DOI_PATT = Pattern.compile("(?:https?://[^\\s]+?)?" + FIND_DOI_EXP, Pattern.CASE_INSENSITIVE);
+    // DOI
+    private final String doi;
 
     /**
      * Creates a DOI from various schemes including URL, URN, and plain DOIs.
@@ -133,14 +126,11 @@ public class DOI {
         return result;
     }
 
-    /**
-     * Tries to retrieve a DOI for an existing BibEntry.
-     *
-     * @param entry the BibteX entry
-     * @return an Optional containing the DOI or an empty Optional
-     */
-    public static Optional<DOI> fromBibEntry(BibEntry entry) {
-        return CrossRef.findDOI(entry);
+    @Override
+    public String toString() {
+        return "DOI{" +
+                "doi='" + doi + '\'' +
+                '}';
     }
 
     /**

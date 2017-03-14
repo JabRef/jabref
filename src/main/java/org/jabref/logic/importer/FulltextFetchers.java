@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.IEEE;
@@ -53,7 +52,13 @@ public class FulltextFetchers {
         Optional<String> doi = clonedEntry.getField(FieldName.DOI);
 
         if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
-            CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+            try {
+                WebFetchers.getIdFetcherForIdentifier(DOI.class)
+                        .findIdentifier(clonedEntry)
+                        .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+            } catch (FetcherException e) {
+                LOGGER.debug("Failed to find DOI", e);
+            }
         }
 
         for (FulltextFetcher finder : finders) {

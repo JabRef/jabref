@@ -2,7 +2,9 @@ package org.jabref.logic.importer;
 
 import java.util.Optional;
 
+import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.fetcher.ArXiv;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.model.entry.FieldName;
@@ -25,5 +27,14 @@ public class WebFetchers {
                 return Optional.empty();
         }
         return Optional.of(fetcher);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
+        if (clazz == DOI.class) {
+            return (IdFetcher<T>) new CrossRef();
+        } else {
+            throw new IllegalArgumentException("No fetcher found for identifier" + clazz.getCanonicalName());
+        }
     }
 }
