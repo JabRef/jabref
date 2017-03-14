@@ -1,5 +1,7 @@
 package org.jabref.gui.groups;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,11 +27,13 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
@@ -104,6 +108,15 @@ public class GroupNodeViewModel {
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
     }
 
+    //Copy pasted from GroupTreeNodeModel
+    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+        if (groupNode.getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger) groupNode.getGroup()).add(entries);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
     public SimpleBooleanProperty expandedProperty() {
         return expandedProperty;
     }
@@ -138,12 +151,18 @@ public class GroupNodeViewModel {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
 
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
-        if (!groupNode.equals(that.groupNode)) return false;
+        if (!groupNode.equals(that.groupNode)) {
+            return false;
+        }
         return true;
     }
 
@@ -223,7 +242,8 @@ public class GroupNodeViewModel {
      * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row
      */
     public boolean acceptableDrop(Dragboard dragboard) {
-        return dragboard.hasContent(DragAndDropDataFormats.GROUP);
+        return dragboard.hasContent(DragAndDropDataFormats.GROUP)
+                || dragboard.hasContent(TransferableEntrySelection.DATAFORMAT);
         // TODO: we should also check isNodeDescendant
     }
 
