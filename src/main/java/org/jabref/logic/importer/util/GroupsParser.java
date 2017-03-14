@@ -90,16 +90,16 @@ public class GroupsParser {
             return GroupsParser.legacyExplicitGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
-            return GroupsParser.automaticPersonsGroupFromString(s, keywordSeparator);
+            return GroupsParser.automaticPersonsGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
-            return GroupsParser.automaticKeywordGroupFromString(s, keywordSeparator);
+            return GroupsParser.automaticKeywordGroupFromString(s);
         }
 
         throw new ParseException("Unknown group: " + s);
     }
 
-    private static AbstractGroup automaticPersonsGroupFromString(String string, Character keywordSeparator) {
+    private static AbstractGroup automaticPersonsGroupFromString(String string) {
         if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + string + "\".");
         }
@@ -112,7 +112,7 @@ public class GroupsParser {
         return new AutomaticPersonsGroup(name, context, field);
     }
 
-    private static AbstractGroup automaticKeywordGroupFromString(String string, Character keywordSeparator) {
+    private static AbstractGroup automaticKeywordGroupFromString(String string) {
         if (!string.startsWith(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + string + "\".");
         }

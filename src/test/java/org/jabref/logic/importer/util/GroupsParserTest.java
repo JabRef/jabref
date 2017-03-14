@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.util;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.scene.paint.Color;
