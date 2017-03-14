@@ -24,11 +24,9 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
     public static final String DEFAULT_WIN_EXECUTABLE = "\\program\\soffice.exe";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
-    public static final String WINDOWS_JARS_SUBPATH = "\\program\\classes";
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
     public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
     public static final String OSX_EXECUTABLE = "soffice.bin";
-    public static final String OSX_JARS_SUBPATH = "/Contents/Resources/java";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
@@ -42,9 +40,8 @@ public class OpenOfficePreferences {
     }
 
     public boolean checkAutoDetectedPaths() {
-        if (preferences.hasKey(JabRefPreferences.OO_JARS_PATH)
-                && preferences.hasKey(JabRefPreferences.OO_EXECUTABLE_PATH)) {
-            return new File(getJarsPath(), "jurt.jar").exists() && new File(getExecutablePath()).exists();
+        if (preferences.hasKey(JabRefPreferences.OO_PATH)) {
+            return new File(getExecutablePath()).exists();
         } else {
             return false;
         }
