@@ -1,5 +1,6 @@
 package org.jabref.logic.pdf;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +50,8 @@ public class EntryAnnotationImporter {
         Map<String, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
-        this.getFilteredFileList().forEach(parsedFileField -> annotations.put(parsedFileField.getLink(), importer.importAnnotations(parsedFileField.getLink(), context)));
+        this.getFilteredFileList().forEach(parsedFileField -> annotations.put(parsedFileField.getLink(),
+                importer.importAnnotations(Paths.get(parsedFileField.getLink()), context)));
         return annotations;
     }
 }

@@ -1,12 +1,10 @@
 package org.jabref.logic.identifier;
 
-import org.jabref.logic.identifier.Eprint;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-
 public class EprintTest {
+
     @Test
     public void acceptPlainEprint() {
         Assert.assertEquals("0706.0001", new Eprint("0706.0001").getEprint());
@@ -28,7 +26,7 @@ public class EprintTest {
         Assert.assertEquals("0706.0001v1", new Eprint("  0706.0001v1 ").getEprint());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void rejectEmbeddedEprint() {
         new Eprint("other stuff 0706.0001v1 end");
     }

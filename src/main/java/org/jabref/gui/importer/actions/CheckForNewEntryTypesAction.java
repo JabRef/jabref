@@ -28,7 +28,7 @@ import org.jabref.model.entry.EntryType;
  * This action checks whether any new custom entry types were loaded from this
  * BIB file. If so, an offer to remember these entry types is given.
  */
-public class CheckForNewEntryTypesAction implements PostOpenAction {
+public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult) {

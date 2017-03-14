@@ -68,9 +68,6 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchMatcher;
-import org.jabref.model.search.matchers.MatcherSet;
-import org.jabref.model.search.matchers.MatcherSets;
-import org.jabref.model.search.matchers.NotMatcher;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -470,6 +467,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (panel == null) {
             return; // ignore this event (happens for example if the file was closed)
         }
+        /*
         if (getLeafsOfSelection().stream().allMatch(GroupTreeNodeViewModel::isAllEntriesGroup)) {
             panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
             if (showOverlappingGroups.isSelected()) {
@@ -478,12 +476,13 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             frame.output(Localization.lang("Displaying no groups") + ".");
             return;
         }
-
+        */
         updateShownEntriesAccordingToSelectedGroups();
     }
 
     private void updateShownEntriesAccordingToSelectedGroups() {
-        final MatcherSet searchRules = MatcherSets
+        updateShownEntriesAccordingToSelectedGroups(Globals.stateManager.activeGroupProperty().get());
+        /*final MatcherSet searchRules = MatcherSets
                 .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
         for (GroupTreeNodeViewModel node : getLeafsOfSelection()) {
@@ -492,8 +491,9 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
         SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
         GroupingWorker worker = new GroupingWorker(searchRule);
-        worker.run();
-        worker.update();
+        worker.getWorker().run();
+        worker.getCallBack().update();
+        */
     }
 
     private void updateShownEntriesAccordingToSelectedGroups(Optional<GroupTreeNode> selectedGroup) {

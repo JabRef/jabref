@@ -2,8 +2,8 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.identifier.ISBN;
+import org.jabref.logic.l10n.Localization;
 
 
 public class ISBNChecker implements ValueChecker {
