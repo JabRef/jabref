@@ -1,8 +1,6 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.identifier;
 
 import java.util.Optional;
-
-import org.jabref.model.entry.identifier.ArXivIdentifier;
 
 import org.junit.Test;
 
