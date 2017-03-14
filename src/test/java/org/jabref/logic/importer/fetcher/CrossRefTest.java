@@ -16,10 +16,19 @@ import static org.junit.Assert.assertEquals;
 public class CrossRefTest {
 
     private CrossRef fetcher;
+    private BibEntry barrosEntry;
 
     @Before
     public void setUp() throws Exception {
         fetcher = new CrossRef();
+
+        barrosEntry = new BibEntry();
+        barrosEntry.setField("title", "Service Interaction Patterns");
+        barrosEntry.setField("author", "Alistair Barros and Marlon Dumas and Arthur H. M. ter Hofstede");
+        barrosEntry.setField("year", "2005");
+        barrosEntry.setField("doi", "10.1007/11538394_20");
+        barrosEntry.setField("issn", "0302-9743");
+        barrosEntry.setField("pages", "302-318");
     }
 
     @Test
@@ -76,5 +85,24 @@ public class CrossRefTest {
         entry.setField("title", "Towards Application Portability in Platform as a Service");
         entry.setField("author", "Stefan Kolb and Simon Harrer");
         assertEquals("10.1109/sose.2014.26", fetcher.findIdentifier(entry).get().getDOI().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Test
+    public void findByDOI() throws Exception {
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20"));
+    }
+
+    @Test
+    public void findByAuthors() throws Exception {
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede").stream().findFirst());
+    }
+
+    @Test
+    public void findByEntry() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Service Interaction Patterns");
+        entry.setField("author", "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
+        entry.setField("year", "2005");
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
     }
 }

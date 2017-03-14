@@ -7,14 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.IdParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
@@ -23,8 +28,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,11 +38,9 @@ import org.json.JSONObject;
  *
  * See https://github.com/CrossRef/rest-api-doc
  */
-public class CrossRef implements IdParserFetcher<DOI> {
+public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, SearchBasedParserFetcher, IdBasedParserFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(CrossRef.class);
-
-    private static final String API_URL = "http://api.crossref.org";
+    private static final String API_URL = "http://api.crossref.org/works";
 
     private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
@@ -55,7 +56,7 @@ public class CrossRef implements IdParserFetcher<DOI> {
 
     @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL + "/works");
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
         entry.getLatexFreeField(FieldName.TITLE).ifPresent(title -> uriBuilder.addParameter("query.title", title));
         entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(author -> uriBuilder.addParameter("query.author", author));
         entry.getLatexFreeField(FieldName.YEAR).ifPresent(year ->
@@ -67,17 +68,48 @@ public class CrossRef implements IdParserFetcher<DOI> {
     }
 
     @Override
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        uriBuilder.addParameter("query", query);
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL + "/" + identifier);
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
     public Parser getParser() {
         return inputStream -> {
-            JSONArray items = JsonReader.toJsonObject(inputStream).getJSONObject("message").getJSONArray("items");
+            JSONObject response = JsonReader.toJsonObject(inputStream).getJSONObject("message");
+
             List<BibEntry> entries = new ArrayList<>();
-            for (int i = 0; i < items.length(); i++) {
-                JSONObject item = items.getJSONObject(i);
-                BibEntry entry = jsonItemToBibEntry(item);
+            if (response.has("items")) {
+                // Response contains a list
+                JSONArray items = response.getJSONArray("items");
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+                    BibEntry entry = jsonItemToBibEntry(item);
+                    entries.add(entry);
+                }
+            } else {
+                // Singleton response
+                BibEntry entry = jsonItemToBibEntry(response);
                 entries.add(entry);
             }
+
             return entries;
         };
+    }
+
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        // Sometimes the fetched entry returns the title also in the subtitle field; in this case only keep the title field
+        if (entry.getField(FieldName.TITLE).equals(entry.getField(FieldName.SUBTITLE))) {
+            new FieldFormatterCleanup(FieldName.SUBTITLE, new ClearFormatter()).cleanup(entry);
+        }
     }
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
@@ -88,8 +120,8 @@ public class CrossRef implements IdParserFetcher<DOI> {
             entry.setField(FieldName.SUBTITLE,
                     Optional.ofNullable(item.optJSONArray("title"))
                             .map(array -> array.optString(0)).orElse(""));
-            entry.setField(FieldName.AUTHOR, toAuthors(item.getJSONArray("author")));
-            entry.setField(FieldName.DATE,
+            entry.setField(FieldName.AUTHOR, toAuthors(item.optJSONArray("author")));
+            entry.setField(FieldName.YEAR,
                     Optional.ofNullable(item.optJSONObject("published-print"))
                             .map(array -> array.optJSONArray("date-parts"))
                             .map(array -> array.optJSONArray(0))
@@ -107,6 +139,10 @@ public class CrossRef implements IdParserFetcher<DOI> {
     }
 
     private String toAuthors(JSONArray authors) {
+        if (authors == null) {
+            return "";
+        }
+
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
         AuthorList authorsParsed = new AuthorList();
         for (int i = 0; i < authors.length(); i++) {
