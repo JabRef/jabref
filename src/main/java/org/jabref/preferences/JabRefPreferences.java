@@ -632,7 +632,7 @@ public class JabRefPreferences {
         if (OS.WINDOWS) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH
-                    + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH + OpenOfficePreferences.WINDOWS_EXECUTABLE);
+                    + OpenOfficePreferences.DEFAULT_WIN_EXECUTABLE + OpenOfficePreferences.WINDOWS_EXECUTABLE);
             defaults.put(OO_JARS_PATH,
                     OpenOfficePreferences.DEFAULT_WINDOWS_PATH + OpenOfficePreferences.WINDOWS_JARS_SUBPATH);
         } else if (OS.OS_X) {

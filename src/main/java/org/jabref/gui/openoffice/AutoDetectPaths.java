@@ -2,7 +2,8 @@ package org.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,12 +26,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * Tools for automatically detecting JAR and executable paths to OpenOffice and/or LibreOffice.
+ * Tools for automatically detecting OpenOffice and/or LibreOffice installations.
  */
 public class AutoDetectPaths extends AbstractWorker {
 
@@ -41,9 +43,7 @@ public class AutoDetectPaths extends AbstractWorker {
     private JDialog prog;
     private final JDialog parent;
 
-
     private final OpenOfficeFileSearch fileSearch = new OpenOfficeFileSearch();
-
 
     public AutoDetectPaths(JDialog parent, OpenOfficePreferences preferences) {
         this.parent = parent;
@@ -82,11 +82,9 @@ public class AutoDetectPaths extends AbstractWorker {
     }
 
     private boolean autoDetectPaths() {
-        fileSearch.resetFileSearch();
         if (OS.WINDOWS) {
-            List<File> progFiles = fileSearch.findWindowsProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(
-                    fileSearch.findFileInDirs(progFiles, OpenOfficePreferences.WINDOWS_EXECUTABLE));
+            List<Path> progFiles = fileSearch.findWindowsProgramFilesDir();
+            List<Path> sofficeFiles = FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, progFiles);
             if (fileSearchCanceled) {
                 return false;
             }
@@ -113,7 +111,7 @@ public class AutoDetectPaths extends AbstractWorker {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 fileChooser.showOpenDialog(parent);
                 if (fileChooser.getSelectedFile() != null) {
-                    sofficeFiles.add(fileChooser.getSelectedFile());
+                    sofficeFiles.add(fileChooser.getSelectedFile().toPath());
                 }
             }
             Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
@@ -124,18 +122,17 @@ public class AutoDetectPaths extends AbstractWorker {
                 return false;
             }
         } else if (OS.OS_X) {
-            List<File> dirList = fileSearch.findOSXProgramFilesDir();
-            List<File> sofficeFiles = new ArrayList<>(
-                    fileSearch.findFileInDirs(dirList, OpenOfficePreferences.OSX_EXECUTABLE));
+            List<Path> dirList = fileSearch.findOSXProgramFilesDir();
+            List<Path> sofficeFiles = FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE,dirList);
 
             if (fileSearchCanceled) {
                 return false;
             }
             Optional<File> actualFile = checkAndSelectAmongMultipleInstalls(sofficeFiles);
             if (actualFile.isPresent()) {
-                for (File rootdir : dirList) {
-                    if (actualFile.get().getPath().startsWith(rootdir.getPath())) {
-                        return setupPreferencesForOO(rootdir, actualFile.get(), OpenOfficePreferences.OSX_EXECUTABLE);
+                for (Path rootdir : dirList) {
+                    if (actualFile.get().getPath().startsWith(rootdir.toString())) {
+                        return setupPreferencesForOO(rootdir.toFile(), actualFile.get(), OpenOfficePreferences.OSX_EXECUTABLE);
                     }
                 }
             }
@@ -143,12 +140,12 @@ public class AutoDetectPaths extends AbstractWorker {
         } else {
             // Linux:
             String usrRoot = "/usr/lib";
-            Optional<File> inUsr = fileSearch.findFileInDir(new File(usrRoot), OpenOfficePreferences.LINUX_EXECUTABLE);
+            Optional<Path> inUsr = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get(usrRoot));
             if (fileSearchCanceled) {
                 return false;
             }
             if (!inUsr.isPresent()) {
-                inUsr = fileSearch.findFileInDir(new File("/usr/lib64"), OpenOfficePreferences.LINUX_EXECUTABLE);
+                inUsr = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib64"));
                 if (inUsr.isPresent()) {
                     usrRoot = "/usr/lib64";
                 }
@@ -157,18 +154,18 @@ public class AutoDetectPaths extends AbstractWorker {
             if (fileSearchCanceled) {
                 return false;
             }
-            Optional<File> inOpt = fileSearch.findFileInDir(new File("/opt"), OpenOfficePreferences.LINUX_EXECUTABLE);
+            Optional<Path> inOpt = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/opt"));
             if (fileSearchCanceled) {
                 return false;
             }
             if ((inUsr.isPresent()) && (!inOpt.isPresent())) {
-                return setupPreferencesForOO(usrRoot, inUsr.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
+                return setupPreferencesForOO(usrRoot, inUsr.get().toFile(), OpenOfficePreferences.LINUX_EXECUTABLE);
             } else if (inOpt.isPresent()) {
                 if (!inUsr.isPresent()) {
-                    return setupPreferencesForOO("/opt", inOpt.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
+                    return setupPreferencesForOO("/opt", inOpt.get().toFile(), OpenOfficePreferences.LINUX_EXECUTABLE);
                 } else { // Found both
-                    JRadioButton optRB = new JRadioButton(inOpt.get().getPath(), true);
-                    JRadioButton usrRB = new JRadioButton(inUsr.get().getPath(), false);
+                    JRadioButton optRB = new JRadioButton(inOpt.get().toString(), true);
+                    JRadioButton usrRB = new JRadioButton(inUsr.get().toString(), false);
                     ButtonGroup bg = new ButtonGroup();
                     bg.add(optRB);
                     bg.add(usrRB);
@@ -187,9 +184,9 @@ public class AutoDetectPaths extends AbstractWorker {
                         return false;
                     }
                     if (optRB.isSelected()) {
-                        return setupPreferencesForOO("/opt", inOpt.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
+                        return setupPreferencesForOO("/opt", inOpt.get().toFile(), OpenOfficePreferences.LINUX_EXECUTABLE);
                     } else {
-                        return setupPreferencesForOO(usrRoot, inUsr.get(), OpenOfficePreferences.LINUX_EXECUTABLE);
+                        return setupPreferencesForOO(usrRoot, inUsr.get().toFile(), OpenOfficePreferences.LINUX_EXECUTABLE);
                     }
                 }
             }
@@ -203,28 +200,28 @@ public class AutoDetectPaths extends AbstractWorker {
 
     private boolean setupPreferencesForOO(File rootDir, File inUsr, String sofficeName) {
         preferences.setExecutablePath(new File(inUsr, sofficeName).getPath());
-        Optional<File> jurt = fileSearch.findFileInDir(rootDir, "jurt.jar");
+        Optional<Path> jurt = FileUtil.find("jurt.jar", rootDir.toPath());
         if (fileSearchCanceled) {
             return false;
         }
         if (jurt.isPresent()) {
-            preferences.setJarsPath(jurt.get().getPath());
+            preferences.setJarsPath(jurt.get().toString());
             return true;
         } else {
             return false;
         }
     }
 
-    private Optional<File> checkAndSelectAmongMultipleInstalls(List<File> sofficeFiles) {
+    private Optional<File> checkAndSelectAmongMultipleInstalls(List<Path> sofficeFiles) {
         if (sofficeFiles.isEmpty()) {
             return Optional.empty();
         } else if (sofficeFiles.size() == 1) {
-            return Optional.of(sofficeFiles.get(0));
+            return Optional.of(sofficeFiles.get(0).toFile());
         }
         // Otherwise more than one file found, select among them
         DefaultListModel<File> mod = new DefaultListModel<>();
-        for (File tmpfile : sofficeFiles) {
-            mod.addElement(tmpfile);
+        for (Path tmpfile : sofficeFiles) {
+            mod.addElement(tmpfile.toFile());
         }
         JList<File> fileList = new JList<>(mod);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -240,9 +237,7 @@ public class AutoDetectPaths extends AbstractWorker {
         } else {
             return Optional.of(fileList.getSelectedValue());
         }
-
     }
-
 
     public JDialog showProgressDialog(JDialog progressParent, String title, String message, boolean includeCancelButton) {
         fileSearchCanceled = false;
@@ -254,7 +249,6 @@ public class AutoDetectPaths extends AbstractWorker {
             JButton cancel = new JButton(Localization.lang("Cancel"));
             cancel.addActionListener(event -> {
                 fileSearchCanceled = true;
-                fileSearch.cancelFileSearch();
                 ((JButton) event.getSource()).setEnabled(false);
             });
             progressDialog.add(cancel, BorderLayout.SOUTH);

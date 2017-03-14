@@ -22,7 +22,7 @@ public class OpenOfficePreferences {
 
     private final JabRefPreferences preferences;
     public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
-    public static final String WINDOWS_EXECUTABLE_SUBPATH = "\\program\\";
+    public static final String DEFAULT_WIN_EXECUTABLE = "\\program\\soffice.exe";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
     public static final String WINDOWS_JARS_SUBPATH = "\\program\\classes";
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
@@ -30,7 +30,6 @@ public class OpenOfficePreferences {
     public static final String OSX_EXECUTABLE = "soffice.bin";
     public static final String OSX_JARS_SUBPATH = "/Contents/Resources/java";
     public static final String LINUX_EXECUTABLE = "soffice";
-
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;

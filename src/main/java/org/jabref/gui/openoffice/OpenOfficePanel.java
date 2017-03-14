@@ -4,16 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -52,6 +55,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -77,7 +81,6 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
@@ -103,7 +106,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
     private boolean autoDetected;
-    private String sOffice;
+    private String executablePath;
     private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
@@ -361,7 +364,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void connect(boolean auto) {
-        String ooJarsDirectory;
+        String installationPath;
         if (auto) {
             AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
             if (adp.runAutodetection()) {
@@ -378,52 +381,35 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            ooJarsDirectory = preferences.getJarsPath();
-            sOffice = preferences.getExecutablePath();
-        } else { // Manual connect
-
+            installationPath = preferences.getOOPath();
+            executablePath = preferences.getExecutablePath();
+        } else {
+            // Manual connect
             showConnectDialog();
             if (!dialogOkPressed) {
                 return;
             }
 
-            String ooPath = preferences.getOOPath();
-            String ooJars = preferences.getJarsPath();
-            sOffice = preferences.getExecutablePath();
+            installationPath = preferences.getOOPath();
+            executablePath = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
-                ooJarsDirectory = ooPath + OpenOfficePreferences.WINDOWS_JARS_SUBPATH;
-                sOffice = ooPath + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH
-                        + OpenOfficePreferences.WINDOWS_EXECUTABLE;
+                executablePath = FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, Paths.get(installationPath)).map(Object::toString).orElse("");
             } else if (OS.OS_X) {
-                sOffice = ooPath + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE;
-                ooJarsDirectory = ooPath + OpenOfficePreferences.OSX_JARS_SUBPATH;
-            } else {
-                // Linux:
-                ooJarsDirectory = ooJars + "/program/classes";
+                executablePath = FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, Paths.get(installationPath)).map(Object::toString).orElse("");
             }
         }
 
-        // Add OO JARs to the classpath:
+        // Add OO JARs to the classpath
         try {
-            List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
-                    new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),
-                    new File(ooJarsDirectory, "ridl.jar"));
-            List<URL> jarList = new ArrayList<>(jarFiles.size());
-            for (File jarFile : jarFiles) {
-                if (!jarFile.exists()) {
-                    throw new IOException("File not found: " + jarFile.getPath());
-                }
-                jarList.add(jarFile.toURI().toURL());
-            }
-            addURL(jarList);
+            loadOpenOfficeJars(installationPath);
 
             // Show progress dialog:
-            final JDialog progDiag = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
+            final JDialog progressDialog = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
                     Localization.lang("Connecting"),
                     Localization.lang("Please wait..."), false);
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
-            progDiag.dispose();
+            progressDialog.dispose();
             diag.dispose();
             if (ooBase == null) {
                 throw connectException;
@@ -460,11 +446,25 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
+    private void loadOpenOfficeJars(String installationPath) throws IOException {
+        List<String> jarFiles = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
+        List<Optional<Path>> filePaths = jarFiles.stream().map(jar -> FileUtil.find(jar, Paths.get(installationPath))).collect(Collectors.toList());
+
+        List<URL> jarList = new ArrayList<>(jarFiles.size());
+        for (Optional<Path> jarFile : filePaths) {
+            if (!jarFile.isPresent()) {
+                throw new IOException("File not found inside OpenOffice installation path: " + jarFile);
+            }
+            jarList.add(jarFile.get().toUri().toURL());
+        }
+        addURL(jarList);
+    }
+
     @Override
     public void run() {
         try {
-            // Connect:
-            ooBase = new OOBibBase(sOffice, true);
+            // Connect
+            ooBase = new OOBibBase(executablePath, true);
         } catch (UnknownPropertyException |
                 CreationException | NoSuchElementException | WrappedTargetException | IOException |
                 NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
@@ -472,8 +472,6 @@ public class OpenOfficePanel extends AbstractWorker {
             connectException = new IOException(e.getMessage());
         }
     }
-
-
 
     // The methods addFile and associated final Class[] parameters were gratefully copied from
     // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
@@ -497,9 +495,7 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-
     private void showConnectDialog() {
-
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
 
