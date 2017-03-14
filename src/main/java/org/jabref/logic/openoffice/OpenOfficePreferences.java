@@ -28,6 +28,9 @@ public class OpenOfficePreferences {
     public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
     public static final String OSX_EXECUTABLE = "soffice.bin";
     public static final String LINUX_EXECUTABLE = "soffice";
+    public static final String DEFAULT_LINUX_PATH = "/opt/openoffice.org3";
+    public static final String DEFAULT_LINUX_JARS = "/opt/openoffice.org/basis3.0";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/openoffice/program/soffice";
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
