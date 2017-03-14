@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -16,7 +17,6 @@ import org.jabref.preferences.JabRefPreferences;
  * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
  * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
  * OO_EXTERNAL_STYLE_FILES list with paths to external style files
- *
  */
 public class OpenOfficePreferences {
 
@@ -34,6 +34,8 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_LINUX_JARS = "/opt/openoffice.org/basis3.0";
     public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/openoffice/program/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
+
+    public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;

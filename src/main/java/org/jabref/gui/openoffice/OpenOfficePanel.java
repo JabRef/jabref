@@ -13,7 +13,6 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -447,10 +446,9 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
     private void loadOpenOfficeJars(String installationPath) throws IOException {
-        List<String> jarFiles = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
-        List<Optional<Path>> filePaths = jarFiles.stream().map(jar -> FileUtil.find(jar, Paths.get(installationPath))).collect(Collectors.toList());
+        List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, Paths.get(installationPath))).collect(Collectors.toList());
 
-        List<URL> jarList = new ArrayList<>(jarFiles.size());
+        List<URL> jarList = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
         for (Optional<Path> jarFile : filePaths) {
             if (!jarFile.isPresent()) {
                 throw new IOException("File not found inside OpenOffice installation path: " + jarFile);
