@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -46,12 +45,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     @Override
     public String getName() {
-        return null;
-    }
-
-    @Override
-    public HelpFile getHelpPage() {
-        return null;
+        return "Crossref";
     }
 
     @Override
