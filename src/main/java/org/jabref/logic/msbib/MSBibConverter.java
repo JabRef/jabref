@@ -12,6 +12,9 @@ public class MSBibConverter {
     private static final String MSBIB_PREFIX = "msbib-";
     private static final String BIBTEX_PREFIX = "BIBTEX_";
 
+    private MSBibConverter() {
+    }
+
     public static MSBibEntry convert(BibEntry entry) {
         MSBibEntry result = new MSBibEntry();
 
