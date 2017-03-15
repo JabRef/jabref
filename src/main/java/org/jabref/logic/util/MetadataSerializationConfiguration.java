@@ -39,4 +39,7 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link SearchGroup}.
      */
     public static final String SEARCH_GROUP_ID = "SearchGroup:";
+
+    private MetadataSerializationConfiguration() {
+    }
 }
