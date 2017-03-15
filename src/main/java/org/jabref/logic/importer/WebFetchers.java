@@ -9,6 +9,9 @@ import org.jabref.model.entry.FieldName;
 
 public class WebFetchers {
 
+    private WebFetchers() {
+    }
+
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
         IdBasedFetcher fetcher;
         switch (field) {

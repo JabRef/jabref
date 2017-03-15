@@ -46,6 +46,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class FieldExtraComponents {
 
+    private FieldExtraComponents() {
+    }
+
     private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to") + " <B>" + Localization.lang("Options") + " -> "

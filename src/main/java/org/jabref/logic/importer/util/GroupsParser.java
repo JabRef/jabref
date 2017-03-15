@@ -22,6 +22,9 @@ import org.jabref.model.strings.StringUtil;
  */
 public class GroupsParser {
 
+    private GroupsParser() {
+    }
+
     public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
         try {

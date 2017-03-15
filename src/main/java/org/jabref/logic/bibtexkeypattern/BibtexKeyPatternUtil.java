@@ -45,6 +45,9 @@ public class BibtexKeyPatternUtil {
 
     private static final int CHARS_OF_FIRST = 5;
 
+    private BibtexKeyPatternUtil() {
+    }
+
     private static String normalize(String content) {
         List<String> tokens = new ArrayList<>();
         int b = 0;

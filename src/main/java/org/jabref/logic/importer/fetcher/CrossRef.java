@@ -33,6 +33,9 @@ public class CrossRef {
 
     private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
+    private CrossRef() {
+    }
+
     public static Optional<DOI> findDOI(BibEntry entry) {
         Objects.requireNonNull(entry);
         Optional<DOI> doi = Optional.empty();
