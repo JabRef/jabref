@@ -2,8 +2,12 @@ package org.jabref.logic.openoffice;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import org.jabref.logic.util.io.FileUtil;
 
 public class OpenOfficeFileSearch {
     /**
@@ -12,7 +16,7 @@ public class OpenOfficeFileSearch {
      *   Since we are not including a library for Windows integration, this method can't
      *   find the Program files dir in localized Windows installations.
      */
-    public List<Path> findWindowsProgramFilesDir() {
+    public List<Path> findWindowsOpenOfficeDirs() {
         List<String> sourceList = new ArrayList<>();
         List<Path> dirList = new ArrayList<>();
 
@@ -48,7 +52,7 @@ public class OpenOfficeFileSearch {
      *   Since we are not including a library for Windows integration, this method can't
      *   find the Program files dir in localized Windows installations.
      */
-    public List<Path> findOSXProgramFilesDir() {
+    public List<Path> findOSXOpenOfficeDirs() {
         List<Path> dirList = new ArrayList<>();
 
         File rootDir = new File("/Applications");
@@ -61,6 +65,21 @@ public class OpenOfficeFileSearch {
                 }
             }
         }
+
+        return dirList;
+    }
+
+    public List<Path> findLinuxOpenOfficeDirs() {
+        List<Path> dirList = new ArrayList<>();
+
+        Optional<Path> execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib"));
+        execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib")));
+
+        execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib64"));
+        execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib64")));
+
+        execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/opt"));
+        execFile.ifPresent(e -> dirList.add(Paths.get("/opt")));
 
         return dirList;
     }

@@ -365,13 +365,11 @@ public class OpenOfficePanel extends AbstractWorker {
     private void connect(boolean auto) {
         String installationPath;
         if (auto) {
-            AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
-            if (adp.runAutodetection()) {
+            DetectOpenOfficeInstallation adp = new DetectOpenOfficeInstallation(diag, preferences);
+            if (adp.runDetection()) {
                 autoDetected = true;
                 dialogOkPressed = true;
                 diag.dispose();
-            } else if (adp.canceled()) {
-                frame.setStatus(Localization.lang("Operation canceled."));
             } else {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
@@ -380,7 +378,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            installationPath = preferences.getOOPath();
+            installationPath = preferences.getInstallationPath();
             executablePath = preferences.getExecutablePath();
         } else {
             // Manual connect
@@ -389,7 +387,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 return;
             }
 
-            installationPath = preferences.getOOPath();
+            installationPath = preferences.getInstallationPath();
             executablePath = preferences.getExecutablePath();
 
             if (OS.WINDOWS) {
@@ -399,14 +397,13 @@ public class OpenOfficePanel extends AbstractWorker {
             }
         }
 
-        // Add OO JARs to the classpath
         try {
+            // Add OO JARs to the classpath
             loadOpenOfficeJars(installationPath);
 
             // Show progress dialog:
-            final JDialog progressDialog = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
-                    Localization.lang("Connecting"),
-                    Localization.lang("Please wait..."), false);
+            final JDialog progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
+                    .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progressDialog.dispose();
             diag.dispose();
@@ -451,7 +448,7 @@ public class OpenOfficePanel extends AbstractWorker {
         List<URL> jarList = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
         for (Optional<Path> jarFile : filePaths) {
             if (!jarFile.isPresent()) {
-                throw new IOException("File not found inside OpenOffice installation path: " + jarFile);
+                throw new IOException("Required Open Office Jars not found inside installation path.");
             }
             jarList.add(jarFile.get().toUri().toURL());
         }
@@ -474,7 +471,6 @@ public class OpenOfficePanel extends AbstractWorker {
     // The methods addFile and associated final Class[] parameters were gratefully copied from
     // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
     private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
-
 
     private static void addURL(List<URL> jarList) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
@@ -500,7 +496,7 @@ public class OpenOfficePanel extends AbstractWorker {
         // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
-        ooPath.setText(preferences.getOOPath());
+        ooPath.setText(preferences.getInstallationPath());
         browseOOPath.addActionListener(e ->
                 new FileDialog(frame).showDialogAndGetSelectedDirectory()
                         .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))

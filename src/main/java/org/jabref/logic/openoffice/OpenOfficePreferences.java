@@ -78,7 +78,7 @@ public class OpenOfficePreferences {
         preferences.put(JabRefPreferences.OO_EXECUTABLE_PATH, path);
     }
 
-    public String getOOPath() {
+    public String getInstallationPath() {
         return preferences.get(JabRefPreferences.OO_PATH);
     }
 
