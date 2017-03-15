@@ -279,16 +279,21 @@ processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
-    reports.xml.destination = "${buildDir}/reports/jacoco/report.xml"
     jacoco {
         append = true
     }
 }
 
+task jacocoMerge(type: JacocoMerge) {
+    executionData test, fetcherTest, databaseTest
+}
+
 jacocoTestReport {
+    executionData jacocoMerge.destinationFile
+    dependsOn jacocoMerge
+
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
-        xml.destination = "${buildDir}/reports/jacoco/report.xml"
         html.enabled = true
     }
 }
