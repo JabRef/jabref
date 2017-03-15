@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -75,11 +76,13 @@ public class OpenOfficeFileSearch {
         Optional<Path> execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib"));
         execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib")));
 
-        execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib64"));
-        execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib64")));
-
         execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/opt"));
         execFile.ifPresent(e -> dirList.add(Paths.get("/opt")));
+
+        if (Files.exists(Paths.get("/usr/lib64"))) {
+            execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib64"));
+            execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib64")));
+        }
 
         return dirList;
     }

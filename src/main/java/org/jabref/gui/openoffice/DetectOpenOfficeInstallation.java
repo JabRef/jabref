@@ -48,7 +48,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         this.preferences = preferences;
     }
 
-    public boolean runDetection() {
+    public boolean isInstalled() {
         foundPaths = false;
         if (preferences.checkAutoDetectedPaths()) {
             return true;

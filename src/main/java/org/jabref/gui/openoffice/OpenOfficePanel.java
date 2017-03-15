@@ -104,12 +104,10 @@ public class OpenOfficePanel extends AbstractWorker {
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
-    private boolean autoDetected;
     private String executablePath;
     private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
-
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
@@ -362,47 +360,31 @@ public class OpenOfficePanel extends AbstractWorker {
         return databases;
     }
 
-    private void connect(boolean auto) {
-        String installationPath;
-        if (auto) {
-            DetectOpenOfficeInstallation adp = new DetectOpenOfficeInstallation(diag, preferences);
-            if (adp.runDetection()) {
-                autoDetected = true;
-                dialogOkPressed = true;
-                diag.dispose();
-            } else {
+    private void connect(boolean autoDetect) {
+        if (autoDetect) {
+            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences);
+
+            if (!officeInstallation.isInstalled()) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
-            }
-            if (!autoDetected) {
                 return;
             }
-
-            installationPath = preferences.getInstallationPath();
-            executablePath = preferences.getExecutablePath();
+            diag.dispose();
         } else {
-            // Manual connect
-            showConnectDialog();
+            showManualConnectionDialog();
             if (!dialogOkPressed) {
                 return;
             }
-
-            installationPath = preferences.getInstallationPath();
-            executablePath = preferences.getExecutablePath();
-
-            if (OS.WINDOWS) {
-                executablePath = FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, Paths.get(installationPath)).map(Object::toString).orElse("");
-            } else if (OS.OS_X) {
-                executablePath = FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, Paths.get(installationPath)).map(Object::toString).orElse("");
-            }
         }
+
+        JDialog progressDialog = null;
 
         try {
             // Add OO JARs to the classpath
-            loadOpenOfficeJars(installationPath);
+            loadOpenOfficeJars(preferences.getInstallationPath());
 
             // Show progress dialog:
-            final JDialog progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
+            progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
                     .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
             progressDialog.dispose();
@@ -412,8 +394,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
 
             if (ooBase.isConnectedToDocument()) {
-                frame.output(Localization.lang("Connected to document") + ": "
-                        + ooBase.getCurrentDocumentTitle().orElse(""));
+                frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
             }
 
             // Enable actions that depend on Connect:
@@ -439,6 +420,10 @@ public class OpenOfficePanel extends AbstractWorker {
                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
                             + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
+        } finally {
+            if (progressDialog != null) {
+                progressDialog.dispose();
+            }
         }
     }
 
@@ -459,7 +444,7 @@ public class OpenOfficePanel extends AbstractWorker {
     public void run() {
         try {
             // Connect
-            ooBase = new OOBibBase(executablePath, true);
+            ooBase = new OOBibBase(preferences.getExecutablePath(), true);
         } catch (UnknownPropertyException |
                 CreationException | NoSuchElementException | WrappedTargetException | IOException |
                 NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
@@ -489,7 +474,7 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    private void showConnectDialog() {
+    private void showManualConnectionDialog() {
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
 
@@ -514,7 +499,7 @@ public class OpenOfficePanel extends AbstractWorker {
         ooJars.setText(preferences.getJarsPath());
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedFile()
+                new FileDialog(frame).showDialogAndGetSelectedDirectory()
                         .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
         );
 
@@ -572,7 +557,6 @@ public class OpenOfficePanel extends AbstractWorker {
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);
-
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
