@@ -505,19 +505,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         worker.getCallBack().update();
     }
 
-    private List<GroupTreeNodeViewModel> getLeafsOfSelection() {
-        TreePath[] selection = groupsTree.getSelectionPaths();
-        if((selection == null) || (selection.length == 0)) {
-            return new ArrayList<>();
-        }
-
-        List<GroupTreeNodeViewModel> selectedLeafs = new ArrayList<>(selection.length);
-        for (TreePath path : selection) {
-            selectedLeafs.add((GroupTreeNodeViewModel) path.getLastPathComponent());
-        }
-        return selectedLeafs;
-    }
-
     private GroupTreeNodeViewModel getFirstSelectedNode() {
         TreePath path = groupsTree.getSelectionPath();
         if (path != null) {
