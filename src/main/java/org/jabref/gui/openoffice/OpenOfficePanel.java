@@ -381,8 +381,12 @@ public class OpenOfficePanel extends AbstractWorker {
 
         try {
             // Add OO JARs to the classpath
-            // Jars might be located in another path then the executable on Linux
-            loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath()), Paths.get(preferences.getJarsPath())));
+            if (OS.LINUX) {
+                // Jars might be located in another path then the executable on Linux
+                loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath()), Paths.get(preferences.getJarsPath())));
+            } else {
+                loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath())));
+            }
 
             // Show progress dialog:
             progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
@@ -502,8 +506,8 @@ public class OpenOfficePanel extends AbstractWorker {
         );
 
         FormBuilder builder = FormBuilder.create()
-                .layout(
-                        new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
+                .layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
+
         if (OS.WINDOWS || OS.OS_X) {
             builder.add(Localization.lang("Path to OpenOffice/LibreOffice directory")).xy(1, 1);
             builder.add(ooPath).xy(3, 1);
@@ -522,21 +526,16 @@ public class OpenOfficePanel extends AbstractWorker {
 
         cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
-        ActionListener tfListener = e -> {
-            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
-            cDiag.dispose();
-        };
-
-        ooPath.addActionListener(tfListener);
-        ooExec.addActionListener(tfListener);
-        ooJars.addActionListener(tfListener);
-
         // Buttons
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
 
         ok.addActionListener(e -> {
-            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            if (OS.WINDOWS || OS.OS_X) {
+                preferences.updateConnectionParams(ooPath.getText(), ooPath.getText(), ooPath.getText());
+            } else {
+                preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            }
             dialogOkPressed = true;
             cDiag.dispose();
         });
