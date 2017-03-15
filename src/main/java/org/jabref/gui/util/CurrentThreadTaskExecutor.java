@@ -40,4 +40,9 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             }
         }
     }
+
+    @Override
+    public void shutdown() {
+        // Nothing to do here
+    }
 }

@@ -26,6 +26,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.RecursiveTreeItem;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
@@ -47,10 +48,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     @FXML
     public void initialize() {
-        viewModel = new GroupTreeViewModel(stateManager, dialogService);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor);
 
         // Set-up bindings
         viewModel.selectedGroupProperty().bind(

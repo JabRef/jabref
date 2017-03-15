@@ -3,6 +3,8 @@ package org.jabref.gui.groups;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupHierarchyType;
@@ -21,12 +23,14 @@ public class GroupNodeViewModelTest {
     private StateManager stateManager;
     private BibDatabaseContext databaseContext;
     private GroupNodeViewModel viewModel;
+    private TaskExecutor taskExecutor;
 
     @Before
     public void setUp() throws Exception {
         stateManager = mock(StateManager.class);
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
+        taskExecutor = new CurrentThreadTaskExecutor();
 
         viewModel = getViewModelForGroup(
                 new WordKeywordGroup("Test group", GroupHierarchyType.INDEPENDENT, "test", "search", true, ',', false));
@@ -51,6 +55,6 @@ public class GroupNodeViewModelTest {
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, group);
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
     }
 }

@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,7 +18,9 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.model.database.BibDatabaseContext;
@@ -45,8 +46,11 @@ public class GroupNodeViewModel {
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, GroupTreeNode groupNode) {
+    private final TaskExecutor taskExecutor;
+
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.groupNode = Objects.requireNonNull(groupNode);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
@@ -64,7 +68,7 @@ public class GroupNodeViewModel {
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.map(groupNode.getChildren(),
-                    child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+                    child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
@@ -81,8 +85,8 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, AbstractGroup group) {
-        this(databaseContext, stateManager, new GroupTreeNode(group));
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group) {
+        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group));
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
@@ -90,13 +94,13 @@ public class GroupNodeViewModel {
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
-        return new GroupNodeViewModel(newDatabase, stateManager, DefaultGroupsFactory.getAllEntriesGroup());
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor) {
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup());
     }
 
     private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
         return automaticGroup.createSubgroups(entry).stream()
-                .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+                .map(child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
     }
 
     public SimpleBooleanProperty expandedProperty() {
@@ -184,10 +188,11 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        new Thread(()-> {
-            int newHits = groupNode.calculateNumberOfMatches(databaseContext.getDatabase());
-            Platform.runLater(() -> hits.setValue(newHits));
-        }).start();
+        BackgroundTask<Integer> calculateHits = BackgroundTask
+                .run(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
+                .onSuccess(hits::setValue);
+
+        taskExecutor.execute(calculateHits);
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
