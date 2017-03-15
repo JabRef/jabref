@@ -174,7 +174,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         JList<File> fileList = new JList<>(mod);
         fileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fileList.setSelectedIndex(0);
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref", "pref, 2dlu, pref, 4dlu, pref"));
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("pref:grow", "pref, 2dlu, pref, 4dlu, pref"));
         builder.add(Localization.lang("Found more than one OpenOffice/LibreOffice executable.")).xy(1, 1);
         builder.add(Localization.lang("Please choose which one to connect to:")).xy(1, 3);
         builder.add(fileList).xy(1, 5);
