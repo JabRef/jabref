@@ -13,8 +13,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -381,7 +381,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
         try {
             // Add OO JARs to the classpath
-            loadOpenOfficeJars(preferences.getInstallationPath());
+            // Jars might be located in another path then the executable on Linux
+            loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath()), Paths.get(preferences.getJarsPath())));
 
             // Show progress dialog:
             progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
@@ -427,17 +428,18 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    private void loadOpenOfficeJars(String installationPath) throws IOException {
-        List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, Paths.get(installationPath))).collect(Collectors.toList());
+    private void loadOpenOfficeJars(List<Path> configurationPaths) throws IOException {
+        List<Path> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPaths)).flatMap(List::stream).collect(Collectors.toList());
 
-        List<URL> jarList = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
-        for (Optional<Path> jarFile : filePaths) {
-            if (!jarFile.isPresent()) {
-                throw new IOException("Required Open Office Jars not found inside installation path.");
-            }
-            jarList.add(jarFile.get().toUri().toURL());
+        if (filePaths.size() != OpenOfficePreferences.OO_JARS.size()) {
+            throw new IOException("(Not all) required Open Office Jars were found inside installation path.");
         }
-        addURL(jarList);
+
+        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
+        for (Path jarPath : filePaths) {
+            jarURLs.add((jarPath.toUri().toURL()));
+        }
+        addURL(jarURLs);
     }
 
     @Override
@@ -453,15 +455,11 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    // The methods addFile and associated final Class[] parameters were gratefully copied from
-    // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
-    private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
-
     private static void addURL(List<URL> jarList) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", CLASS_PARAMETERS);
+            Method method = sysclass.getDeclaredMethod("addURL", (Class<?>[]) new Class[] {URL.class});
             method.setAccessible(true);
             for (URL anU : jarList) {
                 method.invoke(sysloader, anU);
