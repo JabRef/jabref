@@ -63,6 +63,9 @@ public class Formatters {
 
     public static final List<Formatter> ALL = new ArrayList<>();
 
+    private Formatters() {
+    }
+
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
         Objects.requireNonNull(modifier);
         Optional<Formatter> formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();

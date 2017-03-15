@@ -32,6 +32,9 @@ import org.apache.commons.logging.LogFactory;
 public class ImportFormats {
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
 
+    private ImportFormats() {
+    }
+
     /**
      * Create an AbstractAction for performing an Import operation.
      * @param frame The JabRefFrame of this JabRef instance.
