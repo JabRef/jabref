@@ -57,12 +57,11 @@ public class OpenOfficeFileSearch {
         List<Path> dirList = new ArrayList<>();
 
         File rootDir = new File("/Applications");
-        File[] files = rootDir.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory() && ("OpenOffice.org.app".equals(file.getName())
-                        || "LibreOffice.app".equals(file.getName()))) {
-                    dirList.add(file.toPath());
+        File[] dirs = rootDir.listFiles(File::isDirectory);
+        if (dirs != null) {
+            for (File dir : dirs) {
+                if ("OpenOffice.org.app".equals(dir.getName()) || "LibreOffice.app".equals(dir.getName())) {
+                    dirList.add(dir.toPath());
                 }
             }
         }
@@ -72,16 +71,22 @@ public class OpenOfficeFileSearch {
 
     public List<Path> findLinuxOpenOfficeDirs() {
         List<Path> dirList = new ArrayList<>();
+        List<String> sourceList = new ArrayList<>();
 
-        Optional<Path> execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib"));
-        execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib")));
+        sourceList.add("/usr/lib");
+        sourceList.add("/usr/lib64");
+        sourceList.add("/opt");
 
-        execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/opt"));
-        execFile.ifPresent(e -> dirList.add(Paths.get("/opt")));
-
-        if (Files.exists(Paths.get("/usr/lib64"))) {
-            execFile = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, Paths.get("/usr/lib64"));
-            execFile.ifPresent(e -> dirList.add(Paths.get("/usr/lib64")));
+        for (String rootPath : sourceList) {
+            File root = new File(rootPath);
+            File[] dirs = root.listFiles(File::isDirectory);
+            if (dirs != null) {
+                for (File dir : dirs) {
+                    if (dir.getPath().contains("openoffice") || dir.getPath().contains("libreoffice")) {
+                        dirList.add(dir.toPath());
+                    }
+                }
+            }
         }
 
         return dirList;
