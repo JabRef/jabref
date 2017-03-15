@@ -183,7 +183,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         if (answer == JOptionPane.CANCEL_OPTION) {
             return Optional.empty();
         } else {
-            return Optional.of(Paths.get(fileList.getSelectedValue().getParent()));
+            return Optional.of(fileList.getSelectedValue().toPath());
         }
     }
 
