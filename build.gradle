@@ -284,7 +284,14 @@ tasks.withType(Test) {
     }
 }
 
+task jacocoMerge(type: JacocoMerge) {
+    executionData test, fetcherTest, databaseTest
+}
+
 jacocoTestReport {
+    executionData jacocoMerge.destinationFile
+    dependsOn jacocoMerge
+
     reports {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
