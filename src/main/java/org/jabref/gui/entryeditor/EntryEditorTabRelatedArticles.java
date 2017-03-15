@@ -117,7 +117,7 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         this.addHyperlinkListener(e -> {
             try {
                 if ((e.getURL() != null) && (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)) {
-                        new JabRefDesktop().openBrowser(e.getURL().toString());
+                    JabRefDesktop.openBrowser(e.getURL().toString());
                     }
                 } catch (IOException e1) {
                     LOGGER.error(e1.getMessage(), e1);

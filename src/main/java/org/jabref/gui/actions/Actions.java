@@ -5,6 +5,9 @@ package org.jabref.gui.actions;
  */
 public class Actions {
 
+    private Actions() {
+    }
+
     public static final String ABBREVIATE_ISO = "abbreviateIso";
     public static final String ABBREVIATE_MEDLINE = "abbreviateMedline";
     public static final String ADD_FILE_LINK = "addFileLink";
