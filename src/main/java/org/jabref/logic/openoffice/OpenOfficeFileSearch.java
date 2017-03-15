@@ -1,94 +1,80 @@
 package org.jabref.logic.openoffice;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 
 public class OpenOfficeFileSearch {
     /**
-     * Search for Program files directory.
-     * @return the File pointing to the Program files directory, or null if not found.
-     *   Since we are not including a library for Windows integration, this method can't
-     *   find the Program files dir in localized Windows installations.
+     * Detects existing installation of OpenOffice and LibreOffice.
+     *
+     * @return a list of detected installation paths
      */
-    public List<Path> findWindowsOpenOfficeDirs() {
-        List<String> sourceList = new ArrayList<>();
-        List<Path> dirList = new ArrayList<>();
+    public static List<Path> detectInstallations() {
+        if (OS.WINDOWS) {
+            List<Path> programDirs = findWindowsOpenOfficeDirs();
+            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
+        } else if (OS.OS_X) {
+            List<Path> programDirs = findOSXOpenOfficeDirs();
+            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
+        } else if (OS.LINUX) {
+            List<Path> programDirs = findLinuxOpenOfficeDirs();
+            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
+        }
+        return new ArrayList<>(0);
+    }
 
-        // Check default 64-bits program directory
+    private static List<Path> findOpenOfficeDirectories(List<Path> programDirectories) {
+        List<Path> result = new ArrayList<>();
+
+        for (Path programDir : programDirectories) {
+            File[] subDirs = programDir.toFile().listFiles(File::isDirectory);
+            if (subDirs != null) {
+                for (File dir : subDirs) {
+                    if (dir.getPath().toLowerCase(Locale.ROOT).contains("openoffice") || dir.getPath().toLowerCase(Locale.ROOT).contains("libreoffice")) {
+                        result.add(dir.toPath());
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    private static List<Path> findWindowsOpenOfficeDirs() {
+        List<Path> sourceList = new ArrayList<>();
+
+        // 64-bit program directory
         String progFiles = System.getenv("ProgramFiles");
         if (progFiles != null) {
-            sourceList.add(progFiles);
+            sourceList.add(Paths.get(progFiles));
         }
 
-        // Check default 64-bits program directory
+        // 32-bit program directory
         progFiles = System.getenv("ProgramFiles(x86)");
         if (progFiles != null) {
-            sourceList.add(progFiles);
+            sourceList.add(Paths.get(progFiles));
         }
 
-        for (String rootPath : sourceList) {
-            File root = new File(rootPath);
-            File[] dirs = root.listFiles(File::isDirectory);
-            if (dirs != null) {
-                for (File dir : dirs) {
-                    if (dir.getPath().contains("OpenOffice") || dir.getPath().contains("LibreOffice")) {
-                        dirList.add(dir.toPath());
-                    }
-                }
-            }
-        }
-        return dirList;
+        return findOpenOfficeDirectories(sourceList);
     }
 
-    /**
-     * Search for Program files directory.
-     * @return the File pointing to the Program files directory, or null if not found.
-     *   Since we are not including a library for Windows integration, this method can't
-     *   find the Program files dir in localized Windows installations.
-     */
-    public List<Path> findOSXOpenOfficeDirs() {
-        List<Path> dirList = new ArrayList<>();
+    private static List<Path> findOSXOpenOfficeDirs() {
+        List<Path> sourceList = Arrays.asList(Paths.get("/Applications"));
 
-        File rootDir = new File("/Applications");
-        File[] dirs = rootDir.listFiles(File::isDirectory);
-        if (dirs != null) {
-            for (File dir : dirs) {
-                if ("OpenOffice.org.app".equals(dir.getName()) || "LibreOffice.app".equals(dir.getName())) {
-                    dirList.add(dir.toPath());
-                }
-            }
-        }
-
-        return dirList;
+        return findOpenOfficeDirectories(sourceList);
     }
 
-    public List<Path> findLinuxOpenOfficeDirs() {
-        List<Path> dirList = new ArrayList<>();
-        List<String> sourceList = new ArrayList<>();
+    private static List<Path> findLinuxOpenOfficeDirs() {
+        List<Path> sourceList = Arrays.asList(Paths.get("/usr/lib"), Paths.get("/usr/lib64"), Paths.get("/opt"));
 
-        sourceList.add("/usr/lib");
-        sourceList.add("/usr/lib64");
-        sourceList.add("/opt");
-
-        for (String rootPath : sourceList) {
-            File root = new File(rootPath);
-            File[] dirs = root.listFiles(File::isDirectory);
-            if (dirs != null) {
-                for (File dir : dirs) {
-                    if (dir.getPath().contains("openoffice") || dir.getPath().contains("libreoffice")) {
-                        dirList.add(dir.toPath());
-                    }
-                }
-            }
-        }
-
-        return dirList;
+        return findOpenOfficeDirectories(sourceList);
     }
 }

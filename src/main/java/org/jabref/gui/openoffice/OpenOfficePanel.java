@@ -12,8 +12,8 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -380,12 +380,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
         try {
             // Add OO JARs to the classpath
-            if (OS.LINUX) {
-                // Jars might be located in another path then the executable on Linux
-                loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath()), Paths.get(preferences.getJarsPath())));
-            } else {
-                loadOpenOfficeJars(Arrays.asList(Paths.get(preferences.getInstallationPath())));
-            }
+            loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
 
             // Show progress dialog:
             progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
@@ -431,16 +426,16 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-    private void loadOpenOfficeJars(List<Path> configurationPaths) throws IOException {
-        List<Path> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPaths)).flatMap(List::stream).collect(Collectors.toList());
+    private void loadOpenOfficeJars(Path configurationPath) throws IOException {
+        List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
-        if (filePaths.size() != OpenOfficePreferences.OO_JARS.size()) {
+        if (!filePaths.stream().allMatch(Optional::isPresent)) {
             throw new IOException("(Not all) required Open Office Jars were found inside installation path.");
         }
 
         List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
-        for (Path jarPath : filePaths) {
-            jarURLs.add((jarPath.toUri().toURL()));
+        for (Optional<Path> jarPath : filePaths) {
+            jarURLs.add((jarPath.get().toUri().toURL()));
         }
         addURL(jarURLs);
     }

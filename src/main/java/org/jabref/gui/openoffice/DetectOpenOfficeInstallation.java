@@ -4,10 +4,8 @@ import java.awt.BorderLayout;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -41,8 +39,6 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
     private boolean foundPaths;
     private JDialog progressDialog;
 
-    private final OpenOfficeFileSearch fileSearch = new OpenOfficeFileSearch();
-
     public DetectOpenOfficeInstallation(JDialog parent, OpenOfficePreferences preferences) {
         this.parent = parent;
         this.preferences = preferences;
@@ -75,21 +71,6 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         progressDialog.dispose();
     }
 
-    private List<Path> detectInstallations() {
-        if (OS.WINDOWS) {
-            List<Path> programDirs = fileSearch.findWindowsOpenOfficeDirs();
-            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.WINDOWS_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
-        } else if (OS.OS_X) {
-            List<Path> programDirs = fileSearch.findOSXOpenOfficeDirs();
-            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.OSX_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
-        } else if (OS.LINUX) {
-            List<Path> programDirs = fileSearch.findLinuxOpenOfficeDirs();
-            return programDirs.stream().filter(dir -> FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, dir).isPresent()).collect(Collectors.toList());
-        } else {
-            return new ArrayList<>(0);
-        }
-    }
-
     private Optional<Path> selectInstallationPath() {
         JOptionPane.showMessageDialog(parent,
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
@@ -119,7 +100,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
     }
 
     private boolean autoDetectPaths() {
-        List<Path> installations = detectInstallations();
+        List<Path> installations = OpenOfficeFileSearch.detectInstallations();
 
         // manually add installation path
         if (installations.isEmpty()) {
@@ -146,12 +127,12 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
             execPath = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, installDir);
         }
 
-        Optional<Path> jarPath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
+        Optional<Path> jarFilePath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
 
-        if (execPath.isPresent() && jarPath.isPresent()) {
+        if (execPath.isPresent() && jarFilePath.isPresent()) {
             preferences.setOOPath(installDir.toString());
             preferences.setExecutablePath(execPath.get().toString());
-            preferences.setJarsPath(jarPath.get().toString());
+            preferences.setJarsPath(jarFilePath.get().getParent().toString());
             return true;
         }
 
