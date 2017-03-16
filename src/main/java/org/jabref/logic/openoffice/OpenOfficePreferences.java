@@ -30,9 +30,8 @@ public class OpenOfficePreferences {
     public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice";
     public static final String OSX_EXECUTABLE = "soffice";
 
-    public static final String DEFAULT_LINUX_PATH = "/opt/openoffice.org3";
-    public static final String DEFAULT_LINUX_JARS = "/opt/openoffice.org/basis3.0";
-    public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/openoffice/program/soffice";
+    public static final String DEFAULT_LINUX_PATH = "/opt/openoffice4";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/opt/openoffice4/program/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
