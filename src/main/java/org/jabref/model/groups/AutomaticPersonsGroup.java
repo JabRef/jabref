@@ -1,5 +1,6 @@
 package org.jabref.model.groups;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,6 +17,19 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
     public AutomaticPersonsGroup(String name, GroupHierarchyType context, String field) {
         super(name, context);
         this.field = field;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AutomaticPersonsGroup that = (AutomaticPersonsGroup) o;
+        return Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field);
     }
 
     @Override

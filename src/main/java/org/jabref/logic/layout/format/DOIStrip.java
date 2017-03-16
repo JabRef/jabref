@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.model.entry.identifier.DOI;
 
 /**
  * Will strip any prefixes from the Doi field, in order to output only the Doi number

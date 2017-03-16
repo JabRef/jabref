@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,5 +42,17 @@ public class OptionalUtil {
 
     public static <T, R> Stream<R> flatMap(Optional<T> value, Function<? super T, ? extends Collection<? extends R>> mapper) {
         return toStream(value).flatMap(element -> mapper.apply(element).stream());
+    }
+
+    public static <T> Boolean isPresentAnd(Optional<T> value, Predicate<T> check) {
+        return value.isPresent() && check.test(value.get());
+    }
+
+    public static <T, S, R> Optional<R> combine(Optional<T> valueOne, Optional<S> valueTwo, BiFunction<T, S, R> combine) {
+        if (valueOne.isPresent() && valueTwo.isPresent()) {
+            return Optional.ofNullable(combine.apply(valueOne.get(), valueTwo.get()));
+        } else {
+            return Optional.empty();
+        }
     }
 }

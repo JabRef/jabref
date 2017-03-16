@@ -196,7 +196,7 @@ public class BibtexDatabaseWriterTest {
         assertEquals(OS.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
-                + "1 ExplicitGroup:test\\;2\\;;" + OS.NEWLINE
+                + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());
         // @formatter:on
     }
@@ -217,7 +217,7 @@ public class BibtexDatabaseWriterTest {
                 OS.NEWLINE
                 + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
-                + "1 ExplicitGroup:test\\;2\\;;" + OS.NEWLINE
+                        + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());
         // @formatter:on
     }

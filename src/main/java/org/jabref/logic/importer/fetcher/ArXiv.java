@@ -17,7 +17,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -26,11 +25,12 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
-import org.jabref.model.entry.ArXivIdentifier;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;

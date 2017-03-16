@@ -29,6 +29,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The MS Office XML export now exports the field `volumes` and `pubstate`.
 - The integrity checker reports now if a journal is not found in the abbreviation list
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
+- We are happy to welcome [CrossRef](https://www.crossref.org/) as a new member of our fetcher family. [#2455](https://github.com/JabRef/jabref/issues/2455)
 - We improved the UI customization possibilities:
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
     - Resizing the menu and label sizes has been improved.
@@ -37,11 +38,18 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
 - We added MathSciNet as a ID-based fetcher in the `BibTeX -> New entry` dialog (implements a [feature request in the forum](http://discourse.jabref.org/t/allow-to-search-by-mr-number-mathscinet))
 - Removed the apache.commons.collections library
+- We added a few properties to a group:
+    - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
+    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword). Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173).
+- Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
 - We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
 - The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
 - We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
 - A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
 - F4 opens selected file in current JTable context not just from selected entry inside the main table [#2355](https://github.com/JabRef/jabref/issues/2355)
+- We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
+- Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
@@ -59,6 +67,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
  - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
  - We fixed an issue introduced with Version 3.8.2 where executing the `Rename PDFs`-cleanup operation moved the files to the file directory. [#2526](https://github.com/JabRef/jabref/issues/2526)
+ - We improved the performance when opening a big database that still used the old groups format. Fixes an [issue raised in the forum](http://discourse.jabref.org/t/v3-8-2-x64-windows-problem-saving-large-bib-libraries/456).
  - We fixed an issue where the `Move linked files to default file directory`- cleanup operation did not move the files to the location of the bib-file. [#2454](https://github.com/JabRef/jabref/issues/2454)
  - We fixed an issue where executing `Move file` on a selected file in the `general`-tab could overwrite an existing file. [#2385](https://github.com/JabRef/jabref/issues/2358)
  - We fixed an issue with importing groups and subgroups [#2600](https://github.com/JabRef/jabref/issues/2600)

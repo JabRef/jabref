@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
