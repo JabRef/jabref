@@ -87,6 +87,7 @@ import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
@@ -921,7 +922,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             panel.highlightEntry(entry);
 
             return true;
-        } catch (IllegalStateException | IOException ex) {
+        } catch (InvalidFieldValueException | IOException ex) {
             // The source couldn't be parsed, so the user is given an
             // error message, and the choice to keep or revert the contents
             // of the source text field.
@@ -1353,7 +1354,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
                         updateSource();
                         panel.markBaseChanged();
-                    } catch (IllegalArgumentException ex) {
+                    } catch (InvalidFieldValueException ex) {
                         lastFieldAccepted = false;
                         fieldEditor.setInvalidBackgroundColor();
                         if (!SwingUtilities.isEventDispatchThread()) {

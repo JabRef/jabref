@@ -22,9 +22,8 @@ import static org.junit.Assert.assertTrue;
 
 public class BibEntryWriterTest {
 
-    private BibEntryWriter writer;
     private static ImportFormatPreferences importFormatPreferences;
-
+    private BibEntryWriter writer;
 
     @Before
     public void setUpWriter() {
@@ -414,6 +413,16 @@ public class BibEntryWriterTest {
                 "}" + OS.NEWLINE;
 
         assertEquals(expected, actual);
+    }
+
+    @Test(expected = IOException.class)
+    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry("article");
+        entry.setField("note", "some text with unbalanced { braces");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
     }
 
     @Test
