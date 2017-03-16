@@ -154,14 +154,12 @@ class FileAnnotationTab extends JPanel {
     }
 
     private String localizeContent(FileAnnotation annotation) {
-        if (annotation.hasLinkedAnnotation()) {
-            if (annotation.getContent().isEmpty()) {
-                if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
-                    return Localization.lang("Empty Underline");
-                }
-                if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
-                    return Localization.lang("Empty Highlight");
-                }
+        if (annotation.hasLinkedAnnotation() && annotation.getContent().isEmpty()) {
+            if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
+                return Localization.lang("Empty Underline");
+            }
+            if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
+                return Localization.lang("Empty Highlight");
             }
         }
 

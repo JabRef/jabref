@@ -47,16 +47,16 @@ public class EntryAnnotationImporter {
     /**
      * Reads the annotations from the files that are attached to a BibEntry.
      *
-     * @param context The context is needed for the importer.
+     * @param databaseContext The context is needed for the importer.
      * @return Map from each PDF to a list of file annotations
      */
-    public Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext context) {
+    public Map<String, List<FileAnnotation>> importAnnotationsFromFiles(BibDatabaseContext databaseContext) {
         Map<String, List<FileAnnotation>> annotations = new HashMap<>();
         AnnotationImporter importer = new PdfAnnotationImporter();
 
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
         for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
-            Optional<File> expandedFileName = FileUtil.expandFilename(context, parsedFileField.getLink(),
+            Optional<File> expandedFileName = FileUtil.expandFilename(databaseContext, parsedFileField.getLink(),
                     JabRefPreferences.getInstance().getFileDirectoryPreferences());
             expandedFileName.ifPresent(file -> annotations.put(file.toString(), importer.importAnnotations(Paths.get(file.toString()))));
         }

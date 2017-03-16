@@ -118,8 +118,13 @@ public class PdfAnnotationImporterTest {
     @Test
     public void polygonNoNoteMinimal() {
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-polygon.pdf"));
-        // We don't support polygons at the moment
-        assertEquals(0, annotations.size());
+        assertEquals(1, annotations.size());
+        FileAnnotation polygon = annotations.get(0);
+        assertEquals("Linus Dietz", polygon.getAuthor());
+        assertEquals("polygon annotation", polygon.getContent());
+        assertFalse(polygon.hasLinkedAnnotation());
+        assertEquals("Polygon", polygon.getAnnotationType());
+        assertEquals(1, polygon.getPage());
     }
 }
 
