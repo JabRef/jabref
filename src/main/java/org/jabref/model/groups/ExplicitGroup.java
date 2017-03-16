@@ -45,8 +45,13 @@ public class ExplicitGroup extends WordKeywordGroup {
             return false;
         }
         ExplicitGroup other = (ExplicitGroup) o;
-        return Objects.equals(getName(), other.getName()) && Objects.equals(getHierarchicalContext(),
-                other.getHierarchicalContext()) && Objects.equals(getLegacyEntryKeys(), other.getLegacyEntryKeys());
+        return Objects.equals(getName(), other.getName())
+                && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
+                && Objects.equals(getIconCode(), other.getIconCode())
+                && Objects.equals(getDescription(), other.getDescription())
+                && Objects.equals(getColor(), other.getColor())
+                && Objects.equals(isExpanded(), other.isExpanded())
+                && Objects.equals(getLegacyEntryKeys(), other.getLegacyEntryKeys());
     }
 
     public void clearLegacyEntryKeys() {
@@ -59,7 +64,7 @@ public class ExplicitGroup extends WordKeywordGroup {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, context, legacyEntryKeys);
+        return Objects.hash(name, context, legacyEntryKeys, iconCode, color, description, isExpanded);
     }
 
     @Override

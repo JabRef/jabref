@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Base class for all groups.
@@ -34,6 +35,14 @@ public abstract class AbstractGroup implements SearchMatcher {
 
     public Optional<Color> getColor() {
         return color;
+    }
+
+    public void setColor(String colorString) {
+        if (StringUtil.isBlank(colorString)) {
+            color = Optional.empty();
+        } else {
+            setColor(Color.valueOf(colorString));
+        }
     }
 
     public void setColor(Color color) {
