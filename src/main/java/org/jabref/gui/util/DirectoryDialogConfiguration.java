@@ -2,16 +2,7 @@ package org.jabref.gui.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javafx.stage.FileChooser;
-
-import org.jabref.logic.util.FileExtensions;
 
 public class DirectoryDialogConfiguration {
 
