@@ -82,29 +82,29 @@ public class LatexFieldFormatterTests {
         assertEquals(expected, any);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void reportUnbalancedBracing() {
+    @Test(expected = InvalidFieldValueException.class)
+    public void reportUnbalancedBracing() throws Exception {
         String unbalanced = "{";
 
         formatter.format(unbalanced, "anyfield");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void reportUnbalancedBracingWithEscapedBraces() {
+    @Test(expected = InvalidFieldValueException.class)
+    public void reportUnbalancedBracingWithEscapedBraces() throws Exception {
         String unbalanced = "{\\}";
 
         formatter.format(unbalanced, "anyfield");
     }
 
     @Test
-    public void tolerateBalancedBrace() {
+    public void tolerateBalancedBrace() throws Exception {
         String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
     }
 
     @Test
-    public void tolerateEscapeCharacters() {
+    public void tolerateEscapeCharacters() throws Exception {
         String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
