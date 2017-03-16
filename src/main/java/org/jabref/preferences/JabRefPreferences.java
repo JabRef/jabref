@@ -640,7 +640,7 @@ public class JabRefPreferences {
         } else { // Linux
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_JARS);
+            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
