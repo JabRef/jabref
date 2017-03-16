@@ -43,21 +43,13 @@ import org.apache.commons.logging.LogFactory;
 public class EntryTableTransferHandler extends TransferHandler {
 
     private final MainTable entryTable;
-
     private final JabRefFrame frame;
-
     private final BasePanel panel;
-
     private DataFlavor urlFlavor;
-
     private final DataFlavor stringFlavor;
-
     private static final boolean DROP_ALLOWED = true;
-
     private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
-
     private boolean draggingFile;
-
 
     /**
      * Construct the transfer handler.
@@ -174,14 +166,12 @@ public class EntryTableTransferHandler extends TransferHandler {
         return false;
     }
 
-
-
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         if (e instanceof MouseEvent) {
             int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
             int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
-            if(entryTable.isFileColumn(modelIndex)) {
+            if (entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
