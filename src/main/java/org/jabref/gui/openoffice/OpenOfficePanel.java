@@ -34,15 +34,22 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.FileDialog;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -472,13 +479,22 @@ public class OpenOfficePanel extends AbstractWorker {
     private void showManualConnectionDialog() {
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
+        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+
+        final DialogService dirDialog = new FXDialogService();
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
+        DialogService fileDialog = new FXDialogService();
 
         // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getInstallationPath());
         browseOOPath.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
                         .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
         );
 
@@ -486,7 +502,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
         browseOOExec.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedFile()
+                DefaultTaskExecutor.runInJavaFXThread(() -> fileDialog.showFileOpenDialog(fileDialogConfiguration))
                         .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
         );
 
@@ -494,7 +510,7 @@ public class OpenOfficePanel extends AbstractWorker {
         ooJars.setText(preferences.getJarsPath());
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
                         .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
         );
 
@@ -543,7 +559,7 @@ public class OpenOfficePanel extends AbstractWorker {
         bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
-        // Finish and show dialog
+        // Finish and show dirDialog
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);

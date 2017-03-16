@@ -3,14 +3,12 @@ package org.jabref.gui.openoffice;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -18,7 +16,10 @@ import javax.swing.JProgressBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
@@ -75,14 +76,15 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
     }
 
     private Optional<Path> selectInstallationPath() {
+        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
         JOptionPane.showMessageDialog(parent,
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
                 Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                 JOptionPane.INFORMATION_MESSAGE);
 
-        FXDialogService ds = new FXDialogService();
+        DialogService ds = new FXDialogService();
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(System.getenv("ProgramFiles"))).build();
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
         Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
 
         if (path.isPresent()) {

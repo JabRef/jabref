@@ -1,6 +1,8 @@
 package org.jabref.gui.desktop.os;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public interface NativeDesktop {
@@ -28,4 +30,20 @@ public interface NativeDesktop {
     void openPdfWithParameters(String filePath, List<String> parameters) throws  IOException;
 
     String detectProgramPath(String programName, String directoryName);
+
+    /**
+     * Returns the path to the system's applications folder.
+     *
+     * @return the path to the applications folder.
+     */
+    Path getApplicationDirectory();
+
+    /**
+     * Returns the path to the system's user directory.
+     *
+     * @return the path to the user directory.
+     */
+    default Path getUserDirectory() {
+        return Paths.get(System.getProperty("user.home"));
+    }
 }
