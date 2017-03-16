@@ -73,7 +73,8 @@ public class AddToGroupAction extends AbstractAction {
     }
 
     private void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
-        List<AbstractGroup> affectedGroups = node.getNode().getRoot().getContainingGroups(entries, false).stream()
+        List<AbstractGroup> affectedGroups = node.getNode().getRoot()
+                .getContainingGroups(entries, false).stream()
                 .map(GroupTreeNode::getGroup)
                 .filter(group -> group instanceof GroupEntryChanger)
                 .collect(Collectors.toList());

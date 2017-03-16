@@ -34,13 +34,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
 
         // Register listener
-        stateManager.activeDatabaseProperty()
-                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
+        stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
 
         // Set-up bindings
-        filterPredicate
-                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
 
         // Init
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
@@ -67,8 +65,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
     private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
-        //TODO: Can one of this be empty?
-        if (currentDatabase.get() != stateManager.activeDatabaseProperty().get().get()) {
+        if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Switch of database occurred -> do nothing
             return;
         }

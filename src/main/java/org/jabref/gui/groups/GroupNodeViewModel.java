@@ -1,6 +1,5 @@
 package org.jabref.gui.groups;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,13 +107,18 @@ public class GroupNodeViewModel {
                 .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
     }
 
-    //Copy pasted from GroupTreeNodeModel
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
-        if (groupNode.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger) groupNode.getGroup()).add(entries);
-        } else {
-            return Collections.emptyList();
-        }
+        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+        //if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+        //{
+        //    return; // user aborted operation
+        //}
+
+        return groupNode.addEntriesToGroup(entries);
+
+        // TODO: Store undo
+        // if (!undo.isEmpty()) {
+        // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
     }
 
     public SimpleBooleanProperty expandedProperty() {
@@ -239,12 +243,17 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row
+     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row.
+     * Currently, the following sources are allowed:
+     *  - another group (will be added as subgroup on drop)
+     *  - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
      */
     public boolean acceptableDrop(Dragboard dragboard) {
-        return dragboard.hasContent(DragAndDropDataFormats.GROUP)
-                || dragboard.hasContent(TransferableEntrySelection.DATAFORMAT);
         // TODO: we should also check isNodeDescendant
+        boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
+        boolean canDropEntries = dragboard.hasContent(DragAndDropDataFormats.ENTRIES)
+                && groupNode.getGroup() instanceof GroupEntryChanger;
+        return canDropOtherGroup || canDropEntries;
     }
 
     public void moveTo(GroupNodeViewModel target) {

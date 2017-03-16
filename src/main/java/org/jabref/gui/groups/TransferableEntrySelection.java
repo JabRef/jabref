@@ -9,20 +9,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.scene.input.DataFormat;
-
 import org.jabref.model.entry.BibEntry;
 
 public class TransferableEntrySelection implements Transferable {
 
-    public static final DataFormat DATAFORMAT = new DataFormat("application/x-java-jvm-local-objectref");
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;
     private static final DataFlavor[] FLAVORS;
-    private final List<BibEntry> selectedEntries;
-    private final String selectedEntriesCiteKeys;
-
-    private boolean includeCiteKeyword;
 
     static {
         DataFlavor df1 = null;
@@ -39,6 +32,10 @@ public class TransferableEntrySelection implements Transferable {
         FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL,
                 TransferableEntrySelection.FLAVOR_EXTERNAL};
     }
+
+    private final List<BibEntry> selectedEntries;
+    private final String selectedEntriesCiteKeys;
+    private boolean includeCiteKeyword;
 
     public TransferableEntrySelection(List<BibEntry> list) {
         this.selectedEntries = list;

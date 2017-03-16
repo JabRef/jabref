@@ -37,13 +37,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
+    public static final DataFlavor FLAVOR;
     private static final Log LOGGER = LogFactory.getLog(GroupTreeNodeViewModel.class);
-
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
     private static final Icon GROUP_REGULAR_ICON = null;
-
-    public static final DataFlavor FLAVOR;
     private static final DataFlavor[] FLAVORS;
 
     static {
@@ -60,16 +58,16 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     private final GroupTreeNode node;
 
+    public GroupTreeNodeViewModel(GroupTreeNode node) {
+        this.node = node;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("GroupTreeNodeViewModel{");
         sb.append("node=").append(node);
         sb.append('}');
         return sb.toString();
-    }
-
-    public GroupTreeNodeViewModel(GroupTreeNode node) {
-        this.node = node;
     }
 
     @Override
@@ -380,11 +378,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
      * Adds the given entries to this node's group.
      */
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
-        if (node.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger) node.getGroup()).add(entries);
-        } else {
-            return Collections.emptyList();
-        }
+        return node.addEntriesToGroup(entries);
     }
 
     /**
