@@ -374,9 +374,9 @@ public class FileListEntryEditor {
 
         Optional<Path> path;
         if (showSaveDialog) {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showSaveDialog(fileDialogConfiguration));
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
         } else {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showOpenDialog(fileDialogConfiguration));
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
         }
 
         path.ifPresent(selection -> {
