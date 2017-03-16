@@ -180,6 +180,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                             .getContent(DragAndDropDataFormats.ENTRIES);
 
                     row.getItem().addEntriesToGroup(entrySelection.getSelection());
+                    success = true;
                 }
                 event.setDropCompleted(success);
                 event.consume();
