@@ -6,7 +6,7 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
-import org.jabref.model.entry.MathSciNetId;
+import org.jabref.model.entry.identifier.MathSciNetId;
 
 public class MathSciNetPaneView {
 

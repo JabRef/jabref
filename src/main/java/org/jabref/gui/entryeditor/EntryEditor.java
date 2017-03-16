@@ -107,8 +107,8 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MathSciNetId;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.identifier.MathSciNetId;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;

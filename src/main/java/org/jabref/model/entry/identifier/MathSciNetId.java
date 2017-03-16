@@ -1,4 +1,4 @@
-package org.jabref.model.entry;
+package org.jabref.model.entry.identifier;
 
 import java.util.Objects;
 
