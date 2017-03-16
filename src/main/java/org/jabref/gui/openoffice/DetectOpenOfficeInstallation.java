@@ -18,6 +18,9 @@ import javax.swing.JProgressBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficeFileSearch;
@@ -76,25 +79,14 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
                 Localization.lang("Unable to autodetect OpenOffice/LibreOffice installation. Please choose the installation directory manually."),
                 Localization.lang("Could not find OpenOffice/LibreOffice installation"),
                 JOptionPane.INFORMATION_MESSAGE);
-        // TODO Dialog service
-        JFileChooser fileChooser = new JFileChooser(new File(System.getenv("ProgramFiles")));
-        fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
 
-            @Override
-            public String getDescription() {
-                return Localization.lang("Directories");
-            }
-        });
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fileChooser.showOpenDialog(parent);
+        FXDialogService ds = new FXDialogService();
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Paths.get(System.getenv("ProgramFiles"))).build();
+        Optional<Path> path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
 
-        if (fileChooser.getSelectedFile() != null) {
-            return Optional.of(fileChooser.getSelectedFile().toPath());
+        if (path.isPresent()) {
+            return path;
         }
         return Optional.empty();
     }

@@ -103,7 +103,6 @@ public class OpenOfficePanel extends AbstractWorker {
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
-    private String executablePath;
     private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
