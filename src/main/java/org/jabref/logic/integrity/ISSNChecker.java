@@ -2,8 +2,8 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.jabref.logic.identifier.ISSN;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.identifier.ISSN;
 
 
 public class ISSNChecker implements ValueChecker {

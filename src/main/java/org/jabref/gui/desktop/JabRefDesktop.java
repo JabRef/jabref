@@ -29,14 +29,14 @@ import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.identifier.DOI;
-import org.jabref.logic.identifier.Eprint;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;

@@ -5,10 +5,10 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

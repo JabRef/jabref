@@ -27,10 +27,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
-import org.jabref.gui.importer.fetcher.EntryFetchers;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -53,36 +53,14 @@ import org.jdesktop.swingx.VerticalLayout;
 public class EntryTypeDialog extends JDialog implements ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
-
+    private static final int COLUMN = 3;
+    private final JabRefFrame frame;
+    private final CancelAction cancelAction = new CancelAction();
     private EntryType type;
     private SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new FetcherWorker();
     private JButton generateButton;
     private JTextField idTextField;
     private JComboBox<String> comboBox;
-    private final JabRefFrame frame;
-    private static final int COLUMN = 3;
-
-    private final CancelAction cancelAction = new CancelAction();
-
-    static class TypeButton extends JButton implements Comparable<TypeButton> {
-
-        private final EntryType type;
-
-
-        TypeButton(String label, EntryType type) {
-            super(label);
-            this.type = type;
-        }
-
-        @Override
-        public int compareTo(TypeButton o) {
-            return type.getName().compareTo(o.type.getName());
-        }
-
-        public EntryType getType() {
-            return type;
-        }
-    }
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
@@ -186,7 +164,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         idTextField = new JTextField("");
         comboBox = new JComboBox<>();
 
-        EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
         // set DOI as default
         comboBox.setSelectedItem(DoiFetcher.name);
 
@@ -263,6 +241,25 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return type;
     }
 
+    static class TypeButton extends JButton implements Comparable<TypeButton> {
+
+        private final EntryType type;
+
+
+        TypeButton(String label, EntryType type) {
+            super(label);
+            this.type = type;
+        }
+
+        @Override
+        public int compareTo(TypeButton o) {
+            return type.getName().compareTo(o.type.getName());
+        }
+
+        public EntryType getType() {
+            return type;
+        }
+    }
 
     class CancelAction extends AbstractAction {
         public CancelAction() {
@@ -290,7 +287,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
-            fetcher = EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
+            fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);
