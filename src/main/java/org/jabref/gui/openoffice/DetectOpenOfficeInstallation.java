@@ -94,7 +94,7 @@ public class DetectOpenOfficeInstallation extends AbstractWorker {
         fileChooser.showOpenDialog(parent);
 
         if (fileChooser.getSelectedFile() != null) {
-            return Optional.of(Paths.get(fileChooser.getSelectedFile().getParent()));
+            return Optional.of(fileChooser.getSelectedFile().toPath());
         }
         return Optional.empty();
     }
