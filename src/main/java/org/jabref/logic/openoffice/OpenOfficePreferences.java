@@ -27,7 +27,7 @@ public class OpenOfficePreferences {
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
 
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
-    public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice.bin";
+    public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice";
     public static final String OSX_EXECUTABLE = "soffice";
 
     public static final String DEFAULT_LINUX_PATH = "/opt/openoffice.org3";
