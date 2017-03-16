@@ -1,6 +1,7 @@
 package org.jabref.gui.exporter;
 
 import java.io.File;
+import java.util.Locale;
 
 import javax.swing.filechooser.FileFilter;
 
@@ -37,7 +38,7 @@ public class ExportFileFilter extends FileFilter implements Comparable<ExportFil
         if (file.isDirectory()) {
             return true;
         } else {
-            return file.getPath().toLowerCase().endsWith(extension);
+            return file.getPath().toLowerCase(Locale.ROOT).endsWith(extension);
         }
     }
 

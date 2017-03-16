@@ -6,8 +6,11 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
@@ -32,10 +35,11 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, String> toIcon) {
+    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, String> toIcon, Callback<S, Paint> toColor) {
         this.toGraphic = viewModel -> {
             Text graphic = new Text(toIcon.call(viewModel));
             graphic.getStyleClass().add("icon");
+            graphic.setFill(toColor.call(viewModel));
             return graphic;
         };
         return this;
@@ -74,7 +78,10 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        setTooltip(new Tooltip(toTooltip.call(viewModel)));
+                        String tooltip = toTooltip.call(viewModel);
+                        if (StringUtil.isNotBlank(tooltip)) {
+                            setTooltip(new Tooltip(tooltip));
+                        }
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));

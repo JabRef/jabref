@@ -1,8 +1,5 @@
 package org.jabref.logic.bibtex;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.strings.StringUtil;
@@ -268,6 +265,39 @@ public class LatexFieldFormatter {
 
     private void putIn(String s) {
         stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
+    }
+
+    private static void checkBraces(String text) throws IllegalArgumentException {
+        int left = 0;
+        int right = 0;
+
+        // First we collect all occurrences:
+        for (int i = 0; i < text.length(); i++) {
+            char item = text.charAt(i);
+
+            boolean charBeforeIsEscape = false;
+            if(i > 0 && text.charAt(i - 1) == '\\') {
+                charBeforeIsEscape = true;
+            }
+
+            if(!charBeforeIsEscape && item == '{') {
+                left++;
+            } else if (!charBeforeIsEscape && item == '}') {
+                right++;
+            }
+        }
+
+        // Then we throw an exception if the error criteria are met.
+        if (!(right == 0) && (left == 0)) {
+            throw new IllegalArgumentException("'}' character ends string prematurely.");
+        }
+        if (!(right == 0) && (right < left)) {
+            throw new IllegalArgumentException("'}' character ends string prematurely.");
+        }
+        if (left != right) {
+            throw new IllegalArgumentException("Braces don't match.");
+        }
+
     }
 
 }

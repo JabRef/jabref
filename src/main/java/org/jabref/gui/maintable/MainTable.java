@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -62,7 +63,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MainTable extends JTable {
-
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private final MainTableFormat tableFormat;
@@ -101,11 +101,9 @@ public class MainTable extends JTable {
 
     private static List<CompleteRenderer> markedNumberRenderers;
 
-
     static {
         MainTable.updateRenderers();
     }
-
 
     public MainTable(MainTableFormat tableFormat, MainTableDataModel model, JabRefFrame frame,
             BasePanel panel) {
@@ -305,7 +303,6 @@ public class MainTable extends JTable {
         }
 
         return renderer;
-
     }
 
     private void setWidths() {
@@ -372,7 +369,7 @@ public class MainTable extends JTable {
             //TODO OLD
             // String name = tableFormat.getColumnType(i);
             if (name != null) {
-                fields.add(name.toLowerCase());
+                fields.add(name.toLowerCase(Locale.ROOT));
             }
         }
         return fields;
@@ -403,7 +400,7 @@ public class MainTable extends JTable {
             } else {
                 comparators = comparatorChooser.getComparatorsForColumn(i);
                 comparators.clear();
-                comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase()));
+                comparators.add(new FieldComparator(tableFormat.getColumnName(i).toLowerCase(Locale.ROOT)));
             }
         }
 
@@ -483,7 +480,7 @@ public class MainTable extends JTable {
             }
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
             if (type.isPresent()) {
-                String columnName = getColumnName(col).toLowerCase();
+                String columnName = getColumnName(col).toLowerCase(Locale.ROOT);
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
                     return CellRendererMode.REQUIRED;
                 }
@@ -529,7 +526,7 @@ public class MainTable extends JTable {
     }
 
     /**
-     * method to check whether a MainTableColumn at the modelIndex refers to the file field (either as a specific
+     * Method to check whether a MainTableColumn at the modelIndex refers to the file field (either as a specific
      * file extension filter or not)
      *
      * @param modelIndex model index of the column to check
@@ -588,7 +585,7 @@ public class MainTable extends JTable {
     }
 
     /**
-     * updateFont
+     * Repaints the table with the most recent font configuration
      */
     public void updateFont() {
         setFont(GUIGlobals.currentFont);
@@ -606,7 +603,6 @@ public class MainTable extends JTable {
                 && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
-
     }
 
     public void scrollToCenter(int rowIndex, int vColIndex) {
@@ -649,8 +645,6 @@ public class MainTable extends JTable {
         repaint();
     }
 
-
-
     public static void updateRenderers() {
 
         MainTable.defRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND),
@@ -685,12 +679,10 @@ public class MainTable extends JTable {
     }
 
     private static Color mixColors(Color one, Color two) {
-        return new Color((one.getRed() + two.getRed()) / 2, (one.getGreen() + two.getGreen()) / 2,
-                (one.getBlue() + two.getBlue()) / 2);
+        return new Color((one.getRed() + two.getRed()) / 2, (one.getGreen() + two.getGreen()) / 2, (one.getBlue() + two.getBlue()) / 2);
     }
 
-    private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
-                                                                             Object sortingStrategy) {
+    private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list, Object sortingStrategy) {
         return TableComparatorChooser.install(table, list, sortingStrategy);
     }
 
@@ -706,7 +698,6 @@ public class MainTable extends JTable {
         TransferHandler handler = getTransferHandler();
         setTransferHandler(null);
         setTransferHandler(handler);
-
     }
 
     /**
@@ -721,10 +712,6 @@ public class MainTable extends JTable {
         } else {
             return l.get(number);
         }
-    }
-
-    public PersistenceTableColumnListener getTableColumnListener() {
-        return tableColumnListener;
     }
 
     public MainTableColumn getMainTableColumn(int modelIndex) {

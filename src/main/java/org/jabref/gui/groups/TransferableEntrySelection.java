@@ -16,10 +16,6 @@ public class TransferableEntrySelection implements Transferable {
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;
     private static final DataFlavor[] FLAVORS;
-    private final List<BibEntry> selectedEntries;
-    private final String selectedEntriesCiteKeys;
-
-    private boolean includeCiteKeyword;
 
     static {
         DataFlavor df1 = null;
@@ -33,9 +29,13 @@ public class TransferableEntrySelection implements Transferable {
         }
         FLAVOR_INTERNAL = df1;
         FLAVOR_EXTERNAL = df2;
-        FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL, TransferableEntrySelection.FLAVOR_EXTERNAL};
+        FLAVORS = new DataFlavor[] {TransferableEntrySelection.FLAVOR_INTERNAL,
+                TransferableEntrySelection.FLAVOR_EXTERNAL};
     }
 
+    private final List<BibEntry> selectedEntries;
+    private final String selectedEntriesCiteKeys;
+    private boolean includeCiteKeyword;
 
     public TransferableEntrySelection(List<BibEntry> list) {
         this.selectedEntries = list;
@@ -58,20 +58,24 @@ public class TransferableEntrySelection implements Transferable {
     @Override
     public Object getTransferData(DataFlavor someFlavor)
             throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor)) {
-            throw new UnsupportedFlavorException(someFlavor);
-        }
+
+        String s = includeCiteKeyword ? "\\cite{" + selectedEntriesCiteKeys + "}" : selectedEntriesCiteKeys;
+
         if (someFlavor.equals(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             return this;
         }
-        String s = includeCiteKeyword ?
-                "\\cite{" + selectedEntriesCiteKeys + "}"
-                : selectedEntriesCiteKeys;
-        String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
-        if (charset == null) {
-            charset = "";
+
+        else if (someFlavor.equals(DataFlavor.getTextPlainUnicodeFlavor())) {
+
+            String charset = TransferableEntrySelection.FLAVOR_EXTERNAL.getParameter("charset");
+            if (charset == null) {
+                charset = "";
+            }
+            return new ByteArrayInputStream(s.getBytes(charset.trim()));
         }
-        return new ByteArrayInputStream(s.getBytes(charset.trim()));
+
+        //The text/plain DataFormat of javafx uses the String.class directly as representative class and no longer an InputStream
+        return s;
     }
 
     public List<BibEntry> getSelection() {

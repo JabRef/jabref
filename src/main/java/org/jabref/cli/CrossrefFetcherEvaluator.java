@@ -10,13 +10,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jabref.Globals;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.util.DOI;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.JabRefPreferences;
 
 /**
@@ -52,22 +53,31 @@ public class CrossrefFetcherEvaluator {
                         Optional<DOI> origDOI = entry.getField(FieldName.DOI).flatMap(DOI::build);
                         if (origDOI.isPresent()) {
                             dois.incrementAndGet();
-                            Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
-                            if (crossrefDOI.isPresent()) {
-                                doiFound.incrementAndGet();
-                                if (origDOI.get().getDOI().equalsIgnoreCase(crossrefDOI.get().getDOI())) {
-                                    doiIdentical.incrementAndGet();
+                            try {
+                                Optional<DOI> crossrefDOI = new CrossRef().findIdentifier(entry);
+                                if (crossrefDOI.isPresent()) {
+                                    doiFound.incrementAndGet();
+                                    if (origDOI.get().getDOI().equalsIgnoreCase(crossrefDOI.get().getDOI())) {
+                                        doiIdentical.incrementAndGet();
+                                    } else {
+                                        System.out.println("DOI not identical for : " + entry);
+                                    }
                                 } else {
-                                    System.out.println("DOI not identical for : " + entry);
+                                    System.out.println("DOI not found for: " + entry);
                                 }
-                            } else {
-                                System.out.println("DOI not found for: " + entry);
+                            } catch (FetcherException e) {
+                                e.printStackTrace();
                             }
+
                         } else {
-                            Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);
-                            if (crossrefDOI.isPresent()) {
-                                System.out.println("New DOI found for: " + entry);
-                                doiNew.incrementAndGet();
+                            try {
+                                Optional<DOI> crossrefDOI = new CrossRef().findIdentifier(entry);
+                                if (crossrefDOI.isPresent()) {
+                                    System.out.println("New DOI found for: " + entry);
+                                    doiNew.incrementAndGet();
+                                }
+                            } catch (FetcherException e) {
+                                e.printStackTrace();
                             }
                         }
                         countDownLatch.countDown();

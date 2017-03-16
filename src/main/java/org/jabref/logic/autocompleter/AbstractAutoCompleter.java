@@ -3,6 +3,7 @@ package org.jabref.logic.autocompleter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -55,7 +56,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         if (isTooShortToComplete(toComplete)) {
             return new ArrayList<>();
         }
-        String lowerCase = toComplete.toLowerCase();
+        String lowerCase = toComplete.toLowerCase(Locale.ROOT);
 
         if (lowerCase.equals(toComplete)) {
             // user typed in lower case word -> we do an case-insensitive search
@@ -112,7 +113,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         // insensitive treatment
         // first, add the lower cased word to search index
         // second, add a mapping from the lower cased word to the real word
-        String lowerCase = word.toLowerCase();
+        String lowerCase = word.toLowerCase(Locale.ROOT);
         indexCaseInsensitive.add(lowerCase);
         Set<String> set = possibleStringsForSearchString.get(lowerCase);
         if (set == null) {

@@ -10,32 +10,26 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
 
-import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @deprecated use {@link DialogService} instead.
  */
 @Deprecated
 public class FileDialog {
-    private static final Log LOGGER = LogFactory.getLog(FileDialog.class);
+
 
     private final FileChooser fileChooser;
     private FileDialogConfiguration.Builder configurationBuilder;
@@ -69,9 +63,9 @@ public class FileDialog {
             dir = null;
         }
         fileChooser = new FileChooser();
-
         configurationBuilder = new FileDialogConfiguration.Builder();
         configurationBuilder = configurationBuilder.withInitialDirectory(dir);
+
     }
 
     /**
@@ -114,6 +108,14 @@ public class FileDialog {
     }
 
     /**
+     * Sets the initial file name, useful for saving dialogs
+     * @param fileName
+     */
+    public void setInitialFileName(String fileName) {
+        fileChooser.setInitialFileName(fileName);
+    }
+
+    /**
      * Sets a custom file filter.
      * Only use when withExtension() does not suffice.
      *
@@ -122,6 +124,7 @@ public class FileDialog {
     public void setFileFilter(FileChooser.ExtensionFilter filter) {
         fileChooser.getExtensionFilters().add(filter);
         fileChooser.setSelectedExtensionFilter(filter);
+
     }
 
     /**
@@ -144,7 +147,8 @@ public class FileDialog {
         directoryChooser.setTitle(Localization.lang("Select directory"));
         configuration.getInitialDirectory().map(Path::toFile).ifPresent(directoryChooser::setInitialDirectory);
 
-        return runInJavaFXThread(() -> Optional.ofNullable(directoryChooser.showDialog(null)).map(File::toPath));
+        return DefaultTaskExecutor
+                .runInJavaFXThread(() -> Optional.ofNullable(directoryChooser.showDialog(null)).map(File::toPath));
     }
 
     /**
@@ -153,7 +157,7 @@ public class FileDialog {
      */
     public List<String> showDialogAndGetMultipleFiles() {
         configureFileChooser();
-        return runInJavaFXThread(() -> {
+        return DefaultTaskExecutor.runInJavaFXThread(() -> {
             List<File> files = fileChooser.showOpenMultipleDialog(null);
             if (files == null) {
                 return Collections.emptyList();
@@ -176,7 +180,8 @@ public class FileDialog {
      */
     public Optional<Path> showDialogAndGetSelectedFile() {
         configureFileChooser();
-        return runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showOpenDialog(null)).map(File::toPath));
+        return DefaultTaskExecutor
+                .runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showOpenDialog(null)).map(File::toPath));
     }
 
     /**
@@ -187,22 +192,8 @@ public class FileDialog {
      */
     public Optional<Path> saveNewFile() {
         configureFileChooser();
-        return runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showSaveDialog(null)).map(File::toPath));
-    }
-
-    /**
-     * We need to be careful and run everything in the javafx thread
-     * TODO: Remove this work-around as soon as everything uses the javafx thread
-     */
-    private <V> V runInJavaFXThread(Callable<V> callable) {
-        FutureTask<V> task = new FutureTask<>(callable);
-        Platform.runLater(task);
-        try {
-            return task.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error(e);
-            return null;
-        }
+        return DefaultTaskExecutor
+                .runInJavaFXThread(() -> Optional.ofNullable(fileChooser.showSaveDialog(null)).map(File::toPath));
     }
 
     private static String getWorkingDir() {

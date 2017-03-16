@@ -32,7 +32,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportMenuItem;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
-import org.jabref.gui.net.MonitoredURLDownload;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
@@ -43,21 +43,13 @@ import org.apache.commons.logging.LogFactory;
 public class EntryTableTransferHandler extends TransferHandler {
 
     private final MainTable entryTable;
-
     private final JabRefFrame frame;
-
     private final BasePanel panel;
-
     private DataFlavor urlFlavor;
-
     private final DataFlavor stringFlavor;
-
     private static final boolean DROP_ALLOWED = true;
-
     private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
-
     private boolean draggingFile;
-
 
     /**
      * Construct the transfer handler.
@@ -174,14 +166,12 @@ public class EntryTableTransferHandler extends TransferHandler {
         return false;
     }
 
-
-
     @Override
     public void exportAsDrag(JComponent comp, InputEvent e, int action) {
         if (e instanceof MouseEvent) {
             int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
             int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
-            if(entryTable.isFileColumn(modelIndex)) {
+            if (entryTable.isFileColumn(modelIndex)) {
                 LOGGER.info("Dragging file");
                 draggingFile = true;
             }
@@ -377,10 +367,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         File tmpfile = File.createTempFile("jabrefimport", "");
         tmpfile.deleteOnExit();
 
-        // System.out.println("Import url: " + dropLink.toString());
-        // System.out.println("Temp file: "+tmpfile.getAbsolutePath());
-
-        MonitoredURLDownload.buildMonitoredDownload(entryTable, dropLink).downloadToFile(tmpfile);
+        new URLDownload(dropLink).toFile(tmpfile.toPath());
 
         // Import into new if entryTable==null, otherwise into current library:
         ImportMenuItem importer = new ImportMenuItem(frame, entryTable == null);

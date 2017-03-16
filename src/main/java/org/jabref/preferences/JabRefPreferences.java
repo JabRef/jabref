@@ -46,8 +46,6 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.logic.exporter.CustomExportList;
-import org.jabref.logic.exporter.ExportComparator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;

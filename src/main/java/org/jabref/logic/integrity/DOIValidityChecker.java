@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.DOI;
+import org.jabref.model.entry.identifier.DOI;
 
 public class DOIValidityChecker implements ValueChecker {
 

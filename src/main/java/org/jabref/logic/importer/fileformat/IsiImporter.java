@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -126,7 +127,7 @@ public class IsiImporter extends Importer {
             if (map.containsKey(aSubsup)) {
 
                 String s = map.get(aSubsup);
-                if (s.toUpperCase().equals(s)) {
+                if (s.toUpperCase(Locale.ROOT).equals(s)) {
                     s = new TitleCaseFormatter().format(s);
                     map.put(aSubsup, s);
                 }
@@ -288,7 +289,7 @@ public class IsiImporter extends Importer {
                     if ("ER".equals(beg) || "EF".equals(beg) || "VR".equals(beg) || "FN".equals(beg)) {
                         continue;
                     }
-                    hm.put(beg.toLowerCase(), value);
+                    hm.put(beg.toLowerCase(Locale.ROOT), value);
                 }
             }
 
@@ -337,7 +338,7 @@ public class IsiImporter extends Importer {
 
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
-            MonthUtil.Month month = MonthUtil.getMonthByShortName(part1.toLowerCase());
+            MonthUtil.Month month = MonthUtil.getMonthByShortName(part1.toLowerCase(Locale.ROOT));
             if (month.isValid()) {
                 return month.bibtexFormat;
             }
@@ -385,7 +386,7 @@ public class IsiImporter extends Importer {
             first = firstParts[i];
 
             // Do we have only uppercase chars?
-            if (first.toUpperCase().equals(first)) {
+            if (first.toUpperCase(Locale.ROOT).equals(first)) {
                 first = first.replace(".", "");
                 for (int j = 0; j < first.length(); j++) {
                     sb.append(first.charAt(j)).append('.');

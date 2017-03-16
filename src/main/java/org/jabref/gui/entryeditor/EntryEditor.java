@@ -73,7 +73,6 @@ import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.help.HelpAction;
-import org.jabref.gui.importer.fetcher.EntryFetchers;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
@@ -94,6 +93,7 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
@@ -108,8 +108,8 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MathSciNetId;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.identifier.MathSciNetId;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -127,7 +127,6 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
-
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
@@ -544,7 +543,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         JPopupMenu fetcherPopup = new JPopupMenu();
 
-        for (EntryBasedFetcher fetcher : EntryFetchers
+        for (EntryBasedFetcher fetcher : WebFetchers
                 .getEntryBasedFetchers(Globals.prefs.getImportFormatPreferences())) {
             fetcherPopup.add(new JMenuItem(new AbstractAction(fetcher.getName()) {
 
@@ -1173,7 +1172,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // When the tab "Related articles" gets selected, the request to get the recommendations is started.
-                if (activeTab instanceof EntryEditorTabRelatedArticles) {
+                if (activeTab == relatedArticlePanel) {
                     relatedArticlesTab.focus();
                 }
             });

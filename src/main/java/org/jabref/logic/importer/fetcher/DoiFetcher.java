@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +17,10 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.DOI;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String name = "DOI";
@@ -52,8 +51,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
                 // BibTeX data
                 URLDownload download = new URLDownload(doiURL);
-                download.addParameters("Accept", "application/x-bibtex");
-                String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
+                download.addHeader("Accept", "application/x-bibtex");
+                String bibtexString = download.asString();
 
                 // BibTeX entry
                 Optional<BibEntry> fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences);

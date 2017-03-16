@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -223,7 +224,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             toSet = null;
         }
 
-        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase());
+        String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase(Locale.ROOT));
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
             if (fields.length > 1) {

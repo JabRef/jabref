@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 import javafx.stage.FileChooser;
@@ -65,9 +66,17 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public Optional<ButtonType> showConfirmationDialogAndWait(String title, String content) {
+    public boolean showConfirmationDialogAndWait(String title, String content) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
-        return alert.showAndWait();
+        return alert.showAndWait().filter(buttonType -> buttonType == ButtonType.OK).isPresent();
+    }
+
+    @Override
+    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel) {
+        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        alert.getButtonTypes().setAll(ButtonType.CANCEL, okButtonType);
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
     }
 
     @Override
@@ -115,6 +124,7 @@ public class FXDialogService implements DialogService {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
         chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());
+        chooser.setInitialFileName(fileDialogConfiguration.getInitialFileName());
         fileDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
         return chooser;
     }

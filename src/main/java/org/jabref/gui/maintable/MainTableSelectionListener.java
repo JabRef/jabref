@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,27 +55,26 @@ import org.apache.commons.logging.LogFactory;
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
-public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
-        KeyListener, FocusListener {
+public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
+    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
-    private final EventList<BibEntry> tableRows;
 
+    private final EventList<BibEntry> tableRows;
     private PreviewPanel preview;
     private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
+
     private boolean workingOnPreview;
 
     private boolean enabled = true;
-
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
     private int lastPressedCount;
-    private long lastPressedTime;
 
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private long lastPressedTime;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
@@ -280,7 +280,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             // If there are one or more links of the correct type, open the first one:
                             if (modelColumn.isFileFilter()) {
                                 for (int i = 0; i < fileList.getRowCount(); i++) {
-                                    if (fileList.getEntry(i).type.toString().equals(modelColumn.getColumnName())) {
+                                    if (fileList.getEntry(i).getType().toString().equals(modelColumn.getColumnName())) {
                                         flEntry = fileList.getEntry(i);
                                         break;
                                     }
@@ -291,12 +291,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.map(ExternalFileType::getIcon).orElse(null),
-                                        panel.getBibDatabaseContext(), flEntry.type);
-                                boolean success = item.openLink();
-                                if (!success) {
-                                    panel.output(Localization.lang("Unable to open link."));
-                                }
+                                        flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).orElse(null),
+                                        panel.getBibDatabaseContext(), flEntry.getType());
+                                item.doClick();
                             }
                         } else {
                             try {
@@ -382,16 +379,16 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
                         if (column.isFileFilter()
-                                && (!flEntry.type.get().getName().equalsIgnoreCase(column.getColumnName()))) {
+                                && (!flEntry.getType().get().getName().equalsIgnoreCase(column.getColumnName()))) {
                             continue;
                         }
-                        String description = flEntry.description;
+                        String description = flEntry.getDescription();
                         if ((description == null) || (description.trim().isEmpty())) {
-                            description = flEntry.link;
+                            description = flEntry.getLink();
                         }
-                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                                flEntry.type.get().getIcon(), panel.getBibDatabaseContext(),
-                                flEntry.type));
+                        menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.getLink(),
+                                flEntry.getType().get().getIcon(), panel.getBibDatabaseContext(),
+                                flEntry.getType()));
                         showDefaultPopup = false;
                     }
                 } else {
@@ -518,7 +515,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (o == null) {
                     continue;
                 }
-                String s = o.toString().toLowerCase();
+                String s = o.toString().toLowerCase(Locale.ROOT);
                 if (s.length() >= lastPressedCount) {
                     for (int j = 0; j < lastPressedCount; j++) {
                         if (s.charAt(j) != lastPressed[j]) {

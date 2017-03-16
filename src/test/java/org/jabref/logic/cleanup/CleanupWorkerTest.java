@@ -18,6 +18,7 @@ import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.model.Defaults;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.cleanup.FieldFormatterCleanups;
@@ -26,6 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -36,6 +38,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CleanupWorkerTest {
 
@@ -52,7 +55,11 @@ public class CleanupWorkerTest {
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
+        context.setDatabaseFile(bibFolder.newFile("test.bib"));
+
+        FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Biblocation as Primary overwrites all other dirs
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
 
@@ -60,7 +67,7 @@ public class CleanupWorkerTest {
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
                         "", //empty fileDirPattern for backwards compatibility
                         prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
-                        prefs.getFileDirectoryPreferences()));
+                        fileDirPrefs));
 
     }
 

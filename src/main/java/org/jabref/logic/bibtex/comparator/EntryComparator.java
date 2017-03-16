@@ -1,6 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.jabref.model.entry.AuthorList;
@@ -65,10 +66,10 @@ public class EntryComparator implements Comparator<BibEntry> {
         // sorted according to last name.
         if (InternalBibtexFields.getFieldProperties(sortField).contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
-                f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
+                f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase(Locale.ROOT);
             }
             if (f2 != null) {
-                f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase();
+                f2 = AuthorList.fixAuthorForAlphabetization((String) f2).toLowerCase(Locale.ROOT);
             }
 
         } else if (sortField.equals(BibEntry.TYPE_HEADER)) {
@@ -111,8 +112,8 @@ public class EntryComparator implements Comparator<BibEntry> {
             Integer f2AsInteger = Integer.valueOf(f2.toString());
             result = -((Integer) f1).compareTo(f2AsInteger);
         } else {
-            String ours = ((String) f1).toLowerCase();
-            String theirs = ((String) f2).toLowerCase();
+            String ours = ((String) f1).toLowerCase(Locale.ROOT);
+            String theirs = ((String) f2).toLowerCase(Locale.ROOT);
             int comp = ours.compareTo(theirs);
             result = -comp;
         }

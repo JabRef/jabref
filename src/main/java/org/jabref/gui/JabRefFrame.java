@@ -30,7 +30,6 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
@@ -277,6 +276,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction copyPreview = new GeneralAction(Actions.COPY_CITATION_HTML, Localization.lang("Copy preview"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW));
+    private final AbstractAction copyTitle = new GeneralAction(Actions.COPY_TITLE, Localization.menuTitle("Copy title"),
+            Globals.getKeyPrefs().getKey(KeyBinding.COPY_TITLE));
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
     private final AbstractAction copyCiteKey = new GeneralAction(Actions.COPY_CITE_KEY, Localization.menuTitle(
@@ -551,7 +552,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         setGlassPane(glassPane);
 
         setTitle(FRAME_TITLE);
-        setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
+        setIconImages(IconTheme.getLogoSet());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
 
@@ -1039,6 +1040,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         edit.addSeparator();
 
+        edit.add(copyTitle);
         edit.add(copyKey);
         edit.add(copyCiteKey);
         edit.add(copyKeyAndTitle);
@@ -1536,7 +1538,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     private boolean readyForAutosave(BibDatabaseContext context) {
-        return (context.getLocation() == DatabaseLocation.SHARED ||
+        return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
                 context.getDatabaseFile().isPresent();
     }

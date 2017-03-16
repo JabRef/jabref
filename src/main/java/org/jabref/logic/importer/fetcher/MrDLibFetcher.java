@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -87,8 +86,8 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String makeServerRequest(String queryByTitle) throws FetcherException {
         try {
             URLDownload urlDownload = new URLDownload(constructQuery(queryByTitle));
-            urlDownload.fixSSLVerification();
-            String response = urlDownload.downloadToString(StandardCharsets.UTF_8);
+            urlDownload.bypassSSLVerification();
+            String response = urlDownload.asString();
 
             //Conversion of < and >
             response = response.replaceAll("&gt;", ">");

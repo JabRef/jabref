@@ -66,8 +66,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             entry.getField(FieldName.FILE).ifPresent(tm::setContent);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
-                if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
-                    FileUtil.expandFilename(flEntry.link, dirs).ifPresent(files::add);
+                if ((flEntry.getType().isPresent()) && "pdf".equalsIgnoreCase(flEntry.getType().get().getName())) {
+                    FileUtil.expandFilename(flEntry.getLink(), dirs).ifPresent(files::add);
                 }
             }
         }

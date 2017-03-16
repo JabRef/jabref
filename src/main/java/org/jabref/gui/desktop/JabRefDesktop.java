@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -29,12 +30,13 @@ import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -45,12 +47,10 @@ import org.apache.commons.logging.LogFactory;
  * http://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform
  */
 public class JabRefDesktop {
+    private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
 
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
-    private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
-
-    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -82,19 +82,13 @@ public class JabRefDesktop {
                 }
             }
         } else if (FieldName.DOI.equals(fieldName)) {
-            Optional<DOI> doiUrl = DOI.build(link);
-            if (doiUrl.isPresent()) {
-                link = doiUrl.get().getURIAsASCIIString();
-            }
+            link = DOI.build(link).map(DOI::getURIAsASCIIString).orElse(link);
             // should be opened in browser
             fieldName = FieldName.URL;
         } else if (FieldName.EPRINT.equals(fieldName)) {
+            link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
+            // should be opened in browser
             fieldName = FieldName.URL;
-
-            // Check to see if link field already contains a well formated URL
-            if (!link.startsWith("http://")) {
-                link = ARXIV_LOOKUP_PREFIX + link;
-            }
         }
 
         if (FieldName.URL.equals(fieldName)) { // html
@@ -136,7 +130,7 @@ public class JabRefDesktop {
             final Optional<ExternalFileType> type) throws IOException {
         boolean httpLink = false;
 
-        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase()).matches()) {
+        if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             httpLink = true;
         }
 
@@ -221,7 +215,7 @@ public class JabRefDesktop {
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
                 FileListEntry iEntry = tModel.getEntry(i);
-                if (iEntry.link.equals(link)) {
+                if (iEntry.getLink().equals(link)) {
                     flEntry = iEntry;
                     break;
                 }
@@ -242,7 +236,7 @@ public class JabRefDesktop {
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
-                return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
+                return openExternalFileAnyFormat(databaseContext, flEntry.getLink(), flEntry.getType());
             } else {
                 // Canceled:
                 frame.output(cancelMessage);

@@ -137,7 +137,7 @@ public class AutoSetLinks {
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
                             //System.out.println("Comp: "+existingEntry.getLink());
-                            if (new File(existingEntry.link).equals(f)) {
+                            if (new File(existingEntry.getLink()).equals(f)) {
                                 alreadyHas = true;
                                 foundAny = true;
                                 break;

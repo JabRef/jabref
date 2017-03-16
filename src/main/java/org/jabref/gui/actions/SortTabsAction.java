@@ -2,6 +2,7 @@ package org.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -41,6 +42,6 @@ public class SortTabsAction extends MnemonicAwareAction implements Comparator<St
 
     @Override
     public int compare(String o1, String o2) {
-        return o1.toLowerCase().compareTo(o2.toLowerCase());
+        return o1.toLowerCase(Locale.ROOT).compareTo(o2.toLowerCase(Locale.ROOT));
     }
 }

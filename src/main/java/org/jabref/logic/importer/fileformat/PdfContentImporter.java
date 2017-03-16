@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -18,7 +19,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XMPUtil;
@@ -26,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -256,7 +257,7 @@ public class PdfContentImporter extends Importer {
                 } else {
                     // e.g. Copyright (c) 1998 by the Genetics Society of America
                     // future work: get year using RegEx
-                    String lower = curString.toLowerCase();
+                    String lower = curString.toLowerCase(Locale.ROOT);
                     if (lower.contains("copyright")) {
                         fillCurStringWithNonEmptyLines();
                         publisher = curString;
@@ -321,7 +322,7 @@ public class PdfContentImporter extends Importer {
                     fillCurStringWithNonEmptyLines();
                     keywords = removeNonLettersAtEnd(curString);
                 } else {
-                    String lower = curString.toLowerCase();
+                    String lower = curString.toLowerCase(Locale.ROOT);
 
                     int pos = lower.indexOf("technical");
                     if (pos >= 0) {

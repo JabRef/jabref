@@ -43,6 +43,7 @@ import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.MoveFileAction;
+import org.jabref.gui.externalfiles.RenameFileAction;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.filelist.FileListEntry;
@@ -74,7 +75,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final JPopupMenu menu = new JPopupMenu();
 
     public FileListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
-                          EntryEditor entryEditor) {
+            EntryEditor entryEditor) {
         this.frame = frame;
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
@@ -86,6 +87,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
+        initKeyBindings();
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
@@ -108,8 +110,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         download.addActionListener(e -> downloadFile());
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout
-                ("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                .layout(new FormLayout("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
         builder.add(add).xy(3, 1);
         builder.add(auto).xy(5, 1);
@@ -125,6 +126,98 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         setTransferHandler(transferHandler);
         panel.setTransferHandler(transferHandler);
 
+        JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
+        menu.add(openLink);
+        openLink.addActionListener(e -> openSelectedFile());
+
+        JMenuItem openFolder = new JMenuItem(Localization.lang("Open folder"));
+        menu.add(openFolder);
+        openFolder.addActionListener(e -> {
+            int row = getSelectedRow();
+            if (row >= 0) {
+                FileListEntry entry = tableModel.getEntry(row);
+                try {
+                    String path = "";
+                    // absolute path
+                    if (Paths.get(entry.getLink()).isAbsolute()) {
+                        path = Paths.get(entry.getLink()).toString();
+                    } else {
+                        // relative to file folder
+                        for (String folder : databaseContext
+                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
+                            Path file = Paths.get(folder, entry.getLink());
+                            if (Files.exists(file)) {
+                                path = file.toString();
+                                break;
+                            }
+                        }
+                    }
+                    if (!path.isEmpty()) {
+                        JabRefDesktop.openFolderAndSelectFile(path);
+                    } else {
+                        JOptionPane.showMessageDialog(frame,
+                                Localization.lang("File not found"),
+                                Localization.lang("Error"),
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (IOException ex) {
+                    LOGGER.debug("Cannot open folder", ex);
+                }
+            }
+        });
+
+        JMenuItem rename = new JMenuItem(Localization.lang("Rename file"));
+        menu.add(rename);
+        rename.addActionListener(new RenameFileAction(frame, entryEditor, this));
+
+        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
+        menu.add(moveToFileDir);
+        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this));
+
+        JMenuItem deleteFile = new JMenuItem(Localization.lang("Permanently delete local file"));
+        menu.add(deleteFile);
+        deleteFile.addActionListener(e -> {
+            int row = getSelectedRow();
+
+            // no selection
+            if (row == -1) {
+                return;
+            }
+
+            FileListEntry entry = tableModel.getEntry(row);
+            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.getLink(),
+                    Globals.prefs.getFileDirectoryPreferences());
+
+            if (file.isPresent()) {
+                String[] options = {Localization.lang("Delete"), Localization.lang("Cancel")};
+                int userConfirm = JOptionPane.showOptionDialog(frame,
+                        Localization.lang("Delete '%0'?", file.get().getName()),
+                        Localization.lang("Delete file"),
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+
+                if (userConfirm == JOptionPane.YES_OPTION) {
+                    try {
+                        Files.delete(file.get().toPath());
+                        removeEntries();
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
+                                Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.warn("File permission error while deleting: " + entry.getLink(), ex);
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, Localization.lang("File not found"),
+                        Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        adjustColumnWidth();
+    }
+
+    private void initKeyBindings() {
         // Add an input/action pair for deleting entries:
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
         getActionMap().put("delete", new AbstractAction() {
@@ -170,95 +263,13 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         });
 
-        JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
-        menu.add(openLink);
-        openLink.addActionListener(e -> openSelectedFile());
-
-        JMenuItem openFolder = new JMenuItem(Localization.lang("Open folder"));
-        menu.add(openFolder);
-        openFolder.addActionListener(e -> {
-            int row = getSelectedRow();
-            if (row >= 0) {
-                FileListEntry entry = tableModel.getEntry(row);
-                try {
-                    String path = "";
-                    // absolute path
-                    if (Paths.get(entry.link).isAbsolute()) {
-                        path = Paths.get(entry.link).toString();
-                    } else {
-                        // relative to file folder
-                        for (String folder : databaseContext
-                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
-                            Path file = Paths.get(folder, entry.link);
-                            if (Files.exists(file)) {
-                                path = file.toString();
-                                break;
-                            }
-                        }
-                    }
-                    if (!path.isEmpty()) {
-                        JabRefDesktop.openFolderAndSelectFile(path);
-                    } else {
-                        JOptionPane.showMessageDialog(frame,
-                                Localization.lang("File not found"),
-                                Localization.lang("Error"),
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } catch (IOException ex) {
-                    LOGGER.debug("Cannot open folder", ex);
-                }
+        getInputMap().put(KeyStroke.getKeyStroke("F4"),"open file");
+        getActionMap().put("open file", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                openSelectedFile();
             }
         });
-
-        JMenuItem rename = new JMenuItem(Localization.lang("Move/Rename file"));
-        menu.add(rename);
-        rename.addActionListener(new MoveFileAction(frame, entryEditor, this, false));
-
-        JMenuItem moveToFileDir = new JMenuItem(Localization.lang("Move file to file directory"));
-        menu.add(moveToFileDir);
-        moveToFileDir.addActionListener(new MoveFileAction(frame, entryEditor, this, true));
-
-        JMenuItem deleteFile = new JMenuItem(Localization.lang("Permanently delete local file"));
-        menu.add(deleteFile);
-        deleteFile.addActionListener(e -> {
-            int row = getSelectedRow();
-
-            // no selection
-            if (row == -1) {
-                return;
-            }
-
-            FileListEntry entry = tableModel.getEntry(row);
-            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
-                    Globals.prefs.getFileDirectoryPreferences());
-
-            if (file.isPresent()) {
-                String[] options = {Localization.lang("Delete"), Localization.lang("Cancel")};
-                int userConfirm = JOptionPane.showOptionDialog(frame,
-                        Localization.lang("Delete '%0'?", file.get().getName()),
-                        Localization.lang("Delete file"),
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        options,
-                        options[0]);
-
-                if (userConfirm == JOptionPane.YES_OPTION) {
-                    try {
-                        Files.delete(file.get().toPath());
-                        removeEntries();
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
-                                Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-                        LOGGER.warn("File permission error while deleting: " + entry.link, ex);
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(frame, Localization.lang("File not found"),
-                        Localization.lang("Cannot delete file"), JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        adjustColumnWidth();
     }
 
     public void adjustColumnWidth() {
@@ -279,8 +290,9 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             FileListEntry entry = tableModel.getEntry(row);
             try {
                 Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
-                        .getExternalFileTypeByName(entry.type.get().getName());
-                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.link, type.isPresent() ? type : entry.type);
+                        .getExternalFileTypeByName(entry.getType().get().getName());
+                JabRefDesktop.openExternalFileAnyFormat(databaseContext, entry.getLink(),
+                        type.isPresent() ? type : entry.getType());
             } catch (IOException e) {
                 LOGGER.warn("Cannot open selected file.", e);
             }
@@ -451,7 +463,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     }
                     // reset
                     auto.setEnabled(true);
-                } , dialog));
+                }, dialog));
     }
 
     /**
@@ -493,6 +505,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     class TableClickListener extends MouseAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {

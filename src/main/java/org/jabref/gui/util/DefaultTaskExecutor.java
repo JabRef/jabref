@@ -1,14 +1,23 @@
 package org.jabref.gui.util;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
  * Every submitted task is invoked in a separate thread.
  */
 public class DefaultTaskExecutor implements TaskExecutor {
+
+    private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
 
     @Override
     public <V> void execute(BackgroundTask<V> task) {
@@ -17,6 +26,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
             @Override
             public V call() throws Exception {
                 return task.call();
@@ -44,4 +54,16 @@ public class DefaultTaskExecutor implements TaskExecutor {
             return new Exception(throwable);
         }
     }
+
+    public static <V> V runInJavaFXThread(Callable<V> callable) {
+        FutureTask<V> task = new FutureTask<>(callable);
+        Platform.runLater(task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e);
+            return null;
+        }
+    }
+
 }

@@ -16,7 +16,7 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final String fileNamePattern;
     private final String fileDirPattern;
-    private final LayoutFormatterPreferences prefs;
+    private final LayoutFormatterPreferences layoutPrefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
 
@@ -25,7 +25,7 @@ public class CleanupWorker {
         this.databaseContext = databaseContext;
         this.fileNamePattern = cleanupPreferences.getFileNamePattern();
         this.fileDirPattern = cleanupPreferences.getFileDirPattern();
-        this.prefs = cleanupPreferences.getLayoutFormatterPreferences();
+        this.layoutPrefs = cleanupPreferences.getLayoutFormatterPreferences();
         this.fileDirectoryPreferences = cleanupPreferences.getFileDirectoryPreferences();
     }
 
@@ -69,14 +69,14 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext, fileDirectoryPreferences));
+            jobs.add(new MoveFilesCleanup(databaseContext, fileDirPattern, fileDirectoryPreferences, layoutPrefs));
         }
         if (preset.isMakePathsRelative()) {
             jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    fileNamePattern, fileDirPattern, prefs, fileDirectoryPreferences);
+                    fileNamePattern, layoutPrefs, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }
