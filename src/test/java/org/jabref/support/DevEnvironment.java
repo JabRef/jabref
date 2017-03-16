@@ -18,9 +18,4 @@ public class DevEnvironment {
         return Boolean.valueOf(System.getenv("CIRCLECI"));
     }
 
-    public static boolean isSnapCI() {
-        // See https://docs.snap-ci.com/environment-variables/
-        return Boolean.valueOf(System.getenv("SNAP_CI"));
-    }
-
 }
