@@ -31,7 +31,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.EntryAnnotationImporter;
+import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.FileAnnotation;
 
@@ -65,35 +65,23 @@ class FileAnnotationTab extends JPanel {
     private final JScrollPane markedTextScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton reloadAnnotationsButton = new JButton();
+    private final FileAnnotationCache fileAnnotationCache;
     private DefaultListModel<FileAnnotation> listModel;
 
     private final EntryEditor parent;
 
-    private Map<String, List<FileAnnotation>> annotationsOfFiles;
     private boolean isInitialized;
 
 
-    FileAnnotationTab(EntryEditor parent) {
+    FileAnnotationTab(EntryEditor parent, FileAnnotationCache cache) {
+        this.fileAnnotationCache = cache;
         this.parent = parent;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel = new DefaultListModel<>();
         this.isInitialized = false;
     }
 
-    private FileAnnotationTab initializeTab(FileAnnotationTab tab) {
-        if (tab.isInitialized) {
-            return tab;
-        }
-
-        tab.setUpGui();
-        tab.isInitialized = true;
-        tab.parent.repaint();
-        return tab;
-    }
-
-    public FileAnnotationTab initializeTab(FileAnnotationTab tab, Map<String, List<FileAnnotation>> cachedFileAnnotations) {
-        this.annotationsOfFiles = cachedFileAnnotations;
-
+    public FileAnnotationTab initializeTab(FileAnnotationTab tab) {
         if (tab.isInitialized) {
             return tab;
         }
@@ -119,10 +107,11 @@ class FileAnnotationTab extends JPanel {
 
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
-            this.annotationsOfFiles.keySet().forEach(fileNameComboBox::addItem);
+            final Map<String, List<FileAnnotation>> fileAnnotations = fileAnnotationCache.getFromCache(parent.getEntry());
+            fileAnnotations.keySet().forEach(fileNameComboBox::addItem);
 
             //show the annotationsOfFiles attached to the selected file
-            updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem() == null ?
+            updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectedItem() == null ?
                     fileNameComboBox.getItemAt(0) : fileNameComboBox.getSelectedItem().toString()));
             //select the first annotation
             if (annotationList.isSelectionEmpty()) {
@@ -202,10 +191,11 @@ class FileAnnotationTab extends JPanel {
             indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
         }
         fileNameComboBox.removeAllItems();
-        new EntryAnnotationImporter(parent.getEntry()).getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf"))
-                .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
+        final Map<String, List<FileAnnotation>> fileAnnotations = fileAnnotationCache.getFromCache(parent.getEntry());
+        fileAnnotations.keySet().stream().filter(filename -> filename.toLowerCase(Locale.ROOT).endsWith(".pdf")).
+                forEach((fileNameComboBox::addItem));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
-        updateShownAnnotations(annotationsOfFiles.get(fileNameComboBox.getSelectedItem().toString()));
+        updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectedItem().toString()));
     }
 
     private void setUpGui() {
@@ -309,6 +299,7 @@ class FileAnnotationTab extends JPanel {
     private void reloadAnnotations() {
         isInitialized = false;
         Arrays.stream(this.getComponents()).forEach(this::remove);
+        fileAnnotationCache.remove(parent.getEntry());
         initializeTab(this);
         this.repaint();
     }

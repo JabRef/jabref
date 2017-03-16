@@ -38,7 +38,8 @@ public class EntryAnnotationImporterTest {
         Map<String, List<FileAnnotation>> annotations = entryAnnotationImporter.importAnnotationsFromFiles(databaseContext);
 
         //then
-        int fileCounter = 0, annotationCounter = 0;
+        int fileCounter = 0;
+        int annotationCounter = 0;
         for (List<FileAnnotation> annotationsOfFile : annotations.values()) {
             fileCounter++;
             annotationCounter += annotationsOfFile.size();

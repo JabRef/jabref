@@ -10,6 +10,8 @@ import org.jabref.model.pdf.FileAnnotation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public class FileAnnotationCache {
@@ -18,6 +20,8 @@ public class FileAnnotationCache {
     private final static int CACHE_SIZE = 10;
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
+
+    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
 
     public FileAnnotationCache(BibDatabaseContext context) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
@@ -35,6 +39,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
+        LOGGER.info(String.format("Loading Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
         return annotationCache.getUnchecked(entry);
+    }
+
+    public void remove(BibEntry entry) {
+        LOGGER.info(String.format("Deleted Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
+        annotationCache.invalidate(entry);
     }
 }

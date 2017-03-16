@@ -473,7 +473,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.remove(fileAnnotationTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
-            fileAnnotationTab = new FileAnnotationTab(this);
+            fileAnnotationTab = new FileAnnotationTab(this, panel.getAnnotationCache());
             tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), fileAnnotationTab,
 
                     Localization.lang("Show file annotations"));
@@ -1132,7 +1132,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     //Initialize by getting notes from cache if they are cached
 
                     FileAnnotationTab tab = (FileAnnotationTab) activeTab;
-                    tab.initializeTab(tab, panel.getAnnotationCache().getFromCache(entry));
+                    tab.initializeTab(tab);
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
