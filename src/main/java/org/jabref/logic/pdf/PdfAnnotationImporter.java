@@ -51,8 +51,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE) ||
-                            annotation.getSubtype().equals(FDFAnnotationUnderline.SUBTYPE)) {
+                    if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getSubtype()) ||
+                            FDFAnnotationUnderline.SUBTYPE.equals(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
@@ -74,7 +74,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 pageIndex + 1, annotation.getContents(), annotation.getSubtype(), Optional.empty());
 
         try {
-            if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE) || annotation.getSubtype().equals(FDFAnnotationUnderline.SUBTYPE)) {
+            if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getSubtype()) || FDFAnnotationUnderline.SUBTYPE.equals(annotation.getSubtype())) {
                 annotation.setContents(extractMarkedText(page, annotation));
             }
         } catch (IOException e) {

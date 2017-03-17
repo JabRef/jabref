@@ -144,18 +144,18 @@ class FileAnnotationTab extends JPanel {
 
     private String localizeContent(FileAnnotation annotation) {
         if (annotation.hasLinkedAnnotation() && annotation.getContent().isEmpty()) {
-            if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
+            if (FDFAnnotationUnderline.SUBTYPE.equals(annotation.getAnnotationType())) {
                 return Localization.lang("Empty Underline");
             }
-            if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
+            if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getAnnotationType())) {
                 return Localization.lang("Empty Highlight");
             }
         }
 
-        if (annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE)) {
+        if (FDFAnnotationUnderline.SUBTYPE.equals(annotation.getAnnotationType())) {
             return Localization.lang("Underline") + ": " + annotation.getContent();
         }
-        if (annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)) {
+        if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getAnnotationType())) {
             return Localization.lang("Highlight") + ": " + annotation.getContent();
         }
 
@@ -163,8 +163,8 @@ class FileAnnotationTab extends JPanel {
     }
 
     private Predicate<FileAnnotation> isSupportedAnnotationType() {
-        return annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE) ||
-                annotation.getAnnotationType().equals(FDFAnnotationUnderline.SUBTYPE) ||
+        return annotation -> FDFAnnotationHighlight.SUBTYPE.equals(annotation.getAnnotationType()) ||
+                FDFAnnotationUnderline.SUBTYPE.equals(annotation.getAnnotationType()) ||
                 !annotation.hasLinkedAnnotation();
     }
 
