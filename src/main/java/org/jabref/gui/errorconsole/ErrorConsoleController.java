@@ -28,6 +28,7 @@ import org.jabref.logic.util.BuildInfo;
 public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {
 
     @FXML private Button copyLogButton;
+    @FXML private Button clearLogButton;
     @FXML private Button createIssueButton;
     @FXML private ListView<LogEventViewModel> messagesListView;
     @FXML private Label descriptionLabel;
@@ -102,6 +103,11 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
     @FXML
     private void copyLog() {
         viewModel.copyLog();
+    }
+
+    @FXML
+    private void clearLog() {
+        viewModel.clearLog();
     }
 
     @FXML
