@@ -79,6 +79,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue which prohibited the citation export to external programms on MacOS.  [#2613](https://github.com/JabRef/jabref/issues/2613)
  - We fixed an issue where the file folder could not be changed when running `Get fulltext` in the `general`-tab. [#2572](https://github.com/JabRef/jabref/issues/2572)
  - Newly created libraries no longer have the executable bit set under POSIX/Linux systems. The file permissions are now set to `664 (-rw-rw-r--)`. [#2635](https://github.com/JabRef/jabref/issues/#2635)
+ - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
+ 
 ### Removed
 
 
