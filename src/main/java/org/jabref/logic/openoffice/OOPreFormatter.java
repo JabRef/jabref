@@ -9,8 +9,6 @@ import org.jabref.model.strings.StringUtil;
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the
  * bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
- *
- * @version $Revision: 2568 $ ($Date: 2008-01-15 18:40:26 +0100 (Tue, 15 Jan 2008) $)
  */
 public class OOPreFormatter implements LayoutFormatter {
 
@@ -22,8 +20,6 @@ public class OOPreFormatter implements LayoutFormatter {
         String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
                 .replace("\\$", "&dollar;") // Replace \$ with &dollar;
                 .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
-
-
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;

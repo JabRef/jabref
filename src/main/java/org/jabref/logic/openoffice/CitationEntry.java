@@ -9,7 +9,6 @@ public class CitationEntry implements Comparable<CitationEntry> {
     private final String context;
     private final Optional<String> origPageInfo;
 
-
     // Only used for testing...
     public CitationEntry(String refMarkName, String context) {
         this(refMarkName, context, Optional.empty());
