@@ -16,25 +16,28 @@ import static org.junit.Assert.assertTrue;
 
 public class PdfAnnotationImporterTest {
 
-    private AnnotationImporter importer = new PdfAnnotationImporter();
+    private final AnnotationImporter importer = new PdfAnnotationImporter();
 
     @Test
     public void noAnnotationsWriteProtected() {
 
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.pdf"));
         assertEquals(Collections.emptyList(), annotations);
     }
 
     @Test
     public void noAnnotationsEncrypted() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/encrypted.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/encrypted.pdf"));
         assertEquals(Collections.emptyList(), annotations);
     }
 
     @Test
     public void twoAnnotationsThesisExample() {
 
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/thesis-example.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/thesis-example.pdf"));
         assertEquals(2, annotations.size());
     }
 
@@ -46,7 +49,8 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void inlineNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf"));
 
         // Begin old test
         assertEquals(1, annotations.size());
@@ -59,14 +63,16 @@ public class PdfAnnotationImporterTest {
         assertFalse(note.hasLinkedAnnotation());
         // End old test
 
-        FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 25), 1, "inline note annotation", "FreeText", Optional.empty());
-        assertEquals("Comparison fails. WHY?", Collections.singletonList(expected), annotations);
+        FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 25), 1,
+                "inline note annotation", "FreeText", Optional.empty());
+        assertEquals(Collections.singletonList(expected), annotations);
 
     }
 
     @Test
     public void popupNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf"));
         assertEquals(1, annotations.size());
 
         FileAnnotation note = annotations.get(0);
@@ -79,7 +85,8 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void highlightNoNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf"));
         assertEquals(1, annotations.size());
 
         FileAnnotation note = annotations.get(0);
@@ -95,7 +102,8 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void highlightWithNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-with-note.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-with-note.pdf"));
 
         assertEquals(1, annotations.size());
 
@@ -110,10 +118,10 @@ public class PdfAnnotationImporterTest {
         assertEquals("Linus Dietz", note.getLinkedFileAnnotation().getAuthor());
     }
 
-
     @Test
     public void underlineWithNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-underline.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-underline.pdf"));
         assertEquals(1, annotations.size());
 
         FileAnnotation note = annotations.get(0);
@@ -129,7 +137,8 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void polygonNoNoteMinimal() {
-        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-polygon.pdf"));
+        List<FileAnnotation> annotations = importer
+                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-polygon.pdf"));
         assertEquals(1, annotations.size());
         FileAnnotation polygon = annotations.get(0);
         assertEquals("Linus Dietz", polygon.getAuthor());
@@ -139,4 +148,3 @@ public class PdfAnnotationImporterTest {
         assertEquals(1, polygon.getPage());
     }
 }
-

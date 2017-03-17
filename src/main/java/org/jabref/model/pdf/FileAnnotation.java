@@ -1,8 +1,8 @@
 package org.jabref.model.pdf;
 
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.pdfbox.cos.COSName;
@@ -22,7 +22,6 @@ public final class FileAnnotation {
     private final String annotationType;
     private final Optional<FileAnnotation> linkedFileAnnotation;
 
-
     /**
      * A flexible constructor, mainly used as dummy if there is actually no annotation.
      *
@@ -33,7 +32,7 @@ public final class FileAnnotation {
      * @param annotationType the type of the annotation
      */
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
-                          final String content, final String annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
+            final String content, final String annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
         this.timeModified = timeModified;
         this.page = pageNumber;
@@ -113,12 +112,34 @@ public final class FileAnnotation {
         return annotationName;
     }
 
-
     @Override
     public String toString() {
         return abbreviateAnnotationName(content);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+
+        FileAnnotation that = (FileAnnotation) other;
+        return Objects.equals(this.annotationType, that.annotationType)
+                && Objects.equals(this.author, that.author)
+                && Objects.equals(this.content, that.content)
+                && Objects.equals(this.page, that.page)
+                && Objects.equals(this.linkedFileAnnotation, that.linkedFileAnnotation)
+                && Objects.equals(this.timeModified, that.timeModified);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(annotationType, author, content, page, linkedFileAnnotation, timeModified);
+    }
 
     public String getAuthor() {
         return author;
