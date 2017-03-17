@@ -10,7 +10,9 @@
       <emptyLine />
       <package name="javax" withSubpackages="true" static="false" />
       <emptyLine />
-      <package name="net.sf.jabref" withSubpackages="true" static="false" />
+      <package name="javafx" withSubpackages="true" static="false" />
+      <emptyLine />
+      <package name="org.jabref" withSubpackages="true" static="false" />
       <emptyLine />
       <package name="" withSubpackages="true" static="false" />
       <emptyLine />

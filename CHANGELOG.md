@@ -12,11 +12,73 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- JabRef has a new logo! The logo was designed by "[AikTheOne](https://99designs.de/profiles/theonestudio)" - who was the winner of a design contest at 99designs.com
+- Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
+- Partly switched to a new UI technology (JavaFX).
+    - Redesigned group panel.
+      - Number of matched entries is always shown.
+      - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
+      - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
+      - Removed edit mode.
+    - Redesigned about dialog.
+    - Redesigned key bindings dialog.
+    - Redesigned journal abbreviations dialog.
+    - Redesigned error console.
+    - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
+- Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
+- The MS Office XML export now exports the field `volumes` and `pubstate`.
+- The integrity checker reports now if a journal is not found in the abbreviation list
+- Comments in PDF files can now be displayed inside JabRef in a separate tab
+- We are happy to welcome [CrossRef](https://www.crossref.org/) as a new member of our fetcher family. [#2455](https://github.com/JabRef/jabref/issues/2455)
+- We improved the UI customization possibilities:
+    - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
+    - Resizing the menu and label sizes has been improved.
+    - Font sizes can now be increased <kbd>Ctrl</kbd> + <kbd>Plus</kbd>, decreased <kbd>Ctrl</kbd> + <kbd>Minus</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>.
+- We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
+- We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
+- We added MathSciNet as a ID-based fetcher in the `BibTeX -> New entry` dialog (implements a [feature request in the forum](http://discourse.jabref.org/t/allow-to-search-by-mr-number-mathscinet))
+- Removed the apache.commons.collections library
+- We added a few properties to a group:
+    - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
+    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword). Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173).
+- Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
+- We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
+- The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
+- We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
+- A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
 - Using "Look up DOIs" in the quality menu, it is possible to look up DOIs for multiple entries.
+- F4 opens selected file in current JTable context not just from selected entry inside the main table [#2355](https://github.com/JabRef/jabref/issues/2355)
+- We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
+- Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
 
 ### Fixed
-The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
-
+ - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
+ - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
+ - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
+ - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
+ - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
+ - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
+ - We fixed the import of MS-Office XML files, when the `month` field contained an invalid value.
+ - ArXiV fetcher now checks similarity of entry when using DOI retrieval to avoid false positives [#2575](https://github.com/JabRef/jabref/issues/2575)
+ - Sciencedirect/Elsevier fetcher is now able to scrape new HTML structure [#2576](https://github.com/JabRef/jabref/issues/2576)
+ - Fixed the synchronization logic of keywords and special fields and vice versa [#2580](https://github.com/JabRef/jabref/issues/2580)
+ - We fixed an exception that prevented JabRef from starting in rare cases [bug report in the forum](http://discourse.jabref.org/t/jabref-not-opening/476).
+ - We fixed an unhandled exception when saving an entry containing unbalanced braces [#2571](https://github.com/JabRef/jabref/issues/2571) 
+ 
+ - Fixed a display issue when removing a group with a long name [#1407](https://github.com/JabRef/jabref/issues/1407)
+ - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
+ - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
+ - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
+ - We fixed an issue introduced with Version 3.8.2 where executing the `Rename PDFs`-cleanup operation moved the files to the file directory. [#2526](https://github.com/JabRef/jabref/issues/2526)
+ - We improved the performance when opening a big database that still used the old groups format. Fixes an [issue raised in the forum](http://discourse.jabref.org/t/v3-8-2-x64-windows-problem-saving-large-bib-libraries/456).
+ - We fixed an issue where the `Move linked files to default file directory`- cleanup operation did not move the files to the location of the bib-file. [#2454](https://github.com/JabRef/jabref/issues/2454)
+ - We fixed an issue where executing `Move file` on a selected file in the `general`-tab could overwrite an existing file. [#2385](https://github.com/JabRef/jabref/issues/2358)
+ - We fixed an issue with importing groups and subgroups [#2600](https://github.com/JabRef/jabref/issues/2600)
+ - Fixed an issue where title-related key patterns did not correspond to the documentation. [#2604](https://github.com/JabRef/jabref/issues/2604) [#2589](https://github.com/JabRef/jabref/issues/2589)
+ - We fixed an issue which prohibited the citation export to external programms on MacOS.  [#2613](https://github.com/JabRef/jabref/issues/2613)
+ - We fixed an issue where the file folder could not be changed when running `Get fulltext` in the `general`-tab. [#2572](https://github.com/JabRef/jabref/issues/2572)
+ - Newly created libraries no longer have the executable bit set under POSIX/Linux systems. The file permissions are now set to `664 (-rw-rw-r--)`. [#2635](https://github.com/JabRef/jabref/issues/#2635)
 ### Removed
 
 
@@ -63,10 +125,28 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 
 
 
+## [3.8.2] – 2017-01-29
 
+### Changed
+- Added the option to update bibliographic information from DOI to the sidebar of the entryeditor. Implements [#2432](https://github.com/JabRef/jabref/issues/2432).
+- The default shortcut for "Cleanup entries" is now <kbd>Alt</kbd> + <kbd>F8</kbd> since <kbd>F8</kbd> alone did not work.
+  Please [reset your key bindings](http://help.jabref.org/en/CustomKeyBindings) to get <kbd>Alt</kbd> + <kbd>F8</kbd> as default.
+  Fixes [#2251](https://github.com/JabRef/jabref/issues/2251).
 
-
-
+### Fixed
+- The formatter for normalizing pages now also can treat ACM pages such as `2:1--2:33`.
+- Backslashes in content selectors are now correctly escaped. Fixes [#2426](https://github.com/JabRef/jabref/issues/2426).
+- Non-ISO timestamp settings prevented the opening of the entry editor. Fixes [#2447](https://github.com/JabRef/jabref/issues/2447).
+- When pressing <kbd>Ctrl</kbd> + <kbd>F</kbd> and the searchbar is already focused, the text will be selected.
+- LaTeX symbols are now displayed as Unicode for the author column in the main table. `'n` and `\'{n}` are parsed correctly. Fixes [#2458](https://github.com/JabRef/jabref/issues/2458).
+- If one deleted the current query it was not saved (every basepanel can have its own query). Fixes [#2468](https://github.com/JabRef/jabref/issues/2468).
+- The [ACM fetcher](https://help.jabref.org/en/ACMPortal) does no longer add HTML code to the bib-file. Fixes [#2472](https://github.com/JabRef/jabref/issues/2472).
+- When [finding unlinked files](https://help.jabref.org/en/FindUnlinkedFiles), JabRef does not freeze any more. Fixes [#2309]()https://github.com/JabRef/jabref/issues/2309).
+- Collapse and expand all buttons in the group assignment dialog no longer lead to a crash of JabRef.
+- The aux export command line function does no longer add duplicates of references that were resolved via `crossref`. Fixes [#2475](https://github.com/JabRef/jabref/issues/2475).
+- When the database is changed externally, JabRef is no longer prevented from an orderly shutdown. Fixes [#2486](https://github.com/JabRef/jabref/issues/2486).
+- Parsing of damaged metadata is now more robust and reports a more detailed error message. Fixes [#2477](https://github.com/JabRef/jabref/issues/2477).
+- Dynamic groups with regular expression can be edited again. Fixes [#2481](https://github.com/JabRef/jabref/issues/2481).
 
 
 ## [3.8.1] – 2016-12-24
@@ -83,7 +163,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 
 ### Fixed
 - Clicking on "Get Fulltext" button sets links correctly for the entry being edited. Fixes [#2391](https://github.com/JabRef/jabref/issues/2391).
-- The [integrity check](https://help.jabref.org/en/CheckIntegrity) now determines the set of BibLaTeX-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
+- The [integrity check](https://help.jabref.org/en/CheckIntegrity) now determines the set of biblatex-only fields differently. Fixes [#2390](https://github.com/JabRef/jabref/issues/2390).
 - The integrity check filter works again. Fixes [#2406](https://github.com/JabRef/jabref/issues/2406).
 - The [ArXiv fetcher](http://help.jabref.org/en/arXiv) also accepts identifiers that include the "arXiv:" prefix. Fixes [#2427](https://github.com/JabRef/jabref/issues/2427).
 - We fixed an issue where groups containing brackets were not working properly. Fixes [#2394](https://github.com/JabRef/jabref/issues/2394).
@@ -104,14 +184,14 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - We enhanced the integrity checks testing for biblatex-only fields to be aware of more fields (e.g., `location`).
 - ISBNs not available at [ebook.de](https://www.ebook.de) are now resolved using <https://bibtex.chimbori.com/>. [#684](https://github.com/JabRef/jabref/issues/684)
 - When using the ISBN fetcher, the names are now correctly rendered in BibTeX. [#2343](https://github.com/JabRef/jabref/issues/2343)
-- We display both the field name `journaltitle` and `journal` in BibLaTeX mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
+- We display both the field name `journaltitle` and `journal` in biblatex mode as `journaltitle` only was causing headaches. [#2209](https://github.com/JabRef/jabref/issues/2209)
 - We changed the order of the cleanup operations so that the generated file name corresponds to the cleaned-up fields. [#1441](https://github.com/JabRef/jabref/issues/1441)
 - Files can now be moved to subfolders named by a custom format pattern, e.g., based on `entrytype`.
   The pattern can be specified in the settings like the filename pattern. [#1092](https://github.com/JabRef/jabref/issues/1092)
 - [#2375](https://github.com/JabRef/jabref/issues/2375) 'LaTeXCleanup' action does now escape % signs inside BibTeX fields
 - Add the possibility to copy citations of multiple entries to the clipboard
-- Custom EntryTypes are now stored independently for BibTeX and BibLatex mode.
-  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to BibLatex)
+- Custom EntryTypes are now stored independently for BibTeX and biblatex mode.
+  - Upon the first start of JabRef 3.8 old entry type customizations will be converted to custom types for the set default database mode (BibTeX if not changed to biblatex)
 - Upon opening a file with customized entry types it is now possible to choose which customizations should be stored in local preferences.
 - The default emacs executable name on linux changed from `gnuclient` to `emacsclient`.
   [feature-request 433](https://sourceforge.net/p/jabref/feature-requests/433/)
@@ -139,7 +219,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - We fixed an issue when JabRef restores its session and a shared database was used: The error message "No suitable driver found" will not appear.
 - We fixed an issue which caused a metadata loss on reconnection to shared database. [#2219](https://github.com/JabRef/jabref/issues/2219)
 - We fixed an issue which caused an internal error when leaving the file path field empty and connecting to a shared database.
-- We fixed an issue where the BibLaTeX Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
+- We fixed an issue where the biblatex Cleanup did not move the contents of the fields `year` and `month` to the field `date`. [#2335](https://github.com/JabRef/jabref/issues/2335)
 - Fixed [#2378](https://github.com/JabRef/jabref/issues/2378): Saving of the Backup-Option in the Preferences does now work.
 - We fixed an issue which prevented the preference dialog to open on systems with Java 9.
 
@@ -148,7 +228,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 
 ### Changed
 - Implementation of eventbased autosave and backup functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
-- Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
+- Source tab in the entry editor displays "biblatex Source" when using biblatex mode
 - [koppor#171](https://github.com/koppor/jabref/issues/171): Add Shortcuts to context menu
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
@@ -174,7 +254,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
-- [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
+- [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (biblatex)
 - The dialog for choosing new entries additionally supports ID-based entry generation. For instance, when searching for a DOI or ISBN, you have to press <kbd>Ctrl</kbd> + <kbd>N</kbd> instead of using the web search (<kbd>Alt</kbd> + <kbd>4</kbd>).
 - `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
@@ -184,10 +264,10 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - <kbd>Pos1</kbd> / <kbd>Home</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>Up</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>Shift</kbd> + <kbd>Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Importer for MODS format added
-- [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
+- [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (biblatex), Should be normalized (BibTeX)
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
 - Prohibit more than one connections to the same shared database.
-- Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
+- Implemented integrity check for `journaltitle` field: biblatex field only (BibTeX)
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 - [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
@@ -256,7 +336,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
-- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
+- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (biblatex)
 
 
 ## [3.6] – 2016-08-26
@@ -317,7 +397,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - Fixed [#1682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
 - Fixed [#1687](https://github.com/JabRef/jabref/issues/1687): "month" field ascending/descending sorting swapped
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
-- Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): BibLaTeX `date` field is now correctly exported as `year` in MS-Office 2007 xml format
+- Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): biblatex `date` field is now correctly exported as `year` in MS-Office 2007 xml format
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
 - Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
 - Fixed [#1804](https://github.com/JabRef/jabref/issues/1804): Integrity check no longer removes URL field by mistake
@@ -336,7 +416,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed NullPointerException when loading a style file that has not got a default style
-- Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Date fields in the biblatex standard are now always formatted in the correct way, independent of the preferences
 - The merge entry dialog showed wrong heading after merging from DOI
 - Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - When inserting a duplicate the right entry will be selected
@@ -469,7 +549,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - [#459](https://github.com/JabRef/jabref/issues/459) Open default directory when trying to add files to an entry
 - Implemented [#668](https://github.com/JabRef/jabref/issues/668): Replace clear with icon to reduce search bar width
 - Improved layout for OSX: Toolbar buttons and search field
-- BibTeX and BibLaTeX mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
+- BibTeX and biblatex mode is now file based and can be switched at runtime. The information is stored in the .bib file, and if it is not there detected by the entry types.
 - Moved all quality-related database actions inside a new quality menu
 - [#684](https://github.com/JabRef/jabref/issues/684): ISBNtoBibTex Error Message is now more clear
 - Moved default bibliography mode to general preferences tab
@@ -600,7 +680,7 @@ The formatter for normalizing pages now also can treat ACM pages such as `2:1--2
 - Fixed [#435](https://github.com/JabRef/jabref/issues/435): Retrieve non open access ScienceDirect PDFs via HTTP DOM
 - Fixed: Cleanup process aborts if linked file does not exists
 - Fixed [#420](https://github.com/JabRef/jabref/issues/420): Reenable preference changes
-- Fixed [#414](https://github.com/JabRef/jabref/issues/414): Rework BibLatex entry types with correct required and optional fields
+- Fixed [#414](https://github.com/JabRef/jabref/issues/414): Rework biblatex entry types with correct required and optional fields
 - Fixed [#413](https://github.com/JabRef/jabref/issues/413): Help links in released jar version are not working
 - Fixes [#412](https://github.com/JabRef/jabref/issues/412): Biblatex preserves capital letters, checking whether letters may be converted to lowercase within the Integrity Check action is obsolete.
 - Fixed [#437](https://github.com/JabRef/jabref/issues/437): The toolbar after the search field is now correctly wrapped when using a small window size for JabRef
@@ -740,7 +820,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.1...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.2...HEAD
+[3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1
 [3.8]: https://github.com/JabRef/jabref/compare/v3.7...v3.8
 [3.7]: https://github.com/JabRef/jabref/compare/v3.6...v3.7

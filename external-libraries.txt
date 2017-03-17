@@ -13,6 +13,8 @@ Note that the SPDX license identifiers are different from the ones used by debia
 
 # Fonts and Icons
 
+The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under licence CC0 1.0.
+
 Id:      material-design-icons.font
 Project: Material Design Icons
 Version: v1.5.54
@@ -22,6 +24,7 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 
 
 # Libraries
+
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
@@ -45,6 +48,11 @@ License: Apache-2.0
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
+License: Apache-2.0
+
+Id:      org.apache.commons:commons-lang3
+Project: Apache Commons Lang
+URL:     https://commons.apache.org/proper/commons-lang/
 License: Apache-2.0
 
 Id:      com.github.bkromhout:java-diff-utils
@@ -117,6 +125,16 @@ Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
 License: MIT
 
+Id:      org.controlsfx:controlsfx
+Project: ControlsFX
+URL:     http://fxexperience.com/controlsfx/
+License: BSD-3-Clause
+
+Id:      org.fx.misc.easybin:easybind
+Projekt: EasyBind
+URL:     https://github.com/TomasMikula/EasyBind
+License: BSD-2-Clause
+
 Id:      org.jsoup:jsoup
 Project: jsoup
 URL:     https://github.com/jhy/jsoup/
@@ -172,5 +190,20 @@ Id:      de.undercouch.citeproc-java
 Project: Citeproc-Java
 URL:     http://michel-kraemer.github.io/citeproc-java/
 Licence: Apache-2.0
+
+Id:      com.airhacks:afterburner.fx
+Project: afterburner.fx
+URL:     https://github.com/AdamBien/afterburner.fx
+License: Apache 2.0
+
+Id:      de.codecentric.centerdevice
+Project: javafxsvg
+URL:     https://github.com/codecentric/javafxsvg
+License: BSD 3-Clause
+
+Id:      com.github.tomtung
+Project: latex2unicode
+URL:     https://github.com/tomtung/latex2unicode
+License: Apache 2.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
