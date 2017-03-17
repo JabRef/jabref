@@ -91,7 +91,7 @@ public class WebFetchers {
         return list;
     }
 
-    public static ArrayList<IdFetcher> getIdFetchers() {
+    public static List<IdFetcher> getIdFetchers() {
         ArrayList<IdFetcher> list = new ArrayList<>();
         list.add(new CrossRef());
         list.sort(Comparator.comparing(WebFetcher::getName));
