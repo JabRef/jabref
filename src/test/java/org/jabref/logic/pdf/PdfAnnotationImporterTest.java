@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf;
 
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.pdf.FileAnnotation;
@@ -19,13 +20,13 @@ public class PdfAnnotationImporterTest {
     public void noAnnotationsWriteProtected() {
 
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.pdf"));
-        assertEquals(0, annotations.size());
+        assertEquals(Collections.emptyList(), annotations);
     }
 
     @Test
     public void noAnnotationsEncrypted() {
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/encrypted.pdf"));
-        assertEquals(0, annotations.size());
+        assertEquals(Collections.emptyList(), annotations);
     }
 
     @Test
@@ -38,7 +39,7 @@ public class PdfAnnotationImporterTest {
     @Test
     public void noAnnotationsMinimal() {
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal.pdf"));
-        assertEquals(0, annotations.size());
+        assertEquals(Collections.emptyList(), annotations);
     }
 
     @Test
@@ -86,6 +87,7 @@ public class PdfAnnotationImporterTest {
     @Test
     public void highlightWithNoteMinimal() {
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-with-note.pdf"));
+
         assertEquals(1, annotations.size());
 
         FileAnnotation note = annotations.get(0);
@@ -98,6 +100,7 @@ public class PdfAnnotationImporterTest {
         assertEquals("linked note to highlight", note.getLinkedFileAnnotation().getContent());
         assertEquals("Linus Dietz", note.getLinkedFileAnnotation().getAuthor());
     }
+
 
     @Test
     public void underlineWithNoteMinimal() {
