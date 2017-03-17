@@ -1,7 +1,6 @@
 package org.jabref.logic.pdf;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +57,7 @@ public class EntryAnnotationImporter {
         for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
             Optional<File> expandedFileName = FileUtil.expandFilename(databaseContext, parsedFileField.getLink(),
                     JabRefPreferences.getInstance().getFileDirectoryPreferences());
-            expandedFileName.ifPresent(file -> annotations.put(file.toString(), importer.importAnnotations(Paths.get(file.toString()))));
+            expandedFileName.ifPresent(file -> annotations.put(file.toString(), importer.importAnnotations(file.toPath())));
         }
         return annotations;
     }
