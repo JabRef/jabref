@@ -94,6 +94,7 @@ import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
+import org.jabref.gui.worker.LookupDOIsWorker;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
 import org.jabref.logic.autocompleter.AutoCompletePreferences;

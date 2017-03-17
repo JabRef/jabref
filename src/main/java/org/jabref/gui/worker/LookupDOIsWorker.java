@@ -1,18 +1,20 @@
-package net.sf.jabref.gui.worker;
+package org.jabref.gui.worker;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.DOI;
-import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +43,12 @@ public class LookupDOIsWorker extends AbstractWorker {
                 count++;
                 frame.output(Localization.lang("Looking up DOIs... - entry %0 out of %1 - found %2", Integer.toString(count), totalCount, Integer.toString(foundCount)));
                 if (!bibEntry.hasField(FieldName.DOI)) {
-                    Optional<DOI> doi = DOI.fromBibEntry(bibEntry);
+                    Optional<DOI> doi = Optional.empty();
+                    try {
+                        doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(bibEntry);
+                    } catch (FetcherException e) {
+                        LOGGER.error("Could not fetch doi", e);
+                    }
                     if (doi.isPresent()) {
                         Optional<FieldChange> fieldChange = bibEntry.setField(FieldName.DOI, doi.get().getDOI());
                         if (fieldChange.isPresent()) {
