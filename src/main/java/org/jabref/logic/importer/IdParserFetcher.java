@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.identifier.Identifier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
  * 2. Parse the response to get a list of {@link BibEntry}
  * 3. Extract identifier
  */
-public interface IdParserFetcher<T> extends IdFetcher<T> {
+public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
 
     Log LOGGER = LogFactory.getLog(IdParserFetcher.class);
 

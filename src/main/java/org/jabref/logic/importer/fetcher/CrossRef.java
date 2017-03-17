@@ -181,4 +181,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
         return Optional.empty();
     }
+
+    @Override
+    public String getIdentifierName() {
+        return "DOI";
+    }
 }

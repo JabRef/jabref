@@ -27,7 +27,7 @@ public class WebFetchersTest {
     }
 
     @Test
-    public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
+    public void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws Exception {
         List<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends IdBasedFetcher>> expected = reflections.getSubTypesOf(IdBasedFetcher.class);
@@ -55,6 +55,15 @@ public class WebFetchersTest {
 
         Set<Class<? extends SearchBasedFetcher>> expected = reflections.getSubTypesOf(SearchBasedFetcher.class);
         expected.remove(SearchBasedParserFetcher.class);
+        assertEquals(expected, getClasses(idFetchers));
+    }
+
+    @Test
+    public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
+        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers();
+
+        Set<Class<? extends IdFetcher>> expected = reflections.getSubTypesOf(IdFetcher.class);
+        expected.remove(IdParserFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 

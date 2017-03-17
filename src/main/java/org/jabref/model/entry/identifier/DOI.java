@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.model.entry.FieldName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @see https://en.wikipedia.org/wiki/Digital_object_identifier
  */
-public class DOI {
+public class DOI implements Identifier {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
     // DOI resolver
@@ -165,5 +167,15 @@ public class DOI {
      */
     public String getURIAsASCIIString() {
         return getURI().map(URI::toASCIIString).orElse("");
+    }
+
+    @Override
+    public String getDefaultField() {
+        return FieldName.DOI;
+    }
+
+    @Override
+    public String getNormalized() {
+        return doi;
     }
 }
