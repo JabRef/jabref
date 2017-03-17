@@ -427,7 +427,6 @@ class OOBibBase {
         }
     }
 
-
     public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
@@ -1006,8 +1005,7 @@ class OOBibBase {
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
-                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true),
-                        EnumSet.noneOf(OOUtil.Formatting.class));
+                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true), Collections.emptyList());
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
@@ -1282,7 +1280,6 @@ class OOBibBase {
 
     }
 
-
     public static XTextDocument selectComponent(List<XTextDocument> list)
             throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
         String[] values = new String[list.size()];
@@ -1302,7 +1299,6 @@ class OOBibBase {
             return null;
         }
     }
-
 
     private static class ComparableMark implements Comparable<ComparableMark> {
 
