@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -16,21 +17,24 @@ import org.jabref.preferences.JabRefPreferences;
  * OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing
  * OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
  * OO_EXTERNAL_STYLE_FILES list with paths to external style files
- *
  */
 public class OpenOfficePreferences {
 
     private final JabRefPreferences preferences;
+
     public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
-    public static final String WINDOWS_EXECUTABLE_SUBPATH = "\\program\\";
+    public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
-    public static final String WINDOWS_JARS_SUBPATH = "\\program\\classes";
+
     public static final String DEFAULT_OSX_PATH = "/Applications/OpenOffice.org.app";
-    public static final String OSX_EXECUTABLE_SUBPATH = "/Contents/MacOS/";
-    public static final String OSX_EXECUTABLE = "soffice.bin";
-    public static final String OSX_JARS_SUBPATH = "/Contents/Resources/java";
+    public static final String DEFAULT_OSX_EXEC_PATH = "/Applications/OpenOffice.org.app/Contents/MacOS/soffice";
+    public static final String OSX_EXECUTABLE = "soffice";
+
+    public static final String DEFAULT_LINUX_PATH = "/opt/openoffice4";
+    public static final String DEFAULT_LINUX_EXEC_PATH = "/opt/openoffice4/program/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
+    public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -43,9 +47,8 @@ public class OpenOfficePreferences {
     }
 
     public boolean checkAutoDetectedPaths() {
-        if (preferences.hasKey(JabRefPreferences.OO_JARS_PATH)
-                && preferences.hasKey(JabRefPreferences.OO_EXECUTABLE_PATH)) {
-            return new File(getJarsPath(), "jurt.jar").exists() && new File(getExecutablePath()).exists();
+        if (preferences.hasKey(JabRefPreferences.OO_PATH)) {
+            return new File(getExecutablePath()).exists();
         } else {
             return false;
         }
@@ -74,7 +77,7 @@ public class OpenOfficePreferences {
         preferences.put(JabRefPreferences.OO_EXECUTABLE_PATH, path);
     }
 
-    public String getOOPath() {
+    public String getInstallationPath() {
         return preferences.get(JabRefPreferences.OO_PATH);
     }
 
