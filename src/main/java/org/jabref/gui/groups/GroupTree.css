@@ -63,19 +63,17 @@
     -fx-background-color: lightgrey;
 }
 
-.tree-table-row-cell:selected,
-.tree-table-row-cell:pressed {
+.tree-table-row-cell:selected {
     -fx-background-color: #6A9FCD;
     -fx-text-fill: white;
-}
-
-.tree-table-row-cell:selected > .tree-table-cell > .icon,
-.tree-table-row-cell:pressed > .tree-table-cell > .icon {
     -fx-fill: white;
 }
 
-.tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow,
-.tree-table-row-cell:pressed > .tree-table-cell > .tree-disclosure-node > .arrow {
+.tree-table-row-cell:selected > .tree-table-cell > .icon {
+    -fx-fill: white;
+}
+
+.tree-table-row-cell:selected > .tree-table-cell > .tree-disclosure-node > .arrow {
     -fx-background-color: white;
 }
 

@@ -47,9 +47,7 @@ public class QuotedStringTokenizer {
                 }
             } else if (isDelimiter(c)) { // unit finished
                 // advance index until next token or end
-                do {
-                    ++index;
-                } while (index < contentLength && isDelimiter(content.charAt(index)));
+                ++index;
                 return stringBuilder.toString();
             } else {
                 stringBuilder.append(c);

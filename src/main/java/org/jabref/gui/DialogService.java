@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
 
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
@@ -119,7 +120,7 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showSaveDialog(FileDialogConfiguration fileDialogConfiguration);
+    Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Shows a new file open dialog. The method doesn't return until the
@@ -129,5 +130,15 @@ public interface DialogService {
      *
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
-    Optional<Path> showOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+    Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+
+    /**
+     * Shows a new directory selection dialog. The method doesn't return until the
+     * displayed open dialog is dismissed. The return value specifies
+     * the file chosen by the user or an empty {@link Optional} if no selection has been
+     * made.
+     *
+     * @return the selected directory or an empty {@link Optional} if no directory has been selected
+     */
+    Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
 }

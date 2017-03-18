@@ -25,7 +25,6 @@ public class UndoableChangeEntriesOfGroup {
            entryChangeCompound.end();
            return entryChangeCompound;
        }
-
        return null;
-   }
+    }
 }

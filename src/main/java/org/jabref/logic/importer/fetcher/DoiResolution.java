@@ -8,11 +8,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,7 +35,7 @@ public class DoiResolution implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();
 
             // follow all redirects and scan for a single pdf link

@@ -6,10 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.IEEE;
@@ -18,6 +16,7 @@ import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +52,13 @@ public class FulltextFetchers {
         Optional<String> doi = clonedEntry.getField(FieldName.DOI);
 
         if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
-            CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+            try {
+                WebFetchers.getIdFetcherForIdentifier(DOI.class)
+                        .findIdentifier(clonedEntry)
+                        .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+            } catch (FetcherException e) {
+                LOGGER.debug("Failed to find DOI", e);
+            }
         }
 
         for (FulltextFetcher finder : finders) {

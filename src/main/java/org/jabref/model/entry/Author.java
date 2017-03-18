@@ -3,6 +3,8 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * This is an immutable class that keeps information regarding single
  * author. It is just a container for the information, with very simple
@@ -193,9 +195,10 @@ public class Author {
      * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
      */
     private String removeStartAndEndBraces(String name) {
-        if (name == null) {
+        if (StringUtil.isBlank(name)) {
             return null;
         }
+
         if (!name.contains("{")) {
             return name;
         }

@@ -8,9 +8,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import org.jabref.JabRefGUI;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
@@ -107,17 +109,30 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public Optional<Path> showSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
+    public Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showSaveDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
     @Override
-    public Optional<Path> showOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showOpenDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
+    }
+
+    @Override
+    public Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration) {
+        DirectoryChooser chooser = getConfiguredDirectoryChooser(directoryDialogConfiguration);
+        File file = chooser.showDialog(null);
+        return Optional.ofNullable(file).map(File::toPath);
+    }
+
+    private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        directoryDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
+        return chooser;
     }
 
     private FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {

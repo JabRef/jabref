@@ -14,7 +14,6 @@ public class RemoveFromGroupAction extends AbstractAction {
     private GroupTreeNodeViewModel mNode;
     private BasePanel mPanel;
 
-
     public RemoveFromGroupAction(GroupTreeNodeViewModel node, BasePanel panel) {
         super(node.getNode().getGroup().getName());
         mNode = node;

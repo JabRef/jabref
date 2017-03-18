@@ -1,4 +1,4 @@
-package org.jabref.logic.identifier;
+package org.jabref.model.entry.identifier;
 
 import org.junit.Assert;
 import org.junit.Test;

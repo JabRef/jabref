@@ -35,8 +35,8 @@ public class AddToGroupAction extends AbstractAction {
     }
 
     public AddToGroupAction(boolean move) {
-        super(move ? Localization.lang("Assign entry selection exclusively to this group") :
-                Localization.lang("Add entry selection to this group"));
+        super(move ? Localization.lang("Assign entry selection exclusively to this group") : Localization
+                .lang("Add entry selection to this group"));
         this.move = move;
     }
 
@@ -73,11 +73,11 @@ public class AddToGroupAction extends AbstractAction {
     }
 
     private void moveToGroup(List<BibEntry> entries, NamedCompound undoAll) {
-        List<AbstractGroup> affectedGroups =
-                node.getNode().getRoot().getContainingGroups(entries, false).stream()
-                        .map(GroupTreeNode::getGroup)
-                        .filter(group -> group instanceof GroupEntryChanger)
-                        .collect(Collectors.toList());
+        List<AbstractGroup> affectedGroups = node.getNode().getRoot()
+                .getContainingGroups(entries, false).stream()
+                .map(GroupTreeNode::getGroup)
+                .filter(group -> group instanceof GroupEntryChanger)
+                .collect(Collectors.toList());
         affectedGroups.add(node.getNode().getGroup());
         if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
             return; // user aborted operation
@@ -85,7 +85,7 @@ public class AddToGroupAction extends AbstractAction {
 
         // first remove
         for (AbstractGroup group : affectedGroups) {
-            GroupEntryChanger entryChanger = (GroupEntryChanger)group;
+            GroupEntryChanger entryChanger = (GroupEntryChanger) group;
             List<FieldChange> changes = entryChanger.remove(entries);
             if (!changes.isEmpty()) {
                 undoAll.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, changes));

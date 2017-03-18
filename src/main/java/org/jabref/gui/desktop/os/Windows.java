@@ -2,6 +2,7 @@ package org.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,16 @@ public class Windows implements NativeDesktop {
             return Paths.get(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
         }
         return Paths.get(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+    }
+
+    @Override
+    public Path getApplicationDirectory() {
+        String programDir = System.getenv("ProgramFiles");
+
+        if (programDir != null) {
+            return Paths.get(programDir);
+        }
+        return getUserDirectory();
     }
 
     @Override

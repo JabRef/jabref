@@ -1,8 +1,8 @@
 package org.jabref.logic.openoffice;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +35,6 @@ public class OOUtil {
     private static final String CHAR_ESCAPEMENT_HEIGHT = "CharEscapementHeight";
     private static final String CHAR_ESCAPEMENT = "CharEscapement";
 
-
     public enum Formatting {
         BOLD,
         ITALIC,
@@ -50,7 +49,6 @@ public class OOUtil {
     private static final Pattern HTML_TAG = Pattern.compile("</?[a-z]+>");
 
     private static final String UNIQUEFIER_FIELD = "uniq";
-
 
     private OOUtil() {
         // Just to hide the public constructor
@@ -83,7 +81,7 @@ public class OOUtil {
         }
 
         // Do the layout for this entry:
-        String lText = layout.doLayout(entry, database);
+        String formattedText = layout.doLayout(entry, database);
 
         // Afterwards, reset the old value:
         if (oldUniqVal.isPresent()) {
@@ -93,7 +91,7 @@ public class OOUtil {
         }
 
         // Insert the formatted text:
-        OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, lText, parStyle);
+        OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, formattedText, parStyle);
     }
 
     /**
@@ -123,14 +121,14 @@ public class OOUtil {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 
-        Set<Formatting> formatting = EnumSet.noneOf(Formatting.class);
+        List<Formatting> formatting = new ArrayList<>();
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
         Matcher m = OOUtil.HTML_TAG.matcher(lText);
         while (m.find()) {
-            String ss = lText.substring(piv, m.start());
-            if (!ss.isEmpty()) {
-                OOUtil.insertTextAtCurrentLocation(text, cursor, ss, formatting);
+            String currentSubstring = lText.substring(piv, m.start());
+            if (!currentSubstring.isEmpty()) {
+                OOUtil.insertTextAtCurrentLocation(text, cursor, currentSubstring, formatting);
             }
             String tag = m.group();
             // Handle tags:
@@ -185,7 +183,7 @@ public class OOUtil {
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
-            Set<Formatting> formatting)
+            List<Formatting> formatting)
                     throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
                     IllegalArgumentException {
         text.insertString(cursor, string, true);
@@ -256,7 +254,6 @@ public class OOUtil {
             xCursorProps.setPropertyValue(CHAR_STRIKEOUT, com.sun.star.awt.FontStrikeout.NONE);
         }
         cursor.collapseToEnd();
-
     }
 
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, String parStyle)

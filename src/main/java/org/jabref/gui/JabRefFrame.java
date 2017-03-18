@@ -63,6 +63,7 @@ import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
 import org.jabref.gui.actions.ErrorConsoleAction;
 import org.jabref.gui.actions.IntegrityCheckAction;
+import org.jabref.gui.actions.LookupIdentifierAction;
 import org.jabref.gui.actions.ManageKeywordsAction;
 import org.jabref.gui.actions.MassSetFieldAction;
 import org.jabref.gui.actions.MnemonicAwareAction;
@@ -110,8 +111,10 @@ import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.undo.AddUndoableActionEvent;
@@ -405,6 +408,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getIcon());
     private final MassSetFieldAction massSetField = new MassSetFieldAction(this);
     private final ManageKeywordsAction manageKeywords = new ManageKeywordsAction(this);
+    private final JMenu lookupIdentifiers = JabRefFrame.subMenu(Localization.menuTitle("Look up document identifier..."));
     private final GeneralAction findUnlinkedFiles = new GeneralAction(
             FindUnlinkedFilesDialog.ACTION_COMMAND,
             FindUnlinkedFilesDialog.ACTION_MENU_TITLE, FindUnlinkedFilesDialog.ACTION_SHORT_DESCRIPTION,
@@ -1173,6 +1177,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         quality.add(autoSetFile);
         quality.add(findUnlinkedFiles);
         quality.add(autoLinkFile);
+
+        for (IdFetcher fetcher : WebFetchers.getIdFetchers()) {
+            lookupIdentifiers.add(new LookupIdentifierAction(this, fetcher));
+        }
+        quality.add(lookupIdentifiers);
         quality.add(downloadFullText);
         mb.add(quality);
 
@@ -1356,7 +1365,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
@@ -1389,7 +1398,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1491,7 +1500,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
 
             if (file.isPresent()) {
-                if (!uniqPath.equals(file.get().getName())) {
+                if (!uniqPath.equals(file.get().getName()) && uniqPath.contains(File.separator)) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
