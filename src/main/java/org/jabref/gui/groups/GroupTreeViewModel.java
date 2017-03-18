@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -27,6 +28,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
+    private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
+            .getName()
+            .compareToIgnoreCase(v2.getName());
+
     private Optional<BibDatabaseContext> currentDatabase;
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService) {
@@ -34,11 +39,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
 
         // Register listener
-        stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
+        stateManager.activeDatabaseProperty()
+                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate
+                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
 
         // Init
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
@@ -143,5 +150,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
         }
+    }
+
+    public void sortAlphabetically(GroupNodeViewModel group) {
+        group.getGroupNode().getRoot().sortChildren(compAlphabetIgnoreCase, true);
+    }
+
+    public void sortSubGroupAlphabetically(GroupNodeViewModel group) {
+        group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
     }
 }

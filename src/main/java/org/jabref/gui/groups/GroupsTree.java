@@ -28,6 +28,7 @@ public class GroupsTree extends JTree {
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         this.setFocusable(true);
+
     }
 
     /** Returns the first selected node, or null if nothing is selected. */
