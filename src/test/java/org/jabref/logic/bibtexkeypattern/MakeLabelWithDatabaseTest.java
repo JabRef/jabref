@@ -388,6 +388,14 @@ public class MakeLabelWithDatabaseTest {
     }
 
     @Test
+    public void generateKeyTitleRegexe() {
+        bibtexKeyPattern.setDefaultValue("[title:regex(\" \",\"-\")]");
+        entry.setField("title", "Please replace the spaces");
+        BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
+        assertEquals(Optional.of("Please-Replace-the-Spaces"), entry.getCiteKeyOptional());
+    }
+
+    @Test
     public void generateKeyTitleTitleCase() {
         bibtexKeyPattern.setDefaultValue("[title:title_case]");
         BibtexKeyPatternUtil.makeAndSetLabel(bibtexKeyPattern, database, entry, preferences);
