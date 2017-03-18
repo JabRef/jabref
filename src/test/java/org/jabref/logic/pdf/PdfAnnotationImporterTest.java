@@ -49,38 +49,34 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void inlineNoteMinimal() {
-        List<FileAnnotation> annotations = importer
-                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf"));
+        final List<FileAnnotation> expected = Collections.singletonList(
+                new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 25), 1,
+                        "inline note annotation", "FreeText", Optional.empty()));
 
-        // Begin old test
-        assertEquals(1, annotations.size());
-        FileAnnotation note = annotations.get(0);
-        assertEquals("Linus Dietz", note.getAuthor());
-        assertEquals(LocalDateTime.of(2017, 3, 12, 20, 25), note.getTimeModified());
-        assertEquals(1, note.getPage());
-        assertEquals("inline note annotation", note.getContent());
-        assertEquals("FreeText", note.getAnnotationType());
-        assertFalse(note.hasLinkedAnnotation());
-        // End old test
-
-        FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 25), 1,
-                "inline note annotation", "FreeText", Optional.empty());
-        assertEquals(Collections.singletonList(expected), annotations);
-
+        assertEquals(expected,
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf")));
     }
 
     @Test
     public void popupNoteMinimal() {
-        List<FileAnnotation> annotations = importer
-                .importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf"));
-        assertEquals(1, annotations.size());
+        // Fixme: Comparison Fails because seconds are missing, should be 24.
+        final List<FileAnnotation> expected = Collections.singletonList(
+                new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 17), 1,
+                        "A simple pop-up note", "Text", Optional.empty()));
 
+        // Start old test style
+        List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf"));
         FileAnnotation note = annotations.get(0);
         assertEquals("Linus Dietz", note.getAuthor());
-        assertEquals("A simple pop-up note", note.getContent());
-        assertFalse(note.hasLinkedAnnotation());
-        assertEquals("Text", note.getAnnotationType());
+        assertEquals(LocalDateTime.of(2017, 3, 12, 20, 17, 24), note.getTimeModified());
         assertEquals(1, note.getPage());
+
+        assertEquals("A simple pop-up note", note.getContent());
+        assertEquals("Text", note.getAnnotationType());
+        // End old test style
+
+        assertEquals(expected,
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf")));
     }
 
     @Test

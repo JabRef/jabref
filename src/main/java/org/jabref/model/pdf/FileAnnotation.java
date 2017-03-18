@@ -138,7 +138,7 @@ public final class FileAnnotation {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(annotationType, author, content, page, linkedFileAnnotation, timeModified);
+        return Objects.hash(annotationType, author, content, page, linkedFileAnnotation, timeModified);
     }
 
     public String getAuthor() {
