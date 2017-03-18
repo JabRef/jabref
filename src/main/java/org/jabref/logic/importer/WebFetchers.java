@@ -20,6 +20,7 @@ import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.zbMATH;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Identifier;
 
 public class WebFetchers {
 
@@ -42,7 +43,7 @@ public class WebFetchers {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
+    public static <T extends Identifier> IdFetcher<T> getIdFetcherForIdentifier(Class<T> clazz) {
         if (clazz == DOI.class) {
             return (IdFetcher<T>) new CrossRef();
         } else {
@@ -85,6 +86,13 @@ public class WebFetchers {
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new DoiFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
+        list.add(new CrossRef());
+        list.sort(Comparator.comparing(WebFetcher::getName));
+        return list;
+    }
+
+    public static List<IdFetcher> getIdFetchers() {
+        ArrayList<IdFetcher> list = new ArrayList<>();
         list.add(new CrossRef());
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;

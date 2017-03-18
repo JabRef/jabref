@@ -177,7 +177,7 @@ public class FieldExtraComponents {
             }
         });
         // lookup doi
-        JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
+        JButton doiButton = new JButton(Localization.lang("Look up DOI"));
         doiButton.addActionListener(actionEvent -> {
             try {
                 Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());

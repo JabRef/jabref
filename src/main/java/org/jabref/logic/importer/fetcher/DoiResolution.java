@@ -35,7 +35,7 @@ public class DoiResolution implements FulltextFetcher {
 
         Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();
 
             // follow all redirects and scan for a single pdf link
