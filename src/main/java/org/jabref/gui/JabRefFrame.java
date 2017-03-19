@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -108,6 +111,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldDropDown;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -648,6 +652,31 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
 
+        initShowTrackingNotification();
+
+    }
+
+    private void initShowTrackingNotification() {
+        if (!Globals.prefs.shouldAskToCollectTelemetry()) {
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.scheduleWithFixedDelay(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, 1, TimeUnit.MINUTES);
+        }
+    }
+
+    private Void showTrackingNotification() {
+        if (!Globals.prefs.shouldCollectTelemetry()) {
+            DialogService dialogService = new FXDialogService();
+            boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Telemetry: Help make JabRef better"),
+                    Localization.lang("To improve the user experience, we would like to collect data on the features you use. No personal data will be collected."),
+                    Localization.lang("Share anonymous statistics"),
+                    Localization.lang("Don't share"));
+            Globals.prefs.setShouldCollectTelemetry(shouldCollect);
+        }
+
+        Globals.prefs.askedToCollectTelemetry();
+
+        return null;
     }
 
     public void refreshTitleAndTabs() {

@@ -369,6 +369,7 @@ public class JabRefPreferences {
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
+    private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
 
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
@@ -730,6 +731,7 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_DATABASE, "jabref");
         defaults.put(DB_CONNECT_USERNAME, "root");
         defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
+        defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertDefaultCleanupPreset(defaults);
@@ -1573,5 +1575,13 @@ public class JabRefPreferences {
 
     public void setShouldCollectTelemetry(boolean value) {
         putBoolean(COLLECT_TELEMETRY, value);
+    }
+
+    public Boolean shouldAskToCollectTelemetry() {
+        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
+    }
+
+    public void askedToCollectTelemetry() {
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
     }
 }
