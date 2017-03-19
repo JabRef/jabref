@@ -1,10 +1,10 @@
-package net.sf.jabref.gui;
+package org.jabref.gui;
 
 import java.awt.Frame;
 
 import javax.swing.JDialog;
 
-import net.sf.jabref.Globals;
+import org.jabref.Globals;
 
 public class JabRefDialog extends JDialog {
 

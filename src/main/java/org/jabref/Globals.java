@@ -1,5 +1,8 @@
 package org.jabref;
 
+import java.awt.Toolkit;
+import java.util.UUID;
+
 import org.jabref.collab.FileUpdateMonitor;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
@@ -81,6 +84,7 @@ public class Globals {
 
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
+        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.getAzureInstrumentationKey());
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.getVersion().toString());

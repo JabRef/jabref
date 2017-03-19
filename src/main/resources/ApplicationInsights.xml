@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ApplicationInsights xmlns="http://schemas.microsoft.com/ApplicationInsights/2013/Settings" schemaVersion="2014-05-30">
 
-    <!-- The key from the Azure portal -->
-    <InstrumentationKey>c2435fd3-cb59-423c-846b-04898b101cc1</InstrumentationKey>
-
     <PerformanceCounters>
         <!-- Disable collection of the standard set of performance counters -->
         <UseBuiltIn>False</UseBuiltIn>
