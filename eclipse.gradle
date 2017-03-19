@@ -1,15 +1,25 @@
+import org.gradle.plugins.ide.eclipse.model.AccessRule
 apply plugin: "eclipse"
 
 // ensure that source code is generated, otherwise class `BstLexer` cannot be found
 tasks.eclipseClasspath.dependsOn "generateSource"
 
-// workaround until https://issues.gradle.org/browse/GRADLE-2274 is resolved
-eclipseJdt << {
+// workaround until https://github.com/gradle/gradle/issues/898 is resolved
+eclipseJdt.doLast {
     File f = file('.settings/org.eclipse.core.resources.prefs')
     f.write('eclipse.preferences.version=1\n')
     f.append('encoding/<project>=UTF-8')
 }
-
+eclipse {
+ classpath {
+        file {
+            whenMerged {
+                def jre = entries.find { it.path.contains 'org.eclipse.jdt.launching.JRE_CONTAINER' }
+                jre.accessRules.add(new AccessRule('accessible', '**/javafx/**'))
+            }
+        }
+    }
+}
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282
 
@@ -158,7 +168,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.blank_lines_before_imports=1
         org.eclipse.jdt.core.formatter.blank_lines_before_member_type=1
         org.eclipse.jdt.core.formatter.blank_lines_before_method=1
-        org.eclipse.jdt.core.formatter.blank_lines_before_new_chunk=2
+        org.eclipse.jdt.core.formatter.blank_lines_before_new_chunk=1
         org.eclipse.jdt.core.formatter.blank_lines_before_package=0
         org.eclipse.jdt.core.formatter.blank_lines_between_import_groups=1
         org.eclipse.jdt.core.formatter.blank_lines_between_type_declarations=1
@@ -392,7 +402,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_method_declaration=do not insert
         org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_method_invocation=do not insert
         org.eclipse.jdt.core.formatter.join_lines_in_comments=false
-        org.eclipse.jdt.core.formatter.join_wrapped_lines=true
+        org.eclipse.jdt.core.formatter.join_wrapped_lines=false
         org.eclipse.jdt.core.formatter.keep_else_statement_on_same_line=false
         org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line=false
         org.eclipse.jdt.core.formatter.keep_imple_if_on_one_line=false
@@ -482,7 +492,7 @@ tasks.eclipse.doFirst {
             formatter_profile=_JabRef
             formatter_settings_version=12
             org.eclipse.jdt.ui.ignorelowercasenames=true
-            org.eclipse.jdt.ui.importorder=java;javax;net.sf.jabref;org.jabref;;\\#;
+            org.eclipse.jdt.ui.importorder=java;javax;javafx;net.sf.jabref;org.jabref;;\\#;
             org.eclipse.jdt.ui.ondemandthreshold=99
             org.eclipse.jdt.ui.staticondemandthreshold=99
             sp_cleanup.add_default_serial_version_id=true

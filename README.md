@@ -3,17 +3,13 @@
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
-[![Donation](https://img.shields.io/badge/donate-something-orange.svg)](https://donations.jabref.org)
-[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/pr)](http://www.issuestats.com/github/jabref/jabref)
-[![Issue Stats](http://www.issuestats.com/github/jabref/jabref/badge/issue)](http://www.issuestats.com/github/jabref/jabref)
+[![Donation](https://img.shields.io/badge/donate-to%20jabref-orange.svg)](https://donations.jabref.org)
 
 This version is a development version. Features may not work as expected.
 
-Branches of JabRef development are listed at https://github.com/JabRef/jabref/wiki/Branches.
+Development builds are available at [builds.jabref.org](https://builds.jabref.org/master/) whereas the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
 
-Development builds are available at [builds.jabref.org](http://builds.jabref.org/master/), the [latest release is available via GitHub](https://github.com/JabRef/jabref/releases/latest).
-
-Explanation of donation possibilities and usage of donations is available at our [donations page](https://github.com/JabRef/jabref/wiki/Donations).
+Explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
 
 We use [install4j], the multi-platform installer builder.
 
@@ -28,7 +24,7 @@ JabRef also lets you easily link to PDF or web sources for your reference entrie
 JabRef can import from and export to several formats, and you can customize export filters.
 JabRef can be run as a command line application to convert from any import format to any export format.
 
-* Homepage: http://www.jabref.org
+* Homepage: https://www.jabref.org
 * Development page: https://github.com/JabRef/jabref
 * Open HUB page: https://www.openhub.net/p/jabref
 
@@ -54,13 +50,13 @@ JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer),
 
 ### Installing and Running, Mac OS X:
 
-Please see our [Mac OS X FAQ](http://jabref.sourceforge.net/faq.php#osx).
+Please see our [Mac OS X FAQ](https://help.jabref.org/en/FAQosx).
 
 ### Installing and Running, Windows:
 
 JabRef offers an installer, which also adds a shortcut to JabRef to your start menu.
 
-Please also see our [Windows FAQ](http://jabref.sourceforge.net/faq.php#windows)
+Please also see our [Windows FAQ](https://help.jabref.org/en/FAQwindows)
 
 ### Installing and Running, General:
 
@@ -107,7 +103,7 @@ Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A ful
 Since version 3.6, JabRef is licensed under the [MIT license](https://tldrlegal.com/license/mit-license).
 See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
-JabRef also uses libraries distributed by other parties.
+JabRef also uses libraries, fonts, and icons distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
 
   [BibTeX]: https://www.ctan.org/pkg/bibtex
