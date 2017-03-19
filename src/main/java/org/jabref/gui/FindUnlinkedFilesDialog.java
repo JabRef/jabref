@@ -42,7 +42,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -92,7 +91,7 @@ import org.apache.commons.logging.LogFactory;
  * @version 25.11.2008 | 23:13:29
  *
  */
-public class FindUnlinkedFilesDialog extends JDialog {
+public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
     /**
@@ -163,18 +162,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    /**
-     * For Unit-testing only. <i>Don't remove!</i> <br>
-     * Used via reflection in {@link org.jabref.logic.importer.DatabaseFileLookupTest} to construct this
-     * class.
-     */
-    @SuppressWarnings("unused")
-    private FindUnlinkedFilesDialog() {
-        //intended
-    }
-
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
-        super(owner, Localization.lang("Find unlinked files"), true);
+        super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();

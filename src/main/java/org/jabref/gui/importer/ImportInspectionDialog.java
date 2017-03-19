@@ -56,6 +56,7 @@ import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -138,7 +139,7 @@ import org.apache.commons.logging.LogFactory;
  * receiving this call).
  */
 
-public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
+public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
 
     private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
     private BasePanel panel;
@@ -190,7 +191,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(frame);
+        super(frame, ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();

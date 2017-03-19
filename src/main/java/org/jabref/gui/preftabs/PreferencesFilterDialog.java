@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,11 +14,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.WrapLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.JabRefPreferencesFilter;
 
-class PreferencesFilterDialog extends JDialog {
+class PreferencesFilterDialog extends JabRefDialog {
 
     private final JabRefPreferencesFilter preferencesFilter;
 
@@ -28,7 +28,7 @@ class PreferencesFilterDialog extends JDialog {
     private final JLabel count;
 
     public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter, JFrame frame) {
-        super(frame, true); // is modal
+        super(frame, true, PreferencesFilterDialog.class); // is modal
 
         this.preferencesFilter = Objects.requireNonNull(preferencesFilter);
 

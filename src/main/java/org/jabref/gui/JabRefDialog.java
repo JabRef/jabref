@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.awt.Frame;
+import java.awt.Window;
 
 import javax.swing.JDialog;
 
@@ -14,11 +15,43 @@ public class JabRefDialog extends JDialog {
         trackDialogOpening(clazz);
     }
 
+    public <T extends JabRefDialog> JabRefDialog(Class<T> clazz) {
+        super();
+
+        trackDialogOpening(clazz);
+    }
+
+    public <T extends JabRefDialog> JabRefDialog(Frame owner, Class<T> clazz) {
+        super(owner);
+
+        trackDialogOpening(clazz);
+    }
+
+    public <T extends JabRefDialog> JabRefDialog(Window owner, String title, Class<T> clazz) {
+        super(owner, title);
+
+        trackDialogOpening(clazz);
+    }
+
     private <T extends JabRefDialog> void trackDialogOpening(Class<T> clazz) {
         Globals.getTelemetryClient().trackPageView(clazz.getName());
     }
 
+    public <T  extends JabRefDialog> JabRefDialog(Frame owner, String title, Class<T> clazz) {
+        this(owner, title, true, clazz);
+    }
+
     public <T  extends JabRefDialog> JabRefDialog(Frame owner, String title, boolean modal, Class<T> clazz) {
+        super(owner, title, modal);
+
+        trackDialogOpening(clazz);
+    }
+
+    public <T  extends JabRefDialog> JabRefDialog(java.awt.Dialog owner, String title, Class<T> clazz) {
+        this(owner, title, true, clazz);
+    }
+
+    public <T  extends JabRefDialog> JabRefDialog(java.awt.Dialog owner, String title, boolean modal, Class<T> clazz) {
         super(owner, title, modal);
 
         trackDialogOpening(clazz);

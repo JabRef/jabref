@@ -17,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -29,6 +28,7 @@ import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.FileDialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Dialog to manage custom importers.
  */
-public class ImportCustomizationDialog extends JDialog {
+public class ImportCustomizationDialog extends JabRefDialog {
     private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
@@ -57,7 +57,7 @@ public class ImportCustomizationDialog extends JDialog {
     private final JTable customImporterTable;
 
     public ImportCustomizationDialog(final JabRefFrame frame) {
-        super(frame, Localization.lang("Manage custom imports"), false);
+        super(frame, Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
 
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
