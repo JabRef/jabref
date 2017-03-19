@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.model.pdf.FileAnnotationType;
 
 import org.junit.Test;
 
@@ -51,7 +52,7 @@ public class PdfAnnotationImporterTest {
     public void inlineNoteMinimal() {
         final List<FileAnnotation> expected = Collections.singletonList(
                 new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 25), 1,
-                        "inline note annotation", "FreeText", Optional.empty()));
+                        "inline note annotation", FileAnnotationType.FREETEXT, Optional.empty()));
 
         assertEquals(expected,
                 importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-inlinenote.pdf")));
@@ -62,7 +63,7 @@ public class PdfAnnotationImporterTest {
         // Fixme: Comparison Fails because seconds are missing, should be 24.
         final List<FileAnnotation> expected = Collections.singletonList(
                 new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 17), 1,
-                        "A simple pop-up note", "Text", Optional.empty()));
+                        "A simple pop-up note", FileAnnotationType.TEXT, Optional.empty()));
 
         // Start old test style
         List<FileAnnotation> annotations = importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-popup.pdf"));
@@ -70,9 +71,8 @@ public class PdfAnnotationImporterTest {
         assertEquals("Linus Dietz", note.getAuthor());
         assertEquals(LocalDateTime.of(2017, 3, 12, 20, 17, 24), note.getTimeModified());
         assertEquals(1, note.getPage());
-
         assertEquals("A simple pop-up note", note.getContent());
-        assertEquals("Text", note.getAnnotationType());
+        assertEquals(FileAnnotationType.TEXT, note.getAnnotationType());
         // End old test style
 
         assertEquals(expected,
@@ -88,7 +88,7 @@ public class PdfAnnotationImporterTest {
         FileAnnotation note = annotations.get(0);
         assertEquals("Linus Dietz", note.getAuthor());
         assertEquals("World", note.getContent());
-        assertEquals("Highlight", note.getAnnotationType());
+        assertEquals(FileAnnotationType.HIGHLIGHT, note.getAnnotationType());
         assertEquals(1, note.getPage());
 
         assertTrue(note.hasLinkedAnnotation());
@@ -106,7 +106,7 @@ public class PdfAnnotationImporterTest {
         FileAnnotation note = annotations.get(0);
         assertEquals("Linus Dietz", note.getAuthor());
         assertEquals("World", note.getContent());
-        assertEquals("Highlight", note.getAnnotationType());
+        assertEquals(FileAnnotationType.HIGHLIGHT, note.getAnnotationType());
         assertEquals(1, note.getPage());
 
         assertTrue(note.hasLinkedAnnotation());
@@ -123,7 +123,7 @@ public class PdfAnnotationImporterTest {
         FileAnnotation note = annotations.get(0);
         assertEquals("Linus Dietz", note.getAuthor());
         assertEquals("Hello", note.getContent());
-        assertEquals("Underline", note.getAnnotationType());
+        assertEquals(FileAnnotationType.UNDERLINE, note.getAnnotationType());
         assertEquals(1, note.getPage());
 
         assertTrue(note.hasLinkedAnnotation());
@@ -140,7 +140,7 @@ public class PdfAnnotationImporterTest {
         assertEquals("Linus Dietz", polygon.getAuthor());
         assertEquals("polygon annotation", polygon.getContent());
         assertFalse(polygon.hasLinkedAnnotation());
-        assertEquals("Polygon", polygon.getAnnotationType());
+        assertEquals(FileAnnotationType.POLYGON, polygon.getAnnotationType());
         assertEquals(1, polygon.getPage());
     }
 }

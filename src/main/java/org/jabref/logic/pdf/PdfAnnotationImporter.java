@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.pdf.FileAnnotation;
+import org.jabref.model.pdf.FileAnnotationType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,8 +23,6 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationUnderline;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
@@ -51,8 +51,11 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
                 PDPage page = (PDPage) pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getSubtype()) ||
-                            FDFAnnotationUnderline.SUBTYPE.equals(annotation.getSubtype())) {
+                    if (!isSupportedAnnotationType(annotation)) {
+                        continue;
+                    }
+                    if (FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype()) ||
+                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
@@ -68,13 +71,24 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return annotationsList;
     }
 
+    private boolean isSupportedAnnotationType(PDAnnotation annotation) {
+        try {
+            if (!Arrays.asList(FileAnnotationType.values()).contains(FileAnnotationType.valueOf(annotation.getSubtype()))) {
+                return false;
+            }
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug(String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
+        }
+        return true;
+    }
+
     private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
         FileAnnotation annotationBelongingToMarking = new FileAnnotation(
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
-                pageIndex + 1, annotation.getContents(), annotation.getSubtype(), Optional.empty());
+                pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
         try {
-            if (FDFAnnotationHighlight.SUBTYPE.equals(annotation.getSubtype()) || FDFAnnotationUnderline.SUBTYPE.equals(annotation.getSubtype())) {
+            if (FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) || FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype())) {
                 annotation.setContents(extractMarkedText(page, annotation));
             }
         } catch (IOException e) {

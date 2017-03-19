@@ -2,13 +2,14 @@ package org.jabref.model.pdf;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
-public final class FileAnnotation {
+public class FileAnnotation {
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
     private static final String DATE_TIME_STRING = "^D:\\d{14}$";
@@ -19,7 +20,7 @@ public final class FileAnnotation {
     private final LocalDateTime timeModified;
     private final int page;
     private final String content;
-    private final String annotationType;
+    private final FileAnnotationType annotationType;
     private final Optional<FileAnnotation> linkedFileAnnotation;
 
     /**
@@ -32,7 +33,7 @@ public final class FileAnnotation {
      * @param annotationType the type of the annotation
      */
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
-            final String content, final String annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
+                          final String content, final FileAnnotationType annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
         this.timeModified = timeModified;
         this.page = pageNumber;
@@ -50,7 +51,7 @@ public final class FileAnnotation {
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getDictionary().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.empty());
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
     }
 
     /**
@@ -63,7 +64,7 @@ public final class FileAnnotation {
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.of(linkedFileAnnotation));
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.of(linkedFileAnnotation));
     }
 
     /**
@@ -133,7 +134,6 @@ public final class FileAnnotation {
                 && Objects.equals(this.page, that.page)
                 && Objects.equals(this.linkedFileAnnotation, that.linkedFileAnnotation)
                 && Objects.equals(this.timeModified, that.timeModified);
-
     }
 
     @Override
@@ -157,7 +157,7 @@ public final class FileAnnotation {
         return content;
     }
 
-    public String getAnnotationType() {
+    public FileAnnotationType getAnnotationType() {
         return annotationType;
     }
 
