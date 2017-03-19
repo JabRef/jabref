@@ -141,7 +141,12 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         AuthorList authorsParsed = new AuthorList();
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
-            authorsParsed.addAuthor(author.getString("given"), "", "", author.getString("family"), "");
+            authorsParsed.addAuthor(
+                    author.optString("given", ""),
+                    "",
+                    "",
+                    author.optString("family", ""),
+                    "");
         }
         return authorsParsed.getAsFirstLastNamesWithAnd();
     }
