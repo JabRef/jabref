@@ -43,39 +43,6 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
-    public static Optional<DOI> findDOI(BibEntry entry) {
-        Objects.requireNonNull(entry);
-        Optional<DOI> doi = Optional.empty();
-        
-        // title is minimum requirement
-        Optional<String> title = entry.getLatexFreeField(FieldName.TITLE);
-
-        if (!title.isPresent() || title.get().isEmpty()) {
-            return doi;
-        }
-
-        String query = enhanceQuery(title.get(), entry);
-
-        try {
-            HttpResponse<JsonNode> response = Unirest.get(API_URL + "/works")
-                    .queryString("query", query)
-                    .queryString("rows", API_RESULTS)
-                    .asJson();
-
-            JSONArray items = response.getBody().getObject().getJSONObject("message").getJSONArray("items");
-            // quality check
-            Optional<String> dataDoi = findMatchingEntry(entry, items);
-
-            if (dataDoi.isPresent()) {
-                LOGGER.debug("DOI " + dataDoi.get() + " for " + title.get() + " found.");
-                return DOI.build(dataDoi.get());
-            }
-        } catch (UnirestException e) {
-            LOGGER.warn("Unable to query CrossRef API: " + e.getMessage(), e);
-        }
-        return doi;
-    }
-  
     @Override
     public String getName() {
         return "Crossref";

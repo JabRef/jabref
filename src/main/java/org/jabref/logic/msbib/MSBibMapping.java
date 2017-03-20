@@ -80,9 +80,6 @@ public class MSBibMapping {
         biblatexToMsBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
 
-    private MSBibMapping() {
-    }
-
     public static String getBiblatexEntryType(String msbibType) {
         final String defaultType = BibtexEntryTypes.MISC.getName();
 

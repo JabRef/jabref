@@ -39,9 +39,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class AutoSetLinks {
 
-    private AutoSetLinks() {
-    }
-
     /**
      * Shortcut method if links are set without using the GUI
      *

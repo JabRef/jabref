@@ -15,8 +15,6 @@ public class ExportFormats {
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber;
 
-    private ExportFormats() {
-    }
 
     public static void initAllExports(Map<String, ExportFormat> customFormats,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {

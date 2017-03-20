@@ -8,9 +8,6 @@ import java.util.stream.Collectors;
 
 public class FileField {
 
-    private FileField() {
-    }
-
     public static List<ParsedFileField> parse(String value) {
         if ((value == null) || value.trim().isEmpty()) {
             return Collections.emptyList();

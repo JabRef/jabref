@@ -47,9 +47,6 @@ public class GUIGlobals {
 
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
 
-    private GUIGlobals() {
-    }
-
     public static JLabel getTableIcon(String fieldType) {
         JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
         if (label == null) {

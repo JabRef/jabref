@@ -63,8 +63,6 @@ public class MonthUtil {
         }
     }
 
-    private MonthUtil() {
-    }
 
     /**
      * Find month by number

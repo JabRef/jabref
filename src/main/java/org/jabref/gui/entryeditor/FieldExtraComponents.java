@@ -51,10 +51,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class FieldExtraComponents {
 
-
-    private FieldExtraComponents() {
-    }
-  
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
 
     private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"

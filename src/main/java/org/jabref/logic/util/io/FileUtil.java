@@ -44,9 +44,6 @@ public class FileUtil {
 
     public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
-    private FileUtil() {
-    }
-
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *

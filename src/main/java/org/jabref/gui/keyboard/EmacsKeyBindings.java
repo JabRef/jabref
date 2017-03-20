@@ -188,9 +188,6 @@ public class EmacsKeyBindings {
             new JEditorPane(),
     };
 
-    private EmacsKeyBindings() {
-    }
-
     /**
      * Loads the emacs keybindings for all common <code>JTextComponent</code>s.
      *

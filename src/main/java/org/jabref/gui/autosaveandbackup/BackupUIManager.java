@@ -13,9 +13,6 @@ import org.jabref.logic.l10n.Localization;
  */
 public class BackupUIManager {
 
-    private BackupUIManager() {
-    }
-
     public static void showRestoreBackupDialog(JFrame frame, Path originalPath) {
         int answer = JOptionPane.showConfirmDialog(frame,
                 new StringBuilder()

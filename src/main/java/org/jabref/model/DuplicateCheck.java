@@ -55,8 +55,6 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() {
-    }
 
     /**
      * Checks if the two entries represent the same publication.

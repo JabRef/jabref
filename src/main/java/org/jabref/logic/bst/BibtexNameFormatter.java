@@ -26,9 +26,6 @@ import org.jabref.model.entry.AuthorList;
  */
 public class BibtexNameFormatter {
 
-    private BibtexNameFormatter() {
-    }
-
     public static String formatName(String authorsNameList, int whichName, String formatString, Warn warn) {
         AuthorList al = AuthorList.parse(authorsNameList);
 
