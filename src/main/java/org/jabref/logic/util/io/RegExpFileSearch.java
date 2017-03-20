@@ -31,6 +31,9 @@ public class RegExpFileSearch {
     private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
 
 
+    private RegExpFileSearch() {
+    }
+
     /**
      * Search for file links for a set of entries using regexp. Lists of extensions and directories
      * are given.

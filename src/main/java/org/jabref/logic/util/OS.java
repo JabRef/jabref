@@ -19,4 +19,7 @@ public class OS {
     // Newlines
     // will be overridden in initialization due to feature #857 @ JabRef.java
     public static String NEWLINE = System.lineSeparator();
+
+    private OS() {
+    }
 }

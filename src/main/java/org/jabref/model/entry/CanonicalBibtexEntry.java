@@ -10,6 +10,9 @@ import java.util.TreeSet;
 
 public class CanonicalBibtexEntry {
 
+    private CanonicalBibtexEntry() {
+    }
+
     /**
      * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
      * as is

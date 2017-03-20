@@ -20,6 +20,9 @@ public class FileFinder {
 
     private static final Log LOGGER = LogFactory.getLog(FileFinder.class);
 
+    private FileFinder() {
+    }
+
     public static Set<Path> findFiles(List<String> extensions, List<File> directories) {
 
         Objects.requireNonNull(directories, "Directories must not be null!");
