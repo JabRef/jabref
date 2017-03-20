@@ -443,6 +443,10 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         this(JabRefGUI.getMainFrame(), null);
     }
 
+    public GroupDialog(AbstractGroup editedGroup) {
+        this(JabRefGUI.getMainFrame(), editedGroup);
+    }
+
     private static String formatRegExException(String regExp, Exception e) {
         String[] sa = e.getMessage().split("\\n");
         StringBuilder sb = new StringBuilder();

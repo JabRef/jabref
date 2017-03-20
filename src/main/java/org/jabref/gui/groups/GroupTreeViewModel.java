@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -14,8 +15,10 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
@@ -125,6 +128,81 @@ public class GroupTreeViewModel extends AbstractViewModel {
             dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
         });
     }
+
+    /**
+     * Opens "Edit Group Dialog" and changes the given group to the edited one.
+     */
+    public void editGroup(GroupNodeViewModel oldGroup) {
+        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+        newGroup.ifPresent(group -> {
+
+            // TODO: Keep assignments
+            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Change of Grouping Method"),
+                    Localization.lang("Assign the original group's entries to this group?"));
+            //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+            boolean removePreviousAssignents =
+                    (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup) && (group instanceof ExplicitGroup);
+
+            List<FieldChange> addChange = oldGroup.
+                    getGroupNode().setGroup(
+                    group,
+                    keepPreviousAssignments,
+                    removePreviousAssignents,
+                    stateManager.getEntriesInCurrentDatabase());
+
+            // TODO: Add undo
+            // Store undo information.
+            // AbstractUndoableEdit undoAddPreviousEntries = null;
+            // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
+            // if (undoAddPreviousEntries == null) {
+            //    panel.getUndoManager().addEdit(undo);
+            //} else {
+            //    NamedCompound nc = new NamedCompound("Modify Group");
+            //    nc.addEdit(undo);
+            //    nc.addEdit(undoAddPreviousEntries);
+            //    nc.end();/
+            //      panel.getUndoManager().addEdit(nc);
+            //}
+            //if (!addChange.isEmpty()) {
+            //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
+            //}
+
+            dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+        });
+    }
+
+    public void removeSubgroups(GroupNodeViewModel group) {
+        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove subgroups"),
+                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
+        if (confirmation) {
+            /// TODO: Add undo
+            //final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
+            //panel.getUndoManager().addEdit(undo);
+            group.getGroupNode().removeAllChildren();
+            dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
+        }
+    }
+
+    public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
+        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Remove group"),
+                Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
+
+        if (confirmation) {
+            // TODO: Add undo
+            //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+            //panel.getUndoManager().addEdit(undo);
+            GroupTreeNode groupNode = group.getGroupNode();
+            groupNode.getParent().ifPresent(parent ->
+                    groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+            groupNode.removeFromParent();
+
+            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+        }
+    }
+
 
     /**
      * Removes the specified group and its subgroups (after asking for confirmation).
