@@ -1,8 +1,9 @@
-package org.jabref.logic.logging;
+package org.jabref.gui.logging;
 
 import java.io.Serializable;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.logging.LogMessages;
 
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
