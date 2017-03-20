@@ -2,6 +2,8 @@ package org.jabref.logic.logging;
 
 import java.io.Serializable;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
+
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -41,6 +43,6 @@ public class GuiAppender extends AbstractAppender {
      */
     @Override
     public void append(LogEvent event) {
-        LogMessages.getInstance().add(event);
+        DefaultTaskExecutor.runInJavaFXThread(() -> LogMessages.getInstance().add(event));
     }
 }

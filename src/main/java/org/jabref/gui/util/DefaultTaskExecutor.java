@@ -19,6 +19,24 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
 
+    public static <V> V runInJavaFXThread(Callable<V> callable) {
+        FutureTask<V> task = new FutureTask<>(callable);
+        Platform.runLater(task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e);
+            return null;
+        }
+    }
+
+    public static void runInJavaFXThread(Runnable runnable) {
+        runInJavaFXThread(() -> {
+            runnable.run();
+            return null;
+        });
+    }
+
     @Override
     public <V> void execute(BackgroundTask<V> task) {
         new Thread(getJavaFXTask(task)).start();
@@ -54,16 +72,4 @@ public class DefaultTaskExecutor implements TaskExecutor {
             return new Exception(throwable);
         }
     }
-
-    public static <V> V runInJavaFXThread(Callable<V> callable) {
-        FutureTask<V> task = new FutureTask<>(callable);
-        Platform.runLater(task);
-        try {
-            return task.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error(e);
-            return null;
-        }
-    }
-
 }
