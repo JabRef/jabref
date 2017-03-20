@@ -7,6 +7,7 @@ import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel extends FileAnnotation {
+
     public FileAnnotationViewModel(FileAnnotation annotation) {
         super(annotation.getAuthor(), annotation.getTimeModified(), annotation.getPage(), annotation.getContent(),
                 annotation.getAnnotationType(), annotation.hasLinkedAnnotation() ? Optional.of(annotation.getLinkedFileAnnotation()) : Optional.empty());
@@ -21,6 +22,7 @@ public class FileAnnotationViewModel extends FileAnnotation {
             if (FileAnnotationType.HIGHLIGHT.equals(this.getAnnotationType())) {
                 return Localization.lang("Empty Highlight");
             }
+            return Localization.lang("Empty Marking");
         }
 
         if (FileAnnotationType.UNDERLINE.equals(this.getAnnotationType())) {
