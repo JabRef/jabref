@@ -25,8 +25,6 @@ public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
 
-    private MetaDataParser() {
-    }
 
     /**
      * Parses the given data map and returns a new resulting {@link MetaData} instance.

@@ -29,6 +29,7 @@ public class BibtexWidth {
 
     private static int[] widths;
 
+
     static {
         if (BibtexWidth.widths == null) {
             BibtexWidth.widths = new int[128];
@@ -132,9 +133,6 @@ public class BibtexWidth {
             BibtexWidth.widths[125] = 500;
             BibtexWidth.widths[126] = 500;
         }
-    }
-
-    private BibtexWidth() {
     }
 
     private static int getSpecialCharWidth(char[] c, int pos) {

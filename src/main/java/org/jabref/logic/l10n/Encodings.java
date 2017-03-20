@@ -17,7 +17,4 @@ public class Encodings {
         ENCODINGS = encodingsList.toArray(new Charset[encodingsList.size()]);
         ENCODINGS_DISPLAYNAMES = encodingsStringList.toArray(new String[encodingsStringList.size()]);
     }
-
-    private Encodings() {
-    }
 }

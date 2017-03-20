@@ -7,9 +7,6 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.BibEntry;
 
 public class BibDatabaseModeDetection {
-
-    private BibDatabaseModeDetection() {
-    }
     /**
      * Tries to infer the database type by examining a BibDatabase database.
      *

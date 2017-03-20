@@ -19,9 +19,6 @@ public class IdGenerator {
 
     private static int idCounter;
 
-    private IdGenerator() {
-    }
-
     public static synchronized String next() {
         String result = idFormat.format(idCounter);
         idCounter++;

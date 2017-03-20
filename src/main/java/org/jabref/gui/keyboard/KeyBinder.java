@@ -10,9 +10,6 @@ import org.jabref.Globals;
 
 public class KeyBinder {
 
-    private KeyBinder() {
-    }
-
     /**
      * Binds ESC-Key to cancel button
      *

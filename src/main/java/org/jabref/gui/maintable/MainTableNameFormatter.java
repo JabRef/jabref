@@ -6,8 +6,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class MainTableNameFormatter {
 
-    private MainTableNameFormatter(){}
-    
     /**
      * Format a name field for the table, according to user preferences.
      *

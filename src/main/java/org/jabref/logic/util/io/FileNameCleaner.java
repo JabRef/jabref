@@ -26,9 +26,6 @@ public class FileNameCleaner {
     };
     // @formatter:on
 
-    private FileNameCleaner() {
-    }
-
 
     /**
      * Replaces illegal characters in given fileName by '_'

@@ -25,9 +25,6 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class CrossrefFetcherEvaluator {
 
-    private CrossrefFetcherEvaluator() {
-    }
-
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
         try (FileReader reader = new FileReader(args[0])) {

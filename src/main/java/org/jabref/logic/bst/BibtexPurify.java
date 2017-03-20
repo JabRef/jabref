@@ -12,9 +12,6 @@ package org.jabref.logic.bst;
  */
 public class BibtexPurify {
 
-    private BibtexPurify() {
-    }
-
     /**
      *
      * @param toPurify

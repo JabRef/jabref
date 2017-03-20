@@ -40,6 +40,4 @@ public class EntryConverter {
         FIELD_ALIASES.putAll(EntryConverter.FIELD_ALIASES_LTX_TO_TEX);
     }
 
-    private EntryConverter() {
-    }
 }

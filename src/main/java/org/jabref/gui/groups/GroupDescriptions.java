@@ -8,9 +8,6 @@ import org.jabref.model.strings.StringUtil;
 
 public class GroupDescriptions {
 
-    private GroupDescriptions() {
-    }
-
     public static String getDescriptionForPreview(String field, String expr, boolean caseSensitive, boolean regExp) {
         String header = regExp ? Localization.lang(
                 "This group contains entries whose <b>%0</b> field contains the regular expression <b>%1</b>",

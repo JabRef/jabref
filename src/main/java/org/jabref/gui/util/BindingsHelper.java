@@ -16,10 +16,6 @@ import javafx.scene.Node;
  * Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
  */
 public class BindingsHelper {
-
-    private BindingsHelper() {
-    }
-
     public static <T> BooleanBinding any(ObservableList<T> source, Predicate<T> predicate) {
         return Bindings.createBooleanBinding(() -> source.stream().anyMatch(predicate), source);
     }

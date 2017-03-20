@@ -28,9 +28,6 @@ import org.apache.jempbox.xmp.XMPMetadata;
 
 public class XMPUtilMain {
 
-    private XMPUtilMain() {
-    }
-
     /**
      * Command-line tool for working with XMP-data.
      *

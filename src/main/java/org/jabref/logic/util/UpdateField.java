@@ -11,9 +11,6 @@ import org.jabref.model.entry.FieldName;
 
 public class UpdateField {
 
-    private UpdateField() {
-    }
-
     /**
      * Updating a field will result in the entry being reformatted on save
      *

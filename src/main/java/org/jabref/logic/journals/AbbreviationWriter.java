@@ -15,9 +15,6 @@ import org.jabref.logic.util.OS;
  */
 public class AbbreviationWriter {
 
-    private AbbreviationWriter() {
-    }
-
     /**
      * This method will write the list of abbreviations to a file on the file system specified by the given path.
      * If the file already exists its content will be overridden, otherwise a new file will be created.

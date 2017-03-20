@@ -62,8 +62,6 @@ public class XMPUtil {
 
     private static final Log LOGGER = LogFactory.getLog(XMPUtil.class);
 
-    private XMPUtil() {
-    }
 
     /**
      * Convenience method for readXMP(File).

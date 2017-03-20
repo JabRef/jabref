@@ -11,9 +11,6 @@ import org.apache.logging.log4j.core.config.LoggerConfig;
 public class JabRefLogger {
     private static final Log LOGGER = LogFactory.getLog(JabRefLogger.class);
 
-    private JabRefLogger() {
-    }
-
     public static void setDebug() {
         setLogLevelToDebugForJabRefClasses();
         LOGGER.debug("Showing debug messages");

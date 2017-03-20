@@ -18,9 +18,6 @@ import org.jabref.logic.l10n.Localization;
  */
 public class ParserResultWarningDialog {
 
-    private ParserResultWarningDialog() {
-    }
-
     /**
      * Shows a dialog with the warnings from an import or open of a file
      *

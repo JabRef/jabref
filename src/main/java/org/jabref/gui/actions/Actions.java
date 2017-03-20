@@ -69,7 +69,4 @@ public class Actions {
     public static final String UNMARK_ENTRIES = "unmarkEntries";
     public static final String WRITE_XMP = "writeXMP";
     public static final String PRINT_PREVIEW = "printPreview";
-
-    private Actions() {
-    }
 }
