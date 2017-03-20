@@ -1,13 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
 public class RegexFormatter implements Formatter {
 
-    private static String[] rex;
+    private static String[] regex;
 
     @Override
     public String getName() {
@@ -20,12 +18,11 @@ public class RegexFormatter implements Formatter {
     }
 
     @Override
-    public String format(String oldString) {
-        Objects.requireNonNull(oldString);
-        rex[0] = rex[0].replaceAll("\"", "");
-        rex[1] = rex[1].replaceAll("\"", "");
-
-        return oldString.replaceAll(rex[0], rex[1]);
+    public String format(String input) {
+        if (regex == null) {
+            return input;
+        }
+        return input.replaceAll(regex[0], regex[1]);
     }
 
     @Override
@@ -38,12 +35,11 @@ public class RegexFormatter implements Formatter {
         return "Please replace the spaces";
     }
 
-    public static void setRegex(String regex) {
-        regex = regex.substring(1, regex.length() - 1);
-        String[] parts = regex.split("\",\"");
-        parts[0] += "\"";
-        parts[1] = "\"" + parts[1];
-        rex = parts;
+    public static void setRegex(String rex) {
+        // formatting is like ("exp1","exp2"), we want to remove (" and ")
+        rex = rex.substring(2, rex.length() - 2);
+        String[] parts = rex.split("\",\"");
+        regex = parts;
     }
 
 }
