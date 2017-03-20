@@ -57,4 +57,8 @@ public class MetadataSerializationConfiguration {
      * Identifier for {@link AutomaticKeywordGroup}.
      */
     public static final String AUTOMATIC_KEYWORD_GROUP_ID = "AutomaticKeywordGroup:";
+
+  
+    private MetadataSerializationConfiguration() {
+    }
 }

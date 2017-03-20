@@ -22,6 +22,9 @@ class CustomEntryTypePreferenceMigration {
 
     private static JabRefPreferences prefs = Globals.prefs;
 
+    private CustomEntryTypePreferenceMigration() {
+    }
+
     static void upgradeStoredCustomEntryTypes(BibDatabaseMode defaultBibDatabaseMode) {
         List<CustomEntryType> storedOldTypes = new ArrayList<>();
 

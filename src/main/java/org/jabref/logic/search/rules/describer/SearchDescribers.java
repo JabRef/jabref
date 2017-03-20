@@ -7,6 +7,9 @@ import org.jabref.model.search.rules.SearchRule;
 
 public class SearchDescribers {
 
+    private SearchDescribers() {
+    }
+
     /**
      * Get the search describer for a given search rule and a given search query.
      *

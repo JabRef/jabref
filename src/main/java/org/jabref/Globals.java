@@ -49,6 +49,9 @@ public class Globals {
     private static GlobalFocusListener focusListener;
     private static FileUpdateMonitor fileUpdateMonitor;
 
+    private Globals() {
+    }
+
     // Key binding preferences
     public static KeyBindingPreferences getKeyPrefs() {
         if (keyPrefs == null) {

@@ -2,6 +2,9 @@ package org.jabref.logic.net;
 
 public class ProxyRegisterer {
 
+    private ProxyRegisterer() {
+    }
+
     public static void register(ProxyPreferences proxyPrefs) {
         if (proxyPrefs.isUseProxy()) {
             // NetworkTab.java ensures that proxyHostname and proxyPort are not null

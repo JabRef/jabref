@@ -7,6 +7,9 @@ import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 
 public class GenerateCharacterTable {
 
+    private GenerateCharacterTable() {
+    }
+
     public static void main(String[] args) {
         Map<Integer, String> characterMap = new TreeMap<>(HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP);
         System.out.println("\\documentclass[10pt, a4paper]{article}");
