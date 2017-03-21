@@ -5,7 +5,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
@@ -313,6 +312,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
     }
 
+    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
+        return node.removeEntriesFromGroup(entries);
+    }
+
     public boolean isAllEntriesGroup() {
         return getNode().getGroup() instanceof AllEntriesGroup;
     }
@@ -379,17 +382,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
      */
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         return node.addEntriesToGroup(entries);
-    }
-
-    /**
-     * Removes the given entries from this node's group.
-     */
-    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if (node.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger) node.getGroup()).remove(entries);
-        } else {
-            return Collections.emptyList();
-        }
     }
 
     public void subscribeToDescendantChanged(Consumer<GroupTreeNodeViewModel> subscriber) {

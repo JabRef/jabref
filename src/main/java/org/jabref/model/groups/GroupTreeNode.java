@@ -282,4 +282,16 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             return Collections.emptyList();
         }
     }
+
+    /**
+     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e.,
+     * does not implement {@link GroupEntryChanger}), then no action is performed.
+     */
+    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
+        if (getGroup() instanceof GroupEntryChanger) {
+            return ((GroupEntryChanger) getGroup()).remove(entries);
+        } else {
+            return Collections.emptyList();
+        }
+    }
 }

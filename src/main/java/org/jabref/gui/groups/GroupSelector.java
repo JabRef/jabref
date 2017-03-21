@@ -96,9 +96,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final NodeAction collapseSubtreePopupAction = new CollapseSubtreeAction();
     private final NodeAction sortDirectSubgroupsPopupAction = new SortDirectSubgroupsAction();
     private final NodeAction sortAllSubgroupsPopupAction = new SortAllSubgroupsAction();
-    private final AddToGroupAction addToGroup = new AddToGroupAction(false);
-    private final AddToGroupAction moveToGroup = new AddToGroupAction(true);
-    private final RemoveFromGroupAction removeFromGroup = new RemoveFromGroupAction();
     private final ToggleAction toggleAction;
     private DefaultTreeModel groupsTreeModel;
     private GroupTreeNodeViewModel groupsRoot;
@@ -303,9 +300,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         moveSubmenu.add(moveNodeLeftPopupAction);
         moveSubmenu.add(moveNodeRightPopupAction);
         groupsContextMenu.addSeparator();
-        groupsContextMenu.add(addToGroup);
-        groupsContextMenu.add(moveToGroup);
-        groupsContextMenu.add(removeFromGroup);
         groupsTree.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -365,9 +359,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         expandSubtreePopupAction.setEnabled(path != null);
         collapseSubtreePopupAction.setEnabled(path != null);
         sortSubmenu.setEnabled(path != null);
-        addToGroup.setEnabled(false);
-        moveToGroup.setEnabled(false);
-        removeFromGroup.setEnabled(false);
         if (path != null) { // some path dependent enabling/disabling
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             expandSubtreePopupAction.setNode(node);
@@ -407,17 +398,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
             if (!selection.isEmpty()) {
                 if (node.canAddEntries(selection)) {
-                    addToGroup.setNode(node);
-                    addToGroup.setBasePanel(panel);
-                    addToGroup.setEnabled(true);
-                    moveToGroup.setNode(node);
-                    moveToGroup.setBasePanel(panel);
-                    moveToGroup.setEnabled(true);
+                    //addToGroup.setEnabled(true);
                 }
                 if (node.canRemoveEntries(selection)) {
-                    removeFromGroup.setNode(node);
-                    removeFromGroup.setBasePanel(panel);
-                    removeFromGroup.setEnabled(true);
+                    //removeFromGroup.setEnabled(true);
                 }
             }
         } else {

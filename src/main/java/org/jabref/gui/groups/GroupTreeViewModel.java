@@ -222,4 +222,29 @@ public class GroupTreeViewModel extends AbstractViewModel {
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
         }
     }
+
+    public void addSelectedEntries(GroupNodeViewModel group) {
+        // TODO: Warn
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
+        //    return; // user aborted operation
+
+        List<FieldChange> addChange = group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());
+
+        // TODO: Add undo
+        // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
+        // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
+        // panel.getUndoManager().addEdit(undoAll);
+    }
+
+    public void removeSelectedEntries(GroupNodeViewModel group) {
+        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
+        //    return; // user aborted operation
+
+        List<FieldChange> removeChange = group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
+
+        // TODO: Add undo
+        // if (!undo.isEmpty()) {
+        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+    }
 }
