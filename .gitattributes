@@ -6,5 +6,7 @@ gradlew eol=lf
 *.properties text
 *.java text
 
-# ensure that CHANGELOG entries are merged instead of causing conflicts
-CHANGELOG.md merge=union
+# disable after a release
+# CHANGELOG.md merge=union
+
+src/main/resources/l10n/*.properties merge=union

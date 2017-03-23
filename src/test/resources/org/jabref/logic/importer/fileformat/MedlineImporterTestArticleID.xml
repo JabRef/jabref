@@ -1,0 +1,225 @@
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Status="Publisher" Owner="NLM">
+        <PMID Version="1">26711635</PMID>
+        <DateCreated>
+            <Year>2015</Year>
+            <Month>12</Month>
+            <Day>29</Day>
+        </DateCreated>
+        <DateRevised>
+            <Year>2015</Year>
+            <Month>12</Month>
+            <Day>30</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1879-0070</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <PubDate>
+                        <Year>2015</Year>
+                        <Month>Dec</Month>
+                        <Day>1</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Diagnostic microbiology and infectious disease</Title>
+                <ISOAbbreviation>Diagn. Microbiol. Infect. Dis.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Diagnostic performance of a multiplex PCR assay for meningitis in an HIV-infected population in Uganda.</ArticleTitle>
+            <Pagination>
+            <MedlinePgn>1234</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="pii">S0732-8893(15)00432-0</ELocationID>
+            <ELocationID EIdType="doi">10.1016/j.diagmicrobio.2015.11.017</ELocationID>
+            <Abstract>
+                <AbstractText NlmCategory="UNASSIGNED">This abstract is a dummy.</AbstractText>
+                </Abstract>
+            <AuthorList>
+                <Author>
+                    <LastName>Rhein</LastName>
+                    <ForeName>Joshua</ForeName>
+                    <Initials>J</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA; Infectious Disease Institute, Makerere University, Kampala, Uganda. Electronic address: joshua.rhein@gmail.com.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Bahr</LastName>
+                    <ForeName>Nathan C</ForeName>
+                    <Initials>NC</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Hemmert</LastName>
+                    <ForeName>Andrew C</ForeName>
+                    <Initials>AC</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>BioFire Diagnostics, LLC, Salt Lake City, UT, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Cloud</LastName>
+                    <ForeName>Joann L</ForeName>
+                    <Initials>JL</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>BioFire Diagnostics, LLC, Salt Lake City, UT, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Bellamkonda</LastName>
+                    <ForeName>Satya</ForeName>
+                    <Initials>S</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>BioFire Diagnostics, LLC, Salt Lake City, UT, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Oswald</LastName>
+                    <ForeName>Cody</ForeName>
+                    <Initials>C</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>BioFire Diagnostics, LLC, Salt Lake City, UT, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Lo</LastName>
+                    <ForeName>Eric</ForeName>
+                    <Initials>E</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>BioFire Diagnostics, LLC, Salt Lake City, UT, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Nabeta</LastName>
+                    <ForeName>Henry</ForeName>
+                    <Initials>H</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Kiggundu</LastName>
+                    <ForeName>Reuben</ForeName>
+                    <Initials>R</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Akampurira</LastName>
+                    <ForeName>Andrew</ForeName>
+                    <Initials>A</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Musubire</LastName>
+                    <ForeName>Abdu</ForeName>
+                    <Initials>A</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA; Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Williams</LastName>
+                    <ForeName>Darlisha A</ForeName>
+                    <Initials>DA</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA; Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Meya</LastName>
+                    <ForeName>David B</ForeName>
+                    <Initials>DB</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA; Infectious Disease Institute, Makerere University, Kampala, Uganda.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <LastName>Boulware</LastName>
+                    <ForeName>David R</ForeName>
+                    <Initials>DR</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Infectious Disease and International Health, Department of Medicine, University of Minnesota, Minneapolis, MN, USA.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author>
+                    <CollectiveName>ASTRO-CM Team</CollectiveName>
+                </Author>
+            </AuthorList>
+            <Language>ENG</Language>
+            <PublicationTypeList>
+                <PublicationType UI="">JOURNAL ARTICLE</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2015</Year>
+                <Month>12</Month>
+                <Day>1</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <MedlineTA>Diagn Microbiol Infect Dis</MedlineTA>
+            <NlmUniqueID>8305899</NlmUniqueID>
+            <ISSNLinking>0732-8893</ISSNLinking>
+        </MedlineJournalInfo>
+        <KeywordList Owner="NOTNLM">
+            <Keyword MajorTopicYN="N">Cryptococcal meningitis</Keyword>
+            <Keyword MajorTopicYN="N">Diagnostics</Keyword>
+            <Keyword MajorTopicYN="N">HIV</Keyword>
+            <Keyword MajorTopicYN="N">Immunocompromised</Keyword>
+            <Keyword MajorTopicYN="N">Meningitis</Keyword>
+            <Keyword MajorTopicYN="N">PCR</Keyword>
+        </KeywordList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="received">
+                <Year>2015</Year>
+                <Month>7</Month>
+                <Day>21</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="revised">
+                <Year>2015</Year>
+                <Month>11</Month>
+                <Day>17</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="accepted">
+                <Year>2015</Year>
+                <Month>11</Month>
+                <Day>18</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2015</Year>
+                <Month>12</Month>
+                <Day>30</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2015</Year>
+                <Month>12</Month>
+                <Day>30</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2015</Year>
+                <Month>12</Month>
+                <Day>30</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>aheadofprint</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pii">S0732-8893(15)00432-0</ArticleId>
+            <ArticleId IdType="doi">10.1016/j.diagmicrobio.2015.11.017</ArticleId>
+            <ArticleId IdType="pubmed">26711635</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+</PubmedArticleSet>

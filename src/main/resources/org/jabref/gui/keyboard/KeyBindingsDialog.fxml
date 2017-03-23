@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<DialogPane minHeight="450.0" minWidth="375.0" prefHeight="450.0" prefWidth="407.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.keyboard.KeyBindingsDialogController">
+   <content>
+      <BorderPane prefHeight="428.0" prefWidth="402.0">
+         <bottom>
+            <ButtonBar minWidth="350.0" prefHeight="40.0" prefWidth="250.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
+              <buttons>
+                  <Button fx:id="resetButton" mnemonicParsing="false" onAction="#setDefaultBindings" text="%Reset Bindings" ButtonBar.buttonData="LEFT" />
+                  <Button defaultButton="true" mnemonicParsing="false" onAction="#saveKeyBindingsAndCloseDialog" text="%Save" ButtonBar.buttonData="OK_DONE" />
+                  <Button fx:id="closeButton" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" ButtonBar.buttonData="CANCEL_CLOSE" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
+         <center>
+            <TreeTableView fx:id="keyBindingsTable" prefHeight="200.0" prefWidth="200.0" showRoot="false" styleClass="keybinding-table" BorderPane.alignment="CENTER">
+               <columns>
+                  <TreeTableColumn fx:id="actionColumn" prefWidth="75.0" text="%Action" />
+                  <TreeTableColumn fx:id="shortcutColumn" prefWidth="75.0" text="%Shortcut" />
+                  <TreeTableColumn fx:id="resetColumn" maxWidth="600.0" prefWidth="75.0" />
+               </columns>
+               <columnResizePolicy>
+                  <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+               <BorderPane.margin>
+                  <Insets bottom="10.0" />
+               </BorderPane.margin>
+            </TreeTableView>
+         </center>
+      </BorderPane>
+   </content>
+</DialogPane>

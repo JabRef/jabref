@@ -1,0 +1,80 @@
+<PubmedBookArticleSet>
+<PubmedBookArticle>
+    <BookDocument>
+        <PMID Version="1">21413195</PMID>
+        <ArticleIdList>
+            <ArticleId IdType="bookaccession">NBK51812</ArticleId>
+        </ArticleIdList>
+        <Book>
+            <Publisher>
+                <PublisherName>Royal College of Physicians (UK)</PublisherName>
+                <PublisherLocation>London</PublisherLocation>
+            </Publisher>
+            <BookTitle book="nicecg79">Rheumatoid Arthritis: National Clinical Guideline for Management and Treatment in Adults</BookTitle>
+            <PubDate>
+                <Year>2009</Year>
+                <Month>02</Month>
+            </PubDate>
+            <AuthorList Type="authors">
+                <Author>
+                    <CollectiveName>National Collaborating Centre for Chronic Conditions (UK)</CollectiveName>
+                </Author>
+            </AuthorList>
+            <CollectionTitle book="nicecollect">National Institute for Health and Clinical Excellence: Guidance</CollectionTitle>
+            <Isbn>9781860163593</Isbn>
+			<ELocationID EIdType="doi" ValidYN="Y">10.3275/8949</ELocationID>
+			<ELocationID EIdType="pii" ValidYN="Y">1223321</ELocationID>        </Book>
+        <Language>eng</Language>
+        <PublicationType UI="D016454">Review</PublicationType>
+        <PublicationType UI="D017065">Practice Guideline</PublicationType>
+        <ContributionDate>
+        <Year>2012</Year>
+        <Month>03</Month>
+        <Day>27</Day>
+        </ContributionDate>
+        <ArticleTitle>Title for some article</ArticleTitle>
+    </BookDocument>
+    <PubmedBookData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">21413195</ArticleId>
+        </ArticleIdList>
+    </PubmedBookData>
+</PubmedBookArticle>
+<PubmedBookArticle>
+	<BookDocument>
+	        <PMID Version="1">21413195</PMID>
+        <DateRevised>
+            <Year>2014</Year>
+            <Month>10</Month>
+            <Day>11</Day>
+        </DateRevised>
+	    <Pagination>
+            <MedlinePgn>1831</MedlinePgn>
+        </Pagination>
+	</BookDocument>
+</PubmedBookArticle>
+</PubmedBookArticleSet>

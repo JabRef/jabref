@@ -1,0 +1,372 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2016//EN" "http://www.ncbi.nlm.nih.gov/corehtml/query/DTD/pubmed_160101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+	<MedlineCitation Owner="NLM" Status="MEDLINE"
+		VersionDate="Date" VersionID="5">
+		<PMID Version="1">23633646</PMID>
+		<DateCreated>
+			<Year>2013</Year>
+			<Month>11</Month>
+			<Day>07</Day>
+		</DateCreated>
+		<DateCompleted>
+			<Year>2014</Year>
+			<Month>07</Month>
+			<Day>06</Day>
+		</DateCompleted>
+		<DateRevised>
+			<Year>2015</Year>
+			<Month>9</Month>
+			<Day>15</Day>
+		</DateRevised>
+		<Article PubModel="Print-Electronic">
+			<Journal>
+				<ISSN IssnType="Electronic">1720-8386</ISSN>
+				<JournalIssue CitedMedium="Internet">
+					<Volume>36</Volume>
+					<Issue>9</Issue>
+					<PubDate>
+						<Year>2013</Year>
+						<Season>Spring</Season>
+					</PubDate>
+				</JournalIssue>
+				<Title>Journal of endocrinological investigation</Title>
+				<ISOAbbreviation>J. Endocrinol. Invest.</ISOAbbreviation>
+			</Journal>
+			<ArticleTitle>Predictors of treatment failure, incipient hypothyroidism, and weight gain following radioiodine therapy for Graves' thyrotoxicosis.</ArticleTitle>
+			<Pagination>
+				<MedlinePgn>764-9</MedlinePgn>
+			</Pagination>
+			<ELocationID EIdType="doi" ValidYN="Y">10.3275/8949</ELocationID>
+			<ELocationID EIdType="pii" ValidYN="Y">1223321</ELocationID>
+			<Abstract>
+				<AbstractText Label="BACKGROUND" NlmCategory="BACKGROUND">Just a dummy text.</AbstractText>
+				<AbstractText>And another dummy</AbstractText>
+				<CopyrightInformation>1992 and something</CopyrightInformation>
+			</Abstract>
+			<AuthorList CompleteYN="Y">
+				<Author ValidYN="Y">
+					<LastName>Gibb</LastName>
+					<ForeName>F W</ForeName>
+					<Initials>FW</Initials>
+					<Suffix>Jr</Suffix>
+					<AffiliationInfo>
+						<Affiliation>Edinburgh Centre for Endocrinology, Royal Infirmary of Edinburgh, Little France Crescent, Edinburgh, EH16 4SA, UK. fraser.gibb@nhs.net.</Affiliation>
+					</AffiliationInfo>
+				</Author>
+				<Author ValidYN="Y">
+					<LastName>Zamm itt</LastName>
+					<ForeName>NaN</ForeName>
+					<Initials>NN</Initials>
+				</Author>
+				<Author ValidYN="Y">
+					<LastName>Beckett</LastName>
+					<ForeName>G</ForeName>
+					<Initials>GJ</Initials>
+				</Author>
+				<Author ValidYN="Y">
+					<LastName>Strachan</LastName>
+					<ForeName>M W J</ForeName>
+					<Initials>MW</Initials>
+				</Author>
+			</AuthorList>
+			<Language>en</Language>
+			<PublicationTypeList>
+				<PublicationType UI="D016428">Journal Article</PublicationType>
+			</PublicationTypeList>
+			<ArticleDate DateType="Electronic">
+				<Year>2013</Year>
+				<Month>04</Month>
+				<Day>30</Day>
+			</ArticleDate>
+		</Article>
+		<MedlineJournalInfo>
+			<Country>Italy</Country>
+			<MedlineTA>J Endocrinol Invest</MedlineTA>
+			<NlmUniqueID>7806594</NlmUniqueID>
+			<ISSNLinking>0391-4097</ISSNLinking>
+			<VernacularTitle>title in an other language</VernacularTitle>
+			<NLMUniqueID>12345</NLMUniqueID>
+		</MedlineJournalInfo>
+		<PersonalNameSubjectList>
+			<PersonalNameSubject>
+				<LastName>Koop</LastName>
+				<ForeName>C Everett</ForeName>
+				<Initials>CE</Initials>
+			</PersonalNameSubject>
+			<PersonalNameSubject>
+			</PersonalNameSubject>
+		</PersonalNameSubjectList>
+		<CommentsCorrectionsList>
+			<CommentsCorrections RefType="Cites">
+				<RefSource>Psychosom Med. 2008 Jun;70(5):539-45</RefSource>
+				<PMID VersionID="1">18519880</PMID>
+			</CommentsCorrections>
+			<CommentsCorrections RefType="Cites">
+				<RefSource>Psychosom Med. 2008 Jun;70(5):531-8</RefSource>
+				<PMID VersionID="1">18541904</PMID>
+			</CommentsCorrections>
+			<CommentsCorrections RefType="Cites">
+				<RefSource>Lancet. 2002 May 25;359(9320):1851-6</RefSource>
+				<PMID VersionID="1">12044394</PMID>
+			</CommentsCorrections>
+			<CommentsCorrections RefType="Cites">
+				<RefSource>JAMA. 2006 Aug 9;296(6):679-90</RefSource>
+				<PMID VersionID="1">16896111</PMID>
+			</CommentsCorrections>
+			<CommentsCorrections RefType="Cites">
+				<RefSource>Am J Psychiatry. 1988 Aug;145(8):976-81</RefSource>
+				<PMID VersionID="1">2969199</PMID>
+			</CommentsCorrections>
+			<CommentsCorrections RefType="CommentOn">
+				<RefSource>PLoS Med. 2009 Jan 27;6(1):e11</RefSource>
+				<PMID VersionID="1">19175285</PMID>
+			</CommentsCorrections>
+		</CommentsCorrectionsList>
+		<GeneSymbolList>
+			<GeneSymbol>amino</GeneSymbol>
+			<GeneSymbol>other symbol</GeneSymbol>
+		</GeneSymbolList>
+		<NumberOfReferences>23</NumberOfReferences>
+		<SpaceFlightMission>fly</SpaceFlightMission>
+		<GeneralNote>a note</GeneralNote>
+		<ChemicalList>
+			<Chemical>
+				<RegistryNumber>0</RegistryNumber>
+				<NameOfSubstance UI="D007457">Iodine Radioisotopes</NameOfSubstance>
+			</Chemical>
+			<Chemical>
+				<RegistryNumber>Q51BO43MG4</RegistryNumber>
+				<NameOfSubstance UI="D013974">Thyroxine</NameOfSubstance>
+			</Chemical>
+		</ChemicalList>
+		<CitationSubset>IM</CitationSubset>
+		<InvestigatorList>
+			<Investigator ValidYN="N">
+				<LastName>Wood</LastName>
+				<ForeName>D L</ForeName>
+				<Initials>DL</Initials>
+				<AffiliationInfo>
+					<Affiliation>Vanderbilt U, Nashville, TN</Affiliation>
+				</AffiliationInfo>
+			</Investigator>
+		</InvestigatorList>
+				<KeywordList Owner="NASA">
+			<Keyword MajorTopicYN="N">keyword</Keyword>
+			<Keyword MajorTopicYN="N">another keyword</Keyword>
+		</KeywordList>
+		<MeshHeadingList>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D005260">Female</DescriptorName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D006111">Graves Disease</DescriptorName>
+				<QualifierName MajorTopicYN="Y" UI="Q000532">radiotherapy</QualifierName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D006801">Humans</DescriptorName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D007037">Hypothyroidism</DescriptorName>
+				<QualifierName MajorTopicYN="Y" UI="Q000209">etiology</QualifierName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D007457">Iodine Radioisotopes</DescriptorName>
+				<QualifierName MajorTopicYN="N" UI="Q000009">adverse effects</QualifierName>
+				<QualifierName MajorTopicYN="Y" UI="Q000627">therapeutic use</QualifierName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D012189">Retrospective Studies</DescriptorName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D013971">Thyrotoxicosis</DescriptorName>
+				<QualifierName MajorTopicYN="Y" UI="Q000532">radiotherapy</QualifierName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D013974">Thyroxine</DescriptorName>
+				<QualifierName MajorTopicYN="N" UI="Q000097">blood</QualifierName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D017211">Treatment Failure</DescriptorName>
+			</MeshHeading>
+			<MeshHeading>
+				<DescriptorName MajorTopicYN="N" UI="D015430">Weight Gain</DescriptorName>
+			</MeshHeading>
+		</MeshHeadingList>
+		 <OtherID Source="NRCBL">14.1</OtherID>
+	</MedlineCitation>
+	<PubmedData>
+		<History>
+			<PubMedPubDate PubStatus="aheadofprint">
+				<Year>2013</Year>
+				<Month>4</Month>
+				<Day>30</Day>
+			</PubMedPubDate>
+			<PubMedPubDate PubStatus="entrez">
+				<Year>2013</Year>
+				<Month>5</Month>
+				<Day>2</Day>
+				<Hour>6</Hour>
+				<Minute>0</Minute>
+			</PubMedPubDate>
+			<PubMedPubDate PubStatus="pubmed">
+				<Year>2013</Year>
+				<Month>5</Month>
+				<Day>2</Day>
+				<Hour>6</Hour>
+				<Minute>0</Minute>
+			</PubMedPubDate>
+			<PubMedPubDate PubStatus="medline">
+				<Year>2014</Year>
+				<Month>7</Month>
+				<Day>7</Day>
+				<Hour>6</Hour>
+				<Minute>0</Minute>
+			</PubMedPubDate>
+		</History>
+		<PublicationStatus>ppublish</PublicationStatus>
+		<ArticleIdList>
+			<ArticleId IdType="pii">8949</ArticleId>
+			<ArticleId IdType="doi">10.3275/8949</ArticleId>
+			<ArticleId IdType="pubmed">23633646</ArticleId>
+		</ArticleIdList>
+	</PubmedData>
+</PubmedArticle>
+<PubmedBookArticle>
+    <BookDocument>
+        <PMID Version="1">21413195</PMID>
+        <ArticleIdList>
+            <ArticleId IdType="bookaccession">NBK51812</ArticleId>
+        </ArticleIdList>
+        <Book>
+            <Publisher>
+                <PublisherName>Royal College of Physicians (UK)</PublisherName>
+                <PublisherLocation>London</PublisherLocation>
+            </Publisher>
+            <BookTitle book="nicecg79">Rheumatoid Arthritis: National Clinical Guideline for Management and Treatment in Adults</BookTitle>
+            <PubDate>
+                <Year>2009</Year>
+                <Month>02</Month>
+            </PubDate>
+            <AuthorList Type="authors">
+                <Author>
+                    <CollectiveName>National Collaborating Centre for Chronic Conditions (UK)</CollectiveName>
+                </Author>
+            </AuthorList>
+            <CollectionTitle book="nicecollect">National Institute for Health and Clinical Excellence: Guidance</CollectionTitle>
+            <Isbn>9781860163593</Isbn>
+        </Book>
+        <Language>eng</Language>
+        <PublicationType UI="D016454">Review</PublicationType>
+        <PublicationType UI="D017065">Practice Guideline</PublicationType>
+        <Abstract>
+            <AbstractText>just a dummy.</AbstractText>
+            <CopyrightInformation>Copyright from somwhere</CopyrightInformation>
+        </Abstract>
+        <Sections>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.guideline">Guideline Development Group members</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.acknowledgements">Acknowledgements</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.preface">Preface</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="glossary">Acronyms, abbreviations and glossary</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="development">Development of the Guideline</SectionTitle>
+                <Section>
+                    <LocationLabel Type="chapter">1</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch1">Introduction</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">2</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch2">Methodology</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">3</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch3">Key messages of the guideline</SectionTitle>
+                </Section>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="theguideline">The Guideline</SectionTitle>
+                <Section>
+                    <LocationLabel Type="chapter">4</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch4">Referral, diagnosis and investigations</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">5</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch5">Communication and education</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">6</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch6">The multidisciplinary team</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">7</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch7">Pharmacological management</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">8</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch8">Monitoring rheumatoid arthritis</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">9</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch9">Other aspects and treatment</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">10</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch10">NICE technology appraisal related recommendations</SectionTitle>
+                </Section>
+                <Section>
+                    <LocationLabel Type="chapter">11</LocationLabel>
+                    <SectionTitle book="nicecg79" part="ch11">Areas for future research</SectionTitle>
+                </Section>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="references.rl1">References</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="appendixes.appgroup1">Appendices</SectionTitle>
+            </Section>
+            <Section>
+                <SectionTitle book="nicecg79" part="nicecg79.evidencetables">Evidence Tables</SectionTitle>
+            </Section>
+        </Sections>
+    </BookDocument>
+    <PubmedBookData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>3</Month>
+                <Day>18</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">21413195</ArticleId>
+        </ArticleIdList>
+    </PubmedBookData>
+</PubmedBookArticle>
+
+</PubmedArticleSet>

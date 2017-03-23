@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
+<b:Source>
+<b:LCID>0</b:LCID>
+<b:Year>2002</b:Year>
+<b:Volume>44</b:Volume>
+<b:BIBTEX_Entry>inbook</b:BIBTEX_Entry>
+<b:SourceType>BookSection</b:SourceType>
+<b:Title>Agile Entwicklung Web-basierter Systeme</b:Title>
+<b:Tag>raey</b:Tag>
+<b:Publisher>Gabler Verlag</b:Publisher>
+<b:URL>http://dx.doi.org/10.1007/BF03250842</b:URL>
+<b:DOI>10.1000/182</b:DOI>
+<b:Author/>
+<b:Pages>237-248</b:Pages>
+<b:JournalName>Wirtschaftsinformatik</b:JournalName>
+<b:StandardNumber> ISSN: 0937-6429</b:StandardNumber>
+</b:Source>
+</b:Sources>

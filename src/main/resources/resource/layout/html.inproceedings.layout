@@ -7,7 +7,7 @@
 
 		\begin{doi}
 		<div class="bibtex_doi">
-			<a href="http://dx.doi.org/\doi">doi</a>
+			<a href="\format[DOICheck]{\doi}">doi</a>
 		</div>
 		\end{doi}
 

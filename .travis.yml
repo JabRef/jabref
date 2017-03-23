@@ -1,33 +1,50 @@
 language: java
-jdk:
-  - oraclejdk8
-sudo: false
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
+
+# we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
+# see https://docs.travis-ci.com/user/trusty-ci-environment/
+# This environment is continuously updated as described in https://docs.travis-ci.com/user/build-environment-updates/
+dist: trusty
+sudo: required
 
 services:
   - postgresql
   - mysql
 
-# skip installation as this is also done during the script step
-install: true
+env:
+  global:
+    - GRADLE_OPTS=-Dorg.gradle.daemon=false
+  matrix:
+    - TEST_SUITE=check OPTIONS=modernizer
+    - TEST_SUITE=fetcherTest
+    - TEST_SUITE=databaseTest
+    - TEST_SUITE=guiTest
 
-# allow gui testing on travis
-before_script:
+# JavaFX localization tests need a running X environment
+before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
+
+install: true
+
+before_script:
   - psql -c 'create database jabref;' -U postgres
+  - mysql -u root -e 'create database jabref'
 
 script:
-  - ./gradlew check integrationTest
+  # -Dscan enables the Gradle build scan, which can be used to investiage the time each action consumes
+  # For more information see https://gradle.com/scans/get-started
+  - if [ "$TEST_SUITE" != "guiTest" ]; then ./gradlew $TEST_SUITE $OPTIONS -Dscan; fi
+  - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
 
-after_script:
+after_success:
   # enable codecov report
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  # show test results if build fails
+  - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching

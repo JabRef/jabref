@@ -12,7 +12,7 @@
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
 <td><b>BibTeX</b>:
 <pre>
-@\format[ToLowerCase]{\bibtextype}{\bibtexkey,\begin{author}
+@\format[ToLowerCase]{\entrytype}{\bibtexkey,\begin{author}
   author = {\format[HTMLChars]{\author}}\end{author}\begin{editor},
   editor = {\format[HTMLChars]{\editor}}\end{editor}\begin{title},
   title = {\format[HTMLChars]{\title}}\end{title}\begin{booktitle},

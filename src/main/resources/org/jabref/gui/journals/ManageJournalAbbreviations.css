@@ -1,0 +1,27 @@
+.custom-buttons {
+    -fx-margin-top: 10px;
+    -fx-padding: 5px;
+}
+
+.abbreviations-table {
+	-fx-table-cell-border-color: transparent;
+}
+
+.custom-header {
+    -fx-margin-top: 10px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+.table-row-cell:empty {
+    visibility: hidden;
+}
+
+.table-row-cell:selected > .table-cell > .icon, .table-row-cell:pressed > .table-cell > .icon {
+   -fx-fill: white;
+}
+
+.dialog-pane *.button-bar {
+	-fx-max-height: 0;
+	-fx-pref-height: 0;
+}
