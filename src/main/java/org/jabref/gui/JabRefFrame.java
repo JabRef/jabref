@@ -99,6 +99,7 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.menus.RightClickMenu;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
+import org.jabref.gui.pdfviewer.TogglePdfViewerAction;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;

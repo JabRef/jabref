@@ -15,42 +15,48 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.gui.pdfviewer;
+package org.jabref.gui.pdfviewer;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Pagination;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.ParsedFileField;
+import org.jabref.Globals;
+import org.jabref.gui.AbstractController;
+import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.StateManager;
+import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.ParsedFileField;
 
-import ca.odell.glazedlists.event.ListEvent;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 
-public class PdfViewerViewModel {
+public class PdfViewerController extends AbstractController<PdfViewerController.PdfDocumentViewModel> {
 
-    @FXML
-    private Pagination pagination;
+    @FXML private Pagination pagination;
+
+    @Inject private StateManager stateManager;
 
     private ObjectProperty<PdfDocumentViewModel> currentDocument;
 
@@ -75,20 +81,8 @@ public class PdfViewerViewModel {
 
         pagination.setPageFactory(pageNumber -> currentDocument.get() == null ? null : new ImageView(currentDocument.get().getImage(pageNumber)));
 
-        // TODO: Find a better way to subscribe to the currently selected entries
-        JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable.getSelected().addListEventListener(listChanges -> setCurrentEntries(listChanges));
-        setCurrentEntries(JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable.getSelectedEntries());
-    }
-
-    private void setCurrentEntries(ListEvent<BibEntry> listChanges) {
-        List<BibEntry> newlySelectedEntries = new ArrayList<>();
-        while (listChanges.next()) {
-            if (listChanges.getType() == ListEvent.INSERT) {
-                newlySelectedEntries.add(listChanges.getNewValue());
-            }
-        }
-        setCurrentEntries(newlySelectedEntries);
-
+        stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> setCurrentEntries(stateManager.getSelectedEntries()));
+        setCurrentEntries(stateManager.getSelectedEntries());
     }
 
     private void setCurrentEntries(List<BibEntry> entries) {
@@ -99,13 +93,14 @@ public class PdfViewerViewModel {
     }
 
     private void setCurrentEntry(BibEntry rawEntry) {
-        TypedBibEntry entry = new TypedBibEntry(rawEntry);
+        BibDatabaseContext databaseContext = stateManager.activeDatabaseProperty().get().get();
+        TypedBibEntry entry = new TypedBibEntry(rawEntry, databaseContext);
         List<ParsedFileField> linkedFiles = entry.getFiles();
         for (ParsedFileField linkedFile : linkedFiles) {
             // TODO: Find a better way to get the open database
             // TODO: It should be possible to simply write linkedFile.getFile()
             Optional<File> file = FileUtil.expandFilename(
-                    JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(), linkedFile.getLink());
+                    databaseContext, linkedFile.getLink(), Globals.prefs.getFileDirectoryPreferences());
             if (file.isPresent()) {
                 setCurrentDocument(file.get().toPath());
             }
@@ -120,7 +115,7 @@ public class PdfViewerViewModel {
         }
     }
 
-    private class PdfDocumentViewModel {
+    public class PdfDocumentViewModel extends AbstractViewModel {
 
         private final PDDocument document;
 

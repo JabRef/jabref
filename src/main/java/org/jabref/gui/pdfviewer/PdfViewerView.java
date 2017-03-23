@@ -15,27 +15,22 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.gui.pdfviewer;
+package org.jabref.gui.pdfviewer;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.DialogPane;
 
-import net.sf.jabref.gui.FXAlert;
-import net.sf.jabref.logic.l10n.Localization;
+import org.jabref.gui.AbstractDialogView;
+import org.jabref.gui.FXDialog;
+import org.jabref.logic.l10n.Localization;
 
-import com.airhacks.afterburner.views.FXMLView;
+public class PdfViewerView extends AbstractDialogView {
 
-public class PdfViewerView extends FXMLView {
-
-    public PdfViewerView() {
-        super();
-        bundle = Localization.getMessages();
-    }
-
+    @Override
     public void show() {
-        FXAlert dialog = new FXAlert(AlertType.INFORMATION, Localization.lang("PDF Preview"));
-        //dialog.setDialogPane((DialogPane) this.getView());
-        dialog.setScene(new Scene(this.getView()));
+        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("PDF Preview"));
+        dialog.setDialogPane((DialogPane) this.getView());
+        //dialog.setScene(new Scene(this.getView()));
         //dialog.getDialogPane().setContent(this.getView());
         dialog.setResizable(true);
         dialog.show();
