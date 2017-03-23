@@ -88,6 +88,13 @@ public class CrossRefTest {
     }
 
     @Test
+    public void findWithSubtitle() throws Exception {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "A break in the clouds: towards a cloud definition");
+        assertEquals("10.1145/1496091.1496100", fetcher.findIdentifier(entry).get().getDOI().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Test
     public void findByDOI() throws Exception {
         assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20"));
     }
