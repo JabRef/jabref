@@ -153,9 +153,6 @@ public class URLDownload {
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
-        } catch (IOException e) {
-            LOGGER.warn("Could not copy input", e);
-            throw e;
         }
     }
 
