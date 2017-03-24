@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * Search rule for contain-based search.
  */
@@ -33,11 +35,12 @@ public class ContainBasedSearchRule implements SearchRule {
         if (!caseSensitive) {
             searchString = searchString.toLowerCase(Locale.ROOT);
         }
+        searchString = StringUtils.stripAccents(searchString);
 
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (String fieldKey : bibEntry.getFieldNames()) {
-            String formattedFieldContent = bibEntry.getLatexFreeField(fieldKey).get();
+            String formattedFieldContent = StringUtils.stripAccents(bibEntry.getLatexFreeField(fieldKey).get());
             if (!caseSensitive) {
                 formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);
             }
