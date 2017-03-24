@@ -1377,8 +1377,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
+            // don't select the current entry again (eg use BasePanel#highlightEntry} in case another entry was selected)
             if (!movingAway && isShowing()) {
-                panel.highlightEntry(entry);
+                SwingUtilities.invokeLater(() -> {
+                    final int row = panel.getMainTable().findEntry(entry);
+                    if (row >= 0) {
+                        panel.getMainTable().ensureVisible(row);
+                    }
+                });
             }
         }
     }
