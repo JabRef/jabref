@@ -25,24 +25,32 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
+import javafx.animation.FadeTransition;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Pagination;
+import javafx.geometry.Pos;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
 
 import org.jabref.Globals;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,24 +59,68 @@ import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.fxmisc.flowless.Cell;
+import org.fxmisc.flowless.VirtualFlow;
 
 public class PdfViewerController extends AbstractController<PdfViewerController.PdfDocumentViewModel> {
 
-    @FXML private Pagination pagination;
+    @FXML private ChoiceBox<String> fileChoice;
+    @FXML private BorderPane mainPane;
+
+    //@FXML private Pagination pagination;
 
     @Inject private StateManager stateManager;
+    @Inject private TaskExecutor taskExecutor;
 
     private ObjectProperty<PdfDocumentViewModel> currentDocument;
+
+    private static Image renderPage(PDPage page) {
+        try {
+            int resolution = 96;
+            BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 2 * resolution);
+            return SwingFXUtils.toFXImage(resize(image, 600, 800), null);
+        } catch (IOException e) {
+            // TODO: LOG
+            return null;
+        }
+    }
+
+    // Taken from http://stackoverflow.com/a/9417836/873661
+    private static BufferedImage resize(BufferedImage img, int newW, int newH) {
+        java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
+        BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = dimg.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+
+        return dimg;
+    }
 
     @FXML
     private void initialize() {
         currentDocument = new SimpleObjectProperty<>();
         currentDocument.addListener((observable, oldDocument, newDocument) -> {
             if (newDocument != null) {
-                pagination.setCurrentPageIndex(0);
+                ObservableList<PDPage> pages = FXCollections.observableArrayList(newDocument.getPages());
+                VirtualFlow<PDPage, Cell<PDPage, StackPane>> flow = VirtualFlow.createVertical(pages, this::createPageCell);
+
+
+                //flow.visibleProperty().bind(isNotEmpty(pages));
+                //flow.managedProperty().bind(isNotEmpty(pages));
+
+                mainPane.setCenter(flow);
+                StackPane.setAlignment(flow, Pos.BOTTOM_RIGHT);
+
+                //flow.resize(1000, 1000);
+                //flow.layout();
+                //flow.setMinWidth(1000);
+                //flow.setPrefWidth(1000);
+                //pagination.setCurrentPageIndex(0);
             }
         });
-        pagination.pageCountProperty().bind(new IntegerBinding() {
+
+        /*pagination.pageCountProperty().bind(new IntegerBinding() {
             {
                 super.bind(currentDocument);
             }
@@ -80,9 +132,48 @@ public class PdfViewerController extends AbstractController<PdfViewerController.
         pagination.disableProperty().bind(Bindings.isNull(currentDocument));
 
         pagination.setPageFactory(pageNumber -> currentDocument.get() == null ? null : new ImageView(currentDocument.get().getImage(pageNumber)));
-
+*/
         stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> setCurrentEntries(stateManager.getSelectedEntries()));
         setCurrentEntries(stateManager.getSelectedEntries());
+    }
+
+    private Cell<PDPage, StackPane> createPageCell(PDPage pageNew) {
+        return new Cell<PDPage, StackPane>() {
+            ImageView imageView = new ImageView(renderPage(pageNew));
+            StackPane imageHolder = new StackPane();
+
+            @Override
+            public StackPane getNode() {
+                imageHolder.getStyleClass().setAll("image-holder");
+                imageHolder.getChildren().setAll(imageView);
+                //imageHolder.setPadding(new Insets(100));
+                return imageHolder;
+            }
+
+            @Override
+            public boolean isReusable() {
+                return true;
+            }
+
+            @Override
+            public void updateItem(PDPage page) {
+                // First hide old page
+                imageView.setOpacity(0);
+
+                BackgroundTask<Image> generateImage = BackgroundTask
+                        .run(() -> renderPage(page))
+                        .onSuccess(image -> {
+                            imageView.setImage(image);
+
+                            // Fade new page in for smoother transition
+                            FadeTransition fadeIn = new FadeTransition(Duration.millis(100), imageView);
+                            fadeIn.setFromValue(0);
+                            fadeIn.setToValue(1);
+                            fadeIn.play();
+                        });
+                taskExecutor.execute(generateImage);
+            }
+        };
     }
 
     private void setCurrentEntries(List<BibEntry> entries) {
@@ -105,6 +196,11 @@ public class PdfViewerController extends AbstractController<PdfViewerController.
                 setCurrentDocument(file.get().toPath());
             }
         }
+
+        fileChoice.setItems(
+                FXCollections.observableArrayList(
+                        linkedFiles.stream().map(ParsedFileField::getLink).collect(Collectors.toList())));
+        fileChoice.getSelectionModel().selectFirst();
     }
 
     private void setCurrentDocument(Path path) {
@@ -127,6 +223,10 @@ public class PdfViewerController extends AbstractController<PdfViewerController.
             return document.getNumberOfPages();
         }
 
+        public List<PDPage> getPages() {
+            return document.getDocumentCatalog().getAllPages();
+        }
+
         public Image getImage(int pageNumber) {
             if (pageNumber <= 0 || pageNumber > document.getNumberOfPages()) {
                 return null;
@@ -140,18 +240,6 @@ public class PdfViewerController extends AbstractController<PdfViewerController.
                 e.printStackTrace();
                 return null;
             }
-        }
-
-        // Taken from http://stackoverflow.com/a/9417836/873661
-        private BufferedImage resize(BufferedImage img, int newW, int newH) {
-            java.awt.Image tmp = img.getScaledInstance(newW, newH, java.awt.Image.SCALE_SMOOTH);
-            BufferedImage dimg = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2d = dimg.createGraphics();
-            g2d.drawImage(tmp, 0, 0, null);
-            g2d.dispose();
-
-            return dimg;
         }
     }
 }

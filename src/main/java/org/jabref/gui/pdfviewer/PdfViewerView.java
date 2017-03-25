@@ -18,6 +18,7 @@
 package org.jabref.gui.pdfviewer;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.DialogPane;
 
 import org.jabref.gui.AbstractDialogView;
@@ -28,10 +29,13 @@ public class PdfViewerView extends AbstractDialogView {
 
     @Override
     public void show() {
-        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("PDF Preview"));
-        dialog.setDialogPane((DialogPane) this.getView());
-        //dialog.setScene(new Scene(this.getView()));
-        //dialog.getDialogPane().setContent(this.getView());
+        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("PDF Preview"), false);
+        DialogPane dialogPane = (DialogPane) this.getView();
+
+        // Remove button bar at bottom
+        dialogPane.getChildren().removeIf(node -> node instanceof ButtonBar);
+
+        dialog.setDialogPane(dialogPane);
         dialog.setResizable(true);
         dialog.show();
     }

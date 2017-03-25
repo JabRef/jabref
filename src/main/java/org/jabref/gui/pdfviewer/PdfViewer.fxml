@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" depthTest="DISABLE" prefHeight="600.0" prefWidth="750.0"
+            xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.pdfviewer.PdfViewerController">
+    <content>
+        <BorderPane fx:id="mainPane">
+            <fx:define>
+                <ToggleGroup fx:id="toggleGroupMode"/>
+            </fx:define>
+            <top>
+                <ToolBar fx:id="topPane" BorderPane.alignment="CENTER_RIGHT">
+                    <ChoiceBox prefWidth="200.0" styleClass="flatButton" fx:id="fileChoice"/>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <ToggleButton styleClass="flatButton" mnemonicParsing="false" text="Live"
+                                      toggleGroup="$toggleGroupMode"/>
+                        <ToggleButton styleClass="flatButton" mnemonicParsing="false" text="Locked"
+                                      toggleGroup="$toggleGroupMode"/>
+                    </HBox>
+                </ToolBar>
+            </top>
+            <right>
+                <ScrollBar orientation="VERTICAL"/>
+            </right>
+            <bottom>
+                <ToolBar>
+                    <HBox alignment="CENTER" HBox.hgrow="ALWAYS">
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CHEVRON_LEFT"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Previous page"/>
+                            </tooltip>
+                        </Button>
+                        <TextField/>
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="CHEVRON_RIGHT"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Next page"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                    <HBox fx:id="zoomBar" alignment="CENTER_RIGHT">
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="ARROW_EXPAND_ALL"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Fit width"/>
+                            </tooltip>
+                        </Button>
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="NOTE"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Fit a single page"/>
+                            </tooltip>
+                        </Button>
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="MAGNIFY_MINUS"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Zoom out"/>
+                            </tooltip>
+                        </Button>
+                        <Button styleClass="flatButton">
+                            <graphic>
+                                <MaterialDesignIconView glyphName="MAGNIFY_PLUS"/>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="%Zoom in"/>
+                            </tooltip>
+                        </Button>
+                    </HBox>
+                </ToolBar>
+            </bottom>
+        </BorderPane>
+    </content>
+</DialogPane>

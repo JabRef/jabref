@@ -1,0 +1,11 @@
+#mainPane {
+    -fx-background-color: -fx-accented-background;
+    -fx-padding: 0;
+}
+
+.virtual-flow .image-holder {
+    -fx-padding: 0em 0em 1em 0em;
+    -fx-background-color: -fx-accented-background;
+    -fx-background-insets: 0;
+}
+

@@ -52,15 +52,19 @@ public class IconTheme {
     private static javafx.scene.text.Font FX_FONT;
 
     static {
-        try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+        try (InputStream stream = getMaterialDesignIconsStream()) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
             FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
-            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
+            try (InputStream stream2 = getMaterialDesignIconsStream()) {
                 FX_FONT = javafx.scene.text.Font.loadFont(stream2, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE));
             }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }
+    }
+
+    private static InputStream getMaterialDesignIconsStream() {
+        return FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf");
     }
 
     public static javafx.scene.paint.Color getDefaultColor() {
@@ -146,6 +150,18 @@ public class IconTheme {
         return result;
     }
 
+    public static List<java.awt.Image> getLogoSet() {
+        List<java.awt.Image> jabrefLogos = new ArrayList<>();
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon32")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon40")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon48")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon64")).getImage());
+        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon128")).getImage());
+
+        return jabrefLogos;
+    }
 
     public enum JabRefIcon {
 
@@ -343,18 +359,5 @@ public class IconTheme {
         public FontBasedIcon createWithNewColor(Color newColor) {
             return new FontBasedIcon(this.iconCode, newColor, this.size);
         }
-    }
-
-    public static List<java.awt.Image> getLogoSet() {
-        List<java.awt.Image> jabrefLogos = new ArrayList<>();
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon16")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon20")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon32")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon40")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon48")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon64")).getImage());
-        jabrefLogos.add(new ImageIcon(getIconUrl("jabrefIcon128")).getImage());
-
-        return jabrefLogos;
     }
 }
