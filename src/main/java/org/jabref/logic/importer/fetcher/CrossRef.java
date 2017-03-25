@@ -112,7 +112,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
             entry.setType(convertType(item.getString("type")));
             entry.setField(FieldName.TITLE, item.getJSONArray("title").getString(0));
             entry.setField(FieldName.SUBTITLE,
-                    Optional.ofNullable(item.optJSONArray("title"))
+                    Optional.ofNullable(item.optJSONArray("subtitle"))
                             .map(array -> array.optString(0)).orElse(""));
             entry.setField(FieldName.AUTHOR, toAuthors(item.optJSONArray("author")));
             entry.setField(FieldName.YEAR,
@@ -141,7 +141,12 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         AuthorList authorsParsed = new AuthorList();
         for (int i = 0; i < authors.length(); i++) {
             JSONObject author = authors.getJSONObject(i);
-            authorsParsed.addAuthor(author.getString("given"), "", "", author.getString("family"), "");
+            authorsParsed.addAuthor(
+                    author.optString("given", ""),
+                    "",
+                    "",
+                    author.optString("family", ""),
+                    "");
         }
         return authorsParsed.getAsFirstLastNamesWithAnd();
     }

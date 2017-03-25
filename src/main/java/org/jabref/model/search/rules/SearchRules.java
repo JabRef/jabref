@@ -4,6 +4,9 @@ import org.jabref.model.strings.StringUtil;
 
 public class SearchRules {
 
+    private SearchRules() {
+    }
+
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
      */

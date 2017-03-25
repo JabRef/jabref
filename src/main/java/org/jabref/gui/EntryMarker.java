@@ -21,6 +21,8 @@ public class EntryMarker {
 
     private static final Pattern MARK_NUMBER_PATTERN = Pattern.compile(JabRefPreferences.getInstance().MARKING_WITH_NUMBER_PATTERN);
 
+    private EntryMarker() {
+    }
 
     /**
      * @param increment whether the given increment should be added to the current one. Currently never used in JabRef. Could be used to increase marking color ("Mark in specific color").

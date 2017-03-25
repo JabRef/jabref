@@ -16,6 +16,9 @@ import org.jabref.model.groups.KeywordGroup;
 
 public class WarnAssignmentSideEffects {
 
+    private WarnAssignmentSideEffects() {
+    }
+
     /**
      * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
      * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.

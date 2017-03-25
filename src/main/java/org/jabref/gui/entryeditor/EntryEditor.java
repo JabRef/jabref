@@ -26,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -464,7 +463,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.remove(fileAnnotationTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
-            fileAnnotationTab = new FileAnnotationTab(this);
+            fileAnnotationTab = new FileAnnotationTab(this, panel.getAnnotationCache());
             tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), fileAnnotationTab,
 
                     Localization.lang("Show file annotations"));
@@ -1158,12 +1157,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     //Initialize by getting notes from cache if they are cached
 
                     FileAnnotationTab tab = (FileAnnotationTab) activeTab;
-                    try {
-                        tab.initializeTab(tab,
-                                panel.getAnnotationCache().getFromCache(entry));
-                    } catch (ExecutionException e) {
-                        tab.initializeTab((FileAnnotationTab) activeTab);
-                    }
+                    tab.initializeTab(tab);
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
@@ -1480,7 +1474,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 

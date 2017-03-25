@@ -52,6 +52,9 @@ public class JabRefDesktop {
     private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
+    private JabRefDesktop() {
+    }
+
     /**
      * Open a http/pdf/ps viewer for the given link string.
      */

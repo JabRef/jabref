@@ -950,6 +950,9 @@ public class BiblatexEntryTypes {
             THESIS, UNPUBLISHED, CONFERENCE, ELECTRONIC, MASTERSTHESIS, PHDTHESIS, TECHREPORT, WWW, IEEETRANBSTCTL);
 
 
+    private BiblatexEntryTypes() {
+    }
+
     public static Optional<EntryType> getType(String name) {
         return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
     }

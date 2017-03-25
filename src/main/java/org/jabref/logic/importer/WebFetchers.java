@@ -24,6 +24,9 @@ import org.jabref.model.entry.identifier.Identifier;
 
 public class WebFetchers {
 
+    private WebFetchers() {
+    }
+
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
         IdBasedFetcher fetcher;
         switch (field) {

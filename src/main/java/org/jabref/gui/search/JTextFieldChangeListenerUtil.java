@@ -19,6 +19,9 @@ import javax.swing.text.JTextComponent;
  */
 public class JTextFieldChangeListenerUtil {
 
+    private JTextFieldChangeListenerUtil() {
+    }
+
     /**
      * Installs a listener to receive notification when the text of any
      * {@code JTextComponent} is changed. Internally, it installs a

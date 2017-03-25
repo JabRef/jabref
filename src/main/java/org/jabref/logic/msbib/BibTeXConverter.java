@@ -16,6 +16,9 @@ public class BibTeXConverter {
 
     private static final String MSBIB_PREFIX = "msbib-";
 
+    private BibTeXConverter() {
+    }
+
     /**
      * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
      * @param entry The MsBibEntry to convert

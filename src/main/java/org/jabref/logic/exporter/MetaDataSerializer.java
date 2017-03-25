@@ -18,6 +18,9 @@ import org.jabref.model.strings.StringUtil;
 
 public class MetaDataSerializer {
 
+    private MetaDataSerializer() {
+    }
+
     /**
      * Writes all data in the format <key, serialized data>.
      */
@@ -90,7 +93,7 @@ public class MetaDataSerializer {
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if (citeKeyPattern.getDefaultValue() != null && !citeKeyPattern.getDefaultValue().isEmpty()) {
+        if ((citeKeyPattern.getDefaultValue() != null) && !citeKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
             data.add(citeKeyPattern.getDefaultValue().get(0));
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
