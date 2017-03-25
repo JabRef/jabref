@@ -108,6 +108,8 @@ public class MyDialogView extends AbstractDialogView {
 - [Validation framework](https://github.com/sialcasa/mvvmFX/wiki/Validation)
 - [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 - [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
+- [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
+- [FontAwesomeFX](https://bitbucket.org/Jerady/fontawesomefx/overview): supports different icon fonts
 
 ## Features missing in JavaFX:
 - bidirectional binding in FXML, see [official feature request](https://bugs.openjdk.java.net/browse/JDK-8090665)
