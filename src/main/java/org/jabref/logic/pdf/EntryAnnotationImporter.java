@@ -57,7 +57,7 @@ public class EntryAnnotationImporter {
         for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
             Optional<File> expandedFileName = FileUtil.expandFilename(databaseContext, parsedFileField.getLink(),
                     JabRefPreferences.getInstance().getFileDirectoryPreferences());
-            expandedFileName.ifPresent(file -> annotations.put(file.toString(), importer.importAnnotations(file.toPath())));
+            expandedFileName.ifPresent(file -> annotations.put(file.getName(), importer.importAnnotations(file.toPath())));
         }
         return annotations;
     }
