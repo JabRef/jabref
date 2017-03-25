@@ -138,6 +138,8 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
 
+
+
             // Drag and drop support
             row.setOnDragDetected(event -> {
                 TreeItem<GroupNodeViewModel> selectedItem = treeTable.getSelectionModel().getSelectedItem();
@@ -186,6 +188,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 event.consume();
             });
 
+
             return row;
         });
 
@@ -222,11 +225,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
         removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
 
-        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort alphabetically"));
+        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
         sortAlphabetically.setOnAction(event -> viewModel.sortAlphabetically(group));
 
-        MenuItem sortSubGroups = new MenuItem(Localization.lang("Sort subgroups alphabetically"));
+        MenuItem sortSubGroups = new MenuItem(Localization.lang("sort subgroups"));
         sortSubGroups.setOnAction(event -> viewModel.sortSubGroupAlphabetically(group));
+
 
         menu.getItems().add(addSubgroup);
         menu.getItems().add(removeGroupAndSubgroups);
