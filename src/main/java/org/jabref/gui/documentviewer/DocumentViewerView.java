@@ -15,7 +15,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.jabref.gui.pdfviewer;
+package org.jabref.gui.documentviewer;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
@@ -25,11 +25,11 @@ import org.jabref.gui.AbstractDialogView;
 import org.jabref.gui.FXDialog;
 import org.jabref.logic.l10n.Localization;
 
-public class PdfViewerView extends AbstractDialogView {
+public class DocumentViewerView extends AbstractDialogView {
 
     @Override
     public void show() {
-        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("PDF Preview"), false);
+        FXDialog dialog = new FXDialog(AlertType.INFORMATION, Localization.lang("Document viewer"), false);
         DialogPane dialogPane = (DialogPane) this.getView();
 
         // Remove button bar at bottom
