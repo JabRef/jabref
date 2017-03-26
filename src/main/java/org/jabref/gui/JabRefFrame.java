@@ -77,6 +77,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -99,7 +100,6 @@ import org.jabref.gui.menus.FileHistoryMenu;
 import org.jabref.gui.menus.RightClickMenu;
 import org.jabref.gui.openoffice.OpenOfficePanel;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
-import org.jabref.gui.pdfviewer.TogglePdfViewerAction;
 import org.jabref.gui.preftabs.PreferencesDialog;
 import org.jabref.gui.protectedterms.ProtectedTermsDialog;
 import org.jabref.gui.push.PushToApplicationButton;
@@ -320,8 +320,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tlb.setVisible(!tlb.isVisible());
         }
     });
-    private final AbstractAction showPdvViewer = new TogglePdfViewerAction(Localization.menuTitle("Show PDF Viewer"), Localization.lang("Show PDF Viewer"),
-            IconTheme.JabRefIcon.PDF_FILE.getIcon());
+    private final AbstractAction showPdvViewer = new ShowDocumentViewerAction();
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
