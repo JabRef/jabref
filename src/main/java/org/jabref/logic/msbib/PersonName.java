@@ -20,7 +20,7 @@ public class PersonName {
     private String givenName;
     private String surname;
     private String middleName;
-
+    private boolean isCorporate;
 
     public PersonName() {
         // Empty constructor
@@ -28,6 +28,12 @@ public class PersonName {
 
     public PersonName(String name) {
         parseName(name);
+    }
+
+    public PersonName(String name, boolean isCorporate) {
+        this(name);
+        this.isCorporate = isCorporate;
+
     }
 
     public PersonName(String firstName, String middleName, String lastName) {
@@ -59,8 +65,7 @@ public class PersonName {
         } else if (amountOfNames == 2) {
             givenName = names.get(0);
             surname = names.get(1);
-        }
-        else {
+        } else {
             givenName = names.get(0);
             middleName = "";
             for (int i = 1; i < (amountOfNames - 1); i++) {
@@ -104,6 +109,10 @@ public class PersonName {
 
     public void setMiddlename(String middleName) {
         this.middleName = middleName;
+    }
+
+    public boolean isCorporateAuthor() {
+        return isCorporate;
     }
 
     public String getFullname() {

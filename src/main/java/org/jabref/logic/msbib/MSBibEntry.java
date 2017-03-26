@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -321,16 +322,31 @@ class MSBibEntry {
             return;
         }
         Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);
-        Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "NameList");
-        for (PersonName name : authorsLst) {
-            Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Person");
-            addField(document, person, "Last", name.getSurname());
-            addField(document, person, "Middle", name.getMiddlename());
-            addField(document, person, "First", name.getFirstname());
-            nameList.appendChild(person);
+
+        Optional<PersonName> personName = authorsLst.stream().filter(PersonName::isCorporateAuthor)
+                .findFirst();
+        if (personName.isPresent()) {
+            PersonName person = personName.get();
+
+            Element corporate = document.createElementNS(MSBibDatabase.NAMESPACE,
+                    MSBibDatabase.PREFIX + "Corporate");
+            corporate.setTextContent(person.getFullname());
+            authorTop.appendChild(corporate);
+        } else {
+
+            Element nameList = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "NameList");
+            for (PersonName name : authorsLst) {
+                Element person = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Person");
+                addField(document, person, "Last", name.getSurname());
+                addField(document, person, "Middle", name.getMiddlename());
+                addField(document, person, "First", name.getFirstname());
+                nameList.appendChild(person);
+
+            }
+            authorTop.appendChild(nameList);
         }
-        authorTop.appendChild(nameList);
         allAuthors.appendChild(authorTop);
+
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

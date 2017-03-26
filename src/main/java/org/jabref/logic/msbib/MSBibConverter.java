@@ -103,14 +103,18 @@ public class MSBibConverter {
             result.publicationTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getLatexFreeField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
 
         return result;
     }
 
     private static List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new ArrayList<>();
+        if (authors.startsWith("{") && authors.endsWith("}")) {
+            result.add(new PersonName(authors, true));
+            return result;
+        }
 
         if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
             String[] names = authors.split(" (?i)and ");
