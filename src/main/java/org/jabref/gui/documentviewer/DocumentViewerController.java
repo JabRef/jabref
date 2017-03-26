@@ -20,16 +20,18 @@ package org.jabref.gui.documentviewer;
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.model.entry.ParsedFileField;
 
 public class DocumentViewerController extends AbstractController<DocumentViewerViewModel> {
 
-    @FXML private ChoiceBox<String> fileChoice;
+    @FXML private ComboBox<ParsedFileField> fileChoice;
     @FXML private BorderPane mainPane;
 
     @Inject private StateManager stateManager;
@@ -41,8 +43,17 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
 
         setupViewer();
 
+        ViewModelListCellFactory<ParsedFileField> cellFactory = new ViewModelListCellFactory<ParsedFileField>()
+                .withText(ParsedFileField::getLink);
+        fileChoice.setButtonCell(cellFactory.call(null));
+        fileChoice.setCellFactory(cellFactory);
+        fileChoice.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
+        // We always want that the first item is selected after a change
+        // This also automatically selects the first file on the initial load
+        fileChoice.itemsProperty().addListener(
+                (observable, oldValue, newValue) -> fileChoice.getSelectionModel().selectFirst());
         fileChoice.itemsProperty().bind(viewModel.filesProperty());
-        fileChoice.getSelectionModel().selectFirst();
     }
 
     private void setupViewer() {
@@ -52,7 +63,6 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
                 viewer.show(newDocument);
             }
         });
-        viewer.show(viewModel.currentDocumentProperty().get());
         mainPane.setCenter(viewer);
     }
 }

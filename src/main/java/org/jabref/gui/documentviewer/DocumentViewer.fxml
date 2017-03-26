@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.ScrollBar?>
 <?import javafx.scene.control.TextField?>
@@ -22,7 +22,7 @@
             </fx:define>
             <top>
                 <ToolBar fx:id="topPane" BorderPane.alignment="CENTER_RIGHT">
-                    <ChoiceBox prefWidth="200.0" styleClass="flatButton" fx:id="fileChoice"/>
+                    <ComboBox minWidth="200.0" styleClass="flatButton" fx:id="fileChoice"/>
                     <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
                         <ToggleButton styleClass="flatButton" mnemonicParsing="false" text="Live"
                                       toggleGroup="$toggleGroupMode"/>

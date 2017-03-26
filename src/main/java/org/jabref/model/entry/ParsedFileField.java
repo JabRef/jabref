@@ -1,7 +1,14 @@
 package org.jabref.model.entry;
 
+import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
+
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class ParsedFileField {
 
@@ -69,5 +76,10 @@ public class ParsedFileField {
 
     public boolean isEmpty() {
         return NULL_OBJECT.equals(this);
+    }
+
+    public Optional<Path> toPath(BibDatabaseContext database, FileDirectoryPreferences directoryPreferences) {
+        Optional<File> path = FileUtil.expandFilename(database, getLink(), directoryPreferences);
+        return path.map(File::toPath);
     }
 }
