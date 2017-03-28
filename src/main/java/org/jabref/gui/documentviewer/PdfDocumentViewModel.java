@@ -1,8 +1,8 @@
 package org.jabref.gui.documentviewer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +16,7 @@ public class PdfDocumentViewModel extends DocumentViewModel {
 
     public PdfDocumentViewModel(PDDocument document) {
         this.document = Objects.requireNonNull(document);
+        this.maxPagesProperty().set(document.getNumberOfPages());
     }
 
     @Override
@@ -23,11 +24,11 @@ public class PdfDocumentViewModel extends DocumentViewModel {
         @SuppressWarnings("unchecked")
         List<PDPage> pages = document.getDocumentCatalog().getAllPages();
 
-        return FXCollections.observableArrayList(
-                pages.stream().map(PdfDocumentPageViewModel::new).collect(Collectors.toList()));
-    }
-
-    public int getNumberOfPages() {
-        return document.getNumberOfPages();
+        // There is apparently no neat way to get the page number from a PDPage...thus this old-style for loop
+        List<PdfDocumentPageViewModel> pdfPages = new ArrayList<>();
+        for (int i = 0; i < pages.size(); i++) {
+            pdfPages.add(new PdfDocumentPageViewModel(pages.get(i), i + 1));
+        }
+        return FXCollections.observableArrayList(pdfPages);
     }
 }

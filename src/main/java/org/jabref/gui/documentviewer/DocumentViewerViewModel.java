@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -22,6 +24,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.fxmisc.easybind.EasyBind;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
 
@@ -29,6 +32,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private ListProperty<ParsedFileField> files = new SimpleListProperty<>();
     private BooleanProperty liveMode = new SimpleBooleanProperty();
+    private ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
+    private IntegerProperty maxPages = new SimpleIntegerProperty();
 
     public DocumentViewerViewModel(StateManager stateManager) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -42,15 +47,30 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
         this.liveMode.addListener((observable, oldValue, newValue) -> {
             // Switch to currently selected entry if mode is changed to live
-            if (newValue) {
+            if (oldValue != newValue && newValue) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
 
+        maxPages.bindBidirectional(
+                EasyBind.monadic(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
+
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
-    public boolean isLiveMode() {
+    private int getCurrentPage() {
+        return currentPage.get();
+    }
+
+    public ObjectProperty<Integer> currentPageProperty() {
+        return currentPage;
+    }
+
+    public IntegerProperty maxPagesProperty() {
+        return maxPages;
+    }
+
+    private boolean isLiveMode() {
         return liveMode.get();
     }
 
@@ -96,5 +116,13 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public BooleanProperty liveModeProperty() {
         return liveMode;
+    }
+
+    public void showNextPage() {
+        currentPage.set(getCurrentPage() + 1);
+    }
+
+    public void showPreviousPage() {
+        currentPage.set(getCurrentPage() - 1);
     }
 }

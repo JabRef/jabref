@@ -19,13 +19,17 @@ package org.jabref.gui.documentviewer;
 
 import javax.inject.Inject;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.OnlyIntegerFormatter;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.ParsedFileField;
@@ -35,6 +39,8 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
     @FXML private ComboBox<ParsedFileField> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleButton modeLive;
+    @FXML private TextField currentPage;
+    @FXML private Label maxPages;
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
@@ -45,8 +51,16 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
 
         setupViewer();
         setupFileChoice();
+        setupPageControls();
 
         viewModel.liveModeProperty().bind(modeLive.selectedProperty());
+    }
+
+    private void setupPageControls() {
+        OnlyIntegerFormatter integerFormatter = new OnlyIntegerFormatter(1);
+        viewModel.currentPageProperty().bindBidirectional(integerFormatter.valueProperty());
+        currentPage.setTextFormatter(integerFormatter);
+        maxPages.textProperty().bind(viewModel.maxPagesProperty().asString());
     }
 
     private void setupFileChoice() {
@@ -70,6 +84,15 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
                 viewer.show(newDocument);
             }
         });
+        viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         mainPane.setCenter(viewer);
+    }
+
+    public void nextPage(ActionEvent actionEvent) {
+        viewModel.showNextPage();
+    }
+
+    public void previousPage(ActionEvent actionEvent) {
+        viewModel.showPreviousPage();
     }
 }

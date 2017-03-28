@@ -11,4 +11,9 @@ public abstract class DocumentPageViewModel {
      * Renders this page and returns an image representation of itself.
      */
     public abstract Image render();
+
+    /**
+     * Get the page number of the current page in the document.
+     */
+    public abstract int getPageNumber();
 }

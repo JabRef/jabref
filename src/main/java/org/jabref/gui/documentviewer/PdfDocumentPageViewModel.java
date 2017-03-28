@@ -16,9 +16,11 @@ import org.apache.pdfbox.pdmodel.PDPage;
 public class PdfDocumentPageViewModel extends DocumentPageViewModel {
 
     private final PDPage page;
+    private final int pageNumber;
 
-    public PdfDocumentPageViewModel(PDPage page) {
+    public PdfDocumentPageViewModel(PDPage page, int pageNumber) {
         this.page = Objects.requireNonNull(page);
+        this.pageNumber = pageNumber;
     }
 
     // Taken from http://stackoverflow.com/a/9417836/873661
@@ -43,5 +45,10 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
             // TODO: LOG
             return null;
         }
+    }
+
+    @Override
+    public int getPageNumber() {
+        return pageNumber;
     }
 }
