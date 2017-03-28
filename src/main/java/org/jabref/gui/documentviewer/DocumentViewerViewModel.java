@@ -5,8 +5,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -26,15 +28,31 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private StateManager stateManager;
     private ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
     private ListProperty<ParsedFileField> files = new SimpleListProperty<>();
+    private BooleanProperty liveMode = new SimpleBooleanProperty();
 
     public DocumentViewerViewModel(StateManager stateManager) {
         this.stateManager = Objects.requireNonNull(stateManager);
 
-        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> setCurrentEntries(this.stateManager.getSelectedEntries()));
+        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
+            // Switch to currently selected entry in live mode
+            if (isLiveMode()) {
+                setCurrentEntries(this.stateManager.getSelectedEntries());
+            }
+        });
+
+        this.liveMode.addListener((observable, oldValue, newValue) -> {
+            // Switch to currently selected entry if mode is changed to live
+            if (newValue) {
+                setCurrentEntries(this.stateManager.getSelectedEntries());
+            }
+        });
+
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
-    ;
+    public boolean isLiveMode() {
+        return liveMode.get();
+    }
 
     public ObjectProperty<DocumentViewModel> currentDocumentProperty() {
         return currentDocument;
@@ -74,5 +92,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                     file.toPath(database, Globals.prefs.getFileDirectoryPreferences())
                             .ifPresent(this::setCurrentDocument));
         }
+    }
+
+    public BooleanProperty liveModeProperty() {
+        return liveMode;
     }
 }

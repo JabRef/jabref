@@ -21,6 +21,7 @@ import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.AbstractController;
@@ -33,6 +34,7 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
 
     @FXML private ComboBox<ParsedFileField> fileChoice;
     @FXML private BorderPane mainPane;
+    @FXML private ToggleButton modeLive;
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
@@ -42,7 +44,12 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
         viewModel = new DocumentViewerViewModel(stateManager);
 
         setupViewer();
+        setupFileChoice();
 
+        viewModel.liveModeProperty().bind(modeLive.selectedProperty());
+    }
+
+    private void setupFileChoice() {
         ViewModelListCellFactory<ParsedFileField> cellFactory = new ViewModelListCellFactory<ParsedFileField>()
                 .withText(ParsedFileField::getLink);
         fileChoice.setButtonCell(cellFactory.call(null));

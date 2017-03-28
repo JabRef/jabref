@@ -32,6 +32,12 @@
      * A dark gray as background
      */
     -fx-dark-background: #757575;
+
+    /*
+     * A strong blue for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: #6A9FCD;
+
 }
 
 .hyperlink {
@@ -69,4 +75,10 @@
     -fx-background-color: transparent;
     -fx-text-background-color: dimgray;
     -fx-padding: 0.5em;
+}
+
+.flatButton:selected {
+    -fx-background-color: -fx-active-background;
+    -fx-text-fill: white;
+    -fx-fill: white;
 }

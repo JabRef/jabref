@@ -22,12 +22,20 @@
             </fx:define>
             <top>
                 <ToolBar fx:id="topPane" BorderPane.alignment="CENTER_RIGHT">
-                    <ComboBox minWidth="200.0" styleClass="flatButton" fx:id="fileChoice"/>
+                    <ComboBox fx:id="fileChoice" minWidth="200.0" styleClass="flatButton"/>
                     <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
-                        <ToggleButton styleClass="flatButton" mnemonicParsing="false" text="Live"
-                                      toggleGroup="$toggleGroupMode"/>
-                        <ToggleButton styleClass="flatButton" mnemonicParsing="false" text="Locked"
-                                      toggleGroup="$toggleGroupMode"/>
+                        <ToggleButton fx:id="modeLive" mnemonicParsing="false" selected="true" styleClass="flatButton"
+                                      text="%Live">
+                            <tooltip>
+                                <Tooltip text="%Show the document of the currently selected entry."/>
+                            </tooltip>
+                        </ToggleButton>
+                        <ToggleButton mnemonicParsing="false" styleClass="flatButton" text="%Locked"
+                                      toggleGroup="$toggleGroupMode">
+                            <tooltip>
+                                <Tooltip text="%Show this document until unlocked."/>
+                            </tooltip>
+                        </ToggleButton>
                     </HBox>
                 </ToolBar>
             </top>
