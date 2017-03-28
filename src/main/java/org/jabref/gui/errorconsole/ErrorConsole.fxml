@@ -18,6 +18,7 @@
                     <buttons>
                         <Button fx:id="closeButton" cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#closeErrorDialog" text="%Close" textAlignment="CENTER" ButtonBar.buttonData="RIGHT"/>
                         <Button fx:id="copyLogButton" mnemonicParsing="false" onAction="#copyLog" text="%Copy Log" ButtonBar.buttonData="LEFT"/>
+                        <Button fx:id="clearLogButton" mnemonicParsing="false" onAction="#clearLog" text="%Clear Log" ButtonBar.buttonData="LEFT"/>
                         <Button fx:id="createIssueButton" mnemonicParsing="false" onAction="#createIssue" text="%Report Issue" ButtonBar.buttonData="LEFT"/>
                     </buttons>
                 </ButtonBar>

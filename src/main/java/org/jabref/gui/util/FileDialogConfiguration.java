@@ -1,5 +1,6 @@
 package org.jabref.gui.util;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +17,8 @@ public class FileDialogConfiguration {
 
     private final List<FileChooser.ExtensionFilter> extensionFilters;
     private final Path initialDirectory;
+    private final FileChooser.ExtensionFilter defaultExtension;
+    private final String initialFileName;
 
     public Optional<Path> getInitialDirectory() {
         return Optional.ofNullable(initialDirectory);
@@ -25,12 +28,16 @@ public class FileDialogConfiguration {
         return defaultExtension;
     }
 
-    private FileChooser.ExtensionFilter defaultExtension;
+    public String getInitialFileName() {
+        return initialFileName;
+    }
 
-    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters, FileChooser.ExtensionFilter defaultExtension) {
+    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
+            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
         this.initialDirectory = initialDirectory;
         this.extensionFilters = Objects.requireNonNull(extensionFilters);
         this.defaultExtension = defaultExtension;
+        this.initialFileName = initialFileName;
     }
 
     public List<FileChooser.ExtensionFilter> getExtensionFilters() {
@@ -38,9 +45,11 @@ public class FileDialogConfiguration {
     }
 
     public static class Builder {
+
         List<FileChooser.ExtensionFilter> extensionFilter = new ArrayList<>();
         private Path initialDirectory;
         private FileChooser.ExtensionFilter defaultExtension;
+        private String initialFileName;
 
         public Builder addExtensionFilter(FileExtensions extension) {
             extensionFilter.add(toFilter(extension));
@@ -58,10 +67,20 @@ public class FileDialogConfiguration {
         }
 
         public FileDialogConfiguration build() {
-            return new FileDialogConfiguration(initialDirectory, extensionFilter, defaultExtension);
+            return new FileDialogConfiguration(initialDirectory, extensionFilter, defaultExtension, initialFileName);
         }
 
         public Builder withInitialDirectory(Path directory) {
+
+            //Dir must be a folder, not a file
+            if (!Files.isDirectory(directory)) {
+                directory = directory.getParent();
+            }
+            //The lines above work also if the dir does not exist at all!
+            //NULL is accepted by the filechooser as no inital path
+            if (!Files.exists(directory)) {
+                directory = null;
+            }
             initialDirectory = directory;
             return this;
         }
@@ -69,6 +88,12 @@ public class FileDialogConfiguration {
         public Builder withDefaultExtension(FileExtensions extension) {
             defaultExtension = toFilter(extension);
             return this;
+        }
+
+        public Builder withInitialFileName(String initialFileName) {
+            this.initialFileName = initialFileName;
+            return this;
+
         }
     }
 }

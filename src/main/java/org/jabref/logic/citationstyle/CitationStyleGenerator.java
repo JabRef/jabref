@@ -29,6 +29,9 @@ public class CitationStyleGenerator {
     private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
     private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
 
+    private CitationStyleGenerator() {
+    }
+
     /**
      * WARNING: the citation is generated using JavaScript which may take some time, better call it from outside the main Thread
      * Generates a Citation based on the given entry and style

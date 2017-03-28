@@ -37,14 +37,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
-
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
-    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains(
-            "posix");
+    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+
+    private FileUtil() {
+    }
 
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
@@ -199,8 +200,8 @@ public class FileUtil {
     }
 
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.<br/>
+     * Converts a relative filename to an absolute one, if necessary. Returns an empty optional if the file does not
+     * exist.<br/>
      * <p>
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
@@ -256,7 +257,7 @@ public class FileUtil {
 
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
+     * an empty optional if the file does not exist.
      */
     private static Optional<File> expandFilename(String filename, String dir) {
 
@@ -443,5 +444,41 @@ public class FileUtil {
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;
+    }
+
+    /**
+     * Finds a file inside a directory structure.
+     * Will also look for the file inside nested directories.
+     *
+     * @param filename the name of the file that should be found
+     * @param rootDirectory the rootDirectory that will be searched
+     * @return the path to the first file that matches the defined conditions
+     */
+    public static Optional<Path> find(String filename, Path rootDirectory) {
+        try {
+            return Files.walk(rootDirectory)
+                    .filter(Files::isRegularFile)
+                    .filter(f -> f.getFileName().toString().equals(filename))
+                    .findFirst();
+        } catch(IOException ex) {
+            LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Finds a file inside a list of directory structures.
+     * Will also look for the file inside nested directories.
+     *
+     * @param filename the name of the file that should be found
+     * @param directories the directories that will be searched
+     * @return a list including all found paths to files that match the defined conditions
+     */
+    public static List<Path> find(String filename, List<Path> directories) {
+        List<Path> files = new ArrayList<>();
+        for (Path dir : directories) {
+            FileUtil.find(filename, dir).ifPresent(files::add);
+        }
+        return files;
     }
 }

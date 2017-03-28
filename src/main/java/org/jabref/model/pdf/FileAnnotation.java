@@ -1,63 +1,116 @@
 package org.jabref.model.pdf;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
-import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
 public class FileAnnotation {
 
-    private String commentId;
-    private String author;
-    private String date;
-    private int page;
-    private String content;
-    private String annotationType;
-    private FileAnnotation linkedFileAnnotation;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+    private static final String DATE_TIME_STRING = "^D:\\d{14}$";
+    private static final String DATE_TIME_STRING_WITH_TIME_ZONE = "^D:\\d{14}\\+.+";
+    private static final String ANNOTATION_DATE_FORMAT = "yyyyMMddHHmmss";
 
-    private boolean linkedAnnotation;
+    private final String author;
+    private final LocalDateTime timeModified;
+    private final int page;
+    private final String content;
+    private final FileAnnotationType annotationType;
+    private final Optional<FileAnnotation> linkedFileAnnotation;
 
-    public FileAnnotation(final String commentId, final String author, final String date, final int page,
-                          final String content, final String annotationType) {
+    /**
+     * A flexible constructor, mainly used as dummy if there is actually no annotation.
+     *
+     * @param author         The authors of the annotation
+     * @param timeModified   The last time this annotation was modified
+     * @param pageNumber     The page of the pdf where the annotation occurs
+     * @param content        the actual content of the annotation
+     * @param annotationType the type of the annotation
+     */
+    public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
+                          final String content, final FileAnnotationType annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
-        this.date = date;
-        this.page = page;
-        this.content = content;
-        this.commentId = commentId;
+        this.timeModified = timeModified;
+        this.page = pageNumber;
+        this.content = parseContent(content);
         this.annotationType = annotationType;
+        this.linkedFileAnnotation = linkedFileAnnotation;
     }
 
-    public FileAnnotation(final PDAnnotation annotation, final int page ){
-        COSDictionary dict = annotation.getDictionary();
-        this.author = dict.getString(COSName.T);
-        this.commentId = annotation.getAnnotationName();
-        this.date = annotation.getModifiedDate();
-        this.page = page;
-        this.content = annotation.getContents();
-        this.annotationType = annotation.getSubtype();
+    /**
+     * Creating a normal FileAnnotation from a PDAnnotation.
+     *
+     * @param annotation The actual annotation that holds the information
+     * @param pageNumber The page of the pdf where the annotation occurs
+     */
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
+        this(annotation.getDictionary().getString(COSName.T),
+                extractModifiedTime(annotation.getModifiedDate()),
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
+    }
 
+    /**
+     * For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
+     * highlighted or underlined annotation with a sticky note.
+     *
+     * @param annotation           The actual annotation that holds the information
+     * @param pageNumber           The page of the pdf where the annotation occurs
+     * @param linkedFileAnnotation The corresponding note of a marked text area.
+     */
+    public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
+        this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.of(linkedFileAnnotation));
+    }
+
+    /**
+     * Parses a String into a LocalDateTime.
+     *
+     * @param dateTimeString In this case of format yyyyMMddHHmmss.
+     * @return a LocalDateTime parsed from the dateTimeString
+     */
+    public static LocalDateTime extractModifiedTime(String dateTimeString) {
+        if (dateTimeString == null) {
+            return LocalDateTime.now();
+        }
+
+        if (dateTimeString.matches(DATE_TIME_STRING_WITH_TIME_ZONE)) {
+            dateTimeString = dateTimeString.substring(2, 16);
+        } else if (dateTimeString.matches(DATE_TIME_STRING)) {
+            dateTimeString = dateTimeString.substring(2);
+        }
+
+        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
+    }
+
+    private String parseContent(final String content) {
+        if (content == null) {
+            return "";
+        }
+
+        final String unreadableContent = "þÿ";
+        if (content.trim().equals(unreadableContent)) {
+            return "";
+        }
+
+        return content.trim();
     }
 
     /**
      * Abbreviate annotation names when they are longer than {@code ABBREVIATED_ANNOTATION_NAME_LENGTH} chars
-     * @param annotationName
+     *
+     * @param annotationName annotation to be shortened
      * @return the abbreviated name
      */
-    private String abbreviateAnnotationName(final String annotationName ){
-
-            int abbreviatedContentLengthForName = ABBREVIATED_ANNOTATION_NAME_LENGTH;
-            if (annotationName.length() > abbreviatedContentLengthForName) {
-                return annotationName.subSequence(0, abbreviatedContentLengthForName).toString() + "...";
-            }
+    private String abbreviateAnnotationName(final String annotationName) {
+        if (annotationName.length() > ABBREVIATED_ANNOTATION_NAME_LENGTH) {
+            return annotationName.subSequence(0, ABBREVIATED_ANNOTATION_NAME_LENGTH).toString() + "...";
+        }
         return annotationName;
-    }
-
-    public void linkComments(FileAnnotation commentToLinkTo){
-        linkedFileAnnotation = commentToLinkTo;
-        commentToLinkTo.setLinkedFileAnnotation(this);
-        commentToLinkTo.setLinkedAnnotation(true);
-        linkedAnnotation = true;
     }
 
     @Override
@@ -65,63 +118,59 @@ public class FileAnnotation {
         return abbreviateAnnotationName(content);
     }
 
-    public FileAnnotation getLinkedFileAnnotation() {
-        return linkedFileAnnotation;
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+
+        FileAnnotation that = (FileAnnotation) other;
+        return Objects.equals(this.annotationType, that.annotationType)
+                && Objects.equals(this.author, that.author)
+                && Objects.equals(this.content, that.content)
+                && Objects.equals(this.page, that.page)
+                && Objects.equals(this.linkedFileAnnotation, that.linkedFileAnnotation)
+                && Objects.equals(this.timeModified, that.timeModified);
     }
 
-    public void setLinkedFileAnnotation(FileAnnotation linkedFileAnnotation) {
-        this.linkedFileAnnotation = linkedFileAnnotation;
-    }
-
-    public String getCommentId() {
-        return commentId;
-    }
-
-    public void setCommentId(String commentId) {
-        this.commentId = commentId;
+    @Override
+    public int hashCode() {
+        return Objects.hash(annotationType, author, content, page, linkedFileAnnotation, timeModified);
     }
 
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
+    public LocalDateTime getTimeModified() {
+        return timeModified;
     }
 
     public int getPage() {
         return page;
     }
 
-    public void setPage(int page) {
-        this.page = page;
-    }
-
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getAnnotationType() {
+    public FileAnnotationType getAnnotationType() {
         return annotationType;
     }
 
     public boolean hasLinkedAnnotation() {
-        return linkedAnnotation;
+        return this.linkedFileAnnotation.isPresent();
     }
 
-    public void setLinkedAnnotation(boolean linkedAnnotation) {
-        this.linkedAnnotation = linkedAnnotation;
+    /**
+     * Before this getter is called the presence of the linked annotation must be checked via hasLinkedAnnotation()!
+     *
+     * @return the note attached to the annotation
+     */
+    public FileAnnotation getLinkedFileAnnotation() {
+        return linkedFileAnnotation.get();
     }
 }

@@ -105,6 +105,9 @@ public class EntryTypes {
     public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.MISC,
             Arrays.asList(BiblatexEntryTypes.ALL));
 
+    private EntryTypes() {
+    }
+
     /**
      * This method returns the BibtexEntryType for the name of a type,
      * or null if it does not exist.
@@ -228,15 +231,16 @@ public class EntryTypes {
      * @return returns true if the two compared entry types have the same name and equal required and optional fields
      */
     public static boolean isEqualNameAndFieldBased(EntryType type1, EntryType type2) {
-        if (type1 == null && type2 == null) {
+        if ((type1 == null) && (type2 == null)) {
             return true;
-        } else if (type1 == null || type2 == null) {
+        } else if ((type1 == null) || (type2 == null)) {
             return false;
-        } else
+        } else {
             return type1.getName().equals(type2.getName())
                     && type1.getRequiredFields().equals(type2.getRequiredFields())
                     && type1.getOptionalFields().equals(type2.getOptionalFields())
                     && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
+        }
     }
 
     public static boolean isExclusiveBiblatex(String type) {

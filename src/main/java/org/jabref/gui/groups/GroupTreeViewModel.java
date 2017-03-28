@@ -65,6 +65,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
     private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
+        if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
+            // Switch of database occurred -> do nothing
+            return;
+        }
+
         currentDatabase.ifPresent(database -> {
             if (newValue == null) {
                 stateManager.clearSelectedGroup(database);
@@ -75,29 +80,31 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
+     * Opens "New Group Dialog" and add the resulting group to the root
+     */
+    public void addNewGroupToRoot() {
+        addNewSubgroup(rootGroup.get());
+    }
+
+    /**
      * Gets invoked if the user changes the active database.
      * We need to get the new group tree and update the view
      */
     private void onActiveDatabaseChanged(Optional<BibDatabaseContext> newDatabase) {
-        currentDatabase = newDatabase;
-
         if (newDatabase.isPresent()) {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
                     .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
+
             rootGroup.setValue(newRoot);
             stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
-                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
+                    selectedGroup -> this.selectedGroup
+                            .setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
         }
-    }
 
-    /**
-     * Opens "New Group Dialog" and add the resulting group to the root
-     */
-    public void addNewGroupToRoot() {
-        addNewSubgroup(rootGroup.get());
+        currentDatabase = newDatabase;
     }
 
     /**

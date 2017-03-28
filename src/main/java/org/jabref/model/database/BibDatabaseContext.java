@@ -24,8 +24,8 @@ import org.jabref.shared.DBMSSynchronizer;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private MetaData metaData;
     private final Defaults defaults;
+    private MetaData metaData;
     /** The file where this database was last saved to. */
     private File file;
     private DBMSSynchronizer dbmsSynchronizer;
@@ -115,12 +115,12 @@ public class BibDatabaseContext {
         return Optional.ofNullable(file);
     }
 
-    public Optional<Path> getDatabasePath() {
-        return Optional.ofNullable(file).map(File::toPath);
-    }
-
     public void setDatabaseFile(File file) {
         this.file = file;
+    }
+
+    public Optional<Path> getDatabasePath() {
+        return Optional.ofNullable(file).map(File::toPath);
     }
 
     public void clearDatabaseFile() {
@@ -172,7 +172,8 @@ public class BibDatabaseContext {
     * 4. BIB file directory
     *
     * @param fieldName The field type
-    * @return The default directory for this field type.
+     * @param preferences The fileDirectory preferences
+     * @return The default directory for this field type.
     */
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
@@ -248,6 +249,14 @@ public class BibDatabaseContext {
         this.metaData.registerListener(dbmsSynchronizer);
 
         this.location = DatabaseLocation.SHARED;
+    }
+
+    @Override
+    public String toString() {
+        return "BibDatabaseContext{" +
+                "file=" + file +
+                ", location=" + location +
+                '}';
     }
 
     public void convertToLocalDatabase() {

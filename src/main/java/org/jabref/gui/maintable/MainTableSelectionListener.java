@@ -55,27 +55,26 @@ import org.apache.commons.logging.LogFactory;
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
-public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
-        KeyListener, FocusListener {
+public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
+    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
-    private final EventList<BibEntry> tableRows;
 
+    private final EventList<BibEntry> tableRows;
     private PreviewPanel preview;
     private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
+
     private boolean workingOnPreview;
 
     private boolean enabled = true;
-
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
     private int lastPressedCount;
-    private long lastPressedTime;
 
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
+    private long lastPressedTime;
 
     public MainTableSelectionListener(BasePanel panel, MainTable table) {
         this.table = table;
@@ -294,10 +293,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
                                         flEntry.getLink(), flEntry.getType().map(ExternalFileType::getIcon).orElse(null),
                                         panel.getBibDatabaseContext(), flEntry.getType());
-                                boolean success = item.openLink();
-                                if (!success) {
-                                    panel.output(Localization.lang("Unable to open link."));
-                                }
+                                item.doClick();
                             }
                         } else {
                             try {

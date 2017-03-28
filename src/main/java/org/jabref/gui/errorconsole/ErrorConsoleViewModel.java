@@ -29,8 +29,8 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
 
 public class ErrorConsoleViewModel extends AbstractViewModel {
-
     private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
+
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
     private final DialogService dialogService;
@@ -42,9 +42,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
-
-        ObservableList<LogEventViewModel> eventViewModels =
-                new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
+        ObservableList<LogEventViewModel> eventViewModels = new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 
@@ -82,29 +80,43 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
     }
 
     /**
+     * Clears the current log
+     */
+    public void clearLog() {
+        LogMessages.getInstance().clear();
+    }
+
+    /**
      * Opens a new issue on GitHub and copies log to clipboard.
      */
     public void reportIssue() {
         try {
-            String issueTitle = "Automatic Bug Report-" + dateFormat.format(date);
-            String issueBody = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", buildInfo.getVersion(), BuildInfo.OS,
+            String issueTitle = "Automatic Bug Report - " + dateFormat.format(date);
+            // system info
+            String systemInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
+            // steps to reproduce
+            String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
+            // log messages
+            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
+                    + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
+            clipBoardManager.setClipboardContents(issueDetails);
+            // bug report body
+            String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
+
             dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),
                     Localization.lang("Your issue was reported in your browser.") + "\n" +
                             Localization.lang("The log and exception information was copied to your clipboard.") + " " +
-                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description."));
+                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description.") + "\n" +
+                            Localization.lang("Please also add all steps to reproduce this issue, if possible."));
+
             URIBuilder uriBuilder = new URIBuilder()
                     .setScheme("https").setHost("github.com")
                     .setPath("/JabRef/jabref/issues/new")
                     .setParameter("title", issueTitle)
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
-
-            // Append log messages in issue description
-            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
-                    + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
-            clipBoardManager.setClipboardContents(issueDetails);
         } catch (IOException | URISyntaxException e) {
             LOGGER.error(e);
         }

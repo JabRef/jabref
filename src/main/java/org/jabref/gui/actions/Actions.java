@@ -22,6 +22,7 @@ public class Actions {
     public static final String COPY_CITE_KEY = "copyCiteKey";
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
+    public static final String COPY_TITLE = "copyTitle";
     public static final String CUT = "cut";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
@@ -68,4 +69,7 @@ public class Actions {
     public static final String UNMARK_ENTRIES = "unmarkEntries";
     public static final String WRITE_XMP = "writeXMP";
     public static final String PRINT_PREVIEW = "printPreview";
+
+    private Actions() {
+    }
 }

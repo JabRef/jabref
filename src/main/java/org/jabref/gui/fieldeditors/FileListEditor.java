@@ -61,7 +61,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -88,6 +87,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
+        initKeyBindings();
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
@@ -125,51 +125,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         TransferHandler transferHandler = new FileListEditorTransferHandler(frame, entryEditor, null);
         setTransferHandler(transferHandler);
         panel.setTransferHandler(transferHandler);
-
-        // Add an input/action pair for deleting entries:
-        getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
-        getActionMap().put("delete", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                int row = getSelectedRow();
-                removeEntries();
-                row = Math.min(row, getRowCount() - 1);
-                if (row >= 0) {
-                    setRowSelectionInterval(row, row);
-                }
-            }
-        });
-
-        // Add an input/action pair for inserting an entry:
-        getInputMap().put(KeyStroke.getKeyStroke("INSERT"), "insert");
-        getActionMap().put("insert", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                addEntry();
-            }
-        });
-
-        // Add input/action pair for moving an entry up:
-        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
-        getActionMap().put("move up", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                moveEntry(-1);
-            }
-        });
-
-        // Add input/action pair for moving an entry down:
-        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
-        getActionMap().put("move down", new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                moveEntry(1);
-            }
-        });
 
         JMenuItem openLink = new JMenuItem(Localization.lang("Open"));
         menu.add(openLink);
@@ -260,6 +215,61 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
         });
         adjustColumnWidth();
+    }
+
+    private void initKeyBindings() {
+        // Add an input/action pair for deleting entries:
+        getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
+        getActionMap().put("delete", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int row = getSelectedRow();
+                removeEntries();
+                row = Math.min(row, getRowCount() - 1);
+                if (row >= 0) {
+                    setRowSelectionInterval(row, row);
+                }
+            }
+        });
+
+        // Add an input/action pair for inserting an entry:
+        getInputMap().put(KeyStroke.getKeyStroke("INSERT"), "insert");
+        getActionMap().put("insert", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                addEntry();
+            }
+        });
+
+        // Add input/action pair for moving an entry up:
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_UP), "move up");
+        getActionMap().put("move up", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                moveEntry(-1);
+            }
+        });
+
+        // Add input/action pair for moving an entry down:
+        getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.FILE_LIST_EDITOR_MOVE_ENTRY_DOWN), "move down");
+        getActionMap().put("move down", new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                moveEntry(1);
+            }
+        });
+
+        getInputMap().put(KeyStroke.getKeyStroke("F4"),"open file");
+        getActionMap().put("open file", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                openSelectedFile();
+            }
+        });
     }
 
     public void adjustColumnWidth() {

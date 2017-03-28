@@ -8,10 +8,10 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * PostOpenAction that checks whether there are warnings about duplicate BibTeX keys, and
+ * GUIPostOpenAction that checks whether there are warnings about duplicate BibTeX keys, and
  * if so, offers to start the duplicate resolving process.
  */
-public class HandleDuplicateWarnings implements PostOpenAction {
+public class HandleDuplicateWarnings implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult pr) {

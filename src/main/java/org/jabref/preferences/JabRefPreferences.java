@@ -632,19 +632,16 @@ public class JabRefPreferences {
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH
-                    + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH + OpenOfficePreferences.WINDOWS_EXECUTABLE);
-            defaults.put(OO_JARS_PATH,
-                    OpenOfficePreferences.DEFAULT_WINDOWS_PATH + OpenOfficePreferences.WINDOWS_JARS_SUBPATH);
+            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
+            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
         } else if (OS.OS_X) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
-            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH
-                    + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH + OpenOfficePreferences.OSX_JARS_SUBPATH);
+            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
+            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
         } else { // Linux
-            defaults.put(OO_PATH, "/opt/openoffice.org3");
-            defaults.put(OO_EXECUTABLE_PATH, "/usr/lib/openoffice/program/soffice");
-            defaults.put(OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
+            defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
+            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
+            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);

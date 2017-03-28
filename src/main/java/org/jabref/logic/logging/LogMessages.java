@@ -34,4 +34,8 @@ public class LogMessages {
         messages.add(copy);
     }
 
+    public void clear() {
+        messages.clear();
+    }
+
 }

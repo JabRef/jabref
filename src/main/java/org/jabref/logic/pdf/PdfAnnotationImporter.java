@@ -1,18 +1,19 @@
 package org.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.FileAnnotation;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.pdf.FileAnnotationType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,8 +23,6 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
@@ -39,115 +38,128 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      * @return a list with the all the annotations found in the file of the path
      */
     @Override
-    public List<FileAnnotation> importAnnotations(final String path, final BibDatabaseContext context) {
+    public List<FileAnnotation> importAnnotations(final Path path) {
 
-        List<FileAnnotation> annotationsList = new ArrayList<>();
-
-        PDDocument document = null;
-        try {
-            try{
-                document = importPdfFile(path);
-            } catch (FileNotFoundException notFound) {
-                Optional<File> importedFile = FileUtil.expandFilename(context, path,
-                        JabRefPreferences.getInstance().getFileDirectoryPreferences());
-                //Check if the file could be loaded
-                if(importedFile.isPresent()){
-                    String absolutePath = importedFile.get().getAbsolutePath();
-                    document = importPdfFile(absolutePath);
-                } else {
-                    //return empty list to recognize invalid import
-                    return annotationsList;
-                }
-            }
-
-        } catch (IOException e) {
-            LOGGER.error(String.format("Failed to read file %s.", path) , e);
+        if (!validatePath(path)) {
+            // Path could not be validated, return default result
+            return Collections.emptyList();
         }
 
-        List pdfPages = document.getDocumentCatalog().getAllPages();
-        for (int i = 0; i < pdfPages.size(); i++) {
-            PDPage page = (PDPage) pdfPages.get(i);
-            try {
+        List<FileAnnotation> annotationsList = new LinkedList<>();
+        try (PDDocument document = PDDocument.load(path.toString())) {
+            List pdfPages = document.getDocumentCatalog().getAllPages();
+            for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
+                PDPage page = (PDPage) pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
-
-                    String subtype = annotation.getSubtype();
-                    //highlighted text has to be extracted by the rectangle calculated from the highlighting
-                    if (subtype.equals(FDFAnnotationHighlight.SUBTYPE)) {
-
-                        FileAnnotation annotationBelongingToHighlighting = new FileAnnotation(annotation.getAnnotationName(),
-                                annotation.getDictionary().getString(COSName.T), annotation.getModifiedDate(),
-                                i + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE);
-
-                        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-                        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
-                        String highlightedText = null;
-                        for (int j = 1,
-                             k = 0;
-                             j <= (quadsArray.size() / 8);
-                             j++) {
-
-                            COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
-                            COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
-                            COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
-                            COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
-                            COSFloat lowerLeftX = (COSFloat) quadsArray.get(4 + k);
-                            COSFloat lowerLeftY = (COSFloat) quadsArray.get(5 + k);
-
-                            k += 8;
-
-                            float ulx = upperLeftX.floatValue() - 1;
-                            float uly = upperLeftY.floatValue();
-                            float width = upperRightX.floatValue() - lowerLeftX.floatValue();
-                            float height = upperRightY.floatValue() - lowerLeftY.floatValue();
-
-                            PDRectangle pageSize = page.getMediaBox();
-                            uly = pageSize.getHeight() - uly;
-
-                            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-                            stripperByArea.addRegion("highlightedRegion", rectangle);
-                            stripperByArea.extractRegions(page);
-                            String highlightedTextInLine = stripperByArea.getTextForRegion("highlightedRegion");
-
-                            if (j > 1) {
-                                highlightedText = highlightedText.concat(highlightedTextInLine);
-                            } else {
-                                highlightedText = highlightedTextInLine;
-                            }
-                        }
-                        annotation.setContents(highlightedText);
-
-                        FileAnnotation highlighting = new FileAnnotation(annotation, i + 1);
-                        //highlighted text that has a sticky note on it should be linked to the sticky note
-                        highlighting.linkComments(annotationBelongingToHighlighting);
-                        annotationsList.add(annotationBelongingToHighlighting);
-                        annotationsList.add(highlighting);
-
+                    if (!isSupportedAnnotationType(annotation)) {
+                        continue;
+                    }
+                    if (FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype()) ||
+                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype())) {
+                        annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
-                        annotationsList.add(new FileAnnotation(annotation, i + 1));
+                        FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
+                        if (fileAnnotation.getContent() != null && !fileAnnotation.getContent().isEmpty()) {
+                            annotationsList.add(fileAnnotation);
+                        }
                     }
                 }
-            } catch (IOException e) {
-                LOGGER.error(String.format("Failed to read file %s.", path) , e);
             }
-        }
-        try {
-            document.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            LOGGER.error(String.format("Failed to read file '%s'.", path), e);
         }
         return annotationsList;
     }
 
-    /**
-     *
-     * @param path the absolute path to the pdf file
-     * @return a PDDocument representing the pdf file
-     * @throws IOException if the document cannot be read from path
-     */
-    private PDDocument importPdfFile(final String path) throws IOException {
-
-            if(path.toLowerCase(Locale.ROOT).endsWith(".pdf")){
-               return PDDocument.load("/"+ path);
+    private boolean isSupportedAnnotationType(PDAnnotation annotation) {
+        try {
+            if (!Arrays.asList(FileAnnotationType.values()).contains(FileAnnotationType.valueOf(annotation.getSubtype()))) {
+                return false;
             }
-        return null;
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug(String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
+        }
+        return true;
+    }
+
+    private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
+        FileAnnotation annotationBelongingToMarking = new FileAnnotation(
+                annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
+                pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
+
+        try {
+            if (FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) || FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype())) {
+                annotation.setContents(extractMarkedText(page, annotation));
+            }
+        } catch (IOException e) {
+            annotation.setContents("JabRef: Could not extract any marked text!");
+        }
+
+        //Marked text that has a sticky note on it should be linked to the sticky note
+        return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
+    }
+
+
+    private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
+        //highlighted or underlined text has to be extracted by the rectangle calculated from the marking
+        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
+        String markedText = "";
+        for (int j = 1,
+             k = 0;
+             j <= (quadsArray.size() / 8);
+             j++) {
+
+            COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
+            COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
+            COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
+            COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
+            COSFloat lowerLeftX = (COSFloat) quadsArray.get(4 + k);
+            COSFloat lowerLeftY = (COSFloat) quadsArray.get(5 + k);
+
+            k += 8;
+
+            float ulx = upperLeftX.floatValue() - 1;
+            float uly = upperLeftY.floatValue();
+            float width = upperRightX.floatValue() - lowerLeftX.floatValue();
+            float height = upperRightY.floatValue() - lowerLeftY.floatValue();
+
+            PDRectangle pageSize = page.getMediaBox();
+            uly = pageSize.getHeight() - uly;
+
+            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
+            stripperByArea.addRegion("markedRegion", rectangle);
+            stripperByArea.extractRegions(page);
+            String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
+
+            if (j > 1) {
+                markedText = markedText.concat(markedTextInLine);
+            } else {
+                markedText = markedTextInLine;
+            }
+        }
+
+        return markedText.trim();
+    }
+
+    private boolean validatePath(Path path) {
+        Objects.requireNonNull(path);
+
+        if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+            LOGGER.warn(String.format("File %s does not end with .pdf!", path));
+            return false;
+        }
+
+        if (!Files.exists(path)) {
+            LOGGER.warn(String.format("File %s does not exist!", path));
+            return false;
+        }
+
+        if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
+            LOGGER.warn(String.format("File %s is not readable!", path));
+            return false;
+        }
+
+        return true;
     }
 }

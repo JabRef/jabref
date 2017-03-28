@@ -16,17 +16,12 @@ public class LatexFieldFormatter {
 
     // "Fieldname" to indicate that a field should be treated as a bibtex string. Used when writing database to file.
     public static final String BIBTEX_STRING = "__string";
-
-    private StringBuilder stringBuilder;
-
-    private final boolean neverFailOnHashes;
-
-    private final LatexFieldFormatterPreferences prefs;
-
-    private final FieldContentParser parser;
-
     private static final char FIELD_START = '{';
     private static final char FIELD_END = '}';
+    private final boolean neverFailOnHashes;
+    private final LatexFieldFormatterPreferences prefs;
+    private final FieldContentParser parser;
+    private StringBuilder stringBuilder;
 
 
     public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
@@ -44,16 +39,47 @@ public class LatexFieldFormatter {
         return new LatexFieldFormatter(true, prefs);
     }
 
+    private static void checkBraces(String text) throws InvalidFieldValueException {
+        int left = 0;
+        int right = 0;
+
+        // First we collect all occurrences:
+        for (int i = 0; i < text.length(); i++) {
+            char item = text.charAt(i);
+
+            boolean charBeforeIsEscape = false;
+            if (i > 0 && text.charAt(i - 1) == '\\') {
+                charBeforeIsEscape = true;
+            }
+
+            if (!charBeforeIsEscape && item == '{') {
+                left++;
+            } else if (!charBeforeIsEscape && item == '}') {
+                right++;
+            }
+        }
+
+        // Then we throw an exception if the error criteria are met.
+        if (!(right == 0) && (left == 0)) {
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+        }
+        if (!(right == 0) && (right < left)) {
+            throw new InvalidFieldValueException("Unescaped '}' character without opening bracket ends string prematurely.");
+        }
+        if (left != right) {
+            throw new InvalidFieldValueException("Braces don't match.");
+        }
+    }
+
     /**
      * Formats the content of a field.
      *
      * @param content   the content of the field
      * @param fieldName the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @return a formatted string suitable for output
-     * @throws IllegalArgumentException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
+     * @throws InvalidFieldValueException if s is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
-    public String format(String content, String fieldName)
-            throws IllegalArgumentException {
+    public String format(String content, String fieldName) throws InvalidFieldValueException {
 
         if (content == null) {
             return FIELD_START + String.valueOf(FIELD_END);
@@ -82,20 +108,18 @@ public class LatexFieldFormatter {
         return formatAndResolveStrings(result, fieldName);
     }
 
-    private String formatAndResolveStrings(String content, String fieldName) {
+    private String formatAndResolveStrings(String content, String fieldName) throws InvalidFieldValueException {
         stringBuilder = new StringBuilder();
-        int pivot = 0;
-        int pos1;
-        int pos2;
+        checkBraces(content);
+
         // Here we assume that the user encloses any bibtex strings in #, e.g.:
         // #jan# - #feb#
         // ...which will be written to the file like this:
         // jan # { - } # feb
-        checkBraces(content);
-
+        int pivot = 0;
         while (pivot < content.length()) {
             int goFrom = pivot;
-            pos1 = pivot;
+            int pos1 = pivot;
             while (goFrom == pos1) {
                 pos1 = content.indexOf('#', goFrom);
                 if ((pos1 > 0) && (content.charAt(pos1 - 1) == '\\')) {
@@ -106,6 +130,7 @@ public class LatexFieldFormatter {
                 }
             }
 
+            int pos2;
             if (pos1 == -1) {
                 pos1 = content.length(); // No more occurrences found.
                 pos2 = -1;
@@ -115,7 +140,7 @@ public class LatexFieldFormatter {
                     if (neverFailOnHashes) {
                         pos1 = content.length(); // just write out the rest of the text, and throw no exception
                     } else {
-                        throw new IllegalArgumentException(
+                        throw new InvalidFieldValueException(
                                 "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n"
                                         + "In JabRef, use pairs of # characters to indicate a string.\n"
                                         + "Note that the entry causing the problem has been selected.");
@@ -163,7 +188,7 @@ public class LatexFieldFormatter {
         return resolveStrings;
     }
 
-    private String formatWithoutResolvingStrings(String content, String fieldName) {
+    private String formatWithoutResolvingStrings(String content, String fieldName) throws InvalidFieldValueException {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
@@ -185,9 +210,8 @@ public class LatexFieldFormatter {
         boolean inCommandOption = false;
         int nestedEnvironments = 0;
         StringBuilder commandName = new StringBuilder();
-        char c;
         for (int i = startPos; i < endPos; i++) {
-            c = text.charAt(i);
+            char c = text.charAt(i);
 
             // Track whether we are in a LaTeX command of some sort.
             if (Character.isLetter(c) && (escape || inCommandName)) {
@@ -248,39 +272,6 @@ public class LatexFieldFormatter {
 
     private void putIn(String s) {
         stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
-    }
-
-    private static void checkBraces(String text) throws IllegalArgumentException {
-        int left = 0;
-        int right = 0;
-
-        // First we collect all occurrences:
-        for (int i = 0; i < text.length(); i++) {
-            char item = text.charAt(i);
-
-            boolean charBeforeIsEscape = false;
-            if(i > 0 && text.charAt(i - 1) == '\\') {
-                charBeforeIsEscape = true;
-            }
-
-            if(!charBeforeIsEscape && item == '{') {
-                left++;
-            } else if (!charBeforeIsEscape && item == '}') {
-                right++;
-            }
-        }
-
-        // Then we throw an exception if the error criteria are met.
-        if (!(right == 0) && (left == 0)) {
-            throw new IllegalArgumentException("'}' character ends string prematurely.");
-        }
-        if (!(right == 0) && (right < left)) {
-            throw new IllegalArgumentException("'}' character ends string prematurely.");
-        }
-        if (left != right) {
-            throw new IllegalArgumentException("Braces don't match.");
-        }
-
     }
 
 }

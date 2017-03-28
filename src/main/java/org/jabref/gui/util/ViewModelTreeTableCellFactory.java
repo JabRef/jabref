@@ -10,6 +10,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
  *
@@ -76,7 +78,10 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toTooltip != null) {
-                        setTooltip(new Tooltip(toTooltip.call(viewModel)));
+                        String tooltip = toTooltip.call(viewModel);
+                        if (StringUtil.isNotBlank(tooltip)) {
+                            setTooltip(new Tooltip(tooltip));
+                        }
                     }
                     if (toOnMouseClickedEvent != null) {
                         setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));

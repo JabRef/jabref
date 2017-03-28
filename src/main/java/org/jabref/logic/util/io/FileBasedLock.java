@@ -22,6 +22,9 @@ public class FileBasedLock {
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
 
+    private FileBasedLock() {
+    }
+
     /**
      * This method checks whether there is a lock file for the given file. If
      * there is, it waits for 500 ms. This is repeated until the lock is gone

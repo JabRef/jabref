@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -474,6 +475,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> copyKey());
 
+        // The action for copying the selected entry's title.
+        actions.put(Actions.COPY_TITLE, (BaseAction) () -> copyTitle());
+
         // The action for copying a cite for the selected entry.
         actions.put(Actions.COPY_CITE_KEY, (BaseAction) () -> copyCiteKey());
 
@@ -808,6 +812,35 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    private void copyTitle() {
+        List<BibEntry> selectedBibEntries = mainTable.getSelectedEntries();
+        if (!selectedBibEntries.isEmpty()) {
+            storeCurrentEdit();
+
+            // Collect all non-null titles.
+            List<String> titles = selectedBibEntries.stream()
+                    .filter(bibEntry -> bibEntry.getTitle().isPresent())
+                    .map(bibEntry -> bibEntry.getTitle().get())
+                    .collect(Collectors.toList());
+
+            if (titles.isEmpty()) {
+                output(Localization.lang("None of the selected entries have titles."));
+                return;
+            }
+            StringSelection ss = new StringSelection(String.join("\n", titles));
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+
+            if (titles.size() == selectedBibEntries.size()) {
+                // All entries had titles.
+                output((selectedBibEntries.size() > 1 ? Localization.lang("Copied titles") : Localization.lang("Copied title")) + '.');
+            } else {
+                output(Localization.lang("Warning: %0 out of %1 entries have undefined title.",
+                        Integer.toString(selectedBibEntries.size() - titles.size()),
+                        Integer.toString(selectedBibEntries.size())));
+            }
+        }
+    }
+
     private void copyCiteKey() {
         List<BibEntry> bes = mainTable.getSelectedEntries();
         if (!bes.isEmpty()) {
@@ -934,7 +967,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             FileListEntry flEntry = fileListTableModel.getEntry(0);
             ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.getLink(),
                     flEntry.getType().get().getIcon(), bibDatabaseContext, flEntry.getType());
-            item.openLink();
+            item.doClick();
         });
     }
 
@@ -955,23 +988,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (o instanceof BaseAction) {
                 ((BaseAction) o).action();
             } else {
-                // This part uses Spin's features:
-                Runnable wrk = ((AbstractWorker) o).getWorker();
-                // The Worker returned by getWorker() has been wrapped
-                // by Spin.off(), which makes its methods be run in
-                // a different thread from the EDT.
-                CallBack clb = ((AbstractWorker) o).getCallBack();
-
-                ((AbstractWorker) o).init(); // This method runs in this same thread, the EDT.
-                // Useful for initial GUI actions, like printing a message.
-
-                // The CallBack returned by getCallBack() has been wrapped
-                // by Spin.over(), which makes its methods be run on
-                // the EDT.
-                wrk.run(); // Runs the potentially time-consuming action
-                // without freezing the GUI. The magic is that THIS line
-                // of execution will not continue until run() is finished.
-                clb.update(); // Runs the update() method on the EDT.
+                runWorker((AbstractWorker) o);
             }
         } catch (Throwable ex) {
             // If the action has blocked the JabRefFrame before crashing, we need to unblock it.
@@ -980,6 +997,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             frame.unblock();
             LOGGER.error("runCommand error: " + ex.getMessage(), ex);
         }
+    }
+
+    public static void runWorker(AbstractWorker worker) throws Exception {
+        // This part uses Spin's features:
+        Runnable wrk = worker.getWorker();
+        // The Worker returned by getWorker() has been wrapped
+        // by Spin.off(), which makes its methods be run in
+        // a different thread from the EDT.
+        CallBack clb = worker.getCallBack();
+
+        worker.init(); // This method runs in this same thread, the EDT.
+        // Useful for initial GUI actions, like printing a message.
+
+        // The CallBack returned by getCallBack() has been wrapped
+        // by Spin.over(), which makes its methods be run on
+        // the EDT.
+        wrk.run(); // Runs the potentially time-consuming action
+        // without freezing the GUI. The magic is that THIS line
+        // of execution will not continue until run() is finished.
+        clb.update(); // Runs the update() method on the EDT.
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,

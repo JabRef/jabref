@@ -12,6 +12,10 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 public class FieldCheckers {
+
+    private FieldCheckers() {
+    }
+
     static List<FieldChecker> getAll(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         return getAllMap(databaseContext, fileDirectoryPreferences)
                 .entries().stream()

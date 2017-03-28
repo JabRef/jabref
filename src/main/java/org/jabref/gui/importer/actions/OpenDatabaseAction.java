@@ -49,24 +49,21 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
     public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
-
-    private final boolean showDialog;
-    private final JabRefFrame frame;
-
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
-    private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
+    private static final List<GUIPostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
         // Add the action for checking for new custom entry types loaded from the BIB file:
         POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
-        // Add the action for converting legacy entries in ExplicitGroup
-        POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
         // Add the action for the new external file handling system in version 2.3:
         POST_OPEN_ACTIONS.add(new FileLinksUpgradeWarning());
         // Add the action for warning about and handling duplicate BibTeX keys:
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
+
+    private final boolean showDialog;
+    private final JabRefFrame frame;
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
@@ -75,6 +72,21 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         putValue(Action.NAME, Localization.menuTitle("Open library"));
         putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.OPEN_DATABASE));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Open BibTeX library"));
+    }
+
+    /**
+     * Go through the list of post open actions, and perform those that need to be performed.
+     *
+     * @param panel  The BasePanel where the database is shown.
+     * @param result The result of the BIB file parse operation.
+     */
+    public static void performPostOpenActions(BasePanel panel, ParserResult result) {
+        for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
+            if (action.isActionNecessary(result)) {
+                action.performAction(panel, result);
+                panel.frame().getTabbedPane().setSelectedComponent(panel);
+            }
+        }
     }
 
     @Override
@@ -239,24 +251,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             // if the database contents should be modified due to new features
             // in this version of JabRef:
             final ParserResult finalReferenceToResult = result;
-            SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
-        }
-    }
-
-    /**
-     * Go through the list of post open actions, and perform those that need to be performed.
-     *
-     * @param panel  The BasePanel where the database is shown.
-     * @param result The result of the BIB file parse operation.
-     */
-    public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
-        for (PostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
-            if (action.isActionNecessary(result)) {
-                if (mustRaisePanel) {
-                    panel.frame().getTabbedPane().setSelectedComponent(panel);
-                }
-                action.performAction(panel, result);
-            }
+            SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult));
         }
     }
 

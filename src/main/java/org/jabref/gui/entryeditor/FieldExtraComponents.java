@@ -31,20 +31,30 @@ import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLUtil;
-import org.jabref.logic.util.DOI;
-import org.jabref.logic.util.ISBN;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FieldExtraComponents {
+
+    private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
+
+    private FieldExtraComponents() {
+    }
 
     private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
@@ -170,13 +180,17 @@ public class FieldExtraComponents {
             }
         });
         // lookup doi
-        JButton doiButton = new JButton(Localization.lang("Lookup DOI"));
+        JButton doiButton = new JButton(Localization.lang("Look up DOI"));
         doiButton.addActionListener(actionEvent -> {
-            Optional<DOI> doi = DOI.fromBibEntry(entryEditor.getEntry());
-            if (doi.isPresent()) {
-                entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-            } else {
-                panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
+            try {
+                Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
+                if (doi.isPresent()) {
+                    entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
+                } else {
+                    panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
+                }
+            } catch (FetcherException e) {
+                LOGGER.error("Problem fetching DOI", e);
             }
         });
         // fetch bibtex data

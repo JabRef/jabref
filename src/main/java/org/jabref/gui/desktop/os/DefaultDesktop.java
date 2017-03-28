@@ -3,6 +3,7 @@ package org.jabref.gui.desktop.os;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -41,5 +42,10 @@ public class DefaultDesktop implements NativeDesktop {
     @Override
     public String detectProgramPath(String programName, String directoryName) {
         return programName;
+    }
+
+    @Override
+    public Path getApplicationDirectory() {
+        return getUserDirectory();
     }
 }

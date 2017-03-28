@@ -2,8 +2,12 @@ package org.jabref.logic.importer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.logic.importer.util.ConvertLegacyExplicitGroups;
+import org.jabref.logic.importer.util.PostOpenAction;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.logic.util.io.FileBasedLock;
@@ -14,6 +18,9 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenDatabase {
     public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
+
+    private OpenDatabase() {
+    }
 
     /**
      * Load database (bib-file)
@@ -71,6 +78,16 @@ public class OpenDatabase {
             LOGGER.debug("Synchronized special fields based on keywords");
         }
 
+        applyPostActions(result);
+
         return result;
+    }
+
+    private static void applyPostActions(ParserResult parserResult) {
+        List<PostOpenAction> actions = Arrays.asList(new ConvertLegacyExplicitGroups());
+
+        for (PostOpenAction action : actions) {
+            action.performAction(parserResult);
+        }
     }
 }

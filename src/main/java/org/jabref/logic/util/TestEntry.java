@@ -5,6 +5,9 @@ import org.jabref.model.entry.FieldName;
 
 public class TestEntry {
 
+    private TestEntry() {
+    }
+
     public static BibEntry getTestEntry() {
 
         BibEntry entry = new BibEntry("article");

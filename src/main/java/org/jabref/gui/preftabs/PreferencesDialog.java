@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
@@ -63,7 +64,6 @@ public class PreferencesDialog extends JDialog {
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
 
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
-
 
     public PreferencesDialog(JabRefFrame parent) {
         super(parent, Localization.lang("JabRef preferences"), false);
@@ -135,8 +135,8 @@ public class PreferencesDialog extends JDialog {
         westPanel.add(chooser, BorderLayout.CENTER);
         westPanel.add(buttons, BorderLayout.SOUTH);
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.add(main, BorderLayout.CENTER);
-        mainPanel.add(westPanel, BorderLayout.WEST);
+        mainPanel.add(putPanelInScrollPane(main), BorderLayout.CENTER);
+        mainPanel.add(putPanelInScrollPane(westPanel), BorderLayout.WEST);
 
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
@@ -204,6 +204,14 @@ public class PreferencesDialog extends JDialog {
 
         pack();
 
+    }
+
+    private JScrollPane putPanelInScrollPane(JPanel panel) {
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setBorder(null);
+        return scrollPane;
     }
 
     private String getPrefsExportPath() {

@@ -13,7 +13,7 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FileDialog;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
-import org.jabref.gui.importer.actions.PostOpenAction;
+import org.jabref.gui.importer.actions.GUIPostOpenAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
@@ -38,7 +38,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * modify General fields to show "file" instead of "pdf" / "ps"
  * * modify table column settings to show "file" instead of "pdf" / "ps"
  */
-public class FileLinksUpgradeWarning implements PostOpenAction {
+public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
     private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS};
 
@@ -48,6 +48,29 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
     private boolean offerSetFileDir;
 
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained in the field
+     * GUIGlobals.FILE_FIELD.
+     *
+     * @param database The database to modify.
+     * @param fields   The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+
+        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup();
+        for (BibEntry entry : database.getEntries()) {
+            List<FieldChange> changes = cleanupJob.cleanup(entry);
+
+            for (FieldChange change : changes) {
+                ce.addEdit(new UndoableFieldChange(change));
+            }
+        }
+
+        ce.end();
+        return ce;
+    }
 
     /**
      * This method should be performed if the major/minor versions recorded in the ParserResult
@@ -225,29 +248,5 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             }
         }
         return found;
-    }
-
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param database The database to modify.
-     * @param fields   The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
-
-        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup();
-        for (BibEntry entry : database.getEntries()) {
-            List<FieldChange> changes = cleanupJob.cleanup(entry);
-
-            for (FieldChange change : changes) {
-                ce.addEdit(new UndoableFieldChange(change));
-            }
-        }
-
-        ce.end();
-        return ce;
     }
 }

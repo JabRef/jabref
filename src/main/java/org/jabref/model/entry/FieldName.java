@@ -161,6 +161,9 @@ public class FieldName {
     // Map to hold alternative display names
     private static final Map<String, String> displayNames = new HashMap<>();
 
+    private FieldName() {
+    }
+
     public static String orFields(String... fields) {
         return String.join(FieldName.FIELD_SEPARATOR, fields);
     }

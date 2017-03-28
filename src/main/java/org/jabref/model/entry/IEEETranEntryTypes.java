@@ -115,6 +115,9 @@ public class IEEETranEntryTypes {
 
     public static final List<EntryType> ALL = Arrays.asList(ELECTRONIC, IEEETRANBSTCTL, PERIODICAL, PATENT, STANDARD);
 
+    private IEEETranEntryTypes() {
+    }
+
     public static Optional<EntryType> getType(String name) {
         return ALL.stream().filter(e -> e.getName().equalsIgnoreCase(name)).findFirst();
     }

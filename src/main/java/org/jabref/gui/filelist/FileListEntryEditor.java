@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -31,13 +32,16 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -59,6 +63,7 @@ import org.apache.commons.logging.LogFactory;
  * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
+
     private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
 
     private JDialog diag;
@@ -81,9 +86,16 @@ public class FileListEntryEditor {
 
     //Do not make this variable final, as then the lambda action listener will fail on compile
     private JabRefFrame frame;
+    private boolean showSaveDialog;
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
+    public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar, boolean showOpenButton,
+            BibDatabaseContext databaseContext, boolean showSaveDialog) {
+        this(frame, entry, showProgressBar, showOpenButton, databaseContext);
+
+        this.showSaveDialog = showSaveDialog;
+    }
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar, boolean showOpenButton,
             BibDatabaseContext databaseContext) {
@@ -117,8 +129,7 @@ public class FileListEntryEditor {
 
         FormLayout fileDialog = new FormLayout(
                 "left:pref, 4dlu, fill:400dlu, 4dlu, fill:pref, 4dlu, fill:pref",
-                "p, 8dlu, p, 8dlu, p"
-        );
+                "p, 8dlu, p, 8dlu, p");
         FormBuilder builder = FormBuilder.create().layout(fileDialog);
         builder.add(Localization.lang("Link")).xy(1, 1);
         builder.add(link).xy(3, 1);
@@ -158,6 +169,7 @@ public class FileListEntryEditor {
         open.addActionListener(e -> openFile());
 
         AbstractAction cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 diag.dispose();
@@ -190,7 +202,7 @@ public class FileListEntryEditor {
 
         });
 
-        diag = new JDialog(frame, Localization.lang("Save file"), true);
+        diag = new JDialog(frame, Localization.lang("Select files"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
@@ -269,6 +281,13 @@ public class FileListEntryEditor {
         if (visible) {
             okPressed = false;
         }
+        String title;
+        if (showSaveDialog) {
+            title = Localization.lang("Save file");
+        } else {
+            title = Localization.lang("Select files");
+        }
+        diag.setTitle(title);
         diag.setVisible(visible);
     }
 
@@ -335,8 +354,8 @@ public class FileListEntryEditor {
     }
 
     private final ActionListener browsePressed = e -> {
-        String filePath = link.getText().trim();
-        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath,
+        String fileText = link.getText().trim();
+        Optional<File> file = FileUtil.expandFilename(this.databaseContext, fileText,
                 Globals.prefs.getFileDirectoryPreferences());
         String workingDir;
         // no file set yet or found
@@ -346,7 +365,19 @@ public class FileListEntryEditor {
             workingDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
+        String fileName = Paths.get(fileText).getFileName().toString();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(Paths.get(workingDir))
+                .withInitialFileName(fileName).build();
+        DialogService ds = new FXDialogService();
+
+        Optional<Path> path;
+        if (showSaveDialog) {
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+        } else {
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+        }
 
         path.ifPresent(selection -> {
             File newFile = selection.toFile();
@@ -354,7 +385,8 @@ public class FileListEntryEditor {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
 
             // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+            List<String> fileDirs = this.databaseContext
+                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
             link.setText(newFile.getPath());

@@ -3,7 +3,7 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.ISSN;
+import org.jabref.model.entry.identifier.ISSN;
 
 
 public class ISSNChecker implements ValueChecker {
