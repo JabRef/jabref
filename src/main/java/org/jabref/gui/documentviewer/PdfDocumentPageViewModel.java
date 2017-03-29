@@ -9,6 +9,7 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
 /**
  * Represents the view model of a pdf page backed by a {@link PDPage}.
@@ -36,11 +37,11 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
     }
 
     @Override
-    public Image render() {
+    public Image render(int width, int height) {
         try {
             int resolution = 96;
             BufferedImage image = page.convertToImage(BufferedImage.TYPE_INT_RGB, 2 * resolution);
-            return SwingFXUtils.toFXImage(resize(image, 600, 800), null);
+            return SwingFXUtils.toFXImage(resize(image, width, height), null);
         } catch (IOException e) {
             // TODO: LOG
             return null;
@@ -50,5 +51,11 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
     @Override
     public int getPageNumber() {
         return pageNumber;
+    }
+
+    @Override
+    public double getAspectRatio() {
+        PDRectangle mediaBox = page.getMediaBox();
+        return mediaBox.getWidth() / mediaBox.getHeight();
     }
 }

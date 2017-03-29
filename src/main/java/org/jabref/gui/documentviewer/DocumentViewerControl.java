@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
@@ -35,6 +34,8 @@ public class DocumentViewerControl extends StackPane {
     private DoubleProperty scrollY = new SimpleDoubleProperty();
     private DoubleProperty scrollYMax = new SimpleDoubleProperty();
     private VirtualFlow<DocumentPageViewModel, DocumentViewerPage> flow;
+    private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(600);
+
     public DocumentViewerControl(TaskExecutor taskExecutor) {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
@@ -85,7 +86,7 @@ public class DocumentViewerControl extends StackPane {
         // We try to find the page that is displayed in the center of the viewport
         Optional<DocumentViewerPage> inMiddleOfViewport = Optional.empty();
         try {
-            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(0, 800 / 2);
+            VirtualFlowHit<DocumentViewerPage> hit = flow.hit(0, flow.getHeight() / 2);
             if (hit.isCellHit()) {
                 // Successful hit
                 inMiddleOfViewport = Optional.of(hit.getCell());
@@ -102,6 +103,32 @@ public class DocumentViewerControl extends StackPane {
             currentPage.set(
                     visiblePages.stream().findFirst().map(DocumentViewerPage::getPageNumber).orElse(1));
         }
+    }
+
+    public void setPageWidth(double width) {
+        desiredPageDimension = PageDimension.ofFixedWidth(width);
+
+        updateSizeOfDisplayedPages();
+    }
+
+    public void setPageHeight(double height) {
+        desiredPageDimension = PageDimension.ofFixedHeight(height);
+
+        updateSizeOfDisplayedPages();
+    }
+
+    private void updateSizeOfDisplayedPages() {
+        if (flow != null) {
+            for (DocumentViewerPage page : flow.visibleCells()) {
+                page.updateSize();
+            }
+            flow.requestLayout();
+        }
+    }
+
+    public void changePageWidth(int delta) {
+        // Assuming the current page is A4 (or has same aspect ratio)
+        setPageWidth(desiredPageDimension.getWidth(Math.sqrt(2)) + delta);
     }
 
     /**
@@ -126,11 +153,11 @@ public class DocumentViewerControl extends StackPane {
             progress.setMaxSize(50, 50);
 
             // Set empty background and create proper rendering in background (for smoother loading)
-            background = new Rectangle(600, 800);
+            background = new Rectangle(getDesiredWidth(), getDesiredHeight());
             background.setStyle("-fx-fill: WHITE");
-            imageView.setImage(new WritableImage(600, 800));
+            //imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .run(initialPage::render)
+                    .run(() -> renderPage(initialPage))
                     .onSuccess(image -> {
                         imageView.setImage(image);
                         progress.setVisible(false);
@@ -139,6 +166,14 @@ public class DocumentViewerControl extends StackPane {
             taskExecutor.execute(generateImage);
 
             imageHolder.getChildren().setAll(background, progress, imageView);
+        }
+
+        private int getDesiredHeight() {
+            return desiredPageDimension.getHeight(page.getAspectRatio());
+        }
+
+        private int getDesiredWidth() {
+            return desiredPageDimension.getWidth(page.getAspectRatio());
         }
 
         @Override
@@ -155,12 +190,14 @@ public class DocumentViewerControl extends StackPane {
         public void updateItem(DocumentPageViewModel page) {
             this.page = page;
 
-            // First hide old page and show background instead
+            // First hide old page and show background instead (recalculate size of background to make sure its correct)
+            background.setWidth(getDesiredWidth());
+            background.setHeight(getDesiredHeight());
             background.setVisible(true);
             imageView.setOpacity(0);
 
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .run(page::render)
+                    .run(() -> renderPage(page))
                     .onSuccess(image -> {
                         imageView.setImage(image);
 
@@ -173,8 +210,19 @@ public class DocumentViewerControl extends StackPane {
             taskExecutor.execute(generateImage);
         }
 
+        private Image renderPage(DocumentPageViewModel page) {
+            return page.render(getDesiredWidth(), getDesiredHeight());
+        }
+
         public int getPageNumber() {
             return page.getPageNumber();
+        }
+
+        public void updateSize() {
+            background.setWidth(getDesiredWidth());
+            background.setHeight(getDesiredWidth());
+            updateItem(page);
+            imageHolder.requestLayout();
         }
     }
 }

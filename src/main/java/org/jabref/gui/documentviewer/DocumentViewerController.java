@@ -46,16 +46,26 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
 
     @Inject private StateManager stateManager;
     @Inject private TaskExecutor taskExecutor;
+    private DocumentViewerControl viewer;
 
     @FXML
     private void initialize() {
         viewModel = new DocumentViewerViewModel(stateManager);
 
         setupViewer();
+        setupScrollbar();
         setupFileChoice();
         setupPageControls();
+        setupModeButtons();
+    }
 
+    private void setupModeButtons() {
         viewModel.liveModeProperty().bind(modeLive.selectedProperty());
+    }
+
+    private void setupScrollbar() {
+        scrollBar.valueProperty().bindBidirectional(viewer.scrollYProperty());
+        scrollBar.maxProperty().bind(viewer.scrollYMaxProperty());
     }
 
     private void setupPageControls() {
@@ -80,17 +90,13 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
     }
 
     private void setupViewer() {
-        DocumentViewerControl viewer = new DocumentViewerControl(taskExecutor);
+        viewer = new DocumentViewerControl(taskExecutor);
         viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
             if (newDocument != null) {
                 viewer.show(newDocument);
             }
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
-
-        scrollBar.valueProperty().bindBidirectional(viewer.scrollYProperty());
-        scrollBar.maxProperty().bind(viewer.scrollYMaxProperty());
-
         mainPane.setCenter(viewer);
     }
 
@@ -100,5 +106,21 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
 
     public void previousPage(ActionEvent actionEvent) {
         viewModel.showPreviousPage();
+    }
+
+    public void fitWidth(ActionEvent actionEvent) {
+        viewer.setPageWidth(viewer.getWidth());
+    }
+
+    public void zoomIn(ActionEvent actionEvent) {
+        viewer.changePageWidth(100);
+    }
+
+    public void zoomOut(ActionEvent actionEvent) {
+        viewer.changePageWidth(-100);
+    }
+
+    public void fitSinglePage(ActionEvent actionEvent) {
+        viewer.setPageHeight(viewer.getHeight());
     }
 }

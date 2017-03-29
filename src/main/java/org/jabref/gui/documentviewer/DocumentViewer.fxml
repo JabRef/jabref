@@ -67,7 +67,7 @@
                         </Button>
                     </HBox>
                     <HBox fx:id="zoomBar" alignment="CENTER_RIGHT">
-                        <Button styleClass="flatButton">
+                        <Button styleClass="flatButton" onAction="#fitWidth">
                             <graphic>
                                 <MaterialDesignIconView glyphName="ARROW_EXPAND_ALL"/>
                             </graphic>
@@ -75,7 +75,7 @@
                                 <Tooltip text="%Fit width"/>
                             </tooltip>
                         </Button>
-                        <Button styleClass="flatButton">
+                        <Button styleClass="flatButton" onAction="#fitSinglePage">
                             <graphic>
                                 <MaterialDesignIconView glyphName="NOTE"/>
                             </graphic>
@@ -83,7 +83,7 @@
                                 <Tooltip text="%Fit a single page"/>
                             </tooltip>
                         </Button>
-                        <Button styleClass="flatButton">
+                        <Button styleClass="flatButton" onAction="#zoomOut">
                             <graphic>
                                 <MaterialDesignIconView glyphName="MAGNIFY_MINUS"/>
                             </graphic>
@@ -91,7 +91,7 @@
                                 <Tooltip text="%Zoom out"/>
                             </tooltip>
                         </Button>
-                        <Button styleClass="flatButton">
+                        <Button styleClass="flatButton" onAction="#zoomIn">
                             <graphic>
                                 <MaterialDesignIconView glyphName="MAGNIFY_PLUS"/>
                             </graphic>
