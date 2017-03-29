@@ -23,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
@@ -36,6 +37,7 @@ import org.jabref.model.entry.ParsedFileField;
 
 public class DocumentViewerController extends AbstractController<DocumentViewerViewModel> {
 
+    @FXML private ScrollBar scrollBar;
     @FXML private ComboBox<ParsedFileField> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleButton modeLive;
@@ -85,6 +87,10 @@ public class DocumentViewerController extends AbstractController<DocumentViewerV
             }
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
+
+        scrollBar.valueProperty().bindBidirectional(viewer.scrollYProperty());
+        scrollBar.maxProperty().bind(viewer.scrollYMaxProperty());
+
         mainPane.setCenter(viewer);
     }
 

@@ -41,7 +41,7 @@
                 </ToolBar>
             </top>
             <right>
-                <ScrollBar orientation="VERTICAL"/>
+                <ScrollBar orientation="VERTICAL" fx:id="scrollBar"/>
             </right>
             <bottom>
                 <ToolBar>

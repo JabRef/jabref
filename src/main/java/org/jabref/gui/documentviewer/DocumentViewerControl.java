@@ -5,7 +5,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.animation.FadeTransition;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -30,8 +32,9 @@ public class DocumentViewerControl extends StackPane {
     private TaskExecutor taskExecutor;
 
     private ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>(1);
+    private DoubleProperty scrollY = new SimpleDoubleProperty();
+    private DoubleProperty scrollYMax = new SimpleDoubleProperty();
     private VirtualFlow<DocumentPageViewModel, DocumentViewerPage> flow;
-
     public DocumentViewerControl(TaskExecutor taskExecutor) {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
@@ -39,6 +42,14 @@ public class DocumentViewerControl extends StackPane {
 
         // External changes to currentPage should result in scrolling to this page
         EasyBind.subscribe(currentPage, this::showPage);
+    }
+
+    public DoubleProperty scrollYMaxProperty() {
+        return scrollYMax;
+    }
+
+    public DoubleProperty scrollYProperty() {
+        return scrollY;
     }
 
     public int getCurrentPage() {
@@ -59,6 +70,11 @@ public class DocumentViewerControl extends StackPane {
         flow = VirtualFlow.createVertical(document.getPages(), DocumentViewerPage::new);
         getChildren().setAll(flow);
         flow.visibleCells().addListener((ListChangeListener<? super DocumentViewerPage>) c -> updateCurrentPage(flow.visibleCells()));
+
+        // (Bidirectional) binding does not work, so use listeners instead
+        flow.estimatedScrollYProperty().addListener((observable, oldValue, newValue) -> scrollY.setValue(newValue));
+        scrollY.addListener((observable, oldValue, newValue) -> flow.estimatedScrollYProperty().setValue((double) newValue));
+        flow.totalLengthEstimateProperty().addListener((observable, oldValue, newValue) -> scrollYMax.setValue(newValue));
     }
 
     private void updateCurrentPage(ObservableList<DocumentViewerPage> visiblePages) {
