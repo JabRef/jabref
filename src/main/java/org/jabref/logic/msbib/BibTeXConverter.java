@@ -103,11 +103,11 @@ public class BibTeXConverter {
         return result;
     }
 
-    private static void addAuthor(Map<String, String> map, String type, List<PersonName> authors) {
+    private static void addAuthor(Map<String, String> map, String type, List<MsBibAuthor> authors) {
         if (authors == null) {
             return;
         }
-        String allAuthors = authors.stream().map(PersonName::getFullname).collect(Collectors.joining(" and "));
+        String allAuthors = authors.stream().map(MsBibAuthor::getLastFirst).collect(Collectors.joining(" and "));
 
         map.put(type, allAuthors);
     }
