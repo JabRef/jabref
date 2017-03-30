@@ -54,6 +54,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed and improved the auto detection of the OpenOffice and LibreOffice connection
 - Entries with a single corporate author are now correclty exported to the corresponding `corporate` author field in MS-Office XML. [#1497](https://github.com/JabRef/jabref/issues/1497)
 - Improved author handling in MS-Office Import/Export
+- The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
