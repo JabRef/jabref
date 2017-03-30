@@ -2,8 +2,9 @@ package org.jabref.logic.msbib;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -109,21 +110,19 @@ public class MSBibConverter {
         return result;
     }
 
-    private static List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new ArrayList<>();
+    private static List<MsBibAuthor> getAuthors(String authors) {
+        List<MsBibAuthor> result = new ArrayList<>();
+        boolean corporate = false;
+        //Only one corporate authors is supported
         if (authors.startsWith("{") && authors.endsWith("}")) {
-            result.add(new PersonName(authors, true));
-            return result;
+            corporate = true;
+        }
+        AuthorList authorList = AuthorList.parse(authors);
+
+        for (Author author : authorList.getAuthors()) {
+            result.add(new MsBibAuthor(author, corporate));
         }
 
-        if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
-            String[] names = authors.split(" (?i)and ");
-            for (String name : names) {
-                result.add(new PersonName(name));
-            }
-        } else {
-            result.add(new PersonName(authors));
-        }
         return result;
     }
 
