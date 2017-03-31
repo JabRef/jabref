@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
@@ -108,5 +109,10 @@ public class Linux implements NativeDesktop {
     @Override
     public String detectProgramPath(String programName, String directoryName) {
         return programName;
+    }
+
+    @Override
+    public Path getApplicationDirectory() {
+        return Paths.get("/usr/lib/");
     }
 }

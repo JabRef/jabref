@@ -34,6 +34,10 @@ public class DefaultTaskExecutor implements TaskExecutor {
         }
     }
 
+    public static void runInJavaFXThread(Runnable runnable) {
+        Platform.runLater(runnable);
+    }
+
     @Override
     public <V> void execute(BackgroundTask<V> task) {
         executor.submit(getJavaFXTask(task));
@@ -74,5 +78,4 @@ public class DefaultTaskExecutor implements TaskExecutor {
             return new Exception(throwable);
         }
     }
-
 }

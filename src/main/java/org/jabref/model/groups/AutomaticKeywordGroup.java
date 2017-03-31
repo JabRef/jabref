@@ -1,5 +1,6 @@
 package org.jabref.model.groups;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +31,20 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     @Override
     public AbstractGroup deepCopy() {
         return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordSeperator);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
+        return Objects.equals(keywordSeperator, that.keywordSeperator) &&
+                Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keywordSeperator, field);
     }
 
     @Override

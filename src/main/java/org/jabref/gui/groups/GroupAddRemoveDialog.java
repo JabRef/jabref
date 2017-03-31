@@ -47,7 +47,6 @@ public class GroupAddRemoveDialog implements BaseAction {
     private List<BibEntry> selection;
     private JTree tree;
 
-
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
         this.panel = panel;
         this.add = add;
@@ -198,7 +197,6 @@ public class GroupAddRemoveDialog implements BaseAction {
     private boolean checkGroupEnable(GroupTreeNodeViewModel node) {
         return (add ? node.canAddEntries(selection) : node.canRemoveEntries(selection));
     }
-
 
     class AddRemoveGroupTreeCellRenderer extends GroupTreeCellRenderer {
 

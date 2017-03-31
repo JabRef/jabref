@@ -218,7 +218,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.indent_switchstatements_compare_to_cases=true
         org.eclipse.jdt.core.formatter.indent_switchstatements_compare_to_switch=false
         org.eclipse.jdt.core.formatter.indentation.size=4
-        org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_field=insert
+        org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_field=do not insert
         org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_local_variable=insert
         org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_method=insert
         org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_package=insert
@@ -454,7 +454,7 @@ tasks.eclipse.doFirst {
             cleanup.make_variable_declarations_final=true
             cleanup.never_use_blocks=false
             cleanup.never_use_parentheses_in_expressions=false
-            cleanup.organize_imports=false
+            cleanup.organize_imports=true
             cleanup.qualify_static_field_accesses_with_declaring_class=true
             cleanup.qualify_static_member_accesses_through_instances_with_declaring_class=false
             cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class=false

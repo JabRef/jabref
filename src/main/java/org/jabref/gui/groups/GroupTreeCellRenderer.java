@@ -28,7 +28,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private List<GroupTreeNode> matchingGroups = new ArrayList<>();
     private Object highlightBorderCell;
 
-
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
             int row, boolean tmpHasFocus) {
@@ -96,7 +95,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     private boolean printInRed(GroupTreeNodeViewModel viewModel) {
-        if(viewModel.isAllEntriesGroup()) {
+        if (viewModel.isAllEntriesGroup()) {
             // Do not print all entries group in red
             return false;
         }
@@ -105,7 +104,7 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     private boolean printUnderlined(GroupTreeNodeViewModel viewModel) {
-        if(viewModel.isAllEntriesGroup()) {
+        if (viewModel.isAllEntriesGroup()) {
             // Do not underline all entries group
             return false;
         }

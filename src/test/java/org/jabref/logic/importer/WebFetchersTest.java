@@ -1,14 +1,9 @@
-package org.jabref.gui.importer.fetcher;
+package org.jabref.logic.importer;
 
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.EntryBasedFetcher;
-import org.jabref.logic.importer.EntryBasedParserFetcher;
-import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaChimboriFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
@@ -21,7 +16,7 @@ import org.reflections.Reflections;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
-public class EntryFetchersTest {
+public class WebFetchersTest {
 
     Reflections reflections = new Reflections("org.jabref");
     ImportFormatPreferences importFormatPreferences;
@@ -32,8 +27,8 @@ public class EntryFetchersTest {
     }
 
     @Test
-    public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
-        List<IdBasedFetcher> idFetchers = EntryFetchers.getIdFetchers(importFormatPreferences);
+    public void getIdBasedFetchersReturnsAllFetcherDerivingFromIdBasedFetcher() throws Exception {
+        List<IdBasedFetcher> idFetchers = WebFetchers.getIdBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends IdBasedFetcher>> expected = reflections.getSubTypesOf(IdBasedFetcher.class);
         expected.remove(AbstractIsbnFetcher.class);
@@ -46,11 +41,29 @@ public class EntryFetchersTest {
 
     @Test
     public void getEntryBasedFetchersReturnsAllFetcherDerivingFromEntryBasedFetcher() throws Exception {
-        List<EntryBasedFetcher> idFetchers = EntryFetchers.getEntryBasedFetchers(importFormatPreferences);
+        List<EntryBasedFetcher> idFetchers = WebFetchers.getEntryBasedFetchers(importFormatPreferences);
 
         Set<Class<? extends EntryBasedFetcher>> expected = reflections.getSubTypesOf(EntryBasedFetcher.class);
         expected.remove(EntryBasedParserFetcher.class);
         expected.remove(MrDLibFetcher.class);
+        assertEquals(expected, getClasses(idFetchers));
+    }
+
+    @Test
+    public void getSearchBasedFetchersReturnsAllFetcherDerivingFromSearchBasedFetcher() throws Exception {
+        List<SearchBasedFetcher> idFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
+
+        Set<Class<? extends SearchBasedFetcher>> expected = reflections.getSubTypesOf(SearchBasedFetcher.class);
+        expected.remove(SearchBasedParserFetcher.class);
+        assertEquals(expected, getClasses(idFetchers));
+    }
+
+    @Test
+    public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
+        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers();
+
+        Set<Class<? extends IdFetcher>> expected = reflections.getSubTypesOf(IdFetcher.class);
+        expected.remove(IdParserFetcher.class);
         assertEquals(expected, getClasses(idFetchers));
     }
 

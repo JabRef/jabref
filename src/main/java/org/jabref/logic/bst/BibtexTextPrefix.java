@@ -16,6 +16,9 @@ package org.jabref.logic.bst;
  */
 public class BibtexTextPrefix {
 
+    private BibtexTextPrefix() {
+    }
+
     /**
      *
      * @param numOfChars

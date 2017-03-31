@@ -33,6 +33,9 @@ public class ExportAction {
 
     private static final Log LOGGER = LogFactory.getLog(ExportAction.class);
 
+    private ExportAction() {
+    }
+
 
     /**
      * Create an AbstractAction for performing an export operation.

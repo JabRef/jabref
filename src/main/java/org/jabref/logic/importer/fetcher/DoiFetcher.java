@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -21,6 +20,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     public static final String name = "DOI";
@@ -62,7 +62,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Invalid URL"), e);
+            throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
         }

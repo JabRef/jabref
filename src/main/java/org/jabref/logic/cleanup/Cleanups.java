@@ -56,6 +56,9 @@ public class Cleanups {
         RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBiblatexFormatters);
     }
 
+    private Cleanups() {
+    }
+
     public static List<Formatter> getAvailableFormatters() {
         return Collections.unmodifiableList(availableFormatters);
     }

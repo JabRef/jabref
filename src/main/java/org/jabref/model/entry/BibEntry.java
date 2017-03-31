@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
@@ -36,49 +37,38 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
-    private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
     public static final String KEY_FIELD = "bibtexkey";
-    protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
-
+    protected static final String ID_FIELD = "id";
+    private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
-
-    private String id;
-
     private final SharedBibEntryData sharedBibEntryData;
-
-    private String type;
-    private Map<String, String> fields = new ConcurrentHashMap<>();
-
     /**
      * Map to store the words in every field
      */
     private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
-
     /**
      * Cache that stores latex free versions of fields.
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
-
+    private final EventBus eventBus = new EventBus();
+    private String id;
+    private String type;
+    private Map<String, String> fields = new ConcurrentHashMap<>();
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
-
     private String parsedSerialization;
-
     private String commentsBeforeEntry = "";
-
     /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
-
-    private final EventBus eventBus = new EventBus();
 
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
@@ -112,7 +102,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
-                                                 Character keywordDelimiter) {
+            Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         if (newValue.isPresent()) {
             keywordList.replaceAll(keywordsToReplace, newValue.get());
@@ -163,6 +153,13 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * Returns this entry's ID.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
      * Sets this entry's ID, provided the database containing it
      * doesn't veto the change.
      *
@@ -179,29 +176,22 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns this entry's ID.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Sets the cite key AKA citation key AKA BibTeX key.
-     * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
-     *
-     * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
-     */
-    public void setCiteKey(String newCiteKey) {
-        setField(KEY_FIELD, newCiteKey);
-    }
-
-    /**
      * Returns the cite key AKA citation key AKA BibTeX key, or null if it is not set.
      * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      */
     @Deprecated
     public String getCiteKey() {
         return fields.get(KEY_FIELD);
+    }
+
+    /**
+     * Sets the cite key AKA citation key AKA BibTeX key. Note: This is <emph>not</emph> the internal Id of this entry.
+     * The internal Id is always present, whereas the BibTeX key might not be present.
+     *
+     * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+     */
+    public void setCiteKey(String newCiteKey) {
+        setField(KEY_FIELD, newCiteKey);
     }
 
     public Optional<String> getCiteKeyOptional() {
@@ -217,6 +207,13 @@ public class BibEntry implements Cloneable {
      */
     public String getType() {
         return type;
+    }
+
+    /**
+     * Sets this entry's type.
+     */
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -244,13 +241,6 @@ public class BibEntry implements Cloneable {
      */
     public void setType(String type) {
         setType(type, EntryEventSource.LOCAL);
-    }
-
-    /**
-     * Sets this entry's type.
-     */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
     }
 
     /**
@@ -311,7 +301,8 @@ public class BibEntry implements Cloneable {
         if (FieldName.DATE.equals(name)) {
             Optional<String> year = getFieldInterface.getValueForField(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
+                MonthUtil.Month month = MonthUtil
+                        .getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -319,7 +310,7 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
+        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name) || FieldName.DAY.equals(name)) {
             Optional<String> date = getFieldInterface.getValueForField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
@@ -332,7 +323,6 @@ public class BibEntry implements Cloneable {
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
                 final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
-
 
                 @Override
                 public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
@@ -358,6 +348,9 @@ public class BibEntry implements Cloneable {
                 if (FieldName.MONTH.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
                 }
+                if (FieldName.DAY.equals(name)) {
+                    return Optional.of(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+                }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
                 df = new SimpleDateFormat("yyyy");
@@ -378,8 +371,8 @@ public class BibEntry implements Cloneable {
         return Optional.empty();
     }
 
-    private interface GetFieldInterface {
-        Optional<String> getValueForField(String fieldName);
+    public Optional<DOI> getDOI() {
+        return getField(FieldName.DOI).flatMap(DOI::build);
     }
 
     /**
@@ -611,7 +604,7 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
+        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
                 getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
@@ -652,13 +645,13 @@ public class BibEntry implements Cloneable {
         return year;
     }
 
+    public String getParsedSerialization() {
+        return parsedSerialization;
+    }
+
     public void setParsedSerialization(String parsedSerialization) {
         changed = false;
         this.parsedSerialization = parsedSerialization;
-    }
-
-    public String getParsedSerialization() {
-        return parsedSerialization;
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
@@ -847,6 +840,11 @@ public class BibEntry implements Cloneable {
         }
 
         return this.setField(FieldName.FILE, newValue);
+    }
+
+    private interface GetFieldInterface {
+
+        Optional<String> getValueForField(String fieldName);
     }
 
 }

@@ -42,9 +42,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.clipBoardManager = Objects.requireNonNull(clipBoardManager);
         this.buildInfo = Objects.requireNonNull(buildInfo);
-
-        ObservableList<LogEventViewModel> eventViewModels =
-                new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
+        ObservableList<LogEventViewModel> eventViewModels = new MappedList<>(LogMessages.getInstance().getMessages(), LogEventViewModel::new);
         allMessagesData = new ReadOnlyListWrapper<>(eventViewModels);
     }
 
@@ -79,6 +77,13 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
         }
         clipBoardManager.setClipboardContents(getLogMessagesAsString(messages));
         dialogService.notify(Localization.lang("Log copied to clipboard."));
+    }
+
+    /**
+     * Clears the current log
+     */
+    public void clearLog() {
+        LogMessages.getInstance().clear();
     }
 
     /**

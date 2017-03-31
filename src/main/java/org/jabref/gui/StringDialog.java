@@ -39,6 +39,7 @@ import org.jabref.gui.undo.UndoableInsertString;
 import org.jabref.gui.undo.UndoableRemoveString;
 import org.jabref.gui.undo.UndoableStringChange;
 import org.jabref.gui.util.WindowLocation;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import org.jabref.logic.help.HelpFile;
@@ -50,11 +51,10 @@ import org.jabref.preferences.JabRefPreferences;
 
 class StringDialog extends JDialog {
 
+    private static final String STRINGS_TITLE = Localization.lang("Strings for library");
     // A reference to the entry this object works on.
     private final BibDatabase base;
     private final BasePanel panel;
-    private List<BibtexString> strings;
-
     private final StringTable table;
     private final HelpAction helpAction;
 
@@ -62,8 +62,7 @@ class StringDialog extends JDialog {
 
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
-
-    private static final String STRINGS_TITLE = Localization.lang("Strings for library");
+    private List<BibtexString> strings;
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
@@ -147,6 +146,62 @@ class StringDialog extends JDialog {
         pw.displayWindowAtStoredLocation();
     }
 
+    private static boolean isNumber(String name) {
+        // A pure integer number cannot be used as a string label,
+        // since Bibtex will read it as a number.
+        try {
+            Integer.parseInt(name);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
+    private void sortStrings() {
+        // Rebuild our sorted set of strings:
+        strings = new ArrayList<>();
+        for (String s : base.getStringKeySet()) {
+            strings.add(base.getString(s));
+        }
+        Collections.sort(strings, new BibtexStringComparator(false));
+    }
+
+    public void refreshTable() {
+        sortStrings();
+        table.revalidate();
+        table.clearSelection();
+        table.repaint();
+    }
+
+    public void saveDatabase() {
+        panel.runCommand(Actions.SAVE);
+    }
+
+    public void assureNotEditing() {
+        if (table.isEditing()) {
+            int col = table.getEditingColumn();
+            int row = table.getEditingRow();
+            table.getCellEditor(row, col).stopCellEditing();
+        }
+    }
+
+    static class SaveDatabaseAction extends AbstractAction {
+
+        private final StringDialog parent;
+
+
+        public SaveDatabaseAction(StringDialog parent) {
+            super("Save library", IconTheme.JabRefIcon.SAVE.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save library"));
+            this.parent = parent;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            parent.saveDatabase();
+        }
+    }
+
     class StringTable extends JTable {
 
         private final JScrollPane sp = new JScrollPane(this);
@@ -175,28 +230,6 @@ class StringDialog extends JDialog {
         }
 
     }
-
-
-    private void sortStrings() {
-        // Rebuild our sorted set of strings:
-        strings = new ArrayList<>();
-        for (String s : base.getStringKeySet()) {
-            strings.add(base.getString(s));
-        }
-        Collections.sort(strings, new BibtexStringComparator(false));
-    }
-
-    public void refreshTable() {
-        sortStrings();
-        table.revalidate();
-        table.clearSelection();
-        table.repaint();
-    }
-
-    public void saveDatabase() {
-        panel.runCommand(Actions.SAVE);
-    }
-
 
     class StringTableModel extends AbstractTableModel {
 
@@ -249,7 +282,7 @@ class StringDialog extends JDialog {
                     try {
                         new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                                 .format((String) value, "__dummy");
-                    } catch (IllegalArgumentException ex) {
+                    } catch (InvalidFieldValueException ex) {
                         return;
                     }
                     // Store undo information.
@@ -283,30 +316,6 @@ class StringDialog extends JDialog {
             return true;
         }
     }
-
-
-    private static boolean isNumber(String name) {
-        // A pure integer number cannot be used as a string label,
-        // since Bibtex will read it as a number.
-        try {
-            Integer.parseInt(name);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-
-    }
-
-    public void assureNotEditing() {
-        if (table.isEditing()) {
-            int col = table.getEditingColumn();
-            int row = table.getEditingRow();
-            table.getCellEditor(row, col).stopCellEditing();
-        }
-    }
-
-
-
 
     class CloseAction extends AbstractAction {
 
@@ -368,25 +377,6 @@ class StringDialog extends JDialog {
                         Localization.lang("A string with that label already exists"),
                         Localization.lang("Label"), JOptionPane.ERROR_MESSAGE);
             }
-        }
-    }
-
-
-
-    static class SaveDatabaseAction extends AbstractAction {
-
-        private final StringDialog parent;
-
-
-        public SaveDatabaseAction(StringDialog parent) {
-            super("Save library", IconTheme.JabRefIcon.SAVE.getIcon());
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Save library"));
-            this.parent = parent;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            parent.saveDatabase();
         }
     }
 

@@ -10,6 +10,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 
+    private CustomEntryTypesManager() {
+    }
+
     /**
      * Iterate through all entry types, and store those that are
      * custom defined to preferences. This method is called from

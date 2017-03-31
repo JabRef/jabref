@@ -3,17 +3,18 @@ package org.jabref.gui.openoffice;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -33,15 +34,21 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -52,6 +59,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -77,7 +85,6 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
@@ -102,12 +109,9 @@ public class OpenOfficePanel extends AbstractWorker {
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
-    private boolean autoDetected;
-    private String sOffice;
     private IOException connectException;
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
-
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
@@ -360,78 +364,41 @@ public class OpenOfficePanel extends AbstractWorker {
         return databases;
     }
 
-    private void connect(boolean auto) {
-        String ooJarsDirectory;
-        if (auto) {
-            AutoDetectPaths adp = new AutoDetectPaths(diag, preferences);
-            if (adp.runAutodetection()) {
-                autoDetected = true;
-                dialogOkPressed = true;
-                diag.dispose();
-            } else if (adp.canceled()) {
-                frame.setStatus(Localization.lang("Operation canceled."));
-            } else {
+    private void connect(boolean autoDetect) {
+        if (autoDetect) {
+            DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(diag, preferences);
+
+            if (!officeInstallation.isInstalled()) {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
-            }
-            if (!autoDetected) {
                 return;
             }
-
-            ooJarsDirectory = preferences.getJarsPath();
-            sOffice = preferences.getExecutablePath();
-        } else { // Manual connect
-
-            showConnectDialog();
+            diag.dispose();
+        } else {
+            showManualConnectionDialog();
             if (!dialogOkPressed) {
                 return;
             }
-
-            String ooPath = preferences.getOOPath();
-            String ooJars = preferences.getJarsPath();
-            sOffice = preferences.getExecutablePath();
-
-            if (OS.WINDOWS) {
-                ooJarsDirectory = ooPath + OpenOfficePreferences.WINDOWS_JARS_SUBPATH;
-                sOffice = ooPath + OpenOfficePreferences.WINDOWS_EXECUTABLE_SUBPATH
-                        + OpenOfficePreferences.WINDOWS_EXECUTABLE;
-            } else if (OS.OS_X) {
-                sOffice = ooPath + OpenOfficePreferences.OSX_EXECUTABLE_SUBPATH + OpenOfficePreferences.OSX_EXECUTABLE;
-                ooJarsDirectory = ooPath + OpenOfficePreferences.OSX_JARS_SUBPATH;
-            } else {
-                // Linux:
-                ooJarsDirectory = ooJars + "/program/classes";
-            }
         }
 
-        // Add OO JARs to the classpath:
+        JDialog progressDialog = null;
+
         try {
-            List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
-                    new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),
-                    new File(ooJarsDirectory, "ridl.jar"));
-            List<URL> jarList = new ArrayList<>(jarFiles.size());
-            for (File jarFile : jarFiles) {
-                if (!jarFile.exists()) {
-                    throw new IOException("File not found: " + jarFile.getPath());
-                }
-                jarList.add(jarFile.toURI().toURL());
-            }
-            addURL(jarList);
+            // Add OO JARs to the classpath
+            loadOpenOfficeJars(Paths.get(preferences.getInstallationPath()));
 
             // Show progress dialog:
-            final JDialog progDiag = new AutoDetectPaths(diag, preferences).showProgressDialog(diag,
-                    Localization.lang("Connecting"),
-                    Localization.lang("Please wait..."), false);
+            progressDialog = new DetectOpenOfficeInstallation(diag, preferences)
+                    .showProgressDialog(diag, Localization.lang("Connecting"), Localization.lang("Please wait..."));
             getWorker().run(); // Do the actual connection, using Spin to get off the EDT.
-            progDiag.dispose();
+            progressDialog.dispose();
             diag.dispose();
             if (ooBase == null) {
                 throw connectException;
             }
 
             if (ooBase.isConnectedToDocument()) {
-                frame.output(Localization.lang("Connected to document") + ": "
-                        + ooBase.getCurrentDocumentTitle().orElse(""));
+                frame.output(Localization.lang("Connected to document") + ": " + ooBase.getCurrentDocumentTitle().orElse(""));
             }
 
             // Enable actions that depend on Connect:
@@ -457,14 +424,32 @@ public class OpenOfficePanel extends AbstractWorker {
                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
                             + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
+        } finally {
+            if (progressDialog != null) {
+                progressDialog.dispose();
+            }
         }
+    }
+
+    private void loadOpenOfficeJars(Path configurationPath) throws IOException {
+        List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
+
+        if (!filePaths.stream().allMatch(Optional::isPresent)) {
+            throw new IOException("(Not all) required Open Office Jars were found inside installation path.");
+        }
+
+        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size());
+        for (Optional<Path> jarPath : filePaths) {
+            jarURLs.add((jarPath.get().toUri().toURL()));
+        }
+        addURL(jarURLs);
     }
 
     @Override
     public void run() {
         try {
-            // Connect:
-            ooBase = new OOBibBase(sOffice, true);
+            // Connect
+            ooBase = new OOBibBase(preferences.getExecutablePath(), true);
         } catch (UnknownPropertyException |
                 CreationException | NoSuchElementException | WrappedTargetException | IOException |
                 NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
@@ -473,18 +458,11 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-
-
-    // The methods addFile and associated final Class[] parameters were gratefully copied from
-    // anthony_miguel @ http://forum.java.sun.com/thread.jsp?forum=32&thread=300557&tstart=0&trange=15
-    private static final Class<?>[] CLASS_PARAMETERS = new Class[] {URL.class};
-
-
     private static void addURL(List<URL> jarList) throws IOException {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> sysclass = URLClassLoader.class;
         try {
-            Method method = sysclass.getDeclaredMethod("addURL", CLASS_PARAMETERS);
+            Method method = sysclass.getDeclaredMethod("addURL", (Class<?>[]) new Class[] {URL.class});
             method.setAccessible(true);
             for (URL anU : jarList) {
                 method.invoke(sysloader, anU);
@@ -497,18 +475,25 @@ public class OpenOfficePanel extends AbstractWorker {
         }
     }
 
-
-    private void showConnectDialog() {
-
+    private void showManualConnectionDialog() {
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
+        final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
+
+        final DialogService dirDialog = new FXDialogService();
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(nativeDesktop.getApplicationDirectory()).build();
+        DialogService fileDialog = new FXDialogService();
 
         // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
-        ooPath.setText(preferences.getOOPath());
+        ooPath.setText(preferences.getInstallationPath());
         browseOOPath.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
                         .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
         );
 
@@ -516,7 +501,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
         browseOOExec.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedFile()
+                DefaultTaskExecutor.runInJavaFXThread(() -> fileDialog.showFileOpenDialog(fileDialogConfiguration))
                         .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
         );
 
@@ -524,13 +509,13 @@ public class OpenOfficePanel extends AbstractWorker {
         ooJars.setText(preferences.getJarsPath());
         JButton browseOOJars = new JButton(Localization.lang("Browse"));
         browseOOJars.addActionListener(e ->
-                new FileDialog(frame).showDialogAndGetSelectedFile()
+                DefaultTaskExecutor.runInJavaFXThread(() -> dirDialog.showDirectorySelectionDialog(dirDialogConfiguration))
                         .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
         );
 
         FormBuilder builder = FormBuilder.create()
-                .layout(
-                        new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
+                .layout(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, fill:pref", "pref"));
+
         if (OS.WINDOWS || OS.OS_X) {
             builder.add(Localization.lang("Path to OpenOffice/LibreOffice directory")).xy(1, 1);
             builder.add(ooPath).xy(3, 1);
@@ -549,21 +534,16 @@ public class OpenOfficePanel extends AbstractWorker {
 
         cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
 
-        ActionListener tfListener = e -> {
-            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
-            cDiag.dispose();
-        };
-
-        ooPath.addActionListener(tfListener);
-        ooExec.addActionListener(tfListener);
-        ooJars.addActionListener(tfListener);
-
         // Buttons
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
 
         ok.addActionListener(e -> {
-            preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            if (OS.WINDOWS || OS.OS_X) {
+                preferences.updateConnectionParams(ooPath.getText(), ooPath.getText(), ooPath.getText());
+            } else {
+                preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
+            }
             dialogOkPressed = true;
             cDiag.dispose();
         });
@@ -578,11 +558,10 @@ public class OpenOfficePanel extends AbstractWorker {
         bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
 
-        // Finish and show dialog
+        // Finish and show dirDialog
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);
-
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {

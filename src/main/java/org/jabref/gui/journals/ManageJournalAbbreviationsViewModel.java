@@ -164,7 +164,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 .addExtensionFilter(FileExtensions.TXT)
                 .build();
 
-        dialogService.showSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
+        dialogService.showFileSaveDialog(fileDialogConfiguration).ifPresent(this::openFile);
     }
 
     /**
@@ -196,7 +196,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                 .addExtensionFilter(FileExtensions.TXT)
                 .build();
 
-        dialogService.showOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(this::openFile);
     }
 
     /**

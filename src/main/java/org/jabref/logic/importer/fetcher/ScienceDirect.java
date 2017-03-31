@@ -5,10 +5,11 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.identifier.DOI;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -48,7 +49,7 @@ public class ScienceDirect implements FulltextFetcher {
                 // scrape the web page not as mobile client!
                 if (!sciLink.isEmpty()) {
                     Document html = Jsoup.connect(sciLink)
-                            .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                            .userAgent(URLDownload.USER_AGENT)
                             .referrer("http://www.google.com")
                             .ignoreHttpErrors(true).get();
 

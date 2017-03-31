@@ -14,8 +14,11 @@
 <b:NameList>
 <b:Person>
 <b:Last>Czarnecki</b:Last>
-<b:Middle>and Orłowski, Cezary</b:Middle>
 <b:First>Adam</b:First>
+</b:Person>
+<b:Person>
+<b:Last>Orłowski</b:Last>
+<b:First>Cezary</b:First>
 </b:Person>
 </b:NameList>
 </b:Author>

@@ -31,7 +31,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
     /** Removal of a node and all of its children. */
     public static final int REMOVE_NODE_AND_CHILDREN = 2;
 
-
     /**
      * Creates an object that can undo/redo an edit event.
      *
@@ -62,7 +61,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
         m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();
     }
 
-
     @Override
     public String getPresentationName() {
         switch (m_editType) {
@@ -77,7 +75,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
         }
         return "? (" + Localization.lang("unknown edit") + ")";
     }
-
 
     @Override
     public void undo() {

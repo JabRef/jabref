@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -119,23 +120,19 @@ import java.util.stream.Collectors;
  */
 public class AuthorList {
 
+    private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
+    // Avoid partition where these values are contained
+    private final static Collection<String> avoidTermsInLowerCase = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
-
-    // Variables for storing computed strings, so they only need to be created once:
-    private String authorsNatbib;
-    private String authorsFirstFirstAnds;
-    private String authorsAlph;
-
     private final String[] authorsFirstFirst = new String[4];
     private final String[] authorsLastOnly = new String[2];
     private final String[] authorLastFirstAnds = new String[2];
     private final String[] authorsLastFirst = new String[4];
     private final String[] authorsLastFirstFirstLast = new String[2];
-
-    private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
-
-    // Avoid partition where these values are contained
-    private final static Collection<String> avoidTermsInLowerCase = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+    // Variables for storing computed strings, so they only need to be created once:
+    private String authorsNatbib;
+    private String authorsFirstFirstAnds;
+    private String authorsAlph;
 
     /**
      * Creates a new list of authors.
@@ -151,6 +148,10 @@ public class AuthorList {
 
     protected AuthorList(Author author) {
         this(Collections.singletonList(author));
+    }
+
+    public AuthorList() {
+        this(new ArrayList<Author>());
     }
 
     /**
@@ -283,6 +284,37 @@ public class AuthorList {
      */
     public static String fixAuthorNatbib(String authors) {
         return AuthorList.parse(authors).getAsNatbib();
+    }
+
+    /**
+     * Builds a new array of strings with stringbuilder.
+     * Regarding to the name affixes.
+     *
+     * @return New string with correct seperation
+     */
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+        int avoidedTimes = 0;
+        for (int i = 0; i < nameList.size(); i++) {
+            if (indexArray.contains(i)) {
+                // We hit a name affix
+                stringBuilder.append(nameList.get(i));
+                stringBuilder.append(',');
+                avoidedTimes++;
+            } else {
+                stringBuilder.append(nameList.get(i));
+                if (((i + avoidedTimes) % 2) == 0) {
+                    // Hit separation between last name and firstname --> comma has to be kept
+                    stringBuilder.append(',');
+                } else {
+                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
+                    // Will be treated correctly by AuthorList.parse(authors);
+                    stringBuilder.append(';');
+                }
+            }
+        }
+        return stringBuilder;
     }
 
     /**
@@ -554,7 +586,6 @@ public class AuthorList {
         return authorsFirstFirst[abbrInt];
     }
 
-
     /**
      * Compare this object with the given one.
      * <p>
@@ -574,7 +605,6 @@ public class AuthorList {
     public int hashCode() {
         return Objects.hash(authors);
     }
-
 
     /**
      * Returns the list of authors separated by "and"s with first names before
@@ -624,34 +654,7 @@ public class AuthorList {
         return authorsAlph;
     }
 
-    /**
-     * Builds a new array of strings with stringbuilder.
-     * Regarding to the name affixes.
-     * @return New string with correct seperation
-     */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
-        int avoidedTimes = 0;
-        for (int i = 0; i < nameList.size(); i++) {
-            if (indexArray.contains(i)) {
-                // We hit a name affix
-                stringBuilder.append(nameList.get(i));
-                stringBuilder.append(',');
-                avoidedTimes++;
-            } else {
-                stringBuilder.append(nameList.get(i));
-                if (((i + avoidedTimes) % 2) == 0) {
-                    // Hit separation between last name and firstname --> comma has to be kept
-                    stringBuilder.append(',');
-                } else {
-                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
-                    // Will be treated correctly by AuthorList.parse(authors);
-                    stringBuilder.append(';');
-                }
-            }
-        }
-        return stringBuilder;
+    public void addAuthor(String first, String firstabbr, String von, String last, String jr) {
+        authors.add(new Author(first, firstabbr, von, last, jr));
     }
-
 }

@@ -56,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
 public class URLDownload {
     private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0";
+    public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
@@ -153,9 +153,6 @@ public class URLDownload {
              Writer output = new StringWriter()) {
             copy(input, output, encoding);
             return output.toString();
-        } catch (IOException e) {
-            LOGGER.warn("Could not copy input", e);
-            throw e;
         }
     }
 

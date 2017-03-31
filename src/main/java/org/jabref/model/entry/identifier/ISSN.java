@@ -1,4 +1,4 @@
-package org.jabref.logic.identifier;
+package org.jabref.model.entry.identifier;
 
 import java.util.Objects;
 import java.util.regex.Matcher;

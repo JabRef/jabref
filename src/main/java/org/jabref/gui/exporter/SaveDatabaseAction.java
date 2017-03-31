@@ -20,7 +20,6 @@ import org.jabref.gui.FileDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.worker.AbstractWorker;
-import org.jabref.gui.worker.CallBack;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -280,23 +279,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void runCommand() throws Exception {
-        // This part uses Spin's features:
-        Runnable worker = getWorker();
-        // The Worker returned by getWorker() has been wrapped
-        // by Spin.off(), which makes its methods be run in
-        // a different thread from the EDT.
-        CallBack callback = getCallBack();
-
-        init(); // This method runs in this same thread, the EDT.
-        // Useful for initial GUI actions, like printing a message.
-
-        // The CallBack returned by getCallBack() has been wrapped
-        // by Spin.over(), which makes its methods be run on
-        // the EDT.
-        worker.run(); // Runs the potentially time-consuming action
-        // without freezing the GUI. The magic is that THIS line
-        // of execution will not continue until run() is finished.
-        callback.update(); // Runs the update() method on the EDT.
+        BasePanel.runWorker(this);
     }
 
     public void save() throws Exception {

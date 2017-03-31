@@ -3,6 +3,7 @@ package org.jabref.model.groups;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.matchers.AndMatcher;
@@ -20,16 +21,6 @@ public class GroupTreeNodeTest {
     private final List<BibEntry> entries = new ArrayList<>();
     private BibEntry entry;
 
-    @Before
-    public void setUp() throws Exception {
-        entries.clear();
-        entry = new BibEntry();
-        entries.add(entry);
-        entries.add(new BibEntry().withField("author", "author1 and author2"));
-        entries.add(new BibEntry().withField("author", "author1"));
-    }
-
-
     /**
      * Gets the marked node in the following tree of explicit groups:
      * Root
@@ -42,10 +33,6 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = root
                 .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT, ','));
         return parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
-    }
-
-    private GroupTreeNode getNodeInSimpleTree() {
-        return getNodeInSimpleTree(getRoot());
     }
 
     /**
@@ -98,12 +85,6 @@ public class GroupTreeNodeTest {
         return new ExplicitGroup(name, GroupHierarchyType.REFINING, ',');
     }
 
-    /*
-    public GroupTreeNode getNodeInComplexTree() {
-        return getNodeInComplexTree(new TreeNodeMock());
-    }
-    */
-
     /**
      * Gets the marked in the following tree:
      * Root
@@ -124,6 +105,25 @@ public class GroupTreeNodeTest {
     */
     public static GroupTreeNode getRoot() {
         return GroupTreeNode.fromGroup(new AllEntriesGroup("All entries"));
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        entries.clear();
+        entry = new BibEntry();
+        entries.add(entry);
+        entries.add(new BibEntry().withField("author", "author1 and author2"));
+        entries.add(new BibEntry().withField("author", "author1"));
+    }
+
+    /*
+    public GroupTreeNode getNodeInComplexTree() {
+        return getNodeInComplexTree(new TreeNodeMock());
+    }
+    */
+
+    private GroupTreeNode getNodeInSimpleTree() {
+        return getNodeInSimpleTree(getRoot());
     }
 
     @Test
@@ -267,5 +267,20 @@ public class GroupTreeNodeTest {
         node.setGroup(newGroup, true, true, entries);
 
         assertFalse(oldGroup.isMatch(entry));
+    }
+
+    @Test
+    public void getChildByPathFindsCorrectChildInSecondLevel() throws Exception {
+        GroupTreeNode root = getRoot();
+        GroupTreeNode child = getNodeInSimpleTree(root);
+
+        assertEquals(Optional.of(child), root.getChildByPath("ExplicitParent > ExplicitNode"));
+    }
+
+    @Test
+    public void getPathSimpleTree() throws Exception {
+        GroupTreeNode node = getNodeInSimpleTree();
+
+        assertEquals("ExplicitParent > ExplicitNode", node.getPath());
     }
 }
