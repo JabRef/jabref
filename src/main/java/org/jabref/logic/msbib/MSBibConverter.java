@@ -55,12 +55,13 @@ public class MSBibConverter {
             result.number = null;
         }
 
-        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
+        result.day = entry.getFieldOrAlias(FieldName.DAY).orElse(null);
         result.month = entry.getFieldOrAlias(FieldName.MONTH).orElse(null);
 
         if (!entry.getField(FieldName.YEAR).isPresent()) {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
+        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
 
         // Value must be converted
         //Currently only english is supported

@@ -297,6 +297,7 @@ class MSBibEntry {
         }
         addField(document, rootNode, "Year", year);
         addField(document, rootNode, "Month", month);
+        addField(document, rootNode, "Day", day);
 
         addField(document, rootNode, "JournalName", journalName);
         addField(document, rootNode, "PatentNumber", patentNumber);
