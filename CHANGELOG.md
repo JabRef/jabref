@@ -52,6 +52,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
 - Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
 - We fixed and improved the auto detection of the OpenOffice and LibreOffice connection
+- Entries with a single corporate author are now correclty exported to the corresponding `corporate` author field in MS-Office XML. [#1497](https://github.com/JabRef/jabref/issues/1497)
+- Improved author handling in MS-Office Import/Export
+- The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
 
 ### Fixed
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)

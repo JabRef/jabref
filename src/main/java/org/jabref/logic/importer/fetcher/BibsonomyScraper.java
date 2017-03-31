@@ -24,6 +24,9 @@ public class BibsonomyScraper {
 
     private static final Log LOGGER = LogFactory.getLog(BibsonomyScraper.class);
 
+    private BibsonomyScraper() {
+    }
+
     /**
      * Return a BibEntry by looking up the given url from the BibSonomy scraper.
      * @param entryUrl

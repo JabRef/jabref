@@ -23,6 +23,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -128,7 +129,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         try {
             URLConnection connection = getURLForQuery(query).openConnection();
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+            connection.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
             try(InputStream stream = connection.getInputStream()) {
                 List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 

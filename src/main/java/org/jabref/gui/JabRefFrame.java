@@ -62,7 +62,6 @@ import javax.swing.WindowConstants;
 import javafx.application.Platform;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
@@ -766,8 +765,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     private void tearDownJabRef(List<String> filenames) {
         Globals.stopBackgroundTasks();
-
-        JabRefExecutorService.INSTANCE.shutdownEverything();
+        Globals.shutdownThreadPools();
 
         dispose();
 

@@ -112,17 +112,18 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      * and add them to the list of journal abbreviation files.
      */
     void addBuiltInLists() {
-        BackgroundTask<List<Abbreviation>> loadBuiltIn = BackgroundTask
-                .run(JournalAbbreviationLoader::getBuiltInAbbreviations)
+        BackgroundTask
+                .wrap(JournalAbbreviationLoader::getBuiltInAbbreviations)
                 .onRunning(() -> isLoadingBuiltIn.setValue(true))
                 .onSuccess(result -> {
                     isLoadingBuiltIn.setValue(false);
                     addList(Localization.lang("JabRef built in list"), result);
                 })
-                .onFailure(dialogService::showErrorDialogAndWait);
+                .onFailure(dialogService::showErrorDialogAndWait)
+                .executeWith(taskExecutor);
 
-        BackgroundTask<List<Abbreviation>> loadIeee = BackgroundTask
-                .run(() -> {
+        BackgroundTask
+                .wrap(() -> {
                     if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
                         return JournalAbbreviationLoader.getOfficialIEEEAbbreviations();
                     } else {
@@ -134,10 +135,8 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
                     isLoadingIeee.setValue(false);
                     addList(Localization.lang("IEEE built in list"), result);
                 })
-                .onFailure(dialogService::showErrorDialogAndWait);
-
-        taskExecutor.execute(loadBuiltIn);
-        taskExecutor.execute(loadIeee);
+                .onFailure(dialogService::showErrorDialogAndWait)
+                .executeWith(taskExecutor);
     }
 
     private void addList(String name, List<Abbreviation> abbreviations) {

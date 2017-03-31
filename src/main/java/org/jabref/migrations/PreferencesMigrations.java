@@ -18,6 +18,9 @@ public class PreferencesMigrations {
 
     private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
 
+    private PreferencesMigrations() {
+    }
+
     /**
      * Migrate all preferences from net/sf/jabref to org/jabref
      */

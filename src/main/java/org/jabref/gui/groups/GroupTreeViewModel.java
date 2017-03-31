@@ -13,6 +13,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.groups.AbstractGroup;
@@ -25,13 +26,15 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ObjectProperty<GroupNodeViewModel> selectedGroup = new SimpleObjectProperty<>();
     private final StateManager stateManager;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private Optional<BibDatabaseContext> currentDatabase;
 
-    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService) {
+    public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.dialogService = Objects.requireNonNull(dialogService);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
         // Register listener
         stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
@@ -95,13 +98,12 @@ public class GroupTreeViewModel extends AbstractViewModel {
             GroupNodeViewModel newRoot = newDatabase
                     .map(BibDatabaseContext::getMetaData)
                     .flatMap(MetaData::getGroups)
-                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, root))
-                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager));
+                    .map(root -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root))
+                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor));
 
             rootGroup.setValue(newRoot);
             stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
-                    selectedGroup -> this.selectedGroup
-                            .setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, selectedGroup)));
+                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup)));
         }
 
         currentDatabase = newDatabase;

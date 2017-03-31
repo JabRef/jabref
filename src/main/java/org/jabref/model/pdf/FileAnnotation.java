@@ -1,23 +1,27 @@
 package org.jabref.model.pdf;
 
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
-public final class FileAnnotation {
+public class FileAnnotation {
 
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+    private static final String DATE_TIME_STRING = "^D:\\d{14}$";
+    private static final String DATE_TIME_STRING_WITH_TIME_ZONE = "^D:\\d{14}\\+.+";
+    private static final String ANNOTATION_DATE_FORMAT = "yyyyMMddHHmmss";
+
     private final String author;
     private final LocalDateTime timeModified;
     private final int page;
     private final String content;
-    private final String annotationType;
+    private final FileAnnotationType annotationType;
     private final Optional<FileAnnotation> linkedFileAnnotation;
-
 
     /**
      * A flexible constructor, mainly used as dummy if there is actually no annotation.
@@ -29,7 +33,7 @@ public final class FileAnnotation {
      * @param annotationType the type of the annotation
      */
     public FileAnnotation(final String author, final LocalDateTime timeModified, final int pageNumber,
-                          final String content, final String annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
+                          final String content, final FileAnnotationType annotationType, final Optional<FileAnnotation> linkedFileAnnotation) {
         this.author = author;
         this.timeModified = timeModified;
         this.page = pageNumber;
@@ -47,20 +51,20 @@ public final class FileAnnotation {
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getDictionary().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.empty());
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
     }
 
     /**
      * For creating a FileAnnotation that has a connection to another FileAnnotation. Needed when creating a text
-     * highlight annotation with a sticky note.
+     * highlighted or underlined annotation with a sticky note.
      *
      * @param annotation           The actual annotation that holds the information
      * @param pageNumber           The page of the pdf where the annotation occurs
-     * @param linkedFileAnnotation The corresponding note of a highlighted text area.
+     * @param linkedFileAnnotation The corresponding note of a marked text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), annotation.getSubtype(), Optional.of(linkedFileAnnotation));
+                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.of(linkedFileAnnotation));
     }
 
     /**
@@ -74,14 +78,22 @@ public final class FileAnnotation {
             return LocalDateTime.now();
         }
 
-        return LocalDateTime.parse(dateTimeString.substring(2), DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        if (dateTimeString.matches(DATE_TIME_STRING_WITH_TIME_ZONE)) {
+            dateTimeString = dateTimeString.substring(2, 16);
+        } else if (dateTimeString.matches(DATE_TIME_STRING)) {
+            dateTimeString = dateTimeString.substring(2);
+        }
+
+        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern(ANNOTATION_DATE_FORMAT));
     }
 
     private String parseContent(final String content) {
         if (content == null) {
             return "";
         }
-        if (content.trim().equals("þÿ")) {
+
+        final String unreadableContent = "þÿ";
+        if (content.trim().equals(unreadableContent)) {
             return "";
         }
 
@@ -101,19 +113,33 @@ public final class FileAnnotation {
         return annotationName;
     }
 
-
     @Override
     public String toString() {
-        if (this.hasLinkedAnnotation()) {
-            if (this.content.isEmpty()) {
-                return "Empty Highlight";
-            }
-            return abbreviateAnnotationName("Highlight: " + content);
-        }
-
         return abbreviateAnnotationName(content);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+
+        FileAnnotation that = (FileAnnotation) other;
+        return Objects.equals(this.annotationType, that.annotationType)
+                && Objects.equals(this.author, that.author)
+                && Objects.equals(this.content, that.content)
+                && Objects.equals(this.page, that.page)
+                && Objects.equals(this.linkedFileAnnotation, that.linkedFileAnnotation)
+                && Objects.equals(this.timeModified, that.timeModified);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(annotationType, author, content, page, linkedFileAnnotation, timeModified);
+    }
 
     public String getAuthor() {
         return author;
@@ -131,7 +157,7 @@ public final class FileAnnotation {
         return content;
     }
 
-    public String getAnnotationType() {
+    public FileAnnotationType getAnnotationType() {
         return annotationType;
     }
 
@@ -139,6 +165,11 @@ public final class FileAnnotation {
         return this.linkedFileAnnotation.isPresent();
     }
 
+    /**
+     * Before this getter is called the presence of the linked annotation must be checked via hasLinkedAnnotation()!
+     *
+     * @return the note attached to the annotation
+     */
     public FileAnnotation getLinkedFileAnnotation() {
         return linkedFileAnnotation.get();
     }

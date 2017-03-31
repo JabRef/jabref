@@ -21,6 +21,9 @@ import com.jgoodies.looks.Options;
 
 public class SpecialFieldDropDown {
 
+    private SpecialFieldDropDown() {
+    }
+
     public static JButton generateSpecialFieldButtonWithDropDown(SpecialField field, JabRefFrame frame) {
         Dimension buttonDim = new Dimension(23, 23);
         SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field);
