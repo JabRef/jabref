@@ -28,7 +28,8 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("year", "2008");
         bibEntry.setField("author", "Joshua Bloch");
         bibEntry.setField("isbn", "978-0321356680");
-        bibEntry.setField("url", "https://www.amazon.com/Effective-Java-Joshua-Bloch-ebook/dp/B00B8V09HY%3FSubscriptionId%3D0JYN1NVW651KCA56C102%26tag%3Dtechkie-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3DB00B8V09HY");
+        bibEntry.setField("url",
+                "https://www.amazon.com/Effective-Java-Joshua-Bloch-ebook/dp/B00B8V09HY?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B00B8V09HY");
 
         fetcher = new IsbnViaChimboriFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
     }
@@ -65,7 +66,8 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("year", "2015");
         bibEntry.setField("author", "Marlon Dumas and Marcello La Rosa and Jan Mendling and Hajo A. Reijers");
         bibEntry.setField("isbn", "3642434738");
-        bibEntry.setField("url", "https://www.amazon.com/Fundamentals-Business-Process-Management-Marlon/dp/3642434738%3FSubscriptionId%3D0JYN1NVW651KCA56C102%26tag%3Dtechkie-20%26linkCode%3Dxm2%26camp%3D2025%26creative%3D165953%26creativeASIN%3D3642434738");
+        bibEntry.setField("url",
+                "https://www.amazon.com/Fundamentals-Business-Process-Management-Marlon/dp/3642434738?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=3642434738");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3642434738");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
