@@ -188,11 +188,10 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        BackgroundTask<Integer> calculateHits = BackgroundTask
-                .run(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
-                .onSuccess(hits::setValue);
-
-        taskExecutor.execute(calculateHits);
+        BackgroundTask
+                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
+                .onSuccess(hits::setValue)
+                .executeWith(taskExecutor);
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {

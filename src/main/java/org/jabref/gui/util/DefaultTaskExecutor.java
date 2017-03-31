@@ -41,7 +41,7 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     @Override
     public void shutdown() {
-        executor.shutdown();
+        executor.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {

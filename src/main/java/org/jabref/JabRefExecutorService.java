@@ -119,8 +119,6 @@ public class JabRefExecutorService implements Executor {
         // kill the remote thread
         stopRemoteThread();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
-
-        Globals.taskExecutor.shutdown();
     }
 
     class NamedRunnable implements Runnable {

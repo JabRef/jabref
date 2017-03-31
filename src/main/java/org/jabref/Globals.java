@@ -69,4 +69,9 @@ public class Globals {
     public static FileUpdateMonitor getFileUpdateMonitor() {
         return fileUpdateMonitor;
     }
+
+    public static void shutdownThreadPools() {
+        taskExecutor.shutdown();
+        JabRefExecutorService.INSTANCE.shutdownEverything();
+    }
 }
