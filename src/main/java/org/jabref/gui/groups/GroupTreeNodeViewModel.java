@@ -144,14 +144,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return node;
     }
 
-    /** Collapse this node and all its children. */
-    public void collapseSubtree(JTree tree) {
-        for (GroupTreeNodeViewModel child : getChildren()) {
-            child.collapseSubtree(tree);
-        }
-        tree.collapsePath(this.getTreePath());
-    }
-
     /** Expand this node and all its children. */
     public void expandSubtree(JTree tree) {
         tree.expandPath(this.getTreePath());
@@ -327,54 +319,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
                 new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
         undoManager.addEdit(undo);
-    }
-
-    public Optional<MoveGroupChange> moveUp() {
-        final GroupTreeNode parent = node.getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(getNode()).get();
-        if (index > 0) {
-            getNode().moveTo(parent, index - 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index - 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveDown() {
-        final GroupTreeNode parent = node.getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(node).get();
-        if (index < (parent.getNumberOfChildren() - 1)) {
-            node.moveTo(parent, index + 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveLeft() {
-        final GroupTreeNode parent = node.getParent().get(); // TODO: Null!
-        final Optional<GroupTreeNode> grandParent = parent.getParent();
-        final int index = node.getPositionInParent();
-
-        if (!grandParent.isPresent()) {
-            return Optional.empty();
-        }
-        final int indexOfParent = grandParent.get().getIndexOfChild(parent).get();
-        node.moveTo(grandParent.get(), indexOfParent + 1);
-        return Optional.of(new MoveGroupChange(parent, index, grandParent.get(), indexOfParent + 1));
-    }
-
-    public Optional<MoveGroupChange> moveRight() {
-        final GroupTreeNode previousSibling = node.getPreviousSibling().get(); // TODO: Null
-        final GroupTreeNode parent = node.getParent().get(); // TODO: Null!
-        final int index = node.getPositionInParent();
-
-        if (previousSibling == null) {
-            return Optional.empty();
-        }
-
-        node.moveTo(previousSibling);
-        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getNumberOfChildren()));
     }
 
     /**

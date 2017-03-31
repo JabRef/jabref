@@ -112,31 +112,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * For use when dragging: The specified cell is always rendered as selected.
-     *
-     * @param cell The cell over which the user is currently dragging.
-     */
-    public void setHighlight1Cell(Object cell) {
-        this.highlight1Cell = cell;
-    }
-
-    /**
-     * Highlights the specified groups in red.
-     */
-    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.overlappingGroups = nodes;
-    }
-
-    /**
-     * Highlights the specified groups by underlining.
-     */
-    public void setMatchingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.matchingGroups = nodes;
-    }
-
-    /**
      * Highlights the specified cells (by drawing a border around it), or disables highlight if highlightBorderCell ==
      * null.
      */
