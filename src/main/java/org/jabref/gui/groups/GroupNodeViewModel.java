@@ -243,7 +243,7 @@ public class GroupNodeViewModel {
     }
 
     public Optional<GroupNodeViewModel> getChildByPath(String pathToSource) {
-        return groupNode.getChildByPath(pathToSource).map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+        return groupNode.getChildByPath(pathToSource).map(child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
     }
 
     /**
