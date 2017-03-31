@@ -1,16 +1,8 @@
 package org.jabref.gui.groups;
 
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
-
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
-import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import org.jabref.model.groups.GroupTreeNode;
 
 public class GroupsTree extends JTree {
 
