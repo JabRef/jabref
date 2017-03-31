@@ -38,23 +38,32 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.stream(keywordChains).map(Keyword::new).collect(Collectors.toList()));
     }
 
+    public KeywordList(Keyword... keywordChains) {
+        this(Arrays.asList(keywordChains));
+    }
+
+    public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        KeywordList keywordList = new KeywordList();
+
+        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
+        while (tok.hasMoreTokens()) {
+            String chain = tok.nextToken();
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
+        }
+        return keywordList;
+    }
+
     /**
      * @param keywordString a String of keywordChains
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
-        if (StringUtil.isBlank(keywordString)) {
-            return new KeywordList();
-        }
-
-        List<String> keywords = new ArrayList<>();
-
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String word = tok.nextToken().trim();
-            keywords.add(word);
-        }
-        return new KeywordList(keywords);
+        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public KeywordList createClone() {
