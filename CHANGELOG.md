@@ -20,6 +20,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
       - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
       - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
       - Removed edit mode.
+      - Removed the following commands in the right-click menu:
+        - Expand/collapse subtree
+        - Move up/down/left/right
+      - Remove option to "highlight overlapping groups"
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
