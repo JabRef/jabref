@@ -17,4 +17,9 @@ public interface TaskExecutor {
      * @param <V>  type of return value of the task
      */
     <V> void execute(BackgroundTask<V> task);
+
+    /**
+     * Shutdown the task executor.
+     */
+    void shutdown();
 }

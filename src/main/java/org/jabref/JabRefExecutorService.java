@@ -16,27 +16,22 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JabRefExecutorService implements Executor {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefExecutorService.class);
-
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
-
-    private Thread remoteThread;
-
+    private static final Log LOGGER = LogFactory.getLog(JabRefExecutorService.class);
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
-
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef LowPriorityCachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
-
     private final Timer timer = new Timer("timer", true);
+    private Thread remoteThread;
 
     private JabRefExecutorService() {}
 
@@ -75,29 +70,6 @@ public class JabRefExecutorService implements Executor {
 
     public void executeInterruptableTask(final Runnable runnable, String taskName) {
         this.lowPriorityExecutorService.execute(new NamedRunnable(taskName, runnable));
-    }
-
-    class NamedRunnable implements Runnable {
-
-        private final String name;
-
-        private final Runnable task;
-
-        public NamedRunnable(String name, Runnable runnable){
-            this.name = name;
-            this.task = runnable;
-        }
-
-        @Override
-        public void run() {
-            final String orgName = Thread.currentThread().getName();
-            Thread.currentThread().setName(name);
-            try {
-                task.run();
-            } finally {
-                Thread.currentThread().setName(orgName);
-            }
-        }
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
@@ -147,6 +119,29 @@ public class JabRefExecutorService implements Executor {
         // kill the remote thread
         stopRemoteThread();
         // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
+    }
+
+    class NamedRunnable implements Runnable {
+
+        private final String name;
+
+        private final Runnable task;
+
+        public NamedRunnable(String name, Runnable runnable) {
+            this.name = name;
+            this.task = runnable;
+        }
+
+        @Override
+        public void run() {
+            final String orgName = Thread.currentThread().getName();
+            Thread.currentThread().setName(name);
+            try {
+                task.run();
+            } finally {
+                Thread.currentThread().setName(orgName);
+            }
+        }
     }
 
 }

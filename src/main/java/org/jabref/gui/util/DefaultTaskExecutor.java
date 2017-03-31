@@ -2,6 +2,8 @@ package org.jabref.gui.util;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
@@ -18,6 +20,8 @@ import org.apache.commons.logging.LogFactory;
 public class DefaultTaskExecutor implements TaskExecutor {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
+
+    private ExecutorService executor = Executors.newFixedThreadPool(5);
 
     public static <V> V runInJavaFXThread(Callable<V> callable) {
         FutureTask<V> task = new FutureTask<>(callable);
@@ -36,7 +40,12 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     @Override
     public <V> void execute(BackgroundTask<V> task) {
-        new Thread(getJavaFXTask(task)).start();
+        executor.submit(getJavaFXTask(task));
+    }
+
+    @Override
+    public void shutdown() {
+        executor.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
