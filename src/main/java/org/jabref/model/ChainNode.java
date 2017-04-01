@@ -154,6 +154,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
 
     /**
      * Adds the given node at the end of the chain.
+     * E.g., "A > B > C" + "D" -> "A > B > C > D".
      */
     public void addAtEnd(T node) {
         if (child == null) {
