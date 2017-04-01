@@ -60,7 +60,7 @@ public class IntegrityCheck {
             result.addAll(new JournalInAbbreviationListChecker(FieldName.JOURNALTITLE, journalAbbreviationRepository).check(entry));
         }
 
-        result.addAll(new BibtexkeyChecker().check(entry));
+        result.addAll(new BibtexKeyChecker().check(entry));
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
