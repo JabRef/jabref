@@ -65,7 +65,7 @@ public class GroupNodeViewModelTest {
         BibEntry entryThree = new BibEntry().withField("keywords", "A > B > B2");
         databaseContext.getDatabase().insertEntries(entryOne, entryTwo, entryThree);
 
-        AutomaticKeywordGroup group = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',');
+        AutomaticKeywordGroup group = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',', '>');
         GroupNodeViewModel groupViewModel = getViewModelForGroup(group);
 
         WordKeywordGroup expectedGroupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true);

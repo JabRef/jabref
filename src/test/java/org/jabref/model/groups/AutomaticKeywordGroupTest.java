@@ -13,7 +13,7 @@ public class AutomaticKeywordGroupTest {
 
     @Test
     public void createSubgroupsForTwoKeywords() throws Exception {
-        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',');
+        AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, "keywords", ',', '>');
         BibEntry entry = new BibEntry().withField("keywords", "A, B");
 
         Set<GroupTreeNode> expected = new HashSet<>();

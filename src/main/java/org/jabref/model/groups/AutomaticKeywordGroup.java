@@ -12,18 +12,23 @@ import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
-    private Character keywordSeperator;
-    private Character keywordHierarchicalDelimiter = '>';
+    private Character keywordDelimiter;
+    private Character keywordHierarchicalDelimiter;
     private String field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, String field, Character keywordSeperator) {
+    public AutomaticKeywordGroup(String name, GroupHierarchyType context, String field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
         super(name, context);
         this.field = field;
-        this.keywordSeperator = keywordSeperator;
+        this.keywordDelimiter = keywordDelimiter;
+        this.keywordHierarchicalDelimiter = keywordHierarchicalDelimiter;
     }
 
-    public Character getKeywordSeperator() {
-        return keywordSeperator;
+    public Character getKeywordHierarchicalDelimiter() {
+        return keywordHierarchicalDelimiter;
+    }
+
+    public Character getKeywordDelimiter() {
+        return keywordDelimiter;
     }
 
     public String getField() {
@@ -32,7 +37,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordSeperator);
+        return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
     }
 
     @Override
@@ -40,19 +45,19 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
-        return Objects.equals(keywordSeperator, that.keywordSeperator) &&
+        return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
                 Objects.equals(field, that.field);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(keywordSeperator, field);
+        return Objects.hash(keywordDelimiter, field);
     }
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         Optional<KeywordList> keywordList = entry.getLatexFreeField(field)
-                .map(fieldValue -> KeywordList.parse(fieldValue, keywordSeperator));
+                .map(fieldValue -> KeywordList.parse(fieldValue, keywordDelimiter));
         return OptionalUtil.toStream(keywordList)
                 .flatMap(KeywordList::stream)
                 .map(this::createGroup)
@@ -66,7 +71,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
                 field,
                 keywordChain.getPathFromRootAsString(keywordHierarchicalDelimiter),
                 true,
-                keywordSeperator,
+                keywordDelimiter,
                 true);
         GroupTreeNode root = new GroupTreeNode(rootGroup);
         keywordChain.getChild()

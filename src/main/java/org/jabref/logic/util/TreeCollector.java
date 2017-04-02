@@ -17,8 +17,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.TreeNode;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 /**
  * Merges a list of nodes into a tree.
  * Nodes with a common parent are added as direct children.
@@ -86,7 +84,12 @@ public class TreeCollector<T> implements Collector<T, ObservableList<T>, Observa
 
     @Override
     public BinaryOperator<ObservableList<T>> combiner() {
-        throw new NotImplementedException("The TreeCollector does not support parallel streams.");
+        return (list1, list2) -> {
+            for (T item : list2) {
+                accumulator().accept(list1, item);
+            }
+            return list1;
+        };
     }
 
     @Override
