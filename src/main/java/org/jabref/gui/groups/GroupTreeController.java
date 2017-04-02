@@ -220,10 +220,16 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         ContextMenu menu = new ContextMenu();
 
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
-        editGroup.setOnAction(event -> viewModel.editGroup(group));
+        editGroup.setOnAction(event -> {
+            menu.hide();
+            viewModel.editGroup(group);
+        });
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
-        addSubgroup.setOnAction(event -> viewModel.addNewSubgroup(group));
+        addSubgroup.setOnAction(event -> {
+            menu.hide();
+            viewModel.addNewSubgroup(group);
+        });
         MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
         removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
         MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
