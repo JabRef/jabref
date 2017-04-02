@@ -314,12 +314,6 @@ public class ExportFormat implements IExportFormat {
 
     }
 
-    @Override
-    public void performExport(final BibDatabaseContext databaseContext, Path file, final Charset encoding,
-            List<BibEntry> entries) throws Exception {
-        performExport(databaseContext, file.getFileName().toString(), encoding, entries);
-    }
-
     /**
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.

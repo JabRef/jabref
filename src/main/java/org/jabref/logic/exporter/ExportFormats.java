@@ -61,6 +61,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
         ExportFormats.putFormat(new MSBibExportFormat());
         ExportFormats.putFormat(new ModsExportFormat());
+        ExportFormats.putFormat(new PdfFileExporter());
 
         // Now add custom export formats
         for (IExportFormat format : customFormats.values()) {
