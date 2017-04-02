@@ -17,8 +17,8 @@ public class AutomaticKeywordGroupTest {
         BibEntry entry = new BibEntry().withField("keywords", "A, B");
 
         Set<GroupTreeNode> expected = new HashSet<>();
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INDEPENDENT, "keywords", "A", true, ',', true)));
-        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("B", GroupHierarchyType.INDEPENDENT, "keywords", "B", true, ',', true)));
+        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true)));
+        expected.add(GroupTreeNode.fromGroup(new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, "keywords", "B", true, ',', true)));
         assertEquals(expected, keywordsGroup.createSubgroups(entry));
     }
 }

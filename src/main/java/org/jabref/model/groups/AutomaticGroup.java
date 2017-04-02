@@ -4,8 +4,8 @@ import java.util.Set;
 
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.util.TreeCollector;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.TreeCollector;
 
 public abstract class AutomaticGroup extends AbstractGroup {
     public AutomaticGroup(String name, GroupHierarchyType context) {
