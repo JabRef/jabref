@@ -194,7 +194,7 @@ public class BibtexDatabaseWriterTest {
 
         // @formatter:off
         assertEquals(OS.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
+                + "@Comment{jabref-meta: group:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
                 + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());
@@ -215,7 +215,7 @@ public class BibtexDatabaseWriterTest {
         assertEquals(
                 "% Encoding: US-ASCII" + OS.NEWLINE +
                 OS.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
+                        + "@Comment{jabref-meta: group:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
                         + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());

@@ -29,7 +29,8 @@ public class MetaData {
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
-    public static final String GROUPSTREE = "groupstree";
+    public static final String GROUPSTREE = "group";
+    public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
@@ -39,11 +40,11 @@ public class MetaData {
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
     private final EventBus eventBus = new EventBus();
+    private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
+    private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
-    private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
-    private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;

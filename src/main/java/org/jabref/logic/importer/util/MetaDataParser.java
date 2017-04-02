@@ -62,6 +62,7 @@ public class MetaDataParser {
 
             switch (entry.getKey()) {
             case MetaData.GROUPSTREE:
+                case MetaData.GROUPSTREE_LEGACY:
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
                 break;
             case MetaData.SAVE_ACTIONS:
