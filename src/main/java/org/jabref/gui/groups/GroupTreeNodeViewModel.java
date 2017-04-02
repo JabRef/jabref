@@ -16,7 +16,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.model.FieldChange;
@@ -28,7 +27,6 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -161,13 +159,13 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     protected boolean printInItalics() {
-        return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) && node.getGroup().isDynamic();
+        return node.getGroup().isDynamic();
     }
 
     public String getDescription() {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";
-        boolean showDynamic = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC);
+        boolean showDynamic = true;
         if (group instanceof ExplicitGroup) {
             shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup((ExplicitGroup) group);
         } else if (group instanceof KeywordGroup) {
@@ -178,21 +176,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
         }
         return "<html>" + shortDescription + "</html>";
-    }
-
-    public Icon getIcon() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
-            switch (node.getGroup().getHierarchicalContext()) {
-            case REFINING:
-                return GROUP_REFINING_ICON;
-            case INCLUDING:
-                return GROUP_INCLUDING_ICON;
-            default:
-                return GROUP_REGULAR_ICON;
-            }
-        } else {
-            return null;
-        }
     }
 
     public TreePath getTreePath() {

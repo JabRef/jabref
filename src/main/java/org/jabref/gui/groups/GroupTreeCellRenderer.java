@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.border.Border;
@@ -87,10 +86,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         label.setToolTipText(viewModel.getDescription());
 
-        Icon icon = viewModel.getIcon();
-        if (label.getIcon() != icon) {
-            label.setIcon(icon);
-        }
         return c;
     }
 

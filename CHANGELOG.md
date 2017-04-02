@@ -24,6 +24,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
         - Expand/collapse subtree
         - Move up/down/left/right
       - Remove option to "highlight overlapping groups"
+      - Moved the option to "Gray out non-hits" / "Hide non-hits" to the preferences
+      - Removed the following options from the group preferences:
+        - Show icons (icons can now be customized)
+        - Show dynamic groups in italics (dynamic groups are not treated specially now)
+        - Initially show groups tree expanded (always true now)
     - Redesigned about dialog.
     - Redesigned key bindings dialog.
     - Redesigned journal abbreviations dialog.
