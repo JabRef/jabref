@@ -68,8 +68,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final GroupsTree groupsTree;
     private final JPopupMenu groupsContextMenu = new JPopupMenu();
     private final JPopupMenu settings = new JPopupMenu();
-    private final JRadioButtonMenuItem hideNonHits;
-    private final JRadioButtonMenuItem grayOut;
     private final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Localization.lang("Intersection"), true);
     private final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Localization.lang("Float"), true);
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
@@ -98,21 +96,13 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 IconTheme.JabRefIcon.TOGGLE_GROUPS);
 
         this.frame = frame;
-        hideNonHits = new JRadioButtonMenuItem(Localization.lang("Hide non-hits"),
-                !Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
-        grayOut = new JRadioButtonMenuItem(Localization.lang("Gray out non-hits"),
-                Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
-        ButtonGroup nonHits = new ButtonGroup();
-        nonHits.add(hideNonHits);
-        nonHits.add(grayOut);
+
         floatCb.addChangeListener(
                 event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS, floatCb.isSelected()));
         andCb.addChangeListener(
                 event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS, andCb.isSelected()));
         invCb.addChangeListener(
                 event -> Globals.prefs.putBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS, invCb.isSelected()));
-        grayOut.addChangeListener(
-                event -> Globals.prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected()));
 
         JRadioButtonMenuItem highlCb = new JRadioButtonMenuItem(Localization.lang("Highlight"), false);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_FLOAT_SELECTIONS)) {
@@ -144,9 +134,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         settings.addSeparator();
         settings.add(invCb);
         settings.addSeparator();
-        settings.add(grayOut);
-        settings.add(hideNonHits);
-        settings.addSeparator();
         settings.add(autoAssignGroup);
         openSettings.addActionListener(e -> {
             if (!settings.isVisible()) {
@@ -166,8 +153,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         invCb.addActionListener(e -> valueChanged(null));
         floatCb.addActionListener(e -> valueChanged(null));
         highlCb.addActionListener(e -> valueChanged(null));
-        hideNonHits.addActionListener(e -> valueChanged(null));
-        grayOut.addActionListener(e -> valueChanged(null));
         andCb.setToolTipText(Localization.lang("Display only entries belonging to all selected groups."));
         orCb.setToolTipText(Localization.lang("Display all entries belonging to one or more of the selected groups."));
         openSettings.setToolTipText(Localization.lang("Settings"));
@@ -464,9 +449,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
         groupsTree.setModel(groupsTreeModel);
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
-            this.groupsRoot.expandSubtree(groupsTree);
-        }
     }
 
     /**
@@ -580,10 +562,10 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         public void update() {
             // Show the result in the chosen way:
-            if (hideNonHits.isSelected()) {
-                panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FILTER);
-            } else if (grayOut.isSelected()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS)) {
                 panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FLOAT);
+            } else {
+                panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.FILTER);
             }
             panel.getMainTable().getTableModel().updateSortOrder();
             panel.getMainTable().getTableModel().updateGroupFilter();
