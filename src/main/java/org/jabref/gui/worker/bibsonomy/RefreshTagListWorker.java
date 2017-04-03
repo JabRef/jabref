@@ -49,7 +49,10 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 
 		}
 
-		int start = 0, end = BibSonomyProperties.getTagCloudSize(), max = 1, min = 1;
+		int start = 0;
+		int end = BibSonomyProperties.getTagCloudSize();
+		int max = 1;
+		int min = 1;
 
 		//in case of fetching all tags we only get the first 100 most popular
 		if (grouping == GroupingEntity.ALL && BibSonomyProperties.getTagCloudSize() > 100)
@@ -60,9 +63,7 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 		tags.addAll(result);
 
 		for (Tag tag : tags) {
-
 			switch (grouping) {
-
 				case USER:
 					max = Math.max(max, tag.getUsercount());
 					min = Math.min(min, tag.getUsercount());
@@ -70,6 +71,7 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 				default:
 					max = Math.max(max, tag.getGlobalcount());
 					min = Math.min(min, tag.getGlobalcount());
+					break;
 			}
 		}
 		if (max == min) {

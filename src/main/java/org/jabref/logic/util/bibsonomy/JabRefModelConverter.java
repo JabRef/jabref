@@ -300,10 +300,8 @@ public class JabRefModelConverter {
 		// add unknown Properties to misc
 		entry.getFieldNames().forEach(field -> {
 			Optional<String> fieldName = entry.getField(field);
-			if (!knownFields.contains(field) && !JabRefModelConverter.EXCLUDE_FIELDS.contains(field) && !field.startsWith("__")) {
-				if(fieldName.isPresent()) {
-					bibtex.addMiscField(field, fieldName.get());
-				}
+			if (!knownFields.contains(field) && !JabRefModelConverter.EXCLUDE_FIELDS.contains(field) && !field.startsWith("__") && fieldName.isPresent()) {
+			    bibtex.addMiscField(field, fieldName.get());
 			}
 		});
 

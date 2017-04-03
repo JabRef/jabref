@@ -48,16 +48,10 @@ public class IconTheme {
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
     //public static final Color DEFAULT_DISABLED_COLOR = new Color(0x990000);
-    private static Font FONT_16;
-    private static javafx.scene.text.Font FX_FONT;
 
     static {
         try (InputStream stream = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
             FONT = Font.createFont(Font.TRUETYPE_FONT, stream);
-            FONT_16 = FONT.deriveFont(Font.PLAIN, 16f);
-            try (InputStream stream2 = FontBasedIcon.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf")) {
-                FX_FONT = javafx.scene.text.Font.loadFont(stream2, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_LARGE));
-            }
         } catch (FontFormatException | IOException e) {
             LOGGER.warn("Error loading font", e);
         }

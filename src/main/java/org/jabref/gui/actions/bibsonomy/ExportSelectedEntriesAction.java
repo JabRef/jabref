@@ -33,6 +33,7 @@ public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
             case JOptionPane.YES_OPTION:
                 // tags missing & user has explicitly chosen to add default tag
                 ctu.assignDefaultTag();
+                // break; not needed
             case JOptionPane.DEFAULT_OPTION:
                 // this means that all posts have tags
                 ExportWorker worker = new ExportWorker(getJabRefFrame(), entries);
@@ -41,6 +42,7 @@ public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
             default:
                 // happens when tags are missing, and user wants to cancel export
                 LOGGER.debug(Localization.lang("Selected post have no tags assigned"));
+                break;
         }
 
     }

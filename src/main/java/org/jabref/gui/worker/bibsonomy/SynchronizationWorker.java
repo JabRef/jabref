@@ -82,6 +82,7 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 							case CompareDialog.KEEP_LOCAL_ALWAYS:
 								this.keepAllLocal = true;
 								this.keepAllRemote = false;
+								// break; not needed
 							case CompareDialog.KEEP_LOCAL:
 
 								//We have to take intrahash of the incoming Post from Bibsonomy to export entries

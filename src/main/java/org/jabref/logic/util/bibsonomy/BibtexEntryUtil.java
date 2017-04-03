@@ -39,8 +39,7 @@ public class BibtexEntryUtil {
 					&& !"timestamp".equals(field)
 					&& !"owner".equals(field)) {
 
-				if (firstEntryFieldOpt.isPresent()
-						&& secondEntryFieldOpt.isPresent()) {
+                if (firstEntryFieldOpt.isPresent() && secondEntryFieldOpt.isPresent()) {
 					// check if b1 lacks a field that b2 has
 					if (StringUtil.isNullOrEmpty(firstEntryFieldOpt.get())
 							&& !StringUtil.isNullOrEmpty(secondEntryFieldOpt.get())) {

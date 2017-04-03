@@ -64,11 +64,16 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 
 	public void run() {
 
-		dialog.setVisible(true);
-		dialog.setProgress(0, 0);
+        int numberOfPosts = 0;
+        int start = 0;
+        int end = BibSonomyProperties.getNumberOfPostsPerRequest();
+        int cycle = 0;
+        int numberOfPostsPerRequest = BibSonomyProperties.getNumberOfPostsPerRequest();
+        boolean continueFetching = false;
 
-		int numberOfPosts = 0, start = 0, end = BibSonomyProperties.getNumberOfPostsPerRequest(), cycle = 0, numberOfPostsPerRequest = BibSonomyProperties.getNumberOfPostsPerRequest();
-		boolean continueFetching = false;
+        dialog.setVisible(true);
+        dialog.setProgress(0, 0);
+
 		do {
 			List<String> tags = null;
 			String search = null;
@@ -83,6 +88,8 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 				case FULL_TEXT:
 					search = criteria;
 					break;
+                default:
+                    break;
 			}
 
 			try {
@@ -92,47 +99,37 @@ public class ImportPostsByCriteriaWorker extends AbstractBibSonomyWorker {
 					dialog.setProgress(numberOfPosts++, numberOfPostsPerRequest);
 					Optional<BibEntry> entry = JabRefModelConverter.convertPostOptional(post);
 
-					if(entry.isPresent()){
-						BibEntry bibEntry = entry.get();
-						// clear fields if the fetched posts does not belong to the user
-						Optional<String> optUserName = bibEntry.getField(FieldName.USERNAME);
-						if (optUserName.isPresent()) {
-							if (!BibSonomyProperties.getUsername().equals(optUserName.get())) {
-								bibEntry.clearField(FieldName.INTRAHASH);
-								bibEntry.clearField(FieldName.FILE);
-								bibEntry.clearField(FieldName.OWNER);
-							}
-						}
-						dialog.addEntry(bibEntry);
-					}
-				}
+                    if (entry.isPresent()) {
+                        BibEntry bibEntry = entry.get();
+                        // clear fields if the fetched posts does not belong to the user
+                        Optional<String> optUserName = bibEntry.getField(FieldName.USERNAME);
+                        if (optUserName.isPresent() && !BibSonomyProperties.getUsername().equals(optUserName.get())) {
+                            bibEntry.clearField(FieldName.INTRAHASH);
+                            bibEntry.clearField(FieldName.FILE);
+                            bibEntry.clearField(FieldName.OWNER);
+                        }
+                        dialog.addEntry(bibEntry);
+                    }
+                }
 
-				if (!continueFetching) {
-					if (!ignoreRequestSize) {
+                if (!continueFetching && !ignoreRequestSize && !BibSonomyProperties.getIgnoreMorePostsWarning() && numberOfPosts == numberOfPostsPerRequest) {
+                    int status = JOptionPane.showOptionDialog(dialog, "<html>There are probably more than " + BibSonomyProperties.getNumberOfPostsPerRequest()
+                                    + " posts available. Continue importing?<br>You can stop importing entries by hitting the Stop button on the import dialog.", "More posts available",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, JOptionPane.YES_OPTION);
 
-						if (!BibSonomyProperties.getIgnoreMorePostsWarning()) {
+                    switch (status) {
+                        case JOptionPane.YES_OPTION:
+                            continueFetching = true;
+                            break;
 
-							if (numberOfPosts == numberOfPostsPerRequest) {
-								int status = JOptionPane.showOptionDialog(dialog, "<html>There are probably more than " + BibSonomyProperties.getNumberOfPostsPerRequest()
-												+ " posts available. Continue importing?<br>You can stop importing entries by hitting the Stop button on the import dialog.", "More posts available",
-										JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, JOptionPane.YES_OPTION);
-
-								switch (status) {
-									case JOptionPane.YES_OPTION:
-										continueFetching = true;
-										break;
-
-									case JOptionPane.NO_OPTION:
-										this.stopFetching();
-										break;
-									default:
-										break;
-								}
-							}
-						}
-					}
-				}
-				start = ((cycle + 1) * numberOfPostsPerRequest);
+                        case JOptionPane.NO_OPTION:
+                            this.stopFetching();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                start = ((cycle + 1) * numberOfPostsPerRequest);
 				end = ((cycle + 2) * numberOfPostsPerRequest);
 
 				cycle++;

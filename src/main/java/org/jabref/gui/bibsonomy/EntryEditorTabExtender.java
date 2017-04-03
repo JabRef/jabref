@@ -12,8 +12,11 @@ import org.jabref.preferences.JabRefPreferences;
 public class EntryEditorTabExtender {
 
     public static void extend() {
-        boolean generalTab = false, bibsonomyTab = false, extraTab = false;
-        int lastTabId = 0, extraTabID = -1;
+        boolean generalTab = false;
+        boolean bibsonomyTab = false;
+        boolean extraTab = false;
+        int lastTabId = 0;
+        int extraTabID = -1;
 
         JabRefPreferences preferences = JabRefPreferences.getInstance();
         if (preferences.hasKey(JabRefPreferences.CUSTOM_TAB_NAME)) {
@@ -52,12 +55,8 @@ public class EntryEditorTabExtender {
             preferences.put(JabRefPreferences.CUSTOM_TAB_NAME + lastTabId, "Extra");
         }
 
-        if (extraTab) {
-            if (!preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + extraTabID).equals(
-                    BibSonomyProperties.getExtraTabFields())) {
-                preferences.put(JabRefPreferences.CUSTOM_TAB_FIELDS + extraTabID,
-                        BibSonomyProperties.getExtraTabFields());
-            }
+        if (extraTab && !preferences.get(JabRefPreferences.CUSTOM_TAB_FIELDS + extraTabID).equals(BibSonomyProperties.getExtraTabFields())) {
+            preferences.put(JabRefPreferences.CUSTOM_TAB_FIELDS + extraTabID, BibSonomyProperties.getExtraTabFields());
         }
     }
 }

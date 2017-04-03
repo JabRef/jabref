@@ -18,14 +18,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
+import org.bibsonomy.model.Post;
+import org.bibsonomy.model.Resource;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.bibsonomy.JabRefModelConverter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import org.bibsonomy.model.Post;
-import org.bibsonomy.model.Resource;
 
 public class CompareDialog extends JDialog {
 
@@ -102,10 +101,7 @@ public class CompareDialog extends JDialog {
             for (String field : commonFields) {
                 Optional<String> bibEntryFieldOpt = bibEntry.getField(field);
                 //fields that should be ignored
-                if (!field.startsWith("__") && !field.equals("id") && !field.equals("timestamp")
-                        && !field.equals("intrahash") && !field.equals("interhash")
-                        && bibEntryFieldOpt.isPresent() && !bibEntryFieldOpt.get().isEmpty()) {
-
+                if (!field.startsWith("__") && !"id".equals(field) && !"timestamp".equals(field) && !"intrahash".equals(field) && !"interhash".equals(field) && bibEntryFieldOpt.isPresent() && !bibEntryFieldOpt.get().isEmpty()) {
                     // compare values of src and comp entry
                     Optional<String> compEntryFieldOpt = compEntry.getField(field);
                     if (compEntryFieldOpt.isPresent()

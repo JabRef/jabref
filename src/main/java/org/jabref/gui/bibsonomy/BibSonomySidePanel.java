@@ -42,7 +42,6 @@ public class BibSonomySidePanel extends JPanel {
     private JComboBox<GroupingComboBoxItem> visibilityComboBox = null;
     private JabRefFrame jabRefFrame;
     private JScrollPane tagListScrollPane = null;
-    private JButton settingsButton = null;
     private JEditorPane tagCloudPanel = null;
 
     public BibSonomySidePanel(JabRefFrame jabRefFrame) {

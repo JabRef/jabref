@@ -41,6 +41,8 @@ public class BibSonomyHyperLinkListener extends AbstractBibSonomyAction implemen
 		this.visibilityComboBox = visibilityComboBox;
 	}
 
-	public void actionPerformed(ActionEvent e) {}
+	public void actionPerformed(ActionEvent e) {
+	    //Empty method
+    }
 
 }

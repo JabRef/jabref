@@ -35,8 +35,6 @@ import org.bibsonomy.model.enums.Order;
 
 public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
-    private final JabRefPreferences prefs;
-
     private JPanel generalSettingsPanel = null;
     private JPanel credentialsPanel = null;
     private JLabel apiUrlLabel = null;
@@ -58,11 +56,8 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
     private JCheckBox noWarningOnMorePostsCheckBox = null;
     private JSpinner tagCloudSizeSpinner = null;
     private JComboBox<?> tagCloudOrderComboBox = null;
-    private JButton openDatabasePropertiesButton = null;
 
-    public BibSonomyPrefsTab(JabRefPreferences prefs) {
-        this.prefs = Objects.requireNonNull(prefs);
-
+    public BibSonomyPrefsTab() {
         setLayout(new BorderLayout());
         JPanel pan = this.getGeneralSettingsPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -106,6 +101,7 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
                 break;
             default:
                 BibSonomyProperties.setDefaultVisisbility("public");
+                break;
         }
 
         BibSonomyProperties.save();
@@ -125,7 +121,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
         JLabel tagSizeLabel;
         JLabel tagCloudOrderLabel;
         JLabel tagCloudOrderHintLabel;
-        JLabel openDatabasePropertiesLabel;
         JLabel numberOfPostsLabel;
         JLabel extraFieldsHintLabel;
         JLabel extraFieldsLabel;
