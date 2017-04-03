@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
+
     public static final String TYPE_HEADER = "entrytype";
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
     public static final String KEY_FIELD = "bibtexkey";
@@ -101,7 +102,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
-                                                 Character keywordDelimiter) {
+            Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         if (newValue.isPresent()) {
             keywordList.replaceAll(keywordsToReplace, newValue.get());
@@ -300,7 +301,8 @@ public class BibEntry implements Cloneable {
         if (FieldName.DATE.equals(name)) {
             Optional<String> year = getFieldInterface.getValueForField(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
+                MonthUtil.Month month = MonthUtil
+                        .getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -308,7 +310,7 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
+        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name) || FieldName.DAY.equals(name)) {
             Optional<String> date = getFieldInterface.getValueForField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
@@ -321,7 +323,6 @@ public class BibEntry implements Cloneable {
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
                 final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
-
 
                 @Override
                 public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
@@ -346,6 +347,9 @@ public class BibEntry implements Cloneable {
                 }
                 if (FieldName.MONTH.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
+                }
+                if (FieldName.DAY.equals(name)) {
+                    return Optional.of(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
                 }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
@@ -600,7 +604,7 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
+        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
                 getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
@@ -839,6 +843,7 @@ public class BibEntry implements Cloneable {
     }
 
     private interface GetFieldInterface {
+
         Optional<String> getValueForField(String fieldName);
     }
 

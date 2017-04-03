@@ -18,9 +18,12 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
@@ -55,10 +58,11 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox runAutoFileSearch;
     private final JCheckBox allowFileAutoOpenBrowse;
     private final JRadioButton useRegExpComboBox;
-    private final JRadioButton matchExactKeyOnly = new JRadioButton(Localization.lang("Autolink only files that match the BibTeX key"));
-    private final JRadioButton matchStartsWithKey = new JRadioButton(Localization.lang("Autolink files with names starting with the BibTeX key"));
+    private final JRadioButton matchExactKeyOnly = new JRadioButton(
+            Localization.lang("Autolink only files that match the BibTeX key"));
+    private final JRadioButton matchStartsWithKey = new JRadioButton(
+            Localization.lang("Autolink files with names starting with the BibTeX key"));
     private final JTextField regExpTextField;
-
 
     public FileTab(JabRefFrame frame, JabRefPreferences prefs) {
         this.prefs = prefs;
@@ -68,8 +72,10 @@ class FileTab extends JPanel implements PrefsTab {
         bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
                 + "file directory, prefer the BIB file location rather than the file directory set above"));
-        runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
-        allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
+        runAutoFileSearch = new JCheckBox(
+                Localization.lang("When opening file link, search for matching file if no link is defined"));
+        allowFileAutoOpenBrowse = new JCheckBox(
+                Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
         useRegExpComboBox = new JRadioButton(Localization.lang("Use regular expression search"));
         ItemListener regExpListener = e -> regExpTextField.setEditable(useRegExpComboBox.isSelected());
@@ -131,10 +137,16 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(fileDir);
 
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(e ->
-                new FileDialog(this.frame).showDialogAndGetSelectedDirectory()
-                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
-        );
+        browse.addActionListener(e -> {
+
+            DialogService ds = new FXDialogService();
+            DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                    .withInitialDirectory(Paths.get(fileDir.getText())).build();
+
+            DefaultTaskExecutor.runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration))
+                    .ifPresent(f -> fileDir.setText(f.toString()));
+
+        });
         builder.append(browse);
 
         builder.nextLine();
@@ -149,7 +161,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.append(new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH)
-                .getHelpButton());
+                        .getHelpButton());
         builder.nextLine();
         builder.append(runAutoFileSearch, 3);
         builder.nextLine();
@@ -171,7 +183,6 @@ class FileTab extends JPanel implements PrefsTab {
         setLayout(new BorderLayout());
         add(pan, BorderLayout.CENTER);
     }
-
 
     @Override
     public void setValues() {

@@ -1301,33 +1301,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
-                    // The up/down/left/rightkeystrokes are displayed in the
-                    // GroupSelector's popup menu, so if they are to be changed,
-                    // edit GroupSelector.java accordingly!
-                    case KeyEvent.VK_UP:
-                        e.consume();
-                        if (node != null) {
-                            frame.getGroupSelector().moveNodeUp(node, true);
-                        }
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        e.consume();
-                        if (node != null) {
-                            frame.getGroupSelector().moveNodeDown(node, true);
-                        }
-                        break;
-                    case KeyEvent.VK_LEFT:
-                        e.consume();
-                        if (node != null) {
-                            frame.getGroupSelector().moveNodeLeft(node, true);
-                        }
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        e.consume();
-                        if (node != null) {
-                            frame.getGroupSelector().moveNodeRight(node, true);
-                        }
-                        break;
                     case KeyEvent.VK_PAGE_DOWN:
                         frame.nextTab.actionPerformed(null);
                         e.consume();

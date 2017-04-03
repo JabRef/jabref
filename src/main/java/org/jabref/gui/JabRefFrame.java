@@ -57,7 +57,6 @@ import javax.swing.WindowConstants;
 import javafx.application.Platform;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
@@ -740,7 +739,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        JabRefExecutorService.INSTANCE.shutdownEverything();
+        Globals.shutdownThreadPools();
 
         dispose();
 

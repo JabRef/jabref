@@ -4,6 +4,8 @@ import org.jabref.collab.FileUpdateMonitor;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -19,32 +21,26 @@ public class Globals {
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
 
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
-
-
+    public static final TaskExecutor taskExecutor = new DefaultTaskExecutor();
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
-
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static JournalAbbreviationLoader journalAbbreviationLoader;
-
     /**
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
     public static ProtectedTermsLoader protectedTermsLoader;
-
     /**
      * Manager for the state of the GUI.
      */
     public static StateManager stateManager = new StateManager();
-
     // Key binding preferences
     private static KeyBindingPreferences keyPrefs;
-
     // Background tasks
     private static GlobalFocusListener focusListener;
     private static FileUpdateMonitor fileUpdateMonitor;
@@ -75,5 +71,10 @@ public class Globals {
 
     public static FileUpdateMonitor getFileUpdateMonitor() {
         return fileUpdateMonitor;
+    }
+
+    public static void shutdownThreadPools() {
+        taskExecutor.shutdown();
+        JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 }

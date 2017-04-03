@@ -717,8 +717,14 @@ public class StringUtil {
         if(s != null) {
             try {
                 return new String(s.getBytes("UTF8"));
-            } catch (UnsupportedEncodingException e) {}
+            } catch (UnsupportedEncodingException e) {
+                //Empty catch
+            }
         }
         return null;
+    }
+
+    public static boolean containsIgnoreCase(String text, String searchString) {
+        return StringUtils.containsIgnoreCase(text, searchString);
     }
 }

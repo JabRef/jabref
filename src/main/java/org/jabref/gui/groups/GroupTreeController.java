@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
@@ -30,6 +31,7 @@ import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.RecursiveTreeItem;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
@@ -51,10 +53,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     @FXML
     public void initialize() {
-        viewModel = new GroupTreeViewModel(stateManager, dialogService);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor);
 
         // Set-up bindings
         groupTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel
@@ -216,14 +219,34 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
         ContextMenu menu = new ContextMenu();
 
-        MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
-        addSubgroup.setOnAction(event -> viewModel.addNewSubgroup(group));
+        MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
+        editGroup.setOnAction(event -> {
+            menu.hide();
+            viewModel.editGroup(group);
+        });
 
+        MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
+        addSubgroup.setOnAction(event -> {
+            menu.hide();
+            viewModel.addNewSubgroup(group);
+        });
         MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
         removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
+        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
+        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
+        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
 
-        menu.getItems().add(addSubgroup);
-        menu.getItems().add(removeGroupAndSubgroups);
+        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
+        removeSubgroups.setOnAction(event -> viewModel.addSelectedEntries(group));
+        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
+        removeSubgroups.setOnAction(event -> viewModel.removeSelectedEntries(group));
+
+        menu.getItems().add(editGroup);
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().addAll(addEntries, removeEntries);
         return menu;
     }
 
