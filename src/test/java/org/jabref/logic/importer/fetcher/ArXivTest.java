@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Assert;
@@ -52,39 +53,40 @@ public class ArXivTest {
     }
 
     @Test
-    public void noIdentifierPresent() throws IOException {
+    public void findFullTextForEmptyEntryResultsEmptyOptional() throws IOException {
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
+    public void findFullTextRejectsNullParameter() throws IOException {
         finder.findFullText(null);
         Assert.fail();
     }
 
     @Test
-    public void findByDOI() throws IOException {
+    public void findFullTextByDOI() throws IOException {
         entry.setField(FieldName.DOI, "10.1529/biophysj.104.047340");
         entry.setField(FieldName.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
+
     }
 
     @Test
-    public void findByEprint() throws IOException {
+    public void findFullTextByEprint() throws IOException {
         entry.setField("eprint", "1603.06570");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
     @Test
-    public void findByEprintWithPrefix() throws IOException {
+    public void findFullTextByEprintWithPrefix() throws IOException {
         entry.setField("eprint", "arXiv:1603.06570");
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/1603.06570v1")), finder.findFullText(entry));
     }
 
     @Test
-    public void findByEprintWithUnknownDOI() throws IOException {
+    public void findFullTextByEprintWithUnknownDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
         entry.setField("eprint", "1603.06570");
 
@@ -92,21 +94,36 @@ public class ArXivTest {
     }
 
     @Test
-    public void notFoundByUnknownDOI() throws IOException {
+    public void findFullTextByTitle() throws IOException {
+        entry.setField("title", "Pause Point Spectra in DNA Constant-Force Unzipping");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
+    }
+
+    @Test
+    public void findFullTextByTitleAndPartOfAuthor() throws IOException {
+        entry.setField("title", "Pause Point Spectra in DNA Constant-Force Unzipping");
+        entry.setField("author", "Weeks and Lucks");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), finder.findFullText(entry));
+    }
+
+    @Test
+    public void notFindFullTextByUnknownDOI() throws IOException {
         entry.setField("doi", "10.1529/unknown");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void notFoundByUnknownId() throws IOException {
+    public void notFindFullTextByUnknownId() throws IOException {
         entry.setField("eprint", "1234.12345");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void findByDOINotAvailableInCatalog() throws IOException {
+    public void findFullTextByDOINotAvailableInCatalog() throws IOException {
         entry.setField(FieldName.DOI, "10.1016/0370-2693(77)90015-6");
         entry.setField(FieldName.TITLE, "Superspace formulation of supergravity");
 
@@ -172,5 +189,12 @@ public class ArXivTest {
         expectedException.expect(FetcherException.class);
         expectedException.expectMessage("incorrect id format");
         finder.performSearchById("123412345");
+    }
+
+    @Test
+    public void searchIdentifierForSlicePaper() throws Exception {
+        sliceTheoremPaper.clearField(FieldName.EPRINT);
+
+        assertEquals(ArXivIdentifier.parse("1405.2249v1"), finder.findIdentifier(sliceTheoremPaper));
     }
 }

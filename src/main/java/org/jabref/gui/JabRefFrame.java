@@ -1177,7 +1177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         quality.add(findUnlinkedFiles);
         quality.add(autoLinkFile);
 
-        for (IdFetcher fetcher : WebFetchers.getIdFetchers()) {
+        for (IdFetcher fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             lookupIdentifiers.add(new LookupIdentifierAction(this, fetcher));
         }
         quality.add(lookupIdentifiers);
