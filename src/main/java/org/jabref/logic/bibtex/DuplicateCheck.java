@@ -62,6 +62,9 @@ public class DuplicateCheck {
      * Requirements:
      * 1. Equal entry type
      *
+     * Checks:
+     * 1. Equal identifier (DOI)
+     *
      * @param one BibEntry
      * @param two BibEntry
      * @return boolean
@@ -70,6 +73,11 @@ public class DuplicateCheck {
         // same entry type
         if (!one.getType().equals(two.getType())) {
             return false;
+        }
+
+        // same identifier
+        if (compareSingleField(FieldName.DOI, one, two) == 1) {
+            return true;
         }
 
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
