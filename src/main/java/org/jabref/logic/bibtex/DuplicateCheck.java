@@ -1,4 +1,4 @@
-package org.jabref.model;
+package org.jabref.logic.bibtex;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
@@ -46,7 +47,6 @@ public class DuplicateCheck {
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final Map<String, Double> FIELD_WEIGHTS = new HashMap<>();
 
-
     static {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR, 2.5);
@@ -54,24 +54,25 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() {
-    }
+    private DuplicateCheck() {}
 
     /**
      * Checks if the two entries represent the same publication.
+     *
+     * Requirements:
+     * 1. Equal entry type
      *
      * @param one BibEntry
      * @param two BibEntry
      * @return boolean
      */
     public static boolean isDuplicate(BibEntry one, BibEntry two, BibDatabaseMode bibDatabaseMode) {
-
-        // First check if they are of the same type - a necessary condition:
+        // same entry type
         if (!one.getType().equals(two.getType())) {
             return false;
         }
-        EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
+        EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
         // The check if they have the same required fields:
         List<String> var = type.getRequiredFieldsFlat();
         double[] req;

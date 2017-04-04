@@ -83,7 +83,7 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.Defaults;
-import org.jabref.model.DuplicateCheck;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

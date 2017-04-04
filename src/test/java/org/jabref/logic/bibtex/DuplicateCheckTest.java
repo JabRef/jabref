@@ -1,5 +1,6 @@
-package org.jabref.model;
+package org.jabref.logic.bibtex;
 
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;

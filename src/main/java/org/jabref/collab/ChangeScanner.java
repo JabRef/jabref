@@ -29,7 +29,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
-import org.jabref.model.DuplicateCheck;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.EntrySorter;
