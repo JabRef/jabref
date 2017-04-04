@@ -11,7 +11,6 @@ import org.jabref.model.strings.StringUtil;
 
 /**
  * String constants for BibTeX entry field names
- *
  */
 public class FieldName {
     // Character separating field names that are to be used in sequence as
@@ -191,10 +190,12 @@ public class FieldName {
         return StringUtil.capitalizeFirst(field);
     }
 
-    public static ArrayList getNotTextFieldNames() {
-        ArrayList<String> notTextFieldNames = new ArrayList<>();
-        notTextFieldNames.addAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
-    return notTextFieldNames;
+    public static List<String> getNotTextFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR);
+    }
+
+    public static List<String> getIdentifierFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.ISBN, FieldName.ISSN, FieldName.ISRN, FieldName.EPRINT, FieldName.PMID);
     }
 
 }
