@@ -76,7 +76,7 @@ public class DuplicateCheck {
         }
 
         // same identifier
-        if (compareSingleField(FieldName.DOI, one, two) == 1) {
+        if (hasSameIdentifier(one, two)) {
             return true;
         }
 
@@ -102,6 +102,15 @@ public class DuplicateCheck {
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
+    }
+
+    private static boolean hasSameIdentifier(BibEntry one, BibEntry two) {
+        for (String name : FieldName.getIdentifierFieldNames()) {
+            if (compareSingleField(name, one, two) == 1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
