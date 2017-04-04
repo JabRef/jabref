@@ -66,6 +66,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
 
 ### Fixed
+ - We fixed an issue of duplicate keys after using a fetcher, e.g., DOI or ISBN [#2867](https://github.com/JabRef/jabref/issues/2687)
  - We fixed an issue that prevented multiple parallel JabRef instances from terminating gracefully. [#2698](https://github.com/JabRef/jabref/issues/2698)
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
