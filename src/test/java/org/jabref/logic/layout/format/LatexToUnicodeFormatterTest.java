@@ -152,6 +152,7 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("L'oscillation", formatter.format("L'oscillation"));
     }
 
+    @Test
     public void testApostrophC() {
         assertEquals("O'Connor", formatter.format("O'Connor"));
     }
