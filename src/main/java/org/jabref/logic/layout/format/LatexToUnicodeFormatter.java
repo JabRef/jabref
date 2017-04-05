@@ -15,9 +15,9 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     private Pattern underscoreMatcher = Pattern.compile("_(?!\\{)");
 
-    private String underscorePlaceholder = "JABREFUNDERSCORE";
+    private String replacementChar = "\uFFFD";
 
-    private Pattern underscorePlaceholderMatcher = Pattern.compile(underscorePlaceholder);
+    private Pattern underscorePlaceholderMatcher = Pattern.compile(replacementChar);
 
     @Override
     public String getName() {
@@ -31,7 +31,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String inField) {
-        String toFormat = underscoreMatcher.matcher(inField).replaceAll(underscorePlaceholder);
+        String toFormat = underscoreMatcher.matcher(inField).replaceAll(replacementChar);
         toFormat = LatexToUnicodeAdapter.format(toFormat);
         return underscorePlaceholderMatcher.matcher(toFormat).replaceAll("_");
     }
