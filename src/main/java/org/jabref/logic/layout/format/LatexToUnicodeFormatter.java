@@ -1,5 +1,7 @@
 package org.jabref.logic.layout.format;
 
+import java.util.regex.Pattern;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.cleanup.Formatter;
@@ -10,6 +12,12 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
  * and removes other LaTeX commands without handling them.
  */
 public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
+
+    private Pattern underscoreMatcher = Pattern.compile("_(?!\\{)");
+
+    private String underscorePlaceholder = "JABREFUNDERSCORE";
+
+    private Pattern underscorePlaceholderMatcher = Pattern.compile(underscorePlaceholder);
 
     @Override
     public String getName() {
@@ -23,7 +31,9 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String inField) {
-        return LatexToUnicodeAdapter.format(inField);
+        String toFormat = underscoreMatcher.matcher(inField).replaceAll(underscorePlaceholder);
+        toFormat = LatexToUnicodeAdapter.format(toFormat);
+        return underscorePlaceholderMatcher.matcher(toFormat).replaceAll("_");
     }
 
     @Override

@@ -153,7 +153,11 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    public void testApostrophC() {
-        assertEquals("O'Connor", formatter.format("O'Connor"));
+    public void testCustomUnderscoreConversion() {
+        // our custom version which should preserve the _
+        assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
+        // when used with braces the normal unicode conversion should kick in
+        assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
+
 }

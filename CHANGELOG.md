@@ -64,6 +64,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Entries with a single corporate author are now correclty exported to the corresponding `corporate` author field in MS-Office XML. [#1497](https://github.com/JabRef/jabref/issues/1497)
 - Improved author handling in MS-Office Import/Export
 - The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
+- Single underscores are not converted to during the LaTeX to unicode conversion, which does not follow the rules of LaTeX, but is what users requre. [#2664](https://github.com/JabRef/jabref/issues/2664)
 
 ### Fixed
  - We fixed an issue of duplicate keys after using a fetcher, e.g., DOI or ISBN [#2867](https://github.com/JabRef/jabref/issues/2687)
