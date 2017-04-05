@@ -116,6 +116,8 @@ public class JabRefMain extends Application {
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
                     Globals.shutdownThreadPools();
+                    // needed to tell JavaFx to stop
+                    Platform.exit();
                     return;
                 }
             }

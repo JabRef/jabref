@@ -1,9 +1,12 @@
-package org.jabref.model;
+package org.jabref.logic.bibtex;
 
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryType;
 import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.FieldName;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -11,6 +14,21 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class DuplicateCheckTest {
+
+    private BibEntry simpleArticle;
+    private BibEntry unrelatedArticle;
+
+    @Before
+    public void setUp() {
+        simpleArticle = new BibEntry(BibtexEntryTypes.ARTICLE.getName())
+                .withField(FieldName.AUTHOR, "Single Author")
+                .withField(FieldName.TITLE, "A serious paper about something")
+                .withField(FieldName.YEAR, "2017");
+        unrelatedArticle = new BibEntry(BibtexEntryTypes.ARTICLE.getName())
+                .withField(FieldName.AUTHOR, "Completely Different")
+                .withField(FieldName.TITLE, "Holy Moly Uffdada und Trallalla")
+                .withField(FieldName.YEAR, "1992");
+    }
 
     @Test
     public void testDuplicateDetection() {
@@ -77,6 +95,52 @@ public class DuplicateCheckTest {
         assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2)), 0.01);
         assertEquals(0.78, (DuplicateCheck.correlateByWords(d1, d3)), 0.01);
         assertEquals(0.78, (DuplicateCheck.correlateByWords(d2, d3)), 0.01);
+    }
+
+    @Test
+    public void twoUnrelatedEntriesAreNoDuplicates() {
+        assertFalse(DuplicateCheck.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoUnrelatedEntriesWithDifferentDoisAreNoDuplicates() {
+        simpleArticle.setField(FieldName.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(FieldName.DOI, "10.1016/j.is.2004.02.00X");
+
+        assertFalse(DuplicateCheck.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoUnrelatedEntriesWithEqualDoisAreDuplicates() {
+        simpleArticle.setField(FieldName.DOI, "10.1016/j.is.2004.02.002");
+        unrelatedArticle.setField(FieldName.DOI, "10.1016/j.is.2004.02.002");
+
+        assertTrue(DuplicateCheck.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoUnrelatedEntriesWithEqualPmidAreDuplicates() {
+        simpleArticle.setField(FieldName.PMID, "12345678");
+        unrelatedArticle.setField(FieldName.PMID, "12345678");
+
+        assertTrue(DuplicateCheck.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoUnrelatedEntriesWithEqualEprintAreDuplicates() {
+        simpleArticle.setField(FieldName.EPRINT, "12345678");
+        unrelatedArticle.setField(FieldName.EPRINT, "12345678");
+
+        assertTrue(DuplicateCheck.isDuplicate(simpleArticle, unrelatedArticle, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void twoEntriesWithSameDoiButDifferentTypesAreDuplicates() {
+        simpleArticle.setField(FieldName.DOI, "10.1016/j.is.2004.02.002");
+        BibEntry duplicateWithDifferentType = (BibEntry) simpleArticle.clone();
+        duplicateWithDifferentType.setType(BibtexEntryTypes.INCOLLECTION);
+
+        assertTrue(DuplicateCheck.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
 }

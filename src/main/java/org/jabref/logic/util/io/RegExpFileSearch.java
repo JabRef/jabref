@@ -21,7 +21,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class RegExpFileSearch {
-
     private static final Log LOGGER = LogFactory.getLog(RegExpFileSearch.class);
 
     private static final String EXT_MARKER = "__EXTENSION__";
@@ -120,7 +119,6 @@ public class RegExpFileSearch {
     /**
      * Internal Version of findFile, which also accepts a current directory to
      * base the search on.
-     *
      */
     private static List<File> findFile(BibEntry entry, String directory, String file, String extensionRegExp,
             Character keywordDelimiter) {

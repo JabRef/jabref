@@ -56,7 +56,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
 - We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
 - A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
-- Using "Look up document identifier" in the quality menu, it is possible to look up DOIs and other identifiers for multiple entries.
+- Using "Look up document identifier" in the quality menu, it is possible to look up DOIs, ArXiv ids and other identifiers for multiple entries.
 - F4 opens selected file in current JTable context not just from selected entry inside the main table [#2355](https://github.com/JabRef/jabref/issues/2355)
 - We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
 - Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
@@ -66,6 +66,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
 
 ### Fixed
+ - We fixed an issue of duplicate keys after using a fetcher, e.g., DOI or ISBN [#2867](https://github.com/JabRef/jabref/issues/2687)
+ - We fixed an issue that prevented multiple parallel JabRef instances from terminating gracefully. [#2698](https://github.com/JabRef/jabref/issues/2698)
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
  - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)

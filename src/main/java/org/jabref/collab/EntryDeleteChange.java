@@ -7,8 +7,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
