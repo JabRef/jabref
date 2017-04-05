@@ -152,6 +152,10 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("L'oscillation", formatter.format("L'oscillation"));
     }
 
+    public void testApostrophC() {
+        assertEquals("O'Connor", formatter.format("O'Connor"));
+    }
+
     @Test
     public void testCustomUnderscoreConversion() {
         // our custom version which should preserve the _
