@@ -158,10 +158,12 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    public void testCustomUnderscoreConversion() {
-        // our custom version which should preserve the _
+    public void testPreservationOfSingleUnderscore() {
         assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
-        // when used with braces the normal unicode conversion should kick in
+    }
+
+    @Test
+    public void testConversionOfUnderscoreWithBraces() {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
 
