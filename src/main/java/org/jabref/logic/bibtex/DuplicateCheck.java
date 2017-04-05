@@ -59,25 +59,19 @@ public class DuplicateCheck {
     /**
      * Checks if the two entries represent the same publication.
      *
-     * Requirements:
-     * 1. Equal entry type
-     *
-     * Checks:
-     * 1. Equal identifier (DOI)
-     *
      * @param one BibEntry
      * @param two BibEntry
      * @return boolean
      */
     public static boolean isDuplicate(BibEntry one, BibEntry two, BibDatabaseMode bibDatabaseMode) {
-        // same entry type
-        if (!one.getType().equals(two.getType())) {
-            return false;
-        }
-
         // same identifier
         if (hasSameIdentifier(one, two)) {
             return true;
+        }
+
+        // same entry type
+        if (!one.getType().equals(two.getType())) {
+            return false;
         }
 
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
@@ -106,7 +100,7 @@ public class DuplicateCheck {
 
     private static boolean hasSameIdentifier(BibEntry one, BibEntry two) {
         for (String name : FieldName.getIdentifierFieldNames()) {
-            if (compareSingleField(name, one, two) == 1) {
+            if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
                 return true;
             }
         }
