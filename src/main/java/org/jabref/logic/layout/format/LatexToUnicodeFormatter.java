@@ -13,12 +13,6 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
  */
 public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
-    private Pattern underscoreMatcher = Pattern.compile("_(?!\\{)");
-
-    private String replacementChar = "\uFFFD";
-
-    private Pattern underscorePlaceholderMatcher = Pattern.compile(replacementChar);
-
     @Override
     public String getName() {
         return Localization.lang("LaTeX to Unicode");
@@ -31,9 +25,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     @Override
     public String format(String inField) {
-        String toFormat = underscoreMatcher.matcher(inField).replaceAll(replacementChar);
-        toFormat = LatexToUnicodeAdapter.format(toFormat);
-        return underscorePlaceholderMatcher.matcher(toFormat).replaceAll("_");
+        return LatexToUnicodeAdapter.format(inField);
     }
 
     @Override
