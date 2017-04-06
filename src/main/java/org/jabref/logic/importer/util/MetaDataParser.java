@@ -61,37 +61,36 @@ public class MetaDataParser {
             }
 
             switch (entry.getKey()) {
-            case MetaData.GROUPSTREE:
+                case MetaData.GROUPSTREE:
                 case MetaData.GROUPSTREE_LEGACY:
-                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
-                break;
-            case MetaData.SAVE_ACTIONS:
-                metaData.setSaveActions(Cleanups.parse(value));
-                break;
-            case MetaData.DATABASE_TYPE:
-                metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
-                break;
-            case MetaData.KEYPATTERNDEFAULT:
-                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
-                break;
-            case MetaData.PROTECTED_FLAG_META:
-                if (Boolean.parseBoolean(getSingleItem(value))) {
-                    metaData.markAsProtected();
-                } else {
-                    metaData.markAsNotProtected();
-                }
-                break;
-            case MetaData.FILE_DIRECTORY:
-                metaData.setDefaultFileDirectory(getSingleItem(value));
-                break;
-            case MetaData.SAVE_ORDER_CONFIG:
-                metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
-                break;
-            case "groupsversion":
-            case "groups":
-                // These keys were used in previous JabRef versions, we will not support them anymore -> ignored
-                break;
-
+                    metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
+                    break;
+                case MetaData.SAVE_ACTIONS:
+                    metaData.setSaveActions(Cleanups.parse(value));
+                    break;
+                case MetaData.DATABASE_TYPE:
+                    metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
+                    break;
+                case MetaData.KEYPATTERNDEFAULT:
+                    defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
+                    break;
+                case MetaData.PROTECTED_FLAG_META:
+                    if (Boolean.parseBoolean(getSingleItem(value))) {
+                        metaData.markAsProtected();
+                    } else {
+                        metaData.markAsNotProtected();
+                    }
+                    break;
+                case MetaData.FILE_DIRECTORY:
+                    metaData.setDefaultFileDirectory(getSingleItem(value));
+                    break;
+                case MetaData.SAVE_ORDER_CONFIG:
+                    metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+                    break;
+                case "groupsversion":
+                case "groups":
+                    // These keys were used in previous JabRef versions, we will not support them anymore -> ignored
+                    break;
             }
         }
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
