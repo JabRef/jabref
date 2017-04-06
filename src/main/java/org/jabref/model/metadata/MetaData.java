@@ -50,7 +50,7 @@ public class MetaData {
     private boolean isProtected;
     private String defaultFileDirectory;
     private ContentSelectors contentSelectors = new ContentSelectors();
-
+    private Map<String, List<String>> unkownMetaData = new HashMap<>();
 
     /**
      * Constructs an empty metadata.
@@ -99,8 +99,8 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br />
-     *                     A reference to this object is stored internally and is returned at getCiteKeyPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
+     *                         is returned at getCiteKeyPattern();
      */
     public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
@@ -271,6 +271,17 @@ public class MetaData {
 
     public Map<String, String> getUserFileDirectories() {
         return Collections.unmodifiableMap(userFileDirectory);
+    }
+
+    public Map<String, List<String>> getUnknownMetaData() {
+        return Collections.unmodifiableMap(unkownMetaData);
+    }
+
+    public void putUnkownMetaDataItem(String key, List<String> value) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+
+        unkownMetaData.put(key, value);
     }
 
     @Override
