@@ -39,7 +39,7 @@ public class DocumentViewerControl extends StackPane {
     public DocumentViewerControl(TaskExecutor taskExecutor) {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
-        this.getStyleClass().setAll("document-viewer");
+        this.getStyleClass().add("document-viewer");
 
         // External changes to currentPage should result in scrolling to this page
         EasyBind.subscribe(currentPage, this::showPage);
@@ -146,7 +146,7 @@ public class DocumentViewerControl extends StackPane {
 
             imageView = new ImageView();
             imageHolder = new StackPane();
-            imageHolder.getStyleClass().setAll("page");
+            imageHolder.getStyleClass().add("page");
 
             // Show progress indicator
             ProgressIndicator progress = new ProgressIndicator();
