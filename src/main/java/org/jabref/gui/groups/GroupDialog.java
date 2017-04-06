@@ -18,7 +18,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -33,6 +32,7 @@ import javafx.scene.paint.Color;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.Dialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -60,7 +60,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
+class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -132,7 +132,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super(jabrefFrame, Localization.lang("Edit group"), true);
+        super(jabrefFrame, Localization.lang("Edit group"), true, GroupDialog.class);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
