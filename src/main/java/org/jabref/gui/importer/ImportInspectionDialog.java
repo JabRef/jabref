@@ -75,6 +75,7 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.gui.util.component.CheckBoxMessage;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
@@ -83,7 +84,6 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.Defaults;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -141,7 +141,11 @@ import org.apache.commons.logging.LogFactory;
 public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
 
     private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
-    private BasePanel panel;
+    private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
+    private static final int DUPL_COL = 1;
+    private static final int FILE_COL = 2;
+    private static final int URL_COL = 3;
+    private static final int PAD = 4;
     private final JabRefFrame frame;
     private final BibDatabaseContext bibDatabaseContext;
     private final JSplitPane contentPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -153,7 +157,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JButton generate = new JButton(Localization.lang("Generate now"));
     private final EventList<BibEntry> entries = new BasicEventList<>();
     private final SortedList<BibEntry> sortedList;
-
     /**
      * Duplicate resolving may require deletion of old entries.
      */
@@ -165,8 +168,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JButton deselectAllDuplicates = new JButton(Localization.lang("Deselect all duplicates"));
     private final JButton stop = new JButton(Localization.lang("Stop"));
     private final PreviewPanel preview;
-    private boolean generatedKeys; // Set to true after keys have been generated.
-    private boolean defaultSelected = true;
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final Map<BibEntry, Set<GroupTreeNode>> groupAdditions = new HashMap<>();
     private final JCheckBox autoGenerate = new JCheckBox(Localization.lang("Generate keys"),
@@ -174,11 +175,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private final JLabel duplLabel = new JLabel(IconTheme.JabRefIcon.DUPLICATE.getSmallIcon());
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
-    private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
-    private static final int DUPL_COL = 1;
-    private static final int FILE_COL = 2;
-    private static final int URL_COL = 3;
-    private static final int PAD = 4;
+    private BasePanel panel;
+    private boolean generatedKeys; // Set to true after keys have been generated.
+    private boolean defaultSelected = true;
 
 
     /**
@@ -560,6 +559,115 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         return action;
     }
 
+    public void addCallBack(CallBack cb) {
+        callBacks.add(cb);
+    }
+
+    private void signalStopFetching() {
+        callBacks.forEach(CallBack::stopFetching);
+    }
+
+    private void setWidths() {
+        TableColumnModel cm = glTable.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(55);
+        cm.getColumn(0).setMinWidth(55);
+        cm.getColumn(0).setMaxWidth(55);
+        for (int i = 1; i < PAD; i++) {
+            // Lock the width of icon columns.
+            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+        }
+
+        for (int i = 0; i < INSPECTION_FIELDS.size(); i++) {
+            int width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
+            glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
+        }
+    }
+
+    private void setupComparatorChooser() {
+        // First column:
+
+        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
+        comparators.clear();
+
+        comparators = comparatorChooser.getComparatorsForColumn(1);
+        comparators.clear();
+
+        // Icon columns:
+        for (int i = 2; i < PAD; i++) {
+            comparators = comparatorChooser.getComparatorsForColumn(i);
+            comparators.clear();
+            if (i == FILE_COL) {
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
+            } else if (i == URL_COL) {
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
+            }
+        }
+        // Remaining columns:
+        for (int i = PAD; i < (PAD + INSPECTION_FIELDS.size()); i++) {
+            comparators = comparatorChooser.getComparatorsForColumn(i);
+            comparators.clear();
+            comparators.add(new FieldComparator(INSPECTION_FIELDS.get(i - PAD)));
+        }
+
+        sortedList.getReadWriteLock().writeLock().lock();
+        try {
+            comparatorChooser.appendComparator(PAD, 0, false);
+        } finally {
+            sortedList.getReadWriteLock().writeLock().unlock();
+        }
+    }
+
+    /**
+     * The "defaultSelected" boolean value determines if new entries added are
+     * selected for import or not. This value is true by default.
+     *
+     * @param defaultSelected The desired value.
+     */
+    public void setDefaultSelected(boolean defaultSelected) {
+        this.defaultSelected = defaultSelected;
+    }
+
+    @Override
+    public void setStatus(String s) {
+        frame.setStatus(s);
+    }
+
+    @Override
+    public void showMessage(String message, String title, int msgType) {
+        JOptionPane.showMessageDialog(this, message, title, msgType);
+    }
+
+    @Override
+    public void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle, String localizedException) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedException,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
+    }
+
+    public JabRefFrame getFrame() {
+        return frame;
+    }
+
+    @FunctionalInterface
+    public interface CallBack {
+
+        /**
+         * This method is called by the dialog when the user has canceled or
+         * signaled a stop. It is expected that any long-running fetch
+         * operations will stop after this method is called.
+         */
+        void stopFetching();
+    }
 
     /**
      * Stores the information about the selected entries being scheduled for
@@ -599,12 +707,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
         }
     }
-
-
-    public void addCallBack(CallBack cb) {
-        callBacks.add(cb);
-    }
-
 
     private class OkListener implements ActionListener {
 
@@ -729,10 +831,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
 
                 entry.setId(IdGenerator.next());
-                panel.getDatabase().insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
-
             }
+            panel.getDatabase().insertEntries(selected);
 
             ce.end();
             panel.getUndoManager().addEdit(ce);
@@ -791,30 +892,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
 
     }
-
-
-    private void signalStopFetching() {
-        callBacks.forEach(CallBack::stopFetching);
-    }
-
-    private void setWidths() {
-        TableColumnModel cm = glTable.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(55);
-        cm.getColumn(0).setMinWidth(55);
-        cm.getColumn(0).setMaxWidth(55);
-        for (int i = 1; i < PAD; i++) {
-            // Lock the width of icon columns.
-            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-        }
-
-        for (int i = 0; i < INSPECTION_FIELDS.size(); i++) {
-            int width = InternalBibtexFields.getFieldLength(INSPECTION_FIELDS.get(i));
-            glTable.getColumnModel().getColumn(i + PAD).setPreferredWidth(width);
-        }
-    }
-
 
     private class DeleteListener extends AbstractAction {
 
@@ -1283,67 +1360,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-
-    private void setupComparatorChooser() {
-        // First column:
-
-        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
-        comparators.clear();
-
-        comparators = comparatorChooser.getComparatorsForColumn(1);
-        comparators.clear();
-
-        // Icon columns:
-        for (int i = 2; i < PAD; i++) {
-            comparators = comparatorChooser.getComparatorsForColumn(i);
-            comparators.clear();
-            if (i == FILE_COL) {
-                comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
-            } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
-            }
-
-        }
-        // Remaining columns:
-        for (int i = PAD; i < (PAD + INSPECTION_FIELDS.size()); i++) {
-            comparators = comparatorChooser.getComparatorsForColumn(i);
-            comparators.clear();
-            comparators.add(new FieldComparator(INSPECTION_FIELDS.get(i - PAD)));
-        }
-
-        sortedList.getReadWriteLock().writeLock().lock();
-        try {
-            comparatorChooser.appendComparator(PAD, 0, false);
-        } finally {
-            sortedList.getReadWriteLock().writeLock().unlock();
-        }
-
-    }
-
-
-    @FunctionalInterface
-    public interface CallBack {
-
-        /**
-         * This method is called by the dialog when the user has canceled or
-         * signaled a stop. It is expected that any long-running fetch
-         * operations will stop after this method is called.
-         */
-        void stopFetching();
-    }
-
-
-    /**
-     * The "defaultSelected" boolean value determines if new entries added are
-     * selected for import or not. This value is true by default.
-     *
-     * @param defaultSelected The desired value.
-     */
-    public void setDefaultSelected(boolean defaultSelected) {
-        this.defaultSelected = defaultSelected;
-    }
-
-
     class EntryTable extends JTable {
 
         private final GeneralRenderer renderer = new GeneralRenderer(Color.white);
@@ -1447,35 +1463,5 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
         }
 
-    }
-
-
-    @Override
-    public void setStatus(String s) {
-        frame.setStatus(s);
-    }
-
-    @Override
-    public void showMessage(String message, String title, int msgType) {
-        JOptionPane.showMessageDialog(this, message, title, msgType);
-    }
-
-    @Override
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(this, message);
-    }
-
-    /**
-     * Displays a dialog which tells the user that an error occurred while fetching entries
-     */
-    public void showErrorMessage(String fetcherTitle, String localizedException) {
-        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
-                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
-                        localizedException,
-                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
-    }
-
-    public JabRefFrame getFrame() {
-        return frame;
     }
 }

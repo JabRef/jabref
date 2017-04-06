@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -193,20 +194,31 @@ public class BibDatabase {
      * @return false if the insert was done without a duplicate warning
      */
     public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
-        Objects.requireNonNull(entry);
-
-        String id = entry.getId();
-        if (containsEntryWithId(id)) {
-            throw new KeyCollisionException("ID is already in use, please choose another");
-        }
-
-        internalIDs.add(id);
-        entries.add(entry);
-        entry.registerListener(this);
-
-        eventBus.post(new EntryAddedEvent(entry, eventSource));
+        insertEntries(Collections.singletonList(entry), eventSource);
         return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
+
+    public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
+        insertEntries(entries, EntryEventSource.LOCAL);
+    }
+
+    private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+        Objects.requireNonNull(newEntries);
+
+        for (BibEntry entry : newEntries) {
+            String id = entry.getId();
+            if (containsEntryWithId(id)) {
+                throw new KeyCollisionException("ID is already in use, please choose another");
+            }
+
+            internalIDs.add(id);
+            entry.registerListener(this);
+
+            eventBus.post(new EntryAddedEvent(entry, eventSource));
+        }
+        entries.addAll(newEntries);
+    }
+
 
     /**
      * Removes the given entry.

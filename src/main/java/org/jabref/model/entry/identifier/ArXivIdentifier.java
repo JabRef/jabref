@@ -3,7 +3,9 @@ package org.jabref.model.entry.identifier;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ArXivIdentifier {
+import org.jabref.model.entry.FieldName;
+
+public class ArXivIdentifier implements Identifier {
 
     private final String identifier;
 
@@ -31,6 +33,12 @@ public class ArXivIdentifier {
         return identifier.hashCode();
     }
 
+    @Override
+    public String getDefaultField() {
+        return FieldName.EPRINT;
+    }
+
+    @Override
     public String getNormalized() {
         return identifier;
     }

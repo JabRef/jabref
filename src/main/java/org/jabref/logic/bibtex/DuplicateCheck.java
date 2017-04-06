@@ -1,4 +1,4 @@
-package org.jabref.model;
+package org.jabref.logic.bibtex;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
@@ -24,12 +26,10 @@ import org.apache.commons.logging.LogFactory;
  * This class contains utility method for duplicate checking of entries.
  */
 public class DuplicateCheck {
-
     private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
 
     /*
      * Integer values for indicating result of duplicate check (for entries):
-     *
      */
     private static final int NOT_EQUAL = 0;
     private static final int EQUAL = 1;
@@ -47,7 +47,6 @@ public class DuplicateCheck {
     // Extra weighting of those fields that are most likely to provide correct duplicate detection:
     private static final Map<String, Double> FIELD_WEIGHTS = new HashMap<>();
 
-
     static {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR, 2.5);
@@ -55,8 +54,7 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() {
-    }
+    private DuplicateCheck() {}
 
     /**
      * Checks if the two entries represent the same publication.
@@ -66,13 +64,17 @@ public class DuplicateCheck {
      * @return boolean
      */
     public static boolean isDuplicate(BibEntry one, BibEntry two, BibDatabaseMode bibDatabaseMode) {
+        // same identifier
+        if (hasSameIdentifier(one, two)) {
+            return true;
+        }
 
-        // First check if they are of the same type - a necessary condition:
+        // same entry type
         if (!one.getType().equals(two.getType())) {
             return false;
         }
-        EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
+        EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
         // The check if they have the same required fields:
         List<String> var = type.getRequiredFieldsFlat();
         double[] req;
@@ -94,6 +96,15 @@ public class DuplicateCheck {
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
+    }
+
+    private static boolean hasSameIdentifier(BibEntry one, BibEntry two) {
+        for (String name : FieldName.getIdentifierFieldNames()) {
+            if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
@@ -249,51 +260,18 @@ public class DuplicateCheck {
         String longer = s1;
         String shorter = s2;
 
-        if (s1.length() < s2.length()) { // longer should always have greater length
+        if (s1.length() < s2.length()) {
             longer = s2;
             shorter = s1;
         }
+
         int longerLength = longer.length();
+        // both strings are zero length
         if (longerLength == 0) {
             return 1.0;
-            /* both strings are zero length */ }
-        double sim = (longerLength - editDistance(longer, shorter)) / (double) longerLength;
+        }
+        double sim = (longerLength - new StringSimilarity().editDistanceIgnoreCase(longer, shorter)) / (double) longerLength;
         LOGGER.debug("Longer string: " + longer + " Shorter string: " + shorter + " Similarity: " + sim);
         return sim;
-
     }
-
-    /*
-    * Levenshtein Edit Distance
-    * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
-    */
-    private static int editDistance(String s1, String s2) {
-        String s1LowerCase = s1.toLowerCase(Locale.ROOT);
-        String s2LowerCase = s2.toLowerCase(Locale.ROOT);
-
-        int[] costs = new int[s2LowerCase.length() + 1];
-        for (int i = 0; i <= s1LowerCase.length(); i++) {
-            int lastValue = i;
-            for (int j = 0; j <= s2LowerCase.length(); j++) {
-                if (i == 0) {
-                    costs[j] = j;
-                } else if (j > 0) {
-                    int newValue = costs[j - 1];
-                    if (s1LowerCase.charAt(i - 1) != s2LowerCase.charAt(j - 1)) {
-                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                    }
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-
-                }
-            }
-            if (i > 0) {
-                costs[s2LowerCase.length()] = lastValue;
-            }
-        }
-        LOGGER.debug("String 1: " + s1LowerCase + " String 2: " + s2LowerCase + " Distance: " + costs[s2LowerCase.length()]);
-        return costs[s2LowerCase.length()];
-    }
-
-
 }

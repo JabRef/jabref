@@ -87,10 +87,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
- *
- * @author Nosh&Dan
- * @version 25.11.2008 | 23:13:29
- *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
@@ -130,7 +126,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JButton buttonClose;
     /* Options for the TreeView */
     private JButton buttonOptionSelectAll;
-    private JButton buttonOptionUnselectAll;
+    private JButton buttonOptionDeselectAll;
     private JButton buttonOptionExpandAll;
     private JButton buttonOptionCollapseAll;
 
@@ -711,9 +707,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonOptionSelectAll = new JButton();
         buttonOptionSelectAll.setMnemonic('A');
         buttonOptionSelectAll.setAction(actionSelectAll);
-        buttonOptionUnselectAll = new JButton();
-        buttonOptionUnselectAll.setMnemonic('U');
-        buttonOptionUnselectAll.setAction(actionUnselectAll);
+        buttonOptionDeselectAll = new JButton();
+        buttonOptionDeselectAll.setMnemonic('U');
+        buttonOptionDeselectAll.setAction(actionUnselectAll);
         buttonOptionExpandAll = new JButton();
         buttonOptionExpandAll.setMnemonic('E');
         buttonOptionExpandAll.setAction(actionExpandTree);
@@ -809,7 +805,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 GridBagConstraints.NORTHEAST, basicInsets, 1, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionSelectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 0, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionUnselectAll, GridBagConstraints.HORIZONTAL,
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionDeselectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionExpandAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, new Insets(6, 0, 0, 0), 0, 2, 1, 1, 0, 0, 0, 0);

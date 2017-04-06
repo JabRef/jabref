@@ -23,7 +23,7 @@ public class BackgroundTask<V> {
         this.callable = callable;
     }
 
-    public static <V> BackgroundTask<V> run(Callable<V> callable) {
+    public static <V> BackgroundTask<V> wrap(Callable<V> callable) {
         return new BackgroundTask<>(callable);
     }
 
@@ -56,5 +56,9 @@ public class BackgroundTask<V> {
     public BackgroundTask<V> onFailure(Consumer<Exception> onException) {
         this.onException = onException;
         return this;
+    }
+
+    public void executeWith(TaskExecutor taskExecutor) {
+        taskExecutor.execute(this);
     }
 }

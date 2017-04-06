@@ -2,8 +2,9 @@ package org.jabref.logic.msbib;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import org.jabref.model.entry.Author;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -54,12 +55,13 @@ public class MSBibConverter {
             result.number = null;
         }
 
-        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
+        result.day = entry.getFieldOrAlias(FieldName.DAY).orElse(null);
         result.month = entry.getFieldOrAlias(FieldName.MONTH).orElse(null);
 
         if (!entry.getField(FieldName.YEAR).isPresent()) {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
+        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
 
         // Value must be converted
         //Currently only english is supported
@@ -103,23 +105,25 @@ public class MSBibConverter {
             result.publicationTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getLatexFreeField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getLatexFreeField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
 
         return result;
     }
 
-    private static List<PersonName> getAuthors(String authors) {
-        List<PersonName> result = new ArrayList<>();
-
-        if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
-            String[] names = authors.split(" (?i)and ");
-            for (String name : names) {
-                result.add(new PersonName(name));
-            }
-        } else {
-            result.add(new PersonName(authors));
+    private static List<MsBibAuthor> getAuthors(String authors) {
+        List<MsBibAuthor> result = new ArrayList<>();
+        boolean corporate = false;
+        //Only one corporate authors is supported
+        if (authors.startsWith("{") && authors.endsWith("}")) {
+            corporate = true;
         }
+        AuthorList authorList = AuthorList.parse(authors);
+
+        for (Author author : authorList.getAuthors()) {
+            result.add(new MsBibAuthor(author, corporate));
+        }
+
         return result;
     }
 
