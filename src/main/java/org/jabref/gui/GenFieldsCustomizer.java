@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,7 +32,7 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
 
-public class GenFieldsCustomizer extends JDialog {
+public class GenFieldsCustomizer extends JabRefDialog {
 
     private final JPanel buttons = new JPanel();
     private final JButton ok = new JButton();
@@ -50,7 +49,7 @@ public class GenFieldsCustomizer extends JDialog {
     private final JButton revert = new JButton();
 
     public GenFieldsCustomizer(JabRefFrame frame) {
-        super(frame, Localization.lang("Set general fields"), false);
+        super(frame, Localization.lang("Set general fields"), false, GenFieldsCustomizer.class);
         helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));

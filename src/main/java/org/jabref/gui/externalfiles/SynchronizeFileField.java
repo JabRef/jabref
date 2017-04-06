@@ -21,7 +21,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +31,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -282,7 +282,7 @@ public class SynchronizeFileField extends AbstractWorker {
     }
 
 
-    static class OptionsDialog extends JDialog {
+    static class OptionsDialog extends JabRefDialog {
 
 
         private final JButton ok = new JButton(Localization.lang("OK"));
@@ -298,7 +298,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent, BibDatabaseContext databaseContext) {
-            super(parent, Localization.lang("Synchronize file links"), true);
+            super(parent, Localization.lang("Synchronize file links"), true, OptionsDialog.class);
             this.databaseContext = databaseContext;
             ok.addActionListener(e -> {
                 canceled = false;

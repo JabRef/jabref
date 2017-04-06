@@ -15,7 +15,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +25,7 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -201,7 +201,7 @@ public class WriteXMPAction extends AbstractWorker {
     }
 
 
-    class OptionsDialog extends JDialog {
+    class OptionsDialog extends JabRefDialog {
 
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -212,7 +212,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent) {
-            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false);
+            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false, OptionsDialog.class);
             okButton.setEnabled(false);
 
             okButton.addActionListener(e -> dispose());

@@ -64,8 +64,8 @@ public class JabRefMain extends Application {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
 
-        Globals.startBackgroundTasks();
         Globals.prefs = preferences;
+        Globals.startBackgroundTasks();
         Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
 

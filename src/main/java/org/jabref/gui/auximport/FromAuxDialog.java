@@ -12,7 +12,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -24,6 +23,7 @@ import javax.swing.JTextField;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FileDialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.auxparser.AuxParser;
@@ -39,7 +39,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
  */
-public class FromAuxDialog extends JDialog {
+public class FromAuxDialog extends JabRefDialog {
 
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
@@ -64,7 +64,7 @@ public class FromAuxDialog extends JDialog {
 
 
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
-        super(frame, title, modal);
+        super(frame, title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
