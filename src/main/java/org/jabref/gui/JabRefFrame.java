@@ -667,7 +667,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             DialogService dialogService = new FXDialogService();
             boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
-                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. The collected data will be stored on Microsoft Azure and we will only use it to prioritize our development efforts. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
+                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
                     Localization.lang("Share anonymous statistics"),
                     Localization.lang("Don't share"));
             Globals.prefs.setShouldCollectTelemetry(shouldCollect);
