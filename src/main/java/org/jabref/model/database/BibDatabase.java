@@ -3,6 +3,7 @@ package org.jabref.model.database;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -196,6 +197,10 @@ public class BibDatabase {
     public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
         insertEntries(Collections.singletonList(entry), eventSource);
         return duplicationChecker.isDuplicateCiteKeyExisting(entry);
+    }
+
+    public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
+        insertEntries(Arrays.asList(entries), EntryEventSource.LOCAL);
     }
 
     public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
