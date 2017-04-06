@@ -78,7 +78,7 @@ class PreambleEditor extends JDialog {
 
         editor = new TextArea(Localization.lang("Preamble"), database.getPreamble().orElse(""));
 
-        setupJTextComponent((TextArea) editor);
+        //setupJTextComponent((TextArea) editor);
 
         gbl.setConstraints(editor.getLabel(), con);
         pan.add(editor.getLabel());
@@ -157,7 +157,7 @@ class PreambleEditor extends JDialog {
                     editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
                 editor.setValidBackgroundColor();
-                if (editor.getTextComponent().hasFocus()) {
+                if (editor.hasFocus()) {
                     editor.setActiveBackgroundColor();
                 }
                 panel.markBaseChanged();

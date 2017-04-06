@@ -2,12 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -16,10 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -35,7 +26,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -43,7 +33,6 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.MonthUtil;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -129,6 +118,7 @@ public class FieldExtraComponents {
         controls.add(button, BorderLayout.SOUTH);
 
         // enable/disable button
+        /*
         JTextComponent url = (JTextComponent) fieldEditor;
 
         url.getDocument().addDocumentListener(new DocumentListener() {
@@ -155,6 +145,7 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         return Optional.of(controls);
     }
@@ -207,6 +198,7 @@ public class FieldExtraComponents {
         controls.add(fetchButton, BorderLayout.SOUTH);
 
         // enable/disable button
+        /*
         JTextComponent doi = (JTextComponent) fieldEditor;
 
         doi.getDocument().addDocumentListener(new DocumentListener() {
@@ -236,6 +228,7 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         return Optional.of(controls);
     }
@@ -259,6 +252,7 @@ public class FieldExtraComponents {
         });
 
         // enable/disable button
+        /*
         JTextComponent isbn = (JTextComponent) fieldEditor;
 
         isbn.getDocument().addDocumentListener(new DocumentListener() {
@@ -287,6 +281,7 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         return Optional.of(fetchButton);
     }
@@ -310,6 +305,7 @@ public class FieldExtraComponents {
         });
 
         // enable/disable button
+        /*
         JTextComponent eprint = (JTextComponent) fieldEditor;
 
         eprint.getDocument().addDocumentListener(new DocumentListener() {
@@ -337,6 +333,7 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         return Optional.of(fetchButton);
     }
@@ -439,6 +436,7 @@ public class FieldExtraComponents {
      */
     public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, boolean useDatePicker,
             boolean useIsoFormat) {
+        /*
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
             @Override
@@ -455,11 +453,13 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         // insert a datepicker, if the extras field contains this command
         if (useDatePicker) {
             DatePickerButton datePicker = new DatePickerButton(editor, useIsoFormat);
 
+            /*
             // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
             ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
 
@@ -478,6 +478,7 @@ public class FieldExtraComponents {
                     datePicker.updateDatePickerDate(editor.getText());
                 }
             });
+            */
 
             return Optional.of(datePicker.getDatePicker());
         } else {

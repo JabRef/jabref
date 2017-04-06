@@ -351,11 +351,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     @Override
-    public void updateFont() {
-        // Do nothing
-    }
-
-    @Override
     public void paste(String textToInsert) {
         // Do nothing
     }
@@ -574,11 +569,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void setInvalidBackgroundColor() {
-        // Do nothing
-    }
-
-    @Override
-    public void updateFontColor() {
         // Do nothing
     }
 }

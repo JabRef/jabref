@@ -260,11 +260,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     }
 
     @Override
-    public void updateFont() {
-        // Do nothing
-    }
-
-    @Override
     public void paste(String textToInsert) {
         // Do nothing
     }
@@ -409,12 +404,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     public void setInvalidBackgroundColor() {
         // Do nothing
     }
-
-    @Override
-    public void updateFontColor() {
-        // Do nothing
-    }
-
 
     private class EntryLinkListTableModel extends DefaultTableModel {
 

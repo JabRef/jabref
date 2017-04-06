@@ -1,0 +1,20 @@
+.text-area {
+    -fx-text-fill: text-area-foreground;
+    -fx-background-color: text-area-background;
+}
+
+.text-area .content {
+    -fx-background-color: text-area-background;
+}
+
+.text-area:focused {
+
+}
+
+.text-area:focused .content {
+    -fx-background-color:
+            text-area-background,
+            text-area-highlight,
+            linear-gradient(from 0px 0px to 0px 5px, derive(text-area-background, -9%), text-area-background);
+    -fx-background-radius: 3;
+}

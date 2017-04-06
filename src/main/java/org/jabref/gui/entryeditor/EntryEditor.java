@@ -259,6 +259,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void setupFieldPanels() {
         tabbed.removeAll();
+        tabbed.setBackground(GUIGlobals.activeBackgroundColor);
         tabs.clear();
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
                 this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
@@ -417,6 +418,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
         tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
+        tabbed.setBackgroundAt(0, GUIGlobals.validFieldBackgroundColor);
         tabs.add(requiredPanel);
         return requiredFields;
     }
@@ -1278,7 +1280,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 textField.setValidBackgroundColor();
 
-                if (textField.getTextComponent().hasFocus()) {
+                if (textField.hasFocus()) {
                     textField.setActiveBackgroundColor();
                 }
                 updateSource();
@@ -1359,7 +1361,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
                     }
                 }
-                if (fieldEditor.getTextComponent().hasFocus()) {
+                if (fieldEditor.hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {

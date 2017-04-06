@@ -26,6 +26,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.fieldeditors.EntryLinkListEditor;
@@ -34,7 +35,6 @@ import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.TextArea;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -103,9 +103,14 @@ class EntryEditorTab {
         setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
         panel.setName(title);
+        panel.setBackground(GUIGlobals.activeBackgroundColor);
+        panel.setOpaque(true);
+
         // Use the title for the scrollPane, too.
         // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
         scrollPane.setName(title);
+        scrollPane.setBackground(GUIGlobals.activeBackgroundColor);
+        scrollPane.setOpaque(true);
 
         int fieldsPerRow = compressed ? 2 : 1;
 
@@ -150,13 +155,14 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null, getPrompt(field));
-                parent.addSearchListener((TextArea) fieldEditor);
+                //parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
 
             // Add autocompleter listener, if required for this field:
+            /*
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
@@ -164,6 +170,7 @@ class EntryEditorTab {
             }
             setupJTextComponent(fieldEditor.getTextComponent(), autoCompleteListener);
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
+            */
 
             // Store the editor for later reference:
             editors.put(field, fieldEditor);
@@ -285,7 +292,7 @@ class EntryEditorTab {
 
     public void focus() {
         if (activeField != null) {
-            activeField.getTextComponent().requestFocus();
+            activeField.requestFocus();
         }
     }
 
