@@ -10,45 +10,6 @@ import java.util.Set;
 
 public class AuthorListParser {
 
-    /** the raw bibtex author/editor field */
-    private String original;
-
-    /** index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2 */
-    private int tokenStart;
-
-    /** index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5 */
-    private int tokenEnd;
-
-    /** end of token abbreviation (always: tokenStart < tokenAbbr <= tokenEnd), only valid if getToken returns TOKEN_WORD */
-    private int tokenAbbr;
-
-    /** either space of dash */
-    private char tokenTerm;
-
-    /** true if upper-case token, false if lower-case */
-    private boolean tokenCase;
-
-
-    // Constant HashSet containing names of TeX special characters
-    private static final Set<String> TEX_NAMES = new HashSet<>();
-
-    // and static constructor to initialize it
-    static {
-        TEX_NAMES.add("aa");
-        TEX_NAMES.add("ae");
-        TEX_NAMES.add("l");
-        TEX_NAMES.add("o");
-        TEX_NAMES.add("oe");
-        TEX_NAMES.add("i");
-        TEX_NAMES.add("AA");
-        TEX_NAMES.add("AE");
-        TEX_NAMES.add("L");
-        TEX_NAMES.add("O");
-        TEX_NAMES.add("OE");
-        TEX_NAMES.add("j");
-    }
-
-
     private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
 
     // the following are offsets of an entry in a group of entries for one token
@@ -67,6 +28,44 @@ public class AuthorListParser {
     private static final int TOKEN_COMMA = 2;
 
     private static final int TOKEN_WORD = 3;
+
+    // Constant HashSet containing names of TeX special characters
+    private static final Set<String> TEX_NAMES = new HashSet<>();
+
+    /** the raw bibtex author/editor field */
+    private String original;
+
+    /** index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2 */
+    private int tokenStart;
+
+    /** index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5 */
+    private int tokenEnd;
+
+    /** end of token abbreviation (always: tokenStart < tokenAbbr <= tokenEnd), only valid if getToken returns TOKEN_WORD */
+    private int tokenAbbr;
+
+
+    /** either space of dash */
+    private char tokenTerm;
+
+    /** true if upper-case token, false if lower-case */
+    private boolean tokenCase;
+
+
+    static {
+        TEX_NAMES.add("aa");
+        TEX_NAMES.add("ae");
+        TEX_NAMES.add("l");
+        TEX_NAMES.add("o");
+        TEX_NAMES.add("oe");
+        TEX_NAMES.add("i");
+        TEX_NAMES.add("AA");
+        TEX_NAMES.add("AE");
+        TEX_NAMES.add("L");
+        TEX_NAMES.add("O");
+        TEX_NAMES.add("OE");
+        TEX_NAMES.add("j");
+    }
 
     /**
      * Parses the String containing person names and returns a list of person information.
@@ -135,7 +134,7 @@ public class AuthorListParser {
                 if (vonStart < 0) {
                     if (!tokenCase) {
                         int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
-                        if((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
+                        if ((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
                             // We are in a first name which contained a hyphen
                             break;
                         }
@@ -250,7 +249,7 @@ public class AuthorListParser {
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
+        if ((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input

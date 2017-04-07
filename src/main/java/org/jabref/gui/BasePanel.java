@@ -374,7 +374,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             int numSelected;
             boolean canceled;
 
-
             // Run first, in EDT:
             @Override
             public void init() {
@@ -734,7 +733,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
-        if (mainTable.getSelectedRow() != (mainTable.getRowCount() -1)){
+        if (mainTable.getSelectedRow() != (mainTable.getRowCount() - 1)) {
             selectNextEntry();
         } else {
             selectPreviousEntry();
