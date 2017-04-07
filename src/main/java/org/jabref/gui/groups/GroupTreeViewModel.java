@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +34,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
     private Optional<BibDatabaseContext> currentDatabase;
+    private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
+            .getName()
+            .compareToIgnoreCase(v2.getName());
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -40,11 +44,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
 
         // Register listener
-        stateManager.activeDatabaseProperty().addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
+        stateManager.activeDatabaseProperty()
+                .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
         selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
 
         // Set-up bindings
-        filterPredicate.bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
+        filterPredicate
+                .bind(Bindings.createObjectBinding(() -> group -> group.isMatchedBy(filterText.get()), filterText));
 
         // Init
         onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());
@@ -106,7 +112,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             rootGroup.setValue(newRoot);
             stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
-                    selectedGroup -> this.selectedGroup.setValue(new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup)));
+                    selectedGroup -> this.selectedGroup.setValue(
+                            new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup)));
         }
 
         currentDatabase = newDatabase;
@@ -135,7 +142,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+        Optional<AbstractGroup> newGroup = dialogService
+                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
         newGroup.ifPresent(group -> {
 
             // TODO: Keep assignments
@@ -143,11 +151,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     Localization.lang("Change of Grouping Method"),
                     Localization.lang("Assign the original group's entries to this group?"));
             //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-            boolean removePreviousAssignents =
-                    (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup) && (group instanceof ExplicitGroup);
+            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                    && (group instanceof ExplicitGroup);
 
-            List<FieldChange> addChange = oldGroup.
-                    getGroupNode().setGroup(
+            List<FieldChange> addChange = oldGroup.getGroupNode().setGroup(
                     group,
                     keepPreviousAssignments,
                     removePreviousAssignents,
@@ -197,14 +204,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
             //panel.getUndoManager().addEdit(undo);
             GroupTreeNode groupNode = group.getGroupNode();
-            groupNode.getParent().ifPresent(parent ->
-                    groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+            groupNode.getParent()
+                    .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
         }
     }
-
 
     /**
      * Removes the specified group and its subgroups (after asking for confirmation).
@@ -248,5 +254,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // TODO: Add undo
         // if (!undo.isEmpty()) {
         //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+    }
+
+    public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
+        group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
+
     }
 }

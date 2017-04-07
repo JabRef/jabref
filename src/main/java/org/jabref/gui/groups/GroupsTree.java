@@ -20,6 +20,7 @@ public class GroupsTree extends JTree {
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         this.setFocusable(true);
+
     }
 
     /** Highlights the specified cell or disables highlight if cell == null */

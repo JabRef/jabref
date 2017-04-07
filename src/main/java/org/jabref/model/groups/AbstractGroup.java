@@ -45,6 +45,24 @@ public abstract class AbstractGroup implements SearchMatcher {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+        AbstractGroup that = (AbstractGroup) other;
+        return Objects.equals(this.name, that.name) && Objects.equals(this.description, that.description)
+                && Objects.equals(this.context, that.context);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, context);
+    }
+
     public Optional<Color> getColor() {
         return color;
     }
