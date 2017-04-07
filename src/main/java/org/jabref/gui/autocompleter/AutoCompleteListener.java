@@ -146,7 +146,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         int nextCharPosition = textField.getCaretPosition();
 
         // position not at the end of input
-        if(nextCharPosition < textField.getText().length()) {
+        if (nextCharPosition < textField.getText().length()) {
             char nextChar = textField.getText().charAt(nextCharPosition);
             if (!Character.isWhitespace(nextChar)) {
                 return false;

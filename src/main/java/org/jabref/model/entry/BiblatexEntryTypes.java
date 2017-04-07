@@ -31,7 +31,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Article";

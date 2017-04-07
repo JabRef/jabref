@@ -159,7 +159,7 @@ public class EntryTypes {
      */
     public static List<EntryType> getAllCustomTypes(BibDatabaseMode mode) {
         Collection<EntryType> allTypes = getAllValues(mode);
-        if(mode == BibDatabaseMode.BIBTEX) {
+        if (mode == BibDatabaseMode.BIBTEX) {
             return allTypes.stream().filter(entryType -> !BibtexEntryTypes.getType(entryType.getName()).isPresent())
                     .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
