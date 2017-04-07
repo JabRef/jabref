@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,12 +24,16 @@ public class ArchitectureTests {
 
     private static final String PACKAGE_JAVAX_SWING = "javax.swing";
     private static final String PACKAGE_JAVA_AWT = "java.awt";
+    private static final String PACKAGE_JAVA_FX = "javafx";
+
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
     private static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
+    private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
+
     private final String firstPackage;
     private final String secondPackage;
     private Map<String, List<String>> exceptions;
@@ -40,22 +45,31 @@ public class ArchitectureTests {
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new HashMap<>();
+
+        List<String> logicExceptions = new ArrayList<>(2);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_AWT_GEOM);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+
         exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
-                Collections.singletonList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
+                logicExceptions);
+        exceptions.put(PACKAGE_ORG_JABREF_MODEL,
+                Collections.singletonList(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS));
     }
 
 
     @Parameterized.Parameters(name = "{index} -- is {0} independent of {1}?")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] {
+                new Object[][]{
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT},
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_FX},
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI},
                         {PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS},
 
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_FX},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC},
                         {PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS}
@@ -92,5 +106,4 @@ public class ArchitectureTests {
         Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
                 Collections.emptyList(), files);
     }
-
 }
