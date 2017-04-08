@@ -2,6 +2,9 @@ package org.jabref.model.entry;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
+
+import org.jabref.logic.util.io.FileUtil;
 
 public class ParsedFileField {
 
@@ -69,5 +72,13 @@ public class ParsedFileField {
 
     public boolean isEmpty() {
         return NULL_OBJECT.equals(this);
+    }
+
+    public boolean isOnlineLink() {
+        return link.startsWith("http://") || link.startsWith("https://") || link.contains("www.");
+    }
+
+    public Optional<String> getExtension() {
+        return FileUtil.getFileExtension(link);
     }
 }

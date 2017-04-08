@@ -27,7 +27,7 @@ public class FileChecker implements ValueChecker {
     @Override
     public Optional<String> checkValue(String value) {
         List<ParsedFileField> parsedFileFields = FileFieldParser.parse(value).stream()
-                .filter(p -> !(p.getLink().startsWith("http://") || p.getLink().startsWith("https://")))
+                .filter(p -> !p.isOnlineLink())
                 .collect(Collectors.toList());
 
         for (ParsedFileField p : parsedFileFields) {
