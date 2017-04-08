@@ -157,7 +157,7 @@ public class DocumentViewerControl extends StackPane {
             background.setStyle("-fx-fill: WHITE");
             //imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .run(() -> renderPage(initialPage))
+                    .wrap(() -> renderPage(initialPage))
                     .onSuccess(image -> {
                         imageView.setImage(image);
                         progress.setVisible(false);
@@ -197,7 +197,7 @@ public class DocumentViewerControl extends StackPane {
             imageView.setOpacity(0);
 
             BackgroundTask<Image> generateImage = BackgroundTask
-                    .run(() -> renderPage(page))
+                    .wrap(() -> renderPage(page))
                     .onSuccess(image -> {
                         imageView.setImage(image);
 
