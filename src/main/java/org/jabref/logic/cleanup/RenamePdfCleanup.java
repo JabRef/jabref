@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -60,17 +59,16 @@ public class RenamePdfCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
         List<ParsedFileField> newFileList;
         List<ParsedFileField> fileList;
         if (singleFieldCleanup != null) {
             fileList = Arrays.asList(singleFieldCleanup);
 
-            newFileList = typedEntry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
+            newFileList = entry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
-            fileList = typedEntry.getFiles();
+            fileList = entry.getFiles();
         }
 
         boolean changed = false;

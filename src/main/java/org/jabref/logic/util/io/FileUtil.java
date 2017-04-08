@@ -28,8 +28,6 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
@@ -403,12 +401,9 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getField(FieldName.FILE).ifPresent(fileField -> {
-                List<ParsedFileField> fileList = FileField.parse(fileField);
-                for (ParsedFileField file : fileList) {
-                    expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-                }
-            });
+            for (ParsedFileField file : entry.getFiles()) {
+                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
+            }
         }
 
         return result;

@@ -8,7 +8,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.ParsedFileField;
 
 /**
@@ -23,10 +23,10 @@ public class FileLinksCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<ParsedFileField> fileList = FileField.parse(oldValue.get());
+        List<ParsedFileField> fileList = entry.getFiles();
 
         // Parsing automatically moves a single description to link, so we just need to write the fileList back again
-        String newValue = FileField.getStringRepresentation(fileList);
+        String newValue = FileFieldWriter.getStringRepresentation(fileList);
         if (!oldValue.get().equals(newValue)) {
             entry.setField(FieldName.FILE, newValue);
             FieldChange change = new FieldChange(entry, FieldName.FILE, oldValue.get(), newValue);

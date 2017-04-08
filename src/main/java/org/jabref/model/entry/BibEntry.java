@@ -5,6 +5,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -838,13 +839,28 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
         Optional<String> oldValue = this.getField(FieldName.FILE);
-        String newValue = FileField.getStringRepresentation(files);
+        String newValue = FileFieldWriter.getStringRepresentation(files);
 
         if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
             return Optional.empty();
         }
 
         return this.setField(FieldName.FILE, newValue);
+    }
+
+    /**
+     * Gets a list of linked files.
+     *
+     * @return the list of linked files, is never null but can be empty
+     */
+    public List<ParsedFileField> getFiles() {
+        //Extract the path
+        Optional<String> oldValue = getField(FieldName.FILE);
+        if (!oldValue.isPresent()) {
+            return new ArrayList<>();
+        }
+
+        return FileFieldParser.parse(oldValue.get());
     }
 
     private interface GetFieldInterface {

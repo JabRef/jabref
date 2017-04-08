@@ -25,7 +25,7 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
@@ -99,7 +99,7 @@ public class CleanupWorkerTest {
         entry.setField("abstract", "Réflexions");
         File tempFile = bibFolder.newFile();
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         List<FieldChange> changes = worker.cleanup(emptyPreset, entry);
         Assert.assertEquals(Collections.emptyList(), changes);
@@ -226,11 +226,11 @@ public class CleanupWorkerTest {
         tempFile.createNewFile();
         BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -240,11 +240,11 @@ public class CleanupWorkerTest {
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -255,11 +255,11 @@ public class CleanupWorkerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test

@@ -14,7 +14,8 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.FileFieldParser;
+import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.ParsedFileField;
 
 /**
@@ -119,7 +120,7 @@ public class FileListTableModel extends AbstractTableModel {
             value = "";
         }
 
-        List<ParsedFileField> fields = FileField.parse(value);
+        List<ParsedFileField> fields = FileFieldParser.parse(value);
         List<FileListEntry> files = new ArrayList<>();
 
         for(ParsedFileField entry : fields) {
@@ -198,7 +199,7 @@ public class FileListTableModel extends AbstractTableModel {
                 array[i] = entry.getStringArrayRepresentation();
                 i++;
             }
-            return FileField.encodeStringArray(array);
+            return FileFieldWriter.encodeStringArray(array);
         }
     }
 

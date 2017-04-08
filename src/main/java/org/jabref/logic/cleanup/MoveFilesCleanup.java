@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -69,18 +68,17 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
         List<ParsedFileField> fileList;
         List<ParsedFileField> newFileList;
 
         if (singleFileFieldCleanup != null) {
             fileList = Arrays.asList(singleFileFieldCleanup);
             //Add all other except the current selected file
-            newFileList = typedEntry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
+            newFileList = entry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
-            fileList = typedEntry.getFiles();
+            fileList = entry.getFiles();
         }
 
         boolean changed = false;

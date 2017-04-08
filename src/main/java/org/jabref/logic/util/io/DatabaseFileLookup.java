@@ -11,8 +11,6 @@ import java.util.Set;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
@@ -64,10 +62,8 @@ public class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        List<ParsedFileField> entries = FileField.parse(entry.getField(FieldName.FILE).orElse(null));
-
         List<File> fileLinks = new ArrayList<>();
-        for (ParsedFileField field : entries) {
+        for (ParsedFileField field : entry.getFiles()) {
             String link = field.getLink();
 
             // Do not query external file links (huge performance leak)

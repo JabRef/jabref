@@ -11,8 +11,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.preferences.JabRefPreferences;
@@ -38,7 +36,7 @@ public class EntryAnnotationImporter {
      * @return a list of file parsed files
      */
     public List<ParsedFileField> getFilteredFileList() {
-        return FileField.parse(this.entry.getField(FieldName.FILE).get()).stream()
+        return entry.getFiles().stream()
                 .filter(parsedFileField -> parsedFileField.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf"))
                 .filter(parsedFileField -> !parsedFileField.getLink().contains("www.")).collect(Collectors.toList());
     }

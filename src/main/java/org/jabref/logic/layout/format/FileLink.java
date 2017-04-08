@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.logging.Log;
@@ -35,7 +35,7 @@ public class FileLink implements ParamLayoutFormatter {
             return "";
         }
 
-        List<ParsedFileField> fileList = FileField.parse(field);
+        List<ParsedFileField> fileList = FileFieldParser.parse(field);
 
         String link = null;
         if (fileType == null) {

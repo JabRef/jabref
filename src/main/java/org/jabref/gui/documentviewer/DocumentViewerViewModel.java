@@ -19,7 +19,6 @@ import javafx.collections.ListChangeListener;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedFileField;
@@ -90,9 +89,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
-    private void setCurrentEntry(BibEntry rawEntry) {
+    private void setCurrentEntry(BibEntry entry) {
         stateManager.getActiveDatabase().ifPresent(database -> {
-            TypedBibEntry entry = new TypedBibEntry(rawEntry, database);
             List<ParsedFileField> linkedFiles = entry.getFiles();
             // We don't need to switch to the first file, this is done automatically in the UI part
             files.setValue(FXCollections.observableArrayList(linkedFiles));
