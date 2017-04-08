@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An implementation of the FieldEditor backed by a {@link TextAreaFX}.
+ * An implementation of the FieldEditor backed by a {@link EditorTextArea}.
  * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
 public class TextArea implements FieldEditor {
@@ -29,7 +29,7 @@ public class TextArea implements FieldEditor {
 
     private final FieldNameLabel label;
 
-        private final TextAreaFX textArea;
+    private final EditorTextArea textArea;
     private String fieldName;
 
     private AutoCompleteListener autoCompleteListener;
@@ -39,7 +39,7 @@ public class TextArea implements FieldEditor {
     }
 
     public TextArea(String fieldName, String content, String title) {
-        textArea = new TextAreaFX(content);
+        textArea = new EditorTextArea(content);
         textArea.setPromptText(title);
 
         swingPanel = new JFXPanel();

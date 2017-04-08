@@ -4,8 +4,8 @@ import javafx.scene.text.Font;
 
 import org.jabref.gui.GUIGlobals;
 
-public class TextAreaFX extends javafx.scene.control.TextArea {
-    public TextAreaFX(String text) {
+public class EditorTextArea extends javafx.scene.control.TextArea {
+    public EditorTextArea(String text) {
         super(text);
 
         setMinHeight(1);
@@ -23,7 +23,7 @@ public class TextAreaFX extends javafx.scene.control.TextArea {
 
         );
 
-        getStylesheets().add("org/jabref/gui/fieldeditors/TextArea.css");
+        getStylesheets().add("org/jabref/gui/fieldeditors/EditorTextArea.css");
     }
 
     private String convertToHex(java.awt.Color color) {
