@@ -1,14 +1,16 @@
 package org.jabref.model.util;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
@@ -101,35 +103,19 @@ public class FileHelper {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
      */
-    private static Optional<Path> expandFilename(String filename, String dir) {
+    private static Optional<Path> expandFilename(String filename, String directoryName) {
+        Objects.requireNonNull(filename);
+        Objects.requireNonNull(directoryName);
 
-        if ((filename == null) || filename.isEmpty()) {
-            return Optional.empty();
+        Path file = Paths.get(filename);
+        if (Files.exists(file)) {
+            return Optional.of(file);
         }
 
-        String name = filename;
-
-        File file = new File(name);
-        if (file.exists() || (dir == null)) {
-            return Optional.of(file.toPath());
-        }
-
-        if (dir.endsWith(OS.FILE_SEPARATOR)) {
-            name = dir + name;
-        } else {
-            name = dir + OS.FILE_SEPARATOR + name;
-        }
-
-        // fix / and \ problems:
-        if (OS.WINDOWS) {
-            name = SLASH.matcher(name).replaceAll("\\\\");
-        } else {
-            name = BACKSLASH.matcher(name).replaceAll("/");
-        }
-
-        File fileInDir = new File(name);
-        if (fileInDir.exists()) {
-            return Optional.of(fileInDir.toPath());
+        Path directory = Paths.get(directoryName);
+        Path resolvedFile = directory.resolve(file);
+        if (Files.exists(resolvedFile)) {
+            return Optional.of(resolvedFile);
         } else {
             return Optional.empty();
         }
