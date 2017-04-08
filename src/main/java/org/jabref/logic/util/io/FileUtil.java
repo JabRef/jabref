@@ -481,4 +481,9 @@ public class FileUtil {
         }
         return files;
     }
+
+    public static Optional<Path> toPath(ParsedFileField parsedFileField, BibDatabaseContext database, FileDirectoryPreferences directoryPreferences) {
+        Optional<File> path = expandFilename(database, parsedFileField.getLink(), directoryPreferences);
+        return path.map(File::toPath);
+    }
 }

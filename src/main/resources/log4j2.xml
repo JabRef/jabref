@@ -13,6 +13,10 @@
         <Logger name="org.jabref" level="INFO">
             <AppenderRef ref="GuiLogger"/>
         </Logger>
+        <Logger name="org.apache.pdfbox" level="ERROR">
+            <AppenderRef ref="GuiLogger"/>
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
             <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
