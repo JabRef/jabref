@@ -13,10 +13,10 @@ import javax.swing.table.AbstractTableModel;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.util.FileHelper;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -171,7 +171,7 @@ public class FileListTableModel extends AbstractTableModel {
             type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.getFileType());
             if (!type.isPresent()) {
                 // No type could be found from mime type on the extension:
-                Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
+                Optional<String> extension = FileHelper.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
                     Optional<ExternalFileType> typeGuess = ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt(extension.get());

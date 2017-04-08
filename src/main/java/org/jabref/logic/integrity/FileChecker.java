@@ -1,12 +1,12 @@
 package org.jabref.logic.integrity;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.ParsedFileField;
@@ -27,12 +27,12 @@ public class FileChecker implements ValueChecker {
     @Override
     public Optional<String> checkValue(String value) {
         List<ParsedFileField> parsedFileFields = FileFieldParser.parse(value).stream()
-                .filter(p -> !p.isOnlineLink())
+                .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());
 
-        for (ParsedFileField p : parsedFileFields) {
-            Optional<File> file = FileUtil.expandFilename(context, p.getLink(), fileDirectoryPreferences);
-            if ((!file.isPresent()) || !file.get().exists()) {
+        for (ParsedFileField file : parsedFileFields) {
+            Optional<Path> linkedFile = file.findIn(context, fileDirectoryPreferences);
+            if ((!linkedFile.isPresent()) || !Files.exists(linkedFile.get())) {
                 return Optional.of(Localization.lang("link should refer to a correct file path"));
             }
         }

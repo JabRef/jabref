@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,8 +82,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             //old path and old filename
-            Optional<Path> expandedOldFile = FileUtil.expandFilename(realOldFilename,
-                    databaseContext.getFileDirectories(fileDirectoryPreferences)).map(File::toPath);
+            Optional<Path> expandedOldFile = flEntry.findIn(databaseContext, fileDirectoryPreferences);
 
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
@@ -162,7 +161,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
                 .trim());
         //Add extension to newFilename
-        targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+        targetFileName.append('.').append(FileHelper.getFileExtension(realOldFilename).orElse("pdf"));
         return targetFileName.toString();
     }
 

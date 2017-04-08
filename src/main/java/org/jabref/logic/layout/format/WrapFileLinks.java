@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,9 +8,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -165,24 +164,13 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = prefs.getFileDirForDatabase();
                         }
 
-                        Optional<File> f = FileUtil.expandFilename(flEntry.getLink(), dirs);
+                        Optional<Path> f = FileHelper.expandFilename(flEntry.getLink(), dirs);
 
-                        /*
-                         * Stumbled over this while investigating
-                         *
-                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                         */
-                        if (f.isPresent()) {
-                            try {
-                                sb.append(replaceStrings(f.get().getCanonicalPath()));
-                            } catch (IOException ex) {
-                                LOGGER.warn("Problem getting path", ex);
-                                sb.append(replaceStrings(f.get().getPath()));
-                            }
-                        } else {
-                            sb.append(replaceStrings(flEntry.getLink()));
-                        }
+                        String pathString = flEntry.findIn(dirs)
+                                .map(path -> path.normalize().toString())
+                                .orElse(flEntry.getLink());
 
+                        sb.append(replaceStrings(pathString));
                         break;
                     case RELATIVE_FILE_PATH:
 
@@ -195,7 +183,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
                         break;
                     case FILE_EXTENSION:
-                        FileUtil.getFileExtension(flEntry.getLink())
+                        FileHelper.getFileExtension(flEntry.getLink())
                                 .ifPresent(extension -> sb.append(replaceStrings(extension)));
                         break;
                     case FILE_TYPE:

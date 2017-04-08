@@ -45,6 +45,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -84,8 +85,6 @@ public class FileListEntryEditor {
     private boolean openBrowseWhenShown;
     private boolean dontOpenBrowseUntilDisposed;
 
-    //Do not make this variable final, as then the lambda action listener will fail on compile
-    private JabRefFrame frame;
     private boolean showSaveDialog;
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
@@ -101,7 +100,6 @@ public class FileListEntryEditor {
             BibDatabaseContext databaseContext) {
         this.entry = entry;
         this.databaseContext = databaseContext;
-        this.frame = frame;
 
         ActionListener okAction = e -> {
             // If OK button is disabled, ignore this event:
@@ -355,20 +353,14 @@ public class FileListEntryEditor {
 
     private final ActionListener browsePressed = e -> {
         String fileText = link.getText().trim();
-        Optional<File> file = FileUtil.expandFilename(this.databaseContext, fileText,
+        Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
                 Globals.prefs.getFileDirectoryPreferences());
-        String workingDir;
-        // no file set yet or found
-        if (file.isPresent()) {
-            workingDir = file.get().getPath();
-        } else {
-            workingDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
-        }
+        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
 
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(workingDir))
+                .withInitialDirectory(workingDir)
                 .withInitialFileName(fileName).build();
         DialogService ds = new FXDialogService();
 

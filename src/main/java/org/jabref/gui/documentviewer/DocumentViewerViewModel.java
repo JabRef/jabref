@@ -19,7 +19,6 @@ import javafx.collections.ListChangeListener;
 import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedFileField;
 
@@ -108,7 +107,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     public void switchToFile(ParsedFileField file) {
         if (file != null) {
             stateManager.getActiveDatabase().ifPresent(database ->
-                    FileUtil.toPath(file, database, Globals.prefs.getFileDirectoryPreferences())
+                    file.findIn(database, Globals.prefs.getFileDirectoryPreferences())
                             .ifPresent(this::setCurrentDocument));
         }
     }

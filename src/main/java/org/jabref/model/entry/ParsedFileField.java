@@ -1,10 +1,15 @@
 package org.jabref.model.entry;
 
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.FileHelper;
 
 public class ParsedFileField {
 
@@ -78,7 +83,17 @@ public class ParsedFileField {
         return link.startsWith("http://") || link.startsWith("https://") || link.contains("www.");
     }
 
-    public Optional<String> getExtension() {
-        return FileUtil.getFileExtension(link);
+    public Optional<Path> findIn(List<String> directories) {
+        Path file = Paths.get(link);
+        if (file.isAbsolute() || directories.isEmpty()) {
+            return Optional.of(file);
+        } else {
+            return FileHelper.expandFilename(link, directories);
+        }
+    }
+
+    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+        List<String> dirs = databaseContext.getFileDirectories(fileDirectoryPreferences);
+        return findIn(dirs);
     }
 }

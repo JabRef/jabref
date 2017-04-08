@@ -2,6 +2,9 @@ package org.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,12 +34,12 @@ import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -66,16 +69,16 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFileDirectoryPreferences());
 
-            Optional<File> file = FileUtil.expandFilename(link, dir);
+            Optional<Path> file = FileHelper.expandFilename(link, dir);
 
             // Check that the file exists:
-            if (!file.isPresent() || !file.get().exists()) {
+            if (!file.isPresent() || !Files.exists(file.get())) {
                 throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
-            link = file.get().getCanonicalPath();
+            link = file.get().toAbsolutePath().toString();
 
             // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.get().getName().split("\\.");
+            String[] split = file.get().getFileName().toString().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = FieldName.PDF;
@@ -138,10 +141,9 @@ public class JabRefDesktop {
         }
 
         // For other platforms we'll try to find the file type:
-        File file = new File(link);
-
+        Path file = Paths.get(link);
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link,
+            Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
                     Globals.prefs.getFileDirectoryPreferences());
             if (tmp.isPresent()) {
                 file = tmp.get();
@@ -149,9 +151,9 @@ public class JabRefDesktop {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (type.isPresent())) {
+        if (httpLink || Files.exists(file) && (type.isPresent())) {
             // Open the file:
-            String filePath = httpLink ? link : file.getPath();
+            String filePath = httpLink ? link : file.toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
@@ -253,7 +255,7 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException
      */
-    public static void openFolderAndSelectFile(String fileLink) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink) throws IOException {
         NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
     }
 

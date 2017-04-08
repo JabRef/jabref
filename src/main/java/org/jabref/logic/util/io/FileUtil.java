@@ -20,16 +20,15 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.OptionalUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,37 +36,9 @@ import org.apache.commons.logging.LogFactory;
 public class FileUtil {
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    private static final Pattern SLASH = Pattern.compile("/");
-    private static final Pattern BACKSLASH = Pattern.compile("\\\\");
-
     public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
     private FileUtil() {
-    }
-
-    /**
-     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
-     *
-     * @param file
-     * @return The extension, trimmed and in lowercase.
-     */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
-    }
-
-    /**
-     * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
-     *
-     * @param fileName
-     * @return The extension (without leading dot), trimmed and in lowercase.
-     */
-    public static Optional<String> getFileExtension(String fileName) {
-        int dotPosition = fileName.lastIndexOf('.');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));
-        } else {
-            return Optional.empty();
-        }
     }
 
     /**
@@ -198,100 +169,6 @@ public class FileUtil {
     }
 
     /**
-     * Converts a relative filename to an absolute one, if necessary. Returns an empty optional if the file does not
-     * exist.<br/>
-     * <p>
-     * Uses <ul>
-     * <li>the default directory associated with the extension of the file</li>
-     * <li>the standard file directory</li>
-     * <li>the directory of the BIB file</li>
-     * </ul>
-     *
-     * @param databaseContext The database this file belongs to.
-     * @param name     The filename, may also be a relative path to the file
-     */
-    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name,
-            FileDirectoryPreferences fileDirectoryPreferences) {
-        Optional<String> extension = getFileExtension(name);
-        // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
-        // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        // Include the directory of the BIB file:
-        List<String> al = new ArrayList<>();
-        for (String dir : directories) {
-            if (!al.contains(dir)) {
-                al.add(dir);
-            }
-        }
-        for (String aFileDir : fileDir) {
-            if (!al.contains(aFileDir)) {
-                al.add(aFileDir);
-            }
-        }
-
-        return expandFilename(name, al);
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
-     * <p>
-     * Will look in each of the given dirs starting from the beginning and
-     * returning the first found file to match if any.
-     */
-    public static Optional<File> expandFilename(String name, List<String> directories) {
-        for (String dir : directories) {
-            if (dir != null) {
-                Optional<File> result = expandFilename(name, dir);
-                if (result.isPresent()) {
-                    return result;
-                }
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    /**
-     * Converts a relative filename to an absolute one, if necessary. Returns
-     * an empty optional if the file does not exist.
-     */
-    private static Optional<File> expandFilename(String filename, String dir) {
-
-        if ((filename == null) || filename.isEmpty()) {
-            return Optional.empty();
-        }
-
-        String name = filename;
-
-        File file = new File(name);
-        if (file.exists() || (dir == null)) {
-            return Optional.of(file);
-        }
-
-        if (dir.endsWith(OS.FILE_SEPARATOR)) {
-            name = dir + name;
-        } else {
-            name = dir + OS.FILE_SEPARATOR + name;
-        }
-
-        // fix / and \ problems:
-        if (OS.WINDOWS) {
-            name = SLASH.matcher(name).replaceAll("\\\\");
-        } else {
-            name = BACKSLASH.matcher(name).replaceAll("/");
-        }
-
-        File fileInDir = new File(name);
-        if (fileInDir.exists()) {
-            return Optional.of(fileInDir);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Converts an absolute filename to a relative one, if necessary.
      * Returns the parameter fileName itself if no shortening is possible
      * <p>
@@ -395,18 +272,14 @@ public class FileUtil {
      *
      * @return list of files. May be empty
      */
-    public static List<File> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
+    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
         Objects.requireNonNull(bes);
         Objects.requireNonNull(fileDirs);
 
-        List<File> result = new ArrayList<>();
-        for (BibEntry entry : bes) {
-            for (ParsedFileField file : entry.getFiles()) {
-                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-            }
-        }
-
-        return result;
+        return bes.stream()
+                .flatMap(entry -> entry.getFiles().stream())
+                .flatMap(file -> OptionalUtil.toStream(file.findIn(fileDirs)))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -475,10 +348,5 @@ public class FileUtil {
             FileUtil.find(filename, dir).ifPresent(files::add);
         }
         return files;
-    }
-
-    public static Optional<Path> toPath(ParsedFileField parsedFileField, BibDatabaseContext database, FileDirectoryPreferences directoryPreferences) {
-        Optional<File> path = expandFilename(database, parsedFileField.getLink(), directoryPreferences);
-        return path.map(File::toPath);
     }
 }

@@ -2,13 +2,13 @@ package org.jabref.gui.externalfiles;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -44,10 +44,10 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.ParsedFileField;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -139,19 +139,12 @@ public class SynchronizeFileField extends AbstractWorker {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old.get());
 
-                    // We need to specify which directories to search in for Util.expandFilename:
-                    List<String> dirsS = panel.getBibDatabaseContext()
-                            .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-                    List<File> dirs = new ArrayList<>();
-                    for (String dirs1 : dirsS) {
-                        dirs.add(new File(dirs1));
-                    }
-
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
+                        ParsedFileField field = flEntry.toParsedFileField();
+
                         // See if the link looks like an URL:
-                        boolean httpLink = flEntry.getLink().toLowerCase(Locale.ENGLISH).startsWith("http");
-                        if (httpLink) {
+                        if (field.isOnlineLink()) {
                             continue; // Don't check the remote file.
                             // TODO: should there be an option to check remote links?
                         }
@@ -160,8 +153,8 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        Optional<File> file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
-                        if ((!file.isPresent()) || !file.get().exists()) {
+                        Optional<Path> file = field.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences());
+                        if ((file.isPresent()) && Files.exists(file.get())) {
                             int answer;
                             if (removeAllBroken) {
                                 answer = 2; // We should delete this link.

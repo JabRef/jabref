@@ -1,13 +1,10 @@
 package org.jabref.logic.pdf;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedFileField;
@@ -36,7 +33,7 @@ public class EntryAnnotationImporter {
      */
     private List<ParsedFileField> getFilteredFileList() {
         return entry.getFiles().stream()
-                .filter(parsedFileField -> parsedFileField.getExtension().equals(Optional.of("pdf")))
+                .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
                 .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
     }
 
@@ -52,9 +49,8 @@ public class EntryAnnotationImporter {
 
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
         for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
-            Optional<File> expandedFileName = FileUtil.expandFilename(databaseContext, parsedFileField.getLink(),
-                    JabRefPreferences.getInstance().getFileDirectoryPreferences());
-            expandedFileName.ifPresent(file -> annotations.put(file.getName(), importer.importAnnotations(file.toPath())));
+            parsedFileField.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                    .ifPresent(file -> annotations.put(file.getFileName().toString(), importer.importAnnotations(file)));
         }
         return annotations;
     }

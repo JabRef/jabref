@@ -1,12 +1,8 @@
 package org.jabref.logic.layout.format;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.ParsedFileField;
 
@@ -37,18 +33,18 @@ public class FileLink implements ParamLayoutFormatter {
 
         List<ParsedFileField> fileList = FileFieldParser.parse(field);
 
-        String link = null;
+        ParsedFileField link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
             if (!(fileList.isEmpty())) {
-                link = fileList.get(0).getLink();
+                link = fileList.get(0);
             }
         }
         else {
             // A file type is specified:
             for (ParsedFileField flEntry : fileList) {
                 if (flEntry.getFileType().equalsIgnoreCase(fileType)) {
-                    link = flEntry.getLink();
+                    link = flEntry;
                     break;
                 }
             }
@@ -69,23 +65,9 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = prefs.getFileDirForDatabase();
         }
 
-        Optional<File> f = FileUtil.expandFilename(link, dirs);
-
-        /*
-         * Stumbled over this while investigating
-         *
-         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-         */
-        if (f.isPresent()) {
-            try {
-                return f.get().getCanonicalPath();//f.toURI().toString();
-            } catch (IOException e) {
-                LOGGER.warn("Problem getting path", e);
-                return f.get().getPath();
-            }
-        } else {
-            return link;
-        }
+        return link.findIn(dirs)
+                .map(path -> path.normalize().toString())
+                .orElse(link.getLink());
 
     }
 
