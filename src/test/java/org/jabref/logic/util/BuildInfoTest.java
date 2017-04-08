@@ -18,4 +18,9 @@ public class BuildInfoTest {
         assertEquals("42", buildInfo.getVersion().getFullVersion());
     }
 
+    @Test
+    public void azureInstrumentationKeyIsNotEmpty() {
+        BuildInfo buildInfo = new BuildInfo();
+        assertNotEquals("", buildInfo.getAzureInstrumentationKey());
+    }
 }
