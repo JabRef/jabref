@@ -7,6 +7,7 @@
         <GuiAppender name="GuiLogger">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </GuiAppender>
+        <ApplicationInsightsAppender name="applicationInsightsAppender" />
     </Appenders>
     <Loggers>
         <Logger name="org.jabref" level="INFO">
@@ -18,6 +19,7 @@
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
         </Root>
     </Loggers>
 </Configuration>

@@ -14,8 +14,8 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.worker.CallBack;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.entry.BibEntry;
 
 import spin.Spin;

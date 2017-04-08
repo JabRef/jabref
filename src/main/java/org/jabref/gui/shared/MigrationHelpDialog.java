@@ -12,21 +12,20 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
 
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 
-public class MigrationHelpDialog extends JDialog {
+public class MigrationHelpDialog extends JabRefDialog {
 
     public MigrationHelpDialog(ConnectToSharedDatabaseDialog openSharedDatabaseDialog) {
-        super(openSharedDatabaseDialog, Localization.lang("Migration help information"));
-        setModal(true);
+        super(openSharedDatabaseDialog, Localization.lang("Migration help information"), MigrationHelpDialog.class);
 
         String migrationMessage = Localization
                 .lang("Entered library has obsolete structure and is no longer supported.");

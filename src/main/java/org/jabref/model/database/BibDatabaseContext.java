@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
@@ -266,5 +267,9 @@ public class BibDatabaseContext {
         }
 
         this.location = DatabaseLocation.LOCAL;
+    }
+
+    public List<BibEntry> getEntries() {
+        return database.getEntries();
     }
 }

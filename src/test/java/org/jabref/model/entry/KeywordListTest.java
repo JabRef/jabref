@@ -72,4 +72,20 @@ public class KeywordListTest {
     public void asStringAddsSpaceAfterDelimiter() throws Exception {
         assertEquals("keywordOne, keywordTwo", keywords.getAsString(','));
     }
+
+    @Test
+    public void parseHierarchicalChain() throws Exception {
+        Keyword expected = Keyword.of("Parent", "Node", "Child");
+
+        assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ',', '>'));
+    }
+
+    @Test
+    public void parseTwoHierarchicalChains() throws Exception {
+        Keyword expectedOne = Keyword.of("Parent1", "Node1", "Child1");
+        Keyword expectedTwo = Keyword.of("Parent2", "Node2", "Child2");
+
+        assertEquals(new KeywordList(expectedOne, expectedTwo),
+                KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
+    }
 }

@@ -5,9 +5,8 @@ import org.apache.commons.logging.LogFactory;
 
 public class JabRefException extends Exception {
 
-    private String localizedMessage;
-
     private static final Log LOGGER = LogFactory.getLog(JabRefException.class);
+    private String localizedMessage;
 
     public JabRefException(String message) {
         super(message);
@@ -34,7 +33,7 @@ public class JabRefException extends Exception {
     @Override
     public String getLocalizedMessage() {
         if (localizedMessage == null) {
-            LOGGER.warn("No localized message exception message defined. Falling back to getMessage().");
+            LOGGER.debug("No localized message exception message defined. Falling back to getMessage().");
             return getMessage();
         } else {
             return localizedMessage;

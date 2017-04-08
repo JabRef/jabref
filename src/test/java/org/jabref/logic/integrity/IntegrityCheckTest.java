@@ -94,6 +94,7 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("note", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("note", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
 
@@ -102,6 +103,7 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }

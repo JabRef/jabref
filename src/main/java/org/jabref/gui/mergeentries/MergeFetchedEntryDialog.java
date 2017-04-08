@@ -8,10 +8,10 @@ import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -30,7 +30,7 @@ import com.jgoodies.forms.layout.RowSpec;
 /**
  * Dialog for merging Bibtex entry with fetched data
  */
-public class MergeFetchedEntryDialog extends JDialog {
+public class MergeFetchedEntryDialog extends JabRefDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
@@ -43,7 +43,7 @@ public class MergeFetchedEntryDialog extends JDialog {
 
 
     public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
-        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true);
+        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
 
         this.panel = panel;
         this.originalEntry = originalEntry;

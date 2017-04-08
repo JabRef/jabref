@@ -156,4 +156,15 @@ public class LatexToUnicodeFormatterTest {
     public void testApostrophC() {
         assertEquals("O'Connor", formatter.format("O'Connor"));
     }
+
+    @Test
+    public void testPreservationOfSingleUnderscore() {
+        assertEquals("Lorem ipsum_lorem ipsum", formatter.format("Lorem ipsum_lorem ipsum"));
+    }
+
+    @Test
+    public void testConversionOfUnderscoreWithBraces() {
+        assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
+    }
+
 }

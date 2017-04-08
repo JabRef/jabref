@@ -96,8 +96,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.6'
-    compile 'org.antlr:antlr4-runtime:4.6'
+    antlr4 'org.antlr:antlr4:4.7'
+    compile 'org.antlr:antlr4-runtime:4.7'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.40'
@@ -139,10 +139,13 @@ dependencies {
 
     compile 'com.github.lgooddatepicker:LGoodDatePicker:8.3.0'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2-SNAPSHOT'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2'
+
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
+    compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.7.18'
+    testCompile 'org.mockito:mockito-core:2.7.21'
     testCompile 'com.github.tomakehurst:wiremock:2.5.1'
     testCompile 'org.assertj:assertj-swing-junit:3.5.0'
     testCompile 'org.reflections:reflections:0.9.11'
@@ -165,7 +168,8 @@ processResources {
         expand(version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
+                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'))
         filteringCharset = 'UTF-8'
     }
     filteringCharset = 'UTF-8'

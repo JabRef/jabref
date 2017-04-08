@@ -19,6 +19,6 @@ public class CodeStyleTests {
 
         Assert.assertTrue("StringUtil increased in size. "
                 + "We try to keep this class as small as possible. "
-                + "Thus think twice if you add something to StringUtil.", lineCount <= 709);
+                + "Thus think twice if you add something to StringUtil.", lineCount <= 715);
     }
 }

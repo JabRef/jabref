@@ -58,35 +58,24 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     }
 
     /**
+     * Sets the parent node of this node.
+     * <p>
+     * This method does not set this node as the child of the new parent nor does it remove this node
+     * from the old parent. You should probably call {@link #moveTo(ChainNode)} to change the chain.
+     *
+     * @param parent the new parent
+     */
+    protected void setParent(T parent) {
+        this.parent = Objects.requireNonNull(parent);
+    }
+
+    /**
      * Returns this node's child or an empty Optional if this node has no child.
      *
      * @return this node's child T, or an empty Optional if this node has no child
      */
     public Optional<T> getChild() {
         return Optional.ofNullable(child);
-    }
-
-    /**
-     * Removes this node from its parent and makes it a child of the specified node.
-     * In this way the whole subchain based at this node is moved to the given node.
-     *
-     * @param target      the new parent
-     * @throws NullPointerException           if target is null
-     * @throws UnsupportedOperationException  if target is an descendant of this node
-     */
-    public void moveTo(T target) {
-        Objects.requireNonNull(target);
-
-        // Check that the target node is not an ancestor of this node, because this would create loops in the tree
-        if (this.isAncestorOf(target)) {
-            throw new UnsupportedOperationException("the target cannot be a descendant of this node");
-        }
-
-        // Remove from previous parent
-        getParent().ifPresent(oldParent -> oldParent.removeChild());
-
-        // Add as child
-        target.setChild((T) this);
     }
 
     /**
@@ -110,15 +99,26 @@ public abstract class ChainNode<T extends ChainNode<T>> {
     }
 
     /**
-     * Sets the parent node of this node.
-     * <p>
-     * This method does not set this node as the child of the new parent nor does it remove this node
-     * from the old parent. You should probably call {@link #moveTo(ChainNode)} to change the chain.
+     * Removes this node from its parent and makes it a child of the specified node.
+     * In this way the whole subchain based at this node is moved to the given node.
      *
-     * @param parent the new parent
+     * @param target      the new parent
+     * @throws NullPointerException           if target is null
+     * @throws UnsupportedOperationException  if target is an descendant of this node
      */
-    protected void setParent(T parent) {
-        this.parent = Objects.requireNonNull(parent);
+    public void moveTo(T target) {
+        Objects.requireNonNull(target);
+
+        // Check that the target node is not an ancestor of this node, because this would create loops in the tree
+        if (this.isAncestorOf(target)) {
+            throw new UnsupportedOperationException("the target cannot be a descendant of this node");
+        }
+
+        // Remove from previous parent
+        getParent().ifPresent(oldParent -> oldParent.removeChild());
+
+        // Add as child
+        target.setChild((T) this);
     }
 
     /**
@@ -149,6 +149,18 @@ public abstract class ChainNode<T extends ChainNode<T>> {
             return true;
         } else {
             return child.isAncestorOf(anotherNode);
+        }
+    }
+
+    /**
+     * Adds the given node at the end of the chain.
+     * E.g., "A > B > C" + "D" -> "A > B > C > D".
+     */
+    public void addAtEnd(T node) {
+        if (child == null) {
+            setChild(node);
+        } else {
+            child.addAtEnd(node);
         }
     }
 }

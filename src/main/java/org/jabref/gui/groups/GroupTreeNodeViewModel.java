@@ -5,10 +5,8 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import javax.swing.Icon;
@@ -18,7 +16,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.model.FieldChange;
@@ -30,7 +27,6 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -145,14 +141,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return node;
     }
 
-    /** Collapse this node and all its children. */
-    public void collapseSubtree(JTree tree) {
-        for (GroupTreeNodeViewModel child : getChildren()) {
-            child.collapseSubtree(tree);
-        }
-        tree.collapsePath(this.getTreePath());
-    }
-
     /** Expand this node and all its children. */
     public void expandSubtree(JTree tree) {
         tree.expandPath(this.getTreePath());
@@ -171,13 +159,13 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     protected boolean printInItalics() {
-        return Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC) && node.getGroup().isDynamic();
+        return node.getGroup().isDynamic();
     }
 
     public String getDescription() {
         AbstractGroup group = node.getGroup();
         String shortDescription = "";
-        boolean showDynamic = Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC);
+        boolean showDynamic = true;
         if (group instanceof ExplicitGroup) {
             shortDescription = GroupDescriptions.getShortDescriptionExplicitGroup((ExplicitGroup) group);
         } else if (group instanceof KeywordGroup) {
@@ -188,21 +176,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
         }
         return "<html>" + shortDescription + "</html>";
-    }
-
-    public Icon getIcon() {
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS)) {
-            switch (node.getGroup().getHierarchicalContext()) {
-            case REFINING:
-                return GROUP_REFINING_ICON;
-            case INCLUDING:
-                return GROUP_INCLUDING_ICON;
-            default:
-                return GROUP_REGULAR_ICON;
-            }
-        } else {
-            return null;
-        }
     }
 
     public TreePath getTreePath() {
@@ -313,6 +286,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         }
     }
 
+    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
+        return node.removeEntriesFromGroup(entries);
+    }
+
     public boolean isAllEntriesGroup() {
         return getNode().getGroup() instanceof AllEntriesGroup;
     }
@@ -326,70 +303,11 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         undoManager.addEdit(undo);
     }
 
-    public Optional<MoveGroupChange> moveUp() {
-        final GroupTreeNode parent = node.getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(getNode()).get();
-        if (index > 0) {
-            getNode().moveTo(parent, index - 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index - 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveDown() {
-        final GroupTreeNode parent = node.getParent().get();
-        // TODO: Null!
-        final int index = parent.getIndexOfChild(node).get();
-        if (index < (parent.getNumberOfChildren() - 1)) {
-            node.moveTo(parent, index + 1);
-            return Optional.of(new MoveGroupChange(parent, index, parent, index + 1));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MoveGroupChange> moveLeft() {
-        final GroupTreeNode parent = node.getParent().get(); // TODO: Null!
-        final Optional<GroupTreeNode> grandParent = parent.getParent();
-        final int index = node.getPositionInParent();
-
-        if (!grandParent.isPresent()) {
-            return Optional.empty();
-        }
-        final int indexOfParent = grandParent.get().getIndexOfChild(parent).get();
-        node.moveTo(grandParent.get(), indexOfParent + 1);
-        return Optional.of(new MoveGroupChange(parent, index, grandParent.get(), indexOfParent + 1));
-    }
-
-    public Optional<MoveGroupChange> moveRight() {
-        final GroupTreeNode previousSibling = node.getPreviousSibling().get(); // TODO: Null
-        final GroupTreeNode parent = node.getParent().get(); // TODO: Null!
-        final int index = node.getPositionInParent();
-
-        if (previousSibling == null) {
-            return Optional.empty();
-        }
-
-        node.moveTo(previousSibling);
-        return Optional.of(new MoveGroupChange(parent, index, previousSibling, previousSibling.getNumberOfChildren()));
-    }
-
     /**
      * Adds the given entries to this node's group.
      */
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
         return node.addEntriesToGroup(entries);
-    }
-
-    /**
-     * Removes the given entries from this node's group.
-     */
-    public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
-        if (node.getGroup() instanceof GroupEntryChanger) {
-            return ((GroupEntryChanger) node.getGroup()).remove(entries);
-        } else {
-            return Collections.emptyList();
-        }
     }
 
     public void subscribeToDescendantChanged(Consumer<GroupTreeNodeViewModel> subscriber) {

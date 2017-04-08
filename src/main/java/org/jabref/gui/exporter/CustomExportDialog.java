@@ -15,13 +15,13 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.FileDialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Dialog for creating or modifying custom exports.
  */
-class CustomExportDialog extends JDialog {
+class CustomExportDialog extends JabRefDialog {
     private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
@@ -54,7 +54,7 @@ class CustomExportDialog extends JDialog {
     }
 
     public CustomExportDialog(final JabRefFrame parent) {
-        super(parent, Localization.lang("Edit custom export"), true);
+        super(parent, Localization.lang("Edit custom export"), true, CustomExportDialog.class);
         frame = parent;
         ActionListener okListener = e -> {
             Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();
