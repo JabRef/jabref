@@ -12,7 +12,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
@@ -57,14 +57,14 @@ public class RenamePdfCleanupTest {
     public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
         String fileNamePattern = "\\bibtexkey";
         File tempFile = testFolder.newFile("toot.tmp");
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
                 mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
-        ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
+        LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -74,16 +74,16 @@ public class RenamePdfCleanupTest {
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
-                new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("", "", ""))));
+        entry.setField("file", FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
+                new LinkedFile("", tempFile.getAbsolutePath(), ""), new LinkedFile("", "", ""))));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
                 mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
         assertEquals(
-                Optional.of(FileFieldWriter.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
-                        new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("", "", "")))),
+                Optional.of(FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
+                        new LinkedFile("", "Toot - test title.tmp", ""), new LinkedFile("", "", "")))),
                 entry.getField("file"));
     }
 
@@ -92,7 +92,7 @@ public class RenamePdfCleanupTest {
         String fileNamePattern = "\\bibtexkey - \\title";
 
         File tempFile = testFolder.newFile("Toot.tmp");
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
@@ -100,7 +100,7 @@ public class RenamePdfCleanupTest {
                 mock(LayoutFormatterPreferences.class), fileDirPrefs);
         cleanup.cleanup(entry);
 
-        ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
+        LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -108,7 +108,7 @@ public class RenamePdfCleanupTest {
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         testFolder.newFile("Toot.pdf");
-        ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
+        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
@@ -117,7 +117,7 @@ public class RenamePdfCleanupTest {
                 fileDirPrefs);
         cleanup.cleanup(entry);
 
-        ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
+        LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
@@ -125,7 +125,7 @@ public class RenamePdfCleanupTest {
     public void cleanupSingleField() throws IOException {
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         testFolder.newFile("Toot.pdf");
-        ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
+        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
@@ -134,7 +134,7 @@ public class RenamePdfCleanupTest {
 
         cleanup.cleanup(entry);
 
-        ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
+        LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
         assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
 
     }
@@ -143,7 +143,7 @@ public class RenamePdfCleanupTest {
     public void cleanupGetTargetFilename() throws IOException {
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         testFolder.newFile("Toot.pdf");
-        ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
+        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 fileDirPrefs);

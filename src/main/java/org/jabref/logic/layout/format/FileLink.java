@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,9 +31,9 @@ public class FileLink implements ParamLayoutFormatter {
             return "";
         }
 
-        List<ParsedFileField> fileList = FileFieldParser.parse(field);
+        List<LinkedFile> fileList = FileFieldParser.parse(field);
 
-        ParsedFileField link = null;
+        LinkedFile link = null;
         if (fileType == null) {
             // No file type specified. Simply take the first link.
             if (!(fileList.isEmpty())) {
@@ -42,7 +42,7 @@ public class FileLink implements ParamLayoutFormatter {
         }
         else {
             // A file type is specified:
-            for (ParsedFileField flEntry : fileList) {
+            for (LinkedFile flEntry : fileList) {
                 if (flEntry.getFileType().equalsIgnoreCase(fileType)) {
                     link = flEntry;
                     break;

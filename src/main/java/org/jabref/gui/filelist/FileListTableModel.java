@@ -15,7 +15,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
 /**
@@ -120,10 +120,10 @@ public class FileListTableModel extends AbstractTableModel {
             value = "";
         }
 
-        List<ParsedFileField> fields = FileFieldParser.parse(value);
+        List<LinkedFile> fields = FileFieldParser.parse(value);
         List<FileListEntry> files = new ArrayList<>();
 
-        for(ParsedFileField entry : fields) {
+        for(LinkedFile entry : fields) {
             if (entry.isEmpty()) {
                 continue;
             }
@@ -162,7 +162,7 @@ public class FileListTableModel extends AbstractTableModel {
         return entry.getType().get().getIconLabel();
     }
 
-    private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
+    private FileListEntry decodeEntry(LinkedFile entry, boolean deduceUnknownType) {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.getFileType());
 
         if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {

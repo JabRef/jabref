@@ -15,7 +15,7 @@ import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 public class RenameFileAction extends AbstractAction {
 
@@ -39,7 +39,7 @@ public class RenameFileAction extends AbstractAction {
         }
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
-        ParsedFileField field = entry.toParsedFileField();
+        LinkedFile field = entry.toParsedFileField();
         // Check if the current file exists:
         if (field.isOnlineLink()) {
             // TODO: notify that this operation cannot be done on remote links

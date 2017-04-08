@@ -9,7 +9,7 @@ import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Fixes the format of the file field. For example, if the file link is empty but the description wrongly contains the path.
@@ -23,7 +23,7 @@ public class FileLinksCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<ParsedFileField> fileList = entry.getFiles();
+        List<LinkedFile> fileList = entry.getFiles();
 
         // Parsing automatically moves a single description to link, so we just need to write the fileList back again
         String newValue = FileFieldWriter.getStringRepresentation(fileList);

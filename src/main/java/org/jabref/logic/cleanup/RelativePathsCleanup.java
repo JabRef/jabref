@@ -12,7 +12,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class RelativePathsCleanup implements CleanupJob {
@@ -28,19 +28,19 @@ public class RelativePathsCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        List<ParsedFileField> fileList = entry.getFiles();
-        List<ParsedFileField> newFileList = new ArrayList<>();
+        List<LinkedFile> fileList = entry.getFiles();
+        List<LinkedFile> newFileList = new ArrayList<>();
         boolean changed = false;
 
-        for (ParsedFileField fileEntry : fileList) {
+        for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
             String newFileName = FileUtil
                     .shortenFileName(new File(oldFileName), databaseContext.getFileDirectories(fileDirectoryPreferences))
                     .toString();
 
-            ParsedFileField newFileEntry = fileEntry;
+            LinkedFile newFileEntry = fileEntry;
             if (!oldFileName.equals(newFileName)) {
-                newFileEntry = new ParsedFileField(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
+                newFileEntry = new LinkedFile(fileEntry.getDescription(), newFileName, fileEntry.getFileType());
                 changed = true;
             }
             newFileList.add(newFileEntry);

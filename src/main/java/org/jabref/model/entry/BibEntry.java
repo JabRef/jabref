@@ -837,7 +837,7 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+    public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(FieldName.FILE);
         String newValue = FileFieldWriter.getStringRepresentation(files);
 
@@ -853,7 +853,7 @@ public class BibEntry implements Cloneable {
      *
      * @return the list of linked files, is never null but can be empty
      */
-    public List<ParsedFileField> getFiles() {
+    public List<LinkedFile> getFiles() {
         //Extract the path
         Optional<String> oldValue = getField(FieldName.FILE);
         if (!oldValue.isPresent()) {

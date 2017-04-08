@@ -11,21 +11,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
-public class ParsedFileField {
+public class LinkedFile {
 
-    private static final ParsedFileField NULL_OBJECT = new ParsedFileField("", "", "");
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
 
     private final String description;
     private final String link;
     private final String fileType;
 
-    public ParsedFileField(String description, String link, String fileType) {
+    public LinkedFile(String description, String link, String fileType) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
     }
 
-    public ParsedFileField(String description, URL link, String fileType) {
+    public LinkedFile(String description, URL link, String fileType) {
         this(description, Objects.requireNonNull(link).toString(), fileType);
     }
 
@@ -46,9 +46,9 @@ public class ParsedFileField {
         if (this == o) {
             return true;
         }
-        if (o instanceof ParsedFileField) {
+        if (o instanceof LinkedFile) {
 
-            ParsedFileField that = (ParsedFileField) o;
+            LinkedFile that = (LinkedFile) o;
 
             if (!this.description.equals(that.description)) {
                 return false;

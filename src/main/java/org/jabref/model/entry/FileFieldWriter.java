@@ -10,17 +10,17 @@ public class FileFieldWriter {
     private FileFieldWriter() {
     }
 
-    public static String getStringRepresentation(List<ParsedFileField> fields) {
+    public static String getStringRepresentation(List<LinkedFile> fields) {
         String[][] array = new String[fields.size()][];
         int i = 0;
-        for (ParsedFileField entry : fields) {
+        for (LinkedFile entry : fields) {
             array[i] = new String[] {entry.getDescription(), entry.getLink(), entry.getFileType()};
             i++;
         }
         return encodeStringArray(array);
     }
 
-    public static String getStringRepresentation(ParsedFileField field) {
+    public static String getStringRepresentation(LinkedFile field) {
         return getStringRepresentation(Collections.singletonList(field));
     }
 

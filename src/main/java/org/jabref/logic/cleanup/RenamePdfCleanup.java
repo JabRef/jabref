@@ -18,7 +18,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
@@ -35,7 +35,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final LayoutFormatterPreferences layoutPrefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
-    private ParsedFileField singleFieldCleanup;
+    private LinkedFile singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             LayoutFormatterPreferences layoutPrefs,
@@ -49,7 +49,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             LayoutFormatterPreferences layoutPrefs,
-            FileDirectoryPreferences fileDirectoryPreferences, ParsedFileField singleField) {
+            FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
 
         this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPrefs,
                 fileDirectoryPreferences);
@@ -59,8 +59,8 @@ public class RenamePdfCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        List<ParsedFileField> newFileList;
-        List<ParsedFileField> fileList;
+        List<LinkedFile> newFileList;
+        List<LinkedFile> fileList;
         if (singleFieldCleanup != null) {
             fileList = Arrays.asList(singleFieldCleanup);
 
@@ -73,7 +73,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
         boolean changed = false;
 
-        for (ParsedFileField flEntry : fileList) {
+        for (LinkedFile flEntry : fileList) {
             String realOldFilename = flEntry.getLink();
 
             if (onlyRelativePaths && Paths.get(realOldFilename).isAbsolute()) {
@@ -134,7 +134,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     } else {
                         newFileEntryFileName = parent.relativize(newPath).toString();
                     }
-                    newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
+                    newFileList.add(new LinkedFile(description, newFileEntryFileName, type));
                 }
             } else {
                 unsuccessfulRenames++;
@@ -154,7 +154,7 @@ public class RenamePdfCleanup implements CleanupJob {
         return Collections.emptyList();
     }
 
-    public String getTargetFileName(ParsedFileField flEntry, BibEntry entry) {
+    public String getTargetFileName(LinkedFile flEntry, BibEntry entry) {
         String realOldFilename = flEntry.getLink();
 
         StringBuilder targetFileName = new StringBuilder(FileUtil

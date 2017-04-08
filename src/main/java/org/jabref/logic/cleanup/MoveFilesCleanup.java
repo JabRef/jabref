@@ -18,7 +18,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
@@ -34,7 +34,7 @@ public class MoveFilesCleanup implements CleanupJob {
     private final String fileDirPattern;
     private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
-    private ParsedFileField singleFileFieldCleanup;
+    private LinkedFile singleFileFieldCleanup;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
@@ -46,7 +46,7 @@ public class MoveFilesCleanup implements CleanupJob {
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences prefs,
-            ParsedFileField field) {
+            LinkedFile field) {
 
         this(databaseContext, fileDirPattern, fileDirectoryPreferences, prefs);
         this.singleFileFieldCleanup = field;
@@ -68,8 +68,8 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<ParsedFileField> fileList;
-        List<ParsedFileField> newFileList;
+        List<LinkedFile> fileList;
+        List<LinkedFile> newFileList;
 
         if (singleFileFieldCleanup != null) {
             fileList = Arrays.asList(singleFileFieldCleanup);
@@ -82,7 +82,7 @@ public class MoveFilesCleanup implements CleanupJob {
         }
 
         boolean changed = false;
-        for (ParsedFileField fileEntry : fileList) {
+        for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
 
             Optional<Path> oldFile = fileEntry.findIn(paths);
@@ -115,9 +115,9 @@ public class MoveFilesCleanup implements CleanupJob {
                 changed = true;
 
                 String newEntryFilePath = Paths.get(defaultFileDirectory).relativize(newTargetFile).toString();
-                ParsedFileField newFileEntry = fileEntry;
+                LinkedFile newFileEntry = fileEntry;
                 if (!oldFileName.equals(newTargetFile.toString())) {
-                    newFileEntry = new ParsedFileField(fileEntry.getDescription(), newEntryFilePath,
+                    newFileEntry = new LinkedFile(fileEntry.getDescription(), newEntryFilePath,
                             fileEntry.getFileType());
                     changed = true;
                 }

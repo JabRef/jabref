@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
@@ -137,10 +137,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
         StringBuilder sb = new StringBuilder();
         // Build the list containing the links:
-        List<ParsedFileField> fileList = FileFieldParser.parse(field);
+        List<LinkedFile> fileList = FileFieldParser.parse(field);
 
         int piv = 1; // counter for relevant iterations
-        for (ParsedFileField flEntry : fileList) {
+        for (LinkedFile flEntry : fileList) {
             // Use this entry if we don't discriminate on types, or if the type fits:
             if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {
 

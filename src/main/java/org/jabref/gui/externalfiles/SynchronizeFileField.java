@@ -47,7 +47,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -141,7 +141,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
-                        ParsedFileField field = flEntry.toParsedFileField();
+                        LinkedFile field = flEntry.toParsedFileField();
 
                         // See if the link looks like an URL:
                         if (field.isOnlineLink()) {

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class FileChecker implements ValueChecker {
@@ -26,11 +26,11 @@ public class FileChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
-        List<ParsedFileField> parsedFileFields = FileFieldParser.parse(value).stream()
+        List<LinkedFile> linkedFiles = FileFieldParser.parse(value).stream()
                 .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());
 
-        for (ParsedFileField file : parsedFileFields) {
+        for (LinkedFile file : linkedFiles) {
             Optional<Path> linkedFile = file.findIn(context, fileDirectoryPreferences);
             if ((!linkedFile.isPresent()) || !Files.exists(linkedFile.get())) {
                 return Optional.of(Localization.lang("link should refer to a correct file path"));

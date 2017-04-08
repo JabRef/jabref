@@ -5,12 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 public class FileFieldParser {
-    public static List<ParsedFileField> parse(String value) {
+    public static List<LinkedFile> parse(String value) {
         if ((value == null) || value.trim().isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<ParsedFileField> files = new ArrayList<>();
+        List<LinkedFile> files = new ArrayList<>();
         List<String> entry = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inXmlChar = false;
@@ -57,17 +57,17 @@ public class FileFieldParser {
         return files;
     }
 
-    private static ParsedFileField convert(List<String> entry) {
+    private static LinkedFile convert(List<String> entry) {
         // ensure list has at least 3 fields
         while (entry.size() < 3) {
             entry.add("");
         }
-        ParsedFileField field = new ParsedFileField(entry.get(0), entry.get(1), entry.get(2));
+        LinkedFile field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
         // link is only mandatory field
         if(field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
-            field = new ParsedFileField("", field.getFileType(), "");
+            field = new LinkedFile("", field.getFileType(), "");
         } else if(!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
-            field = new ParsedFileField("", field.getDescription(), "");
+            field = new LinkedFile("", field.getDescription(), "");
         }
         entry.clear();
         return field;

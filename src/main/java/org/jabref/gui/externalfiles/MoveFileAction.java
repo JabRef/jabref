@@ -15,7 +15,7 @@ import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Action for moving a file that is linked  from an entry in JabRef.
@@ -42,7 +42,7 @@ public class MoveFileAction extends AbstractAction {
         }
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
-        ParsedFileField field = entry.toParsedFileField();
+        LinkedFile field = entry.toParsedFileField();
 
         if (field.isOnlineLink()) {
             // TODO: notify that this operation cannot be done on remote links

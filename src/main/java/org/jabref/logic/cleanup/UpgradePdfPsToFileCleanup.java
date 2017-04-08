@@ -11,7 +11,7 @@ import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FileFieldWriter;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Collects file links from the ps and pdf fields, and add them to the list contained in the file field.
@@ -34,7 +34,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         // If there are already links in the file field, keep those on top:
         String oldFileContent = entry.getField(FieldName.FILE).orElse(null);
 
-        List<ParsedFileField> fileList = entry.getFiles();
+        List<LinkedFile> fileList = entry.getFiles();
         int oldItemCount = fileList.size();
         for (Map.Entry<String, String> field : fields.entrySet()) {
             entry.getField(field.getKey()).ifPresent(o -> {
@@ -42,7 +42,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
                     return;
                 }
                 File f = new File(o);
-                ParsedFileField flEntry = new ParsedFileField(f.getName(), o, field.getValue());
+                LinkedFile flEntry = new LinkedFile(f.getName(), o, field.getValue());
                 fileList.add(flEntry);
 
                 entry.clearField(field.getKey());

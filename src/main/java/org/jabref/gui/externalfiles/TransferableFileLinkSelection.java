@@ -11,7 +11,7 @@ import java.util.List;
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,10 +28,10 @@ public class TransferableFileLinkSelection implements Transferable {
 
     public TransferableFileLinkSelection(BasePanel panel, List<BibEntry> selection) {
         BibEntry entry = selection.get(0);
-        List<ParsedFileField> files = entry.getFiles();
+        List<LinkedFile> files = entry.getFiles();
         if (!files.isEmpty()) {
             // Find the default directory for this field type, if any:
-            ParsedFileField firstFile = files.get(0);
+            LinkedFile firstFile = files.get(0);
             firstFile.findIn(panel.getDatabaseContext(), Globals.prefs.getFileDirectoryPreferences())
                 .ifPresent(fileList::add);
         }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -31,7 +31,7 @@ public class EntryAnnotationImporter {
      *
      * @return a list of file parsed files
      */
-    private List<ParsedFileField> getFilteredFileList() {
+    private List<LinkedFile> getFilteredFileList() {
         return entry.getFiles().stream()
                 .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
                 .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
@@ -48,8 +48,8 @@ public class EntryAnnotationImporter {
         AnnotationImporter importer = new PdfAnnotationImporter();
 
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
-        for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
-            parsedFileField.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences())
+        for (LinkedFile linkedFile : this.getFilteredFileList()) {
+            linkedFile.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences())
                     .ifPresent(file -> annotations.put(file.getFileName().toString(), importer.importAnnotations(file)));
         }
         return annotations;
