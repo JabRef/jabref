@@ -7,12 +7,12 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
 
-public class DoiEditor extends HBox implements FieldEditorFX {
+public class SimpleEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
+    protected final String fieldName;
     @FXML private EditorTextArea textArea;
 
-    public DoiEditor(String fieldName) {
+    public SimpleEditor(String fieldName) {
         this.fieldName = fieldName;
         ControlHelper.loadFXMLForControl(this);
     }

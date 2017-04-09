@@ -1530,9 +1530,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
                 EntryEditorTab tab = (EntryEditorTab) activeTab;
-                FieldEditor fieldEditor = tab.getActive();
-                fieldEditor.clearAutoCompleteSuggestion();
-                updateField(fieldEditor);
+                //FieldEditor fieldEditor = tab.getActive();
+                //fieldEditor.clearAutoCompleteSuggestion();
+                //updateField(fieldEditor);
             } else {
                 // Source panel.
                 updateField(activeTab);
