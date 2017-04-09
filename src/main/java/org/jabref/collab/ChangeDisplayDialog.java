@@ -9,7 +9,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,11 +20,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
+class ChangeDisplayDialog extends JabRefDialog implements TreeSelectionListener {
 
     private final JTree tree;
     private final JPanel infoPanel = new JPanel();
@@ -38,7 +38,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
     public ChangeDisplayDialog(JFrame owner, final BasePanel panel,
             BibDatabase secondary, final DefaultMutableTreeNode root) {
-        super(owner, Localization.lang("External changes"), true);
+        super(owner, Localization.lang("External changes"), true, ChangeDisplayDialog.class);
         BibDatabase localSecondary;
 
         // Just to be sure, put in an empty secondary base if none is given:

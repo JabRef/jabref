@@ -19,58 +19,67 @@ import org.jabref.model.strings.StringUtil;
  */
 public class KeywordList implements Iterable<Keyword> {
 
-    private final List<Keyword> keywords;
+    private final List<Keyword> keywordChains;
 
     public KeywordList() {
-        keywords = new ArrayList<>();
+        keywordChains = new ArrayList<>();
     }
 
-    public KeywordList(Collection<Keyword> keywords) {
-        this.keywords = new ArrayList<>();
-        keywords.forEach(this::add);
+    public KeywordList(Collection<Keyword> keywordChains) {
+        this.keywordChains = new ArrayList<>();
+        keywordChains.forEach(this::add);
     }
 
-    public KeywordList(List<String> keywords) {
-        this(keywords.stream().map(Keyword::new).collect(Collectors.toList()));
+    public KeywordList(List<String> keywordChains) {
+        this(keywordChains.stream().map(Keyword::new).collect(Collectors.toList()));
     }
 
-    public KeywordList(String... keywords) {
-        this(Arrays.stream(keywords).map(Keyword::new).collect(Collectors.toList()));
+    public KeywordList(String... keywordChains) {
+        this(Arrays.stream(keywordChains).map(Keyword::new).collect(Collectors.toList()));
     }
 
-    /**
-     * @param keywordString a String of keywords
-     * @return an parsed list containing the keywords
-     */
-    public static KeywordList parse(String keywordString, Character delimiter) {
+    public KeywordList(Keyword... keywordChains) {
+        this(Arrays.asList(keywordChains));
+    }
+
+    public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
         }
 
-        List<String> keywords = new ArrayList<>();
+        KeywordList keywordList = new KeywordList();
 
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
         while (tok.hasMoreTokens()) {
-            String word = tok.nextToken().trim();
-            keywords.add(word);
+            String chain = tok.nextToken();
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
         }
-        return new KeywordList(keywords);
+        return keywordList;
+    }
+
+    /**
+     * @param keywordString a String of keywordChains
+     * @return an parsed list containing the keywordChains
+     */
+    public static KeywordList parse(String keywordString, Character delimiter) {
+        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public KeywordList createClone() {
-        return new KeywordList(this.keywords);
+        return new KeywordList(this.keywordChains);
     }
 
     public void replaceAll(KeywordList keywordsToReplace, Keyword newValue) {
         Objects.requireNonNull(newValue);
 
-        // Remove keywords which should be replaced
+        // Remove keywordChains which should be replaced
         int foundPosition = -1; // remember position of the last found keyword
         for (Keyword specialFieldKeyword : keywordsToReplace) {
-            int pos = keywords.indexOf(specialFieldKeyword);
+            int pos = keywordChains.indexOf(specialFieldKeyword);
             if (pos >= 0) {
                 foundPosition = pos;
-                keywords.remove(pos);
+                keywordChains.remove(pos);
             }
         }
 
@@ -78,26 +87,26 @@ public class KeywordList implements Iterable<Keyword> {
         if (foundPosition == -1) {
             add(newValue);
         } else {
-            keywords.add(foundPosition, newValue);
+            keywordChains.add(foundPosition, newValue);
         }
     }
 
     public void removeAll(KeywordList keywordsToRemove) {
-        keywords.removeAll(keywordsToRemove.keywords);
+        keywordChains.removeAll(keywordsToRemove.keywordChains);
     }
 
     public boolean add(Keyword keyword) {
         if (contains(keyword)) {
-            return false; // Don't add duplicate keywords
+            return false; // Don't add duplicate keywordChains
         }
-        return keywords.add(keyword);
+        return keywordChains.add(keyword);
     }
 
     /**
      * Keywords are separated by the given delimiter and an additional space, i.e. "one, two".
      */
     public String getAsString(Character delimiter) {
-        return keywords.stream().map(Keyword::toString).collect(Collectors.joining(delimiter + " "));
+        return keywordChains.stream().map(Keyword::toString).collect(Collectors.joining(delimiter + " "));
     }
 
     public void add(String keywordsString) {
@@ -106,47 +115,47 @@ public class KeywordList implements Iterable<Keyword> {
 
     @Override
     public Iterator<Keyword> iterator() {
-        return keywords.iterator();
+        return keywordChains.iterator();
     }
 
     public int size() {
-        return keywords.size();
+        return keywordChains.size();
     }
 
     public boolean isEmpty() {
-        return keywords.isEmpty();
+        return keywordChains.isEmpty();
     }
 
     public boolean contains(Keyword o) {
-        return keywords.contains(o);
+        return keywordChains.contains(o);
     }
 
     public boolean remove(Keyword o) {
-        return keywords.remove(o);
+        return keywordChains.remove(o);
     }
 
     public boolean remove(String keywordsString) {
-        return keywords.remove(new Keyword(keywordsString));
+        return keywordChains.remove(new Keyword(keywordsString));
     }
 
     public void addAll(KeywordList keywordsToAdd) {
-        keywords.addAll(keywordsToAdd.keywords);
+        keywordChains.addAll(keywordsToAdd.keywordChains);
     }
 
     public void retainAll(KeywordList keywordToRetain) {
-        keywords.retainAll(keywordToRetain.keywords);
+        keywordChains.retainAll(keywordToRetain.keywordChains);
     }
 
     public void clear() {
-        keywords.clear();
+        keywordChains.clear();
     }
 
     public Keyword get(int index) {
-        return keywords.get(index);
+        return keywordChains.get(index);
     }
 
     public Stream<Keyword> stream() {
-        return keywords.stream();
+        return keywordChains.stream();
     }
 
     @Override
@@ -155,7 +164,7 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public Set<String> toStringList() {
-        return keywords.stream().map(Keyword::toString).collect(Collectors.toSet());
+        return keywordChains.stream().map(Keyword::toString).collect(Collectors.toSet());
     }
 
     @Override
@@ -167,11 +176,11 @@ public class KeywordList implements Iterable<Keyword> {
             return false;
         }
         KeywordList keywords1 = (KeywordList) o;
-        return Objects.equals(keywords, keywords1.keywords);
+        return Objects.equals(keywordChains, keywords1.keywordChains);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(keywords);
+        return Objects.hash(keywordChains);
     }
 }

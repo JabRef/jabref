@@ -13,7 +13,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
@@ -27,7 +26,7 @@ import org.jabref.logic.l10n.Localization;
  * @author Morten O. Alver
  */
 
-public class MergeDialog extends JDialog {
+public class MergeDialog extends JabRefDialog {
 
     private final JPanel panel1 = new JPanel();
     private final BorderLayout borderLayout1 = new BorderLayout();
@@ -45,7 +44,7 @@ public class MergeDialog extends JDialog {
     private boolean okPressed;
 
     public MergeDialog(JabRefFrame frame, String title, boolean modal) {
-        super(frame, title, modal);
+        super(frame, title, modal, MergeDialog.class);
         jbInit();
         pack();
     }

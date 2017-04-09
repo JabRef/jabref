@@ -14,7 +14,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.LayoutFocusTraversalPolicy;
 import javax.swing.text.JTextComponent;
@@ -30,7 +29,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.preferences.JabRefPreferences;
 
-class PreambleEditor extends JDialog {
+class PreambleEditor extends JabRefDialog {
     // A reference to the entry this object works on.
     private final BibDatabase database;
     private final BasePanel panel;
@@ -44,7 +43,7 @@ class PreambleEditor extends JDialog {
     private final CloseAction closeAction = new CloseAction();
 
     public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase database) {
-        super(baseFrame);
+        super(baseFrame, PreambleEditor.class);
         this.panel = panel;
         this.database = database;
 

@@ -35,6 +35,7 @@ import javax.swing.table.TableColumnModel;
 import org.jabref.Globals;
 import org.jabref.gui.FileDialog;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -462,14 +463,14 @@ class StyleSelectDialog {
         }
     }
 
-    private class AddFileDialog extends JDialog {
+    private class AddFileDialog extends JabRefDialog {
 
         private final JTextField newFile = new JTextField();
         private boolean addOKPressed;
 
 
         public AddFileDialog() {
-            super(diag, Localization.lang("Add style file"), true);
+            super(diag, Localization.lang("Add style file"), true, AddFileDialog.class);
 
             JButton browse = new JButton(Localization.lang("Browse"));
             FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.JSTYLE);
