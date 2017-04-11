@@ -524,8 +524,10 @@ public class BibtexKeyPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getField(FieldName.AUTHOR)
-                        .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                Optional<String> authorFieldValue = entry.getField(FieldName.AUTHOR);
+                Optional<String> mappedFieldValue = authorFieldValue
+                        .map(authorString -> normalize(database.resolveForStrings(authorString)));
+                String authString = mappedFieldValue.orElse("");
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
