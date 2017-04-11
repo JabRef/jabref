@@ -22,8 +22,6 @@ import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
@@ -32,7 +30,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.MonthUtil;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -142,89 +139,6 @@ public class FieldExtraComponents {
                     button.setEnabled(true);
                 } else {
                     button.setEnabled(false);
-                }
-            }
-        });
-        */
-
-        return Optional.of(controls);
-    }
-
-    /**
-     * Set up a mouse listener for opening an external viewer and fetching by DOI
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, EntryEditor entryEditor, FieldEditor fieldEditor) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        // open doi link
-        JButton button = new JButton(Localization.lang("Open"));
-        button.setEnabled(false);
-        button.addActionListener(actionEvent -> {
-            try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
-            } catch (IOException ex) {
-                panel.output(Localization.lang("Unable to open link."));
-            }
-        });
-        // lookup doi
-        JButton doiButton = new JButton(Localization.lang("Look up DOI"));
-        doiButton.addActionListener(actionEvent -> {
-            try {
-                Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
-                if (doi.isPresent()) {
-                    entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-                } else {
-                    panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
-                }
-            } catch (FetcherException e) {
-                LOGGER.error("Problem fetching DOI", e);
-            }
-        });
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.DOI);
-        });
-
-        controls.add(button, BorderLayout.NORTH);
-        controls.add(doiButton, BorderLayout.CENTER);
-        controls.add(fetchButton, BorderLayout.SOUTH);
-
-        // enable/disable button
-        /*
-        JTextComponent doi = (JTextComponent) fieldEditor;
-
-        doi.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            private void checkDoi() {
-                Optional<DOI> doiUrl = DOI.build(doi.getText());
-                if(doiUrl.isPresent()) {
-                    button.setEnabled(true);
-                    fetchButton.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                    fetchButton.setEnabled(false);
                 }
             }
         });
