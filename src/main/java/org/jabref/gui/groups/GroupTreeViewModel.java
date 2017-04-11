@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.swing.SwingUtilities;
+
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -24,8 +26,6 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
-
-import javax.swing.SwingUtilities;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
