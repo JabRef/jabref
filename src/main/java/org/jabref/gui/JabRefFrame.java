@@ -660,7 +660,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initShowTrackingNotification() {
         if (!Globals.prefs.shouldAskToCollectTelemetry()) {
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleWithFixedDelay(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, 1, TimeUnit.MINUTES);
+            scheduler.schedule(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, TimeUnit.MINUTES);
         }
     }
 
