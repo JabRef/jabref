@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -23,6 +24,8 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
+
+import javax.swing.SwingUtilities;
 
 public class GroupTreeViewModel extends AbstractViewModel {
 
@@ -123,18 +126,20 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
     public void addNewSubgroup(GroupNodeViewModel parent) {
-        Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
-        newGroup.ifPresent(group -> {
-            GroupTreeNode newGroupNode = parent.addSubgroup(group);
+        SwingUtilities.invokeLater(() -> {
+            Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialog());
+            newGroup.ifPresent(group -> {
+                GroupTreeNode newGroupNode = parent.addSubgroup(group);
 
-            // TODO: Add undo
-            //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
-            //panel.getUndoManager().addEdit(undo);
+                // TODO: Add undo
+                //UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+                //panel.getUndoManager().addEdit(undo);
 
-            // TODO: Expand parent to make new group visible
-            //parent.expand();
+                // TODO: Expand parent to make new group visible
+                //parent.expand();
 
-            dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+                dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+            });
         });
     }
 
@@ -142,42 +147,46 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Opens "Edit Group Dialog" and changes the given group to the edited one.
      */
     public void editGroup(GroupNodeViewModel oldGroup) {
-        Optional<AbstractGroup> newGroup = dialogService
-                .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
-        newGroup.ifPresent(group -> {
+        SwingUtilities.invokeLater(() -> {
+            Optional<AbstractGroup> newGroup = dialogService
+                    .showCustomDialogAndWait(new GroupDialog(oldGroup.getGroupNode().getGroup()));
+            newGroup.ifPresent(group -> {
 
-            // TODO: Keep assignments
-            boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Change of Grouping Method"),
-                    Localization.lang("Assign the original group's entries to this group?"));
-            //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
-            boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
-                    && (group instanceof ExplicitGroup);
+                Platform.runLater(() -> {
+                    // TODO: Keep assignments
+                    boolean keepPreviousAssignments = dialogService.showConfirmationDialogAndWait(
+                            Localization.lang("Change of Grouping Method"),
+                            Localization.lang("Assign the original group's entries to this group?"));
+                    //        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+                    boolean removePreviousAssignents = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
+                            && (group instanceof ExplicitGroup);
 
-            List<FieldChange> addChange = oldGroup.getGroupNode().setGroup(
-                    group,
-                    keepPreviousAssignments,
-                    removePreviousAssignents,
-                    stateManager.getEntriesInCurrentDatabase());
+                    List<FieldChange> addChange = oldGroup.getGroupNode().setGroup(
+                            group,
+                            keepPreviousAssignments,
+                            removePreviousAssignents,
+                            stateManager.getEntriesInCurrentDatabase());
 
-            // TODO: Add undo
-            // Store undo information.
-            // AbstractUndoableEdit undoAddPreviousEntries = null;
-            // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
-            // if (undoAddPreviousEntries == null) {
-            //    panel.getUndoManager().addEdit(undo);
-            //} else {
-            //    NamedCompound nc = new NamedCompound("Modify Group");
-            //    nc.addEdit(undo);
-            //    nc.addEdit(undoAddPreviousEntries);
-            //    nc.end();/
-            //      panel.getUndoManager().addEdit(nc);
-            //}
-            //if (!addChange.isEmpty()) {
-            //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
-            //}
+                    // TODO: Add undo
+                    // Store undo information.
+                    // AbstractUndoableEdit undoAddPreviousEntries = null;
+                    // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
+                    // if (undoAddPreviousEntries == null) {
+                    //    panel.getUndoManager().addEdit(undo);
+                    //} else {
+                    //    NamedCompound nc = new NamedCompound("Modify Group");
+                    //    nc.addEdit(undo);
+                    //    nc.addEdit(undoAddPreviousEntries);
+                    //    nc.end();/
+                    //      panel.getUndoManager().addEdit(nc);
+                    //}
+                    //if (!addChange.isEmpty()) {
+                    //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
+                    //}
 
-            dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+                    dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+                });
+            });
         });
     }
 
