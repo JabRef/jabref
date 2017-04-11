@@ -2,6 +2,9 @@ package org.jabref.model.entry;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Utility class for everything related to months.
@@ -107,17 +110,25 @@ public class MonthUtil {
     }
 
     /**
-     * This method accepts three types of months given:
+     * @deprecated use {@link #parse(String)} instead
+     */
+    @Deprecated
+    public static Month getMonth(String value) {
+        return parse(value).orElse(MonthUtil.NULL_OBJECT);
+    }
+
+    /**
+     * This method accepts three types of months:
      * - Single and Double Digit months from 1 to 12 (01 to 12)
-     * - 3 Digit BibTex strings (jan, feb, mar...)
+     * - 3 Digit BibTex strings (jan, feb, mar...) possibly with # prepended
      * - Full English Month identifiers.
      *
      * @param value the given value
      * @return the corresponding Month instance
      */
-    public static Month getMonth(String value) {
-        if (value == null) {
-            return MonthUtil.NULL_OBJECT;
+    public static Optional<Month> parse(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
         }
 
         // Much more liberal matching covering most known abbreviations etc.
@@ -127,15 +138,14 @@ public class MonthUtil {
         }
         Month month = MonthUtil.getMonthByShortName(testString);
         if (month.isValid()) {
-            return month;
+            return Optional.of(month);
         }
 
         try {
             int number = Integer.parseInt(value);
-            return MonthUtil.getMonthByNumber(number);
+            return Optional.of(MonthUtil.getMonthByNumber(number));
         } catch (NumberFormatException e) {
-            return MonthUtil.NULL_OBJECT;
+            return Optional.empty();
         }
     }
-
 }
