@@ -18,6 +18,8 @@ env:
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
     - TEST_SUITE=fetcherTest
+
+matrix:
     fast_finish: true
     allow_failures:
       - env: TEST_SUITE=fetcherTest
