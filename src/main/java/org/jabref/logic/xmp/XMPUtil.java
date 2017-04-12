@@ -31,7 +31,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
@@ -325,7 +325,8 @@ public class XMPUtil {
             if (c != null) {
                 entry.setField(FieldName.YEAR, String.valueOf(c.get(Calendar.YEAR)));
                 if (date.length() > 4) {
-                    entry.setField(FieldName.MONTH, MonthUtil.getMonthByIndex(c.get(Calendar.MONTH)).bibtexFormat);
+                    Optional<Month> month = Month.getMonthByIndex(c.get(Calendar.MONTH));
+                    month.ifPresent(entry::setMonth);
                 }
             }
         }

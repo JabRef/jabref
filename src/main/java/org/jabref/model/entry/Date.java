@@ -70,7 +70,7 @@ public class Date {
 
     public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue, Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
-        Optional<MonthUtil.Month> month = monthValue.flatMap(MonthUtil::parse);
+        Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
 
 
@@ -78,9 +78,9 @@ public class Date {
             TemporalAccessor date;
             if (month.isPresent()) {
                 if (day.isPresent()) {
-                    date = LocalDate.of(year.get().getValue(), month.get().number, day.get());
+                    date = LocalDate.of(year.get().getValue(), month.get().getNumber(), day.get());
                 } else {
-                    date = YearMonth.of(year.get().getValue(), month.get().number);
+                    date = YearMonth.of(year.get().getValue(), month.get().getNumber());
                 }
             } else {
                 date = year.get();

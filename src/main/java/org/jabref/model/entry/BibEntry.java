@@ -94,6 +94,10 @@ public class BibEntry implements Cloneable {
         this.sharedBibEntryData = new SharedBibEntryData();
     }
 
+    public Optional<FieldChange> setMonth(Month parsedMonth) {
+        return setField(FieldName.MONTH, parsedMonth.getBibtexFormat());
+    }
+
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
             Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
@@ -583,20 +587,7 @@ public class BibEntry implements Cloneable {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public Optional<String> getPublicationDate() {
-        if (!hasField(FieldName.YEAR)) {
-            return Optional.empty();
-        }
-
-        Optional<String> year = getField(FieldName.YEAR);
-
-        Optional<String> monthString = getField(FieldName.MONTH);
-        if (monthString.isPresent()) {
-            MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
-            if (month.isValid()) {
-                return Optional.of(year.orElse("") + "-" + month.twoDigitNumber);
-            }
-        }
-        return year;
+        return getFieldOrAlias(FieldName.DATE);
     }
 
     public String getParsedSerialization() {

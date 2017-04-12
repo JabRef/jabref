@@ -17,7 +17,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -199,10 +199,8 @@ public class RisImporter extends Importer {
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
                                 int monthNumber = Integer.parseInt(parts[1]);
-                                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
-                                if (month.isValid()) {
-                                    fields.put(FieldName.MONTH, month.bibtexFormat);
-                                }
+                                Optional<Month> month = Month.getMonthByNumber(monthNumber);
+                                month.ifPresent(parsedMonth -> fields.put(FieldName.MONTH, parsedMonth.getBibtexFormat()));
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }

@@ -13,7 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
 
@@ -118,7 +118,9 @@ public class FieldComparator implements Comparator<BibEntry> {
             int comparisonResult = Integer.compare(f1year, f2year);
             return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
-            return Integer.compare(MonthUtil.getMonth(f1).number, MonthUtil.getMonth(f2).number) * multiplier;
+            int month1 = Month.parse(f1).map(Month::getNumber).orElse(-1);
+            int month2 = Month.parse(f2).map(Month::getNumber).orElse(-1);
+            return Integer.compare(month1, month2) * multiplier;
         }
 
         if (isNumeric) {

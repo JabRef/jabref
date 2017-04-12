@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 /**
  * Importer for the ISI Web of Science, INSPEC and Medline format.
@@ -338,9 +339,9 @@ public class IsiImporter extends Importer {
 
         String[] parts = value.split("\\s|\\-");
         for (String part1 : parts) {
-            MonthUtil.Month month = MonthUtil.getMonthByShortName(part1.toLowerCase(Locale.ROOT));
-            if (month.isValid()) {
-                return month.bibtexFormat;
+            Optional<Month> month = Month.getMonthByShortName(part1.toLowerCase(Locale.ROOT));
+            if (month.isPresent()) {
+                return month.get().getBibtexFormat();
             }
         }
 
@@ -348,9 +349,9 @@ public class IsiImporter extends Importer {
         for (String part : parts) {
             try {
                 int number = Integer.parseInt(part);
-                MonthUtil.Month month = MonthUtil.getMonthByNumber(number);
-                if (month.isValid()) {
-                    return month.bibtexFormat;
+                Optional<Month>  month = Month.getMonthByNumber(number);
+                if (month.isPresent()) {
+                    return month.get().getBibtexFormat();
                 }
             } catch (NumberFormatException ignored) {
                 // Ignored

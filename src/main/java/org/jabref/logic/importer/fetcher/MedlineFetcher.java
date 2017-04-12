@@ -18,6 +18,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -26,8 +28,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -144,10 +147,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        entry.clearField("journal-abbreviation");
-        entry.clearField("status");
-        entry.clearField("copyright");
-        entry.getField("month").ifPresent(month -> entry.setField("month", MonthUtil.getMonth(month).bibtexFormat));
+        new FieldFormatterCleanup("journal-abbreviation", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup("status", new ClearFormatter()).cleanup(entry);
+        new FieldFormatterCleanup("copyright", new ClearFormatter()).cleanup(entry);
+
+        new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()).cleanup(entry);
     }
 
     @Override
