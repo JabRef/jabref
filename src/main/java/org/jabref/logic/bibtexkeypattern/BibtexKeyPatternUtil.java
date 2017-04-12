@@ -526,10 +526,8 @@ public class BibtexKeyPatternUtil {
                  */
                 String authString;
                 if (database != null) {
-                    Optional<String> authorFieldValue = entry.getField(FieldName.AUTHOR);
-                    Optional<String> mappedFieldValue = authorFieldValue
-                            .map(authorString -> normalize(database.resolveForStrings(authorString)));
-                    authString = mappedFieldValue.orElse("");
+                    authString = entry.getField(FieldName.AUTHOR)
+                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 } else {
                     authString = entry.getField(FieldName.AUTHOR).orElse("");
                 }
