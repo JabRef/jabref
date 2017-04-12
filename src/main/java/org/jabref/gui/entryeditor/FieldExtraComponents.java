@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Executors;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -24,6 +23,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -201,7 +201,7 @@ public class FieldExtraComponents {
         };
 
         doiButton.addActionListener(actionEvent -> {
-            Executors.newSingleThreadExecutor().execute(doiFetcher);
+            JabRefExecutorService.INSTANCE.execute(doiFetcher);
         });
         // fetch bibtex data
         JButton fetchButton = new JButton(
