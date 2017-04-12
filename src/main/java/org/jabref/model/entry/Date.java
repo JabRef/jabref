@@ -9,6 +9,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class Date {
@@ -19,42 +20,18 @@ public class Date {
         this.date = date;
     }
 
-    public String getNormalized() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
-        return dateFormatter.format(date);
-    }
-
-    public Optional<Integer> getYear() {
-        return get(ChronoField.YEAR);
-    }
-
-    public Optional<Integer> get(ChronoField field) {
-        if (date.isSupported(field)) {
-            return Optional.of(date.get(field));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<Integer> getMonth() {
-        return get(ChronoField.MONTH_OF_YEAR);
-    }
-
-    public Optional<Integer> getDay() {
-        return get(ChronoField.DAY_OF_MONTH);
-    }
-
     /**
      * Try to parse the following formats
      *  - "M/y" (covers 9/15, 9/2015, and 09/2015)
      *  - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
      *  - "yyyy-MM-dd" (covers 2009-1-15)
+     *  - "dd-MM-yyyy" (covers 15-1-2009)
      *  - "d.M.uuuu" (covers 15.1.2015)
      *  - "uuuu.M.d" (covers 2015.1.15)
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     public static Optional<Date> parse(String dateString) {
-        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
+        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
                 "d.M.uuuu", "uuuu.M.d", "uuuu");
         for (String formatString : formatStrings) {
             try {
@@ -98,5 +75,52 @@ public class Date {
         } catch (NumberFormatException ex) {
             return Optional.empty();
         }
+    }
+
+    public String getNormalized() {
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
+        return dateFormatter.format(date);
+    }
+
+    public Optional<Integer> getYear() {
+        return get(ChronoField.YEAR);
+    }
+
+    public Optional<Integer> get(ChronoField field) {
+        if (date.isSupported(field)) {
+            return Optional.of(date.get(field));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Integer> getMonth() {
+        return get(ChronoField.MONTH_OF_YEAR);
+    }
+
+    public Optional<Integer> getDay() {
+        return get(ChronoField.DAY_OF_MONTH);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Date date1 = (Date) o;
+        return Objects.equals(getYear(), date1.getYear()) &&
+                Objects.equals(getMonth(), date1.getMonth()) &&
+                Objects.equals(getDay(), date1.getDay());
+    }
+
+    @Override
+    public String toString() {
+        return "Date{" +
+                "date=" + date +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(date);
     }
 }
