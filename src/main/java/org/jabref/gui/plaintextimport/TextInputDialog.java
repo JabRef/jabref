@@ -48,6 +48,7 @@ import javax.swing.JTextPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -456,6 +457,11 @@ public class TextInputDialog extends JabRefDialog {
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
+        SwingUtilities.invokeLater(() -> {
+            parseWithFreeCiteButton.setText(Localization.lang("Parsing..."));
+            parseWithFreeCiteButton.setEnabled(false);
+        });
+
         FreeCiteImporter fimp = new FreeCiteImporter(Globals.prefs.getImportFormatPreferences());
         String text = textPane.getText();
 
@@ -468,6 +474,12 @@ public class TextInputDialog extends JabRefDialog {
         text = text.replace("##NEWLINE##", OS.NEWLINE);
 
         ParserResult importerResult = fimp.importEntries(text);
+
+        SwingUtilities.invokeLater(() -> {
+            parseWithFreeCiteButton.setText(Localization.lang("Parse with FreeCite"));
+            parseWithFreeCiteButton.setEnabled(true);
+        });
+
         if (importerResult.hasWarnings()) {
             frame.showMessage(importerResult.getErrorMessage());
         }
