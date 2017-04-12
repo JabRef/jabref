@@ -15,9 +15,11 @@ env:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
   matrix:
     - TEST_SUITE=check OPTIONS=modernizer
-    - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
+    - TEST_SUITE=fetcherTest
+    allow_failures:
+    - env: TEST_SUITE=fetcherTest
 
 # JavaFX localization tests need a running X environment
 before_install:
