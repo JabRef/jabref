@@ -20,7 +20,7 @@ env:
     - TEST_SUITE=fetcherTest
     fast_finish: true
     allow_failures:
-    - env: TEST_SUITE=fetcherTest
+      - env: TEST_SUITE=fetcherTest
 
 # JavaFX localization tests need a running X environment
 before_install:
