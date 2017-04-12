@@ -524,10 +524,15 @@ public class BibtexKeyPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                Optional<String> authorFieldValue = entry.getField(FieldName.AUTHOR);
-                Optional<String> mappedFieldValue = authorFieldValue
-                        .map(authorString -> normalize(database.resolveForStrings(authorString)));
-                String authString = mappedFieldValue.orElse("");
+                String authString;
+                if (database != null) {
+                    Optional<String> authorFieldValue = entry.getField(FieldName.AUTHOR);
+                    Optional<String> mappedFieldValue = authorFieldValue
+                            .map(authorString -> normalize(database.resolveForStrings(authorString)));
+                    authString = mappedFieldValue.orElse("");
+                } else {
+                    authString = entry.getField(FieldName.AUTHOR).orElse("");
+                }
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
@@ -536,8 +541,12 @@ public class BibtexKeyPatternUtil {
                 }
 
                 if (authString.isEmpty()) {
-                    authString = entry.getField(FieldName.EDITOR)
+                    if (database != null) {
+                        authString = entry.getField(FieldName.EDITOR)
                             .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                    } else {
+                        authString = entry.getField(FieldName.EDITOR).orElse("");
+                    }
                 }
 
                 // Gather all author-related checks, so we don't
