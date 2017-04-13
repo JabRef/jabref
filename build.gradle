@@ -19,8 +19,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id "com.simonharrer.modernizer" version "1.4.0-1"
     id 'me.champeau.gradle.jmh' version '0.3.1'
-    // If this is updated to 0.0.9, check configurations.errorprone
-    id "net.ltgt.errorprone" version "0.0.8"
+    id "net.ltgt.errorprone" version "0.0.10"
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
