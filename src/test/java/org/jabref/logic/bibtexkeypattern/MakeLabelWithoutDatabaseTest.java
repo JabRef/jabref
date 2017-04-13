@@ -22,10 +22,8 @@ public class MakeLabelWithoutDatabaseTest {
 
     @Test
     public void makeLabelForFileSearch() {
-        String label = BibtexKeyPatternUtil.makeLabel(entry,
-                /*value=*/ "auth",
-                /*keywordDelimiter=*/ ',',
-                /*database=*/ null);
+        String label =
+            BibtexKeyPatternUtil.makeLabel(entry, "auth", ',', null);
         assertEquals("Doe", label);
     }
 
@@ -36,10 +34,8 @@ public class MakeLabelWithoutDatabaseTest {
         localEntry.setField("year", "2016");
         localEntry.setField("title", "An awesome paper on JabRef");
 
-        String label = BibtexKeyPatternUtil.makeLabel(localEntry,
-                /*value=*/ "auth",
-                /*keywordDelimiter=*/ ',',
-                /*database=*/ null);
+        String label =
+            BibtexKeyPatternUtil.makeLabel(localEntry, "auth", ',', null);
         assertEquals("Doe", label);
     }
 
