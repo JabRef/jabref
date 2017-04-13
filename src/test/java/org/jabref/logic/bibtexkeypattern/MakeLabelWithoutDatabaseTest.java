@@ -9,7 +9,6 @@ import static org.junit.Assert.assertEquals;
 
 public class MakeLabelWithoutDatabaseTest {
 
-    // private GlobalBibtexKeyPattern pattern;
     private BibEntry entry;
 
     @Before
