@@ -24,7 +24,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +36,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -50,7 +50,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class EntryCustomizationDialog extends JDialog implements ListSelectionListener {
+public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
     private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
@@ -79,7 +79,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
      * Creates a new instance of EntryCustomizationDialog
      */
     public EntryCustomizationDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Customize entry types"), false);
+        super(frame, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
 
         this.frame = frame;
         initGui();

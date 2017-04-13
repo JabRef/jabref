@@ -51,12 +51,11 @@ public class StateManager {
     }
 
     public ObservableList<BibEntry> getSelectedEntries() {
-        return FXCollections.unmodifiableObservableList(selectedEntries);
+        return selectedEntries;
     }
 
     public void setSelectedEntries(List<BibEntry> newSelectedEntries) {
-        selectedEntries.clear();
-        selectedEntries.addAll(newSelectedEntries);
+        selectedEntries.setAll(newSelectedEntries);
     }
 
     public void setSelectedGroup(BibDatabaseContext database, GroupTreeNode newSelectedGroup) {
@@ -70,6 +69,10 @@ public class StateManager {
 
     public void clearSelectedGroup(BibDatabaseContext database) {
         selectedGroups.remove(database);
+    }
+
+    public Optional<BibDatabaseContext> getActiveDatabase() {
+        return activeDatabase.get();
     }
 
     public List<BibEntry> getEntriesInCurrentDatabase() {
