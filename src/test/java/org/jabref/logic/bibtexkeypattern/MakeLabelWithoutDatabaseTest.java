@@ -11,7 +11,6 @@ public class MakeLabelWithoutDatabaseTest {
 
     // private GlobalBibtexKeyPattern pattern;
     private BibEntry entry;
-    private String patternString;
 
     @Before
     public void setUp() {
