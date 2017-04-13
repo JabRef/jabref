@@ -29,4 +29,18 @@ public class MakeLabelWithoutDatabaseTest {
         assertEquals("Doe", label);
     }
 
+    @Test
+    public void makeEditorLabelForFileSearch() {
+        BibEntry localEntry = new BibEntry();
+        localEntry.setField("editor", "John Doe");
+        localEntry.setField("year", "2016");
+        localEntry.setField("title", "An awesome paper on JabRef");
+
+        String label = BibtexKeyPatternUtil.makeLabel(localEntry,
+                /*value=*/ "auth",
+                /*keywordDelimiter=*/ ',',
+                /*database=*/ null);
+        assertEquals("Doe", label);
+    }
+
 }
