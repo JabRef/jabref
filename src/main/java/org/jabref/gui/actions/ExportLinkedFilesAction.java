@@ -17,6 +17,7 @@ import org.jabref.gui.FXDialogService;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.TypedBibEntry;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -24,25 +25,29 @@ import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.JabRefPreferences;
 
-public class ExportFilesAction extends AbstractAction {
+public class ExportLinkedFilesAction extends AbstractAction {
 
-    public ExportFilesAction() {
-        // TODO Auto-generated constructor stub
+    public ExportLinkedFilesAction() {
+        super(Localization.lang("Export linked files"));
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(
-                Paths.get(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))).build();
+        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(
+                        Paths.get(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .build();
+        List<BibEntry> entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
 
         DialogService ds = new FXDialogService();
         Optional<Path> path = DefaultTaskExecutor
                 .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(dirDialogConfiguration));
 
-        List<BibEntry> entries = JabRefGUI.getMainFrame().getCurrentBasePanel().getSelectedEntries();
         BibDatabaseContext databaseContext = JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabaseContext();
 
+        System.out.println("Files count " + entries.stream()
+                .flatMap(entry -> new TypedBibEntry(entry, databaseContext).getFiles().stream()).count());
 
         for (BibEntry entry : entries) {
             TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
@@ -72,6 +77,3 @@ public class ExportFilesAction extends AbstractAction {
     };
 
 }
-
-
-
