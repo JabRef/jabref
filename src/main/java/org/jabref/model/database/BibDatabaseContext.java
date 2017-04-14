@@ -199,12 +199,12 @@ public class BibDatabaseContext {
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
             assert dbPath != null : "dbPath is null";
-            assert dbPath.getParent() != null : "dbPath.getParent() is null";
-            assert dbPath.getParent().toAbsolutePath() != null : "dbPath.getParent().toAbsolutePath() is null";
-            assert dbPath.getParent().toAbsolutePath().toString() != null : "dbPath.getParent().toAbsolutePath().toString() is null";
-            assert preferences != null : "'preferences' is null";
-            assert fileDirs != null : "'fileDirs' is null";
-            String parentDir = dbPath.getParent().toAbsolutePath().toString();
+            Path parentPath = dbPath.getParent();
+            if( parentPath == null ) {
+                parentPath = Paths.get(System.getProperty("user.dir"));
+            }
+            assert parentPath != null : "BibTex database parent path is null";
+            String parentDir = parentPath.toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
