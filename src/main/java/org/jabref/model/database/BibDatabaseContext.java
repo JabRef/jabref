@@ -198,25 +198,20 @@ public class BibDatabaseContext {
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
-                if( dbPath == null ) {
-                    System.err.println( "EEE>>> dbPath is null" );
-                } else {
-                    System.err.println( "EEE>>> dbPath is NOT null: " + dbPath );
-                }
-                assert dbPath != null : "dbPath is null";
-                assert dbPath.getParent() != null : "dbPath.getParent() is null";
-                assert dbPath.getParent().toAbsolutePath() != null : "dbPath.getParent().toAbsolutePath() is null";
-                assert dbPath.getParent().toAbsolutePath().toString() != null : "dbPath.getParent().toAbsolutePath().toString() is null";
-                assert preferences != null : "'preferences' is null";
-                assert fileDirs != null : "'fileDirs' is null";
-                String parentDir = dbPath.getParent().toAbsolutePath().toString();
-                // Check if we should add it as primary file dir (first in the list) or not:
-                if (preferences.isBibLocationAsPrimary()) {
-                    fileDirs.add(0, parentDir);
-                } else {
-                    fileDirs.add(parentDir);
-                }
-            });
+            assert dbPath != null : "dbPath is null";
+            assert dbPath.getParent() != null : "dbPath.getParent() is null";
+            assert dbPath.getParent().toAbsolutePath() != null : "dbPath.getParent().toAbsolutePath() is null";
+            assert dbPath.getParent().toAbsolutePath().toString() != null : "dbPath.getParent().toAbsolutePath().toString() is null";
+            assert preferences != null : "'preferences' is null";
+            assert fileDirs != null : "'fileDirs' is null";
+            String parentDir = dbPath.getParent().toAbsolutePath().toString();
+            // Check if we should add it as primary file dir (first in the list) or not:
+            if (preferences.isBibLocationAsPrimary()) {
+                fileDirs.add(0, parentDir);
+            } else {
+                fileDirs.add(parentDir);
+            }
+        });
 
         return fileDirs;
     }
