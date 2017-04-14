@@ -10,7 +10,9 @@
         This turns on diagnostic level logging.
         Information like loaded performance counters and "Sent Telemetry" events are written to the console.
     -->
-    <SDKLogger />
+    <!--<SDKLogger />-->
+
+    <QuickPulse enabled="false"/>
 
     <Channel>
         <!--
@@ -18,6 +20,6 @@
             which can be helpful during the development process.
             Make sure to turn this off on production servers due to performance considerations.
         -->
-        <DeveloperMode>true</DeveloperMode>
+        <!-- <DeveloperMode>true</DeveloperMode> -->
     </Channel>
 </ApplicationInsights>
