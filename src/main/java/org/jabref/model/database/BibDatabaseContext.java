@@ -179,8 +179,6 @@ public class BibDatabaseContext {
     public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
-        System.out.println( ">>> HERE!" );
-
         // 1. metadata user-specific directory
         Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
         if (userFileDirectory.isPresent()) {
