@@ -27,7 +27,6 @@ public class BibDatabaseContextTest {
     @Before
     public void setUp() {
         Map<String, String> mapFieldDirs = new HashMap<>();
-        mapFieldDirs.put("pdf", "/home/saulius/jabref");
         preferences = new FileDirectoryPreferences("saulius", mapFieldDirs, true);
         currentWorkingDir = Paths.get(System.getProperty("user.dir")).toString();
     }
