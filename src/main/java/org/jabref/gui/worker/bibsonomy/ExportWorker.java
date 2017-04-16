@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.bibsonomy.JabRefModelConverter;
 import org.jabref.model.entry.BibEntry;
@@ -68,7 +68,13 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 
 				Optional<String> filesOpt = entry.getField(FieldName.FILE);
 				if (filesOpt.isPresent() && !filesOpt.get().isEmpty() && intrahashOpt.isPresent()) {
-					WorkerUtil.performAsynchronously(new UploadDocumentsWorker(jabRefFrame, intrahashOpt.get(), filesOpt.get()));
+                    final UploadDocumentsWorker worker = new UploadDocumentsWorker(jabRefFrame, intrahashOpt.get(), filesOpt.get());
+                    try {
+                        BasePanel.runWorker(worker);
+                    } catch (Throwable t) {
+                        jabRefFrame.unblock();
+                        LOGGER.error("Failed to initialize Worker", t);
+                    }
 				}
 			}
 			jabRefFrame.output("Done.");

@@ -3,8 +3,8 @@ package org.jabref.gui.actions.bibsonomy;
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.gui.worker.AbstractWorker;
 
 import org.apache.commons.logging.Log;
@@ -40,11 +40,10 @@ public abstract class AbstractBibSonomyAction extends AbstractAction {
      */
     protected void performAsynchronously(AbstractWorker worker) {
         try {
-            WorkerUtil.performAsynchronously(worker);
+            BasePanel.runWorker(worker);
         } catch (Throwable t) {
             jabRefFrame.unblock();
             LOGGER.error("Failed to initialize Worker", t);
-            t.printStackTrace();
         }
     }
 
