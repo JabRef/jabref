@@ -149,187 +149,172 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
             apiUrlLabel = new JLabel();
             apiUrlLabel.setText(Localization.lang("Application URL"));
 
-            //y = 0
-            GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-            gridBagConstraints2.gridx = 1;
-            gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints2.weightx = 1.0;
-            gridBagConstraints2.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints2.gridwidth = 6;
-            gridBagConstraints2.gridy = 0;
+            GridBagConstraints gridBagConstraints0 = new GridBagConstraints();
+            gridBagConstraints0.gridy = 0;
+            gridBagConstraints0.gridx = 1;
+            gridBagConstraints0.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints0.weightx = 1.0;
+            gridBagConstraints0.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints0.gridwidth = 6;
 
-            //y = 1
-            GridBagConstraints gridBagConstraints24 = new GridBagConstraints();
-            gridBagConstraints24.gridy = 1;
-            gridBagConstraints24.gridx = 1;
-            gridBagConstraints24.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints24.insets = new Insets(0, 0, 3, 3);
-            gridBagConstraints24.anchor = GridBagConstraints.WEST;
+            GridBagConstraints gridBagConstraints1_1 = new GridBagConstraints();
+            gridBagConstraints1_1.gridy = 1;
+            gridBagConstraints1_1.gridx = 1;
+            gridBagConstraints1_1.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints1_1.insets = new Insets(0, 0, 3, 3);
+            gridBagConstraints1_1.anchor = GridBagConstraints.WEST;
 
-            GridBagConstraints gridBagConstraints25 = new GridBagConstraints();
-            gridBagConstraints25.gridy = 1;
-            gridBagConstraints25.gridx = 2;
-            gridBagConstraints25.fill = GridBagConstraints.BOTH;
-            gridBagConstraints25.weightx = 1.0;
-            gridBagConstraints25.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints25.gridwidth = 2;
+            GridBagConstraints gridBagConstraints1_2 = new GridBagConstraints();
+            gridBagConstraints1_2.gridy = 1;
+            gridBagConstraints1_2.gridx = 2;
+            gridBagConstraints1_2.fill = GridBagConstraints.BOTH;
+            gridBagConstraints1_2.weightx = 1.0;
+            gridBagConstraints1_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints1_2.gridwidth = 2;
 
-            //y = 2
-            GridBagConstraints gridBagConstraints16 = new GridBagConstraints();
-            gridBagConstraints16.gridy = 2;
-            gridBagConstraints16.gridx = 1;
-            gridBagConstraints16.anchor = GridBagConstraints.WEST;
-            gridBagConstraints16.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints16.insets = new Insets(0, 0, 3, 3);
+            GridBagConstraints gridBagConstraints2_1 = new GridBagConstraints();
+            gridBagConstraints2_1.gridy = 2;
+            gridBagConstraints2_1.gridx = 1;
+            gridBagConstraints2_1.anchor = GridBagConstraints.WEST;
+            gridBagConstraints2_1.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints2_1.insets = new Insets(0, 0, 3, 3);
 
-            GridBagConstraints gridBagConstraints26 = new GridBagConstraints();
-            gridBagConstraints26.gridy = 2;
-            gridBagConstraints26.gridx = 2;
-            gridBagConstraints26.fill = GridBagConstraints.BOTH;
-            gridBagConstraints26.weightx = 1.0;
-            gridBagConstraints26.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints26.gridwidth = 2;
+            GridBagConstraints gridBagConstraints2_2 = new GridBagConstraints();
+            gridBagConstraints2_2.gridy = 2;
+            gridBagConstraints2_2.gridx = 2;
+            gridBagConstraints2_2.fill = GridBagConstraints.BOTH;
+            gridBagConstraints2_2.weightx = 1.0;
+            gridBagConstraints2_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints2_2.gridwidth = 2;
 
-            //y = 3
-            GridBagConstraints gridBagConstraints27 = new GridBagConstraints();
-            gridBagConstraints27.gridy = 3;
-            gridBagConstraints27.gridx = 2;
-            gridBagConstraints27.anchor = GridBagConstraints.WEST;
-            gridBagConstraints27.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints27.insets = new Insets(0, 0, 3, 0);
+            GridBagConstraints gridBagConstraints3_2 = new GridBagConstraints();
+            gridBagConstraints3_2.gridy = 3;
+            gridBagConstraints3_2.gridx = 2;
+            gridBagConstraints3_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints3_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints3_2.insets = new Insets(0, 0, 3, 0);
 
-            //y = 4
-            GridBagConstraints gridBagConstraints21 = new GridBagConstraints();
-            gridBagConstraints21.gridy = 4;
-            gridBagConstraints21.gridx = 1;
-            gridBagConstraints21.anchor = GridBagConstraints.WEST;
-            gridBagConstraints21.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints21.insets = new Insets(0, 0, 0, 3);
+            GridBagConstraints gridBagConstraints4_1 = new GridBagConstraints();
+            gridBagConstraints4_1.gridy = 4;
+            gridBagConstraints4_1.gridx = 1;
+            gridBagConstraints4_1.anchor = GridBagConstraints.WEST;
+            gridBagConstraints4_1.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints4_1.insets = new Insets(0, 0, 0, 3);
 
-            GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
-            gridBagConstraints22.gridy = 4;
-            gridBagConstraints22.gridx = 2;
-            gridBagConstraints22.fill = GridBagConstraints.BOTH;
-            gridBagConstraints22.weightx = 1.0;
-            gridBagConstraints22.gridwidth = 2;
-            gridBagConstraints22.ipadx = 2;
-            gridBagConstraints22.ipady = 2;
-            gridBagConstraints22.insets = new Insets(0, 0, 3, 0);
+            GridBagConstraints gridBagConstraints4_2 = new GridBagConstraints();
+            gridBagConstraints4_2.gridy = 4;
+            gridBagConstraints4_2.gridx = 2;
+            gridBagConstraints4_2.fill = GridBagConstraints.BOTH;
+            gridBagConstraints4_2.weightx = 1.0;
+            gridBagConstraints4_2.gridwidth = 2;
+            gridBagConstraints4_2.ipadx = 2;
+            gridBagConstraints4_2.ipady = 2;
+            gridBagConstraints4_2.insets = new Insets(0, 0, 3, 0);
 
-            //y = 5
-            GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
-            gridBagConstraints23.gridy = 5;
-            gridBagConstraints23.gridx = 2;
-            gridBagConstraints23.anchor = GridBagConstraints.WEST;
-            gridBagConstraints23.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints23.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints23.gridwidth = 4;
+            GridBagConstraints gridBagConstraints5_2 = new GridBagConstraints();
+            gridBagConstraints5_2.gridy = 5;
+            gridBagConstraints5_2.gridx = 2;
+            gridBagConstraints5_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints5_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints5_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints5_2.gridwidth = 4;
 
-            //y = 6
-            GridBagConstraints gridBagConstraints9 = new GridBagConstraints();
-            gridBagConstraints9.gridy = 6;
-            gridBagConstraints9.gridx = 2;
-            gridBagConstraints9.anchor = GridBagConstraints.WEST;
-            gridBagConstraints9.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints9.weightx = 1.0;
-            gridBagConstraints9.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints9.gridwidth = 7;
+            GridBagConstraints gridBagConstraints6_2 = new GridBagConstraints();
+            gridBagConstraints6_2.gridy = 6;
+            gridBagConstraints6_2.gridx = 2;
+            gridBagConstraints6_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints6_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints6_2.weightx = 1.0;
+            gridBagConstraints6_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints6_2.gridwidth = 7;
 
-            //y = 8
-            GridBagConstraints gridBagConstraints10 = new GridBagConstraints();
-            gridBagConstraints10.gridy = 8;
-            gridBagConstraints10.gridx = 2;
-            gridBagConstraints10.anchor = GridBagConstraints.WEST;
-            gridBagConstraints10.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints10.weightx = 1.0;
-            gridBagConstraints10.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints10.gridwidth = 5;
+            GridBagConstraints gridBagConstraints8_2 = new GridBagConstraints();
+            gridBagConstraints8_2.gridy = 8;
+            gridBagConstraints8_2.gridx = 2;
+            gridBagConstraints8_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints8_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints8_2.weightx = 1.0;
+            gridBagConstraints8_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints8_2.gridwidth = 5;
 
-            //y = 9
-            GridBagConstraints gridBagConstraints12 = new GridBagConstraints();
-            gridBagConstraints12.gridy = 9;
-            gridBagConstraints12.gridx = 2;
-            gridBagConstraints12.anchor = GridBagConstraints.WEST;
-            gridBagConstraints12.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints12.weightx = 1.0;
-            gridBagConstraints12.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints12.gridwidth = 5;
+            GridBagConstraints gridBagConstraints9_2 = new GridBagConstraints();
+            gridBagConstraints9_2.gridy = 9;
+            gridBagConstraints9_2.gridx = 2;
+            gridBagConstraints9_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints9_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints9_2.weightx = 1.0;
+            gridBagConstraints9_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints9_2.gridwidth = 5;
 
+            GridBagConstraints gridBagConstraints10_2 = new GridBagConstraints();
+            gridBagConstraints10_2.gridy = 10;
+            gridBagConstraints10_2.gridx = 2;
+            gridBagConstraints10_2.anchor = GridBagConstraints.WEST;
+            gridBagConstraints10_2.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints10_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints10_2.gridwidth = 5;
 
-            //y = 10
-            GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
-            gridBagConstraints13.gridy = 10;
-            gridBagConstraints13.gridx = 2;
-            gridBagConstraints13.anchor = GridBagConstraints.WEST;
-            gridBagConstraints13.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints13.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints13.gridwidth = 5;
+            GridBagConstraints gridBagConstraints14_1 = new GridBagConstraints();
+            gridBagConstraints14_1.gridy = 14;
+            gridBagConstraints14_1.gridx = 1;
+            gridBagConstraints14_1.anchor = GridBagConstraints.WEST;
+            gridBagConstraints14_1.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints14_1.weightx = 1.0;
+            gridBagConstraints14_1.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints14_1.gridwidth = 1;
 
+            GridBagConstraints gridBagConstraints14_2 = new GridBagConstraints();
+            gridBagConstraints14_2.gridy = 14;
+            gridBagConstraints14_2.gridx = 2;
+            gridBagConstraints14_2.fill = GridBagConstraints.BOTH;
+            gridBagConstraints14_2.gridwidth = 1;
+            gridBagConstraints14_2.weightx = 1;
+            gridBagConstraints14_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints14_2.gridwidth = 1;
 
-            //y = 14
-            GridBagConstraints gridBagConstraints31 = new GridBagConstraints();
-            gridBagConstraints31.gridy = 14;
-            gridBagConstraints31.gridx = 1;
-            gridBagConstraints31.anchor = GridBagConstraints.WEST;
-            gridBagConstraints31.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints31.weightx = 1.0;
-            gridBagConstraints31.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints31.gridwidth = 1;
+            GridBagConstraints gridBagConstraints15_1 = new GridBagConstraints();
+            gridBagConstraints15_1.gridy = 15;
+            gridBagConstraints15_1.gridx = 1;
+            gridBagConstraints15_1.anchor = GridBagConstraints.WEST;
+            gridBagConstraints15_1.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints15_1.weightx = 0.1;
+            gridBagConstraints15_1.insets = new Insets(0, 0, 0, 3);
 
-            GridBagConstraints gridBagConstraints32 = new GridBagConstraints();
-            gridBagConstraints32.gridy = 14;
-            gridBagConstraints32.gridx = 2;
-            gridBagConstraints32.fill = GridBagConstraints.BOTH;
-            gridBagConstraints32.gridwidth = 1;
-            gridBagConstraints32.weightx = 1;
-            gridBagConstraints32.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints32.gridwidth = 1;
+            GridBagConstraints gridBagConstraints15_2 = new GridBagConstraints();
+            gridBagConstraints15_2.gridy = 15;
+            gridBagConstraints15_2.gridx = 2;
+            gridBagConstraints15_2.fill = GridBagConstraints.BOTH;
+            gridBagConstraints15_2.weightx = 1.0;
+            gridBagConstraints15_2.insets = new Insets(0, 0, 3, 0);
+            gridBagConstraints15_2.gridwidth = 5;
 
-            //y = 15
-            GridBagConstraints gridBagConstraints14 = new GridBagConstraints();
-            gridBagConstraints14.gridy = 15;
-            gridBagConstraints14.gridx = 1;
-            gridBagConstraints14.anchor = GridBagConstraints.WEST;
-            gridBagConstraints14.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints14.weightx = 0.1;
-            gridBagConstraints14.insets = new Insets(0, 0, 0, 3);
-
-            GridBagConstraints gridBagConstraints15 = new GridBagConstraints();
-            gridBagConstraints15.gridy = 15;
-            gridBagConstraints15.gridx = 2;
-            gridBagConstraints15.fill = GridBagConstraints.BOTH;
-            gridBagConstraints15.weightx = 1.0;
-            gridBagConstraints15.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints15.gridwidth = 5;
-
-            //y = 19
-            GridBagConstraints gridBagConstraints20 = new GridBagConstraints();
-            gridBagConstraints20.gridy = 19;
-            gridBagConstraints20.gridx = 1;
-            gridBagConstraints20.fill = GridBagConstraints.BOTH;
-            gridBagConstraints20.weightx = 1.0;
-            gridBagConstraints20.weighty = 1.0;
-            gridBagConstraints20.gridwidth = 8;
+            GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
+            gridBagConstraints19.gridy = 19;
+            gridBagConstraints19.gridx = 1;
+            gridBagConstraints19.fill = GridBagConstraints.BOTH;
+            gridBagConstraints19.weightx = 1.0;
+            gridBagConstraints19.weighty = 1.0;
+            gridBagConstraints19.gridwidth = 8;
 
             generalSettingsPanel = new JPanel();
             generalSettingsPanel.setLayout(new GridBagLayout());
             generalSettingsPanel.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-            generalSettingsPanel.add(getCredentialsPanel(), gridBagConstraints2);
-            generalSettingsPanel.add(getIgnoreOneTagWarningCheckBox(), gridBagConstraints9);
-            generalSettingsPanel.add(getUpdateTagsCheckBox(), gridBagConstraints10);
-            generalSettingsPanel.add(getUploadDocumentsCheckBox(), gridBagConstraints12);
-            generalSettingsPanel.add(getDownloadDocumentsCheckBox(), gridBagConstraints13);
-            generalSettingsPanel.add(defaultVisibilityLabel, gridBagConstraints14);
-            generalSettingsPanel.add(getDefaultVisibilityComboBox(), gridBagConstraints15);
-            generalSettingsPanel.add(getGeneralSettingsWhitespacePanel(), gridBagConstraints20);
-            generalSettingsPanel.add(numberOfPostsLabel, gridBagConstraints21);
-            generalSettingsPanel.add(getNumberOfPostsSpinner(), gridBagConstraints22);
-            generalSettingsPanel.add(getNoWarningOnMorePostsCheckBox(), gridBagConstraints23);
-            generalSettingsPanel.add(tagSizeLabel, gridBagConstraints24);
-            generalSettingsPanel.add(getTagCloudSizeSpinner(), gridBagConstraints25);
-            generalSettingsPanel.add(tagCloudOrderLabel, gridBagConstraints16);
-            generalSettingsPanel.add(getTagCloudOrderComboBox(), gridBagConstraints26);
-            generalSettingsPanel.add(tagCloudOrderHintLabel, gridBagConstraints27);
+            generalSettingsPanel.add(getCredentialsPanel(), gridBagConstraints0);
+            generalSettingsPanel.add(getIgnoreOneTagWarningCheckBox(), gridBagConstraints6_2);
+            generalSettingsPanel.add(getUpdateTagsCheckBox(), gridBagConstraints8_2);
+            generalSettingsPanel.add(getUploadDocumentsCheckBox(), gridBagConstraints9_2);
+            generalSettingsPanel.add(getDownloadDocumentsCheckBox(), gridBagConstraints10_2);
+            generalSettingsPanel.add(defaultVisibilityLabel, gridBagConstraints15_1);
+            generalSettingsPanel.add(getDefaultVisibilityComboBox(), gridBagConstraints15_2);
+            generalSettingsPanel.add(getGeneralSettingsWhitespacePanel(), gridBagConstraints19);
+            generalSettingsPanel.add(numberOfPostsLabel, gridBagConstraints4_1);
+            generalSettingsPanel.add(getNumberOfPostsSpinner(), gridBagConstraints4_2);
+            generalSettingsPanel.add(getNoWarningOnMorePostsCheckBox(), gridBagConstraints5_2);
+            generalSettingsPanel.add(tagSizeLabel, gridBagConstraints1_1);
+            generalSettingsPanel.add(getTagCloudSizeSpinner(), gridBagConstraints1_2);
+            generalSettingsPanel.add(tagCloudOrderLabel, gridBagConstraints2_1);
+            generalSettingsPanel.add(getTagCloudOrderComboBox(), gridBagConstraints2_2);
+            generalSettingsPanel.add(tagCloudOrderHintLabel, gridBagConstraints3_2);
         }
         return generalSettingsPanel;
     }
