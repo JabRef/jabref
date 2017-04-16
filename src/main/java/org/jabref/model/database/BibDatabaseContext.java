@@ -192,9 +192,7 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(path ->
-            fileDirs.add(path.toAbsolutePath().toString())
-        );
+        preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
