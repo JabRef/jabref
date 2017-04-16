@@ -18,7 +18,20 @@ import static org.junit.Assert.assertEquals;
 
 public class BibDatabaseContextTest {
 
+    // The 'currentWorkingDir' variable is used to re-create the part
+    // of the JabRef internal state that we get when the 'jabref
+    // biblio.bib' command is invoked from a command line (on
+    // Unix/Linux, but I guess on Windows clones as well). In the
+    // above-mentioned command, the current working directory must be
+    // used as a 'biblio.bib' parent directory. Since the current
+    // working directory is different on various computers that invoke
+    // the test, we can not hard-code it into the test but must
+    // determine it at run-time:
     private String currentWorkingDir;
+
+    // Store the minimal preferences for the
+    // BibDatabaseContext.getFileDirectories(File,
+    // FileDirectoryPreferences) incocation:
     private FileDirectoryPreferences preferences;
 
     @Rule
