@@ -33,6 +33,9 @@ public class Languages {
         LANGUAGES.put("Simplified Chinese", "zh");
     }
 
+    private Languages() {
+    }
+
     public static Optional<Locale> convertToSupportedLocale(String language) {
         Objects.requireNonNull(language);
 

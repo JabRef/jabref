@@ -7,7 +7,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
-<DialogPane prefHeight="500.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.errorconsole.ErrorConsoleController">
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="1080.0"
+            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="org.jabref.gui.errorconsole.ErrorConsoleController">
     <content>
         <BorderPane>
             <bottom>

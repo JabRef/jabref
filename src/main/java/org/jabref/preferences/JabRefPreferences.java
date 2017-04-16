@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
 import java.util.prefs.Preferences;
@@ -181,11 +182,7 @@ public class JabRefPreferences {
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
-    public static final String GROUP_EXPAND_TREE = "groupExpandTree";
-    public static final String GROUP_SHOW_DYNAMIC = "groupShowDynamic";
-    public static final String GROUP_SHOW_ICONS = "groupShowIcons";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_SHOW_OVERLAPPING = "groupShowOverlapping";
     public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
     public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
@@ -363,6 +360,13 @@ public class JabRefPreferences {
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+    // User
+    private static final String USER_ID = "userId";
+
+    // Telemetry collection
+    private static final String COLLECT_TELEMETRY = "collectTelemetry";
+    private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
+
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
     public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
@@ -566,11 +570,7 @@ public class JabRefPreferences {
         defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
-        defaults.put(GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
-        defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
-        defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
-        defaults.put(GROUP_EXPAND_TREE, Boolean.TRUE);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
@@ -722,6 +722,8 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_HOSTNAME, "localhost");
         defaults.put(DB_CONNECT_DATABASE, "jabref");
         defaults.put(DB_CONNECT_USERNAME, "root");
+        defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
+        defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertDefaultCleanupPreset(defaults);
@@ -1546,5 +1548,32 @@ public class JabRefPreferences {
 
     public Character getKeywordDelimiter() {
         return get(KEYWORD_SEPARATOR).charAt(0);
+    }
+
+    public String getOrCreateUserId() {
+        Optional<String> userId = getAsOptional(USER_ID);
+        if (userId.isPresent()) {
+            return userId.get();
+        } else {
+            String newUserId = UUID.randomUUID().toString();
+            put(USER_ID, newUserId);
+            return newUserId;
+        }
+    }
+
+    public Boolean shouldCollectTelemetry() {
+        return getBoolean(COLLECT_TELEMETRY);
+    }
+
+    public void setShouldCollectTelemetry(boolean value) {
+        putBoolean(COLLECT_TELEMETRY, value);
+    }
+
+    public Boolean shouldAskToCollectTelemetry() {
+        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
+    }
+
+    public void askedToCollectTelemetry() {
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
     }
 }

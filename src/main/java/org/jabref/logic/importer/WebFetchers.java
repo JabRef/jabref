@@ -24,6 +24,9 @@ import org.jabref.model.entry.identifier.Identifier;
 
 public class WebFetchers {
 
+    private WebFetchers() {
+    }
+
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
         IdBasedFetcher fetcher;
         switch (field) {
@@ -91,9 +94,10 @@ public class WebFetchers {
         return list;
     }
 
-    public static List<IdFetcher> getIdFetchers() {
+    public static List<IdFetcher> getIdFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<IdFetcher> list = new ArrayList<>();
         list.add(new CrossRef());
+        list.add(new ArXiv(importFormatPreferences));
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }

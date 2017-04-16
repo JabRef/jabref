@@ -82,6 +82,15 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel) {
+        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
+        alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
+    }
+
+    @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
             ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);

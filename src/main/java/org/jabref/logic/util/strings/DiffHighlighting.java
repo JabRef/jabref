@@ -19,6 +19,9 @@ public class DiffHighlighting {
     public static final String HTML_START = "<html><body>";
     public static final String HTML_END = "</body></html>";
 
+    private DiffHighlighting() {
+    }
+
 
     public static String generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         Objects.requireNonNull(separator);

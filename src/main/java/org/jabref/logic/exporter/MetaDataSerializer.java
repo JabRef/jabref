@@ -18,6 +18,9 @@ import org.jabref.model.strings.StringUtil;
 
 public class MetaDataSerializer {
 
+    private MetaDataSerializer() {
+    }
+
     /**
      * Writes all data in the format <key, serialized data>.
      */
@@ -52,6 +55,18 @@ public class MetaDataSerializer {
         // Skip this if only the root node exists (which is always the AllEntriesGroup).
         metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
                 root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
+
+        // finally add all unknown meta data items to the serialization map
+        Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
+        for(Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()){
+            StringBuilder value = new StringBuilder();
+            value.append(OS.NEWLINE);
+            for(String line: entry.getValue()){
+                value.append(line.replaceAll(";", "\\\\;") + MetaData.SEPARATOR_STRING + OS.NEWLINE);
+            }
+            serializedMetaData.put(entry.getKey(), value.toString());
+        }
+
         return serializedMetaData;
     }
 
@@ -90,7 +105,7 @@ public class MetaDataSerializer {
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if (citeKeyPattern.getDefaultValue() != null && !citeKeyPattern.getDefaultValue().isEmpty()) {
+        if ((citeKeyPattern.getDefaultValue() != null) && !citeKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
             data.add(citeKeyPattern.getDefaultValue().get(0));
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);

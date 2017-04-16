@@ -42,7 +42,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -87,12 +86,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
- *
- * @author Nosh&Dan
- * @version 25.11.2008 | 23:13:29
- *
  */
-public class FindUnlinkedFilesDialog extends JDialog {
+public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
     /**
@@ -130,7 +125,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JButton buttonClose;
     /* Options for the TreeView */
     private JButton buttonOptionSelectAll;
-    private JButton buttonOptionUnselectAll;
+    private JButton buttonOptionDeselectAll;
     private JButton buttonOptionExpandAll;
     private JButton buttonOptionCollapseAll;
 
@@ -163,18 +158,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    /**
-     * For Unit-testing only. <i>Don't remove!</i> <br>
-     * Used via reflection in {@link org.jabref.logic.importer.DatabaseFileLookupTest} to construct this
-     * class.
-     */
-    @SuppressWarnings("unused")
-    private FindUnlinkedFilesDialog() {
-        //intended
-    }
-
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
-        super(owner, Localization.lang("Find unlinked files"), true);
+        super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();
@@ -711,9 +696,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonOptionSelectAll = new JButton();
         buttonOptionSelectAll.setMnemonic('A');
         buttonOptionSelectAll.setAction(actionSelectAll);
-        buttonOptionUnselectAll = new JButton();
-        buttonOptionUnselectAll.setMnemonic('U');
-        buttonOptionUnselectAll.setAction(actionUnselectAll);
+        buttonOptionDeselectAll = new JButton();
+        buttonOptionDeselectAll.setMnemonic('U');
+        buttonOptionDeselectAll.setAction(actionUnselectAll);
         buttonOptionExpandAll = new JButton();
         buttonOptionExpandAll.setMnemonic('E');
         buttonOptionExpandAll.setAction(actionExpandTree);
@@ -809,7 +794,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 GridBagConstraints.NORTHEAST, basicInsets, 1, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionSelectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 0, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionUnselectAll, GridBagConstraints.HORIZONTAL,
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionDeselectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionExpandAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, new Insets(6, 0, 0, 0), 0, 2, 1, 1, 0, 0, 0, 0);

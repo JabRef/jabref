@@ -34,7 +34,6 @@ import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -64,6 +63,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.FileDialog;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -99,7 +99,7 @@ import org.apache.commons.logging.LogFactory;
  * - create several bibtex entries in dialog
  * - if the dialog works with an existing entry (right click menu item), the cancel option doesn't work well
  */
-public class TextInputDialog extends JDialog {
+public class TextInputDialog extends JabRefDialog {
 
     private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
 
@@ -135,7 +135,7 @@ public class TextInputDialog extends JDialog {
 
 
     public TextInputDialog(JabRefFrame frame, BibEntry bibEntry) {
-        super(frame, true);
+        super(frame, true, TextInputDialog.class);
 
         this.frame = Objects.requireNonNull(frame);
 

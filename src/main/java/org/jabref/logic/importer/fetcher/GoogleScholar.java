@@ -69,9 +69,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
             uriBuilder.addParameter("as_occt", "title");
 
-            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(
-                    "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
-                    .get();
+            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(URLDownload.USER_AGENT).get();
             // Check results for PDF link
             // TODO: link always on first result or none?
             for (int i = 0; i < NUM_RESULTS; i++) {

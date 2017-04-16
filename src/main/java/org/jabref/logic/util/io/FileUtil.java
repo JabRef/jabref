@@ -44,6 +44,9 @@ public class FileUtil {
 
     public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
 
+    private FileUtil() {
+    }
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -254,7 +257,7 @@ public class FileUtil {
 
     /**
      * Converts a relative filename to an absolute one, if necessary. Returns
-     * null if the file does not exist.
+     * an empty optional if the file does not exist.
      */
     private static Optional<File> expandFilename(String filename, String dir) {
 
@@ -477,5 +480,10 @@ public class FileUtil {
             FileUtil.find(filename, dir).ifPresent(files::add);
         }
         return files;
+    }
+
+    public static Optional<Path> toPath(ParsedFileField parsedFileField, BibDatabaseContext database, FileDirectoryPreferences directoryPreferences) {
+        Optional<File> path = expandFilename(database, parsedFileField.getLink(), directoryPreferences);
+        return path.map(File::toPath);
     }
 }

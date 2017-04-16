@@ -173,11 +173,9 @@ public class GroupAddRemoveDialog implements BaseAction {
             if (checkGroupEnable(node)) {
 
                 if (add) {
-                    AddToGroupAction action = new AddToGroupAction(node, move, panel);
-                    action.actionPerformed(new ActionEvent(node, 0, "add"));
+                    node.addEntriesToGroup(Globals.stateManager.getSelectedEntries());
                 } else {
-                    RemoveFromGroupAction action = new RemoveFromGroupAction(node, panel);
-                    action.actionPerformed(new ActionEvent(node, 0, "remove"));
+                    node.removeEntriesFromGroup(Globals.stateManager.getSelectedEntries());
                 }
 
                 return true;

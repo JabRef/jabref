@@ -69,32 +69,32 @@ public class Author {
         StringBuilder sb = new StringBuilder();
         char lastChar = name.charAt(0);
         for (int i = 0; i < name.length(); i++) {
-            if(i > 0) {
+            if (i > 0) {
                 lastChar = name.charAt(i - 1);
             }
             char currentChar = name.charAt(i);
             sb.append(currentChar);
 
-            if(currentChar == '.') {
+            if (currentChar == '.') {
                 // A.A. -> A. A.
-                if(((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
+                if (((i + 1) < name.length()) && Character.isUpperCase(name.charAt(i + 1))) {
                     sb.append(' ');
                 }
             }
 
             boolean currentIsUppercaseLetter = Character.isLetter(currentChar) && Character.isUpperCase(currentChar);
-            if(!currentIsUppercaseLetter) {
+            if (!currentIsUppercaseLetter) {
                 // No uppercase letter, hence nothing to do
                 continue;
             }
 
             boolean lastIsLowercaseLetter = Character.isLetter(lastChar) && Character.isLowerCase(lastChar);
-            if(lastIsLowercaseLetter) {
+            if (lastIsLowercaseLetter) {
                 // previous character was lowercase (probably an acronym like JabRef) -> don't change anything
                 continue;
             }
 
-            if((i + 1) >= name.length()) {
+            if ((i + 1) >= name.length()) {
                 // Current character is last character in input, so append dot
                 sb.append('.');
                 continue;
@@ -106,7 +106,7 @@ public class Author {
                 sb.append(".");
                 continue;
             }
-            if('.' == nextChar) {
+            if ('.' == nextChar) {
                 // Dot already there, so nothing to do
                 continue;
             }
@@ -116,18 +116,20 @@ public class Author {
             boolean nextWordIsUppercase = true;
             for (int j = i + 1; j < name.length(); j++) {
                 char furtherChar = name.charAt(j);
-                if(Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
+                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~')
+                        || (furtherChar == '.')) {
                     // end of word
                     break;
                 }
 
-                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
-                if(!furtherIsUppercaseLetter) {
+                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar)
+                        && Character.isUpperCase(furtherChar);
+                if (!furtherIsUppercaseLetter) {
                     nextWordIsUppercase = false;
                     break;
                 }
             }
-            if(nextWordIsUppercase) {
+            if (nextWordIsUppercase) {
                 sb.append(". ");
             }
         }
@@ -146,15 +148,17 @@ public class Author {
      * Will return true iff the other object is an Author and all fields are identical on a string comparison.
      */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
 
-        if (o instanceof org.jabref.model.entry.Author) {
-            org.jabref.model.entry.Author a = (org.jabref.model.entry.Author) o;
-            return Objects.equals(firstPart, a.firstPart) && Objects.equals(firstAbbr, a.firstAbbr) && Objects.equals(
-                    vonPart, a.vonPart) && Objects.equals(lastPart, a.lastPart) && Objects.equals(jrPart, a.jrPart);
+        if (other instanceof Author) {
+            Author that = (Author) other;
+            return Objects.equals(firstPart, that.firstPart) && Objects.equals(firstAbbr, that.firstAbbr)
+                    && Objects.equals(
+                            vonPart, that.vonPart)
+                    && Objects.equals(lastPart, that.lastPart) && Objects.equals(jrPart, that.jrPart);
         }
         return false;
     }

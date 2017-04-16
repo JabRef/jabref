@@ -62,7 +62,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Invalid URL"), e);
+            throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
         }

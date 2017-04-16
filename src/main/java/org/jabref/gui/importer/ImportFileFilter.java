@@ -12,6 +12,9 @@ import org.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter {
 
+    private ImportFileFilter() {
+    }
+
     public static FileChooser.ExtensionFilter convert(Importer format) {
         return new FileChooser.ExtensionFilter(format.getExtensions().getDescription(),
                 format.getExtensions().getExtensions());

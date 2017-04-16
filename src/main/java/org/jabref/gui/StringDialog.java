@@ -19,7 +19,6 @@ import javax.swing.ActionMap;
 import javax.swing.DefaultCellEditor;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -49,7 +48,7 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.preferences.JabRefPreferences;
 
-class StringDialog extends JDialog {
+class StringDialog extends JabRefDialog {
 
     private static final String STRINGS_TITLE = Localization.lang("Strings for library");
     // A reference to the entry this object works on.
@@ -66,7 +65,7 @@ class StringDialog extends JDialog {
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
-        super(frame);
+        super(frame, StringDialog.class);
         this.panel = panel;
         this.base = base;
 

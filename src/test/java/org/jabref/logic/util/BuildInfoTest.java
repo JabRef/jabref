@@ -3,6 +3,8 @@ package org.jabref.logic.util;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class BuildInfoTest {
 
@@ -18,4 +20,10 @@ public class BuildInfoTest {
         assertEquals("42", buildInfo.getVersion().getFullVersion());
     }
 
+    @Test
+    public void azureInstrumentationKeyIsNotEmpty() {
+        BuildInfo buildInfo = new BuildInfo();
+        assertNotNull(buildInfo.getAzureInstrumentationKey());
+        assertNotEquals("", buildInfo.getAzureInstrumentationKey());
+    }
 }

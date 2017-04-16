@@ -897,6 +897,9 @@ public class HTMLUnicodeConversionMaps {
 
     }
 
+    private HTMLUnicodeConversionMaps() {
+    }
+
     private static String cleanLaTeX(String escapedString) {
         // Get rid of \{}$ from the LaTeX-string
         return escapedString.replaceAll("[\\\\\\{\\}\\$]", "");

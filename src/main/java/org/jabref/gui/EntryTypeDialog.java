@@ -18,7 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +27,7 @@ import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -50,7 +50,7 @@ import org.jdesktop.swingx.VerticalLayout;
  * Dialog that prompts the user to choose a type for an entry.
  * Returns null if canceled.
  */
-public class EntryTypeDialog extends JDialog implements ActionListener {
+public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
     private static final int COLUMN = 3;
@@ -64,7 +64,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(frame, true);
+        super(frame, true, EntryTypeDialog.class);
 
         this.frame = frame;
 
@@ -96,7 +96,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             if (!customTypes.isEmpty()) {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
             }
-
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
@@ -182,7 +181,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel jPanel = new JPanel();
 
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(4,4,4,4);
+        constraints.insets = new Insets(4, 4, 4, 4);
 
         GridBagLayout layout = new GridBagLayout();
         jPanel.setLayout(layout);
@@ -305,15 +304,19 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             try {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
-                    frame.getCurrentBasePanel().insertEntry(result.get());
+                    final BibEntry bibEntry = result.get();
+                    // Regenerate CiteKey of imported BibEntry
+                    BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+
+                    frame.getCurrentBasePanel().insertEntry(bibEntry);
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) +"." + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 fetcherWorker = new FetcherWorker();
@@ -328,5 +331,4 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             }
         }
     }
-
 }

@@ -19,6 +19,9 @@ import org.apache.commons.logging.LogFactory;
 public class OpenDatabase {
     public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
 
+    private OpenDatabase() {
+    }
+
     /**
      * Load database (bib-file)
      *
