@@ -167,8 +167,11 @@ public class AuthorList {
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        if (!authors.toUpperCase(Locale.ENGLISH).contains(" AND ") && !authors.contains("{") && !authors.contains(";")
-                && ((authors.length() - authors.replace(",", "").length()) > 2)) {
+        final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
+        final boolean authorsContainOpeningBrace = authors.contains("{");
+        final boolean authorsContainSemicolon = authors.contains(";");
+        final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
             List<String> arrayNameList = Arrays.asList(authors.split(","));
 
             // Delete spaces for correct case identification
