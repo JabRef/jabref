@@ -5,34 +5,32 @@ import java.util.Optional;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Represents a month object.
+ * Represents a Month of the Year.
  */
 public enum Month {
 
-    JANUARY("January", "jan", "01", "#jan#", 1),
-    FEBRUARY("February", "feb", "02", "#feb#", 2),
-    MARCH("March", "mar", "03", "#mar#", 3),
-    APRIL("April", "apr", "04", "#apr#", 4),
-    MAY("May", "may", "05", "#may#", 5),
-    JUNE("June", "jun", "06", "#jun#", 6),
-    JULY("July", "jul", "07", "#jul#", 7),
-    AUGUST("August", "aug", "08", "#aug#", 8),
-    SEPTEMBER("September", "sep", "09", "#sep#", 9),
-    OCTOBER("October", "oct", "10", "#oct#", 10),
-    NOVEMBER("November", "nov", "11", "#nov#", 11),
-    DECEMBER("December", "dec", "12", "#dec#", 12);
+    JANUARY("January", "jan", 1),
+    FEBRUARY("February", "feb", 2),
+    MARCH("March", "mar", 3),
+    APRIL("April", "apr", 4),
+    MAY("May", "may", 5),
+    JUNE("June", "jun", 6),
+    JULY("July", "jul", 7),
+    AUGUST("August", "aug", 8),
+    SEPTEMBER("September", "sep", 9),
+    OCTOBER("October", "oct", 10),
+    NOVEMBER("November", "nov", 11),
+    DECEMBER("December", "dec", 12);
 
     private final String fullName;
     private final String shortName;
     private final String twoDigitNumber;
-    private final String bibtexFormat;
     private final int number;
 
-    Month(String fullName, String shortName, String twoDigitNumber, String bibtexFormat, int number) {
+    Month(String fullName, String shortName, int number) {
         this.fullName = fullName;
         this.shortName = shortName;
-        this.twoDigitNumber = twoDigitNumber;
-        this.bibtexFormat = bibtexFormat;
+        this.twoDigitNumber = String.format("%02d", number);
         this.number = number;
     }
 
@@ -70,7 +68,7 @@ public enum Month {
     /**
      * This method accepts three types of months:
      * - Single and Double Digit months from 1 to 12 (01 to 12)
-     * - 3 Digit BibTex strings (jan, feb, mar...) possibly with # prepended
+     * - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
      * - Full English Month identifiers.
      *
      * @param value the given value
@@ -99,22 +97,45 @@ public enum Month {
         }
     }
 
+    /**
+     * Returns the name of a Month in a short (3-letter) format. (jan, feb, mar, ...)
+     *
+     * @return 3-letter identifier for a Month
+     */
     public String getShortName() {
         return shortName;
     }
 
+    /**
+     * Returns the month in BibTeX format. The format is the short 3-digit name surrounded by a '#'.
+     * Example: #jan#, #feb#, etc.
+     *
+     * @return Month in BibTeX format
+     */
     public String getBibtexFormat() {
-        return bibtexFormat;
+        return String.format("#%s#", shortName);
     }
 
+    /**
+     * Returns the number of the Month in a 1-indexed fashion: 1 -> January, 2 -> February etc.
+     * @return number of the month in the Year
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Returns the name of the long in unabbreviated english.
+     * @return Month
+     */
     public String getFullName() {
         return fullName;
     }
 
+    /**
+     * Returns the number of the Month in a 1-indexed fashion using exactly two digits: 01 -> January, 02 -> February...
+     * @return number of the month in the Year with two digits
+     */
     public String getTwoDigitNumber() {
         return twoDigitNumber;
     }
