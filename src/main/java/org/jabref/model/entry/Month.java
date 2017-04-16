@@ -9,32 +9,33 @@ import org.jabref.model.strings.StringUtil;
  */
 public enum Month {
 
-    JANUARY("January", "jan", "01", "#jan#", 0),
-    FEBRUARY("February", "feb", "02", "#feb#", 1),
-    MARCH("March", "mar", "03", "#mar#", 2),
-    APRIL("April", "apr", "04", "#apr#", 3),
-    MAY("May", "may", "05", "#may#", 4),
-    JUNE("June", "jun", "06", "#jun#", 5),
-    JULY("July", "jul", "07", "#jul#", 6),
-    AUGUST("August", "aug", "08", "#aug#", 7),
-    SEPTEMBER("September", "sep", "09", "#sep#", 8),
-    OCTOBER("October", "oct", "10", "#oct#", 9),
-    NOVEMBER("November", "nov", "11", "#nov#", 10),
-    DECEMBER("December", "dec", "12", "#dec#", 11);
+    JANUARY("January", "jan", "01", "#jan#", 1),
+    FEBRUARY("February", "feb", "02", "#feb#", 2),
+    MARCH("March", "mar", "03", "#mar#", 3),
+    APRIL("April", "apr", "04", "#apr#", 4),
+    MAY("May", "may", "05", "#may#", 5),
+    JUNE("June", "jun", "06", "#jun#", 6),
+    JULY("July", "jul", "07", "#jul#", 7),
+    AUGUST("August", "aug", "08", "#aug#", 8),
+    SEPTEMBER("September", "sep", "09", "#sep#", 9),
+    OCTOBER("October", "oct", "10", "#oct#", 10),
+    NOVEMBER("November", "nov", "11", "#nov#", 11),
+    DECEMBER("December", "dec", "12", "#dec#", 12);
 
     private final String fullName;
     private final String shortName;
     private final String twoDigitNumber;
     private final String bibtexFormat;
-    private final int index;
+    private final int number;
 
-    Month(String fullName, String shortName, String twoDigitNumber, String bibtexFormat, int index) {
+    Month(String fullName, String shortName, String twoDigitNumber, String bibtexFormat, int number) {
         this.fullName = fullName;
         this.shortName = shortName;
         this.twoDigitNumber = twoDigitNumber;
         this.bibtexFormat = bibtexFormat;
-        this.index = index;
+        this.number = number;
     }
+
 
     /**
      * Find month by one-based number.
@@ -43,18 +44,8 @@ public enum Month {
      * @param number 1-12 is valid
      */
     public static Optional<Month> getMonthByNumber(int number) {
-        return Month.getMonthByIndex(number - 1);
-    }
-
-    /**
-     * Find month by zero-based index.
-     * If the index is not in the valid range, then an empty Optional is returned.
-     *
-     * @param index 0-11 is valid
-     */
-    public static Optional<Month> getMonthByIndex(int index) {
         for (Month month : Month.values()) {
-            if (month.index == index) {
+            if (month.number == number) {
                 return Optional.of(month);
             }
         }
@@ -116,12 +107,8 @@ public enum Month {
         return bibtexFormat;
     }
 
-    public int getIndex() {
-        return index;
-    }
-
     public int getNumber() {
-        return index + 1;
+        return number;
     }
 
     public String getFullName() {
