@@ -167,4 +167,29 @@ public class LatexToUnicodeFormatterTest {
         assertEquals("Lorem ipsum_(lorem ipsum)", formatter.format("Lorem ipsum_{lorem ipsum}"));
     }
 
+    @Test
+    public void testConversionOfOrdinal1st() {
+        assertEquals("1st", formatter.format("1\\textsuperscript{st}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal2nd() {
+        assertEquals("2nd", formatter.format("2\\textsuperscript{nd}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal3rd() {
+        assertEquals("3rd", formatter.format("3\\textsuperscript{rd}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal4th() {
+        assertEquals("4th", formatter.format("4\\textsuperscript{th}"));
+    }
+
+    @Test
+    public void testConversionOfOrdinal9th() {
+        assertEquals("9th", formatter.format("9\\textsuperscript{th}"));
+    }
+
 }
