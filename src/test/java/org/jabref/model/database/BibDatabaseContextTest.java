@@ -18,11 +18,10 @@ import static org.junit.Assert.assertTrue;
 public class BibDatabaseContextTest {
 
     private String currentWorkingDir;
+    private FileDirectoryPreferences preferences;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    FileDirectoryPreferences preferences;
 
     @Before
     public void setUp() {
