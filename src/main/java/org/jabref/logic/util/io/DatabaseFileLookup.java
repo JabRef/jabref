@@ -21,8 +21,6 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
  * <br>
  * This class provides some functionality to search in a {@link BibDatabase} for
  * files. <br>
-
- * @author Nosh&Dan
  */
 public class DatabaseFileLookup {
 

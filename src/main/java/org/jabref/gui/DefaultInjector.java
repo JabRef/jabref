@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingPreferences;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -17,16 +16,6 @@ public class DefaultInjector implements PresenterFactory {
 
     private static final Log LOGGER = LogFactory.getLog(DefaultInjector.class);
 
-    @Override
-    public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
-        LOGGER.debug("Instantiate " + clazz.getName());
-
-        // Use our own method to construct dependencies
-        Injector.setInstanceSupplier(DefaultInjector::createDependency);
-
-        return Injector.instantiatePresenter(clazz, injectionContext);
-    }
-
     /**
      * This method takes care of creating dependencies.
      * By default, it just creates a new instance of the class.
@@ -36,7 +25,7 @@ public class DefaultInjector implements PresenterFactory {
         if (clazz == DialogService.class) {
             return new FXDialogService();
         } else if (clazz == TaskExecutor.class) {
-            return new DefaultTaskExecutor();
+            return Globals.taskExecutor;
         } else if (clazz == JabRefPreferences.class) {
             return Globals.prefs;
         } else if (clazz == KeyBindingPreferences.class) {
@@ -51,5 +40,15 @@ public class DefaultInjector implements PresenterFactory {
                 return null;
             }
         }
+    }
+
+    @Override
+    public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
+        LOGGER.debug("Instantiate " + clazz.getName());
+
+        // Use our own method to construct dependencies
+        Injector.setInstanceSupplier(DefaultInjector::createDependency);
+
+        return Injector.instantiatePresenter(clazz, injectionContext);
     }
 }

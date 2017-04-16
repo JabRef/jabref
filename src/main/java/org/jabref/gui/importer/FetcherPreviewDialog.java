@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jabref.Globals;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.importer.OutputPrinter;
@@ -41,7 +41,7 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
 /**
  *
  */
-public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
+public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter {
 
     private final EventList<TableEntry> entries = new BasicEventList<>();
     private final JTable glTable;
@@ -51,7 +51,7 @@ public class FetcherPreviewDialog extends JDialog implements OutputPrinter {
 
 
     public FetcherPreviewDialog(JabRefFrame frame, int warningLimit, int tableRowHeight) {
-        super(frame, Localization.lang("Title"), true);
+        super(frame, Localization.lang("Title"), true, FetcherPreviewDialog.class);
         this.frame = frame;
         this.warningLimit = warningLimit;
 

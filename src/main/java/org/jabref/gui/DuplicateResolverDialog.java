@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import org.jabref.gui.help.HelpAction;
@@ -18,7 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-public class DuplicateResolverDialog extends JDialog {
+public class DuplicateResolverDialog extends JabRefDialog {
 
     public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
@@ -46,14 +45,14 @@ public class DuplicateResolverDialog extends JDialog {
     private MergeEntries me;
 
     public DuplicateResolverDialog(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType type) {
-        super(frame, Localization.lang("Possible duplicate entries"), true);
+        super(frame, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = frame;
         init(one, two, type);
     }
 
     public DuplicateResolverDialog(ImportInspectionDialog dialog, BibEntry one, BibEntry two,
             DuplicateResolverType type) {
-        super(dialog, Localization.lang("Possible duplicate entries"), true);
+        super(dialog, Localization.lang("Possible duplicate entries"), true, DuplicateResolverDialog.class);
         this.frame = dialog.getFrame();
         init(one, two, type);
     }

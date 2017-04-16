@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
@@ -16,6 +17,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.util.OptionalUtil;
 
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.monadic.MonadicBinding;
@@ -49,12 +51,11 @@ public class StateManager {
     }
 
     public ObservableList<BibEntry> getSelectedEntries() {
-        return FXCollections.unmodifiableObservableList(selectedEntries);
+        return selectedEntries;
     }
 
     public void setSelectedEntries(List<BibEntry> newSelectedEntries) {
-        selectedEntries.clear();
-        selectedEntries.addAll(newSelectedEntries);
+        selectedEntries.setAll(newSelectedEntries);
     }
 
     public void setSelectedGroup(BibDatabaseContext database, GroupTreeNode newSelectedGroup) {
@@ -68,5 +69,14 @@ public class StateManager {
 
     public void clearSelectedGroup(BibDatabaseContext database) {
         selectedGroups.remove(database);
+    }
+
+    public Optional<BibDatabaseContext> getActiveDatabase() {
+        return activeDatabase.get();
+    }
+
+    public List<BibEntry> getEntriesInCurrentDatabase() {
+        return OptionalUtil.flatMap(activeDatabase.get(), BibDatabaseContext::getEntries)
+                .collect(Collectors.toList());
     }
 }

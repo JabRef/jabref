@@ -17,6 +17,7 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.FileDialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -27,7 +28,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class NewProtectedTermsFileDialog extends JDialog {
+public class NewProtectedTermsFileDialog extends JabRefDialog {
 
     private final JTextField newFile = new JTextField();
     private final JTextField newDescription = new JTextField();
@@ -37,14 +38,14 @@ public class NewProtectedTermsFileDialog extends JDialog {
     private JFrame parent;
 
     public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
-        super(parent, Localization.lang("New protected terms file"), true);
+        super(parent, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         this.loader = loader;
         setupDialog();
         setLocationRelativeTo(parent);
     }
 
     public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
-        super(mainFrame, Localization.lang("New protected terms file"), true);
+        super(mainFrame, Localization.lang("New protected terms file"), true, NewProtectedTermsFileDialog.class);
         parent = mainFrame;
         this.loader = loader;
         setupDialog();

@@ -20,6 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.util.OAI2Handler;
@@ -32,6 +33,7 @@ import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.OptionalUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +53,7 @@ import org.xml.sax.SAXException;
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
-public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
+public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
 
     private static final String API_URL = "http://export.arxiv.org/api/query";
@@ -65,51 +67,23 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
-        Optional<URL> pdfUrl = Optional.empty();
 
-        // 1. Eprint
-        Optional<String> identifier = entry.getField(FieldName.EPRINT);
-        if (StringUtil.isNotBlank(identifier)) {
-            try {
-                // Get pdf of entry with the specified id
-                pdfUrl = searchForEntryById(identifier.get()).flatMap(ArXivEntry::getPdfUrl);
-                if (pdfUrl.isPresent()) {
-                    LOGGER.info("Fulltext PDF found @ arXiv.");
-                    return pdfUrl;
-                }
-            } catch (FetcherException e) {
-                LOGGER.warn("arXiv eprint API request failed", e);
+        try {
+            Optional<URL> pdfUrl = searchForEntries(entry).stream()
+                    .map(ArXivEntry::getPdfUrl)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst();
+
+            if (pdfUrl.isPresent()) {
+                LOGGER.info("Fulltext PDF found @ arXiv.");
             }
+            return pdfUrl;
+        } catch (FetcherException e) {
+            LOGGER.warn("arXiv API request failed", e);
         }
 
-        // 2. DOI
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
-        if (doi.isPresent()) {
-            String doiString = doi.get().getDOI();
-            // Search for an entry in the ArXiv which is linked to the doi
-            try {
-                Optional<ArXivEntry> arxivEntry = searchForEntry("doi:" + doiString);
-
-                if (arxivEntry.isPresent()) {
-                    // Check if entry is a match
-                    StringSimilarity match = new StringSimilarity();
-                    String arxivTitle = arxivEntry.get().title.orElse("");
-                    String entryTitle = entry.getField(FieldName.TITLE).orElse("");
-
-                    if (match.isSimilar(arxivTitle, entryTitle)) {
-                        pdfUrl = arxivEntry.get().getPdfUrl();
-                        if (pdfUrl.isPresent()) {
-                            LOGGER.info("Fulltext PDF found @ arXiv.");
-                            return pdfUrl;
-                        }
-                    }
-                }
-            } catch (FetcherException e) {
-                LOGGER.warn("arXiv DOI API request failed", e);
-            }
-        }
-
-        return pdfUrl;
+        return Optional.empty();
     }
 
     private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
@@ -133,6 +107,47 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         } else {
             return Optional.empty();
         }
+    }
+
+    private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
+        // 1. Eprint
+        Optional<String> identifier = entry.getField(FieldName.EPRINT);
+        if (StringUtil.isNotBlank(identifier)) {
+            try {
+                // Get pdf of entry with the specified id
+                return OptionalUtil.toList(searchForEntryById(identifier.get()));
+            } catch (FetcherException e) {
+                LOGGER.warn("arXiv eprint API request failed", e);
+            }
+        }
+
+        // 2. DOI and other fields
+        String query;
+
+        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::build).map(DOI::getNormalized);
+        if (doi.isPresent()) {
+            // Search for an entry in the ArXiv which is linked to the doi
+            query = "doi:" + doi.get();
+        } else {
+            Optional<String> authorQuery = entry.getField(FieldName.AUTHOR).map(author -> "au:" + author);
+            Optional<String> titleQuery = entry.getField(FieldName.TITLE).map(title -> "ti:" + title);
+            query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
+        }
+
+        Optional<ArXivEntry> arxivEntry = searchForEntry(query);
+
+        if (arxivEntry.isPresent()) {
+            // Check if entry is a match
+            StringSimilarity match = new StringSimilarity();
+            String arxivTitle = arxivEntry.get().title.orElse("");
+            String entryTitle = entry.getField(FieldName.TITLE).orElse("");
+
+            if (match.isSimilar(arxivTitle, entryTitle)) {
+                return OptionalUtil.toList(arxivEntry);
+            }
+        }
+
+        return Collections.emptyList();
     }
 
     private List<ArXivEntry> searchForEntries(String searchQuery) throws FetcherException {
@@ -242,6 +257,19 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
                 (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
 
+    @Override
+    public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
+        return searchForEntries(entry).stream()
+                .map(ArXivEntry::getId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
+    }
+
+    @Override
+    public String getIdentifierName() {
+        return "ArXiv";
+    }
 
     private static class ArXivEntry {
 
@@ -326,7 +354,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         /**
          * Returns the arXiv identifier
          */
-        public Optional<String> getId() {
+        public Optional<String> getIdString() {
             // remove leading http://arxiv.org/abs/ from abstract url to get arXiv ID
             String prefix = "http://arxiv.org/abs/";
             return urlAbstractPage.map(abstractUrl -> {
@@ -336,6 +364,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
                     return abstractUrl;
                 }
             });
+        }
+
+        public Optional<ArXivIdentifier> getId() {
+            return getIdString().flatMap(ArXivIdentifier::parse);
         }
 
         /**
@@ -358,7 +390,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
             bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
             bibEntry.addKeywords(categories, keywordDelimiter);
-            getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
+            getIdString().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
             title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
             doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
             abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));

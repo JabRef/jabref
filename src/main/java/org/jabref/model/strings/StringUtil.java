@@ -706,4 +706,8 @@ public class StringUtil {
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
+
+    public static boolean containsIgnoreCase(String text, String searchString) {
+        return StringUtils.containsIgnoreCase(text, searchString);
+    }
 }

@@ -5,6 +5,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,11 +19,8 @@ import com.jgoodies.forms.layout.FormLayout;
 
 class GroupsPrefsTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox showIcons = new JCheckBox(Localization.lang("Show icons for groups"));
-    private final JCheckBox showDynamic = new JCheckBox(
-            "<html>" + Localization.lang("Show dynamic groups in <i>italics</i>") + "</html>");
-    private final JCheckBox expandTree = new JCheckBox(
-            Localization.lang("Initially show groups tree expanded"));
+    private final JCheckBox hideNonHits = new JCheckBox(Localization.lang("Hide non-hits"));
+    private final JCheckBox grayOut = new JCheckBox(Localization.lang("Gray out non-hits"));
     private final JCheckBox autoAssignGroup = new JCheckBox(
             Localization.lang("Automatically assign new entry to selected groups"));
     private final JTextField groupingField = new JTextField(20);
@@ -47,23 +45,22 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
             }
         });
 
+        ButtonGroup hideMode = new ButtonGroup();
+        hideMode.add(grayOut);
+        hideMode.add(hideNonHits);
+
         FormLayout layout = new FormLayout("9dlu, pref", //500px",
-        "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, " +
-                "p, 3dlu, p");
+                "p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p, 3dlu, p");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         builder.appendSeparator(Localization.lang("View"));
         builder.nextLine();
         builder.nextLine();
         builder.nextColumn();
-        builder.append(showIcons);
+        builder.append(hideNonHits);
         builder.nextLine();
         builder.nextLine();
         builder.nextColumn();
-        builder.append(showDynamic);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(expandTree);
+        builder.append(grayOut);
         builder.nextLine();
         builder.nextLine();
         builder.nextColumn();
@@ -94,9 +91,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        showIcons.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_SHOW_ICONS));
-        showDynamic.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC));
-        expandTree.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE));
+        grayOut.setSelected(prefs.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
@@ -104,9 +99,7 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.putBoolean(JabRefPreferences.GROUP_SHOW_ICONS, showIcons.isSelected());
-        prefs.putBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC, showDynamic.isSelected());
-        prefs.putBoolean(JabRefPreferences.GROUP_EXPAND_TREE, expandTree.isSelected());
+        prefs.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayOut.isSelected());
         prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
         prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());

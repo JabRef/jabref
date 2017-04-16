@@ -15,6 +15,7 @@ import javax.swing.WindowConstants;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.logic.l10n.Localization;
@@ -23,7 +24,7 @@ import org.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class BibtexKeyPatternDialog extends JDialog {
+public class BibtexKeyPatternDialog extends JabRefDialog {
 
     private MetaData metaData;
     private BasePanel panel;
@@ -31,7 +32,7 @@ public class BibtexKeyPatternDialog extends JDialog {
 
 
     public BibtexKeyPatternDialog(JabRefFrame parent, BasePanel panel) {
-        super(parent, Localization.lang("BibTeX key patterns"), true);
+        super(parent, Localization.lang("BibTeX key patterns"), true, BibtexKeyPatternDialog.class);
         this.bibtexKeyPatternPanel = new BibtexKeyPatternPanel(panel);
         setPanel(panel);
         init();

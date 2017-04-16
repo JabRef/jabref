@@ -251,9 +251,6 @@ public class BibtexParser implements Parser {
             boolean duplicateKey = database.insertEntry(entry);
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
-            } else if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {
-                parserResult.addWarning(Localization.lang("Empty BibTeX key") + ": " + entry.getAuthorTitleYear(40)
-                        + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
         } catch (IOException ex) {
             LOGGER.debug("Could not parse entry", ex);
