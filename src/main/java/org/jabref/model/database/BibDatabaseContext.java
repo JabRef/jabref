@@ -200,7 +200,7 @@ public class BibDatabaseContext {
         getDatabasePath().ifPresent(dbPath -> {
             assert dbPath != null : "dbPath is null";
             Path parentPath = dbPath.getParent();
-            if( parentPath == null ) {
+            if (parentPath == null) {
                 parentPath = Paths.get(System.getProperty("user.dir"));
             }
             assert parentPath != null : "BibTex database parent path is null";
