@@ -7,8 +7,8 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
-<?import org.controlsfx.glyphfont.Glyph?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
             xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeController">
     <center>
@@ -32,7 +32,7 @@
                     <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
                             ButtonBar.buttonData="LEFT">
                         <graphic>
-                            <Glyph fontFamily="FontAwesome" icon="PLUS"/>
+                            <MaterialDesignIconView glyphName="PLUS"/>
                         </graphic>
                         <tooltip>
                             <Tooltip text="%New group"/>

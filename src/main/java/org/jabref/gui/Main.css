@@ -32,6 +32,12 @@
      * A dark gray as background
      */
     -fx-dark-background: #757575;
+
+    /*
+     * A strong blue for backgrounds of active items (toggle button, selected list item)
+     */
+    -fx-active-background: #6A9FCD;
+
 }
 
 .hyperlink {
@@ -48,9 +54,31 @@
  .icon {
  	-fx-font-family: 'Material Design Icons';
 	-fx-font-size: 16.0;
+ }
+
+.glyph-icon {
+    -fx-font-size: 16.0;
+    -glyph-size: 16.0;
 }
 
 .tooltip {
     -fx-background-color: #757575; /* For some reason it does not work if we use -fx-dark-background here */
     -fx-effect:none;
+}
+
+.flatButton {
+    -fx-shadow-highlight-color: transparent;
+    -fx-outer-border: transparent;
+    -fx-inner-border: transparent;
+    -fx-focus-color: #6A9FCD;
+    -fx-faint-focus-color: transparent;
+    -fx-background-color: transparent;
+    -fx-text-background-color: dimgray;
+    -fx-padding: 0.5em;
+}
+
+.flatButton:selected {
+    -fx-background-color: -fx-active-background;
+    -fx-text-fill: white;
+    -fx-fill: white;
 }

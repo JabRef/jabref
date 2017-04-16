@@ -1,14 +1,9 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -67,16 +62,12 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
-            // TODO: Update on changes to entry list (however: there is no flatMap and filter as observable TransformationLists)
-            children = databaseContext.getDatabase()
-                    .getEntries().stream()
-                    .flatMap(stream -> createSubgroups(automaticGroup, stream))
-                    .filter(distinctByKey(group -> group.getGroupNode().getName()))
+            children = automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries()).stream()
+                    .map(this::toViewModel)
                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
-            children = EasyBind.map(groupNode.getChildren(),
-                    child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
+            children = EasyBind.map(groupNode.getChildren(), this::toViewModel);
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
@@ -97,18 +88,12 @@ public class GroupNodeViewModel {
         this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group));
     }
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor) {
         return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup());
     }
 
-    private Stream<GroupNodeViewModel> createSubgroups(AutomaticGroup automaticGroup, BibEntry entry) {
-        return automaticGroup.createSubgroups(entry).stream()
-                .map(child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
+    private GroupNodeViewModel toViewModel(GroupTreeNode child) {
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child);
     }
 
     public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
@@ -243,7 +228,7 @@ public class GroupNodeViewModel {
     }
 
     public Optional<GroupNodeViewModel> getChildByPath(String pathToSource) {
-        return groupNode.getChildByPath(pathToSource).map(child -> new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child));
+        return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
     }
 
     /**

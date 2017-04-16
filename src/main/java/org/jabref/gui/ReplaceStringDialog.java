@@ -16,7 +16,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -32,7 +31,7 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Dialog for replacing strings.
  */
-class ReplaceStringDialog extends JDialog {
+class ReplaceStringDialog extends JabRefDialog {
 
     private final JTextField fieldsField = new JTextField("", 30);
     private final JTextField fromField = new JTextField("", 30);
@@ -48,7 +47,7 @@ class ReplaceStringDialog extends JDialog {
 
 
     public ReplaceStringDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("Replace string"), true);
+        super(parent, Localization.lang("Replace string"), true, ReplaceStringDialog.class);
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);

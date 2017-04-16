@@ -10,7 +10,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class NoteChecker implements ValueChecker {
 
-    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
+    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[^a-z]").asPredicate();
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 

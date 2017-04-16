@@ -35,6 +35,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
     - Redesigned error console.
     - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 - Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
+- We added a document viewer which allows you to have a glance at your PDF documents directly from within JabRef.
 - The MS Office XML export now exports the field `volumes` and `pubstate`.
 - The integrity checker reports now if a journal is not found in the abbreviation list
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
@@ -50,7 +51,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added a few properties to a group:
     - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
     - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
-- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword). Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173).
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword) and supports hierarchies. Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173) and [#628](https://github.com/JabRef/jabref/issues/628).
 - Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
 - We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
 - The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
@@ -65,6 +66,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improved author handling in MS-Office Import/Export
 - The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
 - JabRef will now no longer delete meta data it does not know, but keeps such entrys and tries to keep their formatting as far as possible
+- Single underscores are not converted during the LaTeX to unicode conversion, which does not follow the rules of LaTeX, but is what users require. [#2664](https://github.com/JabRef/jabref/issues/2664)
+- The bibtexkey field is not converted to unicode 
 
 ### Fixed
  - We fixed an issue of duplicate keys after using a fetcher, e.g., DOI or ISBN [#2867](https://github.com/JabRef/jabref/issues/2687)
