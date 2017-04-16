@@ -87,10 +87,9 @@ public class MetaDataParser {
                 case MetaData.SAVE_ORDER_CONFIG:
                     metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
                     break;
-                case "groupsversion":
-                case "groups":
-                    // These keys were used in previous JabRef versions, we will not support them anymore -> ignored
-                    break;
+                default:
+                    // Keep meta data items that we do not know in the file
+                    metaData.putUnkownMetaDataItem(entry.getKey(), value);
             }
         }
         if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
