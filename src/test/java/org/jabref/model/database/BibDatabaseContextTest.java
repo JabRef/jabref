@@ -2,6 +2,7 @@ package org.jabref.model.database;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class BibDatabaseContextTest {
 
@@ -35,7 +36,8 @@ public class BibDatabaseContextTest {
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(new File("biblio.bib"));
         List<String> fileDirectories = dbContext.getFileDirectories( "file", preferences );
-        assertTrue(fileDirectories.get(0).equals(currentWorkingDir));
+        assertEquals(Collections.singletonList(currentWorkingDir),
+                fileDirectories);
     }
 
     @Test
@@ -44,7 +46,8 @@ public class BibDatabaseContextTest {
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(new File(dbDirectory + "/" + "biblio.bib"));
         List<String> fileDirectories = dbContext.getFileDirectories("file", preferences);
-        assertTrue(fileDirectories.get(0).equals(currentWorkingDir + "/" + dbDirectory));
+        assertEquals(Collections.singletonList(currentWorkingDir + "/" + dbDirectory),
+                fileDirectories);
     }
 
     @Test
@@ -53,7 +56,8 @@ public class BibDatabaseContextTest {
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(new File(dbDirectory + "/" + "biblio.bib"));
         List<String> fileDirectories = dbContext.getFileDirectories("file", preferences);
-        assertTrue(fileDirectories.get(0).equals(currentWorkingDir + "/" + dbDirectory));
+        assertEquals(Collections.singletonList(currentWorkingDir + "/" + dbDirectory),
+                fileDirectories);
     }
 
     @Test
@@ -62,6 +66,6 @@ public class BibDatabaseContextTest {
         BibDatabaseContext dbContext = new BibDatabaseContext();
         dbContext.setDatabaseFile(new File(dbDirectory + "/" + "biblio.bib"));
         List<String> fileDirectories = dbContext.getFileDirectories("file", preferences);
-        assertTrue(fileDirectories.get(0).equals(dbDirectory));
+        assertEquals(Collections.singletonList(dbDirectory), fileDirectories);
     }
 }
