@@ -8,10 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -28,7 +26,6 @@ import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.preftabs.support.OrderComboBoxItem;
 import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.bibsonomy.common.enums.GroupingEntity;
 import org.bibsonomy.model.enums.Order;
@@ -50,7 +47,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
     private JCheckBox uploadDocumentsCheckBox = null;
     private JCheckBox downloadDocumentsCheckBox = null;
     private JComboBox<GroupingComboBoxItem> defaultVisibilityComboBox = null;
-    private JTextField extraFieldsTextField = null;
     private JPanel generalSettingsWhitespacePanel = null;
     private JSpinner numberOfPostsSpinner = null;
     private JCheckBox noWarningOnMorePostsCheckBox = null;
@@ -89,7 +85,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
         BibSonomyProperties.setUploadDocumentsOnExport(getUploadDocumentsCheckBox().isSelected());
         BibSonomyProperties.setDownloadDocumentsOnImport(getDownloadDocumentsCheckBox().isSelected());
         BibSonomyProperties.setIgnoreMorePostsWarning(getNoWarningOnMorePostsCheckBox().isSelected());
-        BibSonomyProperties.setExtraFields(getExtraFieldsTextField().getText());
         BibSonomyProperties.setTagCloudOrder(((OrderComboBoxItem) getTagCloudOrderComboBox().getSelectedItem()).getKey());
 
         switch (((GroupingComboBoxItem) getDefaultVisibilityComboBox().getSelectedItem()).getKey()) {
@@ -122,8 +117,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
         JLabel tagCloudOrderLabel;
         JLabel tagCloudOrderHintLabel;
         JLabel numberOfPostsLabel;
-        JLabel extraFieldsHintLabel;
-        JLabel extraFieldsLabel;
         JLabel defaultVisibilityLabel;
 
         if (generalSettingsPanel == null) {
@@ -140,14 +133,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
             numberOfPostsLabel = new JLabel();
             numberOfPostsLabel.setText(Localization.lang("Number of Posts to fetch per Request"));
-
-
-            extraFieldsHintLabel = new JLabel();
-            extraFieldsHintLabel.setText(Localization.lang("You have to restart JabRef in order to see newly added or removed extra fields."));
-            extraFieldsHintLabel.setFont(new Font("Dialog", Font.ITALIC, 10));
-
-            extraFieldsLabel = new JLabel();
-            extraFieldsLabel.setText(Localization.lang("Extra fields"));
 
             defaultVisibilityLabel = new JLabel();
             defaultVisibilityLabel.setText(Localization.lang("Default visibility"));
@@ -317,34 +302,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
             gridBagConstraints15.insets = new Insets(0, 0, 3, 0);
             gridBagConstraints15.gridwidth = 5;
 
-            //y = 16
-            GridBagConstraints gridBagConstraints17 = new GridBagConstraints();
-            gridBagConstraints17.gridy = 16;
-            gridBagConstraints17.gridx = 1;
-            gridBagConstraints17.anchor = GridBagConstraints.WEST;
-            gridBagConstraints17.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints17.weightx = 0.1;
-            gridBagConstraints17.insets = new Insets(0, 0, 0, 3);
-
-            GridBagConstraints gridBagConstraints18 = new GridBagConstraints();
-            gridBagConstraints18.gridy = 16;
-            gridBagConstraints18.gridx = 2;
-            gridBagConstraints18.fill = GridBagConstraints.BOTH;
-            gridBagConstraints18.weightx = 1.0;
-            gridBagConstraints18.ipadx = 2;
-            gridBagConstraints18.ipady = 2;
-            gridBagConstraints18.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints18.gridwidth = 5;
-
-            //y = 17
-            GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
-            gridBagConstraints19.gridy = 17;
-            gridBagConstraints19.gridx = 2;
-            gridBagConstraints19.anchor = GridBagConstraints.WEST;
-            gridBagConstraints19.insets = new Insets(0, 0, 3, 0);
-            gridBagConstraints19.fill = GridBagConstraints.HORIZONTAL;
-            gridBagConstraints19.gridwidth = 4;
-
             //y = 19
             GridBagConstraints gridBagConstraints20 = new GridBagConstraints();
             gridBagConstraints20.gridy = 19;
@@ -364,9 +321,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
             generalSettingsPanel.add(getDownloadDocumentsCheckBox(), gridBagConstraints13);
             generalSettingsPanel.add(defaultVisibilityLabel, gridBagConstraints14);
             generalSettingsPanel.add(getDefaultVisibilityComboBox(), gridBagConstraints15);
-            generalSettingsPanel.add(extraFieldsLabel, gridBagConstraints17);
-            generalSettingsPanel.add(getExtraFieldsTextField(), gridBagConstraints18);
-            generalSettingsPanel.add(extraFieldsHintLabel, gridBagConstraints19);
             generalSettingsPanel.add(getGeneralSettingsWhitespacePanel(), gridBagConstraints20);
             generalSettingsPanel.add(numberOfPostsLabel, gridBagConstraints21);
             generalSettingsPanel.add(getNumberOfPostsSpinner(), gridBagConstraints22);
@@ -518,14 +472,6 @@ public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
             new UpdateVisibilityWorker(defaultVisibilityComboBox, items, BibSonomyProperties.getDefaultVisibilty()).run();
         }
         return defaultVisibilityComboBox;
-    }
-
-    private JTextField getExtraFieldsTextField() {
-        if (extraFieldsTextField == null) {
-            extraFieldsTextField = new JTextField();
-            extraFieldsTextField.setText(BibSonomyProperties.getExtraTabFields());
-        }
-        return extraFieldsTextField;
     }
 
     private JPanel getGeneralSettingsWhitespacePanel() {
