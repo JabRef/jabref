@@ -11,7 +11,6 @@ import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.bibsonomy.BibSonomyMenuItem;
 import org.jabref.gui.bibsonomy.BibSonomySidePanel;
 import org.jabref.gui.bibsonomy.BibSonomyToolBarExtender;
-import org.jabref.gui.bibsonomy.EntryEditorTabExtender;
 import org.jabref.gui.bibsonomy.listener.BibSonomyDataBaseChangeListener;
 import org.jabref.gui.bibsonomy.listener.TabbedPaneChangeListener;
 import org.jabref.logic.l10n.Localization;
@@ -90,7 +89,6 @@ public class BibSonomySidePaneComponent extends SidePaneComponent {
 		}
 
 		BibSonomyToolBarExtender.extend(jabRefFrame, this);
-		EntryEditorTabExtender.extend();
 	}
 
 	/**
