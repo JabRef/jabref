@@ -99,6 +99,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Newly created libraries no longer have the executable bit set under POSIX/Linux systems. The file permissions are now set to `664 (-rw-rw-r--)`. [#2635](https://github.com/JabRef/jabref/issues/#2635)
  - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
  - Fixed an issue where names were split inconsistently with the BibTeX conventions [#2652](https://github.com/JabRef/jabref/issues/2652)
+ - <kbd>Ctrl</kbd> + <kbd>A</kbd> now correctly selects all entries again. [#2615](https://github.com/JabRef/jabref/issues/#2615)
  - We fixed an issue where the dialog for selecting the main file directory in the preferences opened the the wrong folder
  
 ### Removed
