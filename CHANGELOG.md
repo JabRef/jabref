@@ -13,93 +13,93 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - JabRef has a new logo! The logo was designed by "[AikTheOne](https://99designs.de/profiles/theonestudio)" - who was the winner of a design contest at 99designs.com
-- Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
-- Partly switched to a new UI technology (JavaFX).
-    - Redesigned group panel.
-      - Number of matched entries is always shown.
-      - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table. 
-      - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
-      - Removed edit mode.
-      - Removed the following commands in the right-click menu:
-        - Expand/collapse subtree
-        - Move up/down/left/right
-      - Remove option to "highlight overlapping groups"
-      - Moved the option to "Gray out non-hits" / "Hide non-hits" to the preferences
-      - Removed the following options from the group preferences:
-        - Show icons (icons can now be customized)
-        - Show dynamic groups in italics (dynamic groups are not treated specially now)
-        - Initially show groups tree expanded (always true now)
-    - Redesigned about dialog.
-    - Redesigned key bindings dialog.
-    - Redesigned journal abbreviations dialog.
-    - Redesigned error console.
-    - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
-- Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
+- Partly switched to a new UI technology ([JavaFX]).
+  - Redesigned group panel.
+    - Number of matched entries is always shown.
+    - The background color of the hit counter signals whether the group contains all/any of the entries selected in the main table.
+    - Added a possibility to filter the groups panel [#1904](https://github.com/JabRef/jabref/issues/1904)
+    - Removed edit mode.
+    - Removed the following commands in the right-click menu:
+      - Expand/collapse subtree
+      - Move up/down/left/right
+    - Remove option to "highlight overlapping groups"
+    - Moved the option to "Gray out non-hits" / "Hide non-hits" to the preferences
+    - Removed the following options from the group preferences:
+      - Show icons (icons can now be customized)
+      - Show dynamic groups in italics (dynamic groups are not treated specially now)
+      - Initially show groups tree expanded (always true now)
+    - Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
+  - Redesigned about dialog.
+  - Redesigned key bindings dialog.
+  - Redesigned journal abbreviations dialog.
+  - New error console.
+  - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
+- We added a few properties to a group:
+    - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
+    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g., a subgroup for every author or keyword) and supports hierarchies. Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173) and [#628](https://github.com/JabRef/jabref/issues/628).
 - We added a document viewer which allows you to have a glance at your PDF documents directly from within JabRef.
-- The MS Office XML export now exports the field `volumes` and `pubstate`.
-- The integrity checker reports now if a journal is not found in the abbreviation list
+- Using "Look up document identifier" in the quality menu, it is possible to look up DOIs, ArXiv ids and other identifiers for multiple entries.
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
-- We are happy to welcome [CrossRef](https://www.crossref.org/) as a new member of our fetcher family. [#2455](https://github.com/JabRef/jabref/issues/2455)
+- We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
+- We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
+- We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
 - We improved the UI customization possibilities:
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
     - Resizing the menu and label sizes has been improved.
     - Font sizes can now be increased <kbd>Ctrl</kbd> + <kbd>Plus</kbd>, decreased <kbd>Ctrl</kbd> + <kbd>Minus</kbd>, and reset to default <kbd>CTRL</kbd> + <kbd>0</kbd>.
-- We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
-- We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
+- <kbd>F4</kbd> opens selected file in current JTable context not just from selected entry inside the main table [#2355](https://github.com/JabRef/jabref/issues/2355)
+- We are happy to welcome [CrossRef](https://www.crossref.org/) as a new member of our fetcher family. [#2455](https://github.com/JabRef/jabref/issues/2455)
 - We added MathSciNet as a ID-based fetcher in the `BibTeX -> New entry` dialog (implements a [feature request in the forum](http://discourse.jabref.org/t/allow-to-search-by-mr-number-mathscinet))
-- Removed the apache.commons.collections library
-- We added a few properties to a group:
-    - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
-    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
-- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g. a subgroup for every author or keyword) and supports hierarchies. Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173) and [#628](https://github.com/JabRef/jabref/issues/628).
-- Expansion status of groups are saved across sessions. [#1428](https://github.com/JabRef/jabref/issues/1428)
-- We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
-- The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting 
-- We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
+- Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
-- Using "Look up document identifier" in the quality menu, it is possible to look up DOIs, ArXiv ids and other identifiers for multiple entries.
-- F4 opens selected file in current JTable context not just from selected entry inside the main table [#2355](https://github.com/JabRef/jabref/issues/2355)
-- We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
 - Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
-- We fixed and improved the auto detection of the OpenOffice and LibreOffice connection
-- Entries with a single corporate author are now correclty exported to the corresponding `corporate` author field in MS-Office XML. [#1497](https://github.com/JabRef/jabref/issues/1497)
-- Improved author handling in MS-Office Import/Export
-- The `day` part of the biblatex `date` field is now exported to the corresponding `day` field in MS-Office XML. [#2691](https://github.com/JabRef/jabref/issues/2691)
-- JabRef will now no longer delete meta data it does not know, but keeps such entrys and tries to keep their formatting as far as possible
+- We fixed and improved the auto detection of the []OpenOffice and LibreOffice connection](http://help.jabref.org/en/OpenOfficeIntegration)
+- We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
+- The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting
+- We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
+- Improved MS-Office Import/Export
+  - Improved author handling
+  - The `day` part of the biblatex `date` field is now exported to the corresponding `day` field. [#2691](https://github.com/JabRef/jabref/issues/2691)
+  - Entries with a single corporate author are now correctly exported to the corresponding `corporate` author field. [#1497](https://github.com/JabRef/jabref/issues/1497)
+  - Now exports the field `volumes` and `pubstate`.
+- The integrity checker reports now if a journal is not found in the abbreviation list
+- JabRef will now no longer delete meta data it does not know, but keeps such entries and tries to keep their formatting as far as possible.
+- Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
 - Single underscores are not converted during the LaTeX to unicode conversion, which does not follow the rules of LaTeX, but is what users require. [#2664](https://github.com/JabRef/jabref/issues/2664)
 - The bibtexkey field is not converted to unicode 
 
 ### Fixed
+ - ArXiV fetcher now checks similarity of entry when using DOI retrieval to avoid false positives [#2575](https://github.com/JabRef/jabref/issues/2575)
  - We fixed an issue of duplicate keys after using a fetcher, e.g., DOI or ISBN [#2867](https://github.com/JabRef/jabref/issues/2687)
  - We fixed an issue that prevented multiple parallel JabRef instances from terminating gracefully. [#2698](https://github.com/JabRef/jabref/issues/2698)
  - We fixed an issue where authors with multiple surnames were not presented correctly in the main table. [#2534](https://github.com/JabRef/jabref/issues/2534)
  - Repairs the handling of apostrophes in the LaTeX to unicode conversion. [#2500](https://github.com/JabRef/jabref/issues/2500)
- - Fix import of journal title in ris format. [#2506](https://github.com/JabRef/jabref/issues/2506)
+ - Fix import of journal title in RIS format. [#2506](https://github.com/JabRef/jabref/issues/2506)
  - We fixed the export of the `number` field in MS-Office XML export. [#2509](https://github.com/JabRef/jabref/issues/2509)
  - The field `issue` is now always exported to the corresponding `issue` field in MS-Office XML.
- - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
  - We fixed the import of MS-Office XML files, when the `month` field contained an invalid value.
- - ArXiV fetcher now checks similarity of entry when using DOI retrieval to avoid false positives [#2575](https://github.com/JabRef/jabref/issues/2575)
+ - We fixed an issue with repeated escaping of the %-sign when running the LaTeXCleanup more than once. [#2451](https://github.com/JabRef/jabref/issues/2451)
  - Sciencedirect/Elsevier fetcher is now able to scrape new HTML structure [#2576](https://github.com/JabRef/jabref/issues/2576)
  - Fixed the synchronization logic of keywords and special fields and vice versa [#2580](https://github.com/JabRef/jabref/issues/2580)
  - We fixed an exception that prevented JabRef from starting in rare cases [bug report in the forum](http://discourse.jabref.org/t/jabref-not-opening/476).
  - We fixed an unhandled exception when saving an entry containing unbalanced braces [#2571](https://github.com/JabRef/jabref/issues/2571) 
  - Fixed a display issue when removing a group with a long name [#1407](https://github.com/JabRef/jabref/issues/1407)
- - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
  - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
  - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
  - We fixed an issue introduced with Version 3.8.2 where executing the `Rename PDFs`-cleanup operation moved the files to the file directory. [#2526](https://github.com/JabRef/jabref/issues/2526)
- - We improved the performance when opening a big database that still used the old groups format. Fixes an [issue raised in the forum](http://discourse.jabref.org/t/v3-8-2-x64-windows-problem-saving-large-bib-libraries/456).
+ - We improved the performance when opening a big library that still used the old groups format. Fixes an [issue raised in the forum](http://discourse.jabref.org/t/v3-8-2-x64-windows-problem-saving-large-bib-libraries/456).
  - We fixed an issue where the `Move linked files to default file directory`- cleanup operation did not move the files to the location of the bib-file. [#2454](https://github.com/JabRef/jabref/issues/2454)
  - We fixed an issue where executing `Move file` on a selected file in the `general`-tab could overwrite an existing file. [#2385](https://github.com/JabRef/jabref/issues/2358)
  - We fixed an issue with importing groups and subgroups [#2600](https://github.com/JabRef/jabref/issues/2600)
  - Fixed an issue where title-related key patterns did not correspond to the documentation. [#2604](https://github.com/JabRef/jabref/issues/2604) [#2589](https://github.com/JabRef/jabref/issues/2589)
- - We fixed an issue which prohibited the citation export to external programms on MacOS.  [#2613](https://github.com/JabRef/jabref/issues/2613)
+ - We fixed an issue which prohibited the citation export to external programs on MacOS. [#2613](https://github.com/JabRef/jabref/issues/2613)
  - We fixed an issue where the file folder could not be changed when running `Get fulltext` in the `general`-tab. [#2572](https://github.com/JabRef/jabref/issues/2572)
  - Newly created libraries no longer have the executable bit set under POSIX/Linux systems. The file permissions are now set to `664 (-rw-rw-r--)`. [#2635](https://github.com/JabRef/jabref/issues/#2635)
- - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
  - <kbd>Ctrl</kbd> + <kbd>A</kbd> now correctly selects all entries again. [#2615](https://github.com/JabRef/jabref/issues/#2615)
- - We fixed an issue where the dialog for selecting the main file directory in the preferences opened the the wrong folder
+ - We fixed an issue where the dialog for selecting the main file directory in the preferences opened the wrong folder
+ - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
+ - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
  
 ### Removed
 
@@ -856,3 +856,4 @@ The changelog of 2.11 and versions before is maintained as [text file](https://g
 [3.0]: https://github.com/JabRef/jabref/compare/v2.11.1...v3.0
 [dev_2.11]: https://github.com/JabRef/jabref/compare/v2.11.1...dev_2.11
 [2.11.1]: https://github.com/JabRef/jabref/compare/v2.11...v2.11.1
+[JavaFX]: https://en.wikipedia.org/wiki/JavaFX
