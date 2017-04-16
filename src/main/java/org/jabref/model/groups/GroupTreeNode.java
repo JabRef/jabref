@@ -130,7 +130,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             return false;
         }
         GroupTreeNode that = (GroupTreeNode) o;
-        return Objects.equals(group, that.group);
+        return Objects.equals(group, that.group) &&
+                Objects.equals(getChildren(), that.getChildren());
     }
 
     @Override
@@ -293,5 +294,12 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Returns true if the underlying groups of both {@link GroupTreeNode}s is the same.
+     */
+    public boolean isSameGroupAs(GroupTreeNode other) {
+        return Objects.equals(group, other.group);
     }
 }

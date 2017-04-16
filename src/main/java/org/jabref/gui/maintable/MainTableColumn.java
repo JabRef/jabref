@@ -107,7 +107,7 @@ public class MainTableColumn {
             result = toUnicode.format(MainTableNameFormatter.formatName(result));
         }
 
-        if (result != null) {
+        if (result != null && !BibEntry.KEY_FIELD.equals(columnName)) {
             result = toUnicode.format(result).trim();
         }
 

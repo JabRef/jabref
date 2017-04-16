@@ -6,7 +6,7 @@ import info.debatty.java.stringsimilarity.Levenshtein;
 
 public class StringSimilarity {
     private final Levenshtein METRIC_DISTANCE = new Levenshtein();
-    // edit distance threshold for entry title comnparison
+    // edit distance threshold for entry title comparison
     private final int METRIC_THRESHOLD = 4;
 
     /**
@@ -20,8 +20,8 @@ public class StringSimilarity {
         return editDistanceIgnoreCase(a, b) <= METRIC_THRESHOLD;
     }
 
-    private double editDistanceIgnoreCase(String a, String b) {
-        // TODO: locale is dependent on the language of the strings?!
+    public double editDistanceIgnoreCase(String a, String b) {
+        // TODO: Locale is dependent on the language of the strings. English is a good denominator.
         return METRIC_DISTANCE.distance(a.toLowerCase(Locale.ENGLISH), b.toLowerCase(Locale.ENGLISH));
     }
 }

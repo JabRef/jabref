@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -197,10 +196,12 @@ public class FieldName {
         return StringUtil.capitalizeFirst(field);
     }
 
-    public static ArrayList getNotTextFieldNames() {
-        ArrayList<String> notTextFieldNames = new ArrayList<>();
-        notTextFieldNames.addAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
-    return notTextFieldNames;
+    public static List<String> getNotTextFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR);
+    }
+
+    public static List<String> getIdentifierFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.PMID);
     }
 
 }

@@ -694,7 +694,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Set the current Entry to be selected.
                 // Fixes the bug of losing selection after, e.g. an autogeneration of a BibTeX key.
-                panel.highlightEntry(entry);
+                // This is also important for the "select all"-action (else it will always select the first entry except it is already)
+                SwingUtilities.invokeLater(() -> {
+                    panel.getMainTable().ensureVisible(entry);
+                });
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
@@ -1368,8 +1371,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
+            // don't select the current entry again (eg use BasePanel#highlightEntry} in case another entry was selected)
             if (!movingAway && isShowing()) {
-                panel.highlightEntry(entry);
+                SwingUtilities.invokeLater(() -> {
+                    panel.getMainTable().ensureVisible(entry);
+                });
             }
         }
     }

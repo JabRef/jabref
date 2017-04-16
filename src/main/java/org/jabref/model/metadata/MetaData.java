@@ -30,7 +30,8 @@ public class MetaData {
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
-    public static final String GROUPSTREE = "groupstree";
+    public static final String GROUPSTREE = "grouping";
+    public static final String GROUPSTREE_LEGACY = "groupstree";
     public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
@@ -40,19 +41,20 @@ public class MetaData {
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
     private final EventBus eventBus = new EventBus();
+    private final Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
+    private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, Vector<String>> bibsonomyData = new HashMap<>();
+
     private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
-    private Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
-    private Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private Map<String, Vector<String>> bibsonomyData = new HashMap<>();
     private String defaultCiteKeyPattern;
     private FieldFormatterCleanups saveActions;
     private BibDatabaseMode mode;
     private boolean isProtected;
     private String defaultFileDirectory;
     private ContentSelectors contentSelectors = new ContentSelectors();
-
+    private Map<String, List<String>> unkownMetaData = new HashMap<>();
 
     /**
      * Constructs an empty metadata.
@@ -109,8 +111,8 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br />
-     *                     A reference to this object is stored internally and is returned at getCiteKeyPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
+     *                         is returned at getCiteKeyPattern();
      */
     public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
@@ -281,6 +283,17 @@ public class MetaData {
 
     public Map<String, String> getUserFileDirectories() {
         return Collections.unmodifiableMap(userFileDirectory);
+    }
+
+    public Map<String, List<String>> getUnknownMetaData() {
+        return Collections.unmodifiableMap(unkownMetaData);
+    }
+
+    public void putUnkownMetaDataItem(String key, List<String> value) {
+        Objects.requireNonNull(key);
+        Objects.requireNonNull(value);
+
+        unkownMetaData.put(key, value);
     }
 
     @Override

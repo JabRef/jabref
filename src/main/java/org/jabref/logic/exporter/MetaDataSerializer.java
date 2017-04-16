@@ -55,6 +55,18 @@ public class MetaDataSerializer {
         // Skip this if only the root node exists (which is always the AllEntriesGroup).
         metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
                 root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
+
+        // finally add all unknown meta data items to the serialization map
+        Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
+        for(Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()){
+            StringBuilder value = new StringBuilder();
+            value.append(OS.NEWLINE);
+            for(String line: entry.getValue()){
+                value.append(line.replaceAll(";", "\\\\;") + MetaData.SEPARATOR_STRING + OS.NEWLINE);
+            }
+            serializedMetaData.put(entry.getKey(), value.toString());
+        }
+
         return serializedMetaData;
     }
 

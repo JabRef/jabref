@@ -22,7 +22,7 @@ public class AbstractView extends FXMLView {
         Parent view = super.getView();
 
         // Add our base css file
-        view.getStylesheets().add(AbstractDialogView.class.getResource("Main.css").toExternalForm());
+        view.getStylesheets().add(0, AbstractDialogView.class.getResource("Main.css").toExternalForm());
 
         // Notify controller about the stage, where it is displayed
         view.sceneProperty().addListener((observable, oldValue, newValue) -> {

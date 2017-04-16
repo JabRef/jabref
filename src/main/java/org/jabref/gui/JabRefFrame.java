@@ -22,10 +22,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -77,6 +82,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -106,6 +112,7 @@ import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.specialfields.SpecialFieldDropDown;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
@@ -319,6 +326,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tlb.setVisible(!tlb.isVisible());
         }
     });
+    private final AbstractAction showPdvViewer = new ShowDocumentViewerAction();
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
@@ -648,6 +656,31 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
 
+        initShowTrackingNotification();
+
+    }
+
+    private void initShowTrackingNotification() {
+        if (!Globals.prefs.shouldAskToCollectTelemetry()) {
+            ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+            scheduler.schedule(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, TimeUnit.MINUTES);
+        }
+    }
+
+    private Void showTrackingNotification() {
+        if (!Globals.prefs.shouldCollectTelemetry()) {
+            DialogService dialogService = new FXDialogService();
+            boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("Telemetry: Help make JabRef better"),
+                    Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
+                    Localization.lang("Share anonymous statistics"),
+                    Localization.lang("Don't share"));
+            Globals.prefs.setShouldCollectTelemetry(shouldCollect);
+        }
+
+        Globals.prefs.askedToCollectTelemetry();
+
+        return null;
     }
 
     public void refreshTitleAndTabs() {
@@ -739,6 +772,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
+        Globals.stopBackgroundTasks();
         Globals.shutdownThreadPools();
 
         dispose();
@@ -1147,6 +1181,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
         view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
+        view.add(showPdvViewer);
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
 
@@ -1183,7 +1218,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         quality.add(findUnlinkedFiles);
         quality.add(autoLinkFile);
 
-        for (IdFetcher fetcher : WebFetchers.getIdFetchers()) {
+        for (IdFetcher fetcher : WebFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences())) {
             lookupIdentifiers.add(new LookupIdentifierAction(this, fetcher));
         }
         quality.add(lookupIdentifiers);
@@ -1544,6 +1579,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         BackupManager.start(context);
+
+        // Track opening
+        trackOpenNewDatabase(basePanel);
+    }
+
+    private void trackOpenNewDatabase(BasePanel basePanel) {
+
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
+
+        Globals.getTelemetryClient().trackEvent("OpenNewDatabase", properties, measurements);
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
