@@ -2,10 +2,11 @@ package org.jabref.logic.importer.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -211,7 +212,8 @@ public class JSONEntryParser {
             entry.setField(FieldName.DATE, date); // For biblatex
             String[] dateparts = date.split("-");
             entry.setField(FieldName.YEAR, dateparts[0]);
-            entry.setField(FieldName.MONTH, MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
+            Optional<Month> month = Month.getMonthByNumber(Integer.parseInt(dateparts[1]));
+            month.ifPresent(entry::setMonth);
         }
 
         // Clean up abstract (often starting with Abstract)

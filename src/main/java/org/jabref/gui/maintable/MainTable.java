@@ -605,6 +605,23 @@ public class MainTable extends JTable {
         }
     }
 
+    /**
+     * Ensures that the given entry is shown in the maintable.
+     * It also selects the given entry
+     * The execution is executed directly. Be sure that it happens in the EDT.
+     *
+     * @param entry the BibEntry to be shown
+     */
+    public void ensureVisible(BibEntry entry) {
+        final int row = this.findEntry(entry);
+        if (row >= 0) {
+            if (this.getSelectedRowCount() == 0) {
+                this.setRowSelectionInterval(row, row);
+            }
+            this.ensureVisible(row);
+        }
+    }
+
     public void scrollToCenter(int rowIndex, int vColIndex) {
         if (!(this.getParent() instanceof JViewport)) {
             return;

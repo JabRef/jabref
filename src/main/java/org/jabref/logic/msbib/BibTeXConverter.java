@@ -3,14 +3,14 @@ package org.jabref.logic.msbib;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
-import org.jabref.model.entry.MonthUtil.Month;
+import org.jabref.model.entry.Month;
 
 public class BibTeXConverter {
 
@@ -85,13 +85,8 @@ public class BibTeXConverter {
             fieldValues.put(FieldName.JOURNAL, entry.journalName);
         }
         if (entry.month != null) {
-            Month month = MonthUtil.getMonth(entry.month);
-            //if we encouter an invalid month shortname would be null
-            if (month.isValid()) {
-                fieldValues.put(FieldName.MONTH, month.shortName);
-            } else {
-                fieldValues.put(FieldName.MONTH, "");
-            }
+            Optional<Month> month = Month.parse(entry.month);
+            month.ifPresent(parsedMonth ->  result.setMonth(parsedMonth));
         }
         if (entry.number != null) {
             fieldValues.put(FieldName.NUMBER, entry.number);

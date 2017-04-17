@@ -5,12 +5,14 @@ import org.jabref.model.groups.AllEntriesGroup;
 
 public class DefaultGroupsFactory {
 
+    public static String ALL_ENTRIES_GROUP_DEFAULT_ICON = "\uF1B8"; /* css: database */
+
     private DefaultGroupsFactory() {
     }
 
     public static AllEntriesGroup getAllEntriesGroup() {
         AllEntriesGroup group = new AllEntriesGroup(Localization.lang("All entries"));
-        group.setIconCode(org.jabref.gui.IconTheme.JabRefIcon.ALL_ENTRIES_GROUP_ICON.getCode());
+        group.setIconCode(ALL_ENTRIES_GROUP_DEFAULT_ICON);
         return group;
     }
 }

@@ -192,13 +192,17 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(path ->
-            fileDirs.add(path.toAbsolutePath().toString())
-        );
+        preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
-            String parentDir = dbPath.getParent().toAbsolutePath().toString();
+            Objects.requireNonNull(dbPath, "dbPath is null");
+            Path parentPath = dbPath.getParent();
+            if (parentPath == null) {
+                parentPath = Paths.get(System.getProperty("user.dir"));
+            }
+            Objects.requireNonNull(parentPath, "BibTex database parent path is null");
+            String parentDir = parentPath.toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);

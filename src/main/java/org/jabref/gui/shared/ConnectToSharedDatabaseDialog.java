@@ -113,7 +113,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
         if (isSharedDatabaseAlreadyPresent()) {
             JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this,
-                    Localization.lang("You are already connected to a library using entered connection details."),
+                    Localization.lang("You are already connected to a database using entered connection details."),
                     Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
         }

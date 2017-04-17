@@ -27,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 
+import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -266,7 +267,7 @@ public class IconTheme {
         GLOBAL_SEARCH("\uF1E7"), /* css: earth */
         DATE_PICKER("\uF0ED;"), /* css: calendar */
         DEFAULT_GROUP_ICON("\uF316"), /* css: label-outline */
-        ALL_ENTRIES_GROUP_ICON("\uF1B8"), /* css: database */
+        ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 
