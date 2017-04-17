@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
-<fx:root type="HBox" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" text="Halo" HBox.hgrow="ALWAYS" />
-    <Button disable="${controller.doiIsNotPresent}" onAction="#openDoi" styleClass="flatButton">
+    <Button disable="${controller.viewModel.doiIsNotPresent}" onAction="#openDoi" styleClass="flatButton">
         <graphic>
             <MaterialDesignIconView glyphName="OPEN_IN_NEW" />
         </graphic>
@@ -17,14 +19,20 @@
     </Button>
     <Button onAction="#lookupDoi" styleClass="flatButton">
         <graphic>
-            <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
-            <MaterialDesignIconView glyphName="MAGNIFY" />
+            <StackPane>
+                <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
+                <MaterialDesignIconView glyphName="MAGNIFY"
+                                        visible="${controller.viewModel.doiLookupInProgress == false}"/>
+                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
+                                   visible="${controller.viewModel.doiLookupInProgress}"/>
+            </StackPane>
         </graphic>
         <tooltip>
             <Tooltip text="%Look up DOI" />
         </tooltip>
     </Button>
-    <Button fx:id="fetchByDoiButton" disable="${controller.doiIsNotPresent}" onAction="#fetchByDoi" styleClass="flatButton">
+    <Button fx:id="fetchByDoiButton" disable="${controller.viewModel.doiIsNotPresent}" onAction="#fetchByDoi"
+            styleClass="flatButton">
         <graphic>
             <MaterialDesignIconView glyphName="CLIPBOARD_ARROW_DOWN" />
         </graphic>

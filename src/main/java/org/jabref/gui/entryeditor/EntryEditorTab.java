@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
@@ -168,7 +169,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService());
             editors.put(fieldName, fieldEditor);
             /*
             if (i == 0) {

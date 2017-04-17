@@ -1,48 +1,46 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import java.util.Optional;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.FXDialogService;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.l10n.Localization;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+
 
 public class DoiEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
+    @FXML private DoiEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
     @FXML private Button fetchByDoiButton;
+    private Optional<BibEntry> entry;
 
-    public boolean isDoiIsNotPresent() {
-        return doiIsNotPresent.get();
-    }
-
-    public BooleanProperty doiIsNotPresentProperty() {
-        return doiIsNotPresent;
-    }
-
-    private BooleanProperty doiIsNotPresent = new SimpleBooleanProperty(true);
-
-    public DoiEditor(String fieldName) {
+    public DoiEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
         this.fieldName = fieldName;
+        this.viewModel = new DoiEditorViewModel(taskExecutor, dialogService);
+
         ControlHelper.loadFXMLForControl(this);
 
-        doiIsNotPresent.bind(textArea.textProperty().isEmpty());
+        viewModel.doiIsNotPresentProperty().bind(textArea.textProperty().isEmpty());
 
-        fetchByDoiButton.setTooltip(
-                new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI))));
+        //fetchByDoiButton.setTooltip(
+        //        new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI))));
+    }
+
+    public DoiEditorViewModel getViewModel() {
+        return viewModel;
     }
 
     @Override
     public void bindToEntry(BibEntry entry) {
+        this.entry = Optional.of(entry);
         textArea.setText(entry.getField(fieldName).orElse(""));
     }
 
@@ -53,38 +51,18 @@ public class DoiEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void fetchByDoi(ActionEvent event) {
-        FXDialogService dialogService = new FXDialogService();
-        dialogService.showConfirmationDialogAndWait("test", "test2");
-        /*
-        BibEntry entry = entryEditor.getEntry();
-        new FetchAndMergeEntry(entry, panel, FieldName.DOI);
-        */
+        entry.ifPresent(bibEntry -> viewModel.fetchByDoi(bibEntry));
     }
 
     @FXML
     private void lookupDoi(ActionEvent event) {
-        /*
-        try {
-            Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
-            if (doi.isPresent()) {
-                entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-            } else {
-                panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
-            }
-        } catch (FetcherException e) {
-            LOGGER.error("Problem fetching DOI", e);
-        }
-        */
+        entry.ifPresent(bibEntry -> viewModel.lookupDoi(bibEntry));
     }
 
     @FXML
     private void openDoi(ActionEvent event) {
-        /*
-        try {
-            JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
-        } catch (IOException ex) {
-            panel.output(Localization.lang("Unable to open link."));
-        }
-        */
+        viewModel.openDoi(textArea.getText());
     }
+
+
 }

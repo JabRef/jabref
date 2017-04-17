@@ -85,24 +85,16 @@ public class JabRefDesktop {
                 }
             }
         } else if (FieldName.DOI.equals(fieldName)) {
-            link = DOI.build(link).map(DOI::getURIAsASCIIString).orElse(link);
-            // should be opened in browser
-            fieldName = FieldName.URL;
+            openDoi(link);
+            return;
         } else if (FieldName.EPRINT.equals(fieldName)) {
             link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
             // should be opened in browser
             fieldName = FieldName.URL;
         }
 
-        if (FieldName.URL.equals(fieldName)) { // html
-            try {
-                openBrowser(link);
-            } catch (IOException e) {
-                LOGGER.error("Error opening file '" + link + "'", e);
-                // TODO: should we rethrow the exception?
-                // In BasePanel.java, the exception is catched and a text output to the frame
-                // throw e;
-            }
+        if (FieldName.URL.equals(fieldName)) {
+            openBrowser(link);
         } else if (FieldName.PS.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
@@ -118,6 +110,11 @@ public class JabRefDesktop {
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
+    }
+
+    public static void openDoi(String doi) throws IOException {
+        String link = DOI.build(doi).map(DOI::getURIAsASCIIString).orElse(doi);
+        openBrowser(link);
     }
 
     /**

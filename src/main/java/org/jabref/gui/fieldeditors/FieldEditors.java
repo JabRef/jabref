@@ -3,13 +3,16 @@ package org.jabref.gui.fieldeditors;
 import java.util.Set;
 
 import org.jabref.Globals;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
+
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
@@ -26,7 +29,7 @@ public class FieldEditors {
             //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
-            return new DoiEditor(fieldName);
+            return new DoiEditor(fieldName, taskExecutor, dialogService);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
             //return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.ISBN)) {
