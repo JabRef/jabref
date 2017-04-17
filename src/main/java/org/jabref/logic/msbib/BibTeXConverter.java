@@ -86,7 +86,7 @@ public class BibTeXConverter {
         }
         if (entry.month != null) {
             Optional<Month> month = Month.parse(entry.month);
-            month.ifPresent(parsedMonth ->  fieldValues.put(FieldName.MONTH, parsedMonth.getBibtexFormat()));
+            month.ifPresent(parsedMonth -> fieldValues.put(FieldName.MONTH, parsedMonth.getTwoDigitNumber()));
         }
         if (entry.number != null) {
             fieldValues.put(FieldName.NUMBER, entry.number);
