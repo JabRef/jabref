@@ -21,11 +21,13 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -185,17 +187,25 @@ public class FieldExtraComponents {
         });
         // lookup doi
         JButton doiButton = new JButton(Localization.lang("Look up DOI"));
-        doiButton.addActionListener(actionEvent -> {
+
+        Runnable doiFetcher = () -> {
             try {
                 Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
-                if (doi.isPresent()) {
-                    entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-                } else {
-                    panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
-                }
+
+                SwingUtilities.invokeLater(() -> {
+                    if (doi.isPresent()) {
+                        entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
+                    } else {
+                        panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
+                    }
+                });
             } catch (FetcherException e) {
                 LOGGER.error("Problem fetching DOI", e);
             }
+        };
+
+        doiButton.addActionListener(actionEvent -> {
+            JabRefExecutorService.INSTANCE.execute(doiFetcher);
         });
         // fetch bibtex data
         JButton fetchButton = new JButton(
