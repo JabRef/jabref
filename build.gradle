@@ -67,15 +67,15 @@ configurations {
 
     linux_x86_64Compile.extendsFrom compile
     macosx_x86_64Compile.extendsFrom compile
-    win32_x86Compile.extendsFrom compile
-    win32_x86_64Compile.extendsFrom compile
+    windows_x86_32Compile.extendsFrom compile
+    windows_x86_64Compile.extendsFrom compile
 }
 
 dependencies {
-    compile configuration: 'linux_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_linux_x86_x64', version: '4.5.0'
-    compile configuration: 'macosx_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_macosx_x86_x64', version: '4.5.0'
-    compile configuration: 'win32_x86', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86', version: '4.5.0'
-    compile configuration: 'win32_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86_x64', version: '4.5.0'
+    compile configuration: 'linux_x86_64',   group: 'com.eclipsesource.j2v8', name: 'j2v8_linux_x86_x64',  version: '4.6.0'
+    compile configuration: 'macosx_x86_64',  group: 'com.eclipsesource.j2v8', name: 'j2v8_macosx_x86_x64', version: '4.6.0'
+    compile configuration: 'windows_x86_32', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86',      version: '4.6.0'
+    compile configuration: 'windows_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86_x64',  version: '4.6.0'
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
