@@ -29,7 +29,7 @@ public class LatexToUnicodeFormatterTest {
     @Test
     public void testFormatTextit() {
         // See #1464
-        assertEquals("text", formatter.format("\\textit{text}"));
+        assertEquals("\uD835\uDC61\uD835\uDC52\uD835\uDC65\uD835\uDC61", formatter.format("\\textit{text}"));
     }
 
 
@@ -169,27 +169,27 @@ public class LatexToUnicodeFormatterTest {
 
     @Test
     public void testConversionOfOrdinal1st() {
-        assertEquals("1st", formatter.format("1\\textsuperscript{st}"));
+        assertEquals("1ˢᵗ", formatter.format("1\\textsuperscript{st}"));
     }
 
     @Test
     public void testConversionOfOrdinal2nd() {
-        assertEquals("2nd", formatter.format("2\\textsuperscript{nd}"));
+        assertEquals("2ⁿᵈ", formatter.format("2\\textsuperscript{nd}"));
     }
 
     @Test
     public void testConversionOfOrdinal3rd() {
-        assertEquals("3rd", formatter.format("3\\textsuperscript{rd}"));
+        assertEquals("3ʳᵈ", formatter.format("3\\textsuperscript{rd}"));
     }
 
     @Test
     public void testConversionOfOrdinal4th() {
-        assertEquals("4th", formatter.format("4\\textsuperscript{th}"));
+        assertEquals("4ᵗʰ", formatter.format("4\\textsuperscript{th}"));
     }
 
     @Test
     public void testConversionOfOrdinal9th() {
-        assertEquals("9th", formatter.format("9\\textsuperscript{th}"));
+        assertEquals("9ᵗʰ", formatter.format("9\\textsuperscript{th}"));
     }
 
 }
