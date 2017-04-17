@@ -963,7 +963,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Sets all the text areas according to the shown entry.
      */
-    public void updateAllFields() {
+    private void updateAllFields() {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).setEntry(entry);

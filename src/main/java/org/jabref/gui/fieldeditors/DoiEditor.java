@@ -6,12 +6,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 
 
 public class DoiEditor extends HBox implements FieldEditorFX {
@@ -30,8 +33,8 @@ public class DoiEditor extends HBox implements FieldEditorFX {
 
         viewModel.doiIsNotPresentProperty().bind(textArea.textProperty().isEmpty());
 
-        //fetchByDoiButton.setTooltip(
-        //        new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI))));
+        fetchByDoiButton.setTooltip(
+                new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI))));
     }
 
     public DoiEditorViewModel getViewModel() {
@@ -41,7 +44,7 @@ public class DoiEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        textArea.setText(entry.getField(fieldName).orElse(""));
+        textArea.bindToEntry(fieldName, entry);
     }
 
     @Override

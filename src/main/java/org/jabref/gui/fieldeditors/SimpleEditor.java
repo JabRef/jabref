@@ -19,7 +19,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        textArea.setText(entry.getField(fieldName).orElse(""));
+        textArea.bindToEntry(fieldName, entry);
     }
 
     @Override

@@ -1447,11 +1447,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // setting showing to null, and recursively calling this method.
                 newEntryShowing(null);
                 showEntry(be);
-            } else {
-                // The correct entry is already being shown. Make sure the editor
-                // is updated.
-                ((EntryEditor) splitPane.getBottomComponent()).updateAllFields();
-
             }
             return;
 
@@ -1594,7 +1589,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             if (currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
-                currentEditor.updateAllFields();
                 currentEditor.updateSource();
             } else {
                 // The entry has changed type, so we must get a new editor.
