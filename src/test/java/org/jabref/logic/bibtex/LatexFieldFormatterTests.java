@@ -1,5 +1,7 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Collections;
+
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -109,4 +111,20 @@ public class LatexFieldFormatterTests {
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
     }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = new LatexFieldFormatterPreferences(
+                false, Collections.emptyList(), new FieldContentParserPreferences());
+        LatexFieldFormatter formatter = new LatexFieldFormatter(latexFieldFormatterPreferences);
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
 }

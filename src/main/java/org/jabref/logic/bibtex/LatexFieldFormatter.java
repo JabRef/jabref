@@ -108,6 +108,11 @@ public class LatexFieldFormatter {
         return formatAndResolveStrings(result, fieldName);
     }
 
+    /**
+     * This method handles # in the field content to get valid bibtex strings
+     *
+     * For instance, <code>#jan# - #feb#</code> gets  <code>jan #{ - } # feb</code> (see @link{org.jabref.logic.bibtex.LatexFieldFormatterTests#makeHashEnclosedWordsRealStringsInMonthField()})
+     */
     private String formatAndResolveStrings(String content, String fieldName) throws InvalidFieldValueException {
         stringBuilder = new StringBuilder();
         checkBraces(content);
@@ -163,7 +168,6 @@ public class LatexFieldFormatter {
                 pivot = pos2 + 1;
             } else {
                 pivot = pos1 + 1;
-                //if (tell++ > 10) System.exit(0);
             }
         }
 
@@ -233,7 +237,7 @@ public class LatexFieldFormatter {
                     inCommandName = false;
                     inCommand = true;
                 } else {
-                    // Or simply the end of this command altogether:
+                    // Or simply the end of this command alltogether:
                     commandName.delete(0, commandName.length());
                     inCommandName = false;
                 }
