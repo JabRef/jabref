@@ -341,7 +341,7 @@ public class IsiImporter extends Importer {
         for (String part1 : parts) {
             Optional<Month> month = Month.getMonthByShortName(part1.toLowerCase(Locale.ROOT));
             if (month.isPresent()) {
-                return month.get().getBibtexFormat();
+                return month.get().getJabRefFormat();
             }
         }
 
@@ -351,7 +351,7 @@ public class IsiImporter extends Importer {
                 int number = Integer.parseInt(part);
                 Optional<Month>  month = Month.getMonthByNumber(number);
                 if (month.isPresent()) {
-                    return month.get().getBibtexFormat();
+                    return month.get().getJabRefFormat();
                 }
             } catch (NumberFormatException ignored) {
                 // Ignored

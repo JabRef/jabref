@@ -107,12 +107,15 @@ public enum Month {
     }
 
     /**
-     * Returns the month in BibTeX format. The format is the short 3-digit name surrounded by a '#'.
+     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#'.
      * Example: #jan#, #feb#, etc.
      *
-     * @return Month in BibTeX format
+     * See https://github.com/JabRef/jabref/issues/263#issuecomment-151246595 for a discussion on that thing.
+     * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef
+     *
+     * @return Month in JabRef format
      */
-    public String getBibtexFormat() {
+    public String getJabRefFormat() {
         return String.format("#%s#", shortName);
     }
 

@@ -95,7 +95,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
-        return setField(FieldName.MONTH, parsedMonth.getBibtexFormat());
+        return setField(FieldName.MONTH, parsedMonth.getJabRefFormat());
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,

@@ -23,7 +23,7 @@ public class NormalizeMonthFormatter implements Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
         Optional<Month> month = Month.parse(value);
-        return month.map(Month::getBibtexFormat).orElse(value);
+        return month.map(Month::getJabRefFormat).orElse(value);
     }
 
     @Override
