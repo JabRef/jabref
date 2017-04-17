@@ -5,36 +5,35 @@ import java.util.Optional;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * Represents a month object.
+ * Represents a Month of the Year.
  */
 public enum Month {
 
-    JANUARY("January", "jan", "01", "#jan#", 0),
-    FEBRUARY("February", "feb", "02", "#feb#", 1),
-    MARCH("March", "mar", "03", "#mar#", 2),
-    APRIL("April", "apr", "04", "#apr#", 3),
-    MAY("May", "may", "05", "#may#", 4),
-    JUNE("June", "jun", "06", "#jun#", 5),
-    JULY("July", "jul", "07", "#jul#", 6),
-    AUGUST("August", "aug", "08", "#aug#", 7),
-    SEPTEMBER("September", "sep", "09", "#sep#", 8),
-    OCTOBER("October", "oct", "10", "#oct#", 9),
-    NOVEMBER("November", "nov", "11", "#nov#", 10),
-    DECEMBER("December", "dec", "12", "#dec#", 11);
+    JANUARY("January", "jan", 1),
+    FEBRUARY("February", "feb", 2),
+    MARCH("March", "mar", 3),
+    APRIL("April", "apr", 4),
+    MAY("May", "may", 5),
+    JUNE("June", "jun", 6),
+    JULY("July", "jul", 7),
+    AUGUST("August", "aug", 8),
+    SEPTEMBER("September", "sep", 9),
+    OCTOBER("October", "oct", 10),
+    NOVEMBER("November", "nov", 11),
+    DECEMBER("December", "dec", 12);
 
     private final String fullName;
     private final String shortName;
     private final String twoDigitNumber;
-    private final String bibtexFormat;
-    private final int index;
+    private final int number;
 
-    Month(String fullName, String shortName, String twoDigitNumber, String bibtexFormat, int index) {
+    Month(String fullName, String shortName, int number) {
         this.fullName = fullName;
         this.shortName = shortName;
-        this.twoDigitNumber = twoDigitNumber;
-        this.bibtexFormat = bibtexFormat;
-        this.index = index;
+        this.twoDigitNumber = String.format("%02d", number);
+        this.number = number;
     }
+
 
     /**
      * Find month by one-based number.
@@ -43,18 +42,8 @@ public enum Month {
      * @param number 1-12 is valid
      */
     public static Optional<Month> getMonthByNumber(int number) {
-        return Month.getMonthByIndex(number - 1);
-    }
-
-    /**
-     * Find month by zero-based index.
-     * If the index is not in the valid range, then an empty Optional is returned.
-     *
-     * @param index 0-11 is valid
-     */
-    public static Optional<Month> getMonthByIndex(int index) {
         for (Month month : Month.values()) {
-            if (month.index == index) {
+            if (month.number == number) {
                 return Optional.of(month);
             }
         }
@@ -79,7 +68,7 @@ public enum Month {
     /**
      * This method accepts three types of months:
      * - Single and Double Digit months from 1 to 12 (01 to 12)
-     * - 3 Digit BibTex strings (jan, feb, mar...) possibly with # prepended
+     * - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
      * - Full English Month identifiers.
      *
      * @param value the given value
@@ -108,26 +97,48 @@ public enum Month {
         }
     }
 
+    /**
+     * Returns the name of a Month in a short (3-letter) format. (jan, feb, mar, ...)
+     *
+     * @return 3-letter identifier for a Month
+     */
     public String getShortName() {
         return shortName;
     }
 
-    public String getBibtexFormat() {
-        return bibtexFormat;
+    /**
+     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a '#'.
+     * Example: #jan#, #feb#, etc.
+     *
+     * See https://github.com/JabRef/jabref/issues/263#issuecomment-151246595 for a discussion on that thing.
+     * This seems to be an <em>invalid</em> format in terms of plain BiBTeX, but a <em>valid</em> format in the case of JabRef
+     *
+     * @return Month in JabRef format
+     */
+    public String getJabRefFormat() {
+        return String.format("#%s#", shortName);
     }
 
-    public int getIndex() {
-        return index;
-    }
-
+    /**
+     * Returns the number of the Month in a 1-indexed fashion: 1 -> January, 2 -> February etc.
+     * @return number of the month in the Year
+     */
     public int getNumber() {
-        return index + 1;
+        return number;
     }
 
+    /**
+     * Returns the name of the long in unabbreviated english.
+     * @return Month
+     */
     public String getFullName() {
         return fullName;
     }
 
+    /**
+     * Returns the number of the Month in a 1-indexed fashion using exactly two digits: 01 -> January, 02 -> February...
+     * @return number of the month in the Year with two digits
+     */
     public String getTwoDigitNumber() {
         return twoDigitNumber;
     }

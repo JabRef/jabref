@@ -70,6 +70,7 @@ public class RisImporter extends Importer {
             String startPage = "";
             String endPage = "";
             String comment = "";
+            Optional<Month> month = Optional.empty();
             Map<String, String> fields = new HashMap<>();
 
             String[] lines = entry1.split("\n");
@@ -199,8 +200,7 @@ public class RisImporter extends Importer {
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
                                 int monthNumber = Integer.parseInt(parts[1]);
-                                Optional<Month> month = Month.getMonthByNumber(monthNumber);
-                                month.ifPresent(parsedMonth -> fields.put(FieldName.MONTH, parsedMonth.getBibtexFormat()));
+                                month = Month.getMonthByNumber(monthNumber);
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
@@ -240,13 +240,16 @@ public class RisImporter extends Importer {
 
                 fields.put(FieldName.PAGES, startPage + endPage);
             }
-            BibEntry b = new BibEntry(type);
 
             // Remove empty fields:
             fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
 
             // create one here
+            // type is set in the loop above
+            BibEntry b = new BibEntry(type);
             b.setField(fields);
+            // month has a special treatment as we use the separate method "setMonth" of BibEntry instead of directly setting the value
+            month.ifPresent(parsedMonth -> b.setMonth(parsedMonth));
             bibitems.add(b);
 
         }
