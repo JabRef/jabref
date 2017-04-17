@@ -94,8 +94,8 @@ public class Date {
         }
     }
 
-    public Optional<Integer> getMonth() {
-        return get(ChronoField.MONTH_OF_YEAR);
+    public Optional<Month> getMonth() {
+        return get(ChronoField.MONTH_OF_YEAR).flatMap(Month::getMonthByNumber);
     }
 
     public Optional<Integer> getDay() {

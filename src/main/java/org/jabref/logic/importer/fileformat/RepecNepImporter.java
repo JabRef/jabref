@@ -144,13 +144,11 @@ public class RepecNepImporter extends Importer {
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
-
+    private final ImportFormatPreferences importFormatPreferences;
     private int line;
     private String lastLine = "";
     private String preLine = "";
     private boolean inOverviewSection;
-
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
@@ -346,11 +344,7 @@ public class RepecNepImporter extends Importer {
             } else if (keyword.startsWith("Date")) {
                 // parse date field
                 String content = readMultipleLines(in);
-                Date.parse(content).ifPresent(date -> {
-                    date.getYear().ifPresent(year -> be.setField(FieldName.YEAR, year.toString()));
-                    date.getMonth().ifPresent(month -> be.setField(FieldName.MONTH, month.toString()));
-                    date.getDay().ifPresent(day -> be.setField(FieldName.DAY, day.toString()));
-                });
+                Date.parse(content).ifPresent(be::setDate);
 
                 // parse URL field
             } else if (keyword.startsWith("URL")) {

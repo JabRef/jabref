@@ -209,6 +209,13 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Sets this entry's type.
+     */
     public void setType(EntryType type) {
         this.setType(type.getName());
     }
@@ -231,13 +238,6 @@ public class BibEntry implements Cloneable {
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
         eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, oldType, eventSource));
-    }
-
-    /**
-     * Sets this entry's type.
-     */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -790,6 +790,12 @@ public class BibEntry implements Cloneable {
         }
 
         return this.setField(FieldName.FILE, newValue);
+    }
+
+    public void setDate(Date date) {
+        date.getYear().ifPresent(year -> setField(FieldName.YEAR, year.toString()));
+        date.getMonth().ifPresent(this::setMonth);
+        date.getDay().ifPresent(day -> setField(FieldName.DAY, day.toString()));
     }
 
     private interface GetFieldInterface {
