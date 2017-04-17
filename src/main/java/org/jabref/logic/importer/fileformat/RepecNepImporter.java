@@ -345,7 +345,6 @@ public class RepecNepImporter extends Importer {
                 // parse date field
                 String content = readMultipleLines(in);
                 Date.parse(content).ifPresent(be::setDate);
-
                 // parse URL field
             } else if (keyword.startsWith("URL")) {
                 String content;

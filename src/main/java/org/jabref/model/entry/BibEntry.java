@@ -209,15 +209,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -796,6 +796,10 @@ public class BibEntry implements Cloneable {
         date.getYear().ifPresent(year -> setField(FieldName.YEAR, year.toString()));
         date.getMonth().ifPresent(this::setMonth);
         date.getDay().ifPresent(day -> setField(FieldName.DAY, day.toString()));
+    }
+
+    public Optional<Month> getMonth() {
+        return getFieldOrAlias(FieldName.MONTH).flatMap(Month::parse);
     }
 
     private interface GetFieldInterface {
