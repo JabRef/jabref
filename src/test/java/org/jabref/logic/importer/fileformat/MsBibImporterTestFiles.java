@@ -23,7 +23,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class MsBibImporterTestfiles {
+public class MsBibImporterTestFiles {
 
     @Parameter
     public String fileName;
@@ -32,12 +32,12 @@ public class MsBibImporterTestfiles {
 
     @Before
     public void setUp() throws Exception {
-        resourceDir = Paths.get(MsBibImporterTestfiles.class.getResource("").toURI());
+        resourceDir = Paths.get(MsBibImporterTestFiles.class.getResource("").toURI());
     }
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws IOException, URISyntaxException {
-        try (Stream<Path> stream = Files.list(Paths.get(MsBibImporterTestfiles.class.getResource("").toURI()))) {
+        try (Stream<Path> stream = Files.list(Paths.get(MsBibImporterTestFiles.class.getResource("").toURI()))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".xml"))
                     .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
         }

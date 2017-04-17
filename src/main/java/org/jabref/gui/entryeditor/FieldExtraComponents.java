@@ -8,20 +8,26 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -41,7 +47,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.JabRefPreferences;
@@ -181,17 +187,25 @@ public class FieldExtraComponents {
         });
         // lookup doi
         JButton doiButton = new JButton(Localization.lang("Look up DOI"));
-        doiButton.addActionListener(actionEvent -> {
+
+        Runnable doiFetcher = () -> {
             try {
                 Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
-                if (doi.isPresent()) {
-                    entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-                } else {
-                    panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
-                }
+
+                SwingUtilities.invokeLater(() -> {
+                    if (doi.isPresent()) {
+                        entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
+                    } else {
+                        panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
+                    }
+                });
             } catch (FetcherException e) {
                 LOGGER.error("Problem fetching DOI", e);
             }
+        };
+
+        doiButton.addActionListener(actionEvent -> {
+            JabRefExecutorService.INSTANCE.execute(doiFetcher);
         });
         // fetch bibtex data
         JButton fetchButton = new JButton(
@@ -368,19 +382,19 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getMonthExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor, BibDatabaseMode type) {
-        final String[] options = new String[13];
-        options[0] = Localization.lang("Select");
-        for (int i = 1; i <= 12; i++) {
-            options[i] = MonthUtil.getMonthByNumber(i).fullName;
-        }
-        JComboBox<String> month = new JComboBox<>(options);
+        List<String> monthNames = Arrays.stream(Month.values()).map(Month::getFullName).collect(Collectors.toList());
+        List<String> options = new ArrayList<>(13);
+        options.add(Localization.lang("Select"));
+        options.addAll(monthNames);
+
+        JComboBox<String> month = new JComboBox<>(options.toArray(new String[0]));
         month.addActionListener(actionEvent -> {
-            int monthnumber = month.getSelectedIndex();
-            if (monthnumber >= 1) {
+            int monthNumber = month.getSelectedIndex();
+            if (monthNumber >= 1) {
                 if (type == BibDatabaseMode.BIBLATEX) {
-                    fieldEditor.setText(String.valueOf(monthnumber));
+                    fieldEditor.setText(String.valueOf(monthNumber));
                 } else {
-                    fieldEditor.setText(MonthUtil.getMonthByNumber(monthnumber).bibtexFormat);
+                    fieldEditor.setText(Month.getMonthByNumber(monthNumber).get().getJabRefFormat());
                 }
             } else {
                 fieldEditor.setText("");

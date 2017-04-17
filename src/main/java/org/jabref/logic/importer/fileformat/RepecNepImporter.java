@@ -2,14 +2,9 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,6 +13,7 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.Date;
 import org.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
@@ -148,13 +144,11 @@ public class RepecNepImporter extends Importer {
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
-
+    private final ImportFormatPreferences importFormatPreferences;
     private int line;
     private String lastLine = "";
     private String preLine = "";
     private boolean inOverviewSection;
-
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
@@ -347,30 +341,10 @@ public class RepecNepImporter extends Importer {
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines(in));
 
-                // parse date field
             } else if (keyword.startsWith("Date")) {
-                Date date = null;
+                // parse date field
                 String content = readMultipleLines(in);
-                String[] recognizedDateFormats = new String[]{"yyyy-MM-dd", "yyyy-MM", "yyyy"};
-                int i = 0;
-                for (; (i < recognizedDateFormats.length) && (date == null); i++) {
-                    try {
-                        date = new SimpleDateFormat(recognizedDateFormats[i]).parse(content);
-                    } catch (ParseException e) {
-                        // wrong format
-                    }
-                }
-
-                Calendar cal = new GregorianCalendar();
-                cal.setTime(date == null ? new Date() : date);
-                be.setField(FieldName.YEAR, String.valueOf(cal.get(Calendar.YEAR)));
-                if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField(FieldName.MONTH, String.valueOf(cal.get(Calendar.MONTH) + 1));
-                }
-                if ((date != null) && recognizedDateFormats[i - 1].contains("dd")) {
-                    be.setField(FieldName.DAY, String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
-                }
-
+                Date.parse(content).ifPresent(be::setDate);
                 // parse URL field
             } else if (keyword.startsWith("URL")) {
                 String content;

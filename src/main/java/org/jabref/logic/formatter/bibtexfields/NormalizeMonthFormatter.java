@@ -1,10 +1,11 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 public class NormalizeMonthFormatter implements Formatter {
 
@@ -21,12 +22,8 @@ public class NormalizeMonthFormatter implements Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-        MonthUtil.Month month = MonthUtil.getMonth(value);
-        if (month.isValid()) {
-            return month.bibtexFormat;
-        } else {
-            return value;
-        }
+        Optional<Month> month = Month.parse(value);
+        return month.map(Month::getJabRefFormat).orElse(value);
     }
 
     @Override

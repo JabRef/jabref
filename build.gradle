@@ -19,8 +19,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id "com.simonharrer.modernizer" version "1.4.0-1"
     id 'me.champeau.gradle.jmh' version '0.3.1'
-    // If this is updated to 0.0.9, check configurations.errorprone
-    id "net.ltgt.errorprone" version "0.0.8"
+    id "net.ltgt.errorprone" version "0.0.10"
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -44,7 +43,7 @@ apply from: 'xjc.gradle'
 
 group = "org.jabref"
 version = "4.0.0-dev"
-project.ext.threeDotVersion = "4.0.0.0"
+project.ext.threeDotVersion = "4.0.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -126,9 +125,9 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.23'
 
-    compile 'org.apache.logging.log4j:log4j-jcl:2.8.1'
-    compile 'org.apache.logging.log4j:log4j-api:2.8.1'
-    compile 'org.apache.logging.log4j:log4j-core:2.8.1'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
+    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
+    compile 'org.apache.logging.log4j:log4j-core:2.8.2'
     compile 'org.xmlunit:xmlunit-core:2.3.0'
     compile 'org.xmlunit:xmlunit-matchers:2.3.0'
 
@@ -145,8 +144,8 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.7.21'
-    testCompile 'com.github.tomakehurst:wiremock:2.5.1'
+    testCompile 'org.mockito:mockito-core:2.7.22'
+    testCompile 'com.github.tomakehurst:wiremock:2.6.0'
     testCompile 'org.assertj:assertj-swing-junit:3.5.0'
     testCompile 'org.reflections:reflections:0.9.11'
 }

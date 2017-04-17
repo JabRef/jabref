@@ -309,14 +309,14 @@ public class AuthorListParser {
      * additional information is given in global variables <CODE>token_start</CODE>,
      * <CODE>token_end</CODE>, <CODE>token_abbr</CODE>, <CODE>token_term</CODE>,
      * and <CODE>token_case</CODE>; namely: <CODE>orig.substring(token_start,token_end)</CODE>
-     * is the thext of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
+     * is the text of the token, <CODE>orig.substring(token_start,token_abbr)</CODE>
      * is the token abbreviation, <CODE>token_term</CODE> contains token
      * terminator (space or dash), and <CODE>token_case</CODE> is <CODE>true</CODE>,
      * if token is upper-case and <CODE>false</CODE> if token is lower-case.
      *
      * @return <CODE>TOKEN_EOF</CODE> -- no more tokens, <CODE>TOKEN_COMMA</CODE> --
      * token is comma, <CODE>TOKEN_AND</CODE> -- token is the word
-     * "and" (or "And", or "aND", etc.) or a colon, <CODE>TOKEN_WORD</CODE> --
+     * "and" (or "And", or "aND", etc.) or a semicolon, <CODE>TOKEN_WORD</CODE> --
      * token is a word; additional information is given in global
      * variables <CODE>token_start</CODE>, <CODE>token_end</CODE>,
      * <CODE>token_abbr</CODE>, <CODE>token_term</CODE>, and
@@ -339,7 +339,7 @@ public class AuthorListParser {
             tokenEnd++;
             return TOKEN_COMMA;
         }
-        // Colon is considered to separate names like "and"
+        // Semicolon is considered to separate names like "and"
         if (original.charAt(tokenStart) == ';') {
             tokenEnd++;
             return TOKEN_AND;

@@ -270,6 +270,13 @@ public class VersionTest {
     }
 
     @Test
+    public void stableShouldNotBeUpdatedToBeta() {
+        Version stable = Version.parse("3.8.2");
+        Version beta = Version.parse("4.0-beta");
+        assertFalse(stable.shouldBeUpdatedTo(beta));
+    }
+
+    @Test
     public void alphaShouldBeUpdatedToStables() {
         Version alpha = Version.parse("2.8-alpha");
         Version stable = Version.parse("2.8");

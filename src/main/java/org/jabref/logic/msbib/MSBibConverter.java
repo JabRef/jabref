@@ -7,6 +7,7 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Month;
 
 public class MSBibConverter {
 
@@ -56,7 +57,7 @@ public class MSBibConverter {
         }
 
         result.day = entry.getFieldOrAlias(FieldName.DAY).orElse(null);
-        result.month = entry.getFieldOrAlias(FieldName.MONTH).orElse(null);
+        result.month = entry.getMonth().map(Month::getNumber).map(Object::toString).orElse(null);
 
         if (!entry.getField(FieldName.YEAR).isPresent()) {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
