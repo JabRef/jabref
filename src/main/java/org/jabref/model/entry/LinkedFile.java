@@ -11,6 +11,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
 
+/**
+ * Represents the link to an external file (e.g. associated PDF file).
+ */
 public class LinkedFile {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");

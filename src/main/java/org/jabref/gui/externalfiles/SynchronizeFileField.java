@@ -61,15 +61,12 @@ import com.jgoodies.forms.layout.FormLayout;
 public class SynchronizeFileField extends AbstractWorker {
 
     private final BasePanel panel;
-    private List<BibEntry> sel;
-    private SynchronizeFileField.OptionsDialog optDiag;
-
-    private int entriesChangedCount;
-
     private final Object[] brokenLinkOptions = {Localization.lang("Ignore"), Localization.lang("Assign new file"),
             Localization.lang("Remove link"), Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
-
+    private List<BibEntry> sel;
+    private SynchronizeFileField.OptionsDialog optDiag;
+    private int entriesChangedCount;
     private boolean goOn = true;
     private boolean autoSet = true;
     private boolean checkExisting = true;
@@ -154,7 +151,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
                         // Get an absolute path representation:
                         Optional<Path> file = field.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences());
-                        if ((file.isPresent()) && Files.exists(file.get())) {
+                        if ((!file.isPresent()) || !Files.exists(file.get())) {
                             int answer;
                             if (removeAllBroken) {
                                 answer = 2; // We should delete this link.
@@ -280,7 +277,6 @@ public class SynchronizeFileField extends AbstractWorker {
 
         private final JButton ok = new JButton(Localization.lang("OK"));
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
-        private boolean canceled = true;
         private final BibDatabaseContext databaseContext;
         private final JRadioButton autoSetUnset = new JRadioButton(Localization.lang("Automatically set file links")
                 + ". " + Localization.lang("Do not overwrite existing links."), true);
@@ -288,6 +284,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 + ". " + Localization.lang("Allow overwriting existing links."), false);
         private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not automatically set"), false);
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
+        private boolean canceled = true;
 
 
         public OptionsDialog(JFrame parent, BibDatabaseContext databaseContext) {

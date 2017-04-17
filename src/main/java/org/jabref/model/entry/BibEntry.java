@@ -5,7 +5,6 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -213,6 +212,13 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Sets this entry's type.
+     */
     public void setType(EntryType type) {
         this.setType(type.getName());
     }
@@ -235,13 +241,6 @@ public class BibEntry implements Cloneable {
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
         eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, oldType, eventSource));
-    }
-
-    /**
-     * Sets this entry's type.
-     */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -857,7 +856,7 @@ public class BibEntry implements Cloneable {
         //Extract the path
         Optional<String> oldValue = getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         return FileFieldParser.parse(oldValue.get());

@@ -9,15 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class FileHelper {
-    private static final Pattern SLASH = Pattern.compile("/");
-    private static final Pattern BACKSLASH = Pattern.compile("\\\\");
-
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -63,20 +59,20 @@ public class FileHelper {
         List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        // Include the directory of the BIB file:
-        List<String> al = new ArrayList<>();
+
+        List<String> searchDirectories = new ArrayList<>();
         for (String dir : directories) {
-            if (!al.contains(dir)) {
-                al.add(dir);
+            if (!searchDirectories.contains(dir)) {
+                searchDirectories.add(dir);
             }
         }
         for (String aFileDir : fileDir) {
-            if (!al.contains(aFileDir)) {
-                al.add(aFileDir);
+            if (!searchDirectories.contains(aFileDir)) {
+                searchDirectories.add(aFileDir);
             }
         }
 
-        return expandFilename(name, al);
+        return expandFilename(name, searchDirectories);
     }
 
     /**
