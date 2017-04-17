@@ -9,7 +9,7 @@ Here, the categories "Changed" for added and changed functionality,
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 
-## [Unreleased]
+## [4.0-beta] – 2017-04-17
 
 ### Changed
 - JabRef has a new logo! The logo was designed by "[AikTheOne](https://99designs.de/profiles/theonestudio)" - who was the winner of a design contest at 99designs.com
@@ -36,14 +36,14 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - All file dialogs now use the native file selector of the OS. [#1711](https://github.com/JabRef/jabref/issues/1711)
 - We added a few properties to a group:
     - Icon (with customizable color) that is shown in the groups panel (implements a [feature request in the forum](http://discourse.jabref.org/t/assign-colors-to-groups/321)).
-    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/)
-- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g., a subgroup for every author or keyword) and supports hierarchies. Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/) and [#1173](https://github.com/JabRef/jabref/issues/1173) and [#628](https://github.com/JabRef/jabref/issues/628).
+    - Description text that is shown on mouse hover (implements old feature requests [489](https://sourceforge.net/p/jabref/feature-requests/489/) and [818](https://sourceforge.net/p/jabref/feature-requests/818/))
+- We introduced "automatic groups" that automatically create subgroups based on a certain criteria (e.g., a subgroup for every author or keyword) and supports hierarchies. Implements [91](https://sourceforge.net/p/jabref/feature-requests/91/), [398](https://sourceforge.net/p/jabref/feature-requests/398/), [#1173](https://github.com/JabRef/jabref/issues/1173) and [#628](https://github.com/JabRef/jabref/issues/628).
 - We added a document viewer which allows you to have a glance at your PDF documents directly from within JabRef.
 - Using "Look up document identifier" in the quality menu, it is possible to look up DOIs, ArXiv ids and other identifiers for multiple entries.
 - Comments in PDF files can now be displayed inside JabRef in a separate tab
 - We separated the `Move file` and `Rename Pdfs` logic and context menu entries in the `General`-Tab for the Field `file` to improve the semantics
 - We integrated support for the [paper recommender system Mr.DLib](http://help.jabref.org/en/EntryEditor#related-articles-tab) in a new tab in the entry editor.
-- We renamed "database" to "library" to have a real distinction to SQL and NoSQL databases. [#2095](https://github.com/JabRef/jabref/issues/2095)
+- We renamed "database" to "library" to have a real distinction to SQL databases ("shared database") and `bib` files ("library"). [#2095](https://github.com/JabRef/jabref/issues/2095)
 - We improved the UI customization possibilities:
     - It is now possible to customize the colors and the size of the icons (implements a [feature request in the forum](http://discourse.jabref.org/t/menu-and-buttons-with-a-dark-theme/405)).
     - Resizing the menu and label sizes has been improved.
@@ -54,7 +54,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
 - A scrollbar was added to the cleanup panel, as a result of issue [#2501](https://github.com/JabRef/jabref/issues/2501)
 - Several scrollbars were added to the preference dialog which show up when content is too large [#2559](https://github.com/JabRef/jabref/issues/2559)
-- We fixed and improved the auto detection of the []OpenOffice and LibreOffice connection](http://help.jabref.org/en/OpenOfficeIntegration)
+- We fixed and improved the auto detection of the [OpenOffice and LibreOffice connection](http://help.jabref.org/en/OpenOfficeIntegration)
 - We added an option to copy the title of BibTeX entries to the clipboard through `Edit -> Copy title` (implements [#210](https://github.com/koppor/jabref/issues/210))
 - The `Move linked files to default file directory`-Cleanup operation respects the `File directory pattern` setting
 - We removed the ordinals-to-superscript formatter from the recommendations for biblatex save actions [#2596](https://github.com/JabRef/jabref/issues/2596)
@@ -102,51 +102,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
  - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
  
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## [3.8.2] – 2017-01-29
 
@@ -492,7 +447,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Main table now accepts pasted DOIs and tries to retrieve the entry
 - Added support for several Biblatex-fields through drop-down lists with valid alternatives
 - Added integrity checker for an odd number of unescaped '#'
-- Implemented [feature request 384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
+- Implemented [feature request #384](https://sourceforge.net/p/jabref/features/384): The merge entries dialog now show all text and colored differences between the fields
 - Implemented [#1233](https://github.com/JabRef/jabref/issues/1233): Group side pane now takes up all the remaining space
 - Added integrity check detecting HTML-encoded characters
 - Added missing help files
@@ -843,7 +798,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v3.8.2...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta...HEAD
+[4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1
 [3.8]: https://github.com/JabRef/jabref/compare/v3.7...v3.8
