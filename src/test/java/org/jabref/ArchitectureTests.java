@@ -54,9 +54,11 @@ public class ArchitectureTests {
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
         logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
 
-        List<String> modelExceptions = new ArrayList<>(2);
+        List<String> modelExceptions = new ArrayList<>(4);
         modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
         modelExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
 
         exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
                 logicExceptions);
