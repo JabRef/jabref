@@ -1,6 +1,7 @@
-import org.gradle.internal.os.OperatingSystem
-
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
+
+import org.gradle.internal.os.OperatingSystem
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 buildscript {
     repositories {
@@ -197,6 +198,18 @@ processResources {
 
 clean {
     delete "src/main/gen"
+}
+
+def flavours = ['linux_x86_64', 'macosx_x86_64', 'windows_x86_32', 'windows_x86_64']
+flavours.each { String flavour ->
+    SourceSet flavourSourceSet = sourceSets.getByName(flavour)
+    Configuration flavourRuntime = configurations.getByName("${flavour}Runtime")
+    JavaCompile flavourCompileTask = tasks.getByName("compile${flavour.capitalize()}Java")
+    Task shadowJarTask = tasks.create(name: "${flavour}ShadowJar", type: ShadowJar) {
+        classifier = "${flavour}-fat"
+        dependsOn flavourCompileTask
+    }
+    assemble.dependsOn shadowJarTask
 }
 
 task generateSource(dependsOn: ["generateBstGrammarSource", "generateSearchGrammarSource"]) {
