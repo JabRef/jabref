@@ -1,12 +1,8 @@
 package org.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -19,8 +15,7 @@ import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Action for moving a file that is linked  from an entry in JabRef.
@@ -47,18 +42,14 @@ public class MoveFileAction extends AbstractAction {
         }
 
         FileListEntry entry = editor.getTableModel().getEntry(selected);
-        // Check if the current file exists:
-        String ln = entry.getLink();
-        ParsedFileField field = entry.toParsedFileField();
+        LinkedFile field = entry.toParsedFileField();
 
-        boolean httpLink = ln.toLowerCase(Locale.ENGLISH).startsWith("http");
-        if (httpLink) {
+        if (field.isOnlineLink()) {
             // TODO: notify that this operation cannot be done on remote links
             return;
         }
+
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         Optional<Path> fileDir = frame.getCurrentBasePanel().getBibDatabaseContext()
                 .getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences());
         if (!fileDir.isPresent()) {
@@ -66,12 +57,10 @@ public class MoveFileAction extends AbstractAction {
                     Localization.lang("Move file"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        Path file = Paths.get(ln);
-        if (!file.isAbsolute()) {
-            file = FileUtil.expandFilename(ln, dirs).map(File::toPath).orElse(null);
-        }
 
-        if ((file != null) && Files.exists(file)) {
+        // Check if the current file exists:
+        Optional<Path> file = field.findIn(frame.getCurrentBasePanel().getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences());
+        if ((file.isPresent()) && Files.exists(file.get())) {
 
             MoveFilesCleanup moveFiles = new MoveFilesCleanup(frame.getCurrentBasePanel().getBibDatabaseContext(),
                     Globals.prefs.getCleanupPreferences(Globals.journalAbbreviationLoader).getFileDirPattern(),

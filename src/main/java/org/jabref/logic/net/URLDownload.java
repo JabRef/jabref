@@ -37,6 +37,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.util.FileHelper;
 
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.logging.Log;
@@ -208,7 +209,7 @@ public class URLDownload {
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
         String fileName = FileUtil.getFileName(fileNameWithExtension);
-        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
+        String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);

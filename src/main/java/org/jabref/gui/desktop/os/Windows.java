@@ -59,8 +59,8 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath).start();
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
+        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
     }
 
     @Override

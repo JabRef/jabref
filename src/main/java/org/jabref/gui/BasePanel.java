@@ -136,6 +136,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -522,11 +523,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> openExternalFile());
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
+            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
                     bibDatabaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
-            for (final File f : files) {
+            for (final Path f : files) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
@@ -2119,7 +2120,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 final List<File> res = result.get(entry);
                 if (!res.isEmpty()) {
                     final String filepath = res.get(0).getPath();
-                    final Optional<String> extension = FileUtil.getFileExtension(filepath);
+                    final Optional<String> extension = FileHelper.getFileExtension(filepath);
                     if (extension.isPresent()) {
                         Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
                                 .getExternalFileTypeByExt(extension.get());

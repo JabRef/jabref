@@ -1,19 +1,13 @@
 package org.jabref.logic.pdf;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -37,10 +31,10 @@ public class EntryAnnotationImporter {
      *
      * @return a list of file parsed files
      */
-    public List<ParsedFileField> getFilteredFileList() {
-        return FileField.parse(this.entry.getField(FieldName.FILE).get()).stream()
-                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase(Locale.ROOT).endsWith(".pdf"))
-                .filter(parsedFileField -> !parsedFileField.getLink().contains("www.")).collect(Collectors.toList());
+    private List<LinkedFile> getFilteredFileList() {
+        return entry.getFiles().stream()
+                .filter(parsedFileField -> parsedFileField.getFileType().equalsIgnoreCase("pdf"))
+                .filter(parsedFileField -> !parsedFileField.isOnlineLink()).collect(Collectors.toList());
     }
 
     /**
@@ -54,10 +48,9 @@ public class EntryAnnotationImporter {
         AnnotationImporter importer = new PdfAnnotationImporter();
 
         //import annotationsOfFiles if the selected files are valid which is checked in getFilteredFileList()
-        for (ParsedFileField parsedFileField : this.getFilteredFileList()) {
-            Optional<File> expandedFileName = FileUtil.expandFilename(databaseContext, parsedFileField.getLink(),
-                    JabRefPreferences.getInstance().getFileDirectoryPreferences());
-            expandedFileName.ifPresent(file -> annotations.put(file.getName(), importer.importAnnotations(file.toPath())));
+        for (LinkedFile linkedFile : this.getFilteredFileList()) {
+            linkedFile.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                    .ifPresent(file -> annotations.put(file.getFileName().toString(), importer.importAnnotations(file)));
         }
         return annotations;
     }
