@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,12 +24,18 @@ public class ArchitectureTests {
 
     private static final String PACKAGE_JAVAX_SWING = "javax.swing";
     private static final String PACKAGE_JAVA_AWT = "java.awt";
+    private static final String PACKAGE_JAVA_FX = "javafx";
+
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
     private static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
+    private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
+    private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
+    private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
+
     private final String firstPackage;
     private final String secondPackage;
     private Map<String, List<String>> exceptions;
@@ -40,22 +47,38 @@ public class ArchitectureTests {
         // Add exceptions for the architectural test here
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new HashMap<>();
+
+        List<String> logicExceptions = new ArrayList<>(4);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_AWT_GEOM);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
+        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+
+        List<String> modelExceptions = new ArrayList<>(4);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        modelExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
+
         exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
-                Collections.singletonList(EXCEPTION_PACKAGE_JAVA_AWT_GEOM));
+                logicExceptions);
+        exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
     }
 
 
     @Parameterized.Parameters(name = "{index} -- is {0} independent of {1}?")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
-                new Object[][] {
+                new Object[][]{
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_AWT},
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_JAVA_FX},
                         {PACKAGE_ORG_JABREF_LOGIC, PACKAGE_ORG_JABREF_GUI},
                         {PACKAGE_ORG_JABREF_LOGIC, CLASS_ORG_JABREF_GLOBALS},
 
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_AWT},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVAX_SWING},
+                        {PACKAGE_ORG_JABREF_MODEL, PACKAGE_JAVA_FX},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_GUI},
                         {PACKAGE_ORG_JABREF_MODEL, PACKAGE_ORG_JABREF_LOGIC},
                         {PACKAGE_ORG_JABREF_MODEL, CLASS_ORG_JABREF_GLOBALS}
@@ -72,7 +95,7 @@ public class ArchitectureTests {
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 
-        List<Path> files = Files.walk(Paths.get("src"))
+        List<Path> files = Files.walk(Paths.get("src/main/"))
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
@@ -92,5 +115,4 @@ public class ArchitectureTests {
         Assert.assertEquals("The following classes are not allowed to depend on " + secondPackage,
                 Collections.emptyList(), files);
     }
-
 }
