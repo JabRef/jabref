@@ -20,6 +20,7 @@ plugins {
     id "com.simonharrer.modernizer" version "1.4.0-1"
     id 'me.champeau.gradle.jmh' version '0.3.1'
     id "net.ltgt.errorprone" version "0.0.10"
+    id 'com.lazan.javaflavours' version '1.2'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -34,7 +35,6 @@ apply plugin: "project-report"
 apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
-
 apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
@@ -71,11 +71,18 @@ configurations {
     windows_x86_64Compile.extendsFrom compile
 }
 
+javaFlavours {
+    flavour 'linux_x86_64'
+    flavour 'macosx_x86_64'
+    flavour 'windows_x86_32'
+    flavour 'windows_x86_64'
+}
+
 dependencies {
-    compile configuration: 'linux_x86_64',   group: 'com.eclipsesource.j2v8', name: 'j2v8_linux_x86_x64',  version: '4.6.0'
-    compile configuration: 'macosx_x86_64',  group: 'com.eclipsesource.j2v8', name: 'j2v8_macosx_x86_x64', version: '4.6.0'
-    compile configuration: 'windows_x86_32', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86',      version: '4.6.0'
-    compile configuration: 'windows_x86_64', group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86_x64',  version: '4.6.0'
+    linux_x86_64Compile   group: 'com.eclipsesource.j2v8', name: 'j2v8_linux_x86_x64',  version: '4.6.0'
+    macosx_x86_64Compile  group: 'com.eclipsesource.j2v8', name: 'j2v8_macosx_x86_x64', version: '4.6.0'
+    windows_x86_32Compile group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86',      version: '4.6.0'
+    windows_x86_64Compile group: 'com.eclipsesource.j2v8', name: 'j2v8_win32_x86_x64',  version: '4.6.0'
 
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
