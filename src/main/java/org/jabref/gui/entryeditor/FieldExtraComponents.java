@@ -1,8 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,14 +12,12 @@ import java.util.stream.Collectors;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
 import org.jabref.gui.date.DatePickerButton;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.logic.l10n.Localization;
@@ -39,61 +35,6 @@ public class FieldExtraComponents {
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
 
     private FieldExtraComponents() {
-    }
-
-    /**
-     * Set up a mouse listener for opening an external viewer for with with EXTRA_EXTERNAL
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getExternalExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        JButton button = new JButton(Localization.lang("Open"));
-        button.setEnabled(false);
-        button.addActionListener(actionEvent -> {
-            try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
-            } catch (IOException ex) {
-                panel.output(Localization.lang("Unable to open link."));
-            }
-        });
-
-        controls.add(button, BorderLayout.SOUTH);
-
-        // enable/disable button
-        /*
-        JTextComponent url = (JTextComponent) fieldEditor;
-
-        url.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            private void checkUrl() {
-                if (URLUtil.isURL(url.getText())) {
-                    button.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                }
-            }
-        });
-        */
-
-        return Optional.of(controls);
     }
 
     /**

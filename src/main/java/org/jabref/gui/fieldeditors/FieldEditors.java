@@ -24,7 +24,7 @@ public class FieldEditors {
             //return FieldExtraComponents.getDateTimeExtraComponent(editor,
             //        fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            //return FieldExtraComponents.getExternalExtraComponent(panel, editor);
+            return new UrlEditor(fieldName, dialogService);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences);
         } else if (fieldExtras.contains(FieldProperty.DOI) ||

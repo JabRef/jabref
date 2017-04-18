@@ -7,13 +7,13 @@
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
     <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
-    <Button onAction="#toggleAbbreviation"
+    <Button disable="${controller.viewModel.validUrlIsNotPresent}" onAction="#openExternalLink"
             styleClass="flatButton">
         <graphic>
-            <MaterialDesignIconView glyphName="TEXT_SHADOW"/>
+            <MaterialDesignIconView glyphName="OPEN_IN_NEW"/>
         </graphic>
         <tooltip>
-            <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
+            <Tooltip text="%Open"/>
         </tooltip>
     </Button>
 </fx:root>

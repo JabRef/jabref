@@ -616,8 +616,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
                     fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
-        } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
