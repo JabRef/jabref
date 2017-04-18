@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,11 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -25,7 +22,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -85,23 +81,6 @@ public class FieldExtraComponents {
             month.setSelectedIndex(0);
         });
         return Optional.of(month);
-
-    }
-
-    /**
-     * Return a button which sets the owner if the field for fields with EXTRA_SET_OWNER
-     * @param fieldEditor
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getSetOwnerExtraComponent(FieldEditor fieldEditor,
-            StoreFieldAction storeFieldAction) {
-        JButton button = new JButton(Localization.lang("Auto"));
-        button.addActionListener(actionEvent -> {
-            fieldEditor.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
-            storeFieldAction.actionPerformed(new ActionEvent(fieldEditor, 0, ""));
-        });
-        return Optional.of(button);
 
     }
 

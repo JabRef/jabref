@@ -14,7 +14,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         // TODO: Implement this
@@ -32,7 +32,7 @@ public class FieldEditors {
                 fieldExtras.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(fieldName, taskExecutor, dialogService);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            //return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
+            return new OwnerEditor(fieldName, preferences);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             //return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
