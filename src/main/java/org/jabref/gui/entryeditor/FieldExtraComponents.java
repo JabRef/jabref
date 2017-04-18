@@ -24,11 +24,8 @@ import org.jabref.gui.date.DatePickerButton;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
@@ -40,56 +37,8 @@ import org.apache.commons.logging.LogFactory;
 public class FieldExtraComponents {
 
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
-    private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
-            + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
-            + "<BR>" + Localization.lang("To set up, go to") + " <B>" + Localization.lang("Options") + " -> "
-            + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
 
     private FieldExtraComponents() {
-    }
-
-    /**
-     * Add controls for switching between abbreviated and full journal names.
-     * If this field also has a FieldContentSelector, we need to combine these.
-     *
-     * @param panel
-     * @param editor
-     * @param entry
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
-                    ", ");
-            contentSelectors.add(ws);
-            controls.add(ws, BorderLayout.NORTH);
-        }
-
-
-        // Button to toggle abbreviated/full journal names
-        JButton button = new JButton(Localization.lang("Toggle abbreviation"));
-        button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
-        button.addActionListener(actionEvent -> {
-            String text = editor.getText();
-            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
-                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences());
-            if (abbreviationRepository.isKnownName(text)) {
-                String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
-
-                if (s != null) {
-                    editor.setText(s);
-                    storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                    panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
-                }
-            }
-        });
-
-        controls.add(button, BorderLayout.SOUTH);
-        return Optional.of(controls);
     }
 
     /**

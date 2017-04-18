@@ -5,6 +5,8 @@ import java.util.Set;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
@@ -12,7 +14,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         // TODO: Implement this
@@ -24,11 +26,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             //return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            // Add controls for switching between abbreviated and full journal names.
-            // If this field also has a FieldContentSelector, we need to combine these.
-            //return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors, storeFieldAction);
-            //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
-            //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
+            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences);
         } else if (fieldExtras.contains(FieldProperty.DOI) ||
                 fieldExtras.contains(FieldProperty.EPRINT) ||
                 fieldExtras.contains(FieldProperty.ISBN)) {
