@@ -98,14 +98,10 @@ class EntryEditorTab {
         setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
         panel.setName(title);
-        panel.setBackground(GUIGlobals.activeBackgroundColor);
-        panel.setOpaque(true);
 
         // Use the title for the scrollPane, too.
         // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
         scrollPane.setName(title);
-        scrollPane.setBackground(GUIGlobals.activeBackgroundColor);
-        scrollPane.setOpaque(true);
 
         int fieldsPerRow = compressed ? 2 : 1;
 
@@ -131,6 +127,7 @@ class EntryEditorTab {
         for (int i = 0; i < fields.size(); i++) {
             String fieldName = fields.get(i);
 
+            // TODO: Reenable/migrate this
             // Store the editor for later reference:
             /*
             FieldEditor fieldEditor;
@@ -172,12 +169,14 @@ class EntryEditorTab {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService());
             editors.put(fieldName, fieldEditor);
             /*
+            // TODO: Reenable this
             if (i == 0) {
                 activeField = fieldEditor;
             }
             */
 
             /*
+            // TODO: Reenable this
             if (!compressed) {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
@@ -195,6 +194,7 @@ class EntryEditorTab {
             );
             builder.append(swingPanel, 3);
             /*
+            // TODO: Delete when no longer required
             if (extra.isPresent()) {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
@@ -216,6 +216,7 @@ class EntryEditorTab {
                     parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
 
+            // TODO: Reenable this
             //editors.put(BibEntry.KEY_FIELD, textField);
             fields.add(BibEntry.KEY_FIELD);
             /*
@@ -223,6 +224,7 @@ class EntryEditorTab {
              * editor, and this one should be set as active initially:
              */
             if (editors.size() == 1) {
+                // TODO: Reenable this
                 //activeField = textField;
             }
             builder.nextLine();
@@ -298,6 +300,7 @@ class EntryEditorTab {
      *
      * @param fieldEditor
      */
+    // TODO: Reenable or delete this
     //public void setActive(FieldEditor fieldEditor) {
     //    activeField = fieldEditor;
     //}
@@ -333,7 +336,7 @@ class EntryEditorTab {
         if (!editors.containsKey(field)) {
             return false;
         }
-
+        // TODO: Reenable or probably better delete this
         /*
         FieldEditor fieldEditor = editors.get(field);
         if (fieldEditor.getText().equals(content)){
@@ -359,6 +362,7 @@ class EntryEditorTab {
 
     public void setEnabled(boolean enabled) {
         /*
+        // TODO: Reenable this
         for (FieldEditor editor : editors.values()) {
             editor.setEnabled(enabled);
         }

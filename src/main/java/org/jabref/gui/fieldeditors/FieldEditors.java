@@ -15,6 +15,7 @@ public class FieldEditors {
     public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
+        // TODO: Implement this
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             // timestamp or a other field with datepicker command
             // double click AND datefield => insert the current date (today)

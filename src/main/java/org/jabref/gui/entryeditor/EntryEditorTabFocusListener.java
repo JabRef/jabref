@@ -82,7 +82,7 @@ class EntryEditorTabFocusListener implements FocusListener {
 
             }
         }
-
+        // TODO: Reenable this
         //entryEditorTab.setActive((FieldEditor) event.getSource());
     }
 

@@ -51,7 +51,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
     public void bindToEntry(String fieldName, BibEntry entry) {
         this.fieldName = fieldName;
-        //this.setText(entry.getField(fieldName).orElse(""));
         BindingsHelper.bindBidirectional(
                 this.textProperty(),
                 entry.getFieldBinding(fieldName),

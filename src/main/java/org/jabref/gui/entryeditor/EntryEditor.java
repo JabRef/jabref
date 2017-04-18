@@ -259,7 +259,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void setupFieldPanels() {
         tabbed.removeAll();
-        tabbed.setBackground(GUIGlobals.activeBackgroundColor);
         tabs.clear();
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
                 this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
@@ -418,7 +417,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
         tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
-        tabbed.setBackgroundAt(0, GUIGlobals.validFieldBackgroundColor);
         tabs.add(requiredPanel);
         return requiredFields;
     }
@@ -1534,6 +1532,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
                 EntryEditorTab tab = (EntryEditorTab) activeTab;
+                // TODO: Reenable this
                 //FieldEditor fieldEditor = tab.getActive();
                 //fieldEditor.clearAutoCompleteSuggestion();
                 //updateField(fieldEditor);

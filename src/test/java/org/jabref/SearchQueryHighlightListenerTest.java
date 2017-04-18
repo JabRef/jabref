@@ -27,6 +27,7 @@ public class SearchQueryHighlightListenerTest {
     }
 
     /*
+    // TODO: Reenable these tests
     @Test
     public void testHighlighting() {
 
