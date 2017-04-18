@@ -1,33 +1,33 @@
 package org.jabref;
 
-import java.util.Collections;
-
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.preferences.JabRefPreferences;
-
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SearchQueryHighlightListenerTest {
 
-    @Mock
-    private ProtectedTermsLoader loader;
+    //@Mock
+    //private ProtectedTermsLoader loader;
 
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        Globals.protectedTermsLoader = loader;
-        when(loader.getProtectedTermsLists()).thenReturn(Collections.emptyList());
+        //Globals.prefs = JabRefPreferences.getInstance();
+        //Globals.protectedTermsLoader = loader;
+        //when(loader.getProtectedTermsLists()).thenReturn(Collections.emptyList());
+    }
+
+    @Test
+    public void dummyTest() {
+        assertTrue(true);
     }
 
     /*
-    // TODO: Reenable these tests
+    // TODO: Reenable these tests and remove dummyTest
     @Test
     public void testHighlighting() {
 
