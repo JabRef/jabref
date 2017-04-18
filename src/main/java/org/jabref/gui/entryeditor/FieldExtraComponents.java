@@ -17,7 +17,6 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -43,15 +42,13 @@ import org.apache.commons.logging.LogFactory;
 public class FieldExtraComponents {
 
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
-
-    private FieldExtraComponents() {
-    }
-
     private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to") + " <B>" + Localization.lang("Options") + " -> "
             + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
 
+    private FieldExtraComponents() {
+    }
 
     /**
      * Add controls for switching between abbreviated and full journal names.
