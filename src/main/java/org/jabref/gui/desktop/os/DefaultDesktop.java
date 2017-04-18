@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -24,8 +23,8 @@ public class DefaultDesktop implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        File file = Paths.get(filePath).toAbsolutePath().getParent().toFile();
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
+        File file = filePath.toAbsolutePath().getParent().toFile();
         Desktop.getDesktop().open(file);
     }
 

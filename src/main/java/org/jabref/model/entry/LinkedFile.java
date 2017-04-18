@@ -1,23 +1,34 @@
 package org.jabref.model.entry;
 
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
-public class ParsedFileField {
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.FileHelper;
 
-    private static final ParsedFileField NULL_OBJECT = new ParsedFileField("", "", "");
+/**
+ * Represents the link to an external file (e.g. associated PDF file).
+ */
+public class LinkedFile {
+
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
 
     private final String description;
     private final String link;
     private final String fileType;
 
-    public ParsedFileField(String description, String link, String fileType) {
+    public LinkedFile(String description, String link, String fileType) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
     }
 
-    public ParsedFileField(String description, URL link, String fileType) {
+    public LinkedFile(String description, URL link, String fileType) {
         this(description, Objects.requireNonNull(link).toString(), fileType);
     }
 
@@ -38,9 +49,9 @@ public class ParsedFileField {
         if (this == o) {
             return true;
         }
-        if (o instanceof ParsedFileField) {
+        if (o instanceof LinkedFile) {
 
-            ParsedFileField that = (ParsedFileField) o;
+            LinkedFile that = (LinkedFile) o;
 
             if (!this.description.equals(that.description)) {
                 return false;
@@ -69,5 +80,23 @@ public class ParsedFileField {
 
     public boolean isEmpty() {
         return NULL_OBJECT.equals(this);
+    }
+
+    public boolean isOnlineLink() {
+        return link.startsWith("http://") || link.startsWith("https://") || link.contains("www.");
+    }
+
+    public Optional<Path> findIn(List<String> directories) {
+        Path file = Paths.get(link);
+        if (file.isAbsolute() || directories.isEmpty()) {
+            return Optional.of(file);
+        } else {
+            return FileHelper.expandFilename(link, directories);
+        }
+    }
+
+    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+        List<String> dirs = databaseContext.getFileDirectories(fileDirectoryPreferences);
+        return findIn(dirs);
     }
 }
