@@ -5,11 +5,6 @@ import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * @author Christopher Oezbek <oezi@oezi.de>
- * @version 0.1 - Still fails for stuff in AuthorList that is ambiguous
- * @see AuthorList Class tested.
- */
 public class AuthorListTest {
 
     @SuppressWarnings("unused")
@@ -644,6 +639,24 @@ public class AuthorListTest {
     public void parseNameWithBraces() throws Exception {
         Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
+    }
+
+    /**
+     * This tests the issue described at https://github.com/JabRef/jabref/pull/2669#issuecomment-288519458
+     */
+    @Test
+    public void correctNamesWithOneComma() throws Exception {
+        Author expected = new Author("Alexander der Große", "A. d. G.", null, "Canon der Barbar", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Canon der Barbar, Alexander der Große"));
+
+        expected = new Author("Alexander H. G.", "A. H. G.", null, "Rinnooy Kan", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Rinnooy Kan, Alexander H. G."));
+
+        expected = new Author("Alexander Hendrik George", "A. H. G.", null, "Rinnooy Kan", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Rinnooy Kan, Alexander Hendrik George"));
+
+        expected = new Author("José María", "J. M.", null, "Rodriguez Fernandez", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Rodriguez Fernandez, José María"));
     }
 
 }

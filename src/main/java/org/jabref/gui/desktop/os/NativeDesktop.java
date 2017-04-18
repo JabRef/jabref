@@ -17,7 +17,7 @@ public interface NativeDesktop {
      */
     void openFileWithApplication(String filePath, String application) throws IOException;
 
-    void openFolderAndSelectFile(String filePath) throws IOException;
+    void openFolderAndSelectFile(Path file) throws IOException;
 
     void openConsole(String absolutePath) throws IOException;
 

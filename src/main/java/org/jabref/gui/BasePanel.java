@@ -41,6 +41,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import javafx.application.Platform;
+
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.collab.ChangeScanner;
@@ -134,6 +136,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -235,6 +238,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 this.baseChanged = true;
             }
         }
+    }
+
+    public static void runWorker(AbstractWorker worker) throws Exception {
+        // This part uses Spin's features:
+        Runnable wrk = worker.getWorker();
+        // The Worker returned by getWorker() has been wrapped
+        // by Spin.off(), which makes its methods be run in
+        // a different thread from the EDT.
+        CallBack clb = worker.getCallBack();
+
+        worker.init(); // This method runs in this same thread, the EDT.
+        // Useful for initial GUI actions, like printing a message.
+
+        // The CallBack returned by getCallBack() has been wrapped
+        // by Spin.over(), which makes its methods be run on
+        // the EDT.
+        wrk.run(); // Runs the potentially time-consuming action
+        // without freezing the GUI. The magic is that THIS line
+        // of execution will not continue until run() is finished.
+        clb.update(); // Runs the update() method on the EDT.
     }
 
     // Returns a collection of AutoCompleters, which are populated from the current library
@@ -500,11 +523,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.OPEN_EXTERNAL_FILE, (BaseAction) () -> openExternalFile());
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
-            final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
+            final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
                     bibDatabaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
-            for (final File f : files) {
+            for (final Path f : files) {
                 try {
-                    JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
+                    JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
@@ -999,26 +1022,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-    public static void runWorker(AbstractWorker worker) throws Exception {
-        // This part uses Spin's features:
-        Runnable wrk = worker.getWorker();
-        // The Worker returned by getWorker() has been wrapped
-        // by Spin.off(), which makes its methods be run in
-        // a different thread from the EDT.
-        CallBack clb = worker.getCallBack();
-
-        worker.init(); // This method runs in this same thread, the EDT.
-        // Useful for initial GUI actions, like printing a message.
-
-        // The CallBack returned by getCallBack() has been wrapped
-        // by Spin.over(), which makes its methods be run on
-        // the EDT.
-        wrk.run(); // Runs the potentially time-consuming action
-        // without freezing the GUI. The magic is that THIS line
-        // of execution will not continue until run() is finished.
-        clb.update(); // Runs the update() method on the EDT.
-    }
-
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
             SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
@@ -1230,7 +1233,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         mainTable.addFocusListener(selectionListener);
 
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
-        mainTable.addSelectionListener(listEvent -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries()));
+        mainTable.addSelectionListener(listEvent ->
+                Platform.runLater(() -> Globals.stateManager.setSelectedEntries(mainTable.getSelectedEntries())));
 
         String clearSearch = "clearSearch";
         mainTable.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), clearSearch);
@@ -2116,7 +2120,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 final List<File> res = result.get(entry);
                 if (!res.isEmpty()) {
                     final String filepath = res.get(0).getPath();
-                    final Optional<String> extension = FileUtil.getFileExtension(filepath);
+                    final Optional<String> extension = FileHelper.getFileExtension(filepath);
                     if (extension.isPresent()) {
                         Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
                                 .getExternalFileTypeByExt(extension.get());

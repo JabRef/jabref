@@ -81,6 +81,7 @@ import org.jabref.gui.autosaveandbackup.AutosaveUIManager;
 import org.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import org.jabref.gui.customentrytypes.EntryCustomizationDialog;
 import org.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.exporter.ExportAction;
 import org.jabref.gui.exporter.ExportCustomizationDialog;
 import org.jabref.gui.exporter.SaveAllAction;
@@ -324,6 +325,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             tlb.setVisible(!tlb.isVisible());
         }
     });
+    private final AbstractAction showPdvViewer = new ShowDocumentViewerAction();
     private final AbstractAction addToGroup = new GeneralAction(Actions.ADD_TO_GROUP, Localization.lang("Add to group") + ELLIPSES);
     private final AbstractAction removeFromGroup = new GeneralAction(Actions.REMOVE_FROM_GROUP,
             Localization.lang("Remove from group") + ELLIPSES);
@@ -658,7 +660,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initShowTrackingNotification() {
         if (!Globals.prefs.shouldAskToCollectTelemetry()) {
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleWithFixedDelay(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, 1, TimeUnit.MINUTES);
+            scheduler.schedule(() -> DefaultTaskExecutor.runInJavaFXThread(this::showTrackingNotification), 1, TimeUnit.MINUTES);
         }
     }
 
@@ -1173,6 +1175,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
         view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
+        view.add(showPdvViewer);
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
 

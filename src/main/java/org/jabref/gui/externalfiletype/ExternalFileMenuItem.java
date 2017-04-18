@@ -12,9 +12,9 @@ import javax.swing.JOptionPane;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +67,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
             if (!this.fileType.isPresent()) {
                 if (this.fieldName == null) {
                     // We don't already know the file type, so we try to deduce it from the extension:
-                    Optional<String> extension = FileUtil.getFileExtension(link);
+                    Optional<String> extension = FileHelper.getFileExtension(link);
                     // Now we know the extension, check if it is one we know about:
                     type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.orElse(null));
                     fileType = type;

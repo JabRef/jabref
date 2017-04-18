@@ -27,7 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -488,12 +488,8 @@ public class BibDatabase {
 
         // If we get to this point, the string has obviously not been defined locally.
         // Check if one of the standard BibTeX month strings has been used:
-        MonthUtil.Month month = MonthUtil.getMonthByShortName(label);
-        if (month.isValid()) {
-            return month.fullName;
-        } else {
-            return null;
-        }
+        Optional<Month> month = Month.getMonthByShortName(label);
+        return month.map(Month::getFullName).orElse(null);
     }
 
     private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {

@@ -1,0 +1,10 @@
+#mainPane {
+    -fx-background-color: -fx-accented-background;
+    -fx-padding: 0;
+}
+
+.document-viewer .page {
+    -fx-padding: 0em 0em 1em 0em;
+    -fx-background-insets: 0;
+}
+

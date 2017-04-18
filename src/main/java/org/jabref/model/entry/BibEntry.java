@@ -1,14 +1,7 @@
 package org.jabref.model.entry;
 
-import java.text.DateFormat;
-import java.text.FieldPosition;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -99,6 +92,10 @@ public class BibEntry implements Cloneable {
         this.id = id;
         setType(type);
         this.sharedBibEntryData = new SharedBibEntryData();
+    }
+
+    public Optional<FieldChange> setMonth(Month parsedMonth) {
+        return setField(FieldName.MONTH, parsedMonth.getJabRefFormat());
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
@@ -212,6 +209,13 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Sets this entry's type.
+     */
     public void setType(EntryType type) {
         this.setType(type.getName());
     }
@@ -234,13 +238,6 @@ public class BibEntry implements Cloneable {
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
         eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, oldType, eventSource));
-    }
-
-    /**
-     * Sets this entry's type.
-     */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -299,73 +296,34 @@ public class BibEntry implements Cloneable {
 
         // Finally, handle dates
         if (FieldName.DATE.equals(name)) {
-            Optional<String> year = getFieldInterface.getValueForField(FieldName.YEAR);
-            if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil
-                        .getMonth(getFieldInterface.getValueForField(FieldName.MONTH).orElse(""));
-                if (month.isValid()) {
-                    return Optional.of(year.get() + '-' + month.twoDigitNumber);
-                } else {
-                    return year;
-                }
-            }
+            Optional<Date> date = Date.parse(
+                    getFieldInterface.getValueForField(FieldName.YEAR),
+                    getFieldInterface.getValueForField(FieldName.MONTH),
+                    getFieldInterface.getValueForField(FieldName.DAY));
+
+            return date.map(Date::getNormalized);
         }
+
         if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name) || FieldName.DAY.equals(name)) {
             Optional<String> date = getFieldInterface.getValueForField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
             }
 
-            // Create date format matching dates with year and month
-            DateFormat df = new DateFormat() {
-
-                static final String FORMAT1 = "yyyy-MM-dd";
-                static final String FORMAT2 = "yyyy-MM";
-                final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
-                final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
-
-                @Override
-                public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
-                    throw new UnsupportedOperationException();
-                }
-
-                @Override
-                public Date parse(String source, ParsePosition pos) {
-                    if ((source.length() - pos.getIndex()) == FORMAT1.length()) {
-                        return sdf1.parse(source, pos);
-                    }
-                    return sdf2.parse(source, pos);
-                }
-            };
-
-            try {
-                Date parsedDate = df.parse(date.get());
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(parsedDate);
+            Optional<Date> parsedDate = Date.parse(date.get());
+            if (parsedDate.isPresent()) {
                 if (FieldName.YEAR.equals(name)) {
-                    return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
+                    return parsedDate.get().getYear().map(Object::toString);
                 }
                 if (FieldName.MONTH.equals(name)) {
-                    return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
+                    return parsedDate.get().getMonth().map(Month::getJabRefFormat);
                 }
                 if (FieldName.DAY.equals(name)) {
-                    return Optional.of(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));
+                    return parsedDate.get().getDay().map(Object::toString);
                 }
-            } catch (ParseException e) {
-                // So not a date with year and month, try just to parse years
-                df = new SimpleDateFormat("yyyy");
-
-                try {
-                    Date parsedDate = df.parse(date.get());
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(parsedDate);
-                    if (FieldName.YEAR.equals(name)) {
-                        return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
-                    }
-                } catch (ParseException e2) {
-                    LOGGER.warn("Could not parse entry " + name, e2);
-                    return Optional.empty(); // Date field not in valid format
-                }
+            } else {
+                LOGGER.warn("Could not parse date " + date.get());
+                return Optional.empty(); // Date field not in valid format
             }
         }
         return Optional.empty();
@@ -629,20 +587,7 @@ public class BibEntry implements Cloneable {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public Optional<String> getPublicationDate() {
-        if (!hasField(FieldName.YEAR)) {
-            return Optional.empty();
-        }
-
-        Optional<String> year = getField(FieldName.YEAR);
-
-        Optional<String> monthString = getField(FieldName.MONTH);
-        if (monthString.isPresent()) {
-            MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
-            if (month.isValid()) {
-                return Optional.of(year.orElse("") + "-" + month.twoDigitNumber);
-            }
-        }
-        return year;
+        return getFieldOrAlias(FieldName.DATE);
     }
 
     public String getParsedSerialization() {
@@ -824,6 +769,11 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
+        } else if (KEY_FIELD.equals(name)) {
+            // the key field should not be converted
+            Optional<String> citeKey = getCiteKeyOptional();
+            latexFreeFields.put(name, citeKey.get());
+            return citeKey;
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);
@@ -831,15 +781,40 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+    public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(FieldName.FILE);
-        String newValue = FileField.getStringRepresentation(files);
+        String newValue = FileFieldWriter.getStringRepresentation(files);
 
         if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
             return Optional.empty();
         }
 
         return this.setField(FieldName.FILE, newValue);
+    }
+
+    /**
+     * Gets a list of linked files.
+     *
+     * @return the list of linked files, is never null but can be empty
+     */
+    public List<LinkedFile> getFiles() {
+        //Extract the path
+        Optional<String> oldValue = getField(FieldName.FILE);
+        if (!oldValue.isPresent()) {
+            return Collections.emptyList();
+        }
+
+        return FileFieldParser.parse(oldValue.get());
+    }
+
+    public void setDate(Date date) {
+        date.getYear().ifPresent(year -> setField(FieldName.YEAR, year.toString()));
+        date.getMonth().ifPresent(this::setMonth);
+        date.getDay().ifPresent(day -> setField(FieldName.DAY, day.toString()));
+    }
+
+    public Optional<Month> getMonth() {
+        return getFieldOrAlias(FieldName.MONTH).flatMap(Month::parse);
     }
 
     private interface GetFieldInterface {

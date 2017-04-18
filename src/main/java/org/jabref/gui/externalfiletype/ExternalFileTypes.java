@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.entry.FileField;
+import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -263,7 +263,7 @@ public final class ExternalFileTypes {
             array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
-        Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileField.encodeStringArray(array));
+        Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileFieldWriter.encodeStringArray(array));
     }
 
     /**
