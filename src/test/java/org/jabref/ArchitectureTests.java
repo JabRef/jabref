@@ -33,6 +33,8 @@ public class ArchitectureTests {
 
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
     private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
+    private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
+    private static final String EXCEPTION_CLASS_JAVA_FX_COLOR = "javafx.scene.paint.Color";
 
     private final String firstPackage;
     private final String secondPackage;
@@ -46,14 +48,19 @@ public class ArchitectureTests {
         // Note that bending the architectural constraints should not be done inconsiderately
         exceptions = new HashMap<>();
 
-        List<String> logicExceptions = new ArrayList<>(2);
+        List<String> logicExceptions = new ArrayList<>(4);
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_AWT_GEOM);
         logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        logicExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
+        logicExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
+
+        List<String> modelExceptions = new ArrayList<>(2);
+        modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
+        modelExceptions.add(EXCEPTION_CLASS_JAVA_FX_COLOR);
 
         exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
                 logicExceptions);
-        exceptions.put(PACKAGE_ORG_JABREF_MODEL,
-                Collections.singletonList(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS));
+        exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
     }
 
 
@@ -86,7 +93,7 @@ public class ArchitectureTests {
 
         Predicate<String> isPackage = (s) -> s.startsWith("package " + firstPackage);
 
-        List<Path> files = Files.walk(Paths.get("src"))
+        List<Path> files = Files.walk(Paths.get("src/main/"))
                 .filter(p -> p.toString().endsWith(".java"))
                 .filter(p -> {
                     try {
