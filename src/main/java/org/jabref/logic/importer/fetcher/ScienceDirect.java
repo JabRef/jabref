@@ -39,7 +39,7 @@ public class ScienceDirect implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
         if(doi.isPresent()) {
             // Available in catalog?

@@ -19,14 +19,14 @@ import org.jabref.gui.fieldeditors.FieldEditor;
  */
 class EntryEditorTabFocusListener implements FocusListener {
 
+    /**
+     * The EntryEditorTab this FocusListener is currently tied to
+     */
+    private final EntryEditorTab entryEditorTab;
     /** The component this DocumentListener is currently tied to */
     private JTextComponent textComponent;
-
     /** The listener which gets tied to each TextComponent (and removed) */
     private DocumentListener documentListener;
-
-    /** The EntryEditorTab this FocusListener is currently tied to */
-    private final EntryEditorTab entryEditorTab;
 
 
     public EntryEditorTabFocusListener(final EntryEditorTab entryEditorTab) {
@@ -82,8 +82,8 @@ class EntryEditorTabFocusListener implements FocusListener {
 
             }
         }
-
-        entryEditorTab.setActive((FieldEditor) event.getSource());
+        // TODO: Reenable this
+        //entryEditorTab.setActive((FieldEditor) event.getSource());
     }
 
     @Override

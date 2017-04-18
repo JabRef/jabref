@@ -124,7 +124,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         // 2. DOI and other fields
         String query;
 
-        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::build).map(DOI::getNormalized);
+        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
         if (doi.isPresent()) {
             // Search for an entry in the ArXiv which is linked to the doi
             query = "doi:" + doi.get();

@@ -14,6 +14,11 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -50,7 +55,7 @@ public class BibEntry implements Cloneable {
     private final EventBus eventBus = new EventBus();
     private String id;
     private String type;
-    private Map<String, String> fields = new ConcurrentHashMap<>();
+    private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
@@ -330,7 +335,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<DOI> getDOI() {
-        return getField(FieldName.DOI).flatMap(DOI::build);
+        return getField(FieldName.DOI).flatMap(DOI::parse);
     }
 
     /**
@@ -524,7 +529,7 @@ public class BibEntry implements Cloneable {
     @Override
     public Object clone() {
         BibEntry clone = new BibEntry(type);
-        clone.fields = new HashMap<>(fields);
+        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
 
@@ -817,9 +822,12 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(FieldName.MONTH).flatMap(Month::parse);
     }
 
+    public ObjectBinding<String> getFieldBinding(String fieldName) {
+        return Bindings.valueAt(fields, fieldName);
+    }
+
     private interface GetFieldInterface {
 
         Optional<String> getValueForField(String fieldName);
     }
-
 }

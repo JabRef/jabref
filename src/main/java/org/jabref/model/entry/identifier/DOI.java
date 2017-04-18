@@ -93,7 +93,7 @@ public class DOI implements Identifier {
      * @param doi the DOI string
      * @return an Optional containing the DOI or an empty Optional
      */
-    public static Optional<DOI> build(String doi) {
+    public static Optional<DOI> parse(String doi) {
         try {
             return Optional.ofNullable(new DOI(doi));
         } catch (IllegalArgumentException | NullPointerException e) {
@@ -108,7 +108,7 @@ public class DOI implements Identifier {
      * @return true if DOI is valid, false otherwise
      */
     public static boolean isValid(String doi){
-        return build(doi).isPresent();
+        return parse(doi).isPresent();
     }
 
     /**
@@ -149,7 +149,8 @@ public class DOI implements Identifier {
      *
      * @return an encoded URI representation of the DOI
      */
-    public Optional<URI> getURI() {
+    @Override
+    public Optional<URI> getExternalURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
             return Optional.of(uri);
@@ -166,7 +167,7 @@ public class DOI implements Identifier {
      * @return an encoded URL representation of the DOI
      */
     public String getURIAsASCIIString() {
-        return getURI().map(URI::toASCIIString).orElse("");
+        return getExternalURI().map(URI::toASCIIString).orElse("");
     }
 
     @Override

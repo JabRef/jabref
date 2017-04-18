@@ -370,9 +370,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addSpecialTabs() {
 
         // MathSciNet Review
-        entry.getField(FieldName.MR_NUMBER).ifPresent(mrNumberRaw -> {
-            MathSciNetId mrNumber = MathSciNetId.fromString(mrNumberRaw);
-
+        entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse).ifPresent(mrNumber -> {
             JFXPanel reviewPane = new JFXPanel();
             tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
             tabs.add(reviewPane);
@@ -628,12 +626,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.DOI)) {
-            return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
-            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
-            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
@@ -963,7 +955,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Sets all the text areas according to the shown entry.
      */
-    public void updateAllFields() {
+    private void updateAllFields() {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).setEntry(entry);
@@ -1281,7 +1273,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 textField.setValidBackgroundColor();
 
-                if (textField.getTextComponent().hasFocus()) {
+                if (textField.hasFocus()) {
                     textField.setActiveBackgroundColor();
                 }
                 updateSource();
@@ -1362,7 +1354,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
                     }
                 }
-                if (fieldEditor.getTextComponent().hasFocus()) {
+                if (fieldEditor.hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {
@@ -1534,9 +1526,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
                 EntryEditorTab tab = (EntryEditorTab) activeTab;
-                FieldEditor fieldEditor = tab.getActive();
-                fieldEditor.clearAutoCompleteSuggestion();
-                updateField(fieldEditor);
+                // TODO: Reenable this
+                //FieldEditor fieldEditor = tab.getActive();
+                //fieldEditor.clearAutoCompleteSuggestion();
+                //updateField(fieldEditor);
             } else {
                 // Source panel.
                 updateField(activeTab);

@@ -2,12 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,14 +15,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.JTextComponent;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
@@ -35,21 +24,14 @@ import org.jabref.gui.date.DatePickerButton;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
-import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLUtil;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
-import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -58,15 +40,13 @@ import org.apache.commons.logging.LogFactory;
 public class FieldExtraComponents {
 
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
-
-    private FieldExtraComponents() {
-    }
-
     private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
             + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
             + "<BR>" + Localization.lang("To set up, go to") + " <B>" + Localization.lang("Options") + " -> "
             + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
 
+    private FieldExtraComponents() {
+    }
 
     /**
      * Add controls for switching between abbreviated and full journal names.
@@ -135,6 +115,7 @@ public class FieldExtraComponents {
         controls.add(button, BorderLayout.SOUTH);
 
         // enable/disable button
+        /*
         JTextComponent url = (JTextComponent) fieldEditor;
 
         url.getDocument().addDocumentListener(new DocumentListener() {
@@ -161,198 +142,9 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         return Optional.of(controls);
-    }
-
-    /**
-     * Set up a mouse listener for opening an external viewer and fetching by DOI
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getDoiExtraComponent(BasePanel panel, EntryEditor entryEditor, FieldEditor fieldEditor) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        // open doi link
-        JButton button = new JButton(Localization.lang("Open"));
-        button.setEnabled(false);
-        button.addActionListener(actionEvent -> {
-            try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
-            } catch (IOException ex) {
-                panel.output(Localization.lang("Unable to open link."));
-            }
-        });
-        // lookup doi
-        JButton doiButton = new JButton(Localization.lang("Look up DOI"));
-
-        Runnable doiFetcher = () -> {
-            try {
-                Optional<DOI> doi = WebFetchers.getIdFetcherForIdentifier(DOI.class).findIdentifier(entryEditor.getEntry());
-
-                SwingUtilities.invokeLater(() -> {
-                    if (doi.isPresent()) {
-                        entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
-                    } else {
-                        panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
-                    }
-                });
-            } catch (FetcherException e) {
-                LOGGER.error("Problem fetching DOI", e);
-            }
-        };
-
-        doiButton.addActionListener(actionEvent -> {
-            JabRefExecutorService.INSTANCE.execute(doiFetcher);
-        });
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.DOI);
-        });
-
-        controls.add(button, BorderLayout.NORTH);
-        controls.add(doiButton, BorderLayout.CENTER);
-        controls.add(fetchButton, BorderLayout.SOUTH);
-
-        // enable/disable button
-        JTextComponent doi = (JTextComponent) fieldEditor;
-
-        doi.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkDoi();
-            }
-
-            private void checkDoi() {
-                Optional<DOI> doiUrl = DOI.build(doi.getText());
-                if(doiUrl.isPresent()) {
-                    button.setEnabled(true);
-                    fetchButton.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                    fetchButton.setEnabled(false);
-                }
-            }
-        });
-
-        return Optional.of(controls);
-    }
-
-    /**
-     * Add button for fetching by ISBN
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getIsbnExtraComponent(BasePanel panel, EntryEditor entryEditor,
-            FieldEditor fieldEditor) {
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.ISBN)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.ISBN);
-        });
-
-        // enable/disable button
-        JTextComponent isbn = (JTextComponent) fieldEditor;
-
-        isbn.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            private void checkIsbn() {
-                ISBN isbnString = new ISBN(isbn.getText());
-                if (isbnString.isValidFormat()) {
-                    fetchButton.setEnabled(true);
-                } else {
-                    fetchButton.setEnabled(false);
-                }
-            }
-        });
-
-        return Optional.of(fetchButton);
-    }
-
-    /**
-     * Add button for fetching by ISBN
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getEprintExtraComponent(BasePanel panel, EntryEditor entryEditor,
-            FieldEditor fieldEditor) {
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.EPRINT)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.EPRINT);
-        });
-
-        // enable/disable button
-        JTextComponent eprint = (JTextComponent) fieldEditor;
-
-        eprint.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            private void checkEprint() {
-                if ((eprint.getText() == null) || eprint.getText().trim().isEmpty()) {
-                    fetchButton.setEnabled(false);
-                } else {
-                    fetchButton.setEnabled(true);
-                }
-            }
-        });
-
-        return Optional.of(fetchButton);
     }
 
     /**
@@ -453,6 +245,7 @@ public class FieldExtraComponents {
      */
     public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, boolean useDatePicker,
             boolean useIsoFormat) {
+        /*
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
             @Override
@@ -469,11 +262,13 @@ public class FieldExtraComponents {
                 }
             }
         });
+        */
 
         // insert a datepicker, if the extras field contains this command
         if (useDatePicker) {
             DatePickerButton datePicker = new DatePickerButton(editor, useIsoFormat);
 
+            /*
             // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
             ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
 
@@ -492,6 +287,7 @@ public class FieldExtraComponents {
                     datePicker.updateDatePickerDate(editor.getText());
                 }
             });
+            */
 
             return Optional.of(datePicker.getDatePicker());
         } else {

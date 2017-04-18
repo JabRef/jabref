@@ -33,7 +33,7 @@ public class CopyDoiUrlAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         identifier = component == null ? identifier : component.getText();
 
-        Optional<String> urlOptional = DOI.build(identifier).map(DOI::getURIAsASCIIString);
+        Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {
             ClipBoardManager clipBoard = new ClipBoardManager();
             clipBoard.setClipboardContents(urlOptional.get());

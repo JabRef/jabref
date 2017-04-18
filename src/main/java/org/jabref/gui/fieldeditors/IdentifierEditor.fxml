@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import org.jabref.gui.fieldeditors.EditorTextArea?>
+<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+    <EditorTextArea fx:id="textArea" prefHeight="0.0" text="Halo" HBox.hgrow="ALWAYS" />
+    <Button disable="${controller.viewModel.validIdentifierIsNotPresent}" onAction="#openExternalLink"
+            styleClass="flatButton">
+        <graphic>
+            <MaterialDesignIconView glyphName="OPEN_IN_NEW" />
+        </graphic>
+        <tooltip>
+            <Tooltip text="%Open" />
+        </tooltip>
+    </Button>
+    <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="flatButton"
+            visible="${controller.viewModel.idFetcherAvailable}" managed="${controller.viewModel.idFetcherAvailable}">
+        <graphic>
+            <StackPane>
+                <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
+                <MaterialDesignIconView glyphName="MAGNIFY"
+                                        visible="${controller.viewModel.identifierLookupInProgress == false}"/>
+                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
+                                   visible="${controller.viewModel.identifierLookupInProgress}"/>
+            </StackPane>
+        </graphic>
+    </Button>
+    <Button fx:id="fetchInformationByIdentifierButton" disable="${controller.viewModel.validIdentifierIsNotPresent}"
+            onAction="#fetchInformationByIdentifier"
+            styleClass="flatButton">
+        <graphic>
+            <MaterialDesignIconView glyphName="CLIPBOARD_ARROW_DOWN" />
+        </graphic>
+    </Button>
+</fx:root>

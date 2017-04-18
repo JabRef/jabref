@@ -54,6 +54,14 @@ public class WebFetchers {
         }
     }
 
+    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(String fieldName) {
+        switch (fieldName) {
+            case FieldName.DOI:
+                return Optional.of(new CrossRef());
+        }
+        return Optional.empty();
+    }
+
     public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<SearchBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));

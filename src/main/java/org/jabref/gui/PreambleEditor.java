@@ -77,7 +77,8 @@ class PreambleEditor extends JabRefDialog {
 
         editor = new TextArea(Localization.lang("Preamble"), database.getPreamble().orElse(""));
 
-        setupJTextComponent((TextArea) editor);
+        // TODO: Reenable this
+        //setupJTextComponent((TextArea) editor);
 
         gbl.setConstraints(editor.getLabel(), con);
         pan.add(editor.getLabel());
@@ -115,6 +116,13 @@ class PreambleEditor extends JabRefDialog {
         editor.setText(database.getPreamble().orElse(""));
     }
 
+    public FieldEditor getFieldEditor() {
+        return editor;
+    }
+
+    public void storeCurrentEdit() {
+        storeFieldAction.actionPerformed(null);
+    }
 
     private class FieldListener extends FocusAdapter {
 
@@ -130,8 +138,6 @@ class PreambleEditor extends JabRefDialog {
         }
 
     }
-
-
 
     class StoreFieldAction extends AbstractAction {
 
@@ -156,7 +162,7 @@ class PreambleEditor extends JabRefDialog {
                     editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
                 editor.setValidBackgroundColor();
-                if (editor.getTextComponent().hasFocus()) {
+                if (editor.hasFocus()) {
                     editor.setActiveBackgroundColor();
                 }
                 panel.markBaseChanged();
@@ -164,8 +170,6 @@ class PreambleEditor extends JabRefDialog {
 
         }
     }
-
-
 
     class UndoAction extends AbstractAction {
 
@@ -180,8 +184,6 @@ class PreambleEditor extends JabRefDialog {
         }
     }
 
-
-
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
@@ -195,8 +197,6 @@ class PreambleEditor extends JabRefDialog {
         }
     }
 
-
-
     class CloseAction extends AbstractAction {
 
         public CloseAction() {
@@ -209,15 +209,6 @@ class PreambleEditor extends JabRefDialog {
             panel.preambleEditorClosing();
             dispose();
         }
-    }
-
-
-    public FieldEditor getFieldEditor() {
-        return editor;
-    }
-
-    public void storeCurrentEdit() {
-        storeFieldAction.actionPerformed(null);
     }
 
 }

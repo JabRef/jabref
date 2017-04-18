@@ -135,14 +135,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
 
     }
 
-
-    @Override
-    public void updateFontColor() {
-        setForeground(GUIGlobals.editorTextColor);
-    }
-
-    @Override
-    public void updateFont() {
+    private void updateFont() {
         setFont(GUIGlobals.currentFont);
     }
 

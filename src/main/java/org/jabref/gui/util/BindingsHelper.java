@@ -1,11 +1,14 @@
 package org.jabref.gui.util;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.Property;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -47,5 +50,46 @@ public class BindingsHelper {
             }
         };
         pseudoClassState.bind(condition);
+    }
+
+    /**
+     * Binds propertA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
+     */
+    public static <A> void bindBidirectional(Property<A> propertyA, ObservableValue<A> propertyB, Consumer<A> updateB) {
+        final BidirectionalBinding<A> binding = new BidirectionalBinding<>(propertyA, propertyB, updateB);
+
+        // use updateB as initial source
+        propertyA.setValue(propertyB.getValue());
+
+        propertyA.addListener(binding);
+        propertyB.addListener(binding);
+    }
+
+    private static class BidirectionalBinding<A> implements ChangeListener<A> {
+
+        private final Property<A> propertyA;
+        private final Consumer<A> updateB;
+        private boolean updating = false;
+
+        public BidirectionalBinding(Property<A> propertyA, ObservableValue<A> propertyB, Consumer<A> updateB) {
+            this.propertyA = propertyA;
+            this.updateB = updateB;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends A> observable, A oldValue, A newValue) {
+            if (!updating) {
+                try {
+                    updating = true;
+                    if (observable == propertyA) {
+                        updateB.accept(newValue);
+                    } else {
+                        propertyA.setValue(newValue);
+                    }
+                } finally {
+                    updating = false;
+                }
+            }
+        }
     }
 }

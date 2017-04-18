@@ -2,6 +2,7 @@ package org.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -88,24 +89,16 @@ public class JabRefDesktop {
                 }
             }
         } else if (FieldName.DOI.equals(fieldName)) {
-            link = DOI.build(link).map(DOI::getURIAsASCIIString).orElse(link);
-            // should be opened in browser
-            fieldName = FieldName.URL;
+            openDoi(link);
+            return;
         } else if (FieldName.EPRINT.equals(fieldName)) {
             link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
             // should be opened in browser
             fieldName = FieldName.URL;
         }
 
-        if (FieldName.URL.equals(fieldName)) { // html
-            try {
-                openBrowser(link);
-            } catch (IOException e) {
-                LOGGER.error("Error opening file '" + link + "'", e);
-                // TODO: should we rethrow the exception?
-                // In BasePanel.java, the exception is catched and a text output to the frame
-                // throw e;
-            }
+        if (FieldName.URL.equals(fieldName)) {
+            openBrowser(link);
         } else if (FieldName.PS.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
@@ -121,6 +114,11 @@ public class JabRefDesktop {
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
+    }
+
+    private static void openDoi(String doi) throws IOException {
+        String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
+        openBrowser(link);
     }
 
     /**
@@ -268,6 +266,10 @@ public class JabRefDesktop {
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
+    }
+
+    public static void openBrowser(URI url) throws IOException {
+        openBrowser(url.toASCIIString());
     }
 
     /**

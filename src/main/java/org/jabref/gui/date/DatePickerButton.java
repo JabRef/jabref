@@ -66,7 +66,7 @@ public class DatePickerButton implements DateChangeListener {
             editor.setText(newDate);
         }
         // Set focus to editor component after changing its text:
-        editor.getTextComponent().requestFocus();
+        editor.requestFocus();
     }
 
     public JComponent getDatePicker() {

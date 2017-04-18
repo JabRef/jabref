@@ -1,9 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
@@ -22,19 +20,24 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.text.JTextComponent;
+
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
-import org.jabref.gui.fieldeditors.EntryLinkListEditor;
 import org.jabref.gui.fieldeditors.FieldEditor;
+import org.jabref.gui.fieldeditors.FieldEditorFX;
+import org.jabref.gui.fieldeditors.FieldEditors;
+import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.fieldeditors.FileListEditor;
-import org.jabref.gui.fieldeditors.TextArea;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -58,23 +61,15 @@ class EntryEditorTab {
 
     private final EntryEditor parent;
 
-    private final Map<String, FieldEditor> editors = new HashMap<>();
-
-    private FieldEditor activeField;
-
+    private final Map<String, FieldEditorFX> editors = new HashMap<>();
+    private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
+    private final String tabTitle;
+    private final JabRefFrame frame;
+    private final BasePanel basePanel;
     // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
     public FileListEditor fileListEditor;
-
+    private FieldEditorFX activeField;
     private BibEntry entry;
-
-    private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
-
-    private final String tabTitle;
-
-    private final JabRefFrame frame;
-
-    private final BasePanel basePanel;
-
     private boolean updating;
 
 
@@ -103,6 +98,7 @@ class EntryEditorTab {
         setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
         panel.setName(title);
+
         // Use the title for the scrollPane, too.
         // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
         scrollPane.setName(title);
@@ -129,8 +125,11 @@ class EntryEditorTab {
 
         // BibTex edit fields are defined here
         for (int i = 0; i < fields.size(); i++) {
-            String field = fields.get(i);
+            String fieldName = fields.get(i);
 
+            // TODO: Reenable/migrate this
+            // Store the editor for later reference:
+            /*
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
@@ -150,13 +149,14 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null, getPrompt(field));
-                parent.addSearchListener((TextArea) fieldEditor);
+                //parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
 
             // Add autocompleter listener, if required for this field:
+            /*
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
@@ -164,17 +164,37 @@ class EntryEditorTab {
             }
             setupJTextComponent(fieldEditor.getTextComponent(), autoCompleteListener);
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
+            */
 
-            // Store the editor for later reference:
-            editors.put(field, fieldEditor);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService());
+            editors.put(fieldName, fieldEditor);
+            /*
+            // TODO: Reenable this
             if (i == 0) {
                 activeField = fieldEditor;
             }
+            */
 
+            /*
+            // TODO: Reenable this
             if (!compressed) {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
-            builder.append(fieldEditor.getLabel());
+            */
+
+            builder.append(new FieldNameLabel(fieldName));
+
+            JFXPanel swingPanel = new JFXPanel();
+            swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
+            DefaultTaskExecutor.runInJavaFXThread(
+                    () -> {
+                        Scene scene = new Scene(fieldEditor.getNode());
+                        swingPanel.setScene(scene);
+                    }
+            );
+            builder.append(swingPanel, 3);
+            /*
+            // TODO: Delete when no longer required
             if (extra.isPresent()) {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
@@ -184,6 +204,7 @@ class EntryEditorTab {
             } else {
                 builder.append(fieldEditor.getPane(), 3);
             }
+            */
             if (((i + 1) % fieldsPerRow) == 0) {
                 builder.nextLine();
             }
@@ -195,14 +216,16 @@ class EntryEditorTab {
                     parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
 
-            editors.put(BibEntry.KEY_FIELD, textField);
+            // TODO: Reenable this
+            //editors.put(BibEntry.KEY_FIELD, textField);
             fields.add(BibEntry.KEY_FIELD);
             /*
              * If the key field is the only field, we should have only one
              * editor, and this one should be set as active initially:
              */
             if (editors.size() == 1) {
-                activeField = textField;
+                // TODO: Reenable this
+                //activeField = textField;
             }
             builder.nextLine();
             builder.append(textField.getLabel());
@@ -237,6 +260,18 @@ class EntryEditorTab {
         return entry;
     }
 
+    public void setEntry(BibEntry entry) {
+        try {
+            updating = true;
+            for (FieldEditorFX editor : editors.values()) {
+                editor.bindToEntry(entry);
+            }
+            this.entry = entry;
+        } finally {
+            updating = false;
+        }
+    }
+
     private boolean isFieldModified(FieldEditor fieldEditor) {
         String text = fieldEditor.getText().trim();
 
@@ -265,18 +300,19 @@ class EntryEditorTab {
      *
      * @param fieldEditor
      */
-    public void setActive(FieldEditor fieldEditor) {
-        activeField = fieldEditor;
-    }
+    // TODO: Reenable or delete this
+    //public void setActive(FieldEditor fieldEditor) {
+    //    activeField = fieldEditor;
+    //}
+
+    //public FieldEditor getActive() {
+    //    return activeField;
+    //}
 
     public void setActive(String fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
         }
-    }
-
-    public FieldEditor getActive() {
-        return activeField;
     }
 
     public List<String> getFields() {
@@ -285,7 +321,7 @@ class EntryEditorTab {
 
     public void focus() {
         if (activeField != null) {
-            activeField.getTextComponent().requestFocus();
+            activeField.requestFocus();
         }
     }
 
@@ -296,26 +332,12 @@ class EntryEditorTab {
         setEntry(getEntry());
     }
 
-    public void setEntry(BibEntry entry) {
-        try {
-            updating = true;
-            for (FieldEditor editor : editors.values()) {
-                String toSet = entry.getField(editor.getFieldName()).orElse("");
-                if (!toSet.equals(editor.getText())) {
-                    editor.setText(toSet);
-                }
-            }
-            this.entry = entry;
-        } finally {
-            updating = false;
-        }
-    }
-
     public boolean updateField(String field, String content) {
         if (!editors.containsKey(field)) {
             return false;
         }
-
+        // TODO: Reenable or probably better delete this
+        /*
         FieldEditor fieldEditor = editors.get(field);
         if (fieldEditor.getText().equals(content)){
             return true;
@@ -334,13 +356,17 @@ class EntryEditorTab {
         } else {
             fieldEditor.setText(content);
         }
+        */
         return true;
     }
 
     public void setEnabled(boolean enabled) {
+        /*
+        // TODO: Reenable this
         for (FieldEditor editor : editors.values()) {
             editor.setEnabled(enabled);
         }
+        */
     }
 
     public Component getPane() {
