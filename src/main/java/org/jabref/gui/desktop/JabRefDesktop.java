@@ -2,6 +2,7 @@ package org.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -112,8 +113,8 @@ public class JabRefDesktop {
         }
     }
 
-    public static void openDoi(String doi) throws IOException {
-        String link = DOI.build(doi).map(DOI::getURIAsASCIIString).orElse(doi);
+    private static void openDoi(String doi) throws IOException {
+        String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
         openBrowser(link);
     }
 
@@ -263,6 +264,10 @@ public class JabRefDesktop {
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
+    }
+
+    public static void openBrowser(URI url) throws IOException {
+        openBrowser(url.toASCIIString());
     }
 
     /**

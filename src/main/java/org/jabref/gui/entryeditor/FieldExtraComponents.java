@@ -24,13 +24,11 @@ import org.jabref.gui.date.DatePickerButton;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
-import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
@@ -147,111 +145,6 @@ public class FieldExtraComponents {
         */
 
         return Optional.of(controls);
-    }
-
-    /**
-     * Add button for fetching by ISBN
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getIsbnExtraComponent(BasePanel panel, EntryEditor entryEditor,
-            FieldEditor fieldEditor) {
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.ISBN)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.ISBN);
-        });
-
-        // enable/disable button
-        /*
-        JTextComponent isbn = (JTextComponent) fieldEditor;
-
-        isbn.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkIsbn();
-            }
-
-            private void checkIsbn() {
-                ISBN isbnString = new ISBN(isbn.getText());
-                if (isbnString.isValidFormat()) {
-                    fetchButton.setEnabled(true);
-                } else {
-                    fetchButton.setEnabled(false);
-                }
-            }
-        });
-        */
-
-        return Optional.of(fetchButton);
-    }
-
-    /**
-     * Add button for fetching by ISBN
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getEprintExtraComponent(BasePanel panel, EntryEditor entryEditor,
-            FieldEditor fieldEditor) {
-        // fetch bibtex data
-        JButton fetchButton = new JButton(
-                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.EPRINT)));
-        fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> {
-            BibEntry entry = entryEditor.getEntry();
-            new FetchAndMergeEntry(entry, panel, FieldName.EPRINT);
-        });
-
-        // enable/disable button
-        /*
-        JTextComponent eprint = (JTextComponent) fieldEditor;
-
-        eprint.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkEprint();
-            }
-
-            private void checkEprint() {
-                if ((eprint.getText() == null) || eprint.getText().trim().isEmpty()) {
-                    fetchButton.setEnabled(false);
-                } else {
-                    fetchButton.setEnabled(true);
-                }
-            }
-        });
-        */
-
-        return Optional.of(fetchButton);
     }
 
     /**

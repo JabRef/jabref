@@ -370,9 +370,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addSpecialTabs() {
 
         // MathSciNet Review
-        entry.getField(FieldName.MR_NUMBER).ifPresent(mrNumberRaw -> {
-            MathSciNetId mrNumber = MathSciNetId.fromString(mrNumberRaw);
-
+        entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse).ifPresent(mrNumber -> {
             JFXPanel reviewPane = new JFXPanel();
             tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
             tabs.add(reviewPane);
@@ -628,10 +626,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
-            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
-            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {

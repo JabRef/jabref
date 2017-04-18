@@ -33,7 +33,7 @@ public class DoiResolution implements FulltextFetcher {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
         if (doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();

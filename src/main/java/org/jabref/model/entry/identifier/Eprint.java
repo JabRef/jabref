@@ -7,6 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.model.entry.FieldName;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,14 +18,9 @@ import org.apache.commons.logging.LogFactory;
  * @see https://arxiv.org/help/arxiv_identifier
  * @see https://arxiv.org/hypertex/bibstyles/
  */
-public class Eprint {
-    private static final Log LOGGER = LogFactory.getLog(Eprint.class);
-
+public class Eprint implements Identifier {
     public static final URI RESOLVER = URI.create("http://arxiv.org");
-
-    // DOI
-    private final String eprint;
-
+    private static final Log LOGGER = LogFactory.getLog(Eprint.class);
     // Regex
     // (see https://arxiv.org/help/arxiv_identifier)
     private static final String EPRINT_EXP = ""
@@ -39,10 +36,11 @@ public class Eprint {
             + "\\/"                             // divider
             + "\\d{7}"                          // number
             + ")";                              // end group \1
-
     private static final String HTTP_EXP = "https?://[^\\s]+?" + EPRINT_EXP;
     // Pattern
     private static final Pattern EXACT_EPRINT_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + EPRINT_EXP + "$", Pattern.CASE_INSENSITIVE);
+    // DOI
+    private final String eprint;
 
     /**
      * Creates a Eprint from various schemes including URL.
@@ -101,7 +99,8 @@ public class Eprint {
      *
      * @return an encoded URI representation of the Eprint identifier
      */
-    public Optional<URI> getURI() {
+    @Override
+    public Optional<URI> getExternalURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/abs/" + eprint, null);
             return Optional.of(uri);
@@ -118,7 +117,7 @@ public class Eprint {
      * @return an encoded URL representation of the Eprint identifier
      */
     public String getURIAsASCIIString() {
-        return getURI().map(URI::toASCIIString).orElse("");
+        return getExternalURI().map(URI::toASCIIString).orElse("");
     }
 
     /**
@@ -127,6 +126,16 @@ public class Eprint {
      * @return the plain Eprint value.
      */
     public String getEprint() {
+        return eprint;
+    }
+
+    @Override
+    public String getDefaultField() {
+        return FieldName.EPRINT;
+    }
+
+    @Override
+    public String getNormalized() {
         return eprint;
     }
 }

@@ -29,12 +29,10 @@ public class FieldEditors {
             //return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors, storeFieldAction);
             //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.DOI)) {
-            return new DoiEditor(fieldName, taskExecutor, dialogService);
-        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
-            //return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
-            //return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperty.DOI) ||
+                fieldExtras.contains(FieldProperty.EPRINT) ||
+                fieldExtras.contains(FieldProperty.ISBN)) {
+            return new IdentifierEditor(fieldName, taskExecutor, dialogService);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             //return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {

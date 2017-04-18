@@ -214,15 +214,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -335,7 +335,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<DOI> getDOI() {
-        return getField(FieldName.DOI).flatMap(DOI::build);
+        return getField(FieldName.DOI).flatMap(DOI::parse);
     }
 
     /**
