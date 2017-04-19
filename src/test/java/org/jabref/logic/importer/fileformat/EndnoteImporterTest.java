@@ -12,16 +12,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class EndnoteImporterTest {
 
@@ -30,7 +32,7 @@ public class EndnoteImporterTest {
 
     @Before
     public void setUp() {
-        importer = new EndnoteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        importer = new EndnoteImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

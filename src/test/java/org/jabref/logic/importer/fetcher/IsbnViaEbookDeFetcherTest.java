@@ -3,9 +3,9 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @Category(FetcherTests.class)
 public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
@@ -32,7 +33,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("pagetotal", "384");
         bibEntry.setField("url", "http://www.ebook.de/de/product/6441328/joshua_bloch_effective_java.html");
 
-        fetcher = new IsbnViaEbookDeFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+        fetcher = new IsbnViaEbookDeFetcher(mock(ImportFormatPreferences.class));
     }
 
     @Test

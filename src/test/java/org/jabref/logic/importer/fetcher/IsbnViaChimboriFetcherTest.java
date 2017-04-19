@@ -3,9 +3,9 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BiblatexEntryTypes;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.FetcherTests;
 
 import org.junit.Before;
@@ -14,6 +14,7 @@ import org.junit.experimental.categories.Category;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.mock;
 
 @Category(FetcherTests.class)
 public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
@@ -31,7 +32,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("url",
                 "https://www.amazon.com/Effective-Java-Joshua-Bloch-ebook/dp/B00B8V09HY?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B00B8V09HY");
 
-        fetcher = new IsbnViaChimboriFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+        fetcher = new IsbnViaChimboriFetcher(mock(ImportFormatPreferences.class));
     }
 
     @Test

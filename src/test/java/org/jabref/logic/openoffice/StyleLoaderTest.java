@@ -2,17 +2,18 @@ package org.jabref.logic.openoffice;
 
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,9 +34,8 @@ public class StyleLoaderTest {
     @Before
     public void setUp() {
         preferences = new OpenOfficePreferences(JabRefPreferences.getInstance());
-        layoutPreferences = JabRefPreferences.getInstance()
-                .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
-        encoding = JabRefPreferences.getInstance().getDefaultEncoding();
+        layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        encoding = StandardCharsets.UTF_8;
 
     }
 
@@ -46,9 +46,8 @@ public class StyleLoaderTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void throwNPEWithNullRepository() {
-        loader = new StyleLoader(mock(OpenOfficePreferences.class),
-                JabRefPreferences.getInstance().getLayoutFormatterPreferences(null), mock(Charset.class));
+    public void throwNPEWithNullLayoutPreferences() {
+        loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class));
         fail();
     }
 

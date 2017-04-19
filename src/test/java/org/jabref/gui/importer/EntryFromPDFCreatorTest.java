@@ -3,12 +3,10 @@ package org.jabref.gui.importer;
 import java.io.File;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.importer.ImportDataTest;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
@@ -27,7 +25,6 @@ public class EntryFromPDFCreatorTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         // Needed to initialize ExternalFileTypes
         entryCreator = new EntryFromPDFCreator();
         // Needed for PdfImporter - still not enough
