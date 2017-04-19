@@ -273,8 +273,6 @@ public class JabRefPreferences {
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
-    public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
@@ -295,7 +293,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
-    public static final String USE_IEEE_ABRV = "useIEEEAbrv";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
     public static final String CLEANUP_ISSN = "CleanUpISSN";
@@ -367,6 +364,9 @@ public class JabRefPreferences {
     // Remote
     public static final String USE_REMOTE_SERVER = "useRemoteServer";
     public static final String REMOTE_SERVER_PORT = "remoteServerPort";
+    private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
+    private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
+    private static final String USE_IEEE_ABRV = "useIEEEAbrv";
     private static final String BINDINGS = "bindings";
     private static final String BIND_NAMES = "bindNames";
     // User
@@ -1583,5 +1583,10 @@ public class JabRefPreferences {
 
     public KeyBindingRepository getKeyBindingRepository() {
         return new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
+    }
+
+    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
+        putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
+        putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
     }
 }

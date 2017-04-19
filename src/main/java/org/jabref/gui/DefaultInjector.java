@@ -5,6 +5,7 @@ import java.util.function.Function;
 import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -30,6 +31,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.prefs;
         } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
+        } else if (clazz == JournalAbbreviationLoader.class) {
+            return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
         } else {
