@@ -28,11 +28,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class CustomExportList {
 
+    private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
     private final EventList<List<String>> list;
     private final SortedList<List<String>> sorted;
-    private final Map<String, ExportFormat> formats = new TreeMap<>();
 
-    private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
+    private final Map<String, ExportFormat> formats = new TreeMap<>();
 
 
     public CustomExportList(Comparator<List<String>> comp) {

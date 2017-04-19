@@ -244,6 +244,4 @@ public class ExternalFileTypeEntryEditor {
         return okPressed;
     }
 
-
-
 }

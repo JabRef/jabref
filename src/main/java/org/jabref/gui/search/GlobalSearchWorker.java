@@ -18,7 +18,6 @@ import org.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(GlobalSearchWorker.class);

@@ -260,7 +260,6 @@ public class ImportCustomizationDialog extends JabRefDialog {
                 Localization.lang("Command line id"), Localization.lang("Importer class"),
                 Localization.lang("Contained in")};
 
-
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Object value = null;

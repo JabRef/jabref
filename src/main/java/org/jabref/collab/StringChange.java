@@ -17,16 +17,16 @@ import org.apache.commons.logging.LogFactory;
 
 class StringChange extends Change {
 
+    private static final Log LOGGER = LogFactory.getLog(StringChange.class);
     private final BibtexString string;
     private final String mem;
     private final String disk;
-    private final String label;
 
+    private final String label;
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
-    private final BibtexString tmpString;
 
-    private static final Log LOGGER = LogFactory.getLog(StringChange.class);
+    private final BibtexString tmpString;
 
 
     public StringChange(BibtexString string, BibtexString tmpString, String label, String mem, String disk) {

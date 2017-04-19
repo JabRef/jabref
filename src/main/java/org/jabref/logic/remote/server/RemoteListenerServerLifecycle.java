@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private RemoteListenerServerThread remoteListenerServerThread;
-
     private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
+
+    private RemoteListenerServerThread remoteListenerServerThread;
 
     public void stop() {
         if (isOpen()) {

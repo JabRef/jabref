@@ -24,6 +24,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class ManageJournalAbbreviationsController extends AbstractController<ManageJournalAbbreviationsViewModel> {
 
+    @FXML public Label loadingLabel;
+    @FXML public ProgressIndicator progressIndicator;
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
@@ -34,8 +36,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     @FXML private Button addJournalFileButton;
     @FXML private Button addNewJournalFileButton;
     @FXML private Button removeJournalAbbreviationsButton;
-    @FXML public Label loadingLabel;
-    @FXML public ProgressIndicator progressIndicator;
 
 
     @Inject private JabRefPreferences preferences;
@@ -199,7 +199,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private String oldName;
         private int editingIndex;
 
-
         @Override
         public void startEdit() {
             if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
@@ -286,7 +285,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private TextField textField;
         private String oldAbbreviation;
         private int editingIndex;
-
 
         @Override
         public void startEdit() {

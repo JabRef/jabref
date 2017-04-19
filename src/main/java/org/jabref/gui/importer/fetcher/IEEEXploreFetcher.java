@@ -167,7 +167,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
         return false;
     }
 
-
     @Override
     public String getTitle() {
         return "IEEEXplore";
@@ -331,7 +330,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         entry.getField(FieldName.PAGES).ifPresent(pages -> {
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
-                if (pageNumbers[0].equals(pageNumbers[1])) {// single page
+                if (pageNumbers[0].equals(pageNumbers[1])) { // single page
                     entry.setField(FieldName.PAGES, pageNumbers[0]);
                 } else {
                     entry.setField(FieldName.PAGES, pages.replace("-", "--"));
@@ -483,6 +482,5 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }
-
 
 }

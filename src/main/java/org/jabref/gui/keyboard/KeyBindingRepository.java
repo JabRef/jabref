@@ -31,9 +31,9 @@ public class KeyBindingRepository {
         Optional<KeyBinding> keyBinding = getKeyBinding(key);
         Optional<String> result  = keyBinding.flatMap(k -> Optional.ofNullable(bindings.get(k)));
 
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             return result.get();
-        } else if(keyBinding.isPresent()){
+        } else if (keyBinding.isPresent()) {
             return keyBinding.get().getDefaultBinding();
         } else {
             return "Not associated";

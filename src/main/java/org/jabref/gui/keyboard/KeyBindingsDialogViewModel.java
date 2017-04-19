@@ -15,26 +15,26 @@ import org.jabref.logic.l10n.Localization;
 
 public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
-    private final KeyBindingPreferences keyBindingPreferences;
-    private KeyBindingRepository keyBindingRepository;
-    private DialogService dialogService;
-
-    public ObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
-        return selectedKeyBinding;
-    }
-
     private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
+    private final KeyBindingPreferences keyBindingPreferences;
+    private KeyBindingRepository keyBindingRepository;
 
-    public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
-        return rootKeyBinding;
-    }
+    private DialogService dialogService;
 
     public KeyBindingsDialogViewModel(KeyBindingPreferences keyBindingPreferences, DialogService dialogService) {
         this.keyBindingPreferences = Objects.requireNonNull(keyBindingPreferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         keyBindingRepository = new KeyBindingRepository(keyBindingPreferences.getKeyBindings());
         populateTable();
+    }
+
+    public ObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
+        return selectedKeyBinding;
+    }
+
+    public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
+        return rootKeyBinding;
     }
 
     /**

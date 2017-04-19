@@ -28,7 +28,6 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
     private final JTextField vimServer = new JTextField(30);
 
-
     @Override
     public String getApplicationName() {
         return "Vim";

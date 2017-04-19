@@ -81,7 +81,7 @@ public class CitationStyle {
      */
     public static CitationStyle createCitationStyleFromFile(final String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
-            LOGGER.error("Can only load style files: "+ styleFile);
+            LOGGER.error("Can only load style files: " + styleFile);
             return null;
         }
 
@@ -96,15 +96,15 @@ public class CitationStyle {
                 text = new String(Files.readAllBytes(Paths.get(styleFile)), StandardCharsets.UTF_8);
             }
             return createCitationStyleFromSource(text, styleFile);
-        } catch (NoSuchFileException e){
-            LOGGER.error("Could not find file: "+ styleFile, e);
+        } catch (NoSuchFileException e) {
+            LOGGER.error("Could not find file: " + styleFile, e);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
         return null;
     }
 
-    public static CitationStyle getDefault(){
+    public static CitationStyle getDefault() {
         return createCitationStyleFromFile(DEFAULT);
     }
 
@@ -141,7 +141,7 @@ public class CitationStyle {
     /**
      * Checks if the given style file is a CitationStyle
      */
-    public static boolean isCitationStyleFile(String styleFile){
+    public static boolean isCitationStyleFile(String styleFile) {
         return Arrays.stream(FileExtensions.CITATION_STYLE.getExtensions()).anyMatch(styleFile::endsWith);
     }
 

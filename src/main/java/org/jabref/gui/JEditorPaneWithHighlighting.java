@@ -43,7 +43,6 @@ public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQu
         }
     }
 
-
     private String getDocumentText() {
         Document doc = getDocument();
         String text;

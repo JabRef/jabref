@@ -33,7 +33,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
@@ -63,7 +62,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         setupGui();
     }
 
-    private void setupLogic(){
+    private void setupLogic() {
         chosen.getSelectionModel().addListSelectionListener(event -> {
             boolean selectionEmpty = ((ListSelectionModel) event.getSource()).isSelectionEmpty();
             btnLeft.setEnabled(!selectionEmpty);
@@ -112,7 +111,6 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
         });
 
-
         btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
                 .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
 
@@ -132,7 +130,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
     }
 
-    private void setupGui(){
+    private void setupGui() {
         JPanel chooseStyle = FormBuilder.create()
                 .columns("0:grow, $lcgap, pref, $lcgap, 0:grow")
                 .rows("pref, $lg, fill:pref:grow, $lg, pref:grow, $lg, pref:grow, $lg, pref:grow")
@@ -184,7 +182,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         }
 
         availableModel.clear();
-        if (!isPreviewChosen){
+        if (!isPreviewChosen) {
             availableModel.addElement(Localization.lang("Preview"));
         }
 
@@ -193,7 +191,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         btnUp.setEnabled(!chosen.isSelectionEmpty());
         btnDown.setEnabled(!chosen.isSelectionEmpty());
 
-        if (discoverCitationStyleWorker != null){
+        if (discoverCitationStyleWorker != null) {
             discoverCitationStyleWorker.cancel(true);
         }
 
@@ -204,7 +202,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             }
 
             @Override
-            public void done(){
+            public void done() {
                 if (this.isCancelled()) {
                     return;
                 }

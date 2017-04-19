@@ -20,7 +20,6 @@ public class JournalAbbreviationLoader {
     private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     private JournalAbbreviationRepository journalAbbrev;
 
-
     public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 

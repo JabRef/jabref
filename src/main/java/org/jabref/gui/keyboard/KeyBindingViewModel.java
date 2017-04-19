@@ -24,17 +24,12 @@ public class KeyBindingViewModel {
 
     private KeyBinding keyBinding = null;
     private String realBinding = "";
-    private final SimpleStringProperty displayName = new SimpleStringProperty();
-    private final SimpleStringProperty shownBinding = new SimpleStringProperty();
-    private final KeyBindingCategory category;
-
-    public ObservableList<KeyBindingViewModel> getChildren() {
-        return children;
-    }
-
     private ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
     private KeyBindingRepository keyBindingRepository;
+    private final SimpleStringProperty displayName = new SimpleStringProperty();
+    private final SimpleStringProperty shownBinding = new SimpleStringProperty();
 
+    private final KeyBindingCategory category;
 
     public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBinding keyBinding, String binding) {
         this(keyBindingRepository, keyBinding.getCategory());
@@ -47,6 +42,10 @@ public class KeyBindingViewModel {
         this.keyBindingRepository = keyBindingRepository;
         this.category = category;
         setDisplayName();
+    }
+
+    public ObservableList<KeyBindingViewModel> getChildren() {
+        return children;
     }
 
     public KeyBinding getKeyBinding() {

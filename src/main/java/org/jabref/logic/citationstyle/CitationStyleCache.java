@@ -45,7 +45,7 @@ public class CitationStyleCache {
 
     public void setCitationStyle(CitationStyle citationStyle) {
         Objects.requireNonNull(citationStyle);
-        if (!this.citationStyle.equals(citationStyle)){
+        if (!this.citationStyle.equals(citationStyle)) {
             this.citationStyle = citationStyle;
             this.citationStylesCache.clear();
         }
@@ -54,7 +54,6 @@ public class CitationStyleCache {
     public CitationStyle getCitationStyle() {
         return citationStyle;
     }
-
 
     private class BibDatabaseEntryListener {
         /**

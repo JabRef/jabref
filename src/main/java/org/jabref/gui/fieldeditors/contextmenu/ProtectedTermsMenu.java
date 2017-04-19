@@ -48,8 +48,8 @@ public class ProtectedTermsMenu extends JMenu {
             if (!list.isInternalList()) {
                 JMenuItem fileItem = new JMenuItem(list.getDescription());
                 externalFiles.add(fileItem);
-                fileItem.addActionListener(event -> {String selectedText = opener.getSelectedText();
-                if((selectedText != null) && !selectedText.isEmpty()) {
+                fileItem.addActionListener(event -> { String selectedText = opener.getSelectedText();
+                if ((selectedText != null) && !selectedText.isEmpty()) {
                     list.addProtectedTerm(selectedText);
                     }
                 });

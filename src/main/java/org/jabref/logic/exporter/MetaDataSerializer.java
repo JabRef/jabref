@@ -44,7 +44,7 @@ public class MetaDataSerializer {
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
                 .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
 
-        for(ContentSelector selector: metaData.getContentSelectorList()){
+        for (ContentSelector selector: metaData.getContentSelectorList()) {
                 stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getFieldName(), selector.getValues());
 
         }

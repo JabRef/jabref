@@ -28,7 +28,7 @@ public class FileUpdateMonitor implements Runnable {
     public void run() {
         // The running variable is used to make the thread stop when needed.
         while (true) {
-            for(Entry e : entries.values()) {
+            for (Entry e : entries.values()) {
                 try {
                     if (e.hasBeenUpdated()) {
                         e.notifyListener();
@@ -209,7 +209,6 @@ public class FileUpdateMonitor implements Runnable {
             timeStamp--;
         }
     }
-
 
     private static synchronized Path getTempFile() {
         Path temporaryFile = null;

@@ -13,7 +13,6 @@ public class HTMLParagraphs implements LayoutFormatter {
 
     private static final Pattern BEFORE_NEW_LINES_PATTERN = Pattern.compile("(.*?)\\n\\s*\\n");
 
-
     @Override
     public String format(String fieldText) {
 

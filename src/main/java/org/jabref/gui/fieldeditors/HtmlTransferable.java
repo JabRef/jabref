@@ -22,13 +22,13 @@ public class HtmlTransferable implements Transferable {
 
     private static final List<DataFlavor> ALL_FLAVORS = Arrays.asList(HTML_FLAVOR, DataFlavor.allHtmlFlavor, TEXT_FLAVOR);
 
-    private final String htmlText;
-    private final String plainText;
-
     private static final Pattern HTML_NEWLINE = Pattern.compile(" ?<br>|<BR>");
     private static final Pattern REMOVE_HTML = Pattern.compile("<(?!br)(?!BR).*?>");
     private static final Pattern WHITESPACE_AROUND_NEWLINE = Pattern.compile("(?m)^\\s+|\\v+");
     private static final Pattern DOUBLE_WHITESPACES = Pattern.compile("[ ]{2,}");
+    private final String htmlText;
+
+    private final String plainText;
 
     public HtmlTransferable(String html) {
         this.htmlText = html;

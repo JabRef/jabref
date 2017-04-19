@@ -159,7 +159,6 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
-
     private void parseDatabaseID() throws IOException {
 
         while (!eof) {

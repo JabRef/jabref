@@ -112,17 +112,16 @@ public abstract class SidePaneComponent extends JXTitledPanel {
      */
     public abstract ToggleAction getToggleAction();
 
-
     public class ToggleAction extends MnemonicAwareAction {
 
-        public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon){
+        public ToggleAction(String text, String description, KeyStroke key, IconTheme.JabRefIcon icon) {
             super(icon.getIcon());
             putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
             putValue(Action.SHORT_DESCRIPTION, description);
         }
 
-        public ToggleAction(String text, String description, KeyStroke key, Icon icon){
+        public ToggleAction(String text, String description, KeyStroke key, Icon icon) {
             super(icon);
             putValue(Action.NAME, text);
             putValue(Action.ACCELERATOR_KEY, key);
@@ -144,7 +143,7 @@ public abstract class SidePaneComponent extends JXTitledPanel {
             putValue(Action.SELECTED_KEY, manager.isComponentVisible(SidePaneComponent.this.getClass()));
         }
 
-        public void setSelected(boolean selected){
+        public void setSelected(boolean selected) {
             putValue(Action.SELECTED_KEY, selected);
         }
 

@@ -27,12 +27,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class MoveFilesCleanup implements CleanupJob {
 
+    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
-    private final LayoutFormatterPreferences layoutPrefs;
 
+    private final LayoutFormatterPreferences layoutPrefs;
     private final String fileDirPattern;
-    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
     private LinkedFile singleFileFieldCleanup;
 

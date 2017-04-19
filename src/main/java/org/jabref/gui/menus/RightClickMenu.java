@@ -247,7 +247,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         groupMoveTo.setEnabled(groupsPresent);
     }
 
-
     @Override
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
         // Nothing to do
@@ -273,7 +272,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            if(entry.hasField(FieldName.FILE)) {
+            if (entry.hasField(FieldName.FILE)) {
                 JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();

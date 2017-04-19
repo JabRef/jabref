@@ -137,7 +137,7 @@ public class JabRefCLI {
 
     public boolean isGenerateBibtexKeys() { return cl.hasOption("generateBibtexKeys"); }
 
-    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks");}
+    public boolean isAutomaticallySetFileLinks() { return cl.hasOption("automaticallySetFileLinks"); }
 
     private Options getOptions() {
         Options options = new Options();

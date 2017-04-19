@@ -51,7 +51,6 @@ public class AuthorListParser {
     /** true if upper-case token, false if lower-case */
     private boolean tokenCase;
 
-
     static {
         TEX_NAMES.add("aa");
         TEX_NAMES.add("ae");

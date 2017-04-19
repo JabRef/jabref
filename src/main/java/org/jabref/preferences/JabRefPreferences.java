@@ -408,13 +408,13 @@ public class JabRefPreferences {
      * Set with all custom {@link org.jabref.logic.importer.Importer}s
      */
     public final CustomImportList customImports;
-    private final Preferences prefs;
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
+    private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
@@ -1223,7 +1223,7 @@ public class JabRefPreferences {
     }
 
     private void clearAllCustomEntryTypes() throws BackingStoreException {
-        for(BibDatabaseMode mode :BibDatabaseMode.values()) {
+        for (BibDatabaseMode mode :BibDatabaseMode.values()) {
             clearCustomEntryTypes(mode);
         }
     }
@@ -1429,7 +1429,7 @@ public class JabRefPreferences {
         return this;
     }
 
-    public PreviewPreferences getPreviewPreferences(){
+    public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
         int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);

@@ -134,7 +134,7 @@ public class EntryTypes {
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType customEntryType, BibDatabaseMode mode) {
-        if(BibDatabaseMode.BIBLATEX == mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
             BIBLATEX.addOrModifyEntryType(customEntryType);
         } else if (BibDatabaseMode.BIBTEX == mode) {
             BIBTEX.addOrModifyEntryType(customEntryType);
@@ -198,8 +198,8 @@ public class EntryTypes {
     }
 
     public static void removeAllCustomEntryTypes() {
-        for(BibDatabaseMode type : BibDatabaseMode.values()) {
-            for(String typeName : new HashSet<>(getAllTypes(type))) {
+        for (BibDatabaseMode type : BibDatabaseMode.values()) {
+            for (String typeName : new HashSet<>(getAllTypes(type))) {
                 getType(typeName, type).ifPresent(entryType -> {
                     if (entryType instanceof CustomEntryType) {
                         removeType(typeName, type);

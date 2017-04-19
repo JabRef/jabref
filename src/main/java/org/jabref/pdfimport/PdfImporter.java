@@ -43,12 +43,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class PdfImporter {
 
+    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final MainTable entryTable;
-    private final int dropRow;
 
-    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
+    private final int dropRow;
 
     /**
      * Creates the PdfImporter

@@ -33,7 +33,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
     private final JTextField tf = new JTextField();

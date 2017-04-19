@@ -47,13 +47,13 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
             this.filter.bind(filter);
         }
 
-        if(value != null) {
+        if (value != null) {
             addChildrenListener(value);
             bindExpandedProperty(value, expandedProperty);
         }
 
-        valueProperty().addListener((obs, oldValue, newValue)->{
-            if(newValue != null){
+        valueProperty().addListener((obs, oldValue, newValue)-> {
+            if (newValue != null) {
                 addChildrenListener(newValue);
                 bindExpandedProperty(newValue, expandedProperty);
             }
@@ -66,17 +66,17 @@ public class RecursiveTreeItem<T> extends TreeItem<T> {
         }
     }
 
-    private void addChildrenListener(T value){
+    private void addChildrenListener(T value) {
         children = new FilteredList<>(childrenFactory.call(value));
         children.predicateProperty().bind(Bindings.createObjectBinding(() -> this::showNode, filter));
 
         children.forEach(this::addAsChild);
 
         children.addListener((ListChangeListener<T>) change -> {
-            while(change.next()){
+            while (change.next()) {
 
-                if(change.wasRemoved()){
-                    change.getRemoved().forEach(t->{
+                if (change.wasRemoved()) {
+                    change.getRemoved().forEach(t-> {
                         final List<TreeItem<T>> itemsToRemove = RecursiveTreeItem.this.getChildren().stream().filter(treeItem -> treeItem.getValue().equals(t)).collect(Collectors.toList());
 
                         RecursiveTreeItem.this.getChildren().removeAll(itemsToRemove);

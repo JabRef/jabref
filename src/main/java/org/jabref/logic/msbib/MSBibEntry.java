@@ -26,9 +26,16 @@ import org.w3c.dom.NodeList;
  */
 class MSBibEntry {
 
+    /**
+     * Allows 20.3-2007|||20/3-  2007 etc.
+     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
+     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
+     */
+    private static final Pattern DATE_PATTERN = Pattern
+            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
-
     public List<MsBibAuthor> authors;
     public List<MsBibAuthor> bookAuthors;
     public List<MsBibAuthor> editors;
@@ -43,10 +50,10 @@ class MSBibEntry {
     public List<MsBibAuthor> interviewers;
     public List<MsBibAuthor> interviewees;
     public List<MsBibAuthor> inventors;
+
     public List<MsBibAuthor> counsels;
 
     public PageNumbers pages;
-
     public String standardNumber;
     public String address;
     public String conferenceName;
@@ -61,6 +68,7 @@ class MSBibEntry {
     public String day;
     public String number;
     public String patentNumber;
+
     public String journalName;
 
     private String bibtexEntryType;
@@ -73,14 +81,6 @@ class MSBibEntry {
      *  tested using http://www.regexpal.com/
      */
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
-
-    /**
-     * Allows 20.3-2007|||20/3-  2007 etc.
-     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
-     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-     */
-    private static final Pattern DATE_PATTERN = Pattern
-            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
     public MSBibEntry() {
         //empty

@@ -8,12 +8,13 @@ import org.jabref.model.entry.LinkedFile;
 /**
  * This class represents a file link for a Bibtex entry.
  */
+
 public class FileListEntry {
 
     private String description;
 
     private String link;
-    
+
     private Optional<ExternalFileType> type;
 
     public FileListEntry(String description, String link) {

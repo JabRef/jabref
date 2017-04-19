@@ -50,8 +50,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class EntryLinkListEditor extends JTable implements FieldEditor {
-    private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
+    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
 
+    private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
     private final FieldNameLabel label;
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
@@ -62,9 +63,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private final JPopupMenu menu = new JPopupMenu();
     private final boolean singleEntry;
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
-    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
 
-    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
 
     public EntryLinkListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
             EntryEditor entryEditor, boolean singleEntry) {
@@ -173,7 +173,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         updateButtonStates();
     }
 
-
     private void jumpToEntry() {
         String entryKey = null;
 
@@ -269,7 +268,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         return null;
     }
 
-
     private void addEntry() {
         int row = getSelectedRow();
         if (row == -1) {
@@ -281,7 +279,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         adjustColumnWidth();
         updateButtonStates();
     }
-
 
     private void removeEntries() {
         int[] rows = getSelectedRows();
@@ -306,6 +303,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         }
     }
+
     private void moveEntry(int i) {
         int[] sel = getSelectedRows();
         if ((sel.length != 1) || (tableModel.getRowCount() < 2)) {
@@ -325,7 +323,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         setRowSelectionInterval(toIdx, toIdx);
         adjustColumnWidth();
     }
-
 
     class TableClickListener extends MouseAdapter {
 
@@ -405,6 +402,14 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         // Do nothing
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+    public void updateFontColor() {
+        // Do nothing
+    }
+
+>>>>>>> Fix checkstyle warnings
     private class EntryLinkListTableModel extends DefaultTableModel {
 
         private final List<ParsedEntryLink> internalList = Collections.synchronizedList(new ArrayList<>());

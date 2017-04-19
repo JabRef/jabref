@@ -13,15 +13,14 @@ import com.google.common.cache.LoadingCache;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class FileAnnotationCache {
 
+    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
     //cache size in entries
     private final static int CACHE_SIZE = 10;
+
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
-
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
 
     public FileAnnotationCache(BibDatabaseContext context) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
