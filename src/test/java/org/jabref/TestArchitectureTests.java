@@ -23,7 +23,7 @@ import static org.jabref.MainArchitectureTests.CLASS_ORG_JABREF_GLOBALS;
 public class TestArchitectureTests {
 
     private static final String CLASS_ORG_JABREF_PREFERENCES = "org.jabref.preferences.JabRefPreferences";
-    private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "org\\jabref\\JabRefPreferencesTest";
+    private static final String CLASS_ORG_JABREF_PREFERENCES_TEST = "JabRefPreferencesTest";
 
     private final String forbiddenPackage;
 
@@ -51,11 +51,17 @@ public class TestArchitectureTests {
     @Test
     public void testsAreIndependent() throws IOException {
         Predicate<String> isForbiddenPackage = (s) -> s.startsWith("import " + forbiddenPackage);
-        Predicate<String> isExceptionPackage = (s) -> exceptions.stream().anyMatch(s::contains);
+        Predicate<String> isExceptionClass = (s) -> exceptions.stream().anyMatch(exception -> s.startsWith("public class " + exception));
 
         List<Path> files = Files.walk(Paths.get("src/test/"))
                 .filter(p -> p.toString().endsWith(".java"))
-                .filter(p -> !isExceptionPackage.test(p.toString()))
+                .filter(p -> {
+                    try {
+                        return Files.readAllLines(p, StandardCharsets.UTF_8).stream().noneMatch(isExceptionClass);
+                    } catch (IOException e) {
+                        return false;
+                    }
+                })
                 .filter(p -> {
                     try {
                         return Files.readAllLines(p, StandardCharsets.UTF_8).stream().anyMatch(isForbiddenPackage);
