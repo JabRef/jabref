@@ -237,9 +237,12 @@ public class XMPUtilTest {
         }
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XMPPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
+
+        when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
     }
 
     /**
