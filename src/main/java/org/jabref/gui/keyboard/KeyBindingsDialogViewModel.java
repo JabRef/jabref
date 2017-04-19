@@ -12,29 +12,29 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
 
 public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
-    private final KeyBindingPreferences keyBindingPreferences;
-    private KeyBindingRepository keyBindingRepository;
+    private final KeyBindingRepository keyBindingRepository;
+    private final JabRefPreferences preferences;
+    private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
+    private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private DialogService dialogService;
+
+    public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, JabRefPreferences preferences) {
+        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
+        populateTable();
+    }
 
     public ObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
         return selectedKeyBinding;
     }
 
-    private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
-    private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
-
     public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
         return rootKeyBinding;
-    }
-
-    public KeyBindingsDialogViewModel(KeyBindingPreferences keyBindingPreferences, DialogService dialogService) {
-        this.keyBindingPreferences = Objects.requireNonNull(keyBindingPreferences);
-        this.dialogService = Objects.requireNonNull(dialogService);
-        keyBindingRepository = new KeyBindingRepository(keyBindingPreferences.getKeyBindings());
-        populateTable();
     }
 
     /**
@@ -71,7 +71,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     }
 
     public void saveKeyBindings() {
-        keyBindingPreferences.setNewKeyBindings(keyBindingRepository.getKeyBindings());
+        preferences.storeKeyBindingRepository(keyBindingRepository);
 
         String title = Localization.lang("Key bindings changed");
         String content = Localization.lang("Your new key bindings have been stored.") + '\n'

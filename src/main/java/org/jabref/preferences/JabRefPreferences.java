@@ -38,6 +38,7 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preftabs.ImportSettingsTab;
 import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -250,8 +251,6 @@ public class JabRefPreferences {
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String BINDINGS = "bindings";
-    public static final String BIND_NAMES = "bindNames";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String CONSOLE_COMMAND = "consoleCommand";
@@ -360,13 +359,6 @@ public class JabRefPreferences {
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
-    // User
-    private static final String USER_ID = "userId";
-
-    // Telemetry collection
-    private static final String COLLECT_TELEMETRY = "collectTelemetry";
-    private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-
     // Dropped file handler
     public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
     public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
@@ -375,6 +367,13 @@ public class JabRefPreferences {
     // Remote
     public static final String USE_REMOTE_SERVER = "useRemoteServer";
     public static final String REMOTE_SERVER_PORT = "remoteServerPort";
+    private static final String BINDINGS = "bindings";
+    private static final String BIND_NAMES = "bindNames";
+    // User
+    private static final String USER_ID = "userId";
+    // Telemetry collection
+    private static final String COLLECT_TELEMETRY = "collectTelemetry";
+    private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     private static final Class PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
@@ -1575,5 +1574,14 @@ public class JabRefPreferences {
 
     public void askedToCollectTelemetry() {
         putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
+    }
+
+    public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
+        putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
+        putStringList(JabRefPreferences.BINDINGS, keyBindingRepository.getBindings());
+    }
+
+    public KeyBindingRepository getKeyBindingRepository() {
+        return new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
     }
 }

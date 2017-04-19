@@ -3,7 +3,7 @@ package org.jabref.gui;
 import java.util.function.Function;
 
 import org.jabref.Globals;
-import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -28,7 +28,7 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.taskExecutor;
         } else if (clazz == JabRefPreferences.class) {
             return Globals.prefs;
-        } else if (clazz == KeyBindingPreferences.class) {
+        } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;

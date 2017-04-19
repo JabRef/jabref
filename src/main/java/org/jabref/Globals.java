@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.jabref.collab.FileUpdateMonitor;
 import org.jabref.gui.GlobalFocusListener;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -48,7 +48,7 @@ public class Globals {
      */
     public static StateManager stateManager = new StateManager();
     // Key binding preferences
-    private static KeyBindingPreferences keyPrefs;
+    private static KeyBindingRepository keyBindingRepository;
     // Background tasks
     private static GlobalFocusListener focusListener;
     private static FileUpdateMonitor fileUpdateMonitor;
@@ -58,11 +58,11 @@ public class Globals {
     }
 
     // Key binding preferences
-    public static KeyBindingPreferences getKeyPrefs() {
-        if (keyPrefs == null) {
-            keyPrefs = new KeyBindingPreferences(prefs);
+    public static KeyBindingRepository getKeyPrefs() {
+        if (keyBindingRepository == null) {
+            keyBindingRepository = prefs.getKeyBindingRepository();
         }
-        return keyPrefs;
+        return keyBindingRepository;
     }
 
 
