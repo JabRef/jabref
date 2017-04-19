@@ -66,7 +66,8 @@ public class ImportFormats {
             public void actionPerformed(ActionEvent e) {
                 SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
                 List<FileExtensions> extensions = importers.stream().map(Importer::getExtensions).collect(Collectors.toList());
-                FileDialog dialog = new FileDialog(frame, Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
+                FileDialog dialog = new FileDialog(frame,
+                        Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 // Add file filter for all supported types
                 FileChooser.ExtensionFilter allImports = ImportFileFilter.convert(Localization.lang("Available import formats"), importers);
                 dialog.setFileFilter(allImports);

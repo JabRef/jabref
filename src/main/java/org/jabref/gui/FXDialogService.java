@@ -2,7 +2,10 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
@@ -82,7 +85,8 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel) {
+    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel,
+            String cancelButtonLabel) {
         FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
         ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
@@ -138,6 +142,13 @@ public class FXDialogService implements DialogService {
         return Optional.ofNullable(file).map(File::toPath);
     }
 
+    @Override
+    public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
+        FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
+        List<File> files = chooser.showOpenMultipleDialog(null);
+        return files != null ? files.stream().map(File::toPath).collect(Collectors.toList()) : Collections.emptyList();
+    }
+
     private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {
         DirectoryChooser chooser = new DirectoryChooser();
         directoryDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
@@ -152,4 +163,5 @@ public class FXDialogService implements DialogService {
         fileDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
         return chooser;
     }
+
 }

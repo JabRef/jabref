@@ -3,6 +3,8 @@ package org.jabref.gui.importer.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -20,7 +22,8 @@ import javax.swing.SwingUtilities;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
@@ -28,6 +31,8 @@ import org.jabref.gui.autosaveandbackup.BackupUIManager;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -48,6 +53,7 @@ import org.apache.commons.logging.LogFactory;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
+
     public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
     // List of actions that may need to be called after opening the file. Such as
     // upgrade actions etc. that may depend on the JabRef version that wrote the file:
@@ -94,10 +100,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
-            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
-            List<String> chosenStrings = dialog.showDialogAndGetMultipleFiles();
-            filesToOpen.addAll(chosenStrings.stream().map(File::new).collect(Collectors.toList()));
+
+            DialogService ds = new FXDialogService();
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileExtensions.BIBTEX_DB)
+                    .withDefaultExtension(FileExtensions.BIBTEX_DB)
+                    .withInitialDirectory(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)))
+                    .build();
+
+            List<Path> chosenFiles = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+            filesToOpen.addAll(chosenFiles.stream().map(Path::toFile).collect(Collectors.toList()));
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
@@ -193,12 +206,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             if (FileBasedLock.hasLockFile(file.toPath())) {
                 Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
                 if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
-                            - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
+                        - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                     // The lock file is fairly old, so we can offer to "steal" the file:
                     int answer = JOptionPane.showConfirmDialog(null,
                             "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                        + Localization.lang("File is locked by another JabRef instance.") + "<p>"
-                                        + Localization.lang("Do you want to override the file lock?"),
+                                    + Localization.lang("File is locked by another JabRef instance.") + "<p>"
+                                    + Localization.lang("Do you want to override the file lock?"),
                             Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
                         FileBasedLock.deleteLockFile(file.toPath());

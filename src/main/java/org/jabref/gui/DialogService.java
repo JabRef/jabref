@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
@@ -141,6 +142,16 @@ public interface DialogService {
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
+
+    /**
+     * Shows a new file open dialog. The method doesn't return until the
+     * displayed open dialog is dismissed. The return value specifies
+     * the files chosen by the user or an empty {@link Optional} if no selection has been
+     * made.
+     *
+     * @return the selected files or an empty {@link List} if no file has been selected
+     */
+    List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
 
     /**
      * Shows a new directory selection dialog. The method doesn't return until the
