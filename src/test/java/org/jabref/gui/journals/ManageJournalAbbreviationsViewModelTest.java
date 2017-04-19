@@ -21,7 +21,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.assertj.core.util.Files;
 import org.junit.Assert;
@@ -56,7 +56,7 @@ public class ManageJournalAbbreviationsViewModelTest {
     @Before
     public void setUpViewModel() throws Exception {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        JabRefPreferences preferences = mock(JabRefPreferences.class);
+        PreferencesService preferences = mock(PreferencesService.class);
         when(preferences.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
 
         dialogService = mock(DialogService.class);

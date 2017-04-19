@@ -2,8 +2,6 @@ package org.jabref.logic.l10n;
 
 import java.util.Locale;
 
-import org.jabref.preferences.JabRefPreferences;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +21,6 @@ public class LocalizationTest {
     public void restoreDefaultLocale() {
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
-        Localization.setLanguage(JabRefPreferences.getInstance().get(JabRefPreferences.LANGUAGE));
     }
 
     @Test

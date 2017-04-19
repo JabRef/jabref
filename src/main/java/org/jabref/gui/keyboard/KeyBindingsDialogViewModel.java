@@ -12,17 +12,17 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private DialogService dialogService;
 
-    public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, JabRefPreferences preferences) {
+    public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);

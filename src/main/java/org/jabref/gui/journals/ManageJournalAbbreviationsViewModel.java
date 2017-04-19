@@ -25,7 +25,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,13 +49,13 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final SimpleBooleanProperty isLoadingBuiltIn = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isLoadingIeee = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationLoader journalAbbreviationLoader;
 
-    public ManageJournalAbbreviationsViewModel(JabRefPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
+    public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService, TaskExecutor taskExecutor, JournalAbbreviationLoader journalAbbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);

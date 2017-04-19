@@ -80,7 +80,7 @@ import org.jabref.model.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JabRefPreferences {
+public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
     public static final String EMACS_PATH = "emacsPath";
@@ -1492,6 +1492,7 @@ public class JabRefPreferences {
 
     }
 
+    @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST),
                 getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
@@ -1576,15 +1577,18 @@ public class JabRefPreferences {
         putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
     }
 
+    @Override
     public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
         putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
         putStringList(JabRefPreferences.BINDINGS, keyBindingRepository.getBindings());
     }
 
+    @Override
     public KeyBindingRepository getKeyBindingRepository() {
         return new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
     }
 
+    @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
         putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());

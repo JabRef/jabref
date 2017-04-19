@@ -5,7 +5,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -30,7 +30,7 @@ public class KeyBindingsDialogViewModelTest {
     public void setUp() {
         keyBindingRepository = new KeyBindingRepository();
         dialogService = mock(DialogService.class);
-        model = new KeyBindingsDialogViewModel(keyBindingRepository, dialogService, mock(JabRefPreferences.class));
+        model = new KeyBindingsDialogViewModel(keyBindingRepository, dialogService, mock(PreferencesService.class));
     }
 
     @Test

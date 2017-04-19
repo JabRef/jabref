@@ -14,7 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -27,7 +27,7 @@ public class KeyBindingsDialogController extends AbstractController<KeyBindingsD
 
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
-    @Inject private JabRefPreferences preferences;
+    @Inject private PreferencesService preferences;
 
     @FXML
     private void initialize() {
