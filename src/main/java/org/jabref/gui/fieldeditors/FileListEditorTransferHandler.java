@@ -5,6 +5,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -96,7 +97,10 @@ class FileListEditorTransferHandler extends TransferHandler {
             // under Gnome. The data consists of the file paths, one file per line:
             if (t.isDataFlavorSupported(stringFlavor)) {
                 String dropStr = (String) t.getTransferData(stringFlavor);
-                files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
+                List<File> lf = EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr);
+                for (File f : lf) {
+                    files.add(f.toPath());
+                }
             }
 
             SwingUtilities.invokeLater(() -> {
