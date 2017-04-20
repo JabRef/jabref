@@ -824,6 +824,11 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
+        } else if (KEY_FIELD.equals(name)) {
+            // the key field should not be converted
+            Optional<String> citeKey = getCiteKeyOptional();
+            latexFreeFields.put(name, citeKey.get());
+            return citeKey;
         } else {
             String latexFreeField = LatexToUnicodeAdapter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);

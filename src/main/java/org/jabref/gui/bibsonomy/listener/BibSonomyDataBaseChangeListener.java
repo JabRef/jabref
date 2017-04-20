@@ -3,8 +3,8 @@ package org.jabref.gui.bibsonomy.listener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.gui.worker.bibsonomy.DownloadDocumentsWorker;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -15,8 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * {@link BibSonomyDataBaseChangeListener} runs the {@link DownloadDocumentsWorker} as soon as a new entry was added to the database.
- *
- * @author Waldemar Biller <biller@cs.uni-kassel.de>
  */
 public class BibSonomyDataBaseChangeListener {
 
@@ -44,7 +42,12 @@ public class BibSonomyDataBaseChangeListener {
 					// seems to be no event to wait for this properly.
 					Thread.sleep(200);
 					DownloadDocumentsWorker worker = new DownloadDocumentsWorker(jabRefFrame, entry, true);
-					WorkerUtil.performAsynchronously(worker);
+                    try {
+                        BasePanel.runWorker(worker);
+                    } catch (Throwable t) {
+                        jabRefFrame.unblock();
+                        LOGGER.error("Failed to initialize Worker", t);
+                    }
 				} catch (InterruptedException e) {
 					LOGGER.warn("Interrupt while downloading private documents", e);
 					Thread.currentThread().interrupt();

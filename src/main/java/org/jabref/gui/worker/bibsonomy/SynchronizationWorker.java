@@ -8,10 +8,10 @@ import java.util.Optional;
 import javax.swing.JOptionPane;
 
 import org.jabref.bibsonomy.BibSonomyProperties;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.bibsonomy.CompareDialog;
 import org.jabref.gui.util.bibsonomy.LogicInterfaceFactory;
-import org.jabref.gui.util.bibsonomy.WorkerUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.bibsonomy.BibtexEntryUtil;
 import org.jabref.logic.util.bibsonomy.JabRefModelConverter;
@@ -93,8 +93,12 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 								entries.add(entry);
 
 								ExportWorker worker = new ExportWorker(this.jabRefFrame, entries);
-								WorkerUtil.performAsynchronously(worker);
-
+                                try {
+                                    BasePanel.runWorker(worker);
+                                } catch (Exception e) {
+                                    jabRefFrame.unblock();
+                                    LOGGER.error("Failed to initialize Worker", e);
+                                }
 								break;
 
 							// fetch the entry if the user choose "keep remote"

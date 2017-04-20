@@ -56,6 +56,7 @@ import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -75,6 +76,7 @@ import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.comparator.IconComparator;
 import org.jabref.gui.util.component.CheckBoxMessage;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
@@ -83,7 +85,6 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.Defaults;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -138,7 +139,7 @@ import org.apache.commons.logging.LogFactory;
  * receiving this call).
  */
 
-public class ImportInspectionDialog extends JDialog implements ImportInspector, OutputPrinter {
+public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
 
     private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
@@ -189,7 +190,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @param panel
      */
     public ImportInspectionDialog(JabRefFrame frame, BasePanel panel, String undoName, boolean newDatabase) {
-        super(frame);
+        super(frame, ImportInspectionDialog.class);
         this.frame = frame;
         this.panel = panel;
         this.bibDatabaseContext = (panel == null) ? null : panel.getBibDatabaseContext();

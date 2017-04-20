@@ -60,7 +60,7 @@ public class WebFetchersTest {
 
     @Test
     public void getIdFetchersReturnsAllFetcherDerivingFromIdFetcher() throws Exception {
-        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers();
+        List<IdFetcher> idFetchers = WebFetchers.getIdFetchers(importFormatPreferences);
 
         Set<Class<? extends IdFetcher>> expected = reflections.getSubTypesOf(IdFetcher.class);
         expected.remove(IdParserFetcher.class);

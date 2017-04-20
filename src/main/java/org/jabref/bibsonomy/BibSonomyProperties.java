@@ -26,7 +26,6 @@ public class BibSonomyProperties extends Properties {
     private static final String BIBSONOMY_TAGS_IGNORE_NO_TAGS = "bibsonomy.tags.ignorenotags";
     private static final String BIBSONOMY_NUMBER_OF_POSTS_PER_REQUEST = "bibsonomy.request.size";
     private static final String BIBSONOMY_IGNORE_WARNING_MORE_POSTS = "bibsonomy.request.size.ignorewarning";
-    private static final String BIBSONOMY_EXTRA_TAB_FIELDS = "bibsonomy.tabs.extra";
     private static final String BIBSONOMY_VISIBILITY = "bibsonomy.visibilty";
     private static final String BIBSONOMY_TAG_CLOUD_SIZE = "bibsonomy.tagcloud.size";
     private static final String BIBSONOMY_SIDE_PANE_VISIBILITY_TYPE = "bibsonomy.sidepane.visibility.type";
@@ -34,7 +33,7 @@ public class BibSonomyProperties extends Properties {
     private static final String BIBSONOMY_TAG_CLOUD_ORDER = "bibsonomy.tagcloud.order";
 
     //Array containing all property constants
-    private static final String[] propsArray = {API_URL, API_USERNAME, API_KEY, BIBSONOMY_SAVE_API_KEY, BIBSONOMY_DOCUMENTS_IMPORT, BIBSONOMY_DOCUMENTS_EXPORT, BIBSONOMY_TAGS_REFRESH_ON_STARTUP, BIBSONOMY_TAGS_IGNORE_NO_TAGS, BIBSONOMY_NUMBER_OF_POSTS_PER_REQUEST, BIBSONOMY_IGNORE_WARNING_MORE_POSTS, BIBSONOMY_EXTRA_TAB_FIELDS, BIBSONOMY_VISIBILITY, BIBSONOMY_TAG_CLOUD_SIZE, BIBSONOMY_SIDE_PANE_VISIBILITY_TYPE, BIBSONOMY_SIDE_PANE_VISIBILITY_NAME, BIBSONOMY_TAG_CLOUD_ORDER};
+    private static final String[] propsArray = {API_URL, API_USERNAME, API_KEY, BIBSONOMY_SAVE_API_KEY, BIBSONOMY_DOCUMENTS_IMPORT, BIBSONOMY_DOCUMENTS_EXPORT, BIBSONOMY_TAGS_REFRESH_ON_STARTUP, BIBSONOMY_TAGS_IGNORE_NO_TAGS, BIBSONOMY_NUMBER_OF_POSTS_PER_REQUEST, BIBSONOMY_IGNORE_WARNING_MORE_POSTS, BIBSONOMY_VISIBILITY, BIBSONOMY_TAG_CLOUD_SIZE, BIBSONOMY_SIDE_PANE_VISIBILITY_TYPE, BIBSONOMY_SIDE_PANE_VISIBILITY_NAME, BIBSONOMY_TAG_CLOUD_ORDER};
 
 
     private static BibSonomyProperties INSTANCE;
@@ -46,6 +45,9 @@ public class BibSonomyProperties extends Properties {
         return INSTANCE;
     }
 
+    /**
+     * Loads the preferences from JabRefPreferences. BibSonomy takes one key only and uses its own serialization format within the value of this key.
+     */
     private static BibSonomyProperties loadPropertiesFromJabRefPreferences(JabRefPreferences preferences) {
         Optional<String> prefsOpt = Optional.ofNullable(preferences.get(JabRefPreferences.BIBSONOMY_PROPERTIES));
 
@@ -121,10 +123,6 @@ public class BibSonomyProperties extends Properties {
         return Boolean.parseBoolean(getInstance().getProperty(BIBSONOMY_IGNORE_WARNING_MORE_POSTS, "false"));
     }
 
-    public static String getExtraTabFields() {
-        return getInstance().getProperty(BIBSONOMY_EXTRA_TAB_FIELDS, "issn;isbn");
-    }
-
     public static String getDefaultVisibilty() {
         return getInstance().getProperty(BIBSONOMY_VISIBILITY, "public");
     }
@@ -187,10 +185,6 @@ public class BibSonomyProperties extends Properties {
 
     public static void setIgnoreMorePostsWarning(boolean selected) {
         getInstance().setProperty(BIBSONOMY_IGNORE_WARNING_MORE_POSTS, String.valueOf(selected));
-    }
-
-    public static void setExtraFields(String text) {
-        getInstance().setProperty(BIBSONOMY_EXTRA_TAB_FIELDS, text);
     }
 
     public static GroupingEntity getSidePaneVisibilityType() {

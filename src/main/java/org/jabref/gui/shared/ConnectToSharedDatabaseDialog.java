@@ -24,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -36,6 +35,7 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FileDialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
@@ -55,7 +55,7 @@ import org.jabref.shared.security.Password;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ConnectToSharedDatabaseDialog extends JDialog {
+public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
     private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
 
@@ -99,7 +99,7 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
      * @param frame the JabRef Frame
      */
     public ConnectToSharedDatabaseDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Connect to shared database"));
+        super(frame, Localization.lang("Connect to shared database"), ConnectToSharedDatabaseDialog.class);
         this.frame = frame;
         initLayout();
         updateEnableState();
@@ -113,7 +113,7 @@ public class ConnectToSharedDatabaseDialog extends JDialog {
 
         if (isSharedDatabaseAlreadyPresent()) {
             JOptionPane.showMessageDialog(ConnectToSharedDatabaseDialog.this,
-                    Localization.lang("You are already connected to a library using entered connection details."),
+                    Localization.lang("You are already connected to a database using entered connection details."),
                     Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
             return;
         }

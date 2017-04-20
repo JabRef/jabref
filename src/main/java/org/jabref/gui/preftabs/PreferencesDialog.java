@@ -15,7 +15,6 @@ import java.util.prefs.BackingStoreException;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,6 +25,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.gui.FileDialog;
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinder;
 import org.jabref.gui.maintable.MainTable;
@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
  * With this design, it should be very easy to add new tabs later.
  *
  */
-public class PreferencesDialog extends JDialog {
+public class PreferencesDialog extends JabRefDialog {
     private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     private final JPanel main;
@@ -66,7 +66,7 @@ public class PreferencesDialog extends JDialog {
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
     public PreferencesDialog(JabRefFrame parent) {
-        super(parent, Localization.lang("JabRef preferences"), false);
+        super(parent, Localization.lang("JabRef preferences"), false, PreferencesDialog.class);
         JabRefPreferences prefs = JabRefPreferences.getInstance();
         frame = parent;
 

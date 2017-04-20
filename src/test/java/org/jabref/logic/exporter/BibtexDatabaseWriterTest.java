@@ -194,7 +194,7 @@ public class BibtexDatabaseWriterTest {
 
         // @formatter:off
         assertEquals(OS.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
+                + "@Comment{jabref-meta: grouping:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
                 + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());
@@ -215,7 +215,7 @@ public class BibtexDatabaseWriterTest {
         assertEquals(
                 "% Encoding: US-ASCII" + OS.NEWLINE +
                 OS.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + OS.NEWLINE
+                        + "@Comment{jabref-meta: grouping:" + OS.NEWLINE
                 + "0 AllEntriesGroup:;" + OS.NEWLINE
                         + "1 StaticGroup:test\\;2\\;1\\;\\;\\;\\;;" + OS.NEWLINE
                 + "}" + OS.NEWLINE, session.getStringValue());
@@ -333,6 +333,22 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries(), preferences);
 
+        try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
+            assertEquals(scanner.useDelimiter("\\A").next(), session.getStringValue());
+        }
+    }
+
+    @Test
+    public void roundtripWithUnknownMetaData() throws Exception {
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/unknownMetaData.bib");
+        Charset encoding = StandardCharsets.UTF_8;
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile, encoding));
+
+        SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
+        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
+                new Defaults(BibDatabaseMode.BIBTEX));
+
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries(), preferences);
         try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
             assertEquals(scanner.useDelimiter("\\A").next(), session.getStringValue());
         }

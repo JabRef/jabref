@@ -29,7 +29,7 @@ public class TitleFetcherTest {
         bibEntryBischof2009.setField("bibtexkey", "Bischof_2009");
         bibEntryBischof2009.setField("author", "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
         bibEntryBischof2009.setField("booktitle", "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");
-        bibEntryBischof2009.setField("publisher", "Institute of Electrical and Electronics Engineers ({IEEE})");
+        bibEntryBischof2009.setField("publisher", "{IEEE}");
         bibEntryBischof2009.setField("title", "{BPELscript}: A Simplified Script Syntax for {WS}-{BPEL} 2.0");
         bibEntryBischof2009.setField("year", "2009");
         bibEntryBischof2009.setField("doi", "10.1109/seaa.2009.21");

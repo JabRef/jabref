@@ -19,6 +19,11 @@ env:
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
 
+matrix:
+    fast_finish: true
+    allow_failures:
+      - env: TEST_SUITE=fetcherTest
+
 # JavaFX localization tests need a running X environment
 before_install:
   - "export DISPLAY=:99.0"

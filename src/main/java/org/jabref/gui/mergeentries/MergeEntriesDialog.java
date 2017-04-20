@@ -3,11 +3,11 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -27,7 +27,7 @@ import com.jgoodies.forms.layout.RowSpec;
  *
  *         Dialog for merging two Bibtex entries
  */
-public class MergeEntriesDialog extends JDialog {
+public class MergeEntriesDialog extends JabRefDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
@@ -36,7 +36,7 @@ public class MergeEntriesDialog extends JDialog {
     private static final String MARGIN = "5px";
 
     public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), MERGE_ENTRIES, true);
+        super(panel.frame(), MERGE_ENTRIES, true, MergeEntriesDialog.class);
 
         this.panel = panel;
 
