@@ -11,6 +11,7 @@ import org.jabref.testutils.category.FetcherTests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -24,7 +25,7 @@ public class DoiFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new DoiFetcher(mock(ImportFormatPreferences.class));
+        fetcher = new DoiFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBurd2011 = new BibEntry();
         bibEntryBurd2011.setType(BiblatexEntryTypes.BOOK);

@@ -11,6 +11,7 @@ import org.jabref.testutils.category.FetcherTests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -32,7 +33,7 @@ public class IsbnViaChimboriFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("url",
                 "https://www.amazon.com/Effective-Java-Joshua-Bloch-ebook/dp/B00B8V09HY?SubscriptionId=0JYN1NVW651KCA56C102&tag=techkie-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B00B8V09HY");
 
-        fetcher = new IsbnViaChimboriFetcher(mock(ImportFormatPreferences.class));
+        fetcher = new IsbnViaChimboriFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

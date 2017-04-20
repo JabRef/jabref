@@ -11,6 +11,7 @@ import org.jabref.testutils.category.FetcherTests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -23,7 +24,7 @@ public class TitleFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new TitleFetcher(mock(ImportFormatPreferences.class));
+        fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry();
         bibEntryBischof2009.setType(BiblatexEntryTypes.INPROCEEDINGS);

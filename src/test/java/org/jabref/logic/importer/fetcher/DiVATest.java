@@ -10,6 +10,7 @@ import org.jabref.testutils.category.FetcherTests;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,7 +24,7 @@ public class DiVATest {
 
     @Before
     public void setUp() {
-        fetcher = new DiVA(mock(ImportFormatPreferences.class));
+        fetcher = new DiVA(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
