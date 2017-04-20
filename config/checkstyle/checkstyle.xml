@@ -38,7 +38,10 @@
         <module name="DeclarationOrder"/>
 
     </module>
+<<<<<<< HEAD
     <module name="SuppressionFilter">
         <property name="file" value="config/checkstyle/suppressions.xml"/>
     </module>
+=======
+>>>>>>> 59600282cb098f8c050a853435fcff94fc87e50c
 </module>
