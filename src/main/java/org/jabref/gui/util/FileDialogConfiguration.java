@@ -86,6 +86,11 @@ public class FileDialogConfiguration {
             return this;
         }
 
+        public Builder withInitialDirectory(String directory) {
+            withInitialDirectory(Paths.get(directory));
+            return this;
+        }
+
         public Builder withDefaultExtension(FileExtensions extension) {
             defaultExtension = toFilter(extension);
             return this;
@@ -97,9 +102,5 @@ public class FileDialogConfiguration {
 
         }
 
-        public Builder withInitialDirectory(String directory) {
-            withInitialDirectory(Paths.get(directory));
-            return this;
-        }
     }
 }

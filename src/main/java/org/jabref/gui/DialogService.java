@@ -146,7 +146,7 @@ public interface DialogService {
     /**
      * Shows a new file open dialog. The method doesn't return until the
      * displayed open dialog is dismissed. The return value specifies
-     * the files chosen by the user or an empty {@link Optional} if no selection has been
+     * the files chosen by the user or an empty {@link List} if no selection has been
      * made.
      *
      * @return the selected files or an empty {@link List} if no file has been selected
