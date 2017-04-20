@@ -16,13 +16,17 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.FileExtensions;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -54,10 +58,16 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
 
     private void setupDialog() {
         JButton browse = new JButton(Localization.lang("Browse"));
-        FileDialog dialog = new FileDialog(parent).withExtension(FileExtensions.TERMS);
-        dialog.setDefaultExtension(FileExtensions.TERMS);
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileExtensions.TERMS)
+                .withDefaultExtension(FileExtensions.TERMS)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
         browse.addActionListener(e -> {
-            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            Optional<Path> file = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
             file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
         });
 
