@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -118,7 +119,8 @@ public class EntryTableTransferHandler extends TransferHandler {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
                 @SuppressWarnings("unchecked")
-                List<Path> files = (List<Path>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                List<Path> files = ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).stream()
+                        .map(File::toPath).collect(Collectors.toList());
                 return handleDraggedFiles(files, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
