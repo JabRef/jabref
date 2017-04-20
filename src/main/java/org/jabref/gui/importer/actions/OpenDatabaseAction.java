@@ -1,8 +1,7 @@
 package org.jabref.gui.importer.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
@@ -97,7 +96,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<File> filesToOpen = new ArrayList<>();
+        List<Path> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
 
@@ -110,10 +109,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             List<Path> chosenFiles = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
-            filesToOpen.addAll(chosenFiles.stream().map(Path::toFile).collect(Collectors.toList()));
+            filesToOpen.addAll(chosenFiles);
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
-            filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
+            filesToOpen.add(Paths.get(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
         }
 
         openFiles(filesToOpen, true);
@@ -124,17 +123,15 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      *
      * @param file the file, may be null or not existing
      */
-    public void openFile(File file, boolean raisePanel) {
-        List<File> filesToOpen = new ArrayList<>();
+    public void openFile(Path file, boolean raisePanel) {
+        List<Path> filesToOpen = new ArrayList<>();
         filesToOpen.add(file);
         openFiles(filesToOpen, raisePanel);
     }
 
     public void openFilesAsStringList(List<String> fileNamesToOpen, boolean raisePanel) {
-        List<File> filesToOpen = new ArrayList<>();
-        for (String fileName : fileNamesToOpen) {
-            filesToOpen.add(new File(fileName));
-        }
+        List<Path> filesToOpen = fileNamesToOpen.stream().map(Paths::get).collect(Collectors.toList());
+
         openFiles(filesToOpen, raisePanel);
     }
 
@@ -143,14 +140,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      *
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
-    public void openFiles(List<File> filesToOpen, boolean raisePanel) {
+    public void openFiles(List<Path> filesToOpen, boolean raisePanel) {
         BasePanel toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
-            File file = iterator.next();
+        for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext();) {
+            Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
                 if ((basePanel.getBibDatabaseContext().getDatabaseFile().isPresent())
@@ -171,14 +168,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
-            final List<File> theFiles = Collections.unmodifiableList(filesToOpen);
+            final List<Path> theFiles = Collections.unmodifiableList(filesToOpen);
             JabRefExecutorService.INSTANCE.execute(() -> {
-                for (File theFile : theFiles) {
+                for (Path theFile : theFiles) {
                     openTheFile(theFile, raisePanel);
                 }
             });
-            for (File theFile : theFiles) {
-                frame.getFileHistory().newFile(theFile.getPath());
+            for (Path theFile : theFiles) {
+                frame.getFileHistory().newFile(theFile.toString());
             }
         }
         // If no files are remaining to open, this could mean that a file was
@@ -195,16 +192,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     /**
      * @param file the file, may be null or not existing
      */
-    private void openTheFile(File file, boolean raisePanel) {
-        if ((file != null) && file.exists()) {
-            File fileToLoad = file;
-            frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
+    private void openTheFile(Path file, boolean raisePanel) {
+        if ((file != null) && Files.exists(file)) {
+            Path fileToLoad = file.toAbsolutePath();
 
-            String fileName = file.getPath();
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+            frame.output(Localization.lang("Opening") + ": '" + file + "'");
 
-            if (FileBasedLock.hasLockFile(file.toPath())) {
-                Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
+            String fileName = file.getParent().toString();
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileName);
+
+            if (FileBasedLock.hasLockFile(file)) {
+                Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file);
                 if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
                         - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                     // The lock file is fairly old, so we can offer to "steal" the file:
@@ -214,11 +212,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                     + Localization.lang("Do you want to override the file lock?"),
                             Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
-                        FileBasedLock.deleteLockFile(file.toPath());
+                        FileBasedLock.deleteLockFile(file);
                     } else {
                         return;
                     }
-                } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
+                } else if (!FileBasedLock.waitForFileLock(file)) {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Error opening file") + " '" + fileName + "'. "
                                     + Localization.lang("File is locked by another JabRef instance."),
@@ -228,19 +226,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             }
 
-            if (BackupManager.checkForBackupFile(fileToLoad.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(frame, fileToLoad.toPath());
+            if (BackupManager.checkForBackupFile(fileToLoad)) {
+                BackupUIManager.showRestoreBackupDialog(frame, fileToLoad);
             }
 
             ParserResult result;
-            try {
-                result = OpenDatabase.loadDatabase(fileToLoad, Globals.prefs.getImportFormatPreferences());
-            } catch (IOException ex) {
-                LOGGER.error("Error loading database " + fileToLoad, ex);
-                result = new ParserResult();
-                JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
-                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-            }
+            result = OpenDatabase.loadDatabase(fileToLoad.toAbsolutePath().toString(),
+                    Globals.prefs.getImportFormatPreferences());
 
             if (result.getDatabase().isShared()) {
                 try {
@@ -268,7 +260,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         }
     }
 
-    private BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
+    private BasePanel addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
 
         BibDatabase database = result.getDatabase();
 
@@ -283,7 +275,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
 
         if (Objects.nonNull(file)) {
-            frame.output(Localization.lang("Opened library") + " '" + file.getPath() + "' " + Localization.lang("with")
+            frame.output(Localization.lang("Opened library") + " '" + file.toAbsolutePath().toString() + "' "
+                    + Localization.lang("with")
                     + " "
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");
         }
