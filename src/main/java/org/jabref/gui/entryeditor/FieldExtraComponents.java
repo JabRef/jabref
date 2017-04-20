@@ -1,8 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,28 +8,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
-import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
 import org.jabref.gui.date.DatePickerButton;
-import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,111 +29,8 @@ import org.apache.commons.logging.LogFactory;
 public class FieldExtraComponents {
 
     private static final Log LOGGER = LogFactory.getLog(FieldExtraComponents.class);
-    private static final String ABBREVIATION_TOOLTIP_TEXT = "<HTML>"
-            + Localization.lang("Switches between full and abbreviated journal name if the journal name is known.")
-            + "<BR>" + Localization.lang("To set up, go to") + " <B>" + Localization.lang("Options") + " -> "
-            + Localization.lang("Manage journal abbreviations") + "</B></HTML>";
 
     private FieldExtraComponents() {
-    }
-
-    /**
-     * Add controls for switching between abbreviated and full journal names.
-     * If this field also has a FieldContentSelector, we need to combine these.
-     *
-     * @param panel
-     * @param editor
-     * @param entry
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
-                    ", ");
-            contentSelectors.add(ws);
-            controls.add(ws, BorderLayout.NORTH);
-        }
-
-
-        // Button to toggle abbreviated/full journal names
-        JButton button = new JButton(Localization.lang("Toggle abbreviation"));
-        button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
-        button.addActionListener(actionEvent -> {
-            String text = editor.getText();
-            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
-                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences());
-            if (abbreviationRepository.isKnownName(text)) {
-                String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
-
-                if (s != null) {
-                    editor.setText(s);
-                    storeFieldAction.actionPerformed(new ActionEvent(editor, 0, ""));
-                    panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getFieldName(), text, s));
-                }
-            }
-        });
-
-        controls.add(button, BorderLayout.SOUTH);
-        return Optional.of(controls);
-    }
-
-    /**
-     * Set up a mouse listener for opening an external viewer for with with EXTRA_EXTERNAL
-     *
-     * @param fieldEditor
-     * @param panel
-     * @return
-     */
-    public static Optional<JComponent> getExternalExtraComponent(BasePanel panel, FieldEditor fieldEditor) {
-        JPanel controls = new JPanel();
-        controls.setLayout(new BorderLayout());
-        JButton button = new JButton(Localization.lang("Open"));
-        button.setEnabled(false);
-        button.addActionListener(actionEvent -> {
-            try {
-                JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), fieldEditor.getText(), fieldEditor.getFieldName());
-            } catch (IOException ex) {
-                panel.output(Localization.lang("Unable to open link."));
-            }
-        });
-
-        controls.add(button, BorderLayout.SOUTH);
-
-        // enable/disable button
-        /*
-        JTextComponent url = (JTextComponent) fieldEditor;
-
-        url.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkUrl();
-            }
-
-            private void checkUrl() {
-                if (URLUtil.isURL(url.getText())) {
-                    button.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                }
-            }
-        });
-        */
-
-        return Optional.of(controls);
     }
 
     /**
@@ -195,23 +81,6 @@ public class FieldExtraComponents {
             month.setSelectedIndex(0);
         });
         return Optional.of(month);
-
-    }
-
-    /**
-     * Return a button which sets the owner if the field for fields with EXTRA_SET_OWNER
-     * @param fieldEditor
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getSetOwnerExtraComponent(FieldEditor fieldEditor,
-            StoreFieldAction storeFieldAction) {
-        JButton button = new JButton(Localization.lang("Auto"));
-        button.addActionListener(actionEvent -> {
-            fieldEditor.setText(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
-            storeFieldAction.actionPerformed(new ActionEvent(fieldEditor, 0, ""));
-        });
-        return Optional.of(button);
 
     }
 
