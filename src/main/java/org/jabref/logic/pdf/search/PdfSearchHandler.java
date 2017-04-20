@@ -1,14 +1,14 @@
-package net.sf.jabref.logic.search.PDFSearch;
+package org.jabref.logic.pdf.search;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.pdfSearch.ResultSet;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.pdf.search.ResultSet;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -22,9 +22,7 @@ import org.apache.lucene.search.TopDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-/**
- * Created by christoph on 02.08.16.
- */
+
 public class PdfSearchHandler {
 
     Directory directoryToIndex;
@@ -60,7 +58,7 @@ public class PdfSearchHandler {
         for (BibEntry entry : database.getEntries()) {
             if (entry.hasField(FieldName.FILE)) {
                 String key = entry.getCiteKey();
-                File file = new File(entry.getFieldOptional(FieldName.FILE).get().toString());
+                File file = new File(entry.getField(FieldName.FILE).toString());
                 indexWriter.addDocument(reader.readContentFromPDFToString(file, key));
             }
         }

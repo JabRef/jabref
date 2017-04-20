@@ -1,15 +1,13 @@
-package net.sf.jabref.model.pdfSearch;
+package org.jabref.model.pdf.search;
 
 import java.util.List;
 
-import net.sf.jabref.logic.search.PDFSearch.SearchFieldConstants;
+import org.jabref.logic.pdf.search.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.TopDocCollector;
 
-/**
- * Created by christoph on 04.08.16.
- */
+
 public class ResultSet {
 
     private List<SearchResult> searchResults;

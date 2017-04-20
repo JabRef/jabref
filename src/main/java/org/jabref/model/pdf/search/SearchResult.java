@@ -1,10 +1,9 @@
-package net.sf.jabref.model.pdfSearch;
+package org.jabref.model.pdf.search;
 
-import net.sf.jabref.logic.search.PDFSearch.SearchFieldConstants;
 
-/**
- * Created by christoph on 04.08.16.
- */
+import org.jabref.logic.pdf.search.SearchFieldConstants;
+
+
 public class SearchResult {
 
     private String key;

@@ -1,13 +1,11 @@
-package net.sf.jabref.logic.search.PDFSearch;
+package org.jabref.logic.pdf.search;
 
 import java.io.File;
 import java.nio.file.Paths;
 
 import org.junit.Test;
 
-/**
- * Created by christoph on 04.08.16.
- */
+
 public class PdfContentReaderTest {
     @Test
     public void readContentFromPDFToString() throws Exception {

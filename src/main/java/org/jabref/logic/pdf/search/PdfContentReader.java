@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.search.PDFSearch;
+package org.jabref.logic.pdf.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.util.PDFTextStripper;
 
-/**
- * Created by christoph on 02.08.16.
- */
+
 public class PdfContentReader {
 
     /**

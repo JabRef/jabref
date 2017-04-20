@@ -1,8 +1,6 @@
-package net.sf.jabref.logic.search.PDFSearch;
+package org.jabref.logic.pdf.search;
 
-/**
- * Created by christoph on 02.08.16.
- */
+
 public class PdfSearchHandlerTest {
 
 //    @Ignore

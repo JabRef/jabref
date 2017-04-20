@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.search.PDFSearch;
+package org.jabref.logic.pdf.search;
 
 /**
  * Created by christoph on 04.08.16.
