@@ -3,6 +3,7 @@ package org.jabref.gui.importer.actions;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
