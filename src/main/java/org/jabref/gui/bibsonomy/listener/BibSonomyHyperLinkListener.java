@@ -34,9 +34,9 @@ public class BibSonomyHyperLinkListener implements HyperlinkListener {
     }
 
     @Override
-	public void hyperlinkUpdate(HyperlinkEvent e) {
-		if (e.getEventType() == EventType.ACTIVATED) {
-			StringTokenizer tokenizer = new StringTokenizer(e.getDescription(), " ");
+	public void hyperlinkUpdate(HyperlinkEvent hyperlinkEvent) {
+		if (hyperlinkEvent.getEventType() == EventType.ACTIVATED) {
+			StringTokenizer tokenizer = new StringTokenizer(hyperlinkEvent.getDescription(), " ");
 			if (tokenizer.hasMoreElements()) {
 				String criteria = tokenizer.nextToken();
                 ImportPostsByCriteriaWorker worker = new ImportPostsByCriteriaWorker(
@@ -48,9 +48,9 @@ public class BibSonomyHyperLinkListener implements HyperlinkListener {
                         false);
                 try {
                     BasePanel.runWorker(worker);
-                } catch (Throwable t) {
+                } catch (Exception e) {
                     jabRefFrame.unblock();
-                    LOGGER.error("Failed to initialize Worker", t);
+                    LOGGER.error("Failed to initialize Worker", e);
                 }
 			}
 

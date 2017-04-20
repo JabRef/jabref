@@ -722,7 +722,6 @@ public class StringUtil {
             try {
                 return new String(s.getBytes("UTF8"));
             } catch (UnsupportedEncodingException e) {
-                //Empty catch
                 LOGGER.info( "Minor exception", e);
             }
         }

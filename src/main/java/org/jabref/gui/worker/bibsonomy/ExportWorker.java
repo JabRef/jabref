@@ -71,9 +71,9 @@ public class ExportWorker extends AbstractBibSonomyWorker {
                     final UploadDocumentsWorker worker = new UploadDocumentsWorker(jabRefFrame, intrahashOpt.get(), filesOpt.get());
                     try {
                         BasePanel.runWorker(worker);
-                    } catch (Throwable t) {
+                    } catch (Exception e) {
                         jabRefFrame.unblock();
-                        LOGGER.error("Failed to initialize Worker", t);
+                        LOGGER.error("Failed to initialize Worker", e);
                     }
 				}
 			}

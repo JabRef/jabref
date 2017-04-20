@@ -33,7 +33,7 @@ public class ExportSelectedEntriesAction extends AbstractBibSonomyAction {
             case JOptionPane.YES_OPTION:
                 // tags missing & user has explicitly chosen to add default tag
                 ctu.assignDefaultTag();
-                // break; not needed
+                // break; not needed?
             case JOptionPane.DEFAULT_OPTION:
                 // this means that all posts have tags
                 ExportWorker worker = new ExportWorker(getJabRefFrame(), entries);

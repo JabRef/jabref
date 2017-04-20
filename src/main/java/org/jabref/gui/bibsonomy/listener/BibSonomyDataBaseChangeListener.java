@@ -44,9 +44,9 @@ public class BibSonomyDataBaseChangeListener {
 					DownloadDocumentsWorker worker = new DownloadDocumentsWorker(jabRefFrame, entry, true);
                     try {
                         BasePanel.runWorker(worker);
-                    } catch (Throwable t) {
+                    } catch (Exception e) {
                         jabRefFrame.unblock();
-                        LOGGER.error("Failed to initialize Worker", t);
+                        LOGGER.error("Failed to initialize Worker", e);
                     }
 				} catch (InterruptedException e) {
 					LOGGER.warn("Interrupt while downloading private documents", e);
