@@ -32,17 +32,17 @@ import org.bibsonomy.common.enums.GroupingEntity;
 public class BibSonomySidePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private JPanel controlsPanel = null;
-    private JTextField searchTextField = null;
-    private JComboBox<?> searchTypeComboBox = null;
-    private JButton searchButton = null;
-    private JPanel tagsPanel = null;
-    private JButton tagsUpdateButton = null;
-    private JPanel visibilityPanel = null;
-    private JComboBox<GroupingComboBoxItem> visibilityComboBox = null;
+    private JPanel controlsPanel;
+    private JTextField searchTextField;
+    private JComboBox<?> searchTypeComboBox;
+    private JButton searchButton;
+    private JPanel tagsPanel;
+    private JButton tagsUpdateButton;
+    private JPanel visibilityPanel;
+    private JComboBox<GroupingComboBoxItem> visibilityComboBox;
     private JabRefFrame jabRefFrame;
-    private JScrollPane tagListScrollPane = null;
-    private JEditorPane tagCloudPanel = null;
+    private JScrollPane tagListScrollPane;
+    private JEditorPane tagCloudPanel;
 
     public BibSonomySidePanel(JabRefFrame jabRefFrame) {
         super();

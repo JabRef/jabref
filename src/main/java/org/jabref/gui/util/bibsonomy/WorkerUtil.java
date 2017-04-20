@@ -13,7 +13,7 @@ public class WorkerUtil {
      * FIXME: This method does NOT execute asynchronously
      */
     @Deprecated
-    public static void performAsynchronously(AbstractWorker worker) throws Throwable {
+    public static void performAsynchronously(AbstractWorker worker) throws Exception {
         worker.init();
         worker.getWorker().run();
         worker.getCallBack().update();

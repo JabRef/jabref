@@ -92,12 +92,12 @@ public class RefreshTagListWorker extends AbstractBibSonomyWorker {
 			jabRefFrame.output(Localization.lang("Added tag: %0", tag.getName() ));
 
 			switch (grouping) {
-
 				case USER:
 					size = Math.round(12 * (tag.getUsercount() - min) / (max - min)) + 12;
 					break;
 				default:
 					size = Math.round(12 * (tag.getGlobalcount() - min) / (max - min)) + 12;
+					break;
 			}
 
 			tagList.append("<span style='display: inline'>"

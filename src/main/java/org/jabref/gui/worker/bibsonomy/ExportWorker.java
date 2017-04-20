@@ -76,7 +76,7 @@ public class ExportWorker extends AbstractBibSonomyWorker {
 		} catch (AuthenticationException ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
             // TODO: we could open the settings dialog here. This should be done via the eventbus somehow
-		} catch (Throwable ex) {
+		} catch (Exception ex) {
 			LOGGER.error("Failed to export post ", ex);
 		}
 		jabRefFrame.output(Localization.lang("Failed"));

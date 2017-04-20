@@ -48,7 +48,7 @@ public class BibSonomyDataBaseChangeListener {
 				} catch (InterruptedException e) {
 					LOGGER.warn("Interrupt while downloading private documents", e);
 					Thread.currentThread().interrupt();
-				} catch (Throwable e) {
+				} catch (Exception e) {
 					LOGGER.error("Error while downloading private documents", e);
 				}
 			}

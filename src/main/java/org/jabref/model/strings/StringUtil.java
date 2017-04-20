@@ -13,6 +13,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class StringUtil {
 
@@ -22,6 +24,8 @@ public class StringUtil {
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+
+    private static final Log LOGGER = LogFactory.getLog(StringUtil.class);
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -719,6 +723,7 @@ public class StringUtil {
                 return new String(s.getBytes("UTF8"));
             } catch (UnsupportedEncodingException e) {
                 //Empty catch
+                LOGGER.info( "Minor exception", e);
             }
         }
         return null;

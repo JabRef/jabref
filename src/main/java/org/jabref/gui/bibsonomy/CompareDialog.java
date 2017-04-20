@@ -34,18 +34,18 @@ public class CompareDialog extends JDialog {
     public static final int KEEP_REMOTE_ALWAYS = 4000;
 
     private static final long serialVersionUID = 1L;
-    private JButton keepLocal = null;
-    private JButton keepRemote = null;
-    private JButton keepLocalAlways = null;
-    private JButton keepRemoteAlways = null;
-    private JButton cancel = null;
-    private JPanel jContentPane = null;
-    private JPanel buttonPanel = null;
-    private static int status = 0;
-    private JScrollPane jScrollPane = null;
-    private static JTextPane remoteEntry = null;
-    private JScrollPane jScrollPane1 = null;
-    private static JTextPane localEntry = null;
+    private JButton keepLocal;
+    private JButton keepRemote;
+    private JButton keepLocalAlways;
+    private JButton keepRemoteAlways;
+    private JButton cancel;
+    private JPanel jContentPane;
+    private JPanel buttonPanel;
+    private static int status;
+    private JScrollPane jScrollPane;
+    private static JTextPane remoteEntry;
+    private JScrollPane jScrollPane1;
+    private static JTextPane localEntry;
 
     private CompareDialog(JabRefFrame jabRefFrame) {
         super(jabRefFrame);
@@ -87,9 +87,11 @@ public class CompareDialog extends JDialog {
 
                     //mark entries that differ with yellow
                     source.append("<span style=\"background: yellow\">" + "@"
+                            //TODO: use Locale.ENGLISH to fix codacy ?
                             + bibEntryFieldTypeOpt.get().toUpperCase() + "{"
                             + bibEntryCiteKeyOpt.get() + "</span>");
                 } else {
+                    //TODO: use Locale.ENGLISH to fix codacy ?
                     source.append("@" + bibEntryFieldTypeOpt.get().toUpperCase() + "{"
                             + bibEntryCiteKeyOpt.get());
                 }

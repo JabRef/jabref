@@ -32,11 +32,11 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 
 	private static final Log LOGGER = LogFactory.getLog(SynchronizationWorker.class);
 
-	private boolean keepAllLocal = false;
+	private boolean keepAllLocal;
 
-	private boolean keepAllRemote = false;
+	private boolean keepAllRemote;
 
-	private int status = 0;
+	private int status;
 
 	public SynchronizationWorker(final JabRefFrame jabRefFrame) {
 		super(jabRefFrame);
@@ -82,7 +82,7 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 							case CompareDialog.KEEP_LOCAL_ALWAYS:
 								this.keepAllLocal = true;
 								this.keepAllRemote = false;
-								// break; not needed
+								// break; not needed?
 							case CompareDialog.KEEP_LOCAL:
 
 								//We have to take intrahash of the incoming Post from Bibsonomy to export entries
@@ -101,6 +101,7 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 							case CompareDialog.KEEP_REMOTE_ALWAYS:
 								this.keepAllLocal = false;
 								this.keepAllRemote = true;
+                                // break; not needed?
 							case CompareDialog.KEEP_REMOTE:
 
 								// collect ids of entry to be removed
@@ -111,12 +112,13 @@ public class SynchronizationWorker extends AbstractBibSonomyWorker {
 								break;
 
 							case JOptionPane.CANCEL_OPTION:
+                                // break; not needed?
 							default:
 								return;
 						}
 					}
-				} catch (Throwable throwable) {
-					LOGGER.error("error during synchronization", throwable);
+				} catch (Exception e) {
+					LOGGER.error("error during synchronization", e);
 				}
 			}
 

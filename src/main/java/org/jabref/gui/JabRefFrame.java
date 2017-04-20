@@ -54,8 +54,12 @@ import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
+import com.google.common.eventbus.Subscribe;
+import com.jgoodies.looks.HeaderStyle;
+import com.jgoodies.looks.Options;
 import javafx.application.Platform;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.bibsonomy.BibSonomySidePaneComponent;
 import org.jabref.gui.actions.Actions;
@@ -133,12 +137,6 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
-
-import com.google.common.eventbus.Subscribe;
-import com.jgoodies.looks.HeaderStyle;
-import com.jgoodies.looks.Options;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 /**
@@ -819,7 +817,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                                 output(Localization.lang("Unable to save library"));
                                 close = false;
                             }
-                        } catch (Throwable ex) {
+                        } catch (Exception ex) {
                             // Something prevented the file
                             // from being saved. Break!!!
                             close = false;
@@ -1808,6 +1806,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 }
             } catch (Throwable ex) {
                 // do not close
+                LOGGER.info("Minor exception", ex);
             }
         } else if (answer == JOptionPane.NO_OPTION) {
             // discard changes

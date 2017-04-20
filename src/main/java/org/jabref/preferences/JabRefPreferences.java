@@ -1039,6 +1039,7 @@ public class JabRefPreferences {
             }
         } catch (IOException ignored) {
             // Ignored
+            LOGGER.info("Minor exception", ignored);
         }
         return res;
     }

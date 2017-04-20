@@ -41,8 +41,8 @@ public class UploadDocumentsWorker extends AbstractBibSonomyWorker {
 		// split the filey by ; character
 		for (String file : files.split(";")) {
 			// get file name
-			int firstColonPosition = file.indexOf(":");
-			int lastColonPosition = file.lastIndexOf(":");
+			int firstColonPosition = file.indexOf(':');
+			int lastColonPosition = file.lastIndexOf(':');
 			String fileName = file.substring(firstColonPosition + 1, lastColonPosition);
 
 			for (String location : fileLocations) {

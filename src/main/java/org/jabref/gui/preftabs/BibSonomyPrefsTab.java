@@ -8,10 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -22,40 +20,38 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.TitledBorder;
 
+import org.bibsonomy.common.enums.GroupingEntity;
+import org.bibsonomy.model.enums.Order;
 import org.jabref.bibsonomy.BibSonomyGlobals;
 import org.jabref.bibsonomy.BibSonomyProperties;
 import org.jabref.gui.bibsonomy.GroupingComboBoxItem;
 import org.jabref.gui.preftabs.support.OrderComboBoxItem;
 import org.jabref.gui.worker.bibsonomy.UpdateVisibilityWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
-
-import org.bibsonomy.common.enums.GroupingEntity;
-import org.bibsonomy.model.enums.Order;
 
 public class BibSonomyPrefsTab extends JPanel implements PrefsTab {
 
-    private JPanel generalSettingsPanel = null;
-    private JPanel credentialsPanel = null;
-    private JLabel apiUrlLabel = null;
-    private JTextField apiUrlTextField = null;
-    private JLabel userNameLabel = null;
-    private JTextField usernameTextField = null;
-    private JLabel apiKeyLabel = null;
-    private JTextField apiKeyTextField = null;
-    private JCheckBox storeAPIKeyCheckBox = null;
-    private JLabel apiKeyHintLabel = null;
-    private JCheckBox ignoreOneTagWarningCheckBox = null;
-    private JCheckBox updateTagsCheckBox = null;
-    private JCheckBox uploadDocumentsCheckBox = null;
-    private JCheckBox downloadDocumentsCheckBox = null;
-    private JComboBox<GroupingComboBoxItem> defaultVisibilityComboBox = null;
-    private JTextField extraFieldsTextField = null;
-    private JPanel generalSettingsWhitespacePanel = null;
-    private JSpinner numberOfPostsSpinner = null;
-    private JCheckBox noWarningOnMorePostsCheckBox = null;
-    private JSpinner tagCloudSizeSpinner = null;
-    private JComboBox<?> tagCloudOrderComboBox = null;
+    private JPanel generalSettingsPanel;
+    private JPanel credentialsPanel;
+    private JLabel apiUrlLabel;
+    private JTextField apiUrlTextField;
+    private JLabel userNameLabel;
+    private JTextField usernameTextField;
+    private JLabel apiKeyLabel;
+    private JTextField apiKeyTextField;
+    private JCheckBox storeAPIKeyCheckBox;
+    private JLabel apiKeyHintLabel;
+    private JCheckBox ignoreOneTagWarningCheckBox;
+    private JCheckBox updateTagsCheckBox;
+    private JCheckBox uploadDocumentsCheckBox;
+    private JCheckBox downloadDocumentsCheckBox;
+    private JComboBox<GroupingComboBoxItem> defaultVisibilityComboBox;
+    private JTextField extraFieldsTextField;
+    private JPanel generalSettingsWhitespacePanel;
+    private JSpinner numberOfPostsSpinner;
+    private JCheckBox noWarningOnMorePostsCheckBox;
+    private JSpinner tagCloudSizeSpinner;
+    private JComboBox<?> tagCloudOrderComboBox;
 
     public BibSonomyPrefsTab() {
         setLayout(new BorderLayout());

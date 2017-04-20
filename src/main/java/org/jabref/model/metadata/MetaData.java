@@ -9,6 +9,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -53,13 +55,8 @@ public class MetaData {
     private String defaultFileDirectory;
     private ContentSelectors contentSelectors = new ContentSelectors();
 
+    private static final Log LOGGER = LogFactory.getLog(MetaData.class);
 
-    /**
-     * Constructs an empty metadata.
-     */
-    public MetaData() {
-        // Do nothing
-    }
 
     public void addBibsonomyData(String key, Vector<String> value){
         bibsonomyData.put(key,value);
@@ -268,6 +265,7 @@ public class MetaData {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
+            LOGGER.info("Minor exception", e);
         }
     }
 

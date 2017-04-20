@@ -41,10 +41,9 @@ public abstract class AbstractBibSonomyAction extends AbstractAction {
     protected void performAsynchronously(AbstractWorker worker) {
         try {
             WorkerUtil.performAsynchronously(worker);
-        } catch (Throwable t) {
+        } catch (Exception e) {
             jabRefFrame.unblock();
-            LOGGER.error("Failed to initialize Worker", t);
-            t.printStackTrace();
+            LOGGER.error("Failed to initialize Worker", e);
         }
     }
 
