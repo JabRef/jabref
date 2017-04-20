@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class DirectoryDialogConfiguration {
@@ -39,6 +40,11 @@ public class DirectoryDialogConfiguration {
                 directory = null;
             }
             initialDirectory = directory;
+            return this;
+        }
+
+        public Builder withInitialDirectory(String directory) {
+            withInitialDirectory(Paths.get(directory));
             return this;
         }
     }

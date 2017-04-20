@@ -72,6 +72,8 @@ import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
 import org.jabref.gui.importer.UnlinkedPDFFileFilter;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
@@ -101,11 +103,11 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
-    private JabRefFrame frame;
-    private BibDatabaseContext databaseContext;
-    private EntryFromFileCreatorManager creatorManager;
+    private final JabRefFrame frame;
+    private final BibDatabaseContext databaseContext;
+    private final EntryFromFileCreatorManager creatorManager;
 
-    private UnlinkedFilesCrawler crawler;
+    private final UnlinkedFilesCrawler crawler;
     private Path lastSelectedDirectory;
 
     private TreeModel treeModel;
@@ -583,11 +585,15 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
      */
     private void setupActions() {
 
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
         /**
          * Stores the selected directory.
          */
         buttonBrowse.addActionListener(e -> {
-            Optional<Path> selectedDirectory = new FileDialog(frame).showDialogAndGetSelectedDirectory();
+            Optional<Path> selectedDirectory = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration));
             selectedDirectory.ifPresent(d -> {
                 textfieldDirectoryPath.setText(d.toAbsolutePath().toString());
                 storeLastSelectedDirectory(d);
