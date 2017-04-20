@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -118,7 +117,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
                 @SuppressWarnings("unchecked")
-                List<Path> files = (List<Path>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                List<File> files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 return handleDraggedFiles(files, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
@@ -231,10 +230,10 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @return a List<File> containing the individual file objects.
      *
      */
-    public static List<Path> getFilesFromDraggedFilesString(String s) {
+    public static List<File> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
         String[] lines = s.replace("\r", "").split("\n");
-        List<Path> files = new ArrayList<>();
+        List<File> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
 
@@ -264,7 +263,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             File f = new File(line);
             if (f.exists()) {
-                files.add(f.toPath());
+                files.add(f);
             }
         }
         return files;
@@ -291,10 +290,10 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @param dropRow @param dropRow The row in the table where the files were dragged.
      * @return success status for the operation
      */
-    private boolean handleDraggedFiles(List<Path> files, final int dropRow) {
+    private boolean handleDraggedFiles(List<File> files, final int dropRow) {
         final List<String> fileNames = new ArrayList<>();
-        for (Path file : files) {
-            fileNames.add(file.toAbsolutePath().toString());
+        for (File file : files) {
+            fileNames.add(file.getAbsolutePath());
         }
         // Try to load BIB files normally, and import the rest into the current
         // database.
