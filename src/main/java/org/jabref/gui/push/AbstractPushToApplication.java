@@ -9,7 +9,10 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
@@ -37,7 +40,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
     protected String commandPathPreferenceKey;
     protected FormBuilder builder;
-
 
     @Override
     public String getName() {
@@ -157,10 +159,14 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         builder.add(label.toString()).xy(1, 1);
         builder.add(path).xy(3, 1);
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(e ->
-                new FileDialog(null).showDialogAndGetSelectedFile()
-                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString()))
-        );
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
+        browse.addActionListener(
+                e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration))
+                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         builder.add(browse).xy(5, 1);
         settings = builder.build();
     }
