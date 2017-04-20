@@ -15,7 +15,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.Defaults;
@@ -29,7 +29,6 @@ import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,12 +60,10 @@ public class CleanupWorkerTest {
         FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Biblocation as Primary overwrites all other dirs
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-
         worker = new CleanupWorker(context,
-                new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                new CleanupPreferences("\\bibtexkey",
                         "", //empty fileDirPattern for backwards compatibility
-                        prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                        mock(LayoutFormatterPreferences.class),
                         fileDirPrefs));
 
     }

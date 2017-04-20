@@ -14,6 +14,7 @@ import org.jabref.Globals;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
@@ -95,16 +96,18 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public void setValues() {
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
         remoteServerPort.setText(String.valueOf(remotePreferences.getPort()));
-        useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
+        useIEEEAbrv.setSelected(Globals.prefs.getJournalAbbreviationPreferences().useIEEEAbbreviations());
         useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
         useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
     }
 
     @Override
     public void storeSettings() {
-        if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
-            preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-            Globals.journalAbbreviationLoader.update(Globals.prefs.getJournalAbbreviationPreferences());
+        JournalAbbreviationPreferences journalAbbreviationPreferences = Globals.prefs.getJournalAbbreviationPreferences();
+        if (journalAbbreviationPreferences.useIEEEAbbreviations() != useIEEEAbrv.isSelected()) {
+            journalAbbreviationPreferences.setUseIEEEAbbreviations(useIEEEAbrv.isSelected());
+            Globals.prefs.storeJournalAbbreviationPreferences(journalAbbreviationPreferences);
+            Globals.journalAbbreviationLoader.update(journalAbbreviationPreferences);
         }
         storeRemoteSettings();
 

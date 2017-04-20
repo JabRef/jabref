@@ -3,11 +3,13 @@ package org.jabref.logic.importer;
 import java.util.Optional;
 
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
+
+import static org.mockito.Mockito.mock;
 
 public class ParsedBibEntryTests {
 
@@ -17,7 +19,7 @@ public class ParsedBibEntryTests {
 
     @Before
     public void setUp() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test

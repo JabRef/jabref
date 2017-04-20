@@ -10,14 +10,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
 public class PdfContentImporterTestFiles {
@@ -43,8 +45,7 @@ public class PdfContentImporterTestFiles {
     public void correctContent() throws IOException, URISyntaxException {
         String pdfFileName = fileName + ".pdf";
         String bibFileName = fileName + ".bib";
-        PdfContentImporter importer = new PdfContentImporter(
-                JabRefPreferences.getInstance().getImportFormatPreferences());
+        PdfContentImporter importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
         Path pdfFile = Paths.get(PdfContentImporter.class.getResource(pdfFileName).toURI());
         List<BibEntry> result = importer.importDatabase(pdfFile, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);

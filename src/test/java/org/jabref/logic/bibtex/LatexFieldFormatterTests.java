@@ -3,12 +3,13 @@ package org.jabref.logic.bibtex;
 import java.util.Collections;
 
 import org.jabref.logic.util.OS;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class LatexFieldFormatterTests {
 
@@ -16,7 +17,7 @@ public class LatexFieldFormatterTests {
 
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences());
+        this.formatter = new LatexFieldFormatter(mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
