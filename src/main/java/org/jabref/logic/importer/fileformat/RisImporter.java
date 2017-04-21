@@ -29,7 +29,6 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
-
     @Override
     public String getName() {
         return "RIS";

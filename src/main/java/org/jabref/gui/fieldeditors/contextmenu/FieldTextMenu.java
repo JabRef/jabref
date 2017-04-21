@@ -21,15 +21,15 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
+    private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
     private final CopyAction copyAction;
     private final PasteAction pasteAction;
+
     private final JMenuItem doiMenuItem;
 
     private ProtectedTermsMenu protectedTermsMenu;
-
-    private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
 
 
     public FieldTextMenu(FieldEditor fieldComponent) {

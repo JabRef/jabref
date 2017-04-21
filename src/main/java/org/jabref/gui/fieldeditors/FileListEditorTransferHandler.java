@@ -27,14 +27,14 @@ import org.apache.commons.logging.LogFactory;
 
 class FileListEditorTransferHandler extends TransferHandler {
 
+    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
-    private DroppedFileHandler droppedFileHandler;
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
+    private DroppedFileHandler droppedFileHandler;
 
 
     /**

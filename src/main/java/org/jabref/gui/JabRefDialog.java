@@ -27,16 +27,6 @@ public class JabRefDialog extends JDialog {
         trackDialogOpening(clazz);
     }
 
-    public <T extends JabRefDialog> JabRefDialog(Window owner, String title, Class<T> clazz) {
-        super(owner, title);
-
-        trackDialogOpening(clazz);
-    }
-
-    private <T extends JabRefDialog> void trackDialogOpening(Class<T> clazz) {
-        Globals.getTelemetryClient().trackPageView(clazz.getName());
-    }
-
     public <T  extends JabRefDialog> JabRefDialog(Frame owner, String title, Class<T> clazz) {
         this(owner, title, true, clazz);
     }
@@ -55,5 +45,15 @@ public class JabRefDialog extends JDialog {
         super(owner, title, modal);
 
         trackDialogOpening(clazz);
+    }
+
+    public <T extends JabRefDialog> JabRefDialog(Window owner, String title, Class<T> clazz) {
+        super(owner, title);
+
+        trackDialogOpening(clazz);
+    }
+
+    private <T extends JabRefDialog> void trackDialogOpening(Class<T> clazz) {
+        Globals.getTelemetryClient().trackPageView(clazz.getName());
     }
 }

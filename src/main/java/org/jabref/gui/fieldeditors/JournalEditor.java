@@ -12,7 +12,6 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;
 
-
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;

@@ -11,16 +11,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileBasedLock {
-    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
-
-    private static final String LOCKFILE_SUFFIX = ".lock";
-    // default retry count for aquiring file lock
-    private static final int AQUIRE_LOCK_RETRY = 10;
-
     /**
      * The age in ms of a lockfile before JabRef will offer to "steal" the locked file.
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
+
+    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
+    private static final String LOCKFILE_SUFFIX = ".lock";
+
+    // default retry count for aquiring file lock
+    private static final int AQUIRE_LOCK_RETRY = 10;
 
     private FileBasedLock() {
     }

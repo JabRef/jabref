@@ -38,7 +38,6 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPathPreferenceKey;
     protected FormBuilder builder;
 
-
     @Override
     public String getName() {
         return Localization.menuTitle("Push entries to external application (%0)", getApplicationName());

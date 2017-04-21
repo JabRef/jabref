@@ -33,7 +33,7 @@ public class JabRefExecutorService implements Executor {
     private final Timer timer = new Timer("timer", true);
     private Thread remoteThread;
 
-    private JabRefExecutorService() {}
+    private JabRefExecutorService() { }
 
     @Override
     public void execute(Runnable command) {
@@ -73,7 +73,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
-        if(runnable == null) {
+        if (runnable == null) {
             LOGGER.debug("Received null as command for execution");
             return;
         }
@@ -92,7 +92,7 @@ public class JabRefExecutorService implements Executor {
     }
 
     public void manageRemoteThread(Thread thread) {
-        if (this.remoteThread != null){
+        if (this.remoteThread != null) {
             throw new IllegalStateException("Remote thread is already attached");
         } else {
             this.remoteThread = thread;

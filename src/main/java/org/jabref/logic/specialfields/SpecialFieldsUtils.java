@@ -1,6 +1,5 @@
 package org.jabref.logic.specialfields;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +59,7 @@ public class SpecialFieldsUtils {
     public static List<FieldChange> syncKeywordsFromSpecialFields(BibEntry entry, Character keywordDelimiter) {
         List<FieldChange> fieldChanges = new ArrayList<>();
 
-        for(SpecialField field: SpecialField.values()) {
+        for (SpecialField field: SpecialField.values()) {
             fieldChanges.addAll(SpecialFieldsUtils.exportFieldToKeywords(field, entry, keywordDelimiter));
         }
 
@@ -97,7 +96,7 @@ public class SpecialFieldsUtils {
 
         KeywordList keywordList = entry.getKeywords(keywordDelimiter);
 
-        for(SpecialField field: SpecialField.values()) {
+        for (SpecialField field: SpecialField.values()) {
             fieldChanges.addAll(SpecialFieldsUtils.importKeywordsForField(keywordList, field, entry));
         }
 
@@ -114,9 +113,9 @@ public class SpecialFieldsUtils {
 
         // Priority
         clone = keywordsToAdd.createClone();
-        for(SpecialField field: SpecialField.values()){
+        for (SpecialField field: SpecialField.values()) {
             clone.retainAll(field.getKeyWords());
-            if(!clone.isEmpty()) {
+            if (!clone.isEmpty()) {
                 keywordsToRemove.addAll(field.getKeyWords());
             }
         }

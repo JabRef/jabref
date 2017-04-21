@@ -8,12 +8,12 @@ public class DirectoryDialogConfiguration {
 
     private final Path initialDirectory;
 
-    public Optional<Path> getInitialDirectory() {
-        return Optional.ofNullable(initialDirectory);
-    }
-
     private DirectoryDialogConfiguration(Path initialDirectory) {
         this.initialDirectory = initialDirectory;
+    }
+
+    public Optional<Path> getInitialDirectory() {
+        return Optional.ofNullable(initialDirectory);
     }
 
     public static class Builder {

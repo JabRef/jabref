@@ -67,5 +67,6 @@ public class DatabaseFileLookup {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
+
     }
 }

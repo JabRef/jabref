@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class IconTheme {
 
+    public static Font FONT;
     /**
      * JabRef's default color
      */
@@ -44,7 +45,6 @@ public class IconTheme {
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-    public static Font FONT;
 
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);

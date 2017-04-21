@@ -73,7 +73,6 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
         //history.addFirst(item);
     }
 
-
     public void storeHistory() {
         prefs.storeFileHistory(history);
     }

@@ -199,7 +199,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private String oldName;
         private int editingIndex;
 
-
         @Override
         public void startEdit() {
             if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
@@ -286,7 +285,6 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
         private TextField textField;
         private String oldAbbreviation;
         private int editingIndex;
-
 
         @Override
         public void startEdit() {

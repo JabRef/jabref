@@ -20,8 +20,6 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class OpenOfficePreferences {
 
-    private final JabRefPreferences preferences;
-
     public static final String DEFAULT_WINDOWS_PATH = "C:\\Program Files\\OpenOffice.org 4";
     public static final String DEFAULT_WIN_EXEC_PATH = "C:\\Program Files\\OpenOffice.org 4\\program\\soffice.exe";
     public static final String WINDOWS_EXECUTABLE = "soffice.exe";
@@ -35,6 +33,8 @@ public class OpenOfficePreferences {
     public static final String LINUX_EXECUTABLE = "soffice";
 
     public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
+
+    private final JabRefPreferences preferences;
 
     public OpenOfficePreferences(JabRefPreferences preferences) {
         this.preferences = preferences;
@@ -124,6 +124,7 @@ public class OpenOfficePreferences {
     public void clearCurrentStyle() {
         preferences.remove(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
     }
+
     public void setCurrentStyle(String path) {
         preferences.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
     }

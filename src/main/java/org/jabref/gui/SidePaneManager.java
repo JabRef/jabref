@@ -221,7 +221,6 @@ public class SidePaneManager {
         }
     }
 
-
     public synchronized void moveUp(SidePaneComponent comp) {
         if (visible.contains(comp)) {
             int currIndex = visible.indexOf(comp);

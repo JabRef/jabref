@@ -166,7 +166,6 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
         glTable.repaint();
     }
 
-
     static class TableEntry {
 
         private final String id;
@@ -196,7 +195,6 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
     static class PreviewRenderer implements TableCellRenderer {
 
         private final JLabel label = new JLabel();
-
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
@@ -279,7 +277,6 @@ public class FetcherPreviewDialog extends JabRefDialog implements OutputPrinter 
         }
 
     }
-
 
     public boolean isOkPressed() {
         return okPressed;

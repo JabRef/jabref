@@ -130,7 +130,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         updateLayout();
     }
 
-    private void createKeyBindings(){
+    private void createKeyBindings() {
         ActionMap actionMap = this.getActionMap();
         InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
@@ -221,7 +221,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         update();
     }
 
-    private void updatePreviewLayout(String layoutFile){
+    private void updatePreviewLayout(String layoutFile) {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional.of(
@@ -264,19 +264,19 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     public void update() {
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
-        if (citationStyleWorker.isPresent()){
+        if (citationStyleWorker.isPresent()) {
             citationStyleWorker.get().cancel(true);
             citationStyleWorker = Optional.empty();
         }
 
-        if (layout.isPresent()){
+        if (layout.isPresent()) {
             StringBuilder sb = new StringBuilder();
             bibEntry.ifPresent(entry -> sb.append(layout.get()
                     .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null))));
             setPreviewLabel(sb.toString());
             markHighlights();
         }
-        else if (basePanel.isPresent()){
+        else if (basePanel.isPresent()) {
             citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
             citationStyleWorker.get().execute();
         }
@@ -325,7 +325,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             updatePreviewLayout((String) parameter);
         } else if (parameter instanceof CitationStyle) {
             layout = Optional.empty();
-            if (basePanel.isPresent()){
+            if (basePanel.isPresent()) {
                 basePanel.get().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
             }
         } else {
@@ -341,7 +341,6 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
         }
-
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
@@ -400,6 +399,5 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     public PrintAction getPrintAction() {
         return printAction;
     }
-
 
 }

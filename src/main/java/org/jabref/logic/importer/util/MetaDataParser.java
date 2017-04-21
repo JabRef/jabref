@@ -45,7 +45,6 @@ public class MetaDataParser {
         for (Map.Entry<String, String> entry : data.entrySet()) {
             List<String> value = getAsList(entry.getValue());
 
-
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
                 nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
@@ -55,7 +54,7 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, getSingleItem(value));
                 continue;
-            } else if(entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)){
+            } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 metaData.addContentSelector(ContentSelectors.parse(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length()), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
                 continue;
             }

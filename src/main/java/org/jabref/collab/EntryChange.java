@@ -97,7 +97,6 @@ class EntryChange extends Change {
         return new JLabel(name);
     }
 
-
     static class FieldChange extends Change {
 
         private final BibEntry entry;

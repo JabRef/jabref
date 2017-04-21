@@ -11,17 +11,16 @@ import difflib.DiffUtils;
 
 public class DiffHighlighting {
 
+    public static final String HTML_START = "<html><body>";
+    public static final String HTML_END = "</body></html>";
     private static final String ADDITION_START = "<span class=add>";
     private static final String REMOVAL_START = "<span class=del>";
     private static final String CHANGE_START = "<span class=change>";
-    private static final String TAG_END = "</span>";
 
-    public static final String HTML_START = "<html><body>";
-    public static final String HTML_END = "</body></html>";
+    private static final String TAG_END = "</span>";
 
     private DiffHighlighting() {
     }
-
 
     public static String generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         Objects.requireNonNull(separator);

@@ -157,7 +157,7 @@ public class AppendDatabaseAction implements BaseAction {
 
         if (importSelectorWords) {
 
-            for(ContentSelector selector: meta.getContentSelectorList()) {
+            for (ContentSelector selector: meta.getContentSelectorList()) {
                 panel.getBibDatabaseContext().getMetaData().addContentSelector(selector);
             }
         }

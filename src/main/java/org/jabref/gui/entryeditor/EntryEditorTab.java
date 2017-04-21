@@ -52,22 +52,19 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class EntryEditorTab {
 
+    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    public FileListEditor fileListEditor;
     private final JPanel panel = new JPanel();
-
     private final JScrollPane scrollPane = new JScrollPane(panel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     private final List<String> fields;
-
     private final EntryEditor parent;
-
     private final Map<String, FieldEditorFX> editors = new HashMap<>();
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;
@@ -351,16 +348,16 @@ class EntryEditorTab {
         // TODO: Reenable or probably better delete this
         /*
         FieldEditor fieldEditor = editors.get(field);
-        if (fieldEditor.getText().equals(content)){
+        if (fieldEditor.getText().equals(content)) {
             return true;
         }
 
         // trying to preserve current edit position (fixes SF bug #1285)
-        if(fieldEditor.getTextComponent() instanceof JTextComponent) {
+        if (fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
             fieldEditor.setText(content);
             int textLength = fieldEditor.getText().length();
-            if(initialCaretPosition<textLength) {
+            if (initialCaretPosition < textLength) {
                 ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
             } else {
                 ((JTextComponent) fieldEditor).setCaretPosition(textLength);

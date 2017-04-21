@@ -94,7 +94,7 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+                                                                 Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
                 InternalBibtexFields.getFieldProperties(editor.getFieldName())
                         .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
@@ -155,7 +155,7 @@ public class FieldExtraComponents {
      */
 
     public static Optional<JComponent> getTypeExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor,
-            boolean isPatent) {
+                                                             boolean isPatent) {
         String[] optionValues;
         String[] optionDescriptions;
         if (isPatent) {

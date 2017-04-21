@@ -24,28 +24,28 @@ import org.apache.commons.logging.LogFactory;
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
-
-    public static final String UNTITLED_TITLE = Localization.lang("untitled");
-    public static Font currentFont;
-
-    private static final Map<String, JLabel> TABLE_ICONS = new HashMap<>(); // Contains table icon mappings. Set up
-
-    //	Colors.
-    public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
-    static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
-    static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
     public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;
+    public static Font currentFont;
     public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
+
     public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
+    public static final int WIDTH_ICON_COL = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL) + 12; // add some additional space to improve appearance
 
-    public static final int WIDTH_ICON_COL = JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL)+12; // add some additional space to improve appearance
-    public static final int WIDTH_ICON_COL_RANKING = 5*JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL); // Width of Ranking Icon Column
+    public static final int WIDTH_ICON_COL_RANKING = 5 * JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL); // Width of Ranking Icon Column
 
+    public static final String UNTITLED_TITLE = Localization.lang("untitled");
     public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
+
+    //	Colors.
+    public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
+
+    static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
+    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
+    private static final Map<String, JLabel> TABLE_ICONS = new HashMap<>(); // Contains table icon mappings. Set up
+    static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
 
     private GUIGlobals() {
     }

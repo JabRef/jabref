@@ -229,7 +229,7 @@ public class PreferencesDialog extends JabRefDialog {
         Globals.prefs.updateEntryEditorTabList();
     }
 
-    private void storeAllSettings(){
+    private void storeAllSettings() {
         // First check that all tabs are ready to close:
         Component[] preferenceTabs = main.getComponents();
         for (Component tab: preferenceTabs) {
@@ -250,7 +250,6 @@ public class PreferencesDialog extends JabRefDialog {
         frame.getGroupSelector().revalidateGroups(); // icons may have changed
         frame.output(Localization.lang("Preferences recorded."));
     }
-
 
     class OkAction extends AbstractAction {
 
@@ -290,7 +289,6 @@ public class PreferencesDialog extends JabRefDialog {
         }
     }
 
-
     public void setValues() {
         // Update all field values in the tabs:
         int count = main.getComponentCount();
@@ -299,7 +297,6 @@ public class PreferencesDialog extends JabRefDialog {
             ((PrefsTab) comps[i]).setValues();
         }
     }
-
 
     class CancelAction extends AbstractAction {
 

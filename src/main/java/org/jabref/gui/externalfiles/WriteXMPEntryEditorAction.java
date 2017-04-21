@@ -69,7 +69,6 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         setEnabled(true);
     }
 
-
     class WriteXMPWorker extends AbstractWorker {
 
         private final List<Path> files;

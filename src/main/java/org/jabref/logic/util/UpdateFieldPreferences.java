@@ -27,16 +27,13 @@ public class UpdateFieldPreferences {
         return useOwner;
     }
 
-
     public boolean isUseTimeStamp() {
         return useTimeStamp;
     }
 
-
     public String getTimeStampField() {
         return timeStampField;
     }
-
 
     public String getDefaultOwner() {
         return defaultOwner;

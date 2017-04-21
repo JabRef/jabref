@@ -11,11 +11,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Localization {
-    private static final Log LOGGER = LogFactory.getLog(Localization.class);
-
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
     public static final String BIBTEX = "BibTeX";
+
+    private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
@@ -29,8 +29,8 @@ public class Localization {
 
     public static void setLanguage(String language) {
         Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
-        if(!knownLanguage.isPresent()) {
-            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + Locale.getDefault()+ ")");
+        if (!knownLanguage.isPresent()) {
+            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + Locale.getDefault() + ")");
             setLanguage("en");
             return;
         }
@@ -84,14 +84,14 @@ public class Localization {
     }
 
     public static String lang(String key, String... params) {
-        if(messages == null) {
+        if (messages == null) {
             setLanguage("en");
         }
         return translate(messages, "message", key, params);
     }
 
     public static String menuTitle(String key, String... params) {
-        if(menuTitles == null) {
+        if (menuTitles == null) {
             setLanguage("en");
         }
         return translate(menuTitles, "menu item", key, params);

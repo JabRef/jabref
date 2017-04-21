@@ -75,7 +75,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         worker.getCallBack().update();
     }
 
-
     class MyWorker extends AbstractWorker {
 
         private List<String> filenames;
@@ -183,7 +182,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             frame.unblock();
         }
     }
-
 
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibDatabase database = new BibDatabase();

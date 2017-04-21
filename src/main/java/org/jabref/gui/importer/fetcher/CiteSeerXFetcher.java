@@ -32,8 +32,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
             + "&submit=Search&sort=rlv&t=doc";
     private static final Pattern CITE_LINK_PATTERN = Pattern.compile("<a class=\"remove doc_details\" href=\"(.*)\">");
 
-    private boolean stopFetching;
-
     private static final String BASE_PATTERN = "<meta name=\"" + CiteSeerXFetcher.QUERY_MARKER
             + "\" content=\"(.*)\" />";
     private static final Pattern TITLE_PATTERN = Pattern
@@ -45,6 +43,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
     private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
+
+    private boolean stopFetching;
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
@@ -123,8 +123,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
         return null;
     }
-
-
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
         String cont = new URLDownload(urlString).asString();

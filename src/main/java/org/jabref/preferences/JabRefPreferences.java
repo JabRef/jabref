@@ -312,6 +312,14 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    // Dropped file handler
+    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
+    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
+    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
+    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
+    // Remote
+    public static final String USE_REMOTE_SERVER = "useRemoteServer";
+    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -354,23 +362,16 @@ public class JabRefPreferences implements PreferencesService {
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
+
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
-    // Dropped file handler
-    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
-    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    // Remote
-    public static final String USE_REMOTE_SERVER = "useRemoteServer";
-    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
+    // User
+    private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
     private static final String USE_IEEE_ABRV = "useIEEEAbrv";
     private static final String BINDINGS = "bindings";
     private static final String BIND_NAMES = "bindNames";
-    // User
-    private static final String USER_ID = "userId";
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
@@ -407,13 +408,13 @@ public class JabRefPreferences implements PreferencesService {
      * Set with all custom {@link org.jabref.logic.importer.Importer}s
      */
     public final CustomImportList customImports;
-    private final Preferences prefs;
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
+    private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
@@ -1222,7 +1223,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void clearAllCustomEntryTypes() throws BackingStoreException {
-        for(BibDatabaseMode mode :BibDatabaseMode.values()) {
+        for (BibDatabaseMode mode :BibDatabaseMode.values()) {
             clearCustomEntryTypes(mode);
         }
     }
@@ -1428,7 +1429,7 @@ public class JabRefPreferences implements PreferencesService {
         return this;
     }
 
-    public PreviewPreferences getPreviewPreferences(){
+    public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
         int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);

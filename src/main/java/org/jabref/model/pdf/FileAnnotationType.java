@@ -1,6 +1,5 @@
 package org.jabref.model.pdf;
 
-
 public enum FileAnnotationType {
     TEXT("Text"),
     HIGHLIGHT("Highlight"),

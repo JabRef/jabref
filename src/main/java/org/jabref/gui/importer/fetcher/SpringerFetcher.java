@@ -31,7 +31,6 @@ public class SpringerFetcher implements EntryFetcher {
     private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
 
-
     @Override
     public void stopFetching() {
         shouldContinue = false;

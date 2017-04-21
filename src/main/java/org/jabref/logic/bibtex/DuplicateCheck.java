@@ -26,8 +26,9 @@ import org.apache.commons.logging.LogFactory;
  * This class contains utility method for duplicate checking of entries.
  */
 public class DuplicateCheck {
-    private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
+    public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
 
+    private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
     /*
      * Integer values for indicating result of duplicate check (for entries):
      */
@@ -35,9 +36,8 @@ public class DuplicateCheck {
     private static final int EQUAL = 1;
     private static final int EMPTY_IN_ONE = 2;
     private static final int EMPTY_IN_TWO = 3;
-    private static final int EMPTY_IN_BOTH = 4;
 
-    public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
+    private static final int EMPTY_IN_BOTH = 4;
     // Non-required fields are investigated only if the required fields give a value within
     // the doubt range of the threshold:
     private static final double DOUBT_RANGE = 0.05;
@@ -54,7 +54,7 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() {}
+    private DuplicateCheck() { }
 
     /**
      * Checks if the two entries represent the same publication.
