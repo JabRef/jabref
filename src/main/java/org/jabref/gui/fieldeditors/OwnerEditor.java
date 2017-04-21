@@ -11,7 +11,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
