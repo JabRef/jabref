@@ -64,9 +64,9 @@ public class FileFieldParser {
         }
         LinkedFile field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
         // link is only mandatory field
-        if(field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
+        if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
             field = new LinkedFile("", field.getFileType(), "");
-        } else if(!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
+        } else if (!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
             field = new LinkedFile("", field.getDescription(), "");
         }
         entry.clear();

@@ -65,8 +65,6 @@ class EntryEditorTab {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;

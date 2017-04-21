@@ -402,14 +402,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         // Do nothing
     }
 
-<<<<<<< HEAD
-=======
-    @Override
-    public void updateFontColor() {
-        // Do nothing
-    }
-
->>>>>>> Fix checkstyle warnings
     private class EntryLinkListTableModel extends DefaultTableModel {
 
         private final List<ParsedEntryLink> internalList = Collections.synchronizedList(new ArrayList<>());

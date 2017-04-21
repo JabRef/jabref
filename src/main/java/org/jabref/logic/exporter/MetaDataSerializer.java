@@ -58,10 +58,10 @@ public class MetaDataSerializer {
 
         // finally add all unknown meta data items to the serialization map
         Map<String, List<String>> unknownMetaData = metaData.getUnknownMetaData();
-        for(Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()){
+        for (Map.Entry<String, List<String>> entry : unknownMetaData.entrySet()) {
             StringBuilder value = new StringBuilder();
             value.append(OS.NEWLINE);
-            for(String line: entry.getValue()){
+            for (String line: entry.getValue()) {
                 value.append(line.replaceAll(";", "\\\\;") + MetaData.SEPARATOR_STRING + OS.NEWLINE);
             }
             serializedMetaData.put(entry.getKey(), value.toString());

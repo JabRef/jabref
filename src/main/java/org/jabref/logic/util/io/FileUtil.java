@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
     public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
     }

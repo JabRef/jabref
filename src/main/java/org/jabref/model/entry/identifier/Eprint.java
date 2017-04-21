@@ -41,8 +41,6 @@ public class Eprint implements Identifier {
     private static final String HTTP_EXP = "https?://[^\\s]+?" + EPRINT_EXP;
     // Pattern
     private static final Pattern EXACT_EPRINT_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + EPRINT_EXP + "$", Pattern.CASE_INSENSITIVE);
-    // DOI
-    private final String eprint;
 
     // DOI
     private final String eprint;

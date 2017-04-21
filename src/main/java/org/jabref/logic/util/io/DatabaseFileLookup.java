@@ -61,29 +61,12 @@ public class DatabaseFileLookup {
     private List<Path> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-<<<<<<< HEAD
         return entry.getFiles().stream()
                 .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
                 .map(file -> file.findIn(possibleFilePaths))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
-=======
-        List<ParsedFileField> entries = FileField.parse(entry.getField(FieldName.FILE).orElse(null));
 
-        List<File> fileLinks = new ArrayList<>();
-        for (ParsedFileField field : entries) {
-            String link = field.getLink();
-
-            // Do not query external file links (huge performance leak)
-            if (link.contains("//")) {
-                continue;
-            }
-
-            FileUtil.expandFilename(link, possibleFilePaths).ifPresent(fileLinks::add);
-        }
-
-        return fileLinks;
->>>>>>> Fix checkstyle warnings
     }
 }

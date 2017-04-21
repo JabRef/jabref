@@ -16,7 +16,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
@@ -69,6 +68,5 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     private void openExternalLink(ActionEvent event) {
         viewModel.openExternalLink();
     }
-
 
 }

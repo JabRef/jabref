@@ -107,7 +107,7 @@ public class DOI implements Identifier {
      * @param doi the DOI string
      * @return true if DOI is valid, false otherwise
      */
-    public static boolean isValid(String doi){
+    public static boolean isValid(String doi) {
         return parse(doi).isPresent();
     }
 
