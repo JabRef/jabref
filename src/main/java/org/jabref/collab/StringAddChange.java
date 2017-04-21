@@ -16,12 +16,12 @@ import org.apache.commons.logging.LogFactory;
 
 class StringAddChange extends Change {
 
-    private final BibtexString string;
-
-    private final InfoPane tp = new InfoPane();
-    private final JScrollPane sp = new JScrollPane(tp);
-
     private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
+
+    private final BibtexString string;
+    private final InfoPane tp = new InfoPane();
+
+    private final JScrollPane sp = new JScrollPane(tp);
 
 
     public StringAddChange(BibtexString string) {

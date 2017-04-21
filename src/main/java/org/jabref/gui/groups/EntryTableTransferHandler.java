@@ -44,13 +44,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
+    private static final boolean DROP_ALLOWED = true;
+    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
-    private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private boolean draggingFile;
 
     /**

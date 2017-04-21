@@ -15,7 +15,7 @@ public class AndMatcher extends MatcherSet {
 
         // We let each rule add a maximum of 1 to the score.
         for (SearchMatcher rule : matchers) {
-            if(rule.isMatch(bibEntry)) {
+            if (rule.isMatch(bibEntry)) {
                 score++;
             }
         }

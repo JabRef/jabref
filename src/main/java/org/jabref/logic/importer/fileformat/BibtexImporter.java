@@ -58,7 +58,7 @@ public class BibtexImporter extends Importer {
             }
         }
 
-        if(suppliedEncoding.isPresent()) {
+        if (suppliedEncoding.isPresent()) {
             return super.importDatabase(filePath, suppliedEncoding.get());
         } else {
             return super.importDatabase(filePath, defaultEncoding);

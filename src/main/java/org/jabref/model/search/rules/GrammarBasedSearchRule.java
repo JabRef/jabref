@@ -38,7 +38,6 @@ public class GrammarBasedSearchRule implements SearchRule {
     private ParseTree tree;
     private String query;
 
-
     public static class ThrowingErrorListener extends BaseErrorListener {
 
         public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
@@ -222,7 +221,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         public Boolean visitComparison(SearchParser.ComparisonContext context) {
             // remove possible enclosing " symbols
             String right = context.right.getText();
-            if(right.startsWith("\"") && right.endsWith("\"")) {
+            if (right.startsWith("\"") && right.endsWith("\"")) {
                 right = right.substring(1, right.length() - 1);
             }
 

@@ -49,11 +49,12 @@ public class ChangeEntryTypeMenu {
      * Remove all types from the menu. Then cycle through all available
      * types, and add them.
      */
+
     private void populateChangeEntryTypeMenu(JMenu menu, BasePanel panel) {
         menu.removeAll();
 
         // biblatex?
-        if(panel.getBibDatabaseContext().isBiblatexMode()) {
+        if (panel.getBibDatabaseContext().isBiblatexMode()) {
             for (EntryType type : EntryTypes.getAllValues(BibDatabaseMode.BIBLATEX)) {
                 menu.add(new ChangeTypeAction(type, panel));
             }
@@ -71,7 +72,6 @@ public class ChangeEntryTypeMenu {
             // ieeetran
             createEntryTypeSection(panel, menu, "IEEETran Entries", IEEETranEntryTypes.ALL);
 
-
             List<EntryType> customTypes = EntryTypes.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (!customTypes.isEmpty()) {
                 menu.addSeparator();
@@ -87,7 +87,7 @@ public class ChangeEntryTypeMenu {
         Font font = new Font(menu.getFont().getName(), Font.ITALIC, menu.getFont().getSize());
         header.setFont(font);
         header.setEnabled(false);
-        if(!types.isEmpty()) {
+        if (!types.isEmpty()) {
             menu.add(header);
         }
 

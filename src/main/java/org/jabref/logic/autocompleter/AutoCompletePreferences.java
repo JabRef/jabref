@@ -9,14 +9,17 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class AutoCompletePreferences {
 
-    private final JabRefPreferences preferences;
-
     private static final String AUTOCOMPLETER_SHORTEST_TO_COMPLETE = "shortestToComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
     private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
     private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
     private static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
+    private final JabRefPreferences preferences;
+
+    public AutoCompletePreferences(JabRefPreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
 
     public static void putDefaults(Map<String, Object> defaults) {
         defaults.put(AUTOCOMPLETER_SHORTEST_TO_COMPLETE, 1);
@@ -24,10 +27,6 @@ public class AutoCompletePreferences {
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
         defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords");
-    }
-
-    public AutoCompletePreferences(JabRefPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
     }
 
     public int getShortestLengthToComplete() {

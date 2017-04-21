@@ -49,12 +49,6 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
-    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(
-            new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences()));
-    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
-    private String terms;
-
     private static final String START_URL = "http://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";
     private static final String SEARCH_URL_PART_II = "&dl=";
@@ -75,19 +69,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final String START_BIBTEX_ENTRY = "@";
     private static final String END_BIBTEX_ENTRY_HTML = "</pre>";
 
-    private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
-    private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
-    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
-
     private static final int PER_PAGE = 20; // Fetch only one page. Otherwise, the user will get blocked by ACM. 100 has been the old setting. See Bug 3532752 - https://sourceforge.net/tracker/index.php?func=detail&aid=3532752&group_id=92314&atid=600306
     private static final int WAIT_TIME = 200;
-    private boolean shouldContinue;
-
-    // user settings
-    private boolean fetchAbstract;
-    private boolean acmOrGuide;
-
-    private int piv;
 
     private static final Pattern HITS_PATTERN = Pattern.compile("<strong>(\\d+,*\\d*)</strong> results found");
     private static final Pattern MAX_HITS_PATTERN = Pattern
@@ -101,6 +84,26 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Pattern TITLE_PATTERN = Pattern.compile("<a href=.*?\">([^<]*)</a>");
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<div .*?>(.*?)</div>");
     private static final Pattern SOURCE_PATTERN = Pattern.compile("<span style=\"padding-left:10px\">([^<]*)</span>");
+
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
+
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(
+            new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences()));
+
+    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
+    private String terms;
+    private final JRadioButton acmButton = new JRadioButton(Localization.lang("The ACM Digital Library"));
+
+    private final JRadioButton guideButton = new JRadioButton(Localization.lang("The Guide to Computing Literature"));
+    private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
+
+    private boolean shouldContinue;
+    // user settings
+    private boolean fetchAbstract;
+
+    private boolean acmOrGuide;
+
+    private int piv;
 
     @Override
     public JPanel getOptionsPanel() {

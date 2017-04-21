@@ -17,11 +17,11 @@ import org.apache.commons.logging.LogFactory;
 
 class EntryDeleteChange extends Change {
 
+    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
-    private final JScrollPane sp;
 
-    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
+    private final JScrollPane sp;
 
 
     public EntryDeleteChange(BibEntry memEntry, BibEntry tmpEntry) {

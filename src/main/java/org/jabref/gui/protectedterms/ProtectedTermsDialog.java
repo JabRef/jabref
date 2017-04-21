@@ -117,7 +117,6 @@ public class ProtectedTermsDialog {
         });
         newButton.setToolTipText(Localization.lang("New protected terms file"));
 
-
         setupTable();
 
         // Build dialog
@@ -293,7 +292,6 @@ public class ProtectedTermsDialog {
         }
         return Optional.empty();
     }
-
 
     class TermTableModel extends DefaultTableModel {
         @Override
@@ -489,7 +487,6 @@ public class ProtectedTermsDialog {
         }
 
     }
-
 
     private void storePreferences() {
         Globals.prefs.setProtectedTermsPreferences(loader);

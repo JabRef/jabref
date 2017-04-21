@@ -10,7 +10,6 @@ public class Default implements ParamLayoutFormatter {
 
     private String defValue = "";
 
-
     @Override
     public void setArgument(String arg) {
         this.defValue = arg;

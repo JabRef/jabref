@@ -82,11 +82,11 @@ public class DatePickerButton implements DateChangeListener {
         // unregister DateChangeListener before update to prevent circular calls resulting in IllegalStateExceptions
         datePicker.removeDateChangeListener(this);
 
-        if(dateString!=null && !dateString.isEmpty()) {
+        if (dateString != null && !dateString.isEmpty()) {
             try {
                 datePicker.setDate(LocalDate.parse(dateString, dateTimeFormatter));
             } catch (DateTimeParseException exception) {
-                LOGGER.warn("Unable to parse stored date for field '"+editor.getFieldName()+"' with current settings. "
+                LOGGER.warn("Unable to parse stored date for field '" + editor.getFieldName() + "' with current settings. "
                         + "Clear button in calender popup will not work.");
             }
         }

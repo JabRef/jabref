@@ -29,9 +29,9 @@ import org.jabref.model.entry.FieldName;
  */
 public abstract class EntryFromFileCreator implements FileFilter {
 
-    protected final ExternalFileType externalFileType;
-
     private static final int MIN_PATH_TOKEN_LENGTH = 4;
+
+    protected final ExternalFileType externalFileType;
 
     /**
      * Constructor. <br>

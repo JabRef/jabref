@@ -10,17 +10,16 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 
-
 public class SpecialFieldViewModel {
 
     private final SpecialField field;
 
-    public SpecialFieldViewModel(SpecialField field){
+    public SpecialFieldViewModel(SpecialField field) {
         Objects.requireNonNull(field);
         this.field = field;
     }
 
-    public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value, JabRefFrame frame){
+    public SpecialFieldAction getSpecialFieldAction(SpecialFieldValue value, JabRefFrame frame) {
         return new SpecialFieldAction(frame, field, value.getFieldValue().orElse(null),
                 // if field contains only one value, it has to be nulled
                 // otherwise, another setting does not empty the field
@@ -47,7 +46,7 @@ public class SpecialFieldViewModel {
         }
     }
 
-    public String getLocalization(){
+    public String getLocalization() {
         switch (field) {
             case PRINTED:
                 return Localization.lang("Printed");

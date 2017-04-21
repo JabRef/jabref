@@ -60,13 +60,13 @@ public class FieldComparator implements Comparator<BibEntry> {
     }
 
     private FieldType determineFieldType() {
-        if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
+        if (BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
         } else if (InternalBibtexFields.getFieldProperties(this.field[0]).contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
         } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
-        } else if(FieldName.MONTH.equals(this.field[0])) {
+        } else if (FieldName.MONTH.equals(this.field[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
@@ -102,7 +102,7 @@ public class FieldComparator implements Comparator<BibEntry> {
         // Catch all cases involving null:
         if ((f1 == null) && (f2 == null)) {
             return 0;
-        } else if(f1 == null) {
+        } else if (f1 == null) {
             return multiplier;
         } else if (f2 == null) {
             return -multiplier;

@@ -43,7 +43,7 @@ public class CustomEntryType implements EntryType {
     public static Optional<CustomEntryType> parse(String comment) {
         String rest = comment.substring(ENTRYTYPE_FLAG.length());
         int indexEndOfName = rest.indexOf(':');
-        if(indexEndOfName < 0) {
+        if (indexEndOfName < 0) {
             return Optional.empty();
         }
         String fieldsDescription = rest.substring(indexEndOfName + 2);

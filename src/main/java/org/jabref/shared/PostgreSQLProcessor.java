@@ -85,7 +85,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         return "\"" + expression + "\"";
     }
 
-
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         // Disable cleanup output of ThreadedHousekeeper

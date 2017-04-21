@@ -519,7 +519,6 @@ public class TextInputDialog extends JabRefDialog {
         return allFields.toArray(new String[allFields.size()]);
     }
 
-
     private class PasteAction extends BasicAction {
 
         public PasteAction() {
@@ -589,7 +588,6 @@ public class TextInputDialog extends JabRefDialog {
     class FieldListSelectionHandler implements ListSelectionListener {
 
         private int lastIndex = -1;
-
 
         @Override
         public void valueChanged(ListSelectionEvent e) {

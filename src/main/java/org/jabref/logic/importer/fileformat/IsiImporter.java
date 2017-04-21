@@ -45,7 +45,6 @@ public class IsiImporter extends Importer {
     // extra | at the end:
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
-
     @Override
     public String getName() {
         return "ISI";

@@ -50,7 +50,6 @@ public class Date {
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
 
-
         if (year.isPresent()) {
             TemporalAccessor date;
             if (month.isPresent()) {

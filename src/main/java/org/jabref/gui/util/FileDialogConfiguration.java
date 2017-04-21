@@ -20,6 +20,14 @@ public class FileDialogConfiguration {
     private final FileChooser.ExtensionFilter defaultExtension;
     private final String initialFileName;
 
+    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
+                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+        this.initialDirectory = initialDirectory;
+        this.extensionFilters = Objects.requireNonNull(extensionFilters);
+        this.defaultExtension = defaultExtension;
+        this.initialFileName = initialFileName;
+    }
+
     public Optional<Path> getInitialDirectory() {
         return Optional.ofNullable(initialDirectory);
     }
@@ -30,14 +38,6 @@ public class FileDialogConfiguration {
 
     public String getInitialFileName() {
         return initialFileName;
-    }
-
-    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
-        this.initialDirectory = initialDirectory;
-        this.extensionFilters = Objects.requireNonNull(extensionFilters);
-        this.defaultExtension = defaultExtension;
-        this.initialFileName = initialFileName;
     }
 
     public List<FileChooser.ExtensionFilter> getExtensionFilters() {

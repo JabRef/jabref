@@ -103,7 +103,6 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
 
-
         if (!isThereSomethingToBeDone())         {
             return; // Nothing to do, just return.
         }
@@ -156,7 +155,7 @@ public class FileLinksUpgradeWarning implements GUIPostOpenAction {
             formBuilder.add(builderPanel).xy(1, row);
         }
         formBuilder.appendRows("6dlu, p");
-        formBuilder.add(doNotShowDialog).xy(1, row+2);
+        formBuilder.add(doNotShowDialog).xy(1, row + 2);
 
         message.add(formBuilder.build());
 

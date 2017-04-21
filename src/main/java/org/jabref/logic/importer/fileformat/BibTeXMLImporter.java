@@ -47,7 +47,6 @@ public class BibTeXMLImporter extends Importer {
     private static final List<String> IGNORED_METHODS = Arrays.asList("getClass", "getAnnotate", "getContents",
             "getPrice", "getSize", "getChapter");
 
-
     @Override
     public String getName() {
         return "BibTeXML";

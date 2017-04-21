@@ -95,7 +95,7 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+                                                                 Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
                 InternalBibtexFields.getFieldProperties(editor.getFieldName())
                         .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
@@ -113,10 +113,9 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, boolean useDatePicker,
-            boolean useIsoFormat) {
+                                                                 boolean useIsoFormat) {
         /*
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
-
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {// double click
@@ -140,17 +139,14 @@ public class FieldExtraComponents {
             /*
             // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
             ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
-
                 @Override
                 public void insertUpdate(DocumentEvent e) {
                     datePicker.updateDatePickerDate(editor.getText());
                 }
-
                 @Override
                 public void removeUpdate(DocumentEvent e) {
                     datePicker.updateDatePickerDate(editor.getText());
                 }
-
                 @Override
                 public void changedUpdate(DocumentEvent e) {
                     datePicker.updateDatePickerDate(editor.getText());
@@ -218,7 +214,7 @@ public class FieldExtraComponents {
      */
 
     public static Optional<JComponent> getTypeExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor,
-            boolean isPatent) {
+                                                             boolean isPatent) {
         String[] optionValues;
         String[] optionDescriptions;
         if (isPatent) {

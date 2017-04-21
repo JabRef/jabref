@@ -35,5 +35,4 @@ public class FieldNameLabel extends JLabel {
         return ' ' + FieldName.getDisplayName(fieldName) + ' ';
     }
 
-
 }

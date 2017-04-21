@@ -17,13 +17,13 @@ import org.apache.commons.logging.LogFactory;
 
 class StringNameChange extends Change {
 
+    private static final Log LOGGER = LogFactory.getLog(StringNameChange.class);
     private final BibtexString string;
     private final String mem;
     private final String disk;
     private final String content;
-    private final BibtexString tmpString;
 
-    private static final Log LOGGER = LogFactory.getLog(StringNameChange.class);
+    private final BibtexString tmpString;
 
 
     public StringNameChange(BibtexString string, BibtexString tmpString,

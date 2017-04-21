@@ -31,7 +31,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Article";
@@ -64,7 +63,6 @@ public class BiblatexEntryTypes {
                     FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Book";
@@ -93,7 +91,6 @@ public class BiblatexEntryTypes {
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -128,7 +125,6 @@ public class BiblatexEntryTypes {
                     FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -205,7 +201,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Booklet";
@@ -238,7 +233,6 @@ public class BiblatexEntryTypes {
                     FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Collection";
@@ -267,7 +261,6 @@ public class BiblatexEntryTypes {
                     FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -302,7 +295,6 @@ public class BiblatexEntryTypes {
                     FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -356,7 +348,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Manual";
@@ -383,7 +374,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Misc";
@@ -407,7 +397,6 @@ public class BiblatexEntryTypes {
                     FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -435,7 +424,6 @@ public class BiblatexEntryTypes {
                     FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Patent";
@@ -461,7 +449,6 @@ public class BiblatexEntryTypes {
                     FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -518,7 +505,6 @@ public class BiblatexEntryTypes {
                     FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Proceedings";
@@ -548,7 +534,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -582,7 +567,6 @@ public class BiblatexEntryTypes {
                     FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -684,7 +668,6 @@ public class BiblatexEntryTypes {
                     FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "Report";
@@ -701,7 +684,6 @@ public class BiblatexEntryTypes {
         {
             addAllRequired(FieldName.ENTRYSET, FieldName.CROSSREF);
         }
-
 
         @Override
         public String getName() {
@@ -724,7 +706,6 @@ public class BiblatexEntryTypes {
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -749,7 +730,6 @@ public class BiblatexEntryTypes {
                     FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -829,7 +809,6 @@ public class BiblatexEntryTypes {
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
-
         @Override
         public String getName() {
             return "MastersThesis";
@@ -857,7 +836,6 @@ public class BiblatexEntryTypes {
                     FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -887,7 +865,6 @@ public class BiblatexEntryTypes {
                     FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
         }
-
 
         @Override
         public String getName() {
@@ -936,7 +913,6 @@ public class BiblatexEntryTypes {
                     FieldName.CTLUSE_ALT_SPACING, FieldName.CTLALT_STRETCH_FACTOR, FieldName.CTLDASH_REPEATED_NAMES,
                     FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
         }
-
 
         @Override
         public String getName() {

@@ -93,7 +93,7 @@ public class Linux implements NativeDesktop {
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
 
         String application;
-        if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))){
+        if (JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))) {
             application = "acroread";
 
             StringJoiner sj = new StringJoiner(" ");

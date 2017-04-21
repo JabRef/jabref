@@ -8,6 +8,8 @@ import org.jabref.model.search.SearchMatcher;
 
 public abstract class MatcherSet implements SearchMatcher {
 
+    protected final List<SearchMatcher> matchers = new Vector<>();
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -27,8 +29,6 @@ public abstract class MatcherSet implements SearchMatcher {
     public int hashCode() {
         return matchers.hashCode();
     }
-
-    protected final List<SearchMatcher> matchers = new Vector<>();
 
     public void addRule(SearchMatcher newRule) {
         matchers.add(Objects.requireNonNull(newRule));

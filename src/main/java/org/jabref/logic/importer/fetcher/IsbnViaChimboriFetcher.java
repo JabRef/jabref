@@ -81,7 +81,6 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         return Optional.of(entry);
     }
 
-
     @Override
     public void doPostCleanup(BibEntry entry) {
         // We MUST NOT clean the URL. this is the deal with @manastungare - see https://github.com/JabRef/jabref/issues/684#issuecomment-266541507

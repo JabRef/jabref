@@ -37,10 +37,10 @@ public class BibtexKeyPatternPanel extends JPanel {
     protected final GridBagLayout gbl = new GridBagLayout();
     protected final GridBagConstraints con = new GridBagConstraints();
 
-    private final HelpAction help;
-
     // default pattern
     protected final JTextField defaultPat = new JTextField();
+
+    private final HelpAction help;
 
     // one field for each type
     private final Map<String, JTextField> textFields = new HashMap<>();

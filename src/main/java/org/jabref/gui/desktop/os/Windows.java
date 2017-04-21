@@ -26,7 +26,7 @@ public class Windows implements NativeDesktop {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             // quote String so explorer handles URL query strings correctly
-            String quotePath = "\"" + filePath +"\"";
+            String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }
     }
