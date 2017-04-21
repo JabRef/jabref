@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 import org.jabref.Globals;
@@ -17,12 +18,13 @@ public class FieldEditors {
     public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        // TODO: Implement this
+        // TODO: Implement all of them
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
-            // timestamp or a other field with datepicker command
-            // double click AND datefield => insert the current date (today)
-            //return FieldExtraComponents.getDateTimeExtraComponent(editor,
-            //        fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
+            if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
+                return new DateEditor(fieldName, DateTimeFormatter.ISO_DATE);
+            } else {
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)));
+            }
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             return new UrlEditor(fieldName, dialogService);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {

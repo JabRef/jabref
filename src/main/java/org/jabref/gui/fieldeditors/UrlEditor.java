@@ -25,7 +25,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         ControlHelper.loadFXMLForControl(this);
 
-        viewModel.textProperty().bindBidirectional(textArea.textProperty());
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
     }
 
     public UrlEditorViewModel getViewModel() {
@@ -35,7 +35,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        textArea.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(fieldName, entry);
     }
 
     @Override

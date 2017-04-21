@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.layout.HBox?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+    <DatePicker fx:id="datePicker" prefHeight="0" HBox.hgrow="ALWAYS"/>
+</fx:root>
