@@ -20,17 +20,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class ArchitectureTests {
+public class MainArchitectureTests {
 
+    public static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
     private static final String PACKAGE_JAVAX_SWING = "javax.swing";
     private static final String PACKAGE_JAVA_AWT = "java.awt";
     private static final String PACKAGE_JAVA_FX = "javafx";
-
     private static final String PACKAGE_ORG_JABREF_GUI = "org.jabref.gui";
     private static final String PACKAGE_ORG_JABREF_LOGIC = "org.jabref.logic";
     private static final String PACKAGE_ORG_JABREF_MODEL = "org.jabref.model";
-    private static final String CLASS_ORG_JABREF_GLOBALS = "org.jabref.Globals";
-
     private static final String EXCEPTION_PACKAGE_JAVA_AWT_GEOM = "java.awt.geom";
     private static final String EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS = "javafx.collections";
     private static final String EXCEPTION_PACKAGE_JAVA_FX_BEANS = "javafx.beans";
@@ -40,7 +38,7 @@ public class ArchitectureTests {
     private final String secondPackage;
     private Map<String, List<String>> exceptions;
 
-    public ArchitectureTests(String firstPackage, String secondPackage) {
+    public MainArchitectureTests(String firstPackage, String secondPackage) {
         this.firstPackage = firstPackage;
         this.secondPackage = secondPackage;
 
@@ -60,8 +58,7 @@ public class ArchitectureTests {
         modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_COLLECTIONS);
         modelExceptions.add(EXCEPTION_PACKAGE_JAVA_FX_BEANS);
 
-        exceptions.put(PACKAGE_ORG_JABREF_LOGIC,
-                logicExceptions);
+        exceptions.put(PACKAGE_ORG_JABREF_LOGIC, logicExceptions);
         exceptions.put(PACKAGE_ORG_JABREF_MODEL, modelExceptions);
     }
 
