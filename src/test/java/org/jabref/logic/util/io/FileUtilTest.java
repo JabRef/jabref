@@ -11,16 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -36,12 +35,14 @@ public class FileUtilTest {
     private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
+    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     @Before
     public void setUpViewModel() throws IOException {
         existingTestFile = createTemporaryTestFile("existingTestFile.txt");
         otherExistingTestFile = createTemporaryTestFile("otherExistingTestFile.txt");
         otherTemporaryFolder.create();
+        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -65,8 +66,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, JabRefPreferences.getInstance()
-                        .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, layoutFormatterPreferences));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class FileUtilTest {
 
         assertEquals("1234",
                 FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                        mock(LayoutFormatterPreferences.class)));
+                        layoutFormatterPreferences));
     }
 
     @Test
@@ -90,7 +90,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                mock(LayoutFormatterPreferences.class)));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -100,7 +100,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                mock(LayoutFormatterPreferences.class)));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class FileUtilTest {
         BibEntry entry = new BibEntry();
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                layoutFormatterPreferences));
     }
 
     @Test

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.Defaults;
 import org.jabref.model.database.BibDatabase;
@@ -15,12 +14,12 @@ import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -32,13 +31,12 @@ public class RenamePdfCleanupTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
     private BibDatabaseContext context;
     private BibEntry entry;
-    private JabRefPreferences prefs;
 
     private FileDirectoryPreferences fileDirPrefs;
+    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     @Before
     public void setUp() throws Exception {
-        prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
@@ -48,6 +46,7 @@ public class RenamePdfCleanupTest {
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
+        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     /**
@@ -113,7 +112,7 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                layoutFormatterPreferences,
                 fileDirPrefs);
         cleanup.cleanup(entry);
 
@@ -129,7 +128,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                layoutFormatterPreferences,
                 fileDirPrefs, fileField);
 
         cleanup.cleanup(entry);
@@ -145,7 +144,7 @@ public class RenamePdfCleanupTest {
         testFolder.newFile("Toot.pdf");
         LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                layoutFormatterPreferences,
                 fileDirPrefs);
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
         entry.setField("title", "test title");

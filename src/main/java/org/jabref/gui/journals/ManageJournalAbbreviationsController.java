@@ -20,7 +20,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.preferences.PreferencesService;
 
 public class ManageJournalAbbreviationsController extends AbstractController<ManageJournalAbbreviationsViewModel> {
 
@@ -36,15 +37,14 @@ public class ManageJournalAbbreviationsController extends AbstractController<Man
     @FXML private Button addJournalFileButton;
     @FXML private Button addNewJournalFileButton;
     @FXML private Button removeJournalAbbreviationsButton;
-
-
-    @Inject private JabRefPreferences preferences;
+    @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+    @Inject private JournalAbbreviationLoader journalAbbreviationLoader;
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
 
         setUpTable();
         setBindings();

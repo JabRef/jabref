@@ -12,20 +12,20 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
+    private final KeyBindingRepository keyBindingRepository;
+    private final PreferencesService preferences;
     private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
-    private final KeyBindingPreferences keyBindingPreferences;
-    private KeyBindingRepository keyBindingRepository;
-
     private DialogService dialogService;
 
-    public KeyBindingsDialogViewModel(KeyBindingPreferences keyBindingPreferences, DialogService dialogService) {
-        this.keyBindingPreferences = Objects.requireNonNull(keyBindingPreferences);
+    public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
+        this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
         this.dialogService = Objects.requireNonNull(dialogService);
-        keyBindingRepository = new KeyBindingRepository(keyBindingPreferences.getKeyBindings());
+        this.preferences = Objects.requireNonNull(preferences);
         populateTable();
     }
 
@@ -71,7 +71,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     }
 
     public void saveKeyBindings() {
-        keyBindingPreferences.setNewKeyBindings(keyBindingRepository.getKeyBindings());
+        preferences.storeKeyBindingRepository(keyBindingRepository);
 
         String title = Localization.lang("Key bindings changed");
         String content = Localization.lang("Your new key bindings have been stored.") + '\n'

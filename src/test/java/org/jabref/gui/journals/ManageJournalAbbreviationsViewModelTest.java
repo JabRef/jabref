@@ -20,7 +20,8 @@ import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.assertj.core.util.Files;
 import org.junit.Assert;
@@ -39,28 +40,29 @@ import static org.mockito.Mockito.when;
 
 public class ManageJournalAbbreviationsViewModelTest {
 
-    private ManageJournalAbbreviationsViewModel viewModel;
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
-
     @ClassRule
     public static CatchExceptionsFromThread catchExceptions = new CatchExceptionsFromThread();
-
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+    private ManageJournalAbbreviationsViewModel viewModel;
     private Path emptyTestFile;
     private Path testFile1Entries;
     private Path testFile3Entries;
     private Path testFile4Entries;
     private Path testFile5EntriesWithDuplicate;
-    private JabRefPreferences preferences;
+    private JournalAbbreviationPreferences abbreviationPreferences;
     private DialogService dialogService;
 
     @Before
     public void setUpViewModel() throws Exception {
-        preferences = mock(JabRefPreferences.class);
+        abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        PreferencesService preferences = mock(PreferencesService.class);
+        when(preferences.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
+
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor);
+        JournalAbbreviationLoader journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, journalAbbreviationLoader);
         emptyTestFile = createTemporaryTestFile("emptyTestFile.txt", "");
         testFile1Entries = createTemporaryTestFile("testFile1Entries.txt", "Test Entry = TE" + NEWLINE + "");
         testFile3Entries = createTemporaryTestFile("testFile3Entries.txt",
@@ -203,7 +205,7 @@ public class ManageJournalAbbreviationsViewModelTest {
 
     @Test
     public void testBuiltInListsIncludeAllBuiltInAbbreviations() {
-        when(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(false);
+        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(false);
         viewModel.addBuiltInLists();
         Assert.assertEquals(2, viewModel.journalFilesProperty().getSize());
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(0));
@@ -218,7 +220,7 @@ public class ManageJournalAbbreviationsViewModelTest {
 
     @Test
     public void testBuiltInListsStandardIEEEIncludesAllBuiltIEEEAbbreviations() throws Exception {
-        when(preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
+        when(abbreviationPreferences.useIEEEAbbreviations()).thenReturn(true);
         viewModel.addBuiltInLists();
         viewModel.selectLastJournalFile();
         Assert.assertEquals(2, viewModel.journalFilesProperty().getSize());
@@ -440,7 +442,7 @@ public class ManageJournalAbbreviationsViewModelTest {
         addFourTestFileToViewModelAndPreferences();
         List<String> expected = Stream.of(testFile1Entries, testFile3Entries, testFile4Entries, testFile5EntriesWithDuplicate)
                 .map(Path::toString).collect(Collectors.toList());
-        verify(preferences).putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, expected);
+        verify(abbreviationPreferences).setExternalJournalLists(expected);
     }
 
     private Path createTemporaryTestFile(String name, String content) throws Exception {
@@ -468,7 +470,7 @@ public class ManageJournalAbbreviationsViewModelTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.saveExternalFilesList();
+        viewModel.saveEverythingAndUpdateAutoCompleter();
     }
 
     /**

@@ -12,13 +12,16 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
+import org.mockito.Answers;
+
+import static org.mockito.Mockito.mock;
 
 public class BibEntryAssert {
 
@@ -61,7 +64,7 @@ public class BibEntryAssert {
     private static List<BibEntry> getListFromInputStream(InputStream is) throws IOException {
         ParserResult result;
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences());
+            BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
             result = parser.parse(reader);
         }
         Assert.assertNotNull(result);
