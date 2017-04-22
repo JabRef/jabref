@@ -101,6 +101,10 @@ public class Date {
         return get(ChronoField.DAY_OF_MONTH);
     }
 
+    public LocalDate toLocalDate() {
+        return LocalDate.from(date);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

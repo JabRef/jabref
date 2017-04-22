@@ -136,8 +136,6 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.lgooddatepicker:LGoodDatePicker:8.3.0'
-
     compile 'com.github.tomtung:latex2unicode_2.12:0.2'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'

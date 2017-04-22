@@ -11,6 +11,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Continued to redesign the user interface: this time the editor got a fresh coat of paint:
+  - The buttons were changed to icons.
+  - Removed the hidden feature that a double click in the editor inserted the current date.
+  
 
 ### Fixed
 

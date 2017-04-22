@@ -10,16 +10,21 @@ import org.jabref.model.entry.BibEntry;
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
     protected final String fieldName;
+    @FXML private final SimpleEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
     public SimpleEditor(String fieldName) {
         this.fieldName = fieldName;
+        this.viewModel = new SimpleEditorViewModel();
+
         ControlHelper.loadFXMLForControl(this);
+
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
     }
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        textArea.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(fieldName, entry);
     }
 
     @Override
