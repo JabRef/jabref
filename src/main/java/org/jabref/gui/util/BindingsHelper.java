@@ -1,15 +1,19 @@
 package org.jabref.gui.util;
 
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.BooleanPropertyBase;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
@@ -65,6 +69,16 @@ public class BindingsHelper {
         propertyB.addListener(binding);
     }
 
+    public static <A, B> void bindContentBidirectional(ListProperty<A> listProperty, Property<B> property, Function<List<A>, B> mapToB, Function<B, List<A>> mapToList) {
+        final BidirectionalListBinding<A, B> binding = new BidirectionalListBinding<>(listProperty, property, mapToB, mapToList);
+
+        // use property as initial source
+        listProperty.setAll(mapToList.apply(property.getValue()));
+
+        listProperty.addListener(binding);
+        property.addListener(binding);
+    }
+
     private static class BidirectionalBinding<A> implements ChangeListener<A> {
 
         private final Property<A> propertyA;
@@ -86,6 +100,46 @@ public class BindingsHelper {
                     } else {
                         propertyA.setValue(newValue);
                     }
+                } finally {
+                    updating = false;
+                }
+            }
+        }
+    }
+
+    private static class BidirectionalListBinding<A, B> implements ListChangeListener<A>, ChangeListener<B> {
+
+        private final ListProperty<A> listProperty;
+        private final Property<B> property;
+        private final Function<List<A>, B> mapToB;
+        private final Function<B, List<A>> mapToList;
+        private boolean updating = false;
+
+        public BidirectionalListBinding(ListProperty<A> listProperty, Property<B> property, Function<List<A>, B> mapToB, Function<B, List<A>> mapToList) {
+            this.listProperty = listProperty;
+            this.property = property;
+            this.mapToB = mapToB;
+            this.mapToList = mapToList;
+        }
+
+        @Override
+        public void changed(ObservableValue<? extends B> observable, B oldValue, B newValue) {
+            if (!updating) {
+                try {
+                    updating = true;
+                    listProperty.setAll(mapToList.apply(newValue));
+                } finally {
+                    updating = false;
+                }
+            }
+        }
+
+        @Override
+        public void onChanged(Change<? extends A> c) {
+            if (!updating) {
+                try {
+                    updating = true;
+                    property.setValue(mapToB.apply(listProperty.getValue()));
                 } finally {
                     updating = false;
                 }

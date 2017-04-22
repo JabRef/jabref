@@ -34,6 +34,8 @@ public class FieldEditors {
             return new IdentifierEditor(fieldName, taskExecutor, dialogService);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return new OwnerEditor(fieldName, preferences);
+        } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
+            return new LinkedFilesEditor(fieldName);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             //return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {

@@ -52,12 +52,9 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class EntryEditorTab {
 
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private final JPanel panel = new JPanel();
     private final JScrollPane scrollPane = new JScrollPane(panel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
     private final List<String> fields;
     private final EntryEditor parent;
     private final Map<String, FieldEditorFX> editors = new HashMap<>();
@@ -65,6 +62,8 @@ class EntryEditorTab {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
+    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;
@@ -130,13 +129,7 @@ class EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.FILE_EDITOR)) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
-
-                fileListEditor = (FileListEditor) fieldEditor;
-
-                defaultHeight = 0;
-            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
                         true);
                 defaultHeight = 0;
