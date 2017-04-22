@@ -10,7 +10,6 @@ import javafx.scene.layout.HBox;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
 
-
 public class DateEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
