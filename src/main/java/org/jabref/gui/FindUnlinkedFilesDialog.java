@@ -90,8 +90,6 @@ import org.apache.commons.logging.LogFactory;
  * GUI Dialog for the feature "Find unlinked files".
  */
 public class FindUnlinkedFilesDialog extends JabRefDialog {
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
-
     /**
      * Keys to be used for referencing this Action.
      */
@@ -100,6 +98,8 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     public static final String ACTION_SHORT_DESCRIPTION = Localization
             .lang("Searches for unlinked PDF files on the file system");
+
+    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -447,7 +447,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                     new ChangeListener() {
 
                         int counter;
-
 
                         @Override
                         public void stateChanged(ChangeEvent e) {
@@ -1088,7 +1087,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     private static class CheckboxTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private final FileSystemView fsv = FileSystemView.getFileSystemView();
-
 
         @Override
         public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded,

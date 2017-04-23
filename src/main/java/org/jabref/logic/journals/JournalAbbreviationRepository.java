@@ -18,13 +18,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JournalAbbreviationRepository {
 
+    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
     private final Map<String, Abbreviation> fullNameLowerCase2Abbreviation = new HashMap<>();
     private final Map<String, Abbreviation> isoLowerCase2Abbreviation = new HashMap<>();
+
     private final Map<String, Abbreviation> medlineLowerCase2Abbreviation = new HashMap<>();
 
     private final SortedSet<Abbreviation> abbreviations = new TreeSet<>();
-
-    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
         for (Abbreviation abbreviation : abbreviations) {

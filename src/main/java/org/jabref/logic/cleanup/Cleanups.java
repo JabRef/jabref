@@ -27,7 +27,6 @@ public class Cleanups {
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
     public static List<Formatter> availableFormatters;
 
-
     static {
         availableFormatters = new ArrayList<>();
         availableFormatters.addAll(Formatters.ALL);
@@ -107,8 +106,6 @@ public class Cleanups {
 
                     currentIndex = -1;
                 } while (true);
-
-
             }
         } catch (StringIndexOutOfBoundsException ignore) {
             // if this exception occurs, the remaining part of the save actions string is invalid.

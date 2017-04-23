@@ -7,12 +7,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.text.Font;
 
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.util.BindingsHelper;
-import org.jabref.model.entry.BibEntry;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
-
-    private String fieldName;
 
     public EditorTextArea() {
         this("");
@@ -47,17 +43,5 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-    }
-
-    public void bindToEntry(String fieldName, BibEntry entry) {
-        this.fieldName = fieldName;
-        BindingsHelper.bindBidirectional(
-                this.textProperty(),
-                entry.getFieldBinding(fieldName),
-                newValue -> {
-                    if (newValue != null) {
-                        entry.setField(fieldName, newValue);
-                    }
-                });
     }
 }

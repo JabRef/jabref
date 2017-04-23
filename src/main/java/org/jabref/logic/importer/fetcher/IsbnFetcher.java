@@ -16,7 +16,7 @@ import org.jsoup.helper.StringUtil;
  */
 public class IsbnFetcher extends AbstractIsbnFetcher {
 
-    public IsbnFetcher(ImportFormatPreferences importFormatPreferences){
+    public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         super(importFormatPreferences);
     }
 

@@ -133,7 +133,7 @@ public class AuxParser {
         for (String key : result.getUniqueKeys()) {
             Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
-            if(result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
+            if (result.getGeneratedBibDatabase().getEntryByKey(key).isPresent()) {
                 // do nothing, key has already been processed
             } else if (entry.isPresent()) {
                 insertEntry(entry.get(), result);

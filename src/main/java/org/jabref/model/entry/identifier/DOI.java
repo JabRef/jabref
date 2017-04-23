@@ -64,12 +64,12 @@ public class DOI implements Identifier {
         String trimmedDoi = doi.trim();
 
         // HTTP URL decoding
-        if(doi.matches(HTTP_EXP)) {
+        if (doi.matches(HTTP_EXP)) {
             try {
                 // decodes path segment
                 URI url = new URI(trimmedDoi);
                 trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch(URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(doi + " is not a valid HTTP DOI.");
             }
         }
@@ -107,7 +107,7 @@ public class DOI implements Identifier {
      * @param doi the DOI string
      * @return true if DOI is valid, false otherwise
      */
-    public static boolean isValid(String doi){
+    public static boolean isValid(String doi) {
         return parse(doi).isPresent();
     }
 
@@ -154,7 +154,7 @@ public class DOI implements Identifier {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
             return Optional.of(uri);
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             // should never happen
             LOGGER.error(doi + " could not be encoded as URI.", e);
             return Optional.empty();

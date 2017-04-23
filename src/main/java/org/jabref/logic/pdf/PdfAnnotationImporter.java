@@ -26,7 +26,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
-
 public class PdfAnnotationImporter implements AnnotationImporter {
 
     private static final Log LOGGER = LogFactory.getLog(PdfAnnotationImporter.class);
@@ -98,7 +97,6 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         //Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
-
 
     private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
         //highlighted or underlined text has to be extracted by the rectangle calculated from the marking

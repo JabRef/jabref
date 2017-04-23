@@ -118,7 +118,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         builder.add(autoComplete, cc.xy(2, 17));
 
         DefaultFormBuilder builder3 = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:150dlu",""));
-        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields")+":");
+        JLabel label = new JLabel(Localization.lang("Use autocompletion for the following fields") + ":");
 
         builder3.append(label);
         builder3.append(autoCompFields);

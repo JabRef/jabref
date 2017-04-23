@@ -960,7 +960,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>();
-        for (int i=0; i< getBasePanelCount(); i++) {
+        for (int i = 0; i < getBasePanelCount(); i++) {
             returnList.add((BasePanel) tabbedPane.getComponentAt(i));
         }
         return returnList;
@@ -1303,7 +1303,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setRollover(true);
 
         tlb.setFloatable(false);
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             tlb.addAction(newBiblatexDatabaseAction);
         } else {
             tlb.addAction(newBibtexDatabaseAction);

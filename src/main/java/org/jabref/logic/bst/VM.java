@@ -40,6 +40,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class VM implements Warn {
 
+    public static final Integer FALSE = 0;
+
+    public static final Integer TRUE = 1;
+
+    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
+
     private static final Log LOGGER = LogFactory.getLog(VM.class);
 
     private List<BstEntry> entries;
@@ -52,10 +58,6 @@ public class VM implements Warn {
 
     private Stack<Object> stack = new Stack<>();
 
-    public static final Integer FALSE = 0;
-
-    public static final Integer TRUE = 1;
-
     private final Map<String, BstFunction> buildInFunctions;
 
     private File file;
@@ -65,9 +67,6 @@ public class VM implements Warn {
     private StringBuilder bbl;
 
     private String preamble = "";
-
-    private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
-
 
     public static class Identifier {
 
@@ -830,7 +829,6 @@ public class VM implements Warn {
         return false;
     }
 
-
     public String run(BibDatabase db) {
         preamble = db.getPreamble().orElse("");
         return run(db.getEntries());
@@ -946,7 +944,6 @@ public class VM implements Warn {
         functions.put(name, new MacroFunction(replacement));
     }
 
-
     public class MacroFunction implements BstFunction {
 
         private final String replacement;
@@ -1047,7 +1044,6 @@ public class VM implements Warn {
         execute(child.getChild(0).getText(), null);
     }
 
-
     public class StackFunction implements BstFunction {
 
         private final Tree localTree;
@@ -1100,7 +1096,6 @@ public class VM implements Warn {
 
         }
     }
-
 
     private void push(Tree t) {
         stack.push(t);
@@ -1182,7 +1177,6 @@ public class VM implements Warn {
         }
     }
 
-
     public static class BstEntry {
 
         private final BibEntry entry;
@@ -1206,7 +1200,6 @@ public class VM implements Warn {
             return entry;
         }
     }
-
 
     private void push(Integer integer) {
         stack.push(integer);

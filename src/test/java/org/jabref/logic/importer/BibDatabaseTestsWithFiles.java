@@ -7,12 +7,13 @@ import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class BibDatabaseTestsWithFiles {
 
@@ -20,7 +21,7 @@ public class BibDatabaseTestsWithFiles {
 
     @Before
     public void setUp() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test

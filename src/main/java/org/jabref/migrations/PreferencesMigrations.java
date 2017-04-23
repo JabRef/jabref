@@ -29,11 +29,11 @@ public class PreferencesMigrations {
         JabRefPreferences prefs = Globals.prefs;
         Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
         try {
-            if (mainPrefsNode.childrenNames().length!=0) {
+            if (mainPrefsNode.childrenNames().length != 0) {
                 // skip further processing as prefs already have been migrated
                 LOGGER.debug("New prefs node already exists with content - skipping migration");
             } else {
-                if( mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
+                if ( mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
                     LOGGER.info("Migrating old preferences.");
                     Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
                     copyPrefsRecursively(oldNode, mainPrefsNode);
@@ -44,9 +44,8 @@ public class PreferencesMigrations {
         }
     }
 
-
     private static void copyPrefsRecursively(Preferences from, Preferences to) throws BackingStoreException {
-        for(String key : from.keys()) {
+        for (String key : from.keys()) {
             String newValue = from.get(key, "");
             if (newValue.contains("net.sf")) {
                 newValue = newValue.replaceAll("net\\.sf", "org");
@@ -161,12 +160,12 @@ public class PreferencesMigrations {
             Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
             // Migrate default pattern
-            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null)==null) {
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null) == null) {
                 // Check whether old defaultLabelPattern is set
                 String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
-                if(oldDefault!=null) {
+                if (oldDefault != null) {
                     prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
-                    LOGGER.info("Upgraded old default key generator pattern '"+oldDefault+"' to new version.");
+                    LOGGER.info("Upgraded old default key generator pattern '" + oldDefault + "' to new version.");
                 }
 
             }

@@ -16,7 +16,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
@@ -32,7 +31,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         ControlHelper.loadFXMLForControl(this);
 
-        viewModel.textProperty().bind(textArea.textProperty());
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(fieldName))));
@@ -47,7 +46,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        textArea.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(fieldName, entry);
     }
 
     @Override
@@ -69,6 +68,5 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     private void openExternalLink(ActionEvent event) {
         viewModel.openExternalLink();
     }
-
 
 }

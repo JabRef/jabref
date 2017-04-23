@@ -70,7 +70,6 @@ public class IntegrityCheck {
         return result;
     }
 
-
     @FunctionalInterface
     public interface Checker {
         List<IntegrityMessage> check(BibEntry entry);

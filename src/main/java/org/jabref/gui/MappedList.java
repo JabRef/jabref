@@ -90,7 +90,7 @@ public class MappedList<E, F> extends TransformationList<F, E> {
             @Override
             public List<F> getRemoved() {
                 ArrayList<F> res = new ArrayList<>(c.getRemovedSize());
-                for(E e: c.getRemoved()) {
+                for (E e: c.getRemoved()) {
                     res.add(mapper.apply(e));
                 }
                 return res;

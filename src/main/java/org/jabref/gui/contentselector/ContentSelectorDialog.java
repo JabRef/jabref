@@ -46,16 +46,17 @@ import org.apache.commons.logging.LogFactory;
 
 public class ContentSelectorDialog extends JabRefDialog {
 
+    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
+    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
+    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JPanel fieldPan = new JPanel();
     private final JPanel wordPan = new JPanel();
     private final JPanel buttonPan = new JPanel();
+
     private final JPanel fieldNamePan = new JPanel();
     private final JPanel wordEditPan = new JPanel();
-
-    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
-    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
     private String currentField;
     private final JabRefFrame frame;
@@ -74,12 +75,11 @@ public class ContentSelectorDialog extends JabRefDialog {
     private final JTextField fieldNameField = new JTextField("", 20);
     private final JTextField wordEditField = new JTextField("", 20);
     private final JScrollPane fPane = new JScrollPane(fieldList);
+
     private final JScrollPane wPane = new JScrollPane(wordList);
-
     private final Map<String, DefaultListModel<String>> wordListModels = new HashMap<>();
-    private final List<String> removedFields = new ArrayList<>();
 
-    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
+    private final List<String> removedFields = new ArrayList<>();
 
 
     /**
@@ -475,7 +475,6 @@ public class ContentSelectorDialog extends JabRefDialog {
         getContentPane().add(buttonPan);
 
     }
-
 
     private class FieldNameFocusAdapter extends FocusAdapter {
 

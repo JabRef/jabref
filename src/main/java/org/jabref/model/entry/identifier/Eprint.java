@@ -18,9 +18,11 @@ import org.apache.commons.logging.LogFactory;
  * @see https://arxiv.org/help/arxiv_identifier
  * @see https://arxiv.org/hypertex/bibstyles/
  */
+
 public class Eprint implements Identifier {
     public static final URI RESOLVER = URI.create("http://arxiv.org");
     private static final Log LOGGER = LogFactory.getLog(Eprint.class);
+
     // Regex
     // (see https://arxiv.org/help/arxiv_identifier)
     private static final String EPRINT_EXP = ""
@@ -39,6 +41,7 @@ public class Eprint implements Identifier {
     private static final String HTTP_EXP = "https?://[^\\s]+?" + EPRINT_EXP;
     // Pattern
     private static final Pattern EXACT_EPRINT_PATT = Pattern.compile("^(?:https?://[^\\s]+?)?" + EPRINT_EXP + "$", Pattern.CASE_INSENSITIVE);
+
     // DOI
     private final String eprint;
 
@@ -57,12 +60,12 @@ public class Eprint implements Identifier {
         String trimmedId = eprint.trim();
 
         // HTTP URL decoding
-        if(eprint.matches(HTTP_EXP)) {
+        if (eprint.matches(HTTP_EXP)) {
             try {
                 // decodes path segment
                 URI url = new URI(trimmedId);
                 trimmedId = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch(URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(eprint + " is not a valid HTTP Eprint identifier.");
             }
         }
@@ -104,7 +107,7 @@ public class Eprint implements Identifier {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/abs/" + eprint, null);
             return Optional.of(uri);
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             // should never happen
             LOGGER.error(eprint + " could not be encoded as URI.", e);
             return Optional.empty();

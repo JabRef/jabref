@@ -130,7 +130,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         try {
             URLConnection connection = getURLForQuery(query).openConnection();
             connection.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
-            try(InputStream stream = connection.getInputStream()) {
+            try (InputStream stream = connection.getInputStream()) {
                 List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
                 // Post-cleanup

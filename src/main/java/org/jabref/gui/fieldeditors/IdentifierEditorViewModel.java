@@ -7,10 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
@@ -25,13 +22,12 @@ import org.jabref.model.entry.identifier.Identifier;
 
 import org.fxmisc.easybind.EasyBind;
 
-public class IdentifierEditorViewModel extends AbstractViewModel {
+public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private final String fieldName;
     private BooleanProperty validIdentifierIsNotPresent = new SimpleBooleanProperty(true);
     private BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     private BooleanProperty idFetcherAvailable = new SimpleBooleanProperty(true);
     private ObjectProperty<Optional<? extends Identifier>> identifier = new SimpleObjectProperty<>();
-    private StringProperty text = new SimpleStringProperty();
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
@@ -57,14 +53,6 @@ public class IdentifierEditorViewModel extends AbstractViewModel {
 
     public BooleanProperty idFetcherAvailableProperty() {
         return idFetcherAvailable;
-    }
-
-    public String getText() {
-        return text.get();
-    }
-
-    public StringProperty textProperty() {
-        return text;
     }
 
     public boolean getValidIdentifierIsNotPresent() {

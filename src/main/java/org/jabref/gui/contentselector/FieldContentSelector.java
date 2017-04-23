@@ -162,7 +162,6 @@ public class FieldContentSelector extends JComponent {
             return;
         }
 
-
         String currentText = editor.getText();
         KeywordList words = KeywordList.parse(currentText, this.delimiter.charAt(0));
         boolean alreadyInList = words.contains(new Keyword(chosen));

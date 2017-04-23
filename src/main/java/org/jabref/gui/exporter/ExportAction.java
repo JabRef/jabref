@@ -55,7 +55,6 @@ public class ExportAction {
 
             private final boolean selectedOnly;
 
-
             public InternalExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
                 this.selectedOnly = selectedOnly;
@@ -121,7 +120,6 @@ public class ExportAction {
                     AbstractWorker exportWorker = new AbstractWorker() {
 
                         String errorMessage;
-
 
                         @Override
                         public void run() {

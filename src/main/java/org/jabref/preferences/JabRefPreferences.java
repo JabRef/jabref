@@ -38,6 +38,7 @@ import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preftabs.ImportSettingsTab;
 import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -79,7 +80,7 @@ import org.jabref.model.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JabRefPreferences {
+public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
     public static final String EMACS_PATH = "emacsPath";
@@ -250,8 +251,6 @@ public class JabRefPreferences {
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
-    public static final String BINDINGS = "bindings";
-    public static final String BIND_NAMES = "bindNames";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
     public static final String CONSOLE_COMMAND = "consoleCommand";
@@ -274,8 +273,6 @@ public class JabRefPreferences {
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
-    public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    public static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
@@ -296,7 +293,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
-    public static final String USE_IEEE_ABRV = "useIEEEAbrv";
     public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
     public static final String CLEANUP_ISSN = "CleanUpISSN";
@@ -316,6 +312,14 @@ public class JabRefPreferences {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    // Dropped file handler
+    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
+    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
+    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
+    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
+    // Remote
+    public static final String USE_REMOTE_SERVER = "useRemoteServer";
+    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
     /**
      * The OpenOffice/LibreOffice connection preferences are:
      * OO_PATH main directory for OO/LO installation, used to detect location on Win/OS X when using manual connect
@@ -358,23 +362,19 @@ public class JabRefPreferences {
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
+
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
     // User
     private static final String USER_ID = "userId";
-
+    private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
+    private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
+    private static final String USE_IEEE_ABRV = "useIEEEAbrv";
+    private static final String BINDINGS = "bindings";
+    private static final String BIND_NAMES = "bindNames";
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-
-    // Dropped file handler
-    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
-    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    // Remote
-    public static final String USE_REMOTE_SERVER = "useRemoteServer";
-    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     private static final Class PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
@@ -408,13 +408,13 @@ public class JabRefPreferences {
      * Set with all custom {@link org.jabref.logic.importer.Importer}s
      */
     public final CustomImportList customImports;
-    private final Preferences prefs;
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
+    private final Preferences prefs;
     private GlobalBibtexKeyPattern keyPattern;
     // Object containing info about customized entry editor tabs.
     private EntryEditorTabList tabList;
@@ -1223,7 +1223,7 @@ public class JabRefPreferences {
     }
 
     private void clearAllCustomEntryTypes() throws BackingStoreException {
-        for(BibDatabaseMode mode :BibDatabaseMode.values()) {
+        for (BibDatabaseMode mode :BibDatabaseMode.values()) {
             clearCustomEntryTypes(mode);
         }
     }
@@ -1429,7 +1429,7 @@ public class JabRefPreferences {
         return this;
     }
 
-    public PreviewPreferences getPreviewPreferences(){
+    public PreviewPreferences getPreviewPreferences() {
         int cyclePos = getInt(CYCLE_PREVIEW_POS);
         List<String> cycle = getStringList(CYCLE_PREVIEW);
         int panelHeight = getInt(PREVIEW_PANEL_HEIGHT);
@@ -1493,6 +1493,7 @@ public class JabRefPreferences {
 
     }
 
+    @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST),
                 getBoolean(USE_IEEE_ABRV), getDefaultEncoding());
@@ -1575,5 +1576,22 @@ public class JabRefPreferences {
 
     public void askedToCollectTelemetry() {
         putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
+    }
+
+    @Override
+    public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
+        putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
+        putStringList(JabRefPreferences.BINDINGS, keyBindingRepository.getBindings());
+    }
+
+    @Override
+    public KeyBindingRepository getKeyBindingRepository() {
+        return new KeyBindingRepository(getStringList(BIND_NAMES), getStringList(BINDINGS));
+    }
+
+    @Override
+    public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
+        putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
+        putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
     }
 }

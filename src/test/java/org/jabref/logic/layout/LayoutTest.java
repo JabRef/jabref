@@ -6,30 +6,31 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.layout.format.FileLinkPreferences;
-import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LayoutTest {
-    private LayoutFormatterPreferences prefs;
+    private static ImportFormatPreferences importFormatPreferences;
+    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     /**
      * Initialize Preferences.
      */
     @Before
     public void setUp() {
-        prefs = JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
+        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     /**
@@ -45,7 +46,7 @@ public class LayoutTest {
     }
 
     public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences()).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
@@ -54,8 +55,7 @@ public class LayoutTest {
     public String layout(String layoutFile, String entry) throws IOException {
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, prefs)
-                        .getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
 
         return layout.doLayout(be, null);
     }
@@ -103,7 +103,6 @@ public class LayoutTest {
      */
     @Test
     public void testLayout() throws IOException {
-
         String layoutText = layout(
                 "<font face=\"arial\">\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract}\\end{abstract}</font>",
                 t1BibtexString());
@@ -116,12 +115,12 @@ public class LayoutTest {
     @Test
     // Test for http://discourse.jabref.org/t/the-wrapfilelinks-formatter/172 (the example in the help files)
     public void testWrapFileLinksLayout() throws IOException {
-        prefs = new LayoutFormatterPreferences(mock(NameFormatterPreferences.class),
-                mock(JournalAbbreviationPreferences.class),
-                new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")),
-                mock(JournalAbbreviationLoader.class));
+        when(layoutFormatterPreferences.getFileLinkPreferences()).thenReturn(
+                new FileLinkPreferences(Collections.emptyList(), Collections.singletonList("src/test/resources/pdfs/")));
+
         String layoutText = layout("\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
                 "@other{bla, file={Test file:encrypted.pdf:PDF}}");
+
         Assert.assertEquals(
                 "1. Test file (" + new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() + ")",
                 layoutText);

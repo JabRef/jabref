@@ -20,12 +20,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 
+    private static final Log LOGGER = LogFactory.getLog(MarkEntriesAction.class);
     private final JabRefFrame frame;
     private final int level;
     private final JMenuItem menuItem;
-    private int besLength;
 
-    private static final Log LOGGER = LogFactory.getLog(MarkEntriesAction.class);
+    private int besLength;
 
     public MarkEntriesAction(JabRefFrame frame, int level) {
         this.frame = frame;

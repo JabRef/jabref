@@ -23,7 +23,7 @@ public class AbbreviationsTest {
 
     @Test
     public void getNextAbbreviationAbbreviatesIEEEJournalTitle() {
-        when(prefs.isUseIEEEAbbreviations()).thenReturn(true);
+        when(prefs.useIEEEAbbreviations()).thenReturn(true);
 
         assertEquals("#IEEE_J_PROC#",
                 abbreviations.getRepository(prefs)
@@ -32,7 +32,7 @@ public class AbbreviationsTest {
 
     @Test
     public void getNextAbbreviationExpandsIEEEAbbreviation() {
-        when(prefs.isUseIEEEAbbreviations()).thenReturn(true);
+        when(prefs.useIEEEAbbreviations()).thenReturn(true);
 
         assertEquals("Proceedings of the IEEE",
                 abbreviations.getRepository(prefs)

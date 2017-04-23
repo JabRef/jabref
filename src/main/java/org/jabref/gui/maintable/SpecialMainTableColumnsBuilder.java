@@ -165,7 +165,6 @@ class SpecialMainTableColumnsBuilder {
      */
     MainTableColumn createFileIconColumn(String externalFileTypeName) {
 
-
         return new MainTableColumn(externalFileTypeName, Collections.singletonList(FieldName.FILE), new JLabel()) {
 
             @Override

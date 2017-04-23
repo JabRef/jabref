@@ -252,7 +252,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 } catch (SAXException e) {
                     String url = constructUrl(OAI2Fetcher.fixKey(key));
                     LOGGER.error("Error while fetching from " + getTitle(), e);
-                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) + "\n" +
                                     Localization.lang("A SAX exception occurred while parsing '%0':", url),
                             Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
                 }

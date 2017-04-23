@@ -52,22 +52,19 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class EntryEditorTab {
 
+    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
+    public FileListEditor fileListEditor;
     private final JPanel panel = new JPanel();
-
     private final JScrollPane scrollPane = new JScrollPane(panel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
     private final List<String> fields;
-
     private final EntryEditor parent;
-
     private final Map<String, FieldEditorFX> editors = new HashMap<>();
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;
@@ -166,7 +163,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService());
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs);
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -181,6 +178,18 @@ class EntryEditorTab {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
             */
+
+            /*
+            // TODO: Reenable content selector
+            if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
+                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
+                        ", ");
+                contentSelectors.add(ws);
+                controls.add(ws, BorderLayout.NORTH);
+            }
+            //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
+            //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
+             */
 
             builder.append(new FieldNameLabel(fieldName));
 
@@ -339,16 +348,16 @@ class EntryEditorTab {
         // TODO: Reenable or probably better delete this
         /*
         FieldEditor fieldEditor = editors.get(field);
-        if (fieldEditor.getText().equals(content)){
+        if (fieldEditor.getText().equals(content)) {
             return true;
         }
 
         // trying to preserve current edit position (fixes SF bug #1285)
-        if(fieldEditor.getTextComponent() instanceof JTextComponent) {
+        if (fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
             fieldEditor.setText(content);
             int textLength = fieldEditor.getText().length();
-            if(initialCaretPosition<textLength) {
+            if (initialCaretPosition < textLength) {
                 ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
             } else {
                 ((JTextComponent) fieldEditor).setCaretPosition(textLength);
