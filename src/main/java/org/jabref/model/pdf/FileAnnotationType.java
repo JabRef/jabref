@@ -25,9 +25,9 @@ public enum FileAnnotationType {
     UNKNOWN("Unknown"),
     NONE("None");
 
-    private final String name;
     private static final Log LOGGER = LogFactory.getLog(FileAnnotationType.class);
 
+    private final String name;
 
     FileAnnotationType(String name) {
         this.name = name;
@@ -40,7 +40,7 @@ public enum FileAnnotationType {
      * @param annotation the raw PDAnnotation
      * @return The determined FileAnnotationType
      */
-    public static FileAnnotationType parseFileAnnotationType(PDAnnotation annotation) {
+    public static FileAnnotationType parse(PDAnnotation annotation) {
         try {
             return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException e) {

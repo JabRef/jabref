@@ -50,7 +50,7 @@ public class FileAnnotation {
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getDictionary().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.parseFileAnnotationType(annotation), Optional.empty());
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty());
     }
 
     /**
@@ -63,7 +63,7 @@ public class FileAnnotation {
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.parseFileAnnotationType(annotation), Optional.of(linkedFileAnnotation));
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
     }
 
     /**
