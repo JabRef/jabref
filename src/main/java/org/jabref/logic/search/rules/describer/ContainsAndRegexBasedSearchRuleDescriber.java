@@ -30,10 +30,10 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
                 : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>",
                         StringUtil.quoteForHTML(firstWord)));
 
-        if(words.size() > 1) {
+        if (words.size() > 1) {
             List<String> unprocessedWords = words.subList(1, words.size());
             List<String> unprocessedWordsInHtmlFormat = new LinkedList<>();
-            for(String word : unprocessedWords) {
+            for (String word : unprocessedWords) {
                 unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
             }
             String andSeparator = String.format(" %s ", Localization.lang("and"));
@@ -46,7 +46,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
     }
 
     private String getCaseSensitiveDescription() {
-        if(caseSensitive) {
+        if (caseSensitive) {
             return Localization.lang("case sensitive");
         } else {
             return Localization.lang("case insensitive");

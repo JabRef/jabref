@@ -22,8 +22,8 @@ import org.jabref.model.entry.BibEntry;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    private final List<BibEntry> data;
     public static final DataFlavor entryFlavor = new DataFlavor(BibEntry.class, "JabRef entry");
+    private final List<BibEntry> data;
 
 
     public TransferableBibtexEntry(List<BibEntry> bes) {

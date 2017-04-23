@@ -67,7 +67,6 @@ public final class Word {
         }
     }
 
-
     public void toUpperFirst() {
         for (int i = 0; i < chars.length; i++) {
             if (protectedChars[i]) {

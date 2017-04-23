@@ -168,7 +168,6 @@ public class StringUtil {
             return "";
         }
 
-
         if (orgName.toLowerCase(Locale.ROOT).endsWith("." + defaultExtension.toLowerCase(Locale.ROOT))) {
             return orgName;
         }
@@ -678,6 +677,7 @@ public class StringUtil {
         }
         return result.toString();
     }
+
     public static String stripAccents(String searchQuery) {
         return StringUtils.stripAccents(searchQuery);
     }

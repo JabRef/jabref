@@ -68,7 +68,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                     // Try to find L&F
                     Class.forName(l);
                     lookAndFeels.add(l);
-                } catch (ClassNotFoundException|IllegalAccessError ignored) {
+                } catch (ClassNotFoundException | IllegalAccessError ignored) {
                     // LookAndFeel class does not exist or we don't have rights to access it
                     // Ignore it
                 }
@@ -164,9 +164,9 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                 .add(new JLabel("    ")).xy(1,3)
                 .add(new JLabel(Localization.lang("Menu and label font size") + ":")).xy(2,3)
                 .add(fontSize).xy(4,3)
-                .add(new JLabel(Localization.lang("Size of large icons")+":")).xy(2, 5)
+                .add(new JLabel(Localization.lang("Size of large icons") + ":")).xy(2, 5)
                 .add(largeIconsTextField).xy(4,5)
-                .add(new JLabel(Localization.lang("Size of small icons")+":")).xy(6, 5)
+                .add(new JLabel(Localization.lang("Size of small icons") + ":")).xy(6, 5)
                 .add(smallIconsTextField).xy(8,5)
                 .build();
 
@@ -289,7 +289,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                                     .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                             Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
                 }
-            } else if (overrideFonts.isSelected() != oldOverrideFontSize){
+            } else if (overrideFonts.isSelected() != oldOverrideFontSize) {
                 prefs.remove(JabRefPreferences.ICON_SIZE_SMALL);
                 prefs.remove(JabRefPreferences.ICON_SIZE_LARGE);
                 prefs.remove(JabRefPreferences.MENU_FONT_SIZE);

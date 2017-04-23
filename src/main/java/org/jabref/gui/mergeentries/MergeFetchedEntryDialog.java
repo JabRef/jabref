@@ -32,6 +32,7 @@ import com.jgoodies.forms.layout.RowSpec;
  */
 public class MergeFetchedEntryDialog extends JabRefDialog {
 
+    private static final String MARGIN = "5px";
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
     private final BibEntry originalEntry;
@@ -39,7 +40,6 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
     private NamedCompound ce;
     private MergeEntries mergeEntries;
     private final String type;
-    private static final String MARGIN = "5px";
 
 
     public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
@@ -94,7 +94,7 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
     }
 
     private class CancelAction extends AbstractAction {
-        CancelAction(){
+        CancelAction() {
             putValue(Action.NAME, Localization.lang("Cancel"));
         }
 
@@ -106,7 +106,7 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
     }
 
     private class ReplaceAction extends AbstractAction {
-        ReplaceAction(){
+        ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Replace original entry"));
         }
 
@@ -123,7 +123,7 @@ public class MergeFetchedEntryDialog extends JabRefDialog {
             String oldType = originalEntry.getType();
             String newType = mergedEntry.getType();
 
-            if(!oldType.equalsIgnoreCase(newType)) {
+            if (!oldType.equalsIgnoreCase(newType)) {
                 originalEntry.setType(newType);
                 ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
                 edited = true;

@@ -78,7 +78,6 @@ import org.apache.commons.logging.LogFactory;
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
-    // Define codes for the various escape sequences that can be inserted:
     private static final int STRING = 0;
     private static final int ITERATION_COUNT = 1;
     private static final int FILE_PATH = 2;

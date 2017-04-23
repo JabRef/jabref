@@ -22,13 +22,13 @@ import java.util.regex.Pattern;
  */
 public class INSPIREBibtexFilterReader extends FilterReader {
 
-    private final BufferedReader inReader;
+    private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
 
+    private final BufferedReader inReader;
     private String line;
     private int pos;
-    private boolean pre;
 
-    private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
+    private boolean pre;
 
 
     public INSPIREBibtexFilterReader(final Reader initialReader) {

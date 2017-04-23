@@ -17,10 +17,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DatabaseSearcher {
 
-    private final SearchQuery query;
-    private final BibDatabase database;
-
     private static final Log LOGGER = LogFactory.getLog(DatabaseSearcher.class);
+    private final SearchQuery query;
+
+    private final BibDatabase database;
 
     public DatabaseSearcher(SearchQuery query, BibDatabase database) {
         this.query = Objects.requireNonNull(query);

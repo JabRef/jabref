@@ -16,11 +16,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Layout {
 
+    private static final Log LOGGER = LogFactory.getLog(Layout.class);
+
     private final List<LayoutEntry> layoutEntries;
 
     private final List<String> missingFormatters = new ArrayList<>();
-
-    private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
     public Layout(List<StringInt> parsedEntries, LayoutFormatterPreferences prefs) {

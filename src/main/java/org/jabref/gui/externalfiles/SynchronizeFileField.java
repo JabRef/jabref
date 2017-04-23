@@ -271,9 +271,7 @@ public class SynchronizeFileField extends AbstractWorker {
         }
     }
 
-
     static class OptionsDialog extends JabRefDialog {
-
 
         private final JButton ok = new JButton(Localization.lang("OK"));
         private final JButton cancel = new JButton(Localization.lang("Cancel"));

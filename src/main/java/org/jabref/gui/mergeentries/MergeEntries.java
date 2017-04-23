@@ -58,6 +58,17 @@ public class MergeEntries {
     private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
 
+    private static final String MARGIN = "10px";
+
+    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
+
+    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
+    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
+            Localization.lang("Show diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show diff") + " - " + Localization.lang("character"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
+            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
+
     // Headings
     private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
             Localization.lang("Left entry"),
@@ -65,12 +76,6 @@ public class MergeEntries {
             Localization.lang("None"),
             Localization.lang("Right"),
             Localization.lang("Right entry"));
-    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
-            Localization.lang("Show diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show diff") + " - " + Localization.lang("character"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
-
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
@@ -87,15 +92,10 @@ public class MergeEntries {
     private final JComboBox<String> diffMode = new JComboBox<>();
     private final Map<String, JTextPane> leftTextPanes = new HashMap<>();
     private final Map<String, JTextPane> rightTextPanes = new HashMap<>();
+
     private final Map<String, List<JRadioButton>> radioButtons = new HashMap<>();
 
     private final JPanel mainPanel = new JPanel();
-
-    private static final String MARGIN = "10px";
-
-    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
-
-    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
 
 
 
@@ -165,7 +165,6 @@ public class MergeEntries {
         setupEntryTypeRow(mergePanel);
 
         int maxLabelWidth = setupFieldRows(mergePanel);
-
 
         // Create and add scrollpane
         scrollPane = new JScrollPane(mergePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,

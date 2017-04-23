@@ -1,6 +1,5 @@
 package org.jabref.logic.citationstyle;
 
-
 import org.jabref.logic.util.OS;
 
 public enum CitationStyleOutputFormat {

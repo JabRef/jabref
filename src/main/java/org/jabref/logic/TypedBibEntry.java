@@ -40,7 +40,7 @@ public class TypedBibEntry {
      */
     public boolean hasAllRequiredFields() {
         Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
-        if(type.isPresent()) {
+        if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
             return true;

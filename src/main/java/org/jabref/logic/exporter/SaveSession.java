@@ -11,10 +11,10 @@ import org.jabref.model.FieldChange;
 
 public abstract class SaveSession {
 
+    protected boolean backup;
     protected final Charset encoding;
     protected final VerifyingWriter writer;
     private final List<FieldChange> undoableFieldChanges = new ArrayList<>();
-    protected boolean backup;
 
     protected SaveSession(Charset encoding, boolean backup, VerifyingWriter writer) {
         this.encoding = Objects.requireNonNull(encoding);

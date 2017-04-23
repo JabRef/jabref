@@ -29,7 +29,6 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
 
     private final JTextField additionalParams = new JTextField(30);
 
-
     @Override
     public String getApplicationName() {
         return "Emacs";

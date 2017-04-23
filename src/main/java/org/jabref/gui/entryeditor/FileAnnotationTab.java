@@ -40,7 +40,6 @@ import com.jgoodies.forms.factories.Paddings;
 
 import static org.jabref.model.pdf.FileAnnotationType.NONE;
 
-
 class FileAnnotationTab extends JPanel {
 
     private final JList<FileAnnotation> annotationList = new JList<>();
@@ -332,7 +331,6 @@ class FileAnnotationTab extends JPanel {
                 break;
         }
     }
-
 
     private class AnnotationListSelectionListener implements ListSelectionListener {
         @Override

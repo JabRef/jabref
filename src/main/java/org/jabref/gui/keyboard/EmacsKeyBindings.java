@@ -405,7 +405,6 @@ public class EmacsKeyBindings {
         }
     }
 
-
     private static void doCopyOrCut(JTextComponent jtc, boolean copy) {
         if (jtc != null) {
             int caretPosition = jtc.getCaretPosition();
@@ -582,20 +581,19 @@ public class EmacsKeyBindings {
         }
     }
 
-    /**
-     * Manages all killed (cut) text pieces in a ring which is accessible
-     * through {@link YankPopAction}.
-     * <p>
-     * Also provides an unmodifiable copy of all cut pieces.
-     */
     public static class KillRing {
 
+        /**
+         * Manages all killed (cut) text pieces in a ring which is accessible
+         * through {@link YankPopAction}.
+         * <p>
+         * Also provides an unmodifiable copy of all cut pieces.
+         */
+        private static final KillRing INSTANCE = new KillRing();
         private JTextComponent jtc;
         private final LinkedList<String> ring = new LinkedList<>();
+
         private Iterator<String> iter = ring.iterator();
-
-        private static final KillRing INSTANCE = new KillRing();
-
 
         public static KillRing getInstance() {
             return KillRing.INSTANCE;
@@ -775,7 +773,6 @@ public class EmacsKeyBindings {
             }
         }
     }
-
 
     private static int getWordEnd(JTextComponent jtc, int start)
             throws BadLocationException {

@@ -141,7 +141,7 @@ public abstract class Importer implements Comparable<Importer> {
         if (this == obj) {
             return true;
         }
-        if(!(obj instanceof Importer)) {
+        if (!(obj instanceof Importer)) {
             return false;
         }
         Importer other = (Importer)obj;

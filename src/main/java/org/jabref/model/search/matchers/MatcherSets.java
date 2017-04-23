@@ -1,6 +1,5 @@
 package org.jabref.model.search.matchers;
 
-
 public class MatcherSets {
 
     public enum MatcherType {

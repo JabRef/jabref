@@ -34,9 +34,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
-    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
-
     public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
     }
@@ -328,7 +327,7 @@ public class FileUtil {
                     .filter(Files::isRegularFile)
                     .filter(f -> f.getFileName().toString().equals(filename))
                     .findFirst();
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             LOGGER.error("Error trying to locate the file " + filename + " inside the directory " + rootDirectory);
         }
         return Optional.empty();

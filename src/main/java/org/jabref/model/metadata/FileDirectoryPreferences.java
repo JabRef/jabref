@@ -35,7 +35,7 @@ public class FileDirectoryPreferences {
                 return Optional.of(path);
             }
             return Optional.empty();
-        } catch(InvalidPathException ex) {
+        } catch (InvalidPathException ex) {
             return Optional.empty();
         }
     }

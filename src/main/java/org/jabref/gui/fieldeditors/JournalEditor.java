@@ -12,7 +12,6 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;
 
-
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
@@ -26,7 +25,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
         ControlHelper.loadFXMLForControl(this);
 
-        viewModel.textProperty().bindBidirectional(textArea.textProperty());
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
     }
 
     public JournalEditorViewModel getViewModel() {
@@ -36,7 +35,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        textArea.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(fieldName, entry);
     }
 
     @Override

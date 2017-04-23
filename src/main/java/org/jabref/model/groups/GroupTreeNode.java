@@ -143,18 +143,18 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         List<GroupTreeNode> groups = new ArrayList<>();
 
         // Add myself if I contain the entries
-        if(requireAll) {
-            if(this.group.containsAll(entries)) {
+        if (requireAll) {
+            if (this.group.containsAll(entries)) {
                 groups.add(this);
             }
         } else {
-            if(this.group.containsAny(entries)) {
+            if (this.group.containsAny(entries)) {
                 groups.add(this);
             }
         }
 
         // Traverse children
-        for(GroupTreeNode child : getChildren()) {
+        for (GroupTreeNode child : getChildren()) {
             groups.addAll(child.getContainingGroups(entries, requireAll));
         }
 
@@ -174,7 +174,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
 
         // Traverse children
-        for(GroupTreeNode child : getChildren()) {
+        for (GroupTreeNode child : getChildren()) {
             groups.addAll(child.getMatchingGroups(entries));
         }
 

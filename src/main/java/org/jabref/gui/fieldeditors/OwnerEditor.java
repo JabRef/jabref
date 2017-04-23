@@ -11,7 +11,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
@@ -25,7 +24,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
         ControlHelper.loadFXMLForControl(this);
 
-        viewModel.textProperty().bindBidirectional(textArea.textProperty());
+        textArea.textProperty().bindBidirectional(viewModel.textProperty());
     }
 
     public OwnerEditorViewModel getViewModel() {
@@ -35,7 +34,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        textArea.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(fieldName, entry);
     }
 
     @Override

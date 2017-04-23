@@ -70,7 +70,6 @@ public class ModsImporter extends Importer {
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
     private JAXBContext context;
 
-
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());

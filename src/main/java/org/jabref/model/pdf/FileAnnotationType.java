@@ -1,6 +1,5 @@
 package org.jabref.model.pdf;
 
-
 import java.util.Locale;
 
 import org.apache.commons.logging.Log;
@@ -11,6 +10,7 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
  * Our representation of the type of the FileAnnotation. This is needed as some FileAnnotationTypes require special
  * handling (e.g., Highlight or Underline), because of the linked FileAnnotations.
  */
+
 public enum FileAnnotationType {
     TEXT("Text"),
     HIGHLIGHT("Highlight"),

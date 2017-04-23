@@ -50,7 +50,6 @@ public class Date {
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
 
-
         if (year.isPresent()) {
             TemporalAccessor date;
             if (month.isPresent()) {
@@ -100,6 +99,10 @@ public class Date {
 
     public Optional<Integer> getDay() {
         return get(ChronoField.DAY_OF_MONTH);
+    }
+
+    public LocalDate toLocalDate() {
+        return LocalDate.from(date);
     }
 
     @Override

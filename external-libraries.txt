@@ -175,11 +175,6 @@ Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL-3.0
 
-Id:      com.github.lgooddatepicker:LGoodDatePicker
-Project: LGoodDatePicker
-URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
-License: MIT
-
 Id:      spin
 Path:    lib/spin.jar
 Project: Spin

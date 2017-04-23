@@ -474,7 +474,7 @@ public class PdfContentImporter extends Importer {
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             return ParserResult.fromError(exception);
         } catch (FetcherException e) {
             return ParserResult.fromErrorMessage(e.getMessage());

@@ -20,11 +20,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class LookupIdentifiersWorker<T extends Identifier> extends AbstractWorker {
 
+    private static final Log LOGGER = LogFactory.getLog(LookupIdentifiersWorker.class);
     private final JabRefFrame frame;
     private final IdFetcher<T> fetcher;
-    private String message;
 
-    private static final Log LOGGER = LogFactory.getLog(LookupIdentifiersWorker.class);
+    private String message;
 
     public LookupIdentifiersWorker(JabRefFrame frame, IdFetcher<T> fetcher) {
         this.frame = Objects.requireNonNull(frame);

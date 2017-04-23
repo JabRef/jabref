@@ -27,7 +27,6 @@ public class NormalizePagesFormatter implements Formatter {
     private static final String PAGES_REPLACE_PATTERN = "${startpage}--${endpage}";
     private static final String SINGLE_PAGE_REPLACE_PATTERN = "$1";
 
-
     @Override
     public String getName() {
         return Localization.lang("Normalize page numbers");

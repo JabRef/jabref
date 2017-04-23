@@ -10,7 +10,7 @@ public class EntryEditorTabbedPane extends JTabbedPane {
         super();
     }
 
-    public void hidePdfTab(FileAnnotationTab pdfTab){
+    public void hidePdfTab(FileAnnotationTab pdfTab) {
         this.pdfTab = pdfTab;
         this.remove(pdfTab);
     }

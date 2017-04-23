@@ -9,7 +9,7 @@ import org.jabref.logic.l10n.Localization;
 
 public class SearchForUpdateAction extends AbstractAction {
 
-    public SearchForUpdateAction(){
+    public SearchForUpdateAction() {
         super(Localization.lang("Check for updates"));
     }
 

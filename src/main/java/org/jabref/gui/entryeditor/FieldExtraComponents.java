@@ -14,7 +14,6 @@ import javax.swing.JComponent;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.contentselector.FieldContentSelector;
-import org.jabref.gui.date.DatePickerButton;
 import org.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.logic.l10n.Localization;
@@ -95,74 +94,12 @@ public class FieldExtraComponents {
      * @return
      */
     public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+                                                                 Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
                 InternalBibtexFields.getFieldProperties(editor.getFieldName())
                         .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
         contentSelectors.add(ws);
         return Optional.of(ws);
-    }
-
-    /**
-     * Set up field such that double click inserts the current date
-     * If isDataPicker is True, a button with a data picker is returned
-     *
-     * @param editor reference to the FieldEditor to display the date value
-     * @param useDatePicker shows a DatePickerButton if true
-     * @param useIsoFormat if true ISO format is always used
-     * @return
-     */
-    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, boolean useDatePicker,
-            boolean useIsoFormat) {
-        /*
-        ((JTextArea) editor).addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {// double click
-                    String date = "";
-                    if(useIsoFormat) {
-                        date = DateTimeFormatter.ISO_DATE.format(LocalDate.now());
-                    } else {
-                        date = DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)).format(
-                                LocalDateTime.now());
-                    }
-                    editor.setText(date);
-                }
-            }
-        });
-        */
-
-        // insert a datepicker, if the extras field contains this command
-        if (useDatePicker) {
-            DatePickerButton datePicker = new DatePickerButton(editor, useIsoFormat);
-
-            /*
-            // register a DocumentListener on the underlying text document which notifies the DatePicker which date is currently set
-            ((JTextArea) editor).getDocument().addDocumentListener(new DocumentListener() {
-
-                @Override
-                public void insertUpdate(DocumentEvent e) {
-                    datePicker.updateDatePickerDate(editor.getText());
-                }
-
-                @Override
-                public void removeUpdate(DocumentEvent e) {
-                    datePicker.updateDatePickerDate(editor.getText());
-                }
-
-                @Override
-                public void changedUpdate(DocumentEvent e) {
-                    datePicker.updateDatePickerDate(editor.getText());
-                }
-            });
-            */
-
-            return Optional.of(datePicker.getDatePicker());
-        } else {
-            return Optional.empty();
-        }
-
     }
 
     /**
@@ -218,7 +155,7 @@ public class FieldExtraComponents {
      */
 
     public static Optional<JComponent> getTypeExtraComponent(FieldEditor fieldEditor, EntryEditor entryEditor,
-            boolean isPatent) {
+                                                             boolean isPatent) {
         String[] optionValues;
         String[] optionDescriptions;
         if (isPatent) {

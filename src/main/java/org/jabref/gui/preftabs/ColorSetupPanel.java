@@ -79,12 +79,12 @@ public class ColorSetupPanel extends JPanel {
         int col = 0;
         int row;
         for (ColorButton but : buttons) {
-            row = (2*(rowcnt/2)) + 1; // == 2*floor(rowcnt/2) + 1
-            builder.add((JButton)but).xy((6*col)+1, row);
-            builder.add(but.getDefaultButton()).xy((6*col)+3, row);
-            builder.add(but.getName()).xy((6*col)+5, row);
+            row = (2 * (rowcnt / 2)) + 1; // == 2*floor(rowcnt/2) + 1
+            builder.add((JButton)but).xy((6 * col) + 1, row);
+            builder.add(but.getDefaultButton()).xy((6 * col) + 3, row);
+            builder.add(but.getName()).xy((6 * col) + 5, row);
             but.addActionListener(new ColorButtonListener(but));
-            col = 1-col;  // Change 0 -> 1 -> 0 ...
+            col = 1 - col;  // Change 0 -> 1 -> 0 ...
             rowcnt++;
         }
 
@@ -107,7 +107,6 @@ public class ColorSetupPanel extends JPanel {
             Globals.prefs.putColor(but.getKey(), but.getColor());
         }
     }
-
 
     static class ColorButtonListener implements ActionListener {
 

@@ -124,7 +124,7 @@ public class OvidImporter extends Importer {
                         h.put(FieldName.ISSUE, matcher.group(3));
                         h.put(FieldName.PAGES, matcher.group(4));
                         h.put(FieldName.YEAR, matcher.group(5));
-                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) {// may be missing the issue
+                    } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) { // may be missing the issue
                         h.put(FieldName.JOURNAL, matcher.group(1));
                         h.put(FieldName.VOLUME, matcher.group(2));
                         h.put(FieldName.PAGES, matcher.group(3));

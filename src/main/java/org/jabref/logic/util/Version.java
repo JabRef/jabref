@@ -23,12 +23,12 @@ import org.json.JSONObject;
  */
 public class Version {
 
+    public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
     private static final Log LOGGER = LogFactory.getLog(Version.class);
+
     private static final Version UNKNOWN_VERSION = new Version();
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
-
-    public static final String JABREF_DOWNLOAD_URL = "https://downloads.jabref.org";
     private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
 
 
@@ -248,7 +248,6 @@ public class Version {
     public String toString() {
         return this.getFullVersion();
     }
-
 
     public enum DevelopmentStage {
         UNKNOWN("", 0),
