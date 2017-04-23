@@ -2410,8 +2410,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Optional<Path> chosenFile = DefaultTaskExecutor
                     .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
 
-
-
             if (chosenFile.isPresent()) {
                 Path path = chosenFile.get();
                 saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
