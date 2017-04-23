@@ -22,7 +22,7 @@ public class FileDialogConfiguration {
     private final String initialFileName;
 
     private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-                                    FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
         this.initialDirectory = initialDirectory;
         this.extensionFilters = Objects.requireNonNull(extensionFilters);
         this.defaultExtension = defaultExtension;

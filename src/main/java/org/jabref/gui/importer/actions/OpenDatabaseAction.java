@@ -193,13 +193,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * @param file the file, may be null or not existing
      */
     private void openTheFile(Path file, boolean raisePanel) {
-        if ((file != null) && Files.exists(file)) {
+        Objects.requireNonNull(file);
+        if (Files.exists(file)) {
             Path fileToLoad = file.toAbsolutePath();
 
             frame.output(Localization.lang("Opening") + ": '" + file + "'");
 
-            String fileName = file.getParent().toString();
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileName);
+            String fileName = file.getFileName().toString();
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
 
             if (FileBasedLock.hasLockFile(file)) {
                 Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file);
@@ -231,7 +232,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
 
             ParserResult result;
-            result = OpenDatabase.loadDatabase(fileToLoad.toAbsolutePath().toString(),
+            result = OpenDatabase.loadDatabase(fileToLoad.toString(),
                     Globals.prefs.getImportFormatPreferences());
 
             if (result.getDatabase().isShared()) {
@@ -275,7 +276,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
 
         if (Objects.nonNull(file)) {
-            frame.output(Localization.lang("Opened library") + " '" + file.toAbsolutePath().toString() + "' "
+            frame.output(Localization.lang("Opened library") + " '" + file.toString() + "' "
                     + Localization.lang("with")
                     + " "
                     + database.getEntryCount() + " " + Localization.lang("entries") + ".");

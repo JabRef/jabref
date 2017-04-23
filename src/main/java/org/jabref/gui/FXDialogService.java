@@ -155,7 +155,8 @@ public class FXDialogService implements DialogService {
         return chooser;
     }
 
-    private FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {
+    @Override
+    public FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
         chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());

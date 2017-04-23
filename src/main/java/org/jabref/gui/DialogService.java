@@ -7,6 +7,7 @@ import java.util.Optional;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.stage.FileChooser;
 
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -162,4 +163,12 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+
+    /**
+     * Gets the configured {@link FileChooser}, should only be necessary in rare use cases.
+     * For normal usage use the show-Methods which directly return the selected file(s)
+     * @param fileDialogConfiguration
+     * @return A configured instance of the {@link FileChooser}
+     */
+    FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
 }

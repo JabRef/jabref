@@ -87,7 +87,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
         // the existence check has to be done here (and not in open.openIt) as we have to call "removeItem" if the file does not exist
         if (!Files.exists(fileToOpen)) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("File not found") + ": " + fileToOpen.getParent(),
+            JOptionPane.showMessageDialog(frame, Localization.lang("File not found") + ": " + fileToOpen.getFileName(),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             history.removeItem(name);
             setItems();
