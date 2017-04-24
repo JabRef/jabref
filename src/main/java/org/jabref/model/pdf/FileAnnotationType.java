@@ -22,6 +22,7 @@ public enum FileAnnotationType {
     FREETEXT("FreeText"),
     STRIKEOUT("Strikeout"),
     LINK("Link"),
+    INK("Ink"),
     UNKNOWN("Unknown"),
     NONE("None");
 
