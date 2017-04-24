@@ -14,7 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Continued to redesign the user interface: this time the editor got a fresh coat of paint:
   - The buttons were changed to icons.
   - Removed the hidden feature that a double click in the editor inserted the current date.
-  
+- When copying and pasting, the X11 selection is read first and also set. [#2389](https://github.com/JabRef/jabref/issues/2389).
 
 ### Fixed
 
