@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="500.0" prefWidth="1080.0"
+            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="org.jabref.gui.errorconsole.ErrorConsoleController">
+    <content>
+        <BorderPane>
+            <bottom>
+                <ButtonBar styleClass="custom-buttons" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets top="10.0" />
+                    </BorderPane.margin>
+                    <buttons>
+                        <Button fx:id="closeButton" cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#closeErrorDialog" text="%Close" textAlignment="CENTER" ButtonBar.buttonData="RIGHT"/>
+                        <Button fx:id="copyLogButton" mnemonicParsing="false" onAction="#copyLog" text="%Copy Log" ButtonBar.buttonData="LEFT"/>
+                        <Button fx:id="clearLogButton" mnemonicParsing="false" onAction="#clearLog" text="%Clear Log" ButtonBar.buttonData="LEFT"/>
+                        <Button fx:id="createIssueButton" mnemonicParsing="false" onAction="#createIssue" text="%Report Issue" ButtonBar.buttonData="LEFT"/>
+                    </buttons>
+                </ButtonBar>
+            </bottom>
+            <center>
+                <ListView fx:id="messagesListView" onKeyPressed="#copySelectedLogEntries" styleClass="list-content" BorderPane.alignment="CENTER" />
+            </center>
+        </BorderPane>
+    </content>
+   <header>
+      <Label fx:id="descriptionLabel" styleClass="info-section" text="%We now give you insight into the inner workings of JabRef's internals. This information might be helpful to diagnose the root cause of a problem. Please feel free to inform the developers about an issue." wrapText="true" />
+   </header>
+</DialogPane>

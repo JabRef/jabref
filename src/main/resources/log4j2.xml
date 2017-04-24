@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO" packages="net.sf.jabref">
+<Configuration status="INFO" packages="org.jabref">
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
@@ -7,13 +7,19 @@
         <GuiAppender name="GuiLogger">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </GuiAppender>
+        <OurApplicationInsightsAppender name="applicationInsightsAppender"/>
     </Appenders>
     <Loggers>
-        <Logger name="net.sf.jabref" level="INFO">
+        <Logger name="org.jabref" level="INFO">
             <AppenderRef ref="GuiLogger"/>
+        </Logger>
+        <Logger name="org.apache.pdfbox" level="ERROR">
+            <AppenderRef ref="GuiLogger"/>
+            <AppenderRef ref="CONSOLE"/>
         </Logger>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
+            <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
         </Root>
     </Loggers>
 </Configuration>
