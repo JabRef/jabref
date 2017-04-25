@@ -68,19 +68,20 @@ public class FileListEntryEditor {
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
     private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
-    private JDialog diag;
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
-
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
+    private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
+    private JDialog diag;
     //Do not make this variable final, as then the lambda action listener will fail on compile
     private JabRefFrame frame;
-
     private boolean showSaveDialog;
-
-    private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
+    private ConfirmCloseFileListEntryEditor externalConfirm;
+    private FileListEntry entry;
+    //Do not make this variable final, as then the lambda action listener will fail on compiöe
+    private BibDatabaseContext databaseContext;
     private final ActionListener browsePressed = e -> {
         String fileText = link.getText().trim();
         Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
@@ -101,24 +102,19 @@ public class FileListEntryEditor {
             path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
         }
 
-        path.ifPresent(selection -> {
-            File newFile = selection.toFile();
+        path.ifPresent(newFile -> {
             // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.toString());
 
             // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-            newFile = FileUtil.shortenFileName(newFile, fileDirs);
+            List<Path> fileDirectories = this.databaseContext
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            newFile = FileUtil.shortenFileName(newFile, fileDirectories);
 
-            link.setText(newFile.getPath());
+            link.setText(newFile.toString());
             link.requestFocus();
         });
     };
-    private ConfirmCloseFileListEntryEditor externalConfirm;
-    private FileListEntry entry;
-    //Do not make this variable final, as then the lambda action listener will fail on compiöe
-    private BibDatabaseContext databaseContext;
     private boolean okPressed;
 
     private boolean okDisabledExternally;

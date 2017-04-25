@@ -20,19 +20,19 @@ import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.io.FileFinder;
+import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -89,17 +89,48 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(
                 newFile -> {
-                    String fileExtension = FileHelper.getFileExtension(newFile).orElse("");
-                    ExternalFileType suggestedFileType = ExternalFileTypes.getInstance()
-                            .getExternalFileTypeByExt(fileExtension).orElse(new UnknownExternalFileType(fileExtension));
-                    LinkedFile newLinkedFile = new LinkedFile("", newFile.toString(), suggestedFileType.getName());
+                    LinkedFile newLinkedFile = LinkedFile.fromFile(newFile, fileDirectories);
                     files.add(new LinkedFileViewModel(newLinkedFile));
                 }
         );
     }
 
     public void fetchFulltext() {
+        if (!entry.isPresent()) {
+            return;
+        }
 
+        final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+        final List<String> extensions = ExternalFileTypes.getInstance().getExternalFileTypeSelection().stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+
+        // Run the search operation:
+        FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+        List<Path> newFiles = fileFinder.findAssociatedFiles(entry.get(), dirs, extensions);
+
+        boolean newAssociatedFileFound = false;
+        for (Path newFile : newFiles) {
+            boolean alreadyLinked = files.get().stream()
+                    .map(file -> file.findIn(dirs))
+                    .anyMatch(file -> file.isPresent() && file.get().equals(newFile));
+            if (!alreadyLinked) {
+                LinkedFile newLinkedFile = LinkedFile.fromFile(newFile, dirs);
+                files.add(new LinkedFileViewModel(newLinkedFile));
+                newAssociatedFileFound = true;
+            }
+        }
+
+        if (newAssociatedFileFound) {
+            dialogService.notify(Localization.lang("Finished automatically setting external links."));
+        } else {
+            dialogService.notify(
+                    Localization.lang("Finished automatically setting external links.")
+                            + " "
+                            + Localization.lang("No files found."));
+
+            // auto download file as no file found before
+            // TODO: implement
+            //frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
+        }
     }
 
     public void addFromURL() {
@@ -112,7 +143,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
                 Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
                 String suggestedTypeName = suggestedType.map(ExternalFileType::getName).orElse("");
-                List<String> fileDirectories = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
                 Path destination = constructSuggestedPath(suggestedType, fileDirectories);
 
                 LinkedFileViewModel temporaryDownloadFile = new LinkedFileViewModel(new LinkedFile("", url, suggestedTypeName));
@@ -121,13 +152,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.progressProperty());
                 downloadTask.setOnSucceeded(event -> {
                     files.remove(temporaryDownloadFile);
-                    String relativeDestination = destination.toString();
-                    try {
-                        relativeDestination = FileUtil.shortenFileName(destination.toFile(), fileDirectories).getCanonicalPath();
-                    } catch (IOException e) {
-                        LOGGER.debug("Could not determine relative file name " + destination, e);
-                    }
-                    LinkedFile newLinkedFile = new LinkedFile("", relativeDestination, suggestedTypeName);
+                    LinkedFile newLinkedFile = LinkedFile.fromFile(destination, fileDirectories);
                     files.add(new LinkedFileViewModel(newLinkedFile));
                 });
                 downloadTask.setOnFailed(event ->
@@ -152,17 +177,17 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return suggestedType;
     }
 
-    private Path constructSuggestedPath(Optional<ExternalFileType> suggestedType, List<String> fileDirectories) {
+    private Path constructSuggestedPath(Optional<ExternalFileType> suggestedType, List<Path> fileDirectories) {
         String suffix = suggestedType.map(ExternalFileType::getExtension).orElse("");
         String suggestedName = getSuggestedFileName(suffix);
-        String directory;
+        Path directory;
         if (fileDirectories.isEmpty()) {
             directory = null;
         } else {
             directory = fileDirectories.get(0);
         }
-        final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
-        return Paths.get(suggestDir, suggestedName);
+        final Path suggestDir = directory == null ? Paths.get(System.getProperty("user.home")) : directory;
+        return suggestDir.resolve(suggestedName);
     }
 
     private Optional<ExternalFileType> inferFileTypeFromMimeType(URLDownload urlDownload) {

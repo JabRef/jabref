@@ -1,5 +1,9 @@
 package org.jabref.gui.fieldeditors;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,6 +44,10 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
 
     public String getDescription() {
         return linkedFile.getDescription();
+    }
+
+    public Optional<Path> findIn(List<Path> directories) {
+        return linkedFile.findIn(directories);
     }
 
     /**

@@ -1,9 +1,11 @@
 package org.jabref.logic.layout.format;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
@@ -209,7 +211,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = prefs.getFileDirForDatabase();
                         }
 
-                        String pathString = flEntry.findIn(dirs)
+                        String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
                                 .map(path -> path.toAbsolutePath().toString())
                                 .orElse(flEntry.getLink());
 

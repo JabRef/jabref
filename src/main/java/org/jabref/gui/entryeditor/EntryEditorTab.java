@@ -34,7 +34,6 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
-import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -62,8 +61,6 @@ class EntryEditorTab {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;

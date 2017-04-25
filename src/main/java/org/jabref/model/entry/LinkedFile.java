@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
@@ -30,6 +34,18 @@ public class LinkedFile {
 
     public LinkedFile(String description, URL link, String fileType) {
         this(description, Objects.requireNonNull(link).toString(), fileType);
+    }
+
+    /**
+     * Creates an instance of {@link LinkedFile} based on the given file.
+     * We try to guess the file type and relativize the path against the given file directories.
+     */
+    public static LinkedFile fromFile(Path file, List<Path> fileDirectories) {
+        String fileExtension = FileHelper.getFileExtension(file).orElse("");
+        ExternalFileType suggestedFileType = ExternalFileTypes.getInstance()
+                .getExternalFileTypeByExt(fileExtension).orElse(new UnknownExternalFileType(fileExtension));
+        Path relativePath = FileUtil.shortenFileName(file, fileDirectories);
+        return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
 
     public String getFileType() {
@@ -86,17 +102,17 @@ public class LinkedFile {
         return link.startsWith("http://") || link.startsWith("https://") || link.contains("www.");
     }
 
-    public Optional<Path> findIn(List<String> directories) {
+    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences);
+        return findIn(dirs);
+    }
+
+    public Optional<Path> findIn(List<Path> directories) {
         Path file = Paths.get(link);
         if (file.isAbsolute() || directories.isEmpty()) {
             return Optional.of(file);
         } else {
-            return FileHelper.expandFilename(link, directories);
+            return FileHelper.expandFilenameAsPath(link, directories);
         }
-    }
-
-    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        List<String> dirs = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        return findIn(dirs);
     }
 }

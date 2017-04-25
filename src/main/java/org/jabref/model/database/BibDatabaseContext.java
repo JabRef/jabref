@@ -146,9 +146,13 @@ public class BibDatabaseContext {
     }
 
     public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
-        return getFileDirectories(preferences).stream().map(Paths::get).collect(Collectors.toList());
+        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(Paths::get).collect(Collectors.toList());
     }
 
+    /**
+     * @deprecated use {@link #getFileDirectoriesAsPaths(FileDirectoryPreferences)} instead
+     */
+    @Deprecated
     public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
         return getFileDirectories(FieldName.FILE, preferences);
     }
@@ -159,8 +163,7 @@ public class BibDatabaseContext {
      * @return Optional of Path
      */
     public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(p -> Paths.get(p))
-                .filter(Files::exists).findFirst();
+        return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
         //Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
     }
 

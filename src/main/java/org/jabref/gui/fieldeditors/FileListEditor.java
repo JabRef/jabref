@@ -11,14 +11,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -31,14 +28,11 @@ import javax.swing.TransferHandler;
 import javax.swing.table.TableCellRenderer;
 
 import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.actions.Actions;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.MoveFileAction;
 import org.jabref.gui.externalfiles.RenameFileAction;
@@ -50,7 +44,6 @@ import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -67,7 +60,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     private final EntryEditor entryEditor;
     private final JPanel panel;
     private final FileListTableModel tableModel;
-    private final JButton auto;
     private final JPopupMenu menu = new JPopupMenu();
     private FileListEntryEditor editor;
 
@@ -90,19 +82,16 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         remove.setToolTipText(Localization.lang("Remove file link (DELETE)"));
         JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
         JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
-        auto = new JButton(Localization.lang("Get fulltext"));
         remove.setMargin(new Insets(0, 0, 0, 0));
         up.setMargin(new Insets(0, 0, 0, 0));
         down.setMargin(new Insets(0, 0, 0, 0));
         remove.addActionListener(e -> removeEntries());
         up.addActionListener(e -> moveEntry(-1));
         down.addActionListener(e -> moveEntry(1));
-        auto.addActionListener(e -> autoSetLinks());
 
         FormBuilder builder = FormBuilder.create()
                 .layout(new FormLayout("fill:pref,1dlu,fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
         builder.add(up).xy(1, 1);
-        builder.add(auto).xy(5, 1);
         builder.add(down).xy(1, 2);
         builder.add(remove).xy(3, 2);
         panel = new JPanel();
@@ -387,34 +376,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         entryEditor.updateField(this);
         adjustColumnWidth();
         return editor.okPressed();
-    }
-
-    public void autoSetLinks() {
-        auto.setEnabled(false);
-
-        List<BibEntry> entries = new ArrayList<>();
-        entries.add(entryEditor.getEntry());
-
-        // filesystem lookup
-        JDialog dialog = new JDialog(frame, true);
-        JabRefExecutorService.INSTANCE
-                .execute(AutoSetLinks.autoSetLinks(entries, null, null, tableModel, databaseContext, e -> {
-                    auto.setEnabled(true);
-
-                    if (e.getID() > 0) {
-                        entryEditor.updateField(this);
-                        adjustColumnWidth();
-                        frame.output(Localization.lang("Finished automatically setting external links."));
-                    } else {
-                        frame.output(Localization.lang("Finished automatically setting external links.") + " "
-                                + Localization.lang("No files found."));
-
-                        // auto download file as no file found before
-                        frame.getCurrentBasePanel().runCommand(Actions.DOWNLOAD_FULL_TEXT);
-                    }
-                    // reset
-                    auto.setEnabled(true);
-                }, dialog));
     }
 
     /**

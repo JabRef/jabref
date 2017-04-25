@@ -68,7 +68,6 @@ import org.jabref.gui.contentselector.FieldContentSelector;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FieldEditorFocusListener;
-import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.help.HelpAction;
@@ -187,8 +186,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final RedoAction redoAction = new RedoAction();
     private final TabListener tabListener = new TabListener();
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    private FileListEditor fileListEditor;
     private EntryEditorTabRelatedArticles relatedArticlesTab;
     private JTextArea source;
     private FileAnnotationTab fileAnnotationTab;
@@ -243,9 +240,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         updateAllFields();
-        if (this.fileListEditor != null) {
-            this.fileListEditor.adjustColumnWidth();
-        }
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
@@ -300,9 +294,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // Add tabs
                 EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
                         false, true, Localization.lang("Optional fields 2"));
-                if (optPan2.fileListEditor != null) {
-                    fileListEditor = optPan2.fileListEditor;
-                }
                 tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                         optPan2.getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
@@ -311,9 +302,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     EntryEditorTab optPan3;
                     optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
                             false, true, Localization.lang("Deprecated fields"));
-                    if (optPan3.fileListEditor != null) {
-                        fileListEditor = optPan3.fileListEditor;
-                    }
                     tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                             optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
@@ -359,9 +347,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
                     false, tabList.getTabName(i));
-            if (newTab.fileListEditor != null) {
-                fileListEditor = newTab.fileListEditor;
-            }
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
@@ -397,9 +382,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addOtherTab(List<String> otherFields) {
         EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
                 false, false, Localization.lang("Other fields"));
-        if (otherPanel.fileListEditor != null) {
-            fileListEditor = otherPanel.fileListEditor;
-        }
         tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
                 .getPane(), Localization.lang("Show remaining fields"));
         tabs.add(otherPanel);
@@ -410,9 +392,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false,
                 Localization.lang("Required fields"));
-        if (requiredPanel.fileListEditor != null) {
-            fileListEditor = requiredPanel.fileListEditor;
-        }
         tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(requiredPanel);
@@ -444,10 +423,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addOptionalTab(EntryType type) {
         EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
                 false, true, Localization.lang("Optional fields"));
-
-        if (optionalPanel.fileListEditor != null) {
-            fileListEditor = optionalPanel.fileListEditor;
-        }
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                 optionalPanel.getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
@@ -1536,12 +1511,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            FileListEditor localFileListEditor = EntryEditor.this.fileListEditor;
-            if (localFileListEditor == null) {
-                LOGGER.warn("No file list editor found.");
-            } else {
-                localFileListEditor.autoSetLinks();
-            }
+            // TODO: Reimplement this
+            //localFileListEditor.autoSetLinks();
         }
     }
 }
