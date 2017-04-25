@@ -1200,8 +1200,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
                 }
                 // Create an UndoableInsertEntry object.
-                getUndoManager()
-                        .addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry, BasePanel.this));
+                getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), bibEntry, BasePanel.this));
                 output(Localization.lang("Added new '%0' entry.", bibEntry.getType()));
 
                 markBaseChanged(); // The database just changed.
@@ -1349,8 +1348,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null)
-                && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
+        boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1671,8 +1669,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
             if (getBibDatabaseContext().getDatabaseFile().isPresent()) {
-                frame.setTabTitle(this, getTabTitle(),
-                        getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
+                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
             } else {
                 frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
             }
@@ -1705,8 +1702,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         if (entries.size() > 1) {
             int choice = JOptionPane.showConfirmDialog(this,
-                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?",
-                            newType),
+                    Localization.lang("Multiple entries selected. Do you want to change the type of all these to '%0'?", newType),
                     Localization.lang("Change entry type"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (choice == JOptionPane.NO_OPTION) {
                 return;
@@ -2107,8 +2103,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            final List<String> mdDirs = basePanel.getBibDatabaseContext()
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+            final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             for (final String mdDir : mdDirs) {
                 dirs.add(new File(mdDir));
             }
@@ -2120,8 +2115,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Map<BibEntry, List<File>> result;
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
-                result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp,
-                        Globals.prefs.getKeywordDelimiter());
+                result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp, Globals.prefs.getKeywordDelimiter());
             } else {
                 boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
                 result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
@@ -2385,8 +2379,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() throws Exception {
             selectionListener.setPreviewActive(true);
             showPreview(selectionListener.getPreview());
-            selectionListener.getPreview().getPrintAction()
-                    .actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+            selectionListener.getPreview().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
         }
     }
 
