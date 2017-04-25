@@ -1,35 +1,41 @@
 package org.jabref.logic.layout.format;
 
-import org.jabref.logic.layout.LayoutFormatter;
+import java.util.Arrays;
+import java.util.Collection;
 
+import org.jabref.logic.layout.LayoutFormatter;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 public class AuthorAndToSemicolonReplacerTest {
 
-    /**
-     * Test method for
-     * {@link org.jabref.logic.layout.format.AuthorAndToSemicolonReplacer#format(java.lang.String)}.
-     */
+    @Parameter(value = 0)
+    public String input;
+
+    @Parameter(value = 1)
+    public String expected;
+
+    @Parameters(name = "{index}: format(\"{0}\")=\"{1}\"")
+    public static Collection<Object[]> data() {
+
+        return Arrays.asList(new Object[][] {
+            {"",""},
+            {"Someone, Van Something", "Someone, Van Something"},
+            {"John Smith and Black Brown, Peter", "John Smith; Black Brown, Peter"},
+            {"von Neumann, John and Smith, John and Black Brown, Peter", "von Neumann, John; Smith, John; Black Brown, Peter"},
+            {"John von Neumann and John Smith and Peter Black Brown","John von Neumann; John Smith; Peter Black Brown"},
+        });
+    }
+
     @Test
     public void testFormat() {
         LayoutFormatter a = new AuthorAndToSemicolonReplacer();
 
-        // Empty case
-        Assert.assertEquals("", a.format(""));
-
-        // Single Names don't change
-        Assert.assertEquals("Someone, Van Something", a.format("Someone, Van Something"));
-
-        // Two names just one semicolon
-        Assert.assertEquals("John Smith; Black Brown, Peter", a
-                .format("John Smith and Black Brown, Peter"));
-
-        // Three names put two semicolons
-        Assert.assertEquals("von Neumann, John; Smith, John; Black Brown, Peter", a
-                .format("von Neumann, John and Smith, John and Black Brown, Peter"));
-
-        Assert.assertEquals("John von Neumann; John Smith; Peter Black Brown", a
-                .format("John von Neumann and John Smith and Peter Black Brown"));
+        Assert.assertEquals(expected, a.format(input));
     }
 }

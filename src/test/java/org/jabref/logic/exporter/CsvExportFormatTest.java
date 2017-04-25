@@ -21,14 +21,12 @@ import org.junit.rules.TemporaryFolder;
 import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class CsvExportFormatTest {
     private IExportFormat exportFormat;
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public List<BibEntry> entries;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -44,23 +42,6 @@ public class CsvExportFormatTest {
 
         databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
-
-        BibEntry entry = new BibEntry();
-        entry.setField("title", "title1");
-        entry.setField("author", "Someone, Van Something");
-        entry.setCiteKey("mykey1");
-
-        BibEntry entry2 = new BibEntry();
-        entry2.setField("title", "title2");
-        entry2.setField("author", "von Neumann, John and Smith, John and Black Brown, Peter");
-        entry2.setCiteKey("mykey2");
-
-        BibEntry entry3 = new BibEntry();
-        entry3.setField("title", "title3");
-        entry3.setField("editor", "Smith, John and Black Brown, Peter");
-        entry3.setCiteKey("mykey3");
-
-        entries = Arrays.asList(entry, entry2, entry3);
     }
 
     @After
@@ -69,17 +50,71 @@ public class CsvExportFormatTest {
     }
 
     @Test
-    public void testAuthorsAreSeparatedBySemicolon() throws Exception {
+    public void testPerformExportForSingleAuthor() throws Exception {
         File tmpFile = testFolder.newFile();
         String filename = tmpFile.getCanonicalPath();
+        BibEntry entry = new BibEntry();
+        entry.setField("author", "Someone, Van Something");
+        List<BibEntry> entries = Arrays.asList(entry);
 
         exportFormat.performExport(databaseContext, filename, charset, entries);
 
         List<String> lines = Files.readAllLines(tmpFile.toPath());
-        assertEquals(4, lines.size());
-        System.out.println(lines.get(3));
-        assertTrue(lines.get(1).matches("^.*,\"Someone, Van Something\",.*$"));
-        assertTrue(lines.get(2).matches("^.*,\"von Neumann, John; Smith, John; Black Brown, Peter\",.*$"));
-        assertTrue(lines.get(3).matches("^.*,\"Smith, John; Black Brown, Peter\",.*$"));
+        assertEquals(2, lines.size());
+        assertEquals(
+                "10,\"\",\"\",\"Someone, Van Something\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
     }
+
+    @Test
+    public void testPerformExportForMultipleAuthors() throws Exception {
+        File tmpFile = testFolder.newFile();
+        String filename = tmpFile.getCanonicalPath();
+        BibEntry entry = new BibEntry();
+        entry.setField("author", "von Neumann, John and Smith, John and Black Brown, Peter");
+        List<BibEntry> entries = Arrays.asList(entry);
+
+        exportFormat.performExport(databaseContext, filename, charset, entries);
+
+        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        assertEquals(2, lines.size());
+        assertEquals(
+                "10,\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
+    }
+
+    @Test
+    public void testPerformExportForSingleEditor() throws Exception {
+        File tmpFile = testFolder.newFile();
+        String filename = tmpFile.getCanonicalPath();
+        BibEntry entry = new BibEntry();
+        entry.setField("editor", "Someone, Van Something");
+        List<BibEntry> entries = Arrays.asList(entry);
+
+        exportFormat.performExport(databaseContext, filename, charset, entries);
+
+        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        assertEquals(2, lines.size());
+        assertEquals(
+                "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"Someone, Van Something\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
+    }
+
+    @Test
+    public void testPerformExportForMultipleEditors() throws Exception {
+        File tmpFile = testFolder.newFile();
+        String filename = tmpFile.getCanonicalPath();
+        BibEntry entry = new BibEntry();
+        entry.setField("editor", "von Neumann, John and Smith, John and Black Brown, Peter");
+        List<BibEntry> entries = Arrays.asList(entry);
+
+        exportFormat.performExport(databaseContext, filename, charset, entries);
+
+        List<String> lines = Files.readAllLines(tmpFile.toPath());
+        assertEquals(2, lines.size());
+        assertEquals(
+                "10,\"\",\"\",\"\",\"\",\"\",,,\"\",\"\",,\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"von Neumann, John; Smith, John; Black Brown, Peter\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"",
+                lines.get(1));
+    }
+
 }
