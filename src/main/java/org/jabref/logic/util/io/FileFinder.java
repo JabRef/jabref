@@ -32,7 +32,7 @@ public class FileFinder {
 
         BiPredicate<Path, BasicFileAttributes> isDirectoryAndContainsExtension = (path,
                 attr) -> !Files.isDirectory(path)
-                        && extensions.contains(FileHelper.getFileExtension(path.toFile()).orElse(""));
+                && extensions.contains(FileHelper.getFileExtension(path).orElse(""));
 
         Set<Path> result = new HashSet<>();
         for (File directory : directories) {

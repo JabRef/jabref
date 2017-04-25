@@ -28,11 +28,10 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
+    private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     public TemporaryFolder otherTemporaryFolder = new TemporaryFolder();
-
-    private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
     private LayoutFormatterPreferences layoutFormatterPreferences;
@@ -126,27 +125,27 @@ public class FileUtilTest {
 
     @Test
     public void testGetFileExtensionSimpleFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(new File("test.pdf")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.pdf")).get());
     }
 
     @Test
     public void testGetFileExtensionLowerCaseAndTrimmingFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(new File("test.PdF  ")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.PdF  ")).get());
     }
 
     @Test
     public void testGetFileExtensionMultipleDotsFile() {
-        assertEquals("pdf", FileHelper.getFileExtension(new File("te.st.PdF  ")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("te.st.PdF  ")).get());
     }
 
     @Test
     public void testGetFileExtensionNoExtensionFile() {
-        assertFalse(FileHelper.getFileExtension(new File("JustTextNotASingleDot")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Paths.get("JustTextNotASingleDot")).isPresent());
     }
 
     @Test
     public void testGetFileExtensionNoExtension2File() {
-        assertFalse(FileHelper.getFileExtension(new File(".StartsWithADotIsNotAnExtension")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Paths.get(".StartsWithADotIsNotAnExtension")).isPresent());
     }
 
     @Test

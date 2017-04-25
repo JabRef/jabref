@@ -1,6 +1,5 @@
 package org.jabref.model.util;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,8 +19,8 @@ public class FileHelper {
      * @param file
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.toString());
     }
 
     /**

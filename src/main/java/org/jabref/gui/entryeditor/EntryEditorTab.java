@@ -156,7 +156,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext());
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -299,8 +299,6 @@ class EntryEditorTab {
      * Only sets the activeField variable but does not focus it.
      * <p>
      * If you want to focus it call {@link #focus()} afterwards.
-     *
-     * @param fieldEditor
      */
     // TODO: Reenable or delete this
     //public void setActive(FieldEditor fieldEditor) {

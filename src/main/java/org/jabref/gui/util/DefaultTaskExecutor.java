@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import org.jabref.gui.externalfiles.FileDownloadTask;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,6 +43,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
     @Override
     public <V> void execute(BackgroundTask<V> task) {
         executor.submit(getJavaFXTask(task));
+    }
+
+    @Override
+    public void execute(FileDownloadTask downloadTask) {
+        executor.submit(downloadTask);
     }
 
     @Override

@@ -150,7 +150,7 @@ public class AutoSetLinks {
                         if (!alreadyHas) {
                             foundAny = true;
                             Optional<ExternalFileType> type;
-                            Optional<String> extension = FileHelper.getFileExtension(f);
+                            Optional<String> extension = FileHelper.getFileExtension(f.toPath());
                             if (extension.isPresent()) {
                                 type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {

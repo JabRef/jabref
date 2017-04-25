@@ -1,13 +1,22 @@
 package org.jabref.gui.fieldeditors;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
+import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
@@ -15,18 +24,30 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName) {
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
         this.fieldName = fieldName;
-        this.viewModel = new LinkedFilesEditorViewModel();
+        this.viewModel = new LinkedFilesEditorViewModel(dialogService, databaseContext, taskExecutor);
 
         ControlHelper.loadFXMLForControl(this);
 
         ViewModelListCellFactory<LinkedFileViewModel> cellFactory = new ViewModelListCellFactory<LinkedFileViewModel>()
-                .withText(LinkedFileViewModel::getLink)
                 .withTooltip(LinkedFileViewModel::getDescription)
-                .withIcon(LinkedFileViewModel::getTypeIcon);
+                .withGraphic(LinkedFilesEditor::createFileDisplay);
         listView.setCellFactory(cellFactory);
         listView.itemsProperty().bind(viewModel.filesProperty());
+    }
+
+    private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
+        Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
+        Text text = new Text(linkedFile.getLink());
+        ProgressBar progressIndicator = new ProgressBar();
+        progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
+        progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
+
+        HBox container = new HBox(10);
+        container.setPrefHeight(Double.NEGATIVE_INFINITY);
+        container.getChildren().addAll(icon, text, progressIndicator);
+        return container;
     }
 
     public LinkedFilesEditorViewModel getViewModel() {
@@ -42,4 +63,20 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     public Parent getNode() {
         return this;
     }
+
+    @FXML
+    private void addNewFile(ActionEvent event) {
+        viewModel.addNewFile();
+    }
+
+    @FXML
+    private void fetchFulltext(ActionEvent event) {
+        viewModel.fetchFulltext();
+    }
+
+    @FXML
+    private void addFromURL(ActionEvent event) {
+        viewModel.addFromURL();
+    }
+
 }

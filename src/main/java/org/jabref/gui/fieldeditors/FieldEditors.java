@@ -8,13 +8,14 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         // TODO: Implement all of them
@@ -35,7 +36,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return new OwnerEditor(fieldName, preferences);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(fieldName);
+            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             //return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {

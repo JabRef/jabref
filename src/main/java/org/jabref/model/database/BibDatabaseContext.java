@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -142,6 +143,10 @@ public class BibDatabaseContext {
 
     public boolean isBiblatexMode() {
         return getMode() == BibDatabaseMode.BIBLATEX;
+    }
+
+    public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
+        return getFileDirectories(preferences).stream().map(Paths::get).collect(Collectors.toList());
     }
 
     public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
