@@ -105,6 +105,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //add request header
             dl.addHeader("Accept", "application/json");
             dl.addHeader("Content-Type", "application/json");
+            dl.addHeader("Referer", "http://ieeexplore.ieee.org/search/searchresult.jsp");
 
             // set post data
             dl.setPostData(postData);
