@@ -150,7 +150,6 @@ public class ImportFormatReader {
         public final String format;
         public final ParserResult parserResult;
 
-
         public UnknownFormatImport(String format, ParserResult parserResult) {
             this.format = format;
             this.parserResult = parserResult;
