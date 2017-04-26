@@ -22,8 +22,10 @@
         <graphic>
             <StackPane>
                 <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
-                <MaterialDesignIconView glyphName="MAGNIFY"/>
-                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"/>
+                <MaterialDesignIconView glyphName="MAGNIFY"
+                                        visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
+                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
+                                   visible="${controller.viewModel.fulltextLookupInProgress}"/>
             </StackPane>
         </graphic>
         <tooltip>

@@ -263,7 +263,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditorFX editor : editors.values()) {
-                editor.bindToEntry(entry);
+                DefaultTaskExecutor.runInJavaFXThread(() -> editor.bindToEntry(entry));
             }
             this.entry = entry;
         } finally {

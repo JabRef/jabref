@@ -4,8 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
@@ -13,9 +15,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
@@ -44,9 +48,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
+        Button acceptAutoLinkedFile = MaterialDesignIconFactory.get().createIconButton(MaterialDesignIcon.BRIEFCASE_CHECK);
+        acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
+        acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
+        acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
+        acceptAutoLinkedFile.getStyleClass().setAll("flatButton");
+
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        container.getChildren().addAll(icon, text, progressIndicator);
+        container.getChildren().addAll(icon, text, progressIndicator, acceptAutoLinkedFile);
         return container;
     }
 
