@@ -29,7 +29,6 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
      */
     private Boolean interpretSelectionChangeAsAccept = true;
 
-
     @Override
     public void update(List<E> autoCompletions) {
         if (autoCompletions == null) {

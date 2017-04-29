@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 import org.jabref.cli.XMPUtilMain;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
+import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -38,7 +39,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.io.CharStreams;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -52,12 +52,15 @@ import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.util.XMLUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Answers;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Limitations: The test suite only handles UTF8. Not UTF16.
@@ -70,12 +73,6 @@ public class XMPUtilTest {
      * The PDF file that basically all operations are done upon.
      */
     private File pdfFile;
-
-    private JabRefPreferences prefs;
-
-    private boolean use;
-
-    private List<String> privacyFilters;
 
     private XMPPreferences xmpPreferences;
 
@@ -140,7 +137,7 @@ public class XMPUtilTest {
         }
     }
 
-    public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
+    private static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
             throws IOException {
         ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
@@ -148,14 +145,14 @@ public class XMPUtilTest {
         return c.iterator().next();
     }
 
-    public static String bibtexEntry2BibtexString(BibEntry e, JabRefPreferences preferences) throws IOException {
+    private static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()),
+        new BibEntryWriter(new LatexFieldFormatter(mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS)),
                 false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
 
-    public String t1BibtexString() {
+    private String t1BibtexString() {
         return "@article{canh05,\n" + "  author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},\n"
                 + "  title = {Effective work practices for floss development: A model and propositions},\n"
                 + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n" + "  year = {2005},\n"
@@ -163,11 +160,11 @@ public class XMPUtilTest {
                 + "  url = {http://james.howison.name/publications.html}}\n";
     }
 
-    public BibEntry t1BibtexEntry() throws IOException {
+    private BibEntry t1BibtexEntry() throws IOException {
         return XMPUtilTest.bibtexString2BibtexEntry(t1BibtexString(), importFormatPreferences);
     }
 
-    public String t2XMP() {
+    private String t2XMP() {
         return "<rdf:Description rdf:about='' xmlns:bibtex='http://jabref.sourceforge.net/bibteXMP/' "
                 + "bibtex:title='�pt�mz�t��n' " + "bibtex:bibtexkey='OezbekC06' " + "bibtex:entrytype='INCOLLECTION' "
                 + "bibtex:year='2003' "
@@ -175,11 +172,11 @@ public class XMPUtilTest {
                 + ">\n" + "<bibtex:pdf>YeKis03 - Towards.pdf</bibtex:pdf>\n" + "</rdf:Description>\n";
     }
 
-    public String t2BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry(), prefs);
+    private String t2BibtexString() throws IOException {
+        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry());
     }
 
-    public BibEntry t2BibtexEntry() {
+    private BibEntry t2BibtexEntry() {
         BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "�pt�mz�t��n");
         e.setField("bibtexkey", "OezbekC06");
@@ -190,7 +187,7 @@ public class XMPUtilTest {
         return e;
     }
 
-    public BibEntry t3BibtexEntry() {
+    private BibEntry t3BibtexEntry() {
         BibEntry e = new BibEntry();
         e.setType(BibtexEntryTypes.INPROCEEDINGS);
         e.setField("title", "Hypersonic ultra-sound");
@@ -209,7 +206,7 @@ public class XMPUtilTest {
     }
 
     public String t3BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry(), prefs);
+        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry());
     }
 
     public String t3XMP() {
@@ -239,23 +236,13 @@ public class XMPUtilTest {
             pdf.save(pdfFile.getAbsolutePath());
         }
 
-        // Store Privacy Settings
-        prefs = JabRefPreferences.getInstance();
-
-        use = prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
-        privacyFilters = prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS);
-
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        xmpPreferences = mock(XMPPreferences.class);
         // The code assumes privacy filters to be off
-        prefs.putBoolean("useXmpPrivacyFilter", false);
+        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
 
-        importFormatPreferences = prefs.getImportFormatPreferences();
-        xmpPreferences = prefs.getXMPPreferences();
-    }
-
-    @After
-    public void tearDown() {
-        prefs.putBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER, use);
-        prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, privacyFilters);
+        when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
     }
 
     /**
@@ -316,34 +303,14 @@ public class XMPUtilTest {
      */
     @Test
     public void testPrivacyFilter() throws IOException, TransformerException {
-
-        {
-            BibEntry e = t1BibtexEntry();
-
-            prefs.putBoolean("useXmpPrivacyFilter", true);
-            prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, Arrays.asList("author", "title", "note"));
-
-            XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
-
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
-            Assert.assertEquals(1, l.size());
-            BibEntry x = l.get(0);
-
-            Set<String> expectedFields = new HashSet<>(
-                    Arrays.asList("bibtexkey", "booktitle", "owner", "timestamp", "url", "year"));
-
-            Assert.assertEquals(expectedFields, x.getFieldNames());
-        }
-        // First set:
-        prefs.putBoolean("useXmpPrivacyFilter", true);
-        prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS,
-                Arrays.asList("author;title;note;booktitle;year;owner;timestamp"));
+        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author;title;note;booktitle;year;owner;timestamp"));
 
         BibEntry e = t1BibtexEntry();
 
-        XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
         Set<String> ts = x.getFieldNames();
@@ -353,7 +320,25 @@ public class XMPUtilTest {
         Assert.assertTrue(ts.contains("bibtexkey"));
         Assert.assertTrue(ts.contains("year"));
         Assert.assertTrue(ts.contains("url"));
+    }
 
+    @Test
+    public void testPrivacyFilter2() throws Exception {
+        BibEntry e = t1BibtexEntry();
+
+        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(true);
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(Arrays.asList("author", "title", "note"));
+
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
+
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
+        Assert.assertEquals(1, l.size());
+        BibEntry x = l.get(0);
+
+        Set<String> expectedFields = new HashSet<>(
+                Arrays.asList("bibtexkey", "booktitle", "owner", "timestamp", "url", "year"));
+
+        Assert.assertEquals(expectedFields, x.getFieldNames());
     }
 
     /**

@@ -13,9 +13,10 @@ import javax.swing.table.AbstractTableModel;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldParser;
+import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.FileHelper;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
@@ -119,10 +120,11 @@ public class FileListTableModel extends AbstractTableModel {
             value = "";
         }
 
-        List<ParsedFileField> fields = FileField.parse(value);
+        List<LinkedFile> fields = FileFieldParser.parse(value);
         List<FileListEntry> files = new ArrayList<>();
 
-        for(ParsedFileField entry : fields) {
+        for (LinkedFile entry : fields) {
+
             if (entry.isEmpty()) {
                 continue;
             }
@@ -161,7 +163,7 @@ public class FileListTableModel extends AbstractTableModel {
         return entry.getType().get().getIconLabel();
     }
 
-    private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
+    private FileListEntry decodeEntry(LinkedFile entry, boolean deduceUnknownType) {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.getFileType());
 
         if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {
@@ -170,7 +172,7 @@ public class FileListTableModel extends AbstractTableModel {
             type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.getFileType());
             if (!type.isPresent()) {
                 // No type could be found from mime type on the extension:
-                Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
+                Optional<String> extension = FileHelper.getFileExtension(entry.getLink());
                 if (extension.isPresent()) {
                     Optional<ExternalFileType> typeGuess = ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt(extension.get());
@@ -198,7 +200,7 @@ public class FileListTableModel extends AbstractTableModel {
                 array[i] = entry.getStringArrayRepresentation();
                 i++;
             }
-            return FileField.encodeStringArray(array);
+            return FileFieldWriter.encodeStringArray(array);
         }
     }
 

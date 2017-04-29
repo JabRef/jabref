@@ -12,11 +12,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
+    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveString.class);
     private final BibDatabase base;
     private final BibtexString string;
-    private final BasePanel panel;
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveString.class);
+    private final BasePanel panel;
 
     public UndoableRemoveString(BasePanel panel,
             BibDatabase base, BibtexString string) {

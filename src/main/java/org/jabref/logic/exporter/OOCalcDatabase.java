@@ -29,9 +29,9 @@ import org.w3c.dom.Text;
  */
 class OOCalcDatabase {
 
-    private final List<BibEntry> entries;
-
     private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
+
+    private final List<BibEntry> entries;
 
 
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {

@@ -1,15 +1,15 @@
 package org.jabref.logic.integrity;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldParser;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class FileChecker implements ValueChecker {
@@ -23,16 +23,15 @@ public class FileChecker implements ValueChecker {
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
-
     @Override
     public Optional<String> checkValue(String value) {
-        List<ParsedFileField> parsedFileFields = FileField.parse(value).stream()
-                .filter(p -> !(p.getLink().startsWith("http://") || p.getLink().startsWith("https://")))
+        List<LinkedFile> linkedFiles = FileFieldParser.parse(value).stream()
+                .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());
 
-        for (ParsedFileField p : parsedFileFields) {
-            Optional<File> file = FileUtil.expandFilename(context, p.getLink(), fileDirectoryPreferences);
-            if ((!file.isPresent()) || !file.get().exists()) {
+        for (LinkedFile file : linkedFiles) {
+            Optional<Path> linkedFile = file.findIn(context, fileDirectoryPreferences);
+            if ((!linkedFile.isPresent()) || !Files.exists(linkedFile.get())) {
                 return Optional.of(Localization.lang("link should refer to a correct file path"));
             }
         }

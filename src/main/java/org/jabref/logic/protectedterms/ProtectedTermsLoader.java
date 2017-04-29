@@ -19,11 +19,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class ProtectedTermsLoader {
 
+    private static final Map<String, String> internalLists = new HashMap<>();
+
     private static final Log LOGGER = LogFactory.getLog(ProtectedTermsLoader.class);
 
     private final List<ProtectedTermsList> mainList = new ArrayList<>();
-
-    private static final Map<String, String> internalLists = new HashMap<>();
 
     static {
         internalLists.put("/protectedterms/months_weekdays.terms", Localization.lang("Months and weekdays in English"));
@@ -33,13 +33,12 @@ public class ProtectedTermsLoader {
                 Localization.lang("Electrical engineering terms"));
     }
 
+    public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {
+        update(preferences);
+    }
 
     public static List<String> getInternalLists() {
         return new ArrayList<>(internalLists.keySet());
-    }
-
-    public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {
-        update(preferences);
     }
 
     public void update(ProtectedTermsPreferences preferences) {
@@ -109,6 +108,7 @@ public class ProtectedTermsLoader {
         }
 
     }
+
     public List<ProtectedTermsList> getProtectedTermsLists() {
         return mainList;
     }

@@ -47,16 +47,16 @@ public class ChangeScanner implements Runnable {
 
     private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
+    private static final double MATCH_THRESHOLD = 0.4;
     private final File file;
     private final BibDatabase databaseInMemory;
     private final MetaData metadataInMemory;
-    private final BasePanel panel;
 
+    private final BasePanel panel;
     private final JabRefFrame frame;
     private BibDatabase databaseInTemp;
-    private MetaData metadataInTemp;
 
-    private static final double MATCH_THRESHOLD = 0.4;
+    private MetaData metadataInTemp;
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form
@@ -463,7 +463,6 @@ public class ChangeScanner implements Runnable {
             changes.add(new GroupChange(groupsDisk.get(), groupsTmp.get()));
         }
     }
-
 
     @FunctionalInterface
     public interface DisplayResultCallback {

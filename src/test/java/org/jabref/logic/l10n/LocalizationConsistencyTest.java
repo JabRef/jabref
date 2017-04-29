@@ -43,37 +43,6 @@ public class LocalizationConsistencyTest {
         }
     }
 
-
-    private static class DuplicationDetectionProperties extends Properties {
-
-        private static final long serialVersionUID = 1L;
-
-        private final List<String> duplicates = new LinkedList<>();
-
-
-        public DuplicationDetectionProperties() {
-            super();
-        }
-
-        /**
-         * Overriding the HashTable put() so we can check for duplicates
-         */
-        @Override
-        public synchronized Object put(Object key, Object value) {
-            // Have we seen this key before?
-            if (containsKey(key)) {
-                duplicates.add(String.valueOf(key));
-            }
-
-            return super.put(key, value);
-        }
-
-        public List<String> getDuplicates() {
-            return duplicates;
-        }
-    }
-
-
     @Test
     public void ensureNoDuplicates() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
@@ -135,8 +104,7 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findMissingMenuLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.MENU).stream()
-                .collect(Collectors.toList());
+        Set<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.MENU);
 
         assertEquals("DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH MENU FILE\n" +
                 "1. PASTE THESE INTO THE ENGLISH MENU FILE\n" +
@@ -144,7 +112,7 @@ public class LocalizationConsistencyTest {
                 missingKeys.parallelStream()
                         .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
                         .collect(Collectors.toList()),
-                Collections.<LocalizationEntry>emptyList(), missingKeys);
+                Collections.<LocalizationEntry>emptySet(), missingKeys);
     }
 
     @Test
@@ -185,6 +153,35 @@ public class LocalizationConsistencyTest {
         for(LocalizationEntry e : keys) {
             assertTrue("Illegal localization parameter found. Must include a String with potential concatenation or replacement parameters. Illegal parameter: Localization.lang(" + e.getKey(),
                     e.getKey().startsWith("\"") || e.getKey().endsWith("\""));
+        }
+    }
+
+    private static class DuplicationDetectionProperties extends Properties {
+
+        private static final long serialVersionUID = 1L;
+
+        private final List<String> duplicates = new LinkedList<>();
+
+
+        public DuplicationDetectionProperties() {
+            super();
+        }
+
+        /**
+         * Overriding the HashTable put() so we can check for duplicates
+         */
+        @Override
+        public synchronized Object put(Object key, Object value) {
+            // Have we seen this key before?
+            if (containsKey(key)) {
+                duplicates.add(String.valueOf(key));
+            }
+
+            return super.put(key, value);
+        }
+
+        public List<String> getDuplicates() {
+            return duplicates;
         }
     }
 

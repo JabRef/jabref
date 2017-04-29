@@ -32,7 +32,7 @@ public class GvkParser implements Parser {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
-        } catch (ParserConfigurationException|SAXException|IOException exception) {
+        } catch (ParserConfigurationException | SAXException | IOException exception) {
             throw new ParseException(exception);
         }
     }
@@ -352,7 +352,6 @@ public class GvkParser implements Parser {
             // FIXME: online only available in Biblatex
             //entryType = "online";
         }
-
 
         /*
          * Wahrscheinlichkeit, dass ZDB-ID

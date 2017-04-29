@@ -2,7 +2,6 @@ package org.jabref.preferences;
 
 import java.util.List;
 
-
 public class PreviewPreferences {
 
     private final List<String> previewCycle;
@@ -49,7 +48,6 @@ public class PreviewPreferences {
     public Builder getBuilder() {
         return new Builder(this);
     }
-
 
     public static class Builder {
         private List<String> previewCycle;

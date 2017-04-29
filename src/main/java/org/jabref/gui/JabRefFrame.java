@@ -19,6 +19,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -728,7 +730,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
      */
     public void openAction(String filePath) {
-        File file = new File(filePath);
+        Path file = Paths.get(filePath);
         // all the logic is done in openIt. Even raising an existing panel
         getOpenDatabaseAction().openFile(file, true);
     }
@@ -960,7 +962,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      */
     public List<BasePanel> getBasePanelList() {
         List<BasePanel> returnList = new ArrayList<>();
-        for (int i=0; i< getBasePanelCount(); i++) {
+        for (int i = 0; i < getBasePanelCount(); i++) {
             returnList.add((BasePanel) tabbedPane.getComponentAt(i));
         }
         return returnList;
@@ -1305,7 +1307,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setRollover(true);
 
         tlb.setFloatable(false);
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             tlb.addAction(newBiblatexDatabaseAction);
         } else {
             tlb.addAction(newBibtexDatabaseAction);

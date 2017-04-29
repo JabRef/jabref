@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.AuthorAbbreviator;
+import org.jabref.logic.layout.format.AuthorAndToSemicolonReplacer;
 import org.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import org.jabref.logic.layout.format.AuthorAndsReplacer;
 import org.jabref.logic.layout.format.AuthorFirstAbbrLastCommas;
@@ -403,6 +404,8 @@ class LayoutEntry {
             return new OOPreFormatter();
         case "AuthorAbbreviator":
             return new AuthorAbbreviator();
+        case "AuthorAndToSemicolonReplacer":
+            return new AuthorAndToSemicolonReplacer();
         case "AuthorAndsCommaReplacer":
             return new AuthorAndsCommaReplacer();
         case "AuthorAndsReplacer":

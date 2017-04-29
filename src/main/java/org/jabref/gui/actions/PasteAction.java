@@ -36,7 +36,7 @@ public class PasteAction extends AbstractAction {
         data = URLUtil.cleanGoogleSearchURL(data);
 
         // caller
-        if(target instanceof JTextComponent) {
+        if (target instanceof JTextComponent) {
             JTextComponent textField = (JTextComponent) target;
             // replace text selection
             textField.replaceSelection(data);

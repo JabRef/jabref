@@ -7,11 +7,11 @@ fi
 
 # ensure that tar archive of install4j exists
 cd ~/downloads
-wget --quiet -nc http://download-keycdn.ej-technologies.com/install4j/install4j_unix_6_1_4.tar.gz
+wget --quiet -nc http://download-keycdn.ej-technologies.com/install4j/install4j_unix_6_1_5.tar.gz
 
 # extract tar archive of install4j into the source directory of JabRef
 cd ~/jabref
-tar -xzf ~/downloads/install4j_unix_6_1_4.tar.gz
+tar -xzf ~/downloads/install4j_unix_6_1_5.tar.gz
 
 # fetch JREs
 if [ ! -d ~/.install4j6/jres/ ]; then

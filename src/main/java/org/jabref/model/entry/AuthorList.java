@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * <li> every comma separates tokens, while sequences of other separators are
  * equivalent to a single separator; for example: "a - b" consists of 2 tokens
  * ("a" and "b"), while "a,-,b" consists of 3 tokens ("a", "", and "b")
- * <li> anything enclosed in braces belonges to a single token; for example:
+ * <li> anything enclosed in braces belongs to a single token; for example:
  * "abc x{a,b,-~ c}x" consists of 2 tokens, while "abc xa,b,-~ cx" consists of 4
  * tokens ("abc", "xa","b", and "cx");
  * <li> a token followed immediately by a dash is "dash-terminated" token, and
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * tokens "a" and "b" are dash-terminated and "c" and "d" are space-terminated;
  * <li> for the purposes of splitting of 'author name' into parts and
  * construction of abbreviation of first name, one needs definitions of first
- * latter of a token, case of a token, and abbreviation of a token:
+ * letter of a token, case of a token, and abbreviation of a token:
  * <ul>
  * <li> 'first letter' of a token is the first letter character (<CODE>Character.isLetter(c)==true</CODE>)
  * that does not belong to a sequence of letters that immediately follows "\"
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * "{\noopsort{\"o}}xyz" 'first letter' is "o", in "{\AE}x" 'first letter' is
  * "A", in "\aex\ijk\Oe\j" 'first letter' is "j"; if there is no letter
  * satisfying the above rule, 'first letter' is undefined;
- * <li> token is "lower-case" token, if its first letter id defined and is
+ * <li> token is "lower-case" token if its first letter is defined and is
  * lower-case (<CODE>Character.isLowerCase(c)==true</CODE>), and token is
  * "upper-case" token otherwise;
  * <li> 'abbreviation' of a token is the shortest prefix of the token that (a)
@@ -63,7 +63,7 @@ import java.util.stream.Collectors;
  * as "{\noopsort{A}}.", while BiBTeX produces "j."; fixing this problem,
  * however, requires processing of the preabmle;
  * </ul>
- * <li> 'author name's in 'author field' are subsequences of tokens separated by
+ * <li> 'author names' in 'author field' are subsequences of tokens separated by
  * token "and" ("and" is case-insensitive); if 'author name' is an empty
  * sequence of tokens, it is ignored; for examle, both "John Smith and Peter
  * Black" and "and and John Smith and and Peter Black" consists of 2 'author
@@ -71,11 +71,11 @@ import java.util.stream.Collectors;
  * different from BiBTeX behavior);
  * <li> 'author name' consists of 'first-part', 'von-part', 'last-part', and
  * 'junior-part', each of which is a sequence of tokens; how a sequence of
- * tokens has to be splitted into these parts, depends the number of commas:
+ * tokens has to be split into these parts, depends the number of commas:
  * <ul>
  * <li> no commas, all tokens are upper-case: 'junior-part' and 'von-part' are
  * empty, 'last-part' consist of the last token, 'first-part' consists of all
- * other tokens ('first-part' is empty, if 'author name' consists of a single
+ * other tokens ('first-part' is empty if 'author name' consists of a single
  * token); for example, in "John James Smith", 'last-part'="Smith" and
  * 'first-part'="John James";
  * <li> no commas, there exists lower-case token: 'junior-part' is empty,
@@ -100,7 +100,7 @@ import java.util.stream.Collectors;
  * <li> two or more commas (any comma after the second one is ignored; it merely
  * separates tokens): 'junior-part' consists of all tokens between first and
  * second commas, 'first-part' consists of all tokens after the second comma,
- * tokens before the first comma are splitted into 'von-part' and 'last-part'
+ * tokens before the first comma are split into 'von-part' and 'last-part'
  * similarly to the case of one comma; for example: in "de la Vall{\'e}e
  * Poussin, Jr., Charles Louis Xavier Joseph", 'first-part'="Charles Louis
  * Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la Poussin", and
@@ -167,7 +167,11 @@ public class AuthorList {
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        if (!authors.toUpperCase(Locale.ENGLISH).contains(" AND ") && !authors.contains("{") && !authors.contains(";")) {
+        final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
+        final boolean authorsContainOpeningBrace = authors.contains("{");
+        final boolean authorsContainSemicolon = authors.contains(";");
+        final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
             List<String> arrayNameList = Arrays.asList(authors.split(","));
 
             // Delete spaces for correct case identification
@@ -508,7 +512,6 @@ public class AuthorList {
         if (authorLastFirstAnds[abbrInt] != null) {
             return authorLastFirstAnds[abbrInt];
         }
-
 
         authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
                 .collect(Collectors.joining(" and "));

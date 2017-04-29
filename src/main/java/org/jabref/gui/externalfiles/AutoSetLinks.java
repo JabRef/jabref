@@ -35,6 +35,7 @@ import org.jabref.logic.util.io.RegExpFileSearch;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 public class AutoSetLinks {
@@ -149,7 +150,7 @@ public class AutoSetLinks {
                         if (!alreadyHas) {
                             foundAny = true;
                             Optional<ExternalFileType> type;
-                            Optional<String> extension = FileUtil.getFileExtension(f);
+                            Optional<String> extension = FileHelper.getFileExtension(f);
                             if (extension.isPresent()) {
                                 type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {

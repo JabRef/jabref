@@ -50,7 +50,7 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
      */
     @Override
     public List<String> complete(String toComplete) {
-        if(toComplete == null) {
+        if (toComplete == null) {
             return new ArrayList<>();
         }
         if (isTooShortToComplete(toComplete)) {

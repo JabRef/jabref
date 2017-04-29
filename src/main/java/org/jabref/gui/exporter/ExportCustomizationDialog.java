@@ -160,7 +160,6 @@ public class ExportCustomizationDialog extends JabRefDialog {
         table.requestFocus();
     }
 
-
     private static class ExportTableFormat implements TableFormat<List<String>> {
 
         @Override

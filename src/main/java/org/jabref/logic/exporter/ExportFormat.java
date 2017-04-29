@@ -31,6 +31,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ExportFormat implements IExportFormat {
 
+    private static final String LAYOUT_PREFIX = "/resource/layout/";
+
+    private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
     private String displayName;
     private String consoleName;
     private String lfFileName;
@@ -39,12 +42,9 @@ public class ExportFormat implements IExportFormat {
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
     private LayoutFormatterPreferences layoutPreferences;
+
     private SavePreferences savePreferences;
-
     private boolean customExport;
-    private static final String LAYOUT_PREFIX = "/resource/layout/";
-
-    private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
 
     /**
      * Initialize another export format based on templates stored in dir with
@@ -178,7 +178,6 @@ public class ExportFormat implements IExportFormat {
 
         return reader;
     }
-
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,

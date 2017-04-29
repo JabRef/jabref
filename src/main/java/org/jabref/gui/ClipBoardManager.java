@@ -38,18 +38,9 @@ public class ClipBoardManager implements ClipboardOwner {
     }
 
     /**
-     * Place a String on the clipboard, and make this class the
-     * owner of the Clipboard's contents.
-     */
-    public void setClipboardContents(String aString) {
-        StringSelection stringSelection = new StringSelection(aString);
-        CLIPBOARD.setContents(stringSelection, this);
-    }
-
-    /**
      * Places the string into the clipboard using a {@link Transferable}.
      */
-    public void setTransferableClipboardContents(Transferable transferable){
+    public void setTransferableClipboardContents(Transferable transferable) {
         CLIPBOARD.setContents(transferable, this);
     }
 
@@ -74,12 +65,19 @@ public class ClipBoardManager implements ClipboardOwner {
         return result;
     }
 
-
+    /**
+     * Place a String on the clipboard, and make this class the
+     * owner of the Clipboard's contents.
+     */
+    public void setClipboardContents(String aString) {
+        StringSelection stringSelection = new StringSelection(aString);
+        CLIPBOARD.setContents(stringSelection, this);
+    }
+	
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);
         List<BibEntry> result = new ArrayList<>();
-
 
         if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
             // We have determined that the clipboard data is a set of entries.
@@ -96,7 +94,7 @@ public class ClipBoardManager implements ClipboardOwner {
             try {
                 String data = (String) content.getTransferData(DataFlavor.stringFlavor);
                 // fetch from doi
-                if (DOI.build(data).isPresent()) {
+                if (DOI.parse(data).isPresent()) {
                     LOGGER.info("Found DOI in clipboard");
                     Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(new DOI(data).getDOI());
                     entry.ifPresent(result::add);

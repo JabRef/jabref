@@ -130,7 +130,7 @@ public class BibtexString implements Cloneable {
         return parsedSerialization;
     }
 
-    public boolean hasChanged(){
+    public boolean hasChanged() {
         return hasChanged;
     }
 
@@ -138,7 +138,7 @@ public class BibtexString implements Cloneable {
     * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
      */
     public String getUserComments() {
-        if(parsedSerialization != null) {
+        if (parsedSerialization != null) {
 
             try {
                 // get the text before the string
@@ -150,7 +150,7 @@ public class BibtexString implements Cloneable {
                 if (prolog.length() > 0) {
                     return prolog;
                 }
-            } catch(StringIndexOutOfBoundsException ignore) {
+            } catch (StringIndexOutOfBoundsException ignore) {
                 // if this occurs a broken parsed serialization has been set, so just do nothing
             }
         }

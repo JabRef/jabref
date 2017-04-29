@@ -16,10 +16,10 @@ import org.jabref.model.strings.StringUtil;
  */
 public class FieldContentParser {
 
-    private final Set<String> multiLineFields;
-
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+    private final Set<String> multiLineFields;
 
 
     public FieldContentParser(FieldContentParserPreferences prefs) {

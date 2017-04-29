@@ -9,16 +9,19 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Answers;
+
+import static org.mockito.Mockito.mock;
 
 
 public class ModsExportFormatTest {
@@ -39,15 +42,14 @@ public class ModsExportFormatTest {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
-        bibtexImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        bibtexImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
         tempFile = testFolder.newFile();
         importFile = Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
     }
 
     @Test(expected = SaveException.class)
     public final void testPerformExportTrowsSaveException() throws Exception {
-        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase()
-                .getEntries();
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
         modsExportFormat.performExport(databaseContext, "", charset, entries);
     }

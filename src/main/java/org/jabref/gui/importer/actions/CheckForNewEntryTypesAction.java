@@ -97,12 +97,12 @@ public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.PAGE_AXIS));
 
-        JLabel customFoundLabel = new JLabel(Localization.lang("Custom entry types found in file")+".");
+        JLabel customFoundLabel = new JLabel(Localization.lang("Custom entry types found in file") + ".");
         Font boldStandardFont = new Font(customFoundLabel.getFont().getFontName(), Font.BOLD, customFoundLabel.getFont().getSize());
         customFoundLabel.setFont(boldStandardFont);
         checkboxPanel.add(customFoundLabel);
 
-        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences")+":");
+        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences") + ":");
         selectLabel.setFont(boldStandardFont);
         checkboxPanel.add(selectLabel);
 

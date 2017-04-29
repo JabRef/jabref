@@ -81,7 +81,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
         PreviewPanel previewPanel = panel.getPreviewPanel();
-        if (previewPanel != null){
+        if (previewPanel != null) {
             preview = previewPanel;
         } else {
             preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
@@ -100,7 +100,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         EventList<BibEntry> selected = e.getSourceList();
-        if (selected.isEmpty()){
+        if (selected.isEmpty()) {
             return;
         }
 
@@ -370,8 +370,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if(!column.getBibtexFields().isEmpty()) {
-            for(String field : column.getBibtexFields()) {
+        if (!column.getBibtexFields().isEmpty()) {
+            for (String field : column.getBibtexFields()) {
                 if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
@@ -455,11 +455,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
     }
 
-    public void nextPreviewStyle(){
+    public void nextPreviewStyle() {
         cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
     }
 
-    public void previousPreviewStyle(){
+    public void previousPreviewStyle() {
         cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
     }
 

@@ -39,14 +39,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
 
 
     /**
-     * Access related acticles delivered by Mr. DLib.
-     * @return the list of BibEntries, representing the related articles deliverd by MR. DLib
-     */
-    public List<BibEntry> getRelatedArticles() {
-        return relatedArticles;
-    }
-
-    /**
      * Takes the selected entry, runs a request to Mr. DLib and returns the recommendations as a JEditorPane
      * @param selectedEntry The entry selected by the user
      */
@@ -56,6 +48,14 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
         this.setEditable(false);
         registerHyperlinkListener();
         setDefaultContent();
+    }
+
+    /**
+     * Access related acticles delivered by Mr. DLib.
+     * @return the list of BibEntries, representing the related articles deliverd by MR. DLib
+     */
+    public List<BibEntry> getRelatedArticles() {
+        return relatedArticles;
     }
 
 
@@ -176,8 +176,6 @@ public class EntryEditorTabRelatedArticles extends JEditorPane {
             return fetcher.performSearch(selectedEntry);
         }
 
-
     }
-
 
 }

@@ -307,7 +307,7 @@ public class GlobalSearchBar extends JPanel {
             currentBasePanel.setCurrentSearchQuery(null);
         }
 
-        if (dontSelectSearchBar){
+        if (dontSelectSearchBar) {
             dontSelectSearchBar = false;
             return;
         }
@@ -401,7 +401,7 @@ public class GlobalSearchBar extends JPanel {
     }
 
     public void setSearchTerm(String searchTerm, boolean dontSelectSearchBar) {
-        if (searchTerm.equals(searchField.getText())){
+        if (searchTerm.equals(searchField.getText())) {
             return;
         }
 

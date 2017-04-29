@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,7 +50,6 @@ import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -137,22 +135,22 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (row >= 0) {
                 FileListEntry entry = tableModel.getEntry(row);
                 try {
-                    String path = "";
+                    Path path = null;
                     // absolute path
                     if (Paths.get(entry.getLink()).isAbsolute()) {
-                        path = Paths.get(entry.getLink()).toString();
+                        path = Paths.get(entry.getLink());
                     } else {
                         // relative to file folder
                         for (String folder : databaseContext
                                 .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.getLink());
                             if (Files.exists(file)) {
-                                path = file.toString();
+                                path = file;
                                 break;
                             }
                         }
                     }
-                    if (!path.isEmpty()) {
+                    if (path != null) {
                         JabRefDesktop.openFolderAndSelectFile(path);
                     } else {
                         JOptionPane.showMessageDialog(frame,
@@ -185,13 +183,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             }
 
             FileListEntry entry = tableModel.getEntry(row);
-            Optional<File> file = FileUtil.expandFilename(databaseContext, entry.getLink(),
-                    Globals.prefs.getFileDirectoryPreferences());
-
+            Optional<Path> file = entry.toParsedFileField().findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
             if (file.isPresent()) {
                 String[] options = {Localization.lang("Delete"), Localization.lang("Cancel")};
                 int userConfirm = JOptionPane.showOptionDialog(frame,
-                        Localization.lang("Delete '%0'?", file.get().getName()),
+                        Localization.lang("Delete '%0'?", file.get().getFileName().toString()),
                         Localization.lang("Delete file"),
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE,
@@ -201,7 +197,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 if (userConfirm == JOptionPane.YES_OPTION) {
                     try {
-                        Files.delete(file.get().toPath());
+                        Files.delete(file.get());
                         removeEntries();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("File permission error"),
@@ -347,11 +343,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void append(String text) {
-        // Do nothing
-    }
-
-    @Override
-    public void updateFont() {
         // Do nothing
     }
 
@@ -574,11 +565,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
     @Override
     public void setInvalidBackgroundColor() {
-        // Do nothing
-    }
-
-    @Override
-    public void updateFontColor() {
         // Do nothing
     }
 }

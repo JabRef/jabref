@@ -28,7 +28,7 @@ public class MathSciNetPaneView {
 
         root.getChildren().addAll(browser, progress);
 
-        browser.getEngine().load(mathSciNetId.getItemUrl());
+        mathSciNetId.getExternalURI().ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
 
         // Hide progress indicator if finished (over 70% loaded)
         browser.getEngine().getLoadWorker().progressProperty().addListener((observable, oldValue, newValue) -> {

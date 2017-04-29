@@ -60,8 +60,8 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
     }
 
     @Override
-    public void done(){
-        if (this.isCancelled()){
+    public void done() {
+        if (this.isCancelled()) {
             return;
         }
 

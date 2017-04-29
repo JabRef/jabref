@@ -1,10 +1,12 @@
 package org.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -14,14 +16,10 @@ import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 
 /**
  * Write XMP action for EntryEditor toolbar.
@@ -51,26 +49,12 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         BibEntry entry = editor.getEntry();
 
         // Make a list of all PDFs linked from this entry:
-        List<File> files = new ArrayList<>();
-
-        // First check the (legacy) "pdf" field:
-        entry.getField(FieldName.PDF)
-                .ifPresent(pdf -> FileUtil.expandFilename(pdf, panel.getBibDatabaseContext()
-                        .getFileDirectories(FieldName.PDF, Globals.prefs.getFileDirectoryPreferences()))
-                .ifPresent(files::add));
-
-        // Then check the "file" field:
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-        if (entry.hasField(FieldName.FILE)) {
-            FileListTableModel tm = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(tm::setContent);
-            for (int j = 0; j < tm.getRowCount(); j++) {
-                FileListEntry flEntry = tm.getEntry(j);
-                if ((flEntry.getType().isPresent()) && "pdf".equalsIgnoreCase(flEntry.getType().get().getName())) {
-                    FileUtil.expandFilename(flEntry.getLink(), dirs).ifPresent(files::add);
-                }
-            }
-        }
+        List<Path> files = entry.getFiles().stream()
+                .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
+                .map(file -> file.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
         // We want to offload the actual work to a background thread, so we have a worker
         // thread:
@@ -85,14 +69,13 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         setEnabled(true);
     }
 
-
     class WriteXMPWorker extends AbstractWorker {
 
-        private final List<File> files;
+        private final List<Path> files;
         private final BibEntry entry;
 
 
-        public WriteXMPWorker(List<File> files, BibEntry entry) {
+        public WriteXMPWorker(List<Path> files, BibEntry entry) {
 
             this.files = files;
             this.entry = entry;
@@ -105,8 +88,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
             } else {
                 int written = 0;
                 int error = 0;
-                for (File file : files) {
-                    if (!file.exists()) {
+                for (Path file : files) {
+                    if (!Files.exists(file)) {
                         if (files.size() == 1) {
                             message = Localization.lang("PDF does not exist");
                         }
@@ -114,14 +97,14 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
                     } else {
                         try {
-                            XMPUtil.writeXMP(file, entry, panel.getDatabase(), Globals.prefs.getXMPPreferences());
+                            XMPUtil.writeXMP(file.toFile(), entry, panel.getDatabase(), Globals.prefs.getXMPPreferences());
                             if (files.size() == 1) {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }
                             written++;
                         } catch (IOException | TransformerException e) {
                             if (files.size() == 1) {
-                                message = Localization.lang("Error while writing") + " '" + file.getPath() + "'";
+                                message = Localization.lang("Error while writing") + " '" + file.toString() + "'";
                             }
                             error++;
 

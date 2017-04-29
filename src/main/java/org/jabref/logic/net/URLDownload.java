@@ -37,6 +37,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.util.FileHelper;
 
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.logging.Log;
@@ -54,9 +55,9 @@ import org.apache.commons.logging.LogFactory;
  * Each call to a public method creates a new HTTP connection. Nothing is cached.
  */
 public class URLDownload {
-    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
-
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+
+    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
@@ -208,7 +209,7 @@ public class URLDownload {
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
         String fileName = FileUtil.getFileName(fileNameWithExtension);
-        String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
+        String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
@@ -251,7 +252,7 @@ public class URLDownload {
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
             }
-        }};
+        } };
 
         // Install the all-trusting trust manager
         try {

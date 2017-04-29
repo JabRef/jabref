@@ -40,7 +40,6 @@ import com.jgoodies.forms.factories.Paddings;
 
 import static org.jabref.model.pdf.FileAnnotationType.NONE;
 
-
 class FileAnnotationTab extends JPanel {
 
     private final JList<FileAnnotation> annotationList = new JList<>();
@@ -127,7 +126,7 @@ class FileAnnotationTab extends JPanel {
      */
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
-        if (annotations.isEmpty()) {
+        if (annotations == null || annotations.isEmpty()) {
             listModel.addElement(new FileAnnotation("", LocalDateTime.now(), 0, Localization.lang("File has no attached annotations"), NONE, Optional.empty()));
         } else {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
@@ -332,7 +331,6 @@ class FileAnnotationTab extends JPanel {
                 break;
         }
     }
-
 
     private class AnnotationListSelectionListener implements ListSelectionListener {
         @Override

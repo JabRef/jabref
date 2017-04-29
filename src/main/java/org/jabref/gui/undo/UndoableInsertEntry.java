@@ -17,11 +17,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
 
+    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
     private final BibDatabase base;
     private final BibEntry entry;
-    private final BasePanel panel;
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
+    private final BasePanel panel;
 
     public UndoableInsertEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {
@@ -29,7 +29,6 @@ public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
         this.entry = entry;
         this.panel = panel;
     }
-
 
     @Override
     public String getPresentationName() {

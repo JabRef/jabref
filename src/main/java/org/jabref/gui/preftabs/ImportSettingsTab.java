@@ -23,11 +23,11 @@ import com.jgoodies.forms.layout.FormLayout;
 
 public class ImportSettingsTab extends JPanel implements PrefsTab {
 
-    public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
-
-    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
     public static final String[] DEFAULT_FILENAMEPATTERNS = new String[] {"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
+
+    public static final int DEFAULT_STYLE = ImportDialog.CONTENT;
+    private static final String[] DEFAULT_FILENAMEPATTERNS_DISPLAY = new String[] {"bibtexkey", "bibtexkey - title",};
 
     private final JabRefPreferences prefs;
     private final JRadioButton radioButtonXmp;

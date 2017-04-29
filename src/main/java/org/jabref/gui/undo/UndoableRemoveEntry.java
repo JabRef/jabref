@@ -18,11 +18,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
 
+    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveEntry.class);
     private final BibDatabase base;
     private final BibEntry entry;
-    private final BasePanel panel;
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveEntry.class);
+    private final BasePanel panel;
 
     public UndoableRemoveEntry(BibDatabase base, BibEntry entry,
                                BasePanel panel) {

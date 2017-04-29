@@ -13,6 +13,8 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.model.util.FileHelper;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,7 +32,7 @@ public class FileFinder {
 
         BiPredicate<Path, BasicFileAttributes> isDirectoryAndContainsExtension = (path,
                 attr) -> !Files.isDirectory(path)
-                        && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse(""));
+                        && extensions.contains(FileHelper.getFileExtension(path.toFile()).orElse(""));
 
         Set<Path> result = new HashSet<>();
         for (File directory : directories) {

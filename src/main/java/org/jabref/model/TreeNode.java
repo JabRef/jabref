@@ -601,7 +601,7 @@ import javafx.collections.ObservableList;
     protected void notifyAboutDescendantChange(T source) {
         onDescendantChanged.accept(source);
 
-        if( !isRoot()) {
+        if (!isRoot()) {
             parent.notifyAboutDescendantChange(source);
         }
     }

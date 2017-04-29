@@ -370,9 +370,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addSpecialTabs() {
 
         // MathSciNet Review
-        entry.getField(FieldName.MR_NUMBER).ifPresent(mrNumberRaw -> {
-            MathSciNetId mrNumber = MathSciNetId.fromString(mrNumberRaw);
-
+        entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse).ifPresent(mrNumber -> {
             JFXPanel reviewPane = new JFXPanel();
             tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
             tabs.add(reviewPane);
@@ -612,30 +610,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        // timestamp or a other field with datepicker command
-        if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || fieldExtras.contains(FieldProperty.DATE)) {
-            // double click AND datefield => insert the current date (today)
-            return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
-        } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return FieldExtraComponents.getExternalExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            // Add controls for switching between abbreviated and full journal names.
-            // If this field also has a FieldContentSelector, we need to combine these.
-            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
-                    storeFieldAction);
-        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
+        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.DOI)) {
-            return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
-            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
-            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return FieldExtraComponents.getSetOwnerExtraComponent(editor, storeFieldAction);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
@@ -694,7 +671,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Set the current Entry to be selected.
                 // Fixes the bug of losing selection after, e.g. an autogeneration of a BibTeX key.
-                panel.highlightEntry(entry);
+                // This is also important for the "select all"-action (else it will always select the first entry except it is already)
+                SwingUtilities.invokeLater(() -> {
+                    panel.getMainTable().ensureVisible(entry);
+                });
             } catch (IOException ex) {
                 source.setText(ex.getMessage() + "\n\n" +
                         Localization.lang("Correct the entry, and reopen editor to display/edit source."));
@@ -960,7 +940,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Sets all the text areas according to the shown entry.
      */
-    public void updateAllFields() {
+    private void updateAllFields() {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).setEntry(entry);
@@ -1278,7 +1258,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 textField.setValidBackgroundColor();
 
-                if (textField.getTextComponent().hasFocus()) {
+                if (textField.hasFocus()) {
                     textField.setActiveBackgroundColor();
                 }
                 updateSource();
@@ -1359,7 +1339,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         }
                     }
                 }
-                if (fieldEditor.getTextComponent().hasFocus()) {
+                if (fieldEditor.hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
             } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {
@@ -1368,8 +1348,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
+            // don't select the current entry again (eg use BasePanel#highlightEntry} in case another entry was selected)
             if (!movingAway && isShowing()) {
-                panel.highlightEntry(entry);
+                SwingUtilities.invokeLater(() -> {
+                    panel.getMainTable().ensureVisible(entry);
+                });
             }
         }
     }
@@ -1528,9 +1511,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
                 EntryEditorTab tab = (EntryEditorTab) activeTab;
-                FieldEditor fieldEditor = tab.getActive();
-                fieldEditor.clearAutoCompleteSuggestion();
-                updateField(fieldEditor);
+                // TODO: Reenable this
+                //FieldEditor fieldEditor = tab.getActive();
+                //fieldEditor.clearAutoCompleteSuggestion();
+                //updateField(fieldEditor);
             } else {
                 // Source panel.
                 updateField(activeTab);

@@ -14,10 +14,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,14 +60,17 @@ import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.component.OverlayPanel;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -519,7 +522,6 @@ public class TextInputDialog extends JabRefDialog {
         return allFields.toArray(new String[allFields.size()]);
     }
 
-
     private class PasteAction extends BasicAction {
 
         public PasteAction() {
@@ -553,16 +555,21 @@ public class TextInputDialog extends JabRefDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TXT);
-                dialog.setDefaultExtension(FileExtensions.TXT);
-                Optional<Path> path = dialog.showDialogAndGetSelectedFile();
+                FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                        .addExtensionFilter(FileExtensions.TXT)
+                        .withDefaultExtension(FileExtensions.TXT)
+                        .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                DialogService ds = new FXDialogService();
+
+                Optional<Path> path = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
 
                 if (path.isPresent()) {
-                    File newFile = path.get().toFile();
+                    Path file = path.get();
                     document.remove(0, document.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {
-                        try (FileInputStream fis = new FileInputStream(newFile)) {
+                        try (InputStream fis = Files.newInputStream(file)) {
                             eKit.read(fis, document, 0);
                             document.setLogicalStyle(0, document.getStyle("regular"));
                         }
@@ -589,7 +596,6 @@ public class TextInputDialog extends JabRefDialog {
     class FieldListSelectionHandler implements ListSelectionListener {
 
         private int lastIndex = -1;
-
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
