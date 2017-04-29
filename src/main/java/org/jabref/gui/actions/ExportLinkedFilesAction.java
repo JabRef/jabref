@@ -86,7 +86,7 @@ public class ExportLinkedFilesAction extends AbstractAction {
 
 
         ProgressBar bar = new ProgressBar();
-        bar.progressProperty().bind(task.);
+
 
 
     }
