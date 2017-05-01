@@ -16,9 +16,7 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.actions.PasteAction;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
-import org.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
 import org.apache.commons.logging.Log;
@@ -61,10 +59,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
         label = new FieldNameLabel(this.fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
-
-        FieldTextMenu popMenu = new FieldTextMenu(this);
-        this.addMouseListener(popMenu);
-        label.addMouseListener(popMenu);
     }
 
     @Override
@@ -168,8 +162,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
     }
 
     private void setupPasteListener() {
-        //register "Paste" action
-        getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
         getInputMap().put(Globals.getKeyPrefs().getKey(org.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
     }
