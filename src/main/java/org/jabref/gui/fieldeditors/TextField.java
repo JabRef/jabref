@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
@@ -33,7 +32,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
     private static final Log LOGGER = LogFactory.getLog(TextField.class);
 
     private final String fieldName;
-    private final JLabel label;
     private UndoManager undo;
     private AutoCompleteListener autoCompleteListener;
 
@@ -58,13 +56,11 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(this.fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
-        label.addMouseListener(popMenu);
     }
 
     @Override
@@ -83,17 +79,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
     @Override
     public String getFieldName() {
         return fieldName;
-    }
-
-    @Override
-    public JLabel getLabel() {
-        return label;
-    }
-
-    @Override
-    public void setLabelColor(Color color) {
-        label.setForeground(color);
-        throw new NullPointerException("ok");
     }
 
     @Override

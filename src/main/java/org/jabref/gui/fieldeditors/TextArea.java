@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
 import javafx.embed.swing.JFXPanel;
@@ -26,8 +25,6 @@ public class TextArea implements FieldEditor {
     private static final Log LOGGER = LogFactory.getLog(TextArea.class);
 
     private final JFXPanel swingPanel;
-
-    private final FieldNameLabel label;
 
     private final EditorTextArea textArea;
     private String fieldName;
@@ -61,8 +58,6 @@ public class TextArea implements FieldEditor {
 
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(fieldName);
-
         /*
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
@@ -77,16 +72,6 @@ public class TextArea implements FieldEditor {
 
     public void setFieldName(String newName) {
         fieldName = newName;
-    }
-
-    @Override
-    public JLabel getLabel() {
-        return label;
-    }
-
-    @Override
-    public void setLabelColor(Color color) {
-        label.setForeground(color);
     }
 
     @Override
