@@ -24,13 +24,16 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.FXDialogService;
+import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.fieldeditors.FieldEditor;
@@ -83,6 +86,17 @@ class EntryEditorTab {
         // Execute on JavaFX Application Thread
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             Region root = setupPanel(frame, basePanel, addKeyField, compressed, tabTitle);
+
+            if (GUIGlobals.currentFont != null) {
+                root.setStyle(
+                        "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                                + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
+                                + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
+                );
+            }
+
+            root.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
+
             panel.setScene(new Scene(root));
         });
 
@@ -96,6 +110,10 @@ class EntryEditorTab {
 
     private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
+    }
+
+    private String convertToHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
     private Region setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
@@ -175,18 +193,40 @@ class EntryEditorTab {
         }
 
         GridPane gridPane = new GridPane();
+        gridPane.setPrefSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        gridPane.setMaxSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        gridPane.getStyleClass().add("editorPane");
+
+        ColumnConstraints columnExpand = new ColumnConstraints();
+        columnExpand.setHgrow(Priority.ALWAYS);
+        int rows;
         if (compressed) {
-            int rows = (int) Math.ceil((double) fields.size() / 2);
+            rows = (int) Math.ceil((double) fields.size() / 2);
+
             addColumn(gridPane, 0, labels.subList(0, rows));
-            addColumn(gridPane, 2, labels.subList(rows, labels.size()));
+            addColumn(gridPane, 3, labels.subList(rows, labels.size()));
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
-            addColumn(gridPane, 3, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
+            addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
+
+            gridPane.getColumnConstraints().addAll(new ColumnConstraints(), columnExpand, new ColumnConstraints(10), new ColumnConstraints(), columnExpand);
         } else {
+            rows = fields.size();
+
             addColumn(gridPane, 0, labels);
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
+
+            gridPane.getColumnConstraints().addAll(new ColumnConstraints(), columnExpand);
         }
 
-        return new ScrollPane(gridPane);
+
+        RowConstraints rowExpand = new RowConstraints();
+        rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setPercentHeight(100 / rows);
+        for (int i = 0; i < rows; i++) {
+            gridPane.getRowConstraints().add(rowExpand);
+        }
+
+        return gridPane;
     }
 
     private String getPrompt(String field) {
