@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -26,6 +27,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+
+        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
     }
 
     public JournalEditorViewModel getViewModel() {
