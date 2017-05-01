@@ -170,6 +170,16 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
+Id:      org.xmlunit:xmlunit-core
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
+Id:      org.xmlunit:xmlunit-matchers
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
 Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/

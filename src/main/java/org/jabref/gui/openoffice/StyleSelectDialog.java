@@ -33,7 +33,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -43,6 +44,8 @@ import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
@@ -100,7 +103,6 @@ class StyleSelectDialog {
     private boolean okPressed;
     private final StyleLoader loader;
     private final OpenOfficePreferences preferences;
-
 
     public StyleSelectDialog(JabRefFrame frame, OpenOfficePreferences preferences, StyleLoader loader) {
 
@@ -425,7 +427,6 @@ class StyleSelectDialog {
         dd.setVisible(true);
     }
 
-
     /**
      * The listener for the Glazed list monitoring the current selection.
      * When selection changes, we need to update the preview panel.
@@ -467,15 +468,19 @@ class StyleSelectDialog {
         private final JTextField newFile = new JTextField();
         private boolean addOKPressed;
 
-
         public AddFileDialog() {
             super(diag, Localization.lang("Add style file"), true, AddFileDialog.class);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.JSTYLE);
-            dialog.setDefaultExtension(FileExtensions.JSTYLE);
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileExtensions.JSTYLE)
+                    .withDefaultExtension(FileExtensions.JSTYLE)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
             browse.addActionListener(e -> {
-                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                Optional<Path> file = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
