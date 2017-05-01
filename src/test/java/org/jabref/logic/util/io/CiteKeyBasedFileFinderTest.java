@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.BibtexTestData;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -82,7 +83,7 @@ public class CiteKeyBasedFileFinderTest {
         Path jpgFile = rootDir.resolve(Paths.get("graphicsDir", "subDir", "HipKro03test.jpg"));
         Path pdfFile = rootDir.resolve(Paths.get("pdfs", "sub", "HipKro03-sub.pdf"));
 
-        assertEquals(Arrays.asList(jpgFile, pdfFile), results);
+        assertEquals(Arrays.asList(jpgFile, pdfFile), results.stream().sorted().collect(Collectors.toList()));
     }
 
     @Test
