@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -39,6 +40,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -75,6 +77,20 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return FileFieldWriter.getStringRepresentation(filesToSerialize);
     }
 
+    /**
+     * Creates an instance of {@link LinkedFile} based on the given file.
+     * We try to guess the file type and relativize the path against the given file directories.
+     *
+     * TODO: Move this method to {@link LinkedFile} as soon as {@link ExternalFileType} lives in model.
+     */
+    private static LinkedFile fromFile(Path file, List<Path> fileDirectories) {
+        String fileExtension = FileHelper.getFileExtension(file).orElse("");
+        ExternalFileType suggestedFileType = ExternalFileTypes.getInstance()
+                .getExternalFileTypeByExt(fileExtension).orElse(new UnknownExternalFileType(fileExtension));
+        Path relativePath = FileUtil.shortenFileName(file, fileDirectories);
+        return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
+    }
+
     public boolean isFulltextLookupInProgress() {
         return fulltextLookupInProgress.get();
     }
@@ -108,7 +124,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(
                 newFile -> {
-                    LinkedFile newLinkedFile = LinkedFile.fromFile(newFile, fileDirectories);
+                    LinkedFile newLinkedFile = fromFile(newFile, fileDirectories);
                     files.add(new LinkedFileViewModel(newLinkedFile));
                 }
         );
@@ -143,7 +159,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     .map(file -> file.findIn(dirs))
                     .anyMatch(file -> file.isPresent() && file.get().equals(newFile));
             if (!alreadyLinked) {
-                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(LinkedFile.fromFile(newFile, dirs));
+                LinkedFileViewModel newLinkedFile = new LinkedFileViewModel(fromFile(newFile, dirs));
                 newLinkedFile.markAsAutomaticallyFound();
                 result.add(newLinkedFile);
             }
@@ -199,7 +215,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         temporaryDownloadFile.downloadProgressProperty().bind(downloadTask.progressProperty());
         downloadTask.setOnSucceeded(event -> {
             files.remove(temporaryDownloadFile);
-            LinkedFile newLinkedFile = LinkedFile.fromFile(destination, fileDirectories);
+            LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
             files.add(new LinkedFileViewModel(newLinkedFile));
         });
         downloadTask.setOnFailed(event ->
