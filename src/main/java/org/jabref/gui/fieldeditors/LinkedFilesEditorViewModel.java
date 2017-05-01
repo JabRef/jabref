@@ -52,6 +52,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private DialogService dialogService;
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
+
     public LinkedFilesEditorViewModel(DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
@@ -97,15 +98,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void addNewFile() {
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
-        Path workingDirectory = fileDirectories.stream()
-                .findFirst()
+        Path workingDirectory = databaseContext.getFirstExistingFileDir(Globals.prefs.getFileDirectoryPreferences())
                 .orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withInitialDirectory(workingDirectory)
                 .build();
 
+        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(
                 newFile -> {
                     LinkedFile newLinkedFile = LinkedFile.fromFile(newFile, fileDirectories);
@@ -113,7 +113,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 }
         );
     }
-
 
     @Override
     public void bindToEntry(String fieldName, BibEntry entry) {
@@ -282,5 +281,4 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
         return plannedName;
     }
-
 }

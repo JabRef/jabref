@@ -10,7 +10,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.model.entry.LinkedFile;
 
 import de.jensd.fx.glyphs.GlyphIcons;
@@ -62,7 +61,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
 
     /**
      * TODO: Be a bit smarter and try to infer correct icon, for example using {@link
-     * ExternalFileTypes#getExternalFileTypeByName(String)}
+     * org.jabref.gui.externalfiletype.ExternalFileTypes#getExternalFileTypeByName(String)}
      */
     public GlyphIcons getTypeIcon() {
         return MaterialDesignIcon.FILE_PDF;
