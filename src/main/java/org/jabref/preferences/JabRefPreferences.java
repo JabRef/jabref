@@ -65,6 +65,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateFieldPreferences;
 import org.jabref.logic.util.Version;
+import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
 import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -282,7 +283,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LOCAL_AUTO_SAVE = "localAutoSave";
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
-    public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
+    public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     public static final String BIB_LOC_AS_PRIMARY_DIR = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
@@ -748,7 +749,7 @@ public class JabRefPreferences implements PreferencesService {
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
-        defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
+        defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
@@ -1593,5 +1594,14 @@ public class JabRefPreferences implements PreferencesService {
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
         putBoolean(JabRefPreferences.USE_IEEE_ABRV, abbreviationsPreferences.useIEEEAbbreviations());
+    }
+
+    public AutoLinkPreferences getAutoLinkPreferences() {
+        return new AutoLinkPreferences(
+                getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
+                get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
+                getKeywordDelimiter()
+        );
     }
 }

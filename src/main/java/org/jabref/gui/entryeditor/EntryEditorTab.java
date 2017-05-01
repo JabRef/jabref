@@ -34,7 +34,6 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
-import org.jabref.gui.fieldeditors.FileListEditor;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -52,12 +51,9 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 class EntryEditorTab {
 
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private final JPanel panel = new JPanel();
     private final JScrollPane scrollPane = new JScrollPane(panel,
             ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
     private final List<String> fields;
     private final EntryEditor parent;
     private final Map<String, FieldEditorFX> editors = new HashMap<>();
@@ -130,13 +126,7 @@ class EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.FILE_EDITOR)) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
-
-                fileListEditor = (FileListEditor) fieldEditor;
-
-                defaultHeight = 0;
-            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
                         true);
                 defaultHeight = 0;
@@ -163,7 +153,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs);
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext());
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -273,7 +263,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditorFX editor : editors.values()) {
-                editor.bindToEntry(entry);
+                DefaultTaskExecutor.runInJavaFXThread(() -> editor.bindToEntry(entry));
             }
             this.entry = entry;
         } finally {
@@ -306,8 +296,6 @@ class EntryEditorTab {
      * Only sets the activeField variable but does not focus it.
      * <p>
      * If you want to focus it call {@link #focus()} afterwards.
-     *
-     * @param fieldEditor
      */
     // TODO: Reenable or delete this
     //public void setActive(FieldEditor fieldEditor) {

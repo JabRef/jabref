@@ -121,8 +121,9 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileBasedLock;
+import org.jabref.logic.util.io.FileFinder;
+import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.util.io.RegExpFileSearch;
 import org.jabref.model.FieldChange;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
@@ -138,7 +139,6 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
-import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -531,7 +531,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
             final List<Path> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                    bibDatabaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
+                    bibDatabaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
             for (final Path f : files) {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
@@ -2089,60 +2089,34 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             this.basePanel = basePanel;
         }
 
-        public Optional<String> searchAndOpen() {
+        public void searchAndOpen() {
             if (!Globals.prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH)) {
-                return Optional.empty();
+                /*  The search can lead to an unexpected 100% CPU usage which is perceived
+                    as a bug, if the search incidentally starts at a directory with lots
+                    of stuff below. It is now disabled by default. */
+
+                return;
             }
-
-            /*  The search can lead to an unexpected 100% CPU usage which is perceived
-                as a bug, if the search incidentally starts at a directory with lots
-                of stuff below. It is now disabled by default. */
-
-            // see if we can fall back to a filename based on the bibtex key
-            final List<BibEntry> entries = Collections.singletonList(entry);
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
-            final List<File> dirs = new ArrayList<>();
-            final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-            for (final String mdDir : mdDirs) {
-                dirs.add(new File(mdDir));
-            }
-            final List<String> extensions = new ArrayList<>();
-            for (final ExternalFileType type : types) {
-                extensions.add(type.getExtension());
-            }
+            final List<Path> dirs = basePanel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
+
             // Run the search operation:
-            Map<BibEntry, List<File>> result;
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
-                String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
-                result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp, Globals.prefs.getKeywordDelimiter());
-            } else {
-                boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
-            }
-            if (result.containsKey(entry)) {
-                final List<File> res = result.get(entry);
-                if (!res.isEmpty()) {
-                    final String filepath = res.get(0).getPath();
-                    final Optional<String> extension = FileHelper.getFileExtension(filepath);
-                    if (extension.isPresent()) {
-                        Optional<ExternalFileType> type = ExternalFileTypes.getInstance()
-                                .getExternalFileTypeByExt(extension.get());
-                        if (type.isPresent()) {
-                            try {
-                                JabRefDesktop.openExternalFileAnyFormat(basePanel.getBibDatabaseContext(), filepath,
-                                        type);
-                                basePanel.output(Localization.lang("External viewer called") + '.');
-                                return Optional.of(filepath);
-                            } catch (IOException ex) {
-                                basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
-                            }
-                        }
+            FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+            List<Path> files = fileFinder.findAssociatedFiles(entry, dirs, extensions);
+            if (!files.isEmpty()) {
+                Path file = files.get(0);
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByFile(file);
+                if (type.isPresent()) {
+                    try {
+                        JabRefDesktop.openExternalFileAnyFormat(file, basePanel.getBibDatabaseContext(), type);
+                        basePanel.output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        basePanel.output(Localization.lang("Error") + ": " + ex.getMessage());
                     }
                 }
             }
-
-            return Optional.empty();
         }
     }
 

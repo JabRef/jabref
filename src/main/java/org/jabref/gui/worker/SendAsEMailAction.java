@@ -36,9 +36,8 @@ import org.apache.commons.logging.LogFactory;
 public class SendAsEMailAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
-
-    private String message;
     private final JabRefFrame frame;
+    private String message;
 
 
     public SendAsEMailAction(JabRefFrame frame) {
@@ -83,7 +82,7 @@ public class SendAsEMailAction extends AbstractWorker {
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
         List<Path> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences()));
+                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()));
         for (Path f : fileList) {
             attachments.add(f.toAbsolutePath().toString());
             if (openFolders) {

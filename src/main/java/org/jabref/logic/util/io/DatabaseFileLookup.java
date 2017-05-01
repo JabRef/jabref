@@ -25,14 +25,14 @@ public class DatabaseFileLookup {
 
     private final Set<Path> fileCache = new HashSet<>();
 
-    private final List<String> possibleFilePaths;
+    private final List<Path> possibleFilePaths;
 
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
     public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(fileDirectoryPreferences))
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences))
                 .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {

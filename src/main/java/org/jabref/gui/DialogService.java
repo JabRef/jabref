@@ -18,6 +18,8 @@ import org.jabref.logic.l10n.Localization;
  */
 public interface DialogService {
 
+    Optional<String> showInputDialogAndWait(String title, String content);
+
     /**
      * This will create and display a new information dialog.
      * It will include a blue information icon on the left and

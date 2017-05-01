@@ -60,9 +60,9 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<String> paths = databaseContext.getFileDirectories(fileDirectoryPreferences);
+        List<Path> paths = databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences);
         String defaultFileDirectory = firstExistingFileDir.get().toString();
-        Optional<Path> targetDirectory = FileHelper.expandFilename(defaultFileDirectory, paths);
+        Optional<Path> targetDirectory = FileHelper.expandFilenameAsPath(defaultFileDirectory, paths);
 
         if (!targetDirectory.isPresent()) {
             return Collections.emptyList();

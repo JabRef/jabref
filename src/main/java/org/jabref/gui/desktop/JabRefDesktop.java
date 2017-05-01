@@ -160,6 +160,11 @@ public class JabRefDesktop {
         }
     }
 
+    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext,
+                                                    final Optional<ExternalFileType> type) throws IOException {
+        return openExternalFileAnyFormat(databaseContext, file.toString(), type);
+    }
+
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
             throws IOException {
         if (fileType.isPresent()) {

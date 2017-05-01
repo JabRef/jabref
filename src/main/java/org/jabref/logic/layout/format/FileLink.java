@@ -1,6 +1,8 @@
 package org.jabref.logic.layout.format;
 
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
@@ -16,9 +18,8 @@ import org.apache.commons.logging.LogFactory;
 public class FileLink implements ParamLayoutFormatter {
 
     private static final Log LOGGER = LogFactory.getLog(FileLink.class);
-
-    private String fileType;
     private final FileLinkPreferences prefs;
+    private String fileType;
 
 
     public FileLink(FileLinkPreferences fileLinkPreferences) {
@@ -65,7 +66,7 @@ public class FileLink implements ParamLayoutFormatter {
             dirs = prefs.getFileDirForDatabase();
         }
 
-        return link.findIn(dirs)
+        return link.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
                 .map(path -> path.normalize().toString())
                 .orElse(link.getLink());
 

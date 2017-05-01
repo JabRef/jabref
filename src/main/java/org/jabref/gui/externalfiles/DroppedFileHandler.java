@@ -146,8 +146,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : Paths.get(fileName).toString();
@@ -198,8 +198,8 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
@@ -283,8 +283,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             if (renameCheckBox.isSelected() || (single == null)) {
@@ -417,13 +417,13 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+            List<Path> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
             } else {
-                Optional<Path> file = FileHelper.expandFilename(filename, dirs);
+                Optional<Path> file = FileHelper.expandFilenameAsPath(filename, dirs);
                 if (file.isPresent()) {
                     absFilename = file.get().toAbsolutePath().toString();
                 } else {

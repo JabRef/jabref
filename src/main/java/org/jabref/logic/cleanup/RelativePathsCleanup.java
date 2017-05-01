@@ -1,6 +1,6 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +35,7 @@ public class RelativePathsCleanup implements CleanupJob {
         for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
             String newFileName = FileUtil
-                    .shortenFileName(new File(oldFileName), databaseContext.getFileDirectories(fileDirectoryPreferences))
+                    .shortenFileName(Paths.get(oldFileName), databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences))
                     .toString();
 
             LinkedFile newFileEntry = fileEntry;
