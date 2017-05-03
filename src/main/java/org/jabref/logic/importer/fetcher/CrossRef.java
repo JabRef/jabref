@@ -110,7 +110,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         try {
             BibEntry entry = new BibEntry();
             entry.setType(convertType(item.getString("type")));
-            entry.setField(FieldName.TITLE, item.getJSONArray("title").getString(0));
+            entry.setField(FieldName.TITLE, item.getJSONArray("title").optString(0));
             entry.setField(FieldName.SUBTITLE,
                     Optional.ofNullable(item.optJSONArray("subtitle"))
                             .map(array -> array.optString(0)).orElse(""));
