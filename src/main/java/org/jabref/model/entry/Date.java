@@ -101,8 +101,8 @@ public class Date {
         return get(ChronoField.DAY_OF_MONTH);
     }
 
-    public LocalDate toLocalDate() {
-        return LocalDate.from(date);
+    public TemporalAccessor toTemporalAccessor() {
+        return date;
     }
 
     @Override
