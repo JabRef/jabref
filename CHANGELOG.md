@@ -15,7 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - The buttons were changed to icons.
   - Removed the hidden feature that a double click in the editor inserted the current date.
 - All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
-  
+- Improved wording of "Show recommendationns: into "Show 'Related Articles' tab" in the preferences
 
 ### Fixed
 - We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
