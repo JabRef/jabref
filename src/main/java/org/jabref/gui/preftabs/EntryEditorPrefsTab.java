@@ -56,7 +56,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA = new JCheckBox(Localization.lang("Rebind C-a, too"));
         emacsRebindCtrlF = new JCheckBox(Localization.lang("Rebind C-f, too"));
         autoComplete = new JCheckBox(Localization.lang("Enable word/name autocompletion"));
-        recommendations = new JCheckBox(Localization.lang("Show recommendations"));
+        recommendations = new JCheckBox(Localization.lang("Show 'Related_Articles' tab"));
 
         shortestToComplete = new JSpinner(
                 new SpinnerNumberModel(autoCompletePreferences.getShortestLengthToComplete(), 1, 5, 1));
