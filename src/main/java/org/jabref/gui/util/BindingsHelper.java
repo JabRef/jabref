@@ -117,9 +117,12 @@ public class BindingsHelper {
             return this::changedB;
         }
 
-
         public void changedA(ObservableValue<? extends A> observable, A oldValue, A newValue) {
             updateLocked(updateB, oldValue, newValue);
+        }
+        
+        public void changedB(ObservableValue<? extends B> observable, B oldValue, B newValue) {
+            updateLocked(updateA, oldValue, newValue);
         }
 
         private <T> void updateLocked(Consumer<T> update, T oldValue, T newValue) {
@@ -131,10 +134,6 @@ public class BindingsHelper {
                     updating = false;
                 }
             }
-        }
-
-        public void changedB(ObservableValue<? extends B> observable, B oldValue, B newValue) {
-            updateLocked(updateA, oldValue, newValue);
         }
     }
 
