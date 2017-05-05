@@ -113,4 +113,17 @@ public class CrossRefTest {
         entry.setField("year", "2005");
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
     }
+
+    @Test
+    public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
+        BibEntry entry = new BibEntry("article");
+        entry.setField("author", "Dominik Wujastyk");
+        entry.setField("doi", "10.1023/a:1003473214310");
+        entry.setField("issn", "0019-7246");
+        entry.setField("pages", "172-176");
+        entry.setField("volume", "42");
+        entry.setField("year", "1999");
+
+        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
+    }
 }

@@ -1,15 +1,19 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -37,6 +41,13 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(fieldName))));
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", FieldName.getDisplayName(fieldName))));
+
+        List<MenuItem> menuItems = new ArrayList<>();
+        if (fieldName.equalsIgnoreCase(FieldName.DOI)) {
+            menuItems.addAll(EditorMenus.getDOIMenu(textArea));
+        }
+        menuItems.addAll(EditorMenus.getDefaultMenu(textArea));
+        textArea.addToContextMenu(menuItems);
     }
 
     public IdentifierEditorViewModel getViewModel() {
