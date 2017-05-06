@@ -30,8 +30,7 @@ import static org.mockito.Mockito.when;
 
 public class MoveFilesCleanupTest {
 
-    @Rule
-    public TemporaryFolder bibFolder = new TemporaryFolder();
+    @Rule public TemporaryFolder bibFolder = new TemporaryFolder();
 
     private File pdfFolder;
     private BibDatabaseContext databaseContext;
@@ -95,8 +94,7 @@ public class MoveFilesCleanupTest {
         assertTrue(fileAfter.exists());
 
         assertEquals(
-                Optional.of(FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
-                        new LinkedFile("", fileAfter.getName(), ""), new LinkedFile("", "", "")))),
+                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", fileAfter.getName(), ""))),
                 entry.getField("file"));
     }
 
