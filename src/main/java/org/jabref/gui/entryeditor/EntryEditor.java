@@ -588,19 +588,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this,
-                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return FieldExtraComponents.getGenderExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return FieldExtraComponents.getPaginationExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.TYPE)) {
-            return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
         }
         return Optional.empty();
     }
