@@ -15,10 +15,9 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        // TODO: Implement all of them
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
                 return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"));
@@ -29,26 +28,28 @@ public class FieldEditors {
             return new UrlEditor(fieldName, dialogService);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences);
-        } else if (fieldExtras.contains(FieldProperty.DOI) ||
-                fieldExtras.contains(FieldProperty.EPRINT) ||
-                fieldExtras.contains(FieldProperty.ISBN)) {
+        } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
             return new IdentifierEditor(fieldName, taskExecutor, dialogService);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return new OwnerEditor(fieldName, preferences);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            //return FieldExtraComponents.getYesNoExtraComponent(editor, this);
+            return new OptionEditor<>(fieldName, new YesNoEditorViewModel());
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            //return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            return new OptionEditor<>(fieldName, new MonthEditorViewModel(databaseContext.getMode()));
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            //return FieldExtraComponents.getGenderExtraComponent(editor, this);
+            return new OptionEditor<>(fieldName, new GenderEditorViewModel());
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            //return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
+            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel());
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            //return FieldExtraComponents.getPaginationExtraComponent(editor, this);
+            return new OptionEditor<>(fieldName, new PaginationEditorViewModel());
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
-            //return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
+            if ("patent".equalsIgnoreCase(entryType)) {
+                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel());
+            } else {
+                return new OptionEditor<>(fieldName, new TypeEditorViewModel());
+            }
         }
 
         // default

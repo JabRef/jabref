@@ -153,7 +153,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext());
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
