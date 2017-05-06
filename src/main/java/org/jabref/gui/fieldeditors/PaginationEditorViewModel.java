@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 public class PaginationEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(7);
+    private BiMap<String, String> itemMap = HashBiMap.create(7);
 
     public PaginationEditorViewModel() {
         itemMap.put("page", Localization.lang("Page"));
