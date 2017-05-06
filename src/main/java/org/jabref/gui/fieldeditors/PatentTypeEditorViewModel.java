@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 public class PatentTypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(12);
+    private BiMap<String, String> itemMap = HashBiMap.create(12);
 
     public PatentTypeEditorViewModel() {
         itemMap.put("patent", Localization.lang("Patent"));
