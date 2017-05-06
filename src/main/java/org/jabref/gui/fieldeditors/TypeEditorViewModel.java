@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(8);
+    private BiMap<String, String> itemMap = HashBiMap.create(8);
 
     public TypeEditorViewModel() {
         itemMap.put("mathesis", Localization.lang("Master's thesis"));
