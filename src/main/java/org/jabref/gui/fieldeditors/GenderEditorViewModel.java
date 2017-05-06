@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 public class GenderEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(7);
+    private BiMap<String, String> itemMap = HashBiMap.create(7);
 
     public GenderEditorViewModel() {
         itemMap.put("sf", Localization.lang("Female name"));
