@@ -7,7 +7,7 @@ import com.google.common.collect.HashBiMap;
 
 public class EditorTypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(7);
+    private BiMap<String, String> itemMap = HashBiMap.create(7);
 
     public EditorTypeEditorViewModel() {
         itemMap.put("editor", Localization.lang("Editor"));
