@@ -5,7 +5,7 @@ import com.google.common.collect.HashBiMap;
 
 public class YesNoEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    BiMap<String, String> itemMap = HashBiMap.create(2);
+    private BiMap<String, String> itemMap = HashBiMap.create(2);
 
     public YesNoEditorViewModel() {
         itemMap.put("yes", "Yes");
