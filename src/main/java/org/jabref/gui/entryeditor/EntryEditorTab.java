@@ -199,6 +199,9 @@ class EntryEditorTab {
 
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
+
+        ColumnConstraints columnDoNotContract = new ColumnConstraints();
+        columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
         int rows;
         if (compressed) {
             rows = (int) Math.ceil((double) fields.size() / 2);
@@ -208,14 +211,14 @@ class EntryEditorTab {
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
             addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
 
-            gridPane.getColumnConstraints().addAll(new ColumnConstraints(), columnExpand, new ColumnConstraints(10), new ColumnConstraints(), columnExpand);
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10), columnDoNotContract, columnExpand);
         } else {
             rows = fields.size();
 
             addColumn(gridPane, 0, labels);
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
-            gridPane.getColumnConstraints().addAll(new ColumnConstraints(), columnExpand);
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
         }
 
 
