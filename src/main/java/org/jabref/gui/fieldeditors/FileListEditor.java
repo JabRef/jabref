@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -53,7 +51,6 @@ import org.apache.commons.logging.LogFactory;
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
-    private final FieldNameLabel label;
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
     private final String fieldName;
@@ -69,7 +66,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(fieldName);
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
@@ -288,16 +284,6 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     @Override
     public JComponent getTextComponent() {
         return this;
-    }
-
-    @Override
-    public JLabel getLabel() {
-        return label;
-    }
-
-    @Override
-    public void setLabelColor(Color color) {
-        label.setForeground(color);
     }
 
     @Override

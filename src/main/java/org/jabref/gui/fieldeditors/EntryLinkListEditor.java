@@ -1,7 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Insets;
@@ -18,7 +17,6 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -53,7 +51,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
 
     private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
-    private final FieldNameLabel label;
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
     private final String fieldName;
@@ -73,7 +70,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
         this.singleEntry = singleEntry;
-        label = new FieldNameLabel(fieldName);
         tableModel = new EntryLinkListTableModel(EntryLinkList.parse(content, databaseContext.getDatabase()));
         setText(content);
         setModel(tableModel);
@@ -173,6 +169,19 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         updateButtonStates();
     }
 
+    private static String formatEntry(BibEntry entry, BibDatabase database) {
+        StringReader sr = new StringReader(layoutFormat);
+        try {
+            Layout layout = new LayoutHelper(sr,
+                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
+                    .getLayoutFromText();
+            return layout.doLayout(entry, database);
+        } catch (IOException e) {
+            LOGGER.warn("Problem generating entry layout", e);
+        }
+        return "";
+    }
+
     private void jumpToEntry() {
         String entryKey = null;
 
@@ -229,16 +238,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     @Override
     public JComponent getTextComponent() {
         return this;
-    }
-
-    @Override
-    public JLabel getLabel() {
-        return label;
-    }
-
-    @Override
-    public void setLabelColor(Color color) {
-        label.setForeground(color);
     }
 
     @Override
@@ -324,6 +323,41 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         adjustColumnWidth();
     }
 
+    @Override
+    public void undo() {
+        // Do nothing
+    }
+
+    @Override
+    public void redo() {
+        // Do nothing
+    }
+
+    @Override
+    public void setAutoCompleteListener(AutoCompleteListener listener) {
+        // Do nothing
+    }
+
+    @Override
+    public void clearAutoCompleteSuggestion() {
+        // Do nothing
+    }
+
+    @Override
+    public void setActiveBackgroundColor() {
+        // Do nothing
+    }
+
+    @Override
+    public void setValidBackgroundColor() {
+        // Do nothing
+    }
+
+    @Override
+    public void setInvalidBackgroundColor() {
+        // Do nothing
+    }
+
     class TableClickListener extends MouseAdapter {
 
         @Override
@@ -365,41 +399,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 menu.show(EntryLinkListEditor.this, e.getX(), e.getY());
             }
         }
-    }
-
-    @Override
-    public void undo() {
-        // Do nothing
-    }
-
-    @Override
-    public void redo() {
-        // Do nothing
-    }
-
-    @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-        // Do nothing
-    }
-
-    @Override
-    public void clearAutoCompleteSuggestion() {
-        // Do nothing
-    }
-
-    @Override
-    public void setActiveBackgroundColor() {
-        // Do nothing
-    }
-
-    @Override
-    public void setValidBackgroundColor() {
-        // Do nothing
-    }
-
-    @Override
-    public void setInvalidBackgroundColor() {
-        // Do nothing
     }
 
     private class EntryLinkListTableModel extends DefaultTableModel {
@@ -531,19 +530,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 }
             }
         }
-    }
-
-    private static String formatEntry(BibEntry entry, BibDatabase database) {
-        StringReader sr = new StringReader(layoutFormat);
-        try {
-            Layout layout = new LayoutHelper(sr,
-                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                            .getLayoutFromText();
-            return layout.doLayout(entry, database);
-        } catch (IOException e) {
-            LOGGER.warn("Problem generating entry layout", e);
-        }
-        return "";
     }
 
 }
