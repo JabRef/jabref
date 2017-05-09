@@ -18,8 +18,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   
 
 ### Fixed
-We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
-
+- We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
+- We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
 ### Removed
 
 

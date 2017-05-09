@@ -221,7 +221,6 @@ class EntryEditorTab {
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
         }
 
-
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
         rowExpand.setPercentHeight(100 / rows);
