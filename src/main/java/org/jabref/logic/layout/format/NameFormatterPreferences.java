@@ -17,7 +17,6 @@ public class NameFormatterPreferences {
         return nameFormatterKey;
     }
 
-
     public List<String> getNameFormatterValue() {
         return nameFormatterValue;
     }

@@ -1,18 +1,16 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.fxml.Initializable;
-import javafx.scene.text.Font;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.util.BindingsHelper;
-import org.jabref.model.entry.BibEntry;
+import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
-
-    private String fieldName;
 
     public EditorTextArea() {
         this("");
@@ -26,18 +24,20 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
+    }
 
-        if (GUIGlobals.currentFont != null) {
-            setFont(Font.font(GUIGlobals.currentFont.getFontName(), GUIGlobals.currentFont.getSize()));
-
-            setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
-            );
-        }
-
-        getStylesheets().add("org/jabref/gui/fieldeditors/EditorTextArea.css");
+    /**
+     * Adds the given list of menu items to the context menu.
+     */
+    public void addToContextMenu(List<MenuItem> items) {
+        TextAreaSkin customContextSkin = new TextAreaSkin(this) {
+            @Override
+            public void populateContextMenu(ContextMenu contextMenu) {
+                super.populateContextMenu(contextMenu);
+                contextMenu.getItems().addAll(0, items);
+            }
+        };
+        setSkin(customContextSkin);
     }
 
     private String convertToHex(java.awt.Color color) {
@@ -47,17 +47,5 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-    }
-
-    public void bindToEntry(String fieldName, BibEntry entry) {
-        this.fieldName = fieldName;
-        BindingsHelper.bindBidirectional(
-                this.textProperty(),
-                entry.getFieldBinding(fieldName),
-                newValue -> {
-                    if (newValue != null) {
-                        entry.setField(fieldName, newValue);
-                    }
-                });
     }
 }

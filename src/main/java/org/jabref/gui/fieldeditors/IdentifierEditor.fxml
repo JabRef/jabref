@@ -8,7 +8,7 @@
 <?import org.jabref.gui.fieldeditors.EditorTextArea?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
-    <EditorTextArea fx:id="textArea" prefHeight="0.0" text="Halo" HBox.hgrow="ALWAYS" />
+    <EditorTextArea fx:id="textArea" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button disable="${controller.viewModel.validIdentifierIsNotPresent}" onAction="#openExternalLink"
             styleClass="flatButton">
         <graphic>

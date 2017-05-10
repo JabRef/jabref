@@ -1,6 +1,5 @@
 package org.jabref.logic.protectedterms;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,13 +25,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ProtectedTermsParser {
 
-    private final List<String> terms = new ArrayList<>();
-
-    private String description = Localization.lang("The text after the last line starting with # will be used");
-    private String location;
-
     private static final Log LOGGER = LogFactory.getLog(ProtectedTermsParser.class);
 
+    private final List<String> terms = new ArrayList<>();
+    private String description = Localization.lang("The text after the last line starting with # will be used");
+
+    private String location;
 
     public void readTermsFromResource(String resourceFileName, String descriptionString) {
         URL url = Objects
@@ -46,10 +44,9 @@ public class ProtectedTermsParser {
         }
     }
 
-
     public void readTermsFromFile(File file) throws FileNotFoundException {
         location = file.getAbsolutePath();
-        try(FileReader reader = new FileReader(Objects.requireNonNull(file))) {
+        try (FileReader reader = new FileReader(Objects.requireNonNull(file))) {
             readTermsList(reader);
         } catch (FileNotFoundException e) {
             throw e;

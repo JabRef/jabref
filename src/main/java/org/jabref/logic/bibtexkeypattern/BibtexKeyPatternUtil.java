@@ -489,7 +489,7 @@ public class BibtexKeyPatternUtil {
                     Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                     if (formatter.isPresent()) {
                         resultingLabel = formatter.get().format(label);
-                    } else if (!modifier.isEmpty() && (modifier.length()>= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                    } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                         // Alternate text modifier in parentheses. Should be inserted if
                         // the label is empty:
                         if (label.isEmpty() && (modifier.length() > 2)) {
@@ -680,7 +680,7 @@ public class BibtexKeyPatternUtil {
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return separatedKeywords.get(num-1).toString();
+                    return separatedKeywords.get(num - 1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -833,7 +833,6 @@ public class BibtexKeyPatternUtil {
 
         return stringJoiner.toString();
     }
-
 
     public static String removeSmallWords(String title) {
         StringJoiner stringJoiner = new StringJoiner(" ");

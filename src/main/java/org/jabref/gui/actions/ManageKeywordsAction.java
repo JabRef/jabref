@@ -211,7 +211,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return; // nothing to add
         }
 
-
         Keyword newKeyword = new Keyword(keywordTextField.getText().trim());
         if (keywordListModel.isEmpty()) {
             keywordListModel.addElement(newKeyword);

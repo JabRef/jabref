@@ -29,11 +29,11 @@ import com.jgoodies.forms.layout.RowSpec;
  */
 public class MergeEntriesDialog extends JabRefDialog {
 
-    private final BasePanel panel;
-    private final CellConstraints cc = new CellConstraints();
-
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
     private static final String MARGIN = "5px";
+    private final BasePanel panel;
+
+    private final CellConstraints cc = new CellConstraints();
 
     public MergeEntriesDialog(BasePanel panel) {
         super(panel.frame(), MERGE_ENTRIES, true, MergeEntriesDialog.class);
@@ -111,7 +111,6 @@ public class MergeEntriesDialog extends JabRefDialog {
         layout.appendColumn(ColumnSpec.decode(MARGIN));
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
-
 
         WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,

@@ -80,8 +80,8 @@ class PreambleEditor extends JabRefDialog {
         // TODO: Reenable this
         //setupJTextComponent((TextArea) editor);
 
-        gbl.setConstraints(editor.getLabel(), con);
-        pan.add(editor.getLabel());
+        //gbl.setConstraints(editor.getLabel(), con);
+        //pan.add(editor.getLabel());
 
         con.weightx = 1;
 
@@ -156,11 +156,11 @@ class PreambleEditor extends JabRefDialog {
                 panel.getUndoManager().addEdit(
                         new UndoablePreambleChange(database, panel, database.getPreamble().orElse(null), toSet));
                 database.setPreamble(toSet);
-                if ((toSet == null) || toSet.isEmpty()) {
-                    editor.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
-                } else {
-                    editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-                }
+                //if ((toSet == null) || toSet.isEmpty()) {
+                //    editor.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
+                //} else {
+                //    editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+                //}
                 editor.setValidBackgroundColor();
                 if (editor.hasFocus()) {
                     editor.setActiveBackgroundColor();

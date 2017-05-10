@@ -86,17 +86,17 @@ public class LinkedFile {
         return link.startsWith("http://") || link.startsWith("https://") || link.contains("www.");
     }
 
-    public Optional<Path> findIn(List<String> directories) {
+    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences);
+        return findIn(dirs);
+    }
+
+    public Optional<Path> findIn(List<Path> directories) {
         Path file = Paths.get(link);
         if (file.isAbsolute() || directories.isEmpty()) {
             return Optional.of(file);
         } else {
-            return FileHelper.expandFilename(link, directories);
+            return FileHelper.expandFilenameAsPath(link, directories);
         }
-    }
-
-    public Optional<Path> findIn(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        List<String> dirs = databaseContext.getFileDirectories(fileDirectoryPreferences);
-        return findIn(dirs);
     }
 }

@@ -435,7 +435,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     @Override
     public void componentClosing() {
-        if (panel != null) {// panel may be null if no file is open any more
+        if (panel != null) { // panel may be null if no file is open any more
             panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
         }
         getToggleAction().setSelected(false);
@@ -598,8 +598,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return getFirstSelectedNode();
         }
     }
-
-
 
     private class SortDirectSubgroupsAction extends NodeAction {
 

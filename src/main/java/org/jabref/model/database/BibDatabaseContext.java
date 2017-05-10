@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -144,6 +145,15 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
+    public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
+        // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
+        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(Paths::get).collect(Collectors.toList());
+    }
+
+    /**
+     * @deprecated use {@link #getFileDirectoriesAsPaths(FileDirectoryPreferences)} instead
+     */
+    @Deprecated
     public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
         return getFileDirectories(FieldName.FILE, preferences);
     }
@@ -154,9 +164,7 @@ public class BibDatabaseContext {
      * @return Optional of Path
      */
     public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(p -> Paths.get(p))
-                .filter(Files::exists).findFirst();
-        //Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
+        return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
     }
 
     /**

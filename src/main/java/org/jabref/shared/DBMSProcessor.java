@@ -27,14 +27,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class DBMSProcessor {
 
-    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
+    public static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
+
+    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
     protected final Connection connection;
 
     protected DBMSConnectionProperties connectionProperties;
-
-    public static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
 
     protected DBMSProcessor(DBMSConnection dbmsConnection) {
@@ -511,7 +511,7 @@ public abstract class DBMSProcessor {
         Map<String, String> data = new HashMap<>();
 
         try (ResultSet resultSet = connection.createStatement().executeQuery("SELECT * FROM " + escape("METADATA"))) {
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 data.put(resultSet.getString("KEY"), resultSet.getString("VALUE"));
             }
         } catch (SQLException e) {

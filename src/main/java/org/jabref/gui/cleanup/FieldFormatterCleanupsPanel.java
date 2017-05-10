@@ -300,7 +300,6 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         return selectedFormatter;
     }
 
-
     class EnablementStatusListener implements ActionListener {
 
         public EnablementStatusListener(boolean initialStatus) {

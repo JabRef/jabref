@@ -20,7 +20,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Wrapper around {@link SearchBasedFetcher} which implements the old {@link EntryFetcher} interface.
  */
-public class SearchBasedEntryFetcher implements EntryFetcher{
+public class SearchBasedEntryFetcher implements EntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(SearchBasedEntryFetcher.class);
     private final SearchBasedFetcher fetcher;

@@ -4,7 +4,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 
 import org.jabref.logic.l10n.Localization;
 
-
 public class AbstractUndoableJabRefEdit extends AbstractUndoableEdit {
 
     @Override

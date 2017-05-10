@@ -1,6 +1,5 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,8 +7,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.BibtexTestData;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -23,22 +22,18 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FileBasedTestCase {
-
-    private BibEntry entry;
-    private Path rootDir;
+public class CiteKeyBasedFileFinderTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
+    private BibEntry entry;
+    private Path rootDir;
     @Mock
     private ImportFormatPreferences prefs;
 
@@ -80,34 +75,31 @@ public class FileBasedTestCase {
 
     @Test
     public void testFindAssociatedFiles() {
-
-        List<BibEntry> entries = Collections.singletonList(entry);
         List<String> extensions = Arrays.asList("jpg", "pdf");
-        List<File> dirs = Arrays.asList(rootDir.resolve("graphicsDir").toFile(), rootDir.resolve("pdfs").toFile());
+        List<Path> dirs = Arrays.asList(rootDir.resolve("graphicsDir"), rootDir.resolve("pdfs"));
+        FileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        List<Path> results = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
-        Map<BibEntry, List<File>> results = FileUtil.findAssociatedFiles(entries, extensions, dirs, false);
+        Path jpgFile = rootDir.resolve(Paths.get("graphicsDir", "subDir", "HipKro03test.jpg"));
+        Path pdfFile = rootDir.resolve(Paths.get("pdfs", "sub", "HipKro03-sub.pdf"));
 
-        assertEquals(2, results.get(entry).size());
-        assertTrue(results.get(entry)
-                .contains(rootDir.resolve(Paths.get("graphicsDir", "subDir", "HipKro03test.jpg")).toFile()));
-        assertFalse(results.get(entry)
-                .contains(rootDir.resolve(Paths.get("graphicsDir", "subDir", "HipKro03test.png")).toFile()));
-        assertTrue(results.get(entry).contains(rootDir.resolve(Paths.get("pdfs", "sub", "HipKro03-sub.pdf")).toFile()));
+        assertEquals(Arrays.asList(jpgFile, pdfFile), results.stream().sorted().collect(Collectors.toList()));
     }
 
     @Test
-    public void testFindFilesException() {
+    public void findFilesByExtensionInNonExistingDirectoryFindsNothing() {
         List<String> extensions = Arrays.asList("jpg", "pdf");
-        List<File> dirs = Arrays.asList(rootDir.resolve("asdfasdf/asdfasdf").toFile());
-        Set<Path> results = FileFinder.findFiles(extensions, dirs);
+        List<Path> dirs = Collections.singletonList(rootDir.resolve("asdfasdf/asdfasdf"));
+        CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        Set<Path> results = fileFinder.findFilesByExtension(dirs, extensions);
 
         assertEquals(Collections.emptySet(), results);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testFindFilesNullPointerException() {
-
-        FileFinder.findFiles(null, null);
+    public void findFilesByExtensionWithNullThrowsException() {
+        CiteKeyBasedFileFinder fileFinder = new CiteKeyBasedFileFinder(false);
+        fileFinder.findFilesByExtension(Collections.emptyList(), null);
     }
 
 }

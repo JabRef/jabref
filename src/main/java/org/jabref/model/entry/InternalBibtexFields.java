@@ -37,12 +37,6 @@ public class InternalBibtexFields {
      */
     public static final List<String> DEFAULT_GENERAL_FIELDS =  Arrays.asList(FieldName.CROSSREF, FieldName.KEYWORDS, FieldName.FILE, FieldName.DOI, FieldName.URL, FieldName.COMMENT, FieldName.OWNER, FieldName.TIMESTAMP);
 
-    // contains all bibtex-field objects (BibtexSingleField)
-    private final Map<String, BibtexSingleField> fieldSet;
-
-    // the name with the current time stamp field, needed in case we want to change it
-    private String timeStampField;
-
     // Lists of fields with special properties
     private static final List<String> INTEGER_FIELDS = Arrays.asList(FieldName.CTLMAX_NAMES_FORCED_ETAL,
             FieldName.CTLNAMES_SHOW_ETAL, FieldName.CTLALT_STRETCH_FACTOR, FieldName.VOLUMES, FieldName.PMID);
@@ -88,6 +82,12 @@ public class InternalBibtexFields {
 
     // singleton instance
     private static InternalBibtexFields RUNTIME = new InternalBibtexFields(FieldName.TIMESTAMP);
+
+    // contains all bibtex-field objects (BibtexSingleField)
+    private final Map<String, BibtexSingleField> fieldSet;
+
+    // the name with the current time stamp field, needed in case we want to change it
+    private String timeStampField;
 
 
     private InternalBibtexFields(String timeStampFieldName) {

@@ -37,7 +37,6 @@ public class XMPSchemaBibtex extends XMPSchema {
 
     private static final Set<String> PRESERVE_WHITE_SPACE = new HashSet<>();
 
-
     static {
         XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.ABSTRACT);
         XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.NOTE);
@@ -260,8 +259,6 @@ public class XMPSchemaBibtex extends XMPSchema {
 
         return result;
     }
-
-
 
     public void setBibtexEntry(BibEntry entry, XMPPreferences xmpPreferences) {
         setBibtexEntry(entry, null, xmpPreferences);

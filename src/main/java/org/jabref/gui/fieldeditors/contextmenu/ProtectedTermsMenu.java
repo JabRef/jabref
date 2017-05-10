@@ -1,8 +1,9 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.text.JTextComponent;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextArea;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
@@ -11,53 +12,52 @@ import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 
-public class ProtectedTermsMenu extends JMenu {
+class ProtectedTermsMenu extends Menu {
 
     private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
-    private final JMenu externalFiles;
-    private final JTextComponent opener;
+    private final Menu externalFiles;
+    private final TextArea opener;
 
-    public ProtectedTermsMenu(JTextComponent opener) {
+    public ProtectedTermsMenu(TextArea opener) {
         super(Localization.lang("Protect terms"));
         this.opener = opener;
-        JMenuItem protectItem = new JMenuItem(Localization.lang("Add {} around selected text"));
-        protectItem.addActionListener(event -> {
+        MenuItem protectItem = new MenuItem(Localization.lang("Add {} around selected text"));
+        protectItem.setOnAction(event -> {
             String selectedText = opener.getSelectedText();
             if ((selectedText != null) && !selectedText.isEmpty()) {
                 opener.replaceSelection("{" + selectedText + "}");
             }
         });
 
-        JMenuItem formatItem = new JMenuItem(Localization.lang("Format field"));
-        formatItem.addActionListener(event -> opener.setText(formatter.format(opener.getText())));
+        MenuItem formatItem = new MenuItem(Localization.lang("Format field"));
+        formatItem.setOnAction(event -> opener.setText(formatter.format(opener.getText())));
 
-        externalFiles = new JMenu(Localization.lang("Add selected text to list"));
+        externalFiles = new Menu(Localization.lang("Add selected text to list"));
         updateFiles();
 
-
-
-        this.add(protectItem);
-        this.add(externalFiles);
-        this.addSeparator();
-        this.add(formatItem);
+        this.getItems().add(protectItem);
+        this.getItems().add(externalFiles);
+        this.getItems().add(new SeparatorMenuItem());
+        this.getItems().add(formatItem);
     }
 
-    public void updateFiles() {
-        externalFiles.removeAll();
+    private void updateFiles() {
+        externalFiles.getItems().clear();
         for (ProtectedTermsList list : Globals.protectedTermsLoader.getProtectedTermsLists()) {
             if (!list.isInternalList()) {
-                JMenuItem fileItem = new JMenuItem(list.getDescription());
-                externalFiles.add(fileItem);
-                fileItem.addActionListener(event -> {String selectedText = opener.getSelectedText();
-                if((selectedText != null) && !selectedText.isEmpty()) {
-                    list.addProtectedTerm(selectedText);
+                MenuItem fileItem = new MenuItem(list.getDescription());
+                fileItem.setOnAction(event -> {
+                    String selectedText = opener.getSelectedText();
+                    if ((selectedText != null) && !selectedText.isEmpty()) {
+                        list.addProtectedTerm(selectedText);
                     }
                 });
+                externalFiles.getItems().add(fileItem);
             }
         }
-        externalFiles.addSeparator();
-        JMenuItem addToNewFileItem = new JMenuItem(Localization.lang("New") + "...");
-        addToNewFileItem.addActionListener(event -> {
+        externalFiles.getItems().add(new SeparatorMenuItem());
+        MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
+        addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
                     Globals.protectedTermsLoader);
             dialog.setVisible(true);
@@ -66,7 +66,7 @@ public class ProtectedTermsMenu extends JMenu {
                 Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
             }
         });
-        externalFiles.add(addToNewFileItem);
+        externalFiles.getItems().add(addToNewFileItem);
 
     }
 

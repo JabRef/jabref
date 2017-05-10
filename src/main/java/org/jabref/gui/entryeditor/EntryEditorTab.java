@@ -6,23 +6,29 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -34,8 +40,6 @@ import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
-import org.jabref.gui.fieldeditors.FileListEditor;
-import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
@@ -44,88 +48,85 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 
-import com.jgoodies.forms.builder.DefaultFormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 class EntryEditorTab {
 
-    private final JPanel panel = new JPanel();
-
-    private final JScrollPane scrollPane = new JScrollPane(panel,
-            ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
+    private final JFXPanel panel = new JFXPanel();
     private final List<String> fields;
-
     private final EntryEditor parent;
-
-    private final Map<String, FieldEditorFX> editors = new HashMap<>();
+    private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
     private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    // UGLY HACK to have a pointer to the fileListEditor to call autoSetLinks()
-    public FileListEditor fileListEditor;
     private FieldEditorFX activeField;
     private BibEntry entry;
     private boolean updating;
 
 
-    public EntryEditorTab(JabRefFrame frame, BasePanel panel, List<String> fields, EntryEditor parent,
-            boolean addKeyField, boolean compressed, String tabTitle) {
+    public EntryEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
+                          boolean addKeyField, boolean compressed, String tabTitle) {
         if (fields == null) {
             this.fields = new ArrayList<>();
         } else {
             this.fields = new ArrayList<>(fields);
         }
+        // Add the edit field for Bibtex-key.
+        if (addKeyField) {
+            this.fields.add(BibEntry.KEY_FIELD);
+        }
 
         this.parent = parent;
         this.tabTitle = tabTitle;
         this.frame = frame;
-        this.basePanel = panel;
+        this.basePanel = basePanel;
 
-        setupPanel(frame, panel, addKeyField, compressed, tabTitle);
+        // Execute on JavaFX Application Thread
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            Region root = setupPanel(frame, basePanel, addKeyField, compressed, tabTitle);
+
+            if (GUIGlobals.currentFont != null) {
+                root.setStyle(
+                        "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
+                                + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
+                                + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
+                );
+            }
+
+            root.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
+
+            panel.setScene(new Scene(root));
+        });
 
         // The following line makes sure focus cycles inside tab instead of being lost to other parts of the frame:
-        scrollPane.setFocusCycleRoot(true);
+        panel.setFocusCycleRoot(true);
     }
 
-    private void setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
-                            boolean compressed, String title) {
+    private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
+        gridPane.addColumn(columnIndex, nodes.toArray(new Node[nodes.size()]));
+    }
+
+    private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
+        gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
+    }
+
+    private String convertToHex(java.awt.Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    private Region setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
+                              boolean compressed, String title) {
 
         setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
         panel.setName(title);
 
-        // Use the title for the scrollPane, too.
-        // This enables the correct execution of EntryEditor.setVisiblePanel(String name).
-        scrollPane.setName(title);
+        editors.clear();
+        List<Label> labels = new ArrayList<>();
 
-        int fieldsPerRow = compressed ? 2 : 1;
-
-        String colSpec = compressed ? "fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref, "
-                + "8dlu, fill:pref, 1dlu, fill:10dlu:grow, 1dlu, fill:pref"
-                : "fill:pref, 1dlu, fill:pref:grow, 1dlu, fill:pref";
-        StringBuilder stringBuilder = new StringBuilder();
-        int rows = (int) Math.ceil((double) fields.size() / fieldsPerRow);
-        for (int i = 0; i < rows; i++) {
-            stringBuilder.append("fill:pref:grow, ");
-        }
-        if (addKeyField) {
-            stringBuilder.append("4dlu, fill:pref");
-        } else if (stringBuilder.length() >= 2) {
-            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-        }
-        String rowSpec = stringBuilder.toString();
-
-        DefaultFormBuilder builder = new DefaultFormBuilder
-                (new FormLayout(colSpec, rowSpec), panel);
-
-        // BibTex edit fields are defined here
-        for (int i = 0; i < fields.size(); i++) {
-            String fieldName = fields.get(i);
+        for (String fieldName : fields) {
 
             // TODO: Reenable/migrate this
             // Store the editor for later reference:
@@ -133,13 +134,7 @@ class EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.FILE_EDITOR)) {
-                fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
-
-                fileListEditor = (FileListEditor) fieldEditor;
-
-                defaultHeight = 0;
-            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
                         true);
                 defaultHeight = 0;
@@ -166,7 +161,7 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService());
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -182,55 +177,58 @@ class EntryEditorTab {
             }
             */
 
-            builder.append(new FieldNameLabel(fieldName));
-
-            JFXPanel swingPanel = new JFXPanel();
-            swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
-            DefaultTaskExecutor.runInJavaFXThread(
-                    () -> {
-                        Scene scene = new Scene(fieldEditor.getNode());
-                        swingPanel.setScene(scene);
-                    }
-            );
-            builder.append(swingPanel, 3);
             /*
-            // TODO: Delete when no longer required
-            if (extra.isPresent()) {
-                builder.append(fieldEditor.getPane());
-                JPanel pan = new JPanel();
-                pan.setLayout(new BorderLayout());
-                pan.add(extra.get(), BorderLayout.NORTH);
-                builder.append(pan);
-            } else {
-                builder.append(fieldEditor.getPane(), 3);
+            // TODO: Reenable content selector
+            if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
+                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
+                        ", ");
+                contentSelectors.add(ws);
+                controls.add(ws, BorderLayout.NORTH);
             }
-            */
-            if (((i + 1) % fieldsPerRow) == 0) {
-                builder.nextLine();
-            }
-        }
-
-        // Add the edit field for Bibtex-key.
-        if (addKeyField) {
-            final TextField textField = new TextField(BibEntry.KEY_FIELD,
-                    parent.getEntry().getCiteKeyOptional().orElse(""), true);
-            setupJTextComponent(textField, null);
-
-            // TODO: Reenable this
-            //editors.put(BibEntry.KEY_FIELD, textField);
-            fields.add(BibEntry.KEY_FIELD);
-            /*
-             * If the key field is the only field, we should have only one
-             * editor, and this one should be set as active initially:
+            //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
+            //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
              */
-            if (editors.size() == 1) {
-                // TODO: Reenable this
-                //activeField = textField;
-            }
-            builder.nextLine();
-            builder.append(textField.getLabel());
-            builder.append(textField, 3);
+
+            labels.add(new FieldNameLabel(fieldName));
         }
+
+        GridPane gridPane = new GridPane();
+        gridPane.setPrefSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        gridPane.setMaxSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+        gridPane.getStyleClass().add("editorPane");
+
+        ColumnConstraints columnExpand = new ColumnConstraints();
+        columnExpand.setHgrow(Priority.ALWAYS);
+
+        ColumnConstraints columnDoNotContract = new ColumnConstraints();
+        columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
+        int rows;
+        if (compressed) {
+            rows = (int) Math.ceil((double) fields.size() / 2);
+
+            addColumn(gridPane, 0, labels.subList(0, rows));
+            addColumn(gridPane, 3, labels.subList(rows, labels.size()));
+            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
+            addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
+
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10), columnDoNotContract, columnExpand);
+        } else {
+            rows = fields.size();
+
+            addColumn(gridPane, 0, labels);
+            addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
+
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
+        }
+
+        RowConstraints rowExpand = new RowConstraints();
+        rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setPercentHeight(100 / rows);
+        for (int i = 0; i < rows; i++) {
+            gridPane.getRowConstraints().add(rowExpand);
+        }
+
+        return gridPane;
     }
 
     private String getPrompt(String field) {
@@ -264,7 +262,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditorFX editor : editors.values()) {
-                editor.bindToEntry(entry);
+                DefaultTaskExecutor.runInJavaFXThread(() -> editor.bindToEntry(entry));
             }
             this.entry = entry;
         } finally {
@@ -297,8 +295,6 @@ class EntryEditorTab {
      * Only sets the activeField variable but does not focus it.
      * <p>
      * If you want to focus it call {@link #focus()} afterwards.
-     *
-     * @param fieldEditor
      */
     // TODO: Reenable or delete this
     //public void setActive(FieldEditor fieldEditor) {
@@ -339,16 +335,16 @@ class EntryEditorTab {
         // TODO: Reenable or probably better delete this
         /*
         FieldEditor fieldEditor = editors.get(field);
-        if (fieldEditor.getText().equals(content)){
+        if (fieldEditor.getText().equals(content)) {
             return true;
         }
 
         // trying to preserve current edit position (fixes SF bug #1285)
-        if(fieldEditor.getTextComponent() instanceof JTextComponent) {
+        if (fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
             fieldEditor.setText(content);
             int textLength = fieldEditor.getText().length();
-            if(initialCaretPosition<textLength) {
+            if (initialCaretPosition < textLength) {
                 ((JTextComponent) fieldEditor).setCaretPosition(initialCaretPosition);
             } else {
                 ((JTextComponent) fieldEditor).setCaretPosition(textLength);
@@ -370,7 +366,7 @@ class EntryEditorTab {
     }
 
     public Component getPane() {
-        return scrollPane;
+        return panel;
     }
 
     public EntryEditor getParent() {

@@ -45,12 +45,12 @@ public class ContainBasedSearchRule implements SearchRule {
             Iterator<String> unmatchedWordsIterator = unmatchedWords.iterator();
             while (unmatchedWordsIterator.hasNext()) {
                 String word = unmatchedWordsIterator.next();
-                if(formattedFieldContent.contains(word)) {
+                if (formattedFieldContent.contains(word)) {
                     unmatchedWordsIterator.remove();
                 }
             }
 
-            if(unmatchedWords.isEmpty()) {
+            if (unmatchedWords.isEmpty()) {
                 return true;
             }
         }

@@ -57,7 +57,6 @@ public class TagToMarkedTextStore {
         }
     }
 
-
     private static class TMarkedStoreItem {
 
         private final int start;

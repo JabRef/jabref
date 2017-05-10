@@ -11,9 +11,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Continued to redesign the user interface: this time the editor got a fresh coat of paint:
+  - The buttons were changed to icons.
+  - Removed the hidden feature that a double click in the editor inserted the current date.
+- All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
+- Improved wording of "Show recommendationns: into "Show 'Related Articles' tab" in the preferences
 
 ### Fixed
-
+- We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
+- We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
 ### Removed
 
 

@@ -170,15 +170,20 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
+Id:      org.xmlunit:xmlunit-core
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
+Id:      org.xmlunit:xmlunit-matchers
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
 Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL-3.0
-
-Id:      com.github.lgooddatepicker:LGoodDatePicker
-Project: LGoodDatePicker
-URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
-License: MIT
 
 Id:      spin
 Path:    lib/spin.jar

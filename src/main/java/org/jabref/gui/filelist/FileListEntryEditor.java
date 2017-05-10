@@ -65,29 +65,62 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileListEntryEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private JDialog diag;
+    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("OK"));
-
     private final JComboBox<ExternalFileType> types;
     private final JProgressBar prog = new JProgressBar(SwingConstants.HORIZONTAL);
     private final JLabel downloadLabel = new JLabel(Localization.lang("Downloading..."));
+    private JDialog diag;
+    //Do not make this variable final, as then the lambda action listener will fail on compile
+    private JabRefFrame frame;
+    private boolean showSaveDialog;
     private ConfirmCloseFileListEntryEditor externalConfirm;
-
     private FileListEntry entry;
     //Do not make this variable final, as then the lambda action listener will fail on compiöe
     private BibDatabaseContext databaseContext;
+    private final ActionListener browsePressed = e -> {
+        String fileText = link.getText().trim();
+        Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
+                Globals.prefs.getFileDirectoryPreferences());
+        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
+
+        String fileName = Paths.get(fileText).getFileName().toString();
+
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(workingDir)
+                .withInitialFileName(fileName).build();
+        DialogService ds = new FXDialogService();
+
+        Optional<Path> path;
+        if (showSaveDialog) {
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
+        } else {
+            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+        }
+
+        path.ifPresent(newFile -> {
+            // Store the directory for next time:
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.toString());
+
+            // If the file is below the file directory, make the path relative:
+            List<Path> fileDirectories = this.databaseContext
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            newFile = FileUtil.shortenFileName(newFile, fileDirectories);
+
+            link.setText(newFile.toString());
+            link.requestFocus();
+        });
+    };
     private boolean okPressed;
+
     private boolean okDisabledExternally;
     private boolean openBrowseWhenShown;
+
     private boolean dontOpenBrowseUntilDisposed;
-
-    private boolean showSaveDialog;
-
-    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar, boolean showOpenButton,
             BibDatabaseContext databaseContext, boolean showSaveDialog) {
@@ -350,39 +383,4 @@ public class FileListEntryEditor {
     public boolean okPressed() {
         return okPressed;
     }
-
-    private final ActionListener browsePressed = e -> {
-        String fileText = link.getText().trim();
-        Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
-                Globals.prefs.getFileDirectoryPreferences());
-        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
-
-        String fileName = Paths.get(fileText).getFileName().toString();
-
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDir)
-                .withInitialFileName(fileName).build();
-        DialogService ds = new FXDialogService();
-
-        Optional<Path> path;
-        if (showSaveDialog) {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
-        } else {
-            path = DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
-        }
-
-        path.ifPresent(selection -> {
-            File newFile = selection.toFile();
-            // Store the directory for next time:
-            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.getPath());
-
-            // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-            newFile = FileUtil.shortenFileName(newFile, fileDirs);
-
-            link.setText(newFile.getPath());
-            link.requestFocus();
-        });
-    };
 }

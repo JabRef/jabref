@@ -12,13 +12,14 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class BibEntryWriterTest {
 
@@ -27,9 +28,9 @@ public class BibEntryWriterTest {
 
     @Before
     public void setUpWriter() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
-        writer = new BibEntryWriter(
-                new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences()), true);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), true);
     }
 
     @Test

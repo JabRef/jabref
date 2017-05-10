@@ -1,9 +1,11 @@
 package org.jabref.logic.layout.format;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 import org.jabref.model.entry.FileFieldParser;
@@ -78,7 +80,6 @@ import org.apache.commons.logging.LogFactory;
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
-    // Define codes for the various escape sequences that can be inserted:
     private static final int STRING = 0;
     private static final int ITERATION_COUNT = 1;
     private static final int FILE_PATH = 2;
@@ -210,7 +211,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                             dirs = prefs.getFileDirForDatabase();
                         }
 
-                        String pathString = flEntry.findIn(dirs)
+                        String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
                                 .map(path -> path.toAbsolutePath().toString())
                                 .orElse(flEntry.getLink());
 

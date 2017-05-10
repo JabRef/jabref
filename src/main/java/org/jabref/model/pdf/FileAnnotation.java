@@ -2,7 +2,6 @@ package org.jabref.model.pdf;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +50,7 @@ public class FileAnnotation {
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
         this(annotation.getDictionary().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty());
     }
 
     /**
@@ -64,7 +63,7 @@ public class FileAnnotation {
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
         this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
-                pageNumber, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.of(linkedFileAnnotation));
+                pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
     }
 
     /**

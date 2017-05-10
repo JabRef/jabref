@@ -160,6 +160,11 @@ public class JabRefDesktop {
         }
     }
 
+    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext,
+                                                    final Optional<ExternalFileType> type) throws IOException {
+        return openExternalFileAnyFormat(databaseContext, file.toString(), type);
+    }
+
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
             throws IOException {
         if (fileType.isPresent()) {
@@ -288,7 +293,7 @@ public class JabRefDesktop {
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually +"\n"+
+            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
         }
     }

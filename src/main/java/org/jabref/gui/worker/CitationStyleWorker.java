@@ -32,7 +32,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         Objects.requireNonNull(previewPane);
 
         Optional<BasePanel> basePanel = previewPanel.getBasePanel();
-        if (basePanel.isPresent()){
+        if (basePanel.isPresent()) {
             CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
             previewPane.setText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
                     ": " + citationStyle.getTitle() + " ..." + "</i>");

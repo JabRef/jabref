@@ -1,6 +1,5 @@
 package org.jabref.model.util;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,8 +19,8 @@ public class FileHelper {
      * @param file
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.toString());
     }
 
     /**
@@ -81,14 +80,26 @@ public class FileHelper {
      * <p>
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
+     *
+     * @deprecated use {@link #expandFilenameAsPath(String, List)} instead
      */
+    @Deprecated
     public static Optional<Path> expandFilename(String name, List<String> directories) {
         for (String dir : directories) {
-            if (dir != null) {
-                Optional<Path> result = expandFilename(name, dir);
-                if (result.isPresent()) {
-                    return result;
-                }
+            Optional<Path> result = expandFilename(name, Paths.get(dir));
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<Path> expandFilenameAsPath(String name, List<Path> directories) {
+        for (Path directory : directories) {
+            Optional<Path> result = expandFilename(name, directory);
+            if (result.isPresent()) {
+                return result;
             }
         }
 
@@ -99,16 +110,15 @@ public class FileHelper {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
      */
-    private static Optional<Path> expandFilename(String filename, String directoryName) {
+    private static Optional<Path> expandFilename(String filename, Path directory) {
         Objects.requireNonNull(filename);
-        Objects.requireNonNull(directoryName);
+        Objects.requireNonNull(directory);
 
         Path file = Paths.get(filename);
         if (Files.exists(file)) {
             return Optional.of(file);
         }
 
-        Path directory = Paths.get(directoryName);
         Path resolvedFile = directory.resolve(file);
         if (Files.exists(resolvedFile)) {
             return Optional.of(resolvedFile);

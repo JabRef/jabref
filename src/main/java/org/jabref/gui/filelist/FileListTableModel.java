@@ -123,7 +123,8 @@ public class FileListTableModel extends AbstractTableModel {
         List<LinkedFile> fields = FileFieldParser.parse(value);
         List<FileListEntry> files = new ArrayList<>();
 
-        for(LinkedFile entry : fields) {
+        for (LinkedFile entry : fields) {
+
             if (entry.isEmpty()) {
                 continue;
             }

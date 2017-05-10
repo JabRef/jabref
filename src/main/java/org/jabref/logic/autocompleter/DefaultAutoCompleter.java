@@ -13,9 +13,9 @@ import org.jabref.model.entry.BibEntry;
  */
 class DefaultAutoCompleter extends AbstractAutoCompleter {
 
-    private final String fieldName;
-
     private static final String SEPARATING_CHARS = ";,\n ";
+
+    private final String fieldName;
 
     /**
      * @see AutoCompleterFactory

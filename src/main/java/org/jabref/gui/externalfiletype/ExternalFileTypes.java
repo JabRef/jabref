@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiletype;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 public final class ExternalFileTypes {
@@ -19,26 +21,23 @@ public final class ExternalFileTypes {
     // This String is used in the encoded list in prefs of external file type
     // modifications, in order to indicate a removed default file type:
     private static final String FILE_TYPE_REMOVED_FLAG = "REMOVED";
-
+    // The only instance of this class:
+    private static ExternalFileTypes singleton;
     // Map containing all registered external file types:
     private final Set<ExternalFileType> externalFileTypes = new TreeSet<>();
 
     private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "", "www",
             IconTheme.JabRefIcon.WWW.getSmallIcon());
 
-    // The only instance of this class:
-    private static ExternalFileTypes singleton;
-
+    private ExternalFileTypes() {
+        updateExternalFileTypes();
+    }
 
     public static ExternalFileTypes getInstance() {
         if (ExternalFileTypes.singleton == null) {
             ExternalFileTypes.singleton = new ExternalFileTypes();
         }
         return ExternalFileTypes.singleton;
-    }
-
-    private ExternalFileTypes() {
-        updateExternalFileTypes();
     }
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
@@ -319,5 +318,11 @@ public final class ExternalFileTypes {
 
         // Finally, build the list of types based on the modified defaults list:
         externalFileTypes.addAll(types);
+    }
+
+    public Optional<ExternalFileType> getExternalFileTypeByFile(Path file) {
+        final String filePath = file.toString();
+        final Optional<String> extension = FileHelper.getFileExtension(filePath);
+        return extension.flatMap(this::getExternalFileTypeByExt);
     }
 }

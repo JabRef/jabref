@@ -53,10 +53,10 @@ import org.jabref.model.entry.FieldName;
  */
 class ModsExportFormat extends ExportFormat {
 
+    protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     private static final String MINUS = "-";
     private static final String DOUBLE_MINUS = "--";
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
-    protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     private JAXBContext context;
 
 
@@ -181,7 +181,6 @@ class ModsExportFormat extends ExportFormat {
         // Write to File
         marshaller.marshal(jaxbElement, new File(file));
     }
-
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
             ModsDefinition mods) {

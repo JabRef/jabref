@@ -15,10 +15,10 @@ import org.jabref.gui.IconTheme;
  */
 public abstract class MnemonicAwareAction extends AbstractAction {
 
-    public MnemonicAwareAction() {}
+    public MnemonicAwareAction() { }
 
     public MnemonicAwareAction(Icon icon) {
-        if(icon instanceof IconTheme.FontBasedIcon) {
+        if (icon instanceof IconTheme.FontBasedIcon) {
             putValue(Action.SMALL_ICON, ((IconTheme.FontBasedIcon) icon).createSmallIcon());
             putValue(Action.LARGE_ICON_KEY, icon);
         } else {

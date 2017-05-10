@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -43,13 +44,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
+    private static final boolean DROP_ALLOWED = true;
+    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
-    private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private boolean draggingFile;
 
     /**
@@ -118,7 +119,8 @@ public class EntryTableTransferHandler extends TransferHandler {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
                 @SuppressWarnings("unchecked")
-                List<Path> files = (List<Path>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                List<Path> files = ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).stream()
+                        .map(File::toPath).collect(Collectors.toList());
                 return handleDraggedFiles(files, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);

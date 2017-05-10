@@ -1,6 +1,5 @@
 package org.jabref.logic.journals;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,9 +23,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AbbreviationParser {
 
-    private final List<Abbreviation> abbreviations = new LinkedList<>();
-
     private static final Log LOGGER = LogFactory.getLog(AbbreviationParser.class);
+
+    private final List<Abbreviation> abbreviations = new LinkedList<>();
 
     public void readJournalListFromResource(String resourceFileName) {
         URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
@@ -38,7 +37,7 @@ public class AbbreviationParser {
     }
 
     public void readJournalListFromFile(File file) throws FileNotFoundException {
-        try(FileReader reader = new FileReader(Objects.requireNonNull(file))) {
+        try (FileReader reader = new FileReader(Objects.requireNonNull(file))) {
             readJournalList(reader);
         } catch (FileNotFoundException e) {
             throw e;
@@ -65,7 +64,7 @@ public class AbbreviationParser {
      * @param in
      */
     private void readJournalList(Reader in) {
-        try(BufferedReader reader = new BufferedReader(in)){
+        try (BufferedReader reader = new BufferedReader(in)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 addLine(line);
