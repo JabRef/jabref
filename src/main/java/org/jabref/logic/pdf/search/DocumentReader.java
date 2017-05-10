@@ -9,28 +9,32 @@ import org.jabref.model.entry.FieldName;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.util.PDFTextStripper;
 
-import static org.jabref.logic.pdf.search.SearchFieldConstants.AUTHOR;
-import static org.jabref.logic.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.logic.pdf.search.SearchFieldConstants.CREATOR;
-import static org.jabref.logic.pdf.search.SearchFieldConstants.KEY;
-import static org.jabref.logic.pdf.search.SearchFieldConstants.KEYWORDS;
-import static org.jabref.logic.pdf.search.SearchFieldConstants.SUBJECT;
+import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
+import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
+import static org.jabref.model.pdf.search.SearchFieldConstants.CREATOR;
+import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
+import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 
 public class DocumentReader {
 
     private final BibEntry entry;
+    private final PDFTextStripper pdfTextStripper = new PDFTextStripper();
 
-    public DocumentReader(BibEntry bibEntry) {
+    public DocumentReader(BibEntry bibEntry) throws IOException {
         if (!bibEntry.getField(FieldName.FILE).isPresent()) {
             throw new IllegalArgumentException("The file field must not be absent when trying to reading the " +
                     "document!");
         }
-
         this.entry = bibEntry;
+
+        pdfTextStripper.setLineSeparator("\n");
     }
 
     /**
@@ -40,40 +44,52 @@ public class DocumentReader {
         Path pdfPath = Paths.get(this.entry.getField(FieldName.FILE).get());
 
         try (PDDocument pdfDocument = PDDocument.load(pdfPath.toFile())) {
-            PDDocumentInformation info = pdfDocument.getDocumentInformation();
-
-            PDFTextStripper pdfTextStripper = new PDFTextStripper();
-            pdfTextStripper.setLineSeparator("\n");
-
             Document newDocument = new Document();
-            if (this.entry.getCiteKeyOptional().isPresent()) {
-                newDocument.add(normalizeField(KEY, this.entry.getCiteKeyOptional().get()));
-            } else {
-                newDocument.add(normalizeField(KEY, ""));
-            }
-            newDocument.add(normalizeField(CONTENT, pdfTextStripper.getText(pdfDocument)));
-            newDocument.add(normalizeField(AUTHOR, info.getAuthor()));
-            newDocument.add(normalizeField(CREATOR, info.getCreator()));
-            newDocument.add(normalizeField(SUBJECT, info.getSubject()));
-            newDocument.add(normalizeField(KEYWORDS, info.getKeywords()));
+            addKeyIfPresent(newDocument);
+            addContentIfNotEmpty(pdfDocument, newDocument);
+            addMetaData(pdfDocument, newDocument);
             return newDocument;
         } catch (IOException e) {
             throw new IOException("Could not read pdf file: " + pdfPath + "!", e);
         }
     }
 
-    /**
-     * Safely add a field to a document so that null values are not indexed and added as empty strings to prevent a
-     * NullPointerException
-     *
-     * @param field the field name
-     * @param value the value to add to the field, gets mapped to a empty string if null
-     */
-    private Field normalizeField(String field, String value) {
-        if (value == null || value.trim().isEmpty()) {
-            return new Field(field, "", Field.Store.YES, Field.Index.NO);
-        }
+    private void addMetaData(PDDocument pdfDocument, Document newDocument) {
+        PDDocumentInformation info = pdfDocument.getDocumentInformation();
+        addStringField(newDocument, AUTHOR, info.getAuthor());
+        addStringField(newDocument, CREATOR, info.getCreator());
+        addStringField(newDocument, SUBJECT, info.getSubject());
+        addTextField(newDocument, KEYWORDS, info.getKeywords());
+    }
 
-        return new Field(field, value, Field.Store.YES, Field.Index.ANALYZED);
+    private void addTextField(Document newDocument, String field, String value) {
+        if (!isValidField(value)) {
+            return;
+        }
+        newDocument.add(new TextField(field, value, Field.Store.YES));
+    }
+
+    private void addStringField(Document newDocument, String field, String value) {
+        if (!isValidField(value)) {
+            return;
+        }
+        newDocument.add(new StringField(field, value, Field.Store.YES));
+    }
+
+    private boolean isValidField(String value) {
+        return !(value == null || value.trim().isEmpty());
+    }
+
+    private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument) throws IOException {
+        String pdfContent = pdfTextStripper.getText(pdfDocument);
+        if (!pdfContent.trim().isEmpty()) {
+            newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
+        }
+    }
+
+    private void addKeyIfPresent(Document newDocument) {
+        if (this.entry.getCiteKeyOptional().isPresent()) {
+            newDocument.add(new StringField(KEY, this.entry.getCiteKeyOptional().get(), Field.Store.YES));
+        }
     }
 }

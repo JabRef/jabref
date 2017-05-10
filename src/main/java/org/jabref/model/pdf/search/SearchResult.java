@@ -1,7 +1,5 @@
 package org.jabref.model.pdf.search;
 
-import org.jabref.logic.pdf.search.SearchFieldConstants;
-
 public class SearchResult {
 
     private String key;
@@ -14,7 +12,6 @@ public class SearchResult {
     private float luceneScore;
 
     public SearchResult() {
-
     }
 
     public SearchResult(String key, String content, String author, String creator, String subject, String keyword, float luceneScore) {
@@ -50,7 +47,6 @@ public class SearchResult {
                 break;
             default:
                 break;
-
         }
     }
 

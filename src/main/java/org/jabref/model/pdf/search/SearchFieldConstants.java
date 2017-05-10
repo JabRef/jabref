@@ -1,8 +1,5 @@
-package org.jabref.logic.pdf.search;
+package org.jabref.model.pdf.search;
 
-/**
- * Created by christoph on 04.08.16.
- */
 public class SearchFieldConstants {
 
     public static final String TITLE = "title";

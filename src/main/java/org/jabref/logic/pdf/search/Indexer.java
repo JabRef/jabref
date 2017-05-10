@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf.search;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -11,31 +12,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocCollector;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 
 public class Indexer {
     private static final Log LOGGER = LogFactory.getLog(Indexer.class);
 
-    Directory directoryToIndex;
-    StandardAnalyzer analyzer;
+    private final Directory directoryToIndex;
+    private StandardAnalyzer analyzer;
 
-    /**
-     * Initialize an index to search for pdfs in a specific directory
-     *
-     * @param pathToIndex path to the directory where the index is created
-     */
-    public void initializeIndex(String pathToIndex) throws IOException {
-
-        directoryToIndex = FSDirectory.getDirectory(pathToIndex);
-        analyzer = new StandardAnalyzer();
+    public Indexer(Path directory) throws IOException {
+        this.directoryToIndex = new SimpleFSDirectory(directory);
     }
 
     /**
@@ -43,15 +39,17 @@ public class Indexer {
      *
      * @param database a bibtex database to link the pdf files to
      */
-    public void addDocuments(BibDatabase database) throws IOException {
+    public void addDocuments(BibDatabase database) {
 
-        IndexWriter indexWriter = new IndexWriter(directoryToIndex, analyzer, true,
-                IndexWriter.MaxFieldLength.UNLIMITED);
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new StandardAnalyzer()))) {
 
-        database.getEntries().stream().
-                filter(entry -> entry.hasField(FieldName.FILE)).
-                filter(entry -> entry.getCiteKeyOptional().isPresent()).
-                forEach(entry -> addToIndex(entry, indexWriter));
+            database.getEntries().stream().
+                    filter(entry -> entry.hasField(FieldName.FILE)).
+                    filter(entry -> entry.getCiteKeyOptional().isPresent()).
+                    forEach(entry -> addToIndex(entry, indexWriter));
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+        }
     }
 
     private void addToIndex(BibEntry entry, IndexWriter indexWriter) {
@@ -70,23 +68,22 @@ public class Indexer {
      * @param fields          the fields of lucene documents so match the query with
      * @return a result set of all documents that have matches in any fields
      */
-    public ResultSet searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
+    public ResultSet searchWithIndex(Path pathToDirectory, String searchQuery, String[] fields) throws IOException, ParseException {
 
-        Query q = new MultiFieldQueryParser(fields,
-                analyzer).parse(searchQuery);
+        Query q = new MultiFieldQueryParser(fields, analyzer).parse(searchQuery);
 
         int hitsPerPage = 10;
-        IndexSearcher searcher = new IndexSearcher(pathToDirectory);
-        TopDocCollector collector = new TopDocCollector(hitsPerPage);
-        searcher.search(q, collector);
-        ScoreDoc[] hits = collector.topDocs().scoreDocs;
+        DirectoryReader reader = DirectoryReader.open(FSDirectory.open(pathToDirectory));
+        IndexSearcher searcher = new IndexSearcher(reader);
 
-        Document[] searchResults = new Document[hits.length];
+        TopDocs hits = searcher.search(q, hitsPerPage);
 
-        for (int i = 0; i < hits.length; ++i) {
-            int docId = hits[i].doc;
+        Document[] searchResults = new Document[hits.totalHits];
+
+        for (int i = 0; i < hits.totalHits; ++i) {
+            int docId = hits.scoreDocs[i].doc;
             searchResults[i] = searcher.doc(docId);
         }
-        return new ResultSet(searchResults, collector);
+        return new ResultSet(searchResults);
     }
 }
