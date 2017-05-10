@@ -1,15 +1,14 @@
 package org.jabref.logic.pdf.search;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.search.ResultSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
@@ -22,13 +21,11 @@ import org.apache.lucene.search.TopDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
-
 public class Indexer {
+    private static final Log LOGGER = LogFactory.getLog(Indexer.class);
 
     Directory directoryToIndex;
     StandardAnalyzer analyzer;
-    //To be deleted, only testing purpose
-    List<String> l = new ArrayList();
 
     /**
      * Initialize an index to search for pdfs in a specific directory
@@ -39,28 +36,29 @@ public class Indexer {
 
         directoryToIndex = FSDirectory.getDirectory(pathToIndex);
         analyzer = new StandardAnalyzer();
-
     }
 
     /**
      * Adds all pdf files linked to an entry in the database to the lucene search index
      *
      * @param database a bibtex database to link the pdf files to
-     * @throws IOException
      */
     public void addDocuments(BibDatabase database) throws IOException {
 
         IndexWriter indexWriter = new IndexWriter(directoryToIndex, analyzer, true,
                 IndexWriter.MaxFieldLength.UNLIMITED);
 
-        DocumentReader reader = new DocumentReader();
+        database.getEntries().stream().
+                filter(entry -> entry.hasField(FieldName.FILE)).
+                filter(entry -> entry.getCiteKeyOptional().isPresent()).
+                forEach(entry -> addToIndex(entry, indexWriter));
+    }
 
-        for (BibEntry entry : database.getEntries()) {
-            if (entry.hasField(FieldName.FILE)) {
-                String key = entry.getCiteKey();
-                File file = new File(entry.getField(FieldName.FILE).toString());
-                indexWriter.addDocument(reader.readPDFContents(file, key));
-            }
+    private void addToIndex(BibEntry entry, IndexWriter indexWriter) {
+        try {
+            indexWriter.addDocument(new DocumentReader(entry).readPDFContents());
+        } catch (IOException e) {
+            LOGGER.debug("Document could not be added to the index.", e);
         }
     }
 
@@ -71,8 +69,6 @@ public class Indexer {
      * @param searchQuery     a pattern to search for matching entries in the index
      * @param fields          the fields of lucene documents so match the query with
      * @return a result set of all documents that have matches in any fields
-     * @throws ParseException
-     * @throws IOException
      */
     public ResultSet searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
 

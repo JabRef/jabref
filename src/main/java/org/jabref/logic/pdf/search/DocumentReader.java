@@ -1,10 +1,12 @@
 package org.jabref.logic.pdf.search;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -18,36 +20,46 @@ import static org.jabref.logic.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.logic.pdf.search.SearchFieldConstants.KEYWORDS;
 import static org.jabref.logic.pdf.search.SearchFieldConstants.SUBJECT;
 
-
 public class DocumentReader {
 
-    private static final Log LOGGER = LogFactory.getLog(DocumentReader.class);
+    private final BibEntry entry;
+
+    public DocumentReader(BibEntry bibEntry) {
+        if (!bibEntry.getField(FieldName.FILE).isPresent()) {
+            throw new IllegalArgumentException("The file field must not be absent when trying to reading the " +
+                    "document!");
+        }
+
+        this.entry = bibEntry;
+    }
 
     /**
      * Reads the content and metadata from a pdf file
      */
-    public Document readPDFContents(File pdf, String bibTexKey) {
+    public Document readPDFContents() throws IOException {
+        Path pdfPath = Paths.get(this.entry.getField(FieldName.FILE).get());
 
-        Document newDocument = new Document();
-
-        try {
-            PDDocument pdfDocument = PDDocument.load(pdf);
+        try (PDDocument pdfDocument = PDDocument.load(pdfPath.toFile())) {
             PDDocumentInformation info = pdfDocument.getDocumentInformation();
 
             PDFTextStripper pdfTextStripper = new PDFTextStripper();
             pdfTextStripper.setLineSeparator("\n");
-            newDocument.add(normalizeField(KEY, bibTexKey));
+
+            Document newDocument = new Document();
+            if (this.entry.getCiteKeyOptional().isPresent()) {
+                newDocument.add(normalizeField(KEY, this.entry.getCiteKeyOptional().get()));
+            } else {
+                newDocument.add(normalizeField(KEY, ""));
+            }
             newDocument.add(normalizeField(CONTENT, pdfTextStripper.getText(pdfDocument)));
             newDocument.add(normalizeField(AUTHOR, info.getAuthor()));
             newDocument.add(normalizeField(CREATOR, info.getCreator()));
             newDocument.add(normalizeField(SUBJECT, info.getSubject()));
             newDocument.add(normalizeField(KEYWORDS, info.getKeywords()));
-            pdfDocument.close();
+            return newDocument;
         } catch (IOException e) {
-            LOGGER.debug("Could not read pdf file: " + pdf.toString() + "!", e);
+            throw new IOException("Could not read pdf file: " + pdfPath + "!", e);
         }
-
-        return newDocument;
     }
 
     /**
@@ -58,7 +70,7 @@ public class DocumentReader {
      * @param value the value to add to the field, gets mapped to a empty string if null
      */
     private Field normalizeField(String field, String value) {
-        if (value == null) {
+        if (value == null || value.trim().isEmpty()) {
             return new Field(field, "", Field.Store.YES, Field.Index.NO);
         }
 

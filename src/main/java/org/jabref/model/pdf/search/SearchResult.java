@@ -1,8 +1,6 @@
 package org.jabref.model.pdf.search;
 
-
 import org.jabref.logic.pdf.search.SearchFieldConstants;
-
 
 public class SearchResult {
 
