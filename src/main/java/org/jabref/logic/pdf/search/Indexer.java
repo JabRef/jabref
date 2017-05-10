@@ -23,7 +23,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 
-public class PdfSearchHandler {
+public class Indexer {
 
     Directory directoryToIndex;
     StandardAnalyzer analyzer;
@@ -48,18 +48,18 @@ public class PdfSearchHandler {
      * @param database a bibtex database to link the pdf files to
      * @throws IOException
      */
-    public void addDocumentsToServer(BibDatabase database) throws IOException {
+    public void addDocuments(BibDatabase database) throws IOException {
 
         IndexWriter indexWriter = new IndexWriter(directoryToIndex, analyzer, true,
                 IndexWriter.MaxFieldLength.UNLIMITED);
 
-        PdfContentReader reader = new PdfContentReader();
+        DocumentReader reader = new DocumentReader();
 
         for (BibEntry entry : database.getEntries()) {
             if (entry.hasField(FieldName.FILE)) {
                 String key = entry.getCiteKey();
                 File file = new File(entry.getField(FieldName.FILE).toString());
-                indexWriter.addDocument(reader.readContentFromPDFToString(file, key));
+                indexWriter.addDocument(reader.readPDFContents(file, key));
             }
         }
     }

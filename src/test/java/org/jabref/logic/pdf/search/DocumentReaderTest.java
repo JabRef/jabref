@@ -6,16 +6,16 @@ import java.nio.file.Paths;
 import org.junit.Test;
 
 
-public class PdfContentReaderTest {
+public class DocumentReaderTest {
     @Test
     public void readContentFromPDFToString() throws Exception {
 
-        File pdf = new File(Paths.get(PdfContentReaderTest.class.getResource("example.pdf").toURI()).toString());
+        File pdf = new File(Paths.get(DocumentReaderTest.class.getResource("example.pdf").toURI()).toString());
 
-        PdfContentReader reader = new PdfContentReader();
+        DocumentReader reader = new DocumentReader();
 
         //TODO create test database with pdfs
-//        reader.readContentFromPDFToString(pdf, )
+//        reader.readPDFContents(pdf, )
     }
 
     //TODO Test if key matches
