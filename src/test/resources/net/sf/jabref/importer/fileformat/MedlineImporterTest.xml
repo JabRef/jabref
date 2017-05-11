@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MedlineCitationSet PUBLIC "-//NLM//DTD Medline Citation, 1st January, 2015//EN"
+                                    "http://www.nlm.nih.gov/databases/dtd/nlmmedlinecitationset_150101.dtd">
+<MedlineCitationSet>
+<MedlineCitation Owner="PIP" Status="MEDLINE">
+<PMID Version="1">12255379</PMID>
+<DateCreated>
+<Year>1980</Year>
+<Month>01</Month>
+<Day>03</Day>
+</DateCreated>
+<DateCompleted>
+<Year>1980</Year>
+<Month>01</Month>
+<Day>03</Day>
+</DateCompleted>
+<DateRevised>
+<Year>2013</Year>
+<Month>02</Month>
+<Day>19</Day>
+</DateRevised>
+<Article PubModel="Print">
+<Journal>
+<ISSN IssnType="Print">0002-9955</ISSN>
+<JournalIssue CitedMedium="Print">
+<Volume>159</Volume>
+<Issue>3</Issue>
+<PubDate>
+<Year>1955</Year>
+<Month>Sep</Month>
+<Day>17</Day>
+</PubDate>
+</JournalIssue>
+<Title>Journal of the American Medical Association</Title>
+<ISOAbbreviation>J Am Med Assoc</ISOAbbreviation>
+</Journal>
+<ArticleTitle>Association of maternal and fetal factors with development of mental deficiency.  1. Abnormalities in the prenatal and paranatal periods.</ArticleTitle>
+<Pagination>
+<MedlinePgn>155-60</MedlinePgn>
+</Pagination>
+<AuthorList CompleteYN="Y">
+<Author ValidYN="Y">
+<LastName>Pasamanick</LastName>
+<ForeName>B</ForeName>
+<Initials>B</Initials>
+</Author>
+<Author ValidYN="Y">
+<LastName>Lilienfeld</LastName>
+<ForeName>A M</ForeName>
+<Initials>AM</Initials>
+</Author>
+</AuthorList>
+<Language>eng</Language>
+<PublicationTypeList>
+<PublicationType UI="D003160">Comparative Study</PublicationType>
+<PublicationType UI="D016428">Journal Article</PublicationType>
+</PublicationTypeList>
+</Article>
+<MedlineJournalInfo>
+<Country>United States</Country>
+<MedlineTA>J Am Med Assoc</MedlineTA>
+<NlmUniqueID>7507176</NlmUniqueID>
+<ISSNLinking>0002-9955</ISSNLinking>
+</MedlineJournalInfo>
+<CitationSubset>J</CitationSubset>
+<MeshHeadingList>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D001519">Behavior</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D000013">Congenital Abnormalities</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D006233">Disabled Persons</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D004194">Disease</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="Y" UI="D008607">Intellectual Disability</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D007360">Intelligence</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="Y" UI="D008431">Maternal-Fetal Exchange</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D010551">Personality</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D011247">Pregnancy</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="Y" UI="D011248">Pregnancy Complications</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D011584">Psychology</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D012098">Reproduction</DescriptorName>
+</MeshHeading>
+<MeshHeading>
+<DescriptorName MajorTopicYN="N" UI="D012106">Research</DescriptorName>
+</MeshHeading>
+</MeshHeadingList>
+<OtherID Source="PIP">550018</OtherID>
+<OtherID Source="POP">00020417</OtherID>
+<OtherAbstract Type="PIP" Language="eng">
+<AbstractText>Pregnancy, delivery, and neonatal records of mentally defective chil dren born in Baltimore, Maryland, between 1935 and 1952 were compared wi th records of a control group to determine the effects of complications during these 3 phases on  eventual mental disorders.  The mental defectives had a greater amount of recorded complications of pregnancy and delivery, prematurity, and abnormal neonatal experiences.  Nonmechanical pregnancy complications, i.e., bleeding or toxemia, seemed more significant in this association than the mechanical factors of delivery.  Neither duration of labor nor operative procedures performed at delivery was related with the development of mental deficiency.  The associations that did show were not as strong for nonwhites.  Various reasons for this fact are considered.  It seems possible that reproductive casualty can occur during pregnancy, delivery, and the neonatal period.  In its most serious form, it causes spontaneous abortion, stillbirth, neonatal deaths.  Lesser brain damage during these periods will cause, in the following order, cerebral palsy, epilepsy, mental retardation, and behavioral disorders.</AbstractText>
+</OtherAbstract>
+<KeywordList Owner="PIP">
+<Keyword MajorTopicYN="N">Behavior</Keyword>
+<Keyword MajorTopicYN="Y">Comparative Studies</Keyword>
+<Keyword MajorTopicYN="N">Congenital Abnormalities</Keyword>
+<Keyword MajorTopicYN="N">Diseases</Keyword>
+<Keyword MajorTopicYN="N">Handicapped</Keyword>
+<Keyword MajorTopicYN="N">Intelligence</Keyword>
+<Keyword MajorTopicYN="Y">Maternal-fetal Exchange</Keyword>
+<Keyword MajorTopicYN="Y">Mental Retardation</Keyword>
+<Keyword MajorTopicYN="N">Personality</Keyword>
+<Keyword MajorTopicYN="N">Pregnancy</Keyword>
+<Keyword MajorTopicYN="Y">Pregnancy Complications</Keyword>
+<Keyword MajorTopicYN="N">Psychological Factors</Keyword>
+<Keyword MajorTopicYN="N">Reproduction</Keyword>
+<Keyword MajorTopicYN="N">Research Methodology</Keyword>
+<Keyword MajorTopicYN="N">Studies</Keyword>
+</KeywordList>
+</MedlineCitation>
+<MedlineCitation Owner="PIP" Status="MEDLINE">
+<PMID Version="1">12255395</PMID>
+<DateCreated>
+<Year>1980</Year>
+<Month>01</Month>
+<Day>03</Day>
+</DateCreated>
+<DateCompleted>
+<Year>1980</Year>
+<Month>01</Month>
+<Day>03</Day>
+</DateCompleted>
+<DateRevised>
+<Year>2006</Year>
+<Month>11</Month>
+<Day>15</Day>
+</DateRevised>
+<Article PubModel="Print">
+<Journal>
+<ISSN IssnType="Print">0002-9955</ISSN>
+<JournalIssue CitedMedium="Print">
+<Volume>157</Volume>
+<PubDate>
+<Year>1955</Year>
+<Month>Feb</Month>
+<Day>19</Day>
+</PubDate>
+</JournalIssue>
+</MedlineCitation>
+</MedlineCitationSet>
