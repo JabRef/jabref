@@ -18,12 +18,12 @@ import org.apache.lucene.store.SimpleFSDirectory;
 /**
  * Indexes the text of pdf files and adds it into the lucene index.
  */
-public class Indexer {
-    private static final Log LOGGER = LogFactory.getLog(Indexer.class);
+public class PdfIndexer {
+    private static final Log LOGGER = LogFactory.getLog(PdfIndexer.class);
 
     private final Directory directoryToIndex;
 
-    public Indexer() throws IOException {
+    public PdfIndexer() throws IOException {
         this.directoryToIndex = new SimpleFSDirectory(Paths.get("src/main/resources/luceneIndex"));
     }
 
@@ -32,7 +32,7 @@ public class Indexer {
     }
 
     /**
-     * Adds all pdf files linked to an entry in the database to the lucene search index
+     * Adds all PDF files linked to an entry in the database to new Lucene search index
      *
      * @param database a bibtex database to link the pdf files to
      */
@@ -49,7 +49,24 @@ public class Indexer {
     }
 
     /**
-     * Deletes all entries from an index.
+     * Adds all the pdf files linked to one entry in the database to an existing (or new) Lucene search index
+     *
+     * @param entry a bibtex entry to link the pdf files to
+     */
+    public void addToIndex(BibEntry entry) {
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
+                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
+
+            if (entry.hasField(FieldName.FILE) && entry.getCiteKeyOptional().isPresent()) {
+                writeToIndex(entry, indexWriter);
+            }
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+        }
+    }
+
+    /**
+     * Deletes all entries from the Lucene search index.
      */
     public void flushIndex() {
 
@@ -62,26 +79,9 @@ public class Indexer {
         }
     }
 
-    /**
-     * Adds all the pdf files linked to an entry in the database to the lucene search index
-     *
-     * @param entry a bibtex entry to link the pdf files to
-     */
-    public void appendToIndex(BibEntry entry) {
-        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))) {
-
-            if (entry.hasField(FieldName.FILE) && entry.getCiteKeyOptional().isPresent()) {
-                writeToIndex(entry, indexWriter);
-            }
-        } catch (IOException e) {
-            LOGGER.warn(e.getMessage());
-        }
-    }
-
     private void writeToIndex(BibEntry entry, IndexWriter indexWriter) {
         try {
-            indexWriter.addDocument(new DocumentReader(entry).readPDFContents());
+            indexWriter.addDocument(new DocumentReader(entry).readPdfContents());
         } catch (IOException e) {
             LOGGER.debug("Document could not be added to the index.", e);
         }

@@ -29,18 +29,17 @@ public final class DocumentReader {
 
     public DocumentReader(BibEntry bibEntry) throws IOException {
         if (!bibEntry.getField(FieldName.FILE).isPresent()) {
-            throw new IllegalArgumentException("The file field must not be absent when trying to reading the " +
-                    "document!");
+            throw new IllegalArgumentException("The file field must not be absent when trying to reading the document!");
         }
-        this.entry = bibEntry;
 
+        this.entry = bibEntry;
         pdfTextStripper.setLineSeparator("\n");
     }
 
     /**
      * Reads the content and metadata from a pdf file
      */
-    public Document readPDFContents() throws IOException {
+    public Document readPdfContents() throws IOException {
         Path pdfPath = Paths.get(this.entry.getField(FieldName.FILE).get());
 
         try (PDDocument pdfDocument = PDDocument.load(pdfPath.toFile())) {

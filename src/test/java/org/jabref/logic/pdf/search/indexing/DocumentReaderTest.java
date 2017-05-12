@@ -26,7 +26,7 @@ public class DocumentReaderTest {
         BibEntry entry = mock(BibEntry.class);
         when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
 
-        new DocumentReader(entry).readPDFContents();
+        new DocumentReader(entry).readPdfContents();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -45,7 +45,7 @@ public class DocumentReaderTest {
         when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
         when(entry.getCiteKeyOptional()).thenReturn(Optional.of("Example2017"));
 
-        Document doc = new DocumentReader(entry).readPDFContents();
+        Document doc = new DocumentReader(entry).readPdfContents();
 
         assertEquals("Example2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
@@ -60,7 +60,7 @@ public class DocumentReaderTest {
         when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
         when(entry.getCiteKeyOptional()).thenReturn(Optional.of("ThesisExample2017"));
 
-        Document doc = new DocumentReader(entry).readPDFContents();
+        Document doc = new DocumentReader(entry).readPdfContents();
 
         assertEquals("ThesisExample2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
@@ -75,7 +75,7 @@ public class DocumentReaderTest {
         when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
         when(entry.getCiteKeyOptional()).thenReturn(Optional.of("Minimal2017"));
 
-        Document doc = new DocumentReader(entry).readPDFContents();
+        Document doc = new DocumentReader(entry).readPdfContents();
 
         assertEquals("Minimal2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Hello World\n1\n", doc.get(SearchFieldConstants.CONTENT));
@@ -90,7 +90,7 @@ public class DocumentReaderTest {
         when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
         when(entry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
 
-        Document doc = new DocumentReader(entry).readPDFContents();
+        Document doc = new DocumentReader(entry).readPdfContents();
 
         assertEquals("MetaData2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Test\n", doc.get(SearchFieldConstants.CONTENT));

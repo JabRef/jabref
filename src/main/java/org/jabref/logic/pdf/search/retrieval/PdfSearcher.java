@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
-import org.jabref.model.pdf.search.ResultSet;
+import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 
 import org.apache.commons.logging.Log;
@@ -33,15 +33,15 @@ public final class PdfSearcher {
     }
 
     /**
-     * Search for results matching a query in a specified directory
+     * Search for results matching a query in the Lucene search index
      *
      * @param searchString a pattern to search for matching entries in the index, must not be null
      * @param maxHits      number of maximum search results, must be positive
      * @return a result set of all documents that have matches in any fields
      */
-    public ResultSet search(String searchString, int maxHits) throws IOException {
+    public PdfSearchResults search(String searchString, int maxHits) throws IOException {
         if (Objects.requireNonNull(searchString, "The search string was null!").isEmpty()) {
-            return new ResultSet();
+            return new PdfSearchResults();
         }
         if (maxHits <= 0) {
             throw new IllegalArgumentException("Must be called with at least 1 maxHits, was" + maxHits);
@@ -55,10 +55,10 @@ public final class PdfSearcher {
             for (ScoreDoc scoreDoc : searcher.search(query, maxHits).scoreDocs) {
                 resultDocs.add(new SearchResult(searcher, scoreDoc));
             }
-            return new ResultSet(resultDocs);
+            return new PdfSearchResults(resultDocs);
         } catch (ParseException e) {
             LOGGER.warn("Could not parse query: '" + searchString + "'! \n" + e.getMessage());
-            return new ResultSet();
+            return new PdfSearchResults();
         }
     }
 }

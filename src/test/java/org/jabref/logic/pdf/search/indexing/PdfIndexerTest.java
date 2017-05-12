@@ -21,14 +21,14 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class IndexerTest {
+public class PdfIndexerTest {
 
-    private Indexer indexer;
+    private PdfIndexer indexer;
     private BibDatabase database;
 
     @Before
     public void setUp() throws IOException {
-        this.indexer = new Indexer();
+        this.indexer = new PdfIndexer();
         this.database = mock(BibDatabase.class);
     }
 
@@ -113,7 +113,7 @@ public class IndexerTest {
         when(metaDataEntry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
 
         // when
-        indexer.appendToIndex(metaDataEntry);
+        indexer.addToIndex(metaDataEntry);
 
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {

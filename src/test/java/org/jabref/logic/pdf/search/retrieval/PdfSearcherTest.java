@@ -6,11 +6,11 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.logic.pdf.search.indexing.Indexer;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.pdf.search.ResultSet;
+import org.jabref.model.pdf.search.PdfSearchResults;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Before;
@@ -28,7 +28,7 @@ public class PdfSearcherTest {
     @Before
     public void setUp() throws IOException {
         this.search = new PdfSearcher();
-        Indexer indexer = new Indexer();
+        PdfIndexer indexer = new PdfIndexer();
         ObservableList<BibEntry> entryList = FXCollections.observableArrayList();
 
         BibEntry examplePdf = mock(BibEntry.class);
@@ -58,31 +58,31 @@ public class PdfSearcherTest {
 
     @Test
     public void searchForTest() throws IOException, ParseException {
-        ResultSet result = search.search("test", 10);
+        PdfSearchResults result = search.search("test", 10);
         assertEquals(2, result.numSearchResults());
     }
 
     @Test
     public void searchForUniversity() throws IOException, ParseException {
-        ResultSet result = search.search("University", 10);
+        PdfSearchResults result = search.search("University", 10);
         assertEquals(1, result.numSearchResults());
     }
 
     @Test
     public void searchForStopWord() throws IOException, ParseException {
-        ResultSet result = search.search("and", 10);
+        PdfSearchResults result = search.search("and", 10);
         assertEquals(0, result.numSearchResults());
     }
 
     @Test
     public void searchForSecond() throws IOException, ParseException {
-        ResultSet result = search.search("second", 10);
+        PdfSearchResults result = search.search("second", 10);
         assertEquals(2, result.numSearchResults());
     }
 
     @Test
     public void searchForEmptyString() throws IOException {
-        ResultSet result = search.search("", 10);
+        PdfSearchResults result = search.search("", 10);
         assertEquals(0, result.numSearchResults());
     }
 
