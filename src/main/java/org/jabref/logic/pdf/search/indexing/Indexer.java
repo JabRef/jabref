@@ -57,7 +57,6 @@ public class Indexer {
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         try (IndexWriter deleter = new IndexWriter(directoryToIndex, config)) {
             // Do nothing. Index is deleted.
-
         } catch (IOException e) {
             LOGGER.warn(e.getMessage());
         }

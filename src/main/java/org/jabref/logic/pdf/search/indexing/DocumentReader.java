@@ -22,7 +22,7 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 
-public class DocumentReader {
+public final class DocumentReader {
 
     private final BibEntry entry;
     private final PDFTextStripper pdfTextStripper = new PDFTextStripper();

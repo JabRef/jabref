@@ -1,108 +1,73 @@
 package org.jabref.model.pdf.search;
 
-public class SearchResult {
+import java.io.IOException;
 
-    private String key;
-    private String content;
-    private String author;
-    private String creator;
-    private String subject;
-    private String keyword;
+import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
 
-    private float luceneScore;
+import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
+import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
+import static org.jabref.model.pdf.search.SearchFieldConstants.CREATOR;
+import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
+import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 
-    public SearchResult() {
+public final class SearchResult {
+
+    private final String key;
+    private final String content;
+    private final String author;
+    private final String creator;
+    private final String subject;
+    private final String keyword;
+
+    private final float luceneScore;
+
+    public SearchResult(IndexSearcher searcher, ScoreDoc scoreDoc) throws IOException {
+
+        this.key = getFieldContents(searcher, scoreDoc, KEY);
+        this.content = getFieldContents(searcher, scoreDoc, AUTHOR);
+        this.author = getFieldContents(searcher, scoreDoc, CREATOR);
+        this.creator = getFieldContents(searcher, scoreDoc, SUBJECT);
+        this.subject = getFieldContents(searcher, scoreDoc, CONTENT);
+        this.keyword = getFieldContents(searcher, scoreDoc, KEYWORDS);
+        this.luceneScore = scoreDoc.score;
     }
 
-    public SearchResult(String key, String content, String author, String creator, String subject, String keyword, float luceneScore) {
-        this.key = key;
-        this.content = content;
-        this.author = author;
-        this.creator = creator;
-        this.subject = subject;
-        this.keyword = keyword;
-        this.luceneScore = luceneScore;
-    }
-
-    public void mapField(String fieldName, String value) {
-
-        switch (fieldName) {
-            case SearchFieldConstants.KEY:
-                setKey(value);
-                break;
-            case SearchFieldConstants.AUTHOR:
-                setAuthor(value);
-                break;
-            case SearchFieldConstants.CREATOR:
-                setCreator(value);
-                break;
-            case SearchFieldConstants.SUBJECT:
-                setSubject(value);
-                break;
-            case SearchFieldConstants.CONTENT:
-                setContent(value);
-                break;
-            case SearchFieldConstants.KEYWORDS:
-                setKeyword(value);
-                break;
-            default:
-                break;
+    private String getFieldContents(IndexSearcher searcher, ScoreDoc scoreDoc, String field) throws IOException {
+        IndexableField indexableField = searcher.doc(scoreDoc.doc).getField(field);
+        if (indexableField == null) {
+            return "";
         }
+        return indexableField.stringValue();
     }
 
     public String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public String getContent() {
         return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
     }
 
     public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public String getCreator() {
         return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
     }
 
     public String getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
     public String getKeyword() {
         return keyword;
     }
 
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
-
     public float getLuceneScore() {
         return luceneScore;
-    }
-
-    public void setLuceneScore(float luceneScore) {
-        this.luceneScore = luceneScore;
     }
 }

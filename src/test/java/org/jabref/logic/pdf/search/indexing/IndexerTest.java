@@ -37,10 +37,10 @@ public class IndexerTest {
         // given
         when(database.getEntries()).thenReturn(FXCollections.emptyObservableList());
 
-        //when
+        // when
         indexer.createIndex(database);
 
-        //then
+        // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(0, reader.numDocs());
         }
@@ -57,10 +57,10 @@ public class IndexerTest {
         ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(entry));
         when(database.getEntries()).thenReturn(entries);
 
-        //when
+        // when
         indexer.createIndex(database);
 
-        //then
+        // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
             assertEquals(6, MultiFields.getFields(reader).size());
@@ -78,10 +78,10 @@ public class IndexerTest {
         ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(entry));
         when(database.getEntries()).thenReturn(entries);
 
-        //when
+        // when
         indexer.createIndex(database);
 
-        //then
+        // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
             assertEquals(3, MultiFields.getFields(reader).size());
@@ -112,8 +112,10 @@ public class IndexerTest {
         when(metaDataEntry.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/metaData.pdf"));
         when(metaDataEntry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
 
-        //when
+        // when
         indexer.appendToIndex(metaDataEntry);
+
+        // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(2, reader.numDocs());
         }
@@ -137,10 +139,10 @@ public class IndexerTest {
             assertEquals(6, MultiFields.getFields(reader).size());
         }
 
-        //when
+        // when
         indexer.flushIndex();
 
-        //then
+        // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(0, reader.numDocs());
         }
