@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public final class PdfSearchResults {
 
     private final List<SearchResult> searchResults;
-
 
     public PdfSearchResults(List<SearchResult> search) {
         this.searchResults = Collections.unmodifiableList(search);
