@@ -144,6 +144,7 @@ dependencies {
     compile 'org.apache.lucene:lucene-core:6.5.1'
     compile 'org.apache.lucene:lucene-queryparser:6.5.1'
     compile 'org.apache.lucene:lucene-queries:6.5.1'
+    compile 'org.apache.lucene:lucene-analyzers-common:6.5.1'
 
 
     testCompile 'junit:junit:4.12'
