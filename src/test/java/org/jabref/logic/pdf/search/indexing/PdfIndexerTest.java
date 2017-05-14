@@ -52,7 +52,7 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(2, MultiFields.getFields(reader).size());
+            assertEquals(1, MultiFields.getFields(reader).size());
         }
     }
 
@@ -70,7 +70,7 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(3, MultiFields.getFields(reader).size());
+            assertEquals(2, MultiFields.getFields(reader).size());
         }
     }
 
@@ -88,7 +88,7 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(5, MultiFields.getFields(reader).size());
+            assertEquals(4, MultiFields.getFields(reader).size());
         }
     }
 
@@ -104,7 +104,7 @@ public class PdfIndexerTest {
         // index actually exists
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(3, MultiFields.getFields(reader).size());
+            assertEquals(2, MultiFields.getFields(reader).size());
         }
 
         // when
@@ -129,7 +129,7 @@ public class PdfIndexerTest {
         // index with first entry
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(3, MultiFields.getFields(reader).size());
+            assertEquals(2, MultiFields.getFields(reader).size());
         }
 
         BibEntry metadata = new BibEntry("article");

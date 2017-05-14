@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -22,10 +23,11 @@ import org.apache.pdfbox.util.PDFTextStripper;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.CREATOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
+import static org.jabref.model.pdf.search.SearchFieldConstants.TITLE;
+import static org.jabref.model.pdf.search.SearchFieldConstants.UID;
 
 /**
  * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
@@ -68,7 +70,7 @@ public final class DocumentReader {
     private Document readPdfContents(Path pdfPath) throws IOException {
         try (PDDocument pdfDocument = PDDocument.load(pdfPath.toFile())) {
             Document newDocument = new Document();
-            addKeyIfPresent(newDocument);
+            addIdentifiers(newDocument);
             addContentIfNotEmpty(pdfDocument, newDocument);
             addMetaData(pdfDocument, newDocument);
             return newDocument;
@@ -78,9 +80,10 @@ public final class DocumentReader {
     private void addMetaData(PDDocument pdfDocument, Document newDocument) {
         PDDocumentInformation info = pdfDocument.getDocumentInformation();
         addStringField(newDocument, AUTHOR, info.getAuthor());
-        addStringField(newDocument, CREATOR, info.getCreator());
+        addStringField(newDocument, TITLE, info.getTitle());
         addStringField(newDocument, SUBJECT, info.getSubject());
         addTextField(newDocument, KEYWORDS, info.getKeywords());
+
     }
 
     private void addTextField(Document newDocument, String field, String value) {
@@ -115,7 +118,8 @@ public final class DocumentReader {
         }
     }
 
-    private void addKeyIfPresent(Document newDocument) {
+    private void addIdentifiers(Document newDocument) {
+        newDocument.add(new StoredField(UID, this.entry.getId()));
         if (this.entry.getCiteKeyOptional().isPresent()) {
             newDocument.add(new StringField(KEY, this.entry.getCiteKeyOptional().get(), Field.Store.YES));
         }

@@ -55,7 +55,6 @@ public class DocumentReaderTest {
         Document doc = documents.get(0);
         assertEquals("Example2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
-        assertEquals("LaTeX with hyperref package", doc.get(SearchFieldConstants.CREATOR));
     }
 
     @Test
@@ -74,7 +73,6 @@ public class DocumentReaderTest {
         Document doc = documents.get(0);
         assertEquals("ThesisExample2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
-        assertEquals("LaTeX, hyperref, KOMA-Script", doc.get(SearchFieldConstants.CREATOR));
     }
 
     @Test
@@ -93,7 +91,6 @@ public class DocumentReaderTest {
         Document doc = documents.get(0);
         assertEquals("Minimal2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Hello World\n1\n", doc.get(SearchFieldConstants.CONTENT));
-        assertEquals("TeX", doc.get(SearchFieldConstants.CREATOR));
     }
 
     @Test
@@ -113,7 +110,6 @@ public class DocumentReaderTest {
         assertEquals("MetaData2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Test\n", doc.get(SearchFieldConstants.CONTENT));
         assertEquals("Author Name", doc.get(SearchFieldConstants.AUTHOR));
-        assertEquals("pdflatex", doc.get(SearchFieldConstants.CREATOR));
         assertEquals("A Subject", doc.get(SearchFieldConstants.SUBJECT));
         assertEquals("Test, Whatever, Metadata, JabRef", doc.get(SearchFieldConstants.KEYWORDS));
     }
