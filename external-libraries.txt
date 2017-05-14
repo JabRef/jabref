@@ -221,4 +221,24 @@ Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode
 License: Apache 2.0
 
+Id:      org.apache.lucene:lucene-core
+Project: lucene-core
+URL:     https://lucene.apache.org/core/
+License: Apache 2.0
+
+Id:      org.apache.lucene:lucene-queryparser
+Project: lucene-queryparser
+URL:     https://lucene.apache.org
+License: Apache 2.0
+
+Id:      org.apache.lucene:lucene-queries
+Project: lucene-queries
+URL:     https://lucene.apache.org
+License: Apache 2.0
+
+Id:      org.apache.lucene:lucene-analyzers-common
+Project: lucene-lucene-analyzers-common
+URL:     https://lucene.apache.org
+License: Apache 2.0
+
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

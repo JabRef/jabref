@@ -9,6 +9,7 @@ import java.util.Objects;
 import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,8 +40,9 @@ public final class PdfSearcher {
      * @param maxHits      number of maximum search results, must be positive
      * @return a result set of all documents that have matches in any fields
      */
-    public PdfSearchResults search(String searchString, int maxHits) throws IOException {
-        if (Objects.requireNonNull(searchString, "The search string was null!").isEmpty()) {
+    public PdfSearchResults search(final String searchString, final int maxHits)
+            throws IOException {
+        if (StringUtil.isBlank(Objects.requireNonNull(searchString, "The search string was null!"))) {
             return new PdfSearchResults();
         }
         if (maxHits <= 0) {

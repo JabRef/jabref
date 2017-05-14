@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.strings.StringUtil;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -76,12 +77,12 @@ public final class DocumentReader {
     }
 
     private boolean isValidField(String value) {
-        return !(value == null || value.trim().isEmpty());
+        return !(StringUtil.isNullOrEmpty(value));
     }
 
     private void addContentIfNotEmpty(PDDocument pdfDocument, Document newDocument) throws IOException {
         String pdfContent = pdfTextStripper.getText(pdfDocument);
-        if (!pdfContent.trim().isEmpty()) {
+        if (StringUtil.isNotBlank(pdfContent)) {
             newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
         }
     }
