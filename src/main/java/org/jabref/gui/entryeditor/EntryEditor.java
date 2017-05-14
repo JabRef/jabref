@@ -219,7 +219,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
-        this.entry = entry;
+        this.entry = Objects.requireNonNull(entry);
 
         entry.registerListener(this);
         entry.registerListener(SpecialFieldUpdateListener.getInstance());
@@ -293,7 +293,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add tabs
                 EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
-                        false, true, Localization.lang("Optional fields 2"));
+                        false, true, Localization.lang("Optional fields 2"), entry);
                 tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                         optPan2.getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
@@ -301,7 +301,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
                     EntryEditorTab optPan3;
                     optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
-                            false, true, Localization.lang("Deprecated fields"));
+                            false, true, Localization.lang("Deprecated fields"), entry);
                     tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                             optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
@@ -346,7 +346,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
-                    false, tabList.getTabName(i));
+                    false, tabList.getTabName(i), entry);
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
@@ -381,7 +381,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void addOtherTab(List<String> otherFields) {
         EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
-                false, false, Localization.lang("Other fields"));
+                false, false, Localization.lang("Other fields"), entry);
         tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
                 .getPane(), Localization.lang("Show remaining fields"));
         tabs.add(otherPanel);
@@ -391,7 +391,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         List<String> requiredFields = type.getRequiredFieldsFlat();
 
         EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false,
-                Localization.lang("Required fields"));
+                Localization.lang("Required fields"), entry);
         tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(requiredPanel);
@@ -422,7 +422,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void addOptionalTab(EntryType type) {
         EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
-                false, true, Localization.lang("Optional fields"));
+                false, true, Localization.lang("Optional fields"), entry);
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                 optionalPanel.getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);

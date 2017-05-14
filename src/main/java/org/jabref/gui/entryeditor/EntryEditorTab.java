@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -67,7 +68,8 @@ class EntryEditorTab {
 
 
     public EntryEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, boolean compressed, String tabTitle) {
+                          boolean addKeyField, boolean compressed, String tabTitle, BibEntry entry) {
+        this.entry = Objects.requireNonNull(entry);
         if (fields == null) {
             this.fields = new ArrayList<>();
         } else {
