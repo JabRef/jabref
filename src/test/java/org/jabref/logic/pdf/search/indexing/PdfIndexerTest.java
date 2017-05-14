@@ -2,14 +2,11 @@ package org.jabref.logic.pdf.search.indexing;
 
 
 import java.io.IOException;
-import java.util.Optional;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import java.util.Collections;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -18,8 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class PdfIndexerTest {
 
@@ -29,14 +24,11 @@ public class PdfIndexerTest {
     @Before
     public void setUp() throws IOException {
         this.indexer = new PdfIndexer();
-        this.database = mock(BibDatabase.class);
+        this.database = new BibDatabase();
     }
 
     @Test
-    public void addNoDocuments() throws IOException {
-        // given
-        when(database.getEntries()).thenReturn(FXCollections.emptyObservableList());
-
+    public void createEmptyIndex() throws IOException {
         // when
         indexer.createIndex(database);
 
@@ -46,16 +38,13 @@ public class PdfIndexerTest {
         }
     }
 
-    @Test
-    public void metaDataOneEntry() throws IOException {
-        // given
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.hasField(FieldName.FILE)).thenReturn(true);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/metaData.pdf"));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
 
-        ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(entry));
-        when(database.getEntries()).thenReturn(entries);
+    @Test
+    public void exampleThesisIndex() throws IOException {
+        // given
+        BibEntry entry = new BibEntry("PHDThesis");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        database.insertEntry(entry);
 
         // when
         indexer.createIndex(database);
@@ -63,20 +52,17 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(6, MultiFields.getFields(reader).size());
+            assertEquals(2, MultiFields.getFields(reader).size());
         }
     }
 
     @Test
-    public void examplePdf() throws IOException {
+    public void exampleThesisIndexWithKey() throws IOException {
         // given
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.hasField(FieldName.FILE)).thenReturn(true);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/example.pdf"));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("Example2017"));
-
-        ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(entry));
-        when(database.getEntries()).thenReturn(entries);
+        BibEntry entry = new BibEntry("PHDThesis");
+        entry.setCiteKey("Example2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        database.insertEntry(entry);
 
         // when
         indexer.createIndex(database);
@@ -89,54 +75,36 @@ public class PdfIndexerTest {
     }
 
     @Test
-    public void examplePdfAndMetaData() throws IOException {
+    public void metaDataIndex() throws IOException {
         // given
-        BibEntry examplePdf = mock(BibEntry.class);
-        when(examplePdf.hasField(FieldName.FILE)).thenReturn(true);
-        when(examplePdf.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/example.pdf"));
-        when(examplePdf.getCiteKeyOptional()).thenReturn(Optional.of("Example2017"));
+        BibEntry entry = new BibEntry("article");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/metaData.pdf", "pdf")));
 
-        ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(examplePdf));
-        when(database.getEntries()).thenReturn(entries);
-
-        indexer.createIndex(database);
-
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
-            assertEquals(1, reader.numDocs());
-            assertEquals(3, MultiFields.getFields(reader).size());
-        }
-
-
-        BibEntry metaDataEntry = mock(BibEntry.class);
-        when(metaDataEntry.hasField(FieldName.FILE)).thenReturn(true);
-        when(metaDataEntry.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/metaData.pdf"));
-        when(metaDataEntry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
+        database.insertEntry(entry);
 
         // when
-        indexer.addToIndex(metaDataEntry);
+        indexer.createIndex(database);
 
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
-            assertEquals(2, reader.numDocs());
+            assertEquals(1, reader.numDocs());
+            assertEquals(5, MultiFields.getFields(reader).size());
         }
     }
 
     @Test
-    public void flushIndex() throws IOException {
+    public void testFlushIndex() throws IOException {
         // given
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.hasField(FieldName.FILE)).thenReturn(true);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of("src/test/resources/pdfs/metaData.pdf"));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
-
-        ObservableList<BibEntry> entries = FXCollections.unmodifiableObservableList(FXCollections.observableArrayList(entry));
-        when(database.getEntries()).thenReturn(entries);
+        BibEntry entry = new BibEntry("PHDThesis");
+        entry.setCiteKey("Example2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        database.insertEntry(entry);
 
         indexer.createIndex(database);
-
+        // index actually exists
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(6, MultiFields.getFields(reader).size());
+            assertEquals(3, MultiFields.getFields(reader).size());
         }
 
         // when
@@ -145,6 +113,35 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(0, reader.numDocs());
+        }
+    }
+
+
+    @Test
+    public void exampleThesisIndexAppendMetaData() throws IOException {
+        // given
+        BibEntry exampleThesis = new BibEntry("PHDThesis");
+        exampleThesis.setCiteKey("ExampleThesis2017");
+        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        database.insertEntry(exampleThesis);
+        indexer.createIndex(database);
+
+        // index with first entry
+        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+            assertEquals(1, reader.numDocs());
+            assertEquals(3, MultiFields.getFields(reader).size());
+        }
+
+        BibEntry metadata = new BibEntry("article");
+        metadata.setCiteKey("MetaData2017");
+        metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "src/test/resources/pdfs/metaData.pdf", "pdf")));
+
+        // when
+        indexer.addToIndex(metadata);
+
+        // then
+        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+            assertEquals(2, reader.numDocs());
         }
     }
 }

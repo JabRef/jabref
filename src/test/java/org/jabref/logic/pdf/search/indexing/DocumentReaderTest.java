@@ -1,12 +1,11 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
@@ -14,39 +13,46 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 public class DocumentReaderTest {
 
-    @Test(expected = IOException.class)
-    public void unknownFileTestShouldThrowIOException() throws IOException {
-        Path example = Paths.get("src/test/resources/pdfs/NOT_PRESENT.pdf");
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
+    @Test
+    public void unknownFileTestShouldReturnEmptyList() throws IOException {
+        // given
+        BibEntry entry = new BibEntry();
+        entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "src/test/resources/pdfs/NOT_PRESENT.pdf", "Type")));
 
-        new DocumentReader(entry).readPdfContents();
+        // when
+        final List<Document> emptyDocumentList = new DocumentReader(entry).readLinkedPdfs();
+
+        // then
+        assertEquals(Collections.emptyList(), emptyDocumentList);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void unknownFileTestShouldThrowIllegalArgumentException() throws IOException {
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.empty());
+    @Test(expected = IllegalStateException.class)
+    public void noLinkedFiles() throws IOException {
+        // given
+        BibEntry entry = new BibEntry();
 
+        // when
         new DocumentReader(entry);
     }
 
+
     @Test
     public void exampleTest() throws IOException {
-        Path example = Paths.get("src/test/resources/pdfs/example.pdf");
+        // given
+        BibEntry entry = new BibEntry("article");
+        entry.setCiteKey("Example2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example", "src/test/resources/pdfs/example.pdf", "pdf")));
 
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("Example2017"));
+        // when
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
 
-        Document doc = new DocumentReader(entry).readPdfContents();
+        // then
+        assertEquals(1, documents.size());
 
+        Document doc = documents.get(0);
         assertEquals("Example2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
         assertEquals("LaTeX with hyperref package", doc.get(SearchFieldConstants.CREATOR));
@@ -54,14 +60,18 @@ public class DocumentReaderTest {
 
     @Test
     public void thesisExampleTest() throws IOException {
-        Path example = Paths.get("src/test/resources/pdfs/thesis-example.pdf");
+        // given
+        BibEntry entry = new BibEntry("PHDThesis");
+        entry.setCiteKey("ThesisExample2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
 
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("ThesisExample2017"));
+        // when
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
 
-        Document doc = new DocumentReader(entry).readPdfContents();
+        //then
+        assertEquals(1, documents.size());
 
+        Document doc = documents.get(0);
         assertEquals("ThesisExample2017", doc.get(SearchFieldConstants.KEY));
         assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
         assertEquals("LaTeX, hyperref, KOMA-Script", doc.get(SearchFieldConstants.CREATOR));
@@ -69,14 +79,18 @@ public class DocumentReaderTest {
 
     @Test
     public void minimalTest() throws IOException {
-        Path example = Paths.get("src/test/resources/pdfs/minimal.pdf");
+        // given
+        BibEntry entry = new BibEntry("article");
+        entry.setCiteKey("Minimal2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "src/test/resources/pdfs/minimal.pdf", "pdf")));
 
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("Minimal2017"));
+        // when
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
 
-        Document doc = new DocumentReader(entry).readPdfContents();
+        // then
+        assertEquals(1, documents.size());
 
+        Document doc = documents.get(0);
         assertEquals("Minimal2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Hello World\n1\n", doc.get(SearchFieldConstants.CONTENT));
         assertEquals("TeX", doc.get(SearchFieldConstants.CREATOR));
@@ -84,14 +98,18 @@ public class DocumentReaderTest {
 
     @Test
     public void metaDataTest() throws IOException {
-        Path example = Paths.get("src/test/resources/pdfs/metaData.pdf");
+        // given
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("MetaData2017");
+        entry.setFiles(Collections.singletonList(new LinkedFile("Minimal", "src/test/resources/pdfs/metaData.pdf", "pdf")));
 
-        BibEntry entry = mock(BibEntry.class);
-        when(entry.getField(FieldName.FILE)).thenReturn(Optional.of(example.toString()));
-        when(entry.getCiteKeyOptional()).thenReturn(Optional.of("MetaData2017"));
+        // when
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
 
-        Document doc = new DocumentReader(entry).readPdfContents();
+        // then
+        assertEquals(1, documents.size());
 
+        Document doc = documents.get(0);
         assertEquals("MetaData2017", doc.get(SearchFieldConstants.KEY));
         assertEquals("Test\n", doc.get(SearchFieldConstants.CONTENT));
         assertEquals("Author Name", doc.get(SearchFieldConstants.AUTHOR));
