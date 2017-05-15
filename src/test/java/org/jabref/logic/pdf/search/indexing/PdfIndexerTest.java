@@ -88,7 +88,7 @@ public class PdfIndexerTest {
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
             assertEquals(1, reader.numDocs());
-            assertEquals(4, MultiFields.getFields(reader).size());
+            assertEquals(5, MultiFields.getFields(reader).size());
         }
     }
 
