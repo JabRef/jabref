@@ -257,6 +257,21 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // NamedCompound undoAll = new NamedCompound(Localization.lang("change assignment of entries"));
         // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
         // panel.getUndoManager().addEdit(undoAll);
+
+        // TODO Display massages
+        //if (undo == null) {
+        //    frame.output(Localization.lang("The group \"%0\" already contains the selection.",
+        //            node.getGroup().getName()));
+        //    return;
+        //}
+        // panel.getUndoManager().addEdit(undo);
+        // final String groupName = node.getGroup().getName();
+        // if (assignedEntries == 1) {
+        //    frame.output(Localization.lang("Assigned 1 entry to group \"%0\".", groupName));
+        // } else {
+        //    frame.output(Localization.lang("Assigned %0 entries to group \"%1\".", String.valueOf(assignedEntries),
+        //            groupName));
+        //}
     }
 
     public void removeSelectedEntries(GroupNodeViewModel group) {

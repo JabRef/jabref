@@ -185,9 +185,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
-    public static final String GROUP_INVERT_SELECTIONS = "groupInvertSelections";
     public static final String GROUP_INTERSECT_SELECTIONS = "groupIntersectSelections";
-    public static final String GROUP_FLOAT_SELECTIONS = "groupFloatSelections";
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String LIST_OF_FILE_COLUMNS = "listOfFileColumns";
@@ -568,9 +566,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
         defaults.put(AUTO_COMPLETE, Boolean.FALSE);
         AutoCompletePreferences.putDefaults(defaults);
-        defaults.put(GROUP_FLOAT_SELECTIONS, Boolean.TRUE);
-        defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
-        defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
+        defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
         defaults.put(KEYWORD_SEPARATOR, ", ");
