@@ -5,15 +5,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -30,16 +35,16 @@ import org.jabref.model.metadata.MetaData;
 public class GroupTreeViewModel extends AbstractViewModel {
 
     private final ObjectProperty<GroupNodeViewModel> rootGroup = new SimpleObjectProperty<>();
-    private final ObjectProperty<GroupNodeViewModel> selectedGroup = new SimpleObjectProperty<>();
+    private final ListProperty<GroupNodeViewModel> selectedGroups = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
     private final StringProperty filterText = new SimpleStringProperty();
-    private Optional<BibDatabaseContext> currentDatabase;
     private final Comparator<GroupTreeNode> compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -> v1
             .getName()
             .compareToIgnoreCase(v2.getName());
+    private Optional<BibDatabaseContext> currentDatabase;
 
     public GroupTreeViewModel(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -49,7 +54,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // Register listener
         stateManager.activeDatabaseProperty()
                 .addListener((observable, oldValue, newValue) -> onActiveDatabaseChanged(newValue));
-        selectedGroup.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
+        selectedGroups.addListener((observable, oldValue, newValue) -> onSelectedGroupChanged(newValue));
 
         // Set-up bindings
         filterPredicate
@@ -63,8 +68,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         return rootGroup;
     }
 
-    public ObjectProperty<GroupNodeViewModel> selectedGroupProperty() {
-        return selectedGroup;
+    public ListProperty<GroupNodeViewModel> selectedGroupsProperty() {
+        return selectedGroups;
     }
 
     public ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicateProperty() {
@@ -79,7 +84,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
      * Gets invoked if the user selects a different group.
      * We need to notify the {@link StateManager} about this change so that the main table gets updated.
      */
-    private void onSelectedGroupChanged(GroupNodeViewModel newValue) {
+    private void onSelectedGroupChanged(ObservableList<GroupNodeViewModel> newValue) {
         if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {
             // Switch of database occurred -> do nothing
             return;
@@ -87,9 +92,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         currentDatabase.ifPresent(database -> {
             if (newValue == null) {
-                stateManager.clearSelectedGroup(database);
+                stateManager.clearSelectedGroups(database);
             } else {
-                stateManager.setSelectedGroup(database, newValue.getGroupNode());
+                stateManager.setSelectedGroups(database, newValue.stream().map(GroupNodeViewModel::getGroupNode).collect(Collectors.toList()));
             }
         });
     }
@@ -114,9 +119,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor));
 
             rootGroup.setValue(newRoot);
-            stateManager.getSelectedGroup(newDatabase.get()).ifPresent(
-                    selectedGroup -> this.selectedGroup.setValue(
-                            new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup)));
+            this.selectedGroups.setAll(
+                    stateManager.getSelectedGroup(newDatabase.get()).stream()
+                            .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup))
+                            .collect(Collectors.toList()));
         }
 
         currentDatabase = newDatabase;

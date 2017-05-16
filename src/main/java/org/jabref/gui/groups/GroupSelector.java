@@ -9,7 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -55,6 +54,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.search.SearchMatcher;
+import org.jabref.model.search.matchers.MatcherSet;
+import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -329,27 +330,22 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void updateShownEntriesAccordingToSelectedGroups() {
         updateShownEntriesAccordingToSelectedGroups(Globals.stateManager.activeGroupProperty().get());
-        /*final MatcherSet searchRules = MatcherSets
-                .build(andCb.isSelected() ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
-
-        for (GroupTreeNodeViewModel node : getLeafsOfSelection()) {
-            SearchMatcher searchRule = node.getNode().getSearchMatcher();
-            searchRules.addRule(searchRule);
-        }
-        SearchMatcher searchRule = invCb.isSelected() ? new NotMatcher(searchRules) : searchRules;
-        GroupingWorker worker = new GroupingWorker(searchRule);
-        worker.getWorker().run();
-        worker.getCallBack().update();
-        */
     }
 
-    private void updateShownEntriesAccordingToSelectedGroups(Optional<GroupTreeNode> selectedGroup) {
-        if (!selectedGroup.isPresent()) {
+    private void updateShownEntriesAccordingToSelectedGroups(List<GroupTreeNode> selectedGroups) {
+        if (selectedGroups == null || selectedGroups.isEmpty()) {
             // No selected group, nothing to do
             return;
         }
-        SearchMatcher searchRule = selectedGroup.get().getSearchMatcher();
-        GroupingWorker worker = new GroupingWorker(searchRule);
+
+        final MatcherSet searchRules = MatcherSets.build(
+                Globals.prefs.getBoolean(JabRefPreferences.GROUP_INTERSECT_SELECTIONS) ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+
+        for (GroupTreeNode node : selectedGroups) {
+            searchRules.addRule(node.getSearchMatcher());
+        }
+
+        GroupingWorker worker = new GroupingWorker(searchRules);
         worker.run();
         worker.update();
     }

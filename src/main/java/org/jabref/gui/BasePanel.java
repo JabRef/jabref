@@ -2151,7 +2151,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
                     && frame.getGroupSelector().getToggleAction().isSelected()) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
-                Globals.stateManager.getSelectedGroup(bibDatabaseContext).ifPresent(
+                Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(entries));
                 SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
             }

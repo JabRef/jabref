@@ -11,11 +11,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- Continued to redesign the user interface: this time the editor got a fresh coat of paint:
+- We continued to improve the new groups interface:
+  - You can now again select multiple groups (and a few related settings were added to the preferences) [#2786](https://github.com/JabRef/jabref/issues/2786).
+- The entry editor got a fresh coat of paint:
+  - Homogenize the size of text fields.
   - The buttons were changed to icons.
+  - Completely new interface to add or modify linked files.
   - Removed the hidden feature that a double click in the editor inserted the current date.
 - All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
-- Improved wording of "Show recommendationns: into "Show 'Related Articles' tab" in the preferences
+- Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
 
 ### Fixed
 - We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
