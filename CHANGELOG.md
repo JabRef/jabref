@@ -20,6 +20,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Fixed
 - We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
 - We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
+- We fixed a bug that only allowed parsing positive timezones from a FileAnnotation [#2839](https://github.com/JabRef/jabref/issues/22839)
+
 ### Removed
 
 
