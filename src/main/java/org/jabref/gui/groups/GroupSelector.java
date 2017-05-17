@@ -71,8 +71,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     private final JRadioButtonMenuItem andCb = new JRadioButtonMenuItem(Localization.lang("Intersection"), true);
     private final JRadioButtonMenuItem floatCb = new JRadioButtonMenuItem(Localization.lang("Float"), true);
     private final JCheckBoxMenuItem invCb = new JCheckBoxMenuItem(Localization.lang("Inverted"), false);
-    private final JCheckBoxMenuItem autoAssignGroup = new JCheckBoxMenuItem(
-            Localization.lang("Automatically assign new entry to selected groups"));
     private final JMenu sortSubmenu = new JMenu(Localization.lang("Sort alphabetically"));
     private final NodeAction sortDirectSubgroupsPopupAction = new SortDirectSubgroupsAction();
     private final NodeAction sortAllSubgroupsPopupAction = new SortAllSubgroupsAction();
@@ -122,26 +120,14 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             andCb.setSelected(false);
         }
 
-        autoAssignGroup.addChangeListener(
-                event -> Globals.prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected()));
-
         invCb.setSelected(Globals.prefs.getBoolean(JabRefPreferences.GROUP_INVERT_SELECTIONS));
-        autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
 
         JButton openSettings = new JButton(IconTheme.JabRefIcon.PREFERENCES.getSmallIcon());
         settings.add(andCb);
         settings.add(orCb);
         settings.addSeparator();
         settings.add(invCb);
-        settings.addSeparator();
-        settings.add(autoAssignGroup);
-        openSettings.addActionListener(e -> {
-            if (!settings.isVisible()) {
-                JButton src = (JButton) e.getSource();
-                autoAssignGroup.setSelected(Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
-                settings.show(src, 0, openSettings.getHeight());
-            }
-        });
+
 
         JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFile.GROUP)
                 .getHelpButton();
@@ -469,10 +455,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         ce.addEdit(undo);
     }
 
-    public TreePath getSelectionPath() {
-        return groupsTree.getSelectionPath();
-    }
-
     public void concludeAssignment(AbstractUndoableEdit undo, GroupTreeNode node, int assignedEntries) {
         if (undo == null) {
             frame.output(Localization.lang("The group \"%0\" already contains the selection.",
@@ -524,10 +506,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         synchronized (getTreeLock()) {
             validateTree();
         }
-    }
-
-    public GroupsTree getGroupsTree() {
-        return this.groupsTree;
     }
 
     @Subscribe

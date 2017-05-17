@@ -55,6 +55,7 @@ install4j {
 
 
 repositories {
+    mavenLocal()
     jcenter()
     maven {
         url 'https://oss.sonatype.org/content/groups/public'
