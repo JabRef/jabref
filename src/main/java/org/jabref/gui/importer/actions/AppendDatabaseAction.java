@@ -56,29 +56,29 @@ public class AppendDatabaseAction implements BaseAction {
         this.panel = panel;
     }
 
-    private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr, boolean importEntries,
-            boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
+    private static void mergeFromBibtex(BasePanel panel, ParserResult parserResult, boolean importEntries,
+                                        boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
 
-        BibDatabase fromDatabase = pr.getDatabase();
+        BibDatabase fromDatabase = parserResult.getDatabase();
         List<BibEntry> appendedEntries = new ArrayList<>();
         List<BibEntry> originalEntries = new ArrayList<>();
         BibDatabase database = panel.getDatabase();
 
         NamedCompound ce = new NamedCompound(Localization.lang("Append library"));
-        MetaData meta = pr.getMetaData();
+        MetaData meta = parserResult.getMetaData();
 
         if (importEntries) { // Add entries
             boolean overwriteOwner = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER);
             boolean overwriteTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP);
 
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
-                BibEntry be = (BibEntry) originalEntry.clone();
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
+                BibEntry entry = (BibEntry) originalEntry.clone();
+                UpdateField.setAutomaticFields(entry, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
-                database.insertEntry(be);
-                appendedEntries.add(be);
+                database.insertEntry(entry);
+                appendedEntries.add(entry);
                 originalEntries.add(originalEntry);
-                ce.addEdit(new UndoableInsertEntry(database, be, panel));
+                ce.addEdit(new UndoableInsertEntry(database, entry, panel));
             }
         }
 
@@ -145,21 +145,20 @@ public class AppendDatabaseAction implements BaseAction {
 
     @Override
     public void action() {
-
         filesToOpen.clear();
-        final MergeDialog md = new MergeDialog(frame, Localization.lang("Append library"), true);
-        md.setLocationRelativeTo(panel);
-        md.setVisible(true);
-        if (md.isOkPressed()) {
+        final MergeDialog dialog = new MergeDialog(frame, Localization.lang("Append library"), true);
+        dialog.setLocationRelativeTo(panel);
+        dialog.setVisible(true);
+        if (dialog.isOkPressed()) {
 
             FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                     .withDefaultExtension(FileExtensions.BIBTEX_DB)
                     .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
                     .build();
-            DialogService ds = new FXDialogService();
+            DialogService dialogService = new FXDialogService();
 
             List<Path> chosen = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
             if (chosen.isEmpty()) {
                 return;
             }
@@ -168,7 +167,7 @@ public class AppendDatabaseAction implements BaseAction {
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             JabRefExecutorService.INSTANCE.execute(
-                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups(), md.importSelectorWords()));
+                    () -> openIt(dialog.importEntries(), dialog.importStrings(), dialog.importGroups(), dialog.importSelectorWords()));
         }
     }
 
@@ -181,9 +180,9 @@ public class AppendDatabaseAction implements BaseAction {
             try {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent().toString());
                 // Should this be done _after_ we know it was successfully opened?
-                ParserResult pr = OpenDatabase.loadDatabase(file.toFile(),
+                ParserResult parserResult = OpenDatabase.loadDatabase(file.toFile(),
                         Globals.prefs.getImportFormatPreferences());
-                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups,
+                AppendDatabaseAction.mergeFromBibtex(panel, parserResult, importEntries, importStrings, importGroups,
                         importSelectorWords);
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
