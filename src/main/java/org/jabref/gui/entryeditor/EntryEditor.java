@@ -80,6 +80,7 @@ import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
@@ -239,7 +240,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             tabbed.setSelectedIndex(sourceIndex);
         }
 
-        updateAllFields();
+        DefaultTaskExecutor.runInJavaFXThread(() -> setEntry(entry));
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
@@ -454,6 +455,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
     @Override
     public BibEntry getEntry() {
         return entry;
+    }
+
+    /**
+     * Sets all the text areas according to the shown entry.
+     */
+    private void setEntry(BibEntry entry) {
+        for (Object tab : tabs) {
+            if (tab instanceof EntryEditorTab) {
+                ((EntryEditorTab) tab).setEntry(entry);
+            }
+        }
     }
 
     public BibDatabase getDatabase() {
@@ -886,17 +898,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    /**
-     * Sets all the text areas according to the shown entry.
-     */
-    private void updateAllFields() {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEntry(entry);
-            }
-        }
-    }
-
     public void updateAllContentSelectors() {
         if (!contentSelectors.isEmpty()) {
             for (FieldContentSelector contentSelector : contentSelectors) {
@@ -1090,7 +1091,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
-                    ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
                 }
 

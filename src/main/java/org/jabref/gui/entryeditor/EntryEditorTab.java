@@ -247,15 +247,11 @@ class EntryEditorTab {
         return "";
     }
 
-    private BibEntry getEntry() {
-        return entry;
-    }
-
     public void setEntry(BibEntry entry) {
         try {
             updating = true;
             for (FieldEditorFX editor : editors.values()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> editor.bindToEntry(entry));
+                editor.bindToEntry(entry);
             }
             this.entry = entry;
         } finally {
@@ -268,15 +264,6 @@ class EntryEditorTab {
      * <p>
      * If you want to focus it call {@link #focus()} afterwards.
      */
-    // TODO: Reenable or delete this
-    //public void setActive(FieldEditor fieldEditor) {
-    //    activeField = fieldEditor;
-    //}
-
-    //public FieldEditor getActive() {
-    //    return activeField;
-    //}
-
     public void setActive(String fieldName) {
         if (editors.containsKey(fieldName)) {
             activeField = editors.get(fieldName);
@@ -291,13 +278,6 @@ class EntryEditorTab {
         if (activeField != null) {
             activeField.requestFocus();
         }
-    }
-
-    /**
-     * Reset all fields from the data in the BibEntry.
-     */
-    public void updateAll() {
-        setEntry(getEntry());
     }
 
     public boolean updateField(String field, String content) {
