@@ -1914,10 +1914,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return sidePaneManager;
     }
 
-    public GroupSelector getGroupSelector() {
-        return groupSelector;
-    }
-
     public void setPreviewToggle(boolean enabled) {
         previewToggle.setSelected(enabled);
     }

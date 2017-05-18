@@ -43,7 +43,6 @@ class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
         //TODO: NULL
         m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_oldGroupBackup.deepCopy());
-        groupSelector.revalidateGroups();
     }
 
     @Override
@@ -51,6 +50,5 @@ class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
         super.redo();
         m_groupsRootHandle.getDescendant(m_pathToNode).get().setGroup(
                 m_newGroupBackup.deepCopy());
-        groupSelector.revalidateGroups();
     }
 }

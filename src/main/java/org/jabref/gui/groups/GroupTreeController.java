@@ -2,17 +2,22 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
@@ -59,11 +64,27 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     public void initialize() {
         viewModel = new GroupTreeViewModel(stateManager, dialogService, taskExecutor);
 
+        // Set-up groups tree
+        groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
         // Set-up bindings
-        groupTree.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel
-                .selectedGroupProperty().setValue(newValue != null ? newValue.getValue() : null));
-        viewModel.selectedGroupProperty().addListener((observable, oldValue, newValue) -> getTreeItemByValue(newValue)
-                .ifPresent(treeItem -> groupTree.getSelectionModel().select(treeItem)));
+        Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
+                (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
+        Consumer<List<TreeItem<GroupNodeViewModel>>> updateViewModel =
+                (newSelectedGroups) -> {
+                    if (newSelectedGroups == null) {
+                        viewModel.selectedGroupsProperty().clear();
+                    } else {
+                        viewModel.selectedGroupsProperty().setAll(newSelectedGroups.stream().map(TreeItem::getValue).collect(Collectors.toList()));
+                    }
+                };
+        BindingsHelper.bindContentBidirectional(
+                groupTree.getSelectionModel().getSelectedItems(),
+                viewModel.selectedGroupsProperty(),
+                updateSelectedGroups,
+                updateViewModel
+        );
+
         viewModel.filterTextProperty().bind(searchField.textProperty());
 
         groupTree.rootProperty().bind(
@@ -196,6 +217,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         setupClearButtonField(searchField);
     }
 
+    private void selectNode(GroupNodeViewModel value) {
+        getTreeItemByValue(value)
+                .ifPresent(treeItem -> groupTree.getSelectionModel().select(treeItem));
+    }
+
     private Optional<TreeItem<GroupNodeViewModel>> getTreeItemByValue(GroupNodeViewModel value) {
         return getTreeItemByValue(groupTree.getRoot(), value);
     }
@@ -252,6 +278,22 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         menu.getItems().addAll(addEntries, removeEntries);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(sortAlphabetically);
+
+        // TODO: Disable some actions under certain conditions
+        //if (group.canBeEdited()) {
+        //editGroupPopupAction.setEnabled(false);
+        //addGroupPopupAction.setEnabled(false);
+        //removeGroupAndSubgroupsPopupAction.setEnabled(false);
+        //removeGroupKeepSubgroupsPopupAction.setEnabled(false);
+        //} else {
+        //editGroupPopupAction.setEnabled(true);
+        //addGroupPopupAction.setEnabled(true);
+        //addGroupPopupAction.setNode(node);
+        //removeGroupAndSubgroupsPopupAction.setEnabled(true);
+        //removeGroupKeepSubgroupsPopupAction.setEnabled(true);
+        //}
+        //sortSubmenu.setEnabled(!node.isLeaf());
+        //removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
     }
