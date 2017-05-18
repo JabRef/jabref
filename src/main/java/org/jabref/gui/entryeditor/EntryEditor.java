@@ -714,19 +714,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
-     * Sets the enabled status of all text fields of the entry editor.
-     */
-    @Override
-    public void setEnabled(boolean enabled) {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEnabled(enabled);
-            }
-        }
-        source.setEnabled(enabled);
-    }
-
-    /**
      * Makes sure the current edit is stored.
      */
     public void storeCurrentEdit() {

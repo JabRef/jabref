@@ -1472,7 +1472,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         showEntryEditor(entryEditor);
 
         newEntryShowing(be);
-        setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
     /**

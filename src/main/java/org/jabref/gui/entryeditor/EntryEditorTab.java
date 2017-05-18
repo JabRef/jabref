@@ -1,24 +1,18 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.AWTKeyStroke;
 import java.awt.Component;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.swing.ActionMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.KeyStroke;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Node;
@@ -36,8 +30,6 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
-import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
@@ -58,7 +50,6 @@ class EntryEditorTab {
     private final List<String> fields;
     private final EntryEditor parent;
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
-    private final FocusListener fieldListener = new EntryEditorTabFocusListener(this);
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
@@ -272,27 +263,6 @@ class EntryEditorTab {
         }
     }
 
-    private boolean isFieldModified(FieldEditor fieldEditor) {
-        String text = fieldEditor.getText().trim();
-
-        if (text.isEmpty()) {
-            return getEntry().hasField(fieldEditor.getFieldName());
-        } else {
-            return !Optional.of(text).equals(getEntry().getField(fieldEditor.getFieldName()));
-        }
-    }
-
-    public void markIfModified(FieldEditor fieldEditor) {
-        // Only mark as changed if not already is and the field was indeed modified
-        if (!updating && !basePanel.isModified() && isFieldModified(fieldEditor)) {
-            markBaseChanged();
-        }
-    }
-
-    private void markBaseChanged() {
-        basePanel.markBaseChanged();
-    }
-
     /**
      * Only sets the activeField variable but does not focus it.
      * <p>
@@ -358,15 +328,6 @@ class EntryEditorTab {
         return true;
     }
 
-    public void setEnabled(boolean enabled) {
-        /*
-        // TODO: Reenable this
-        for (FieldEditor editor : editors.values()) {
-            editor.setEnabled(enabled);
-        }
-        */
-    }
-
     public Component getPane() {
         return panel;
     }
@@ -401,41 +362,5 @@ class EntryEditorTab {
         actionMap.put("nexttab", this.frame.nextTab);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
         actionMap.put("prevtab", this.frame.prevTab);
-    }
-
-    /**
-     * Set up key bindings and focus listener for the FieldEditor.
-     *
-     * @param component
-     */
-    private void setupJTextComponent(final JComponent component, final AutoCompleteListener autoCompleteListener) {
-
-        // Here we add focus listeners to the component. The funny code is because we need
-        // to guarantee that the AutoCompleteListener - if used - is called before fieldListener
-        // on a focus lost event. The AutoCompleteListener is responsible for removing any
-        // current suggestion when focus is lost, and this must be done before fieldListener
-        // stores the current edit. Swing doesn't guarantee the order of execution of event
-        // listeners, so we handle this by only adding the AutoCompleteListener and telling
-        // it to call fieldListener afterwards. If no AutoCompleteListener is used, we
-        // add the fieldListener normally.
-        if (autoCompleteListener == null) {
-            component.addFocusListener(fieldListener);
-        } else {
-            component.addKeyListener(autoCompleteListener);
-            component.addFocusListener(autoCompleteListener);
-            autoCompleteListener.setNextFocusListener(fieldListener);
-        }
-
-        setupKeyBindings(component.getInputMap(JComponent.WHEN_FOCUSED), component.getActionMap());
-
-        Set<AWTKeyStroke> keys = new HashSet<>(
-                component.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
-        component.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-        keys = new HashSet<>(component.getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
-        component.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
     }
 }
