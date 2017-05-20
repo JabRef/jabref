@@ -25,7 +25,7 @@ import org.jabref.preferences.JabRefPreferences;
  * The groups side pane.
  * This class is just a Swing wrapper around the JavaFX implementation {@link GroupTreeView}.
  */
-public class GroupSelector extends SidePaneComponent {
+public class GroupSidePane extends SidePaneComponent {
 
     protected final JabRefFrame frame;
     private final ToggleAction toggleAction;
@@ -34,7 +34,7 @@ public class GroupSelector extends SidePaneComponent {
      * The first element for each group defines which field to use for the quicksearch. The next two define the name and
      * regexp for the group.
      */
-    public GroupSelector(JabRefFrame frame, SidePaneManager manager) {
+    public GroupSidePane(JabRefFrame frame, SidePaneManager manager) {
         super(manager, IconTheme.JabRefIcon.TOGGLE_GROUPS.getIcon(), Localization.lang("Groups"));
 
         Globals.stateManager.activeGroupProperty()
@@ -101,7 +101,7 @@ public class GroupSelector extends SidePaneComponent {
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            frame.getSidePaneManager().hide(GroupSelector.class);
+            frame.getSidePaneManager().hide(GroupSidePane.class);
             return;
         }
 
