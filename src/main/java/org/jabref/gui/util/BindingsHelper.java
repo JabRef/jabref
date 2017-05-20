@@ -18,6 +18,8 @@ import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
+import net.corda.client.jfx.utils.MappedList;
+
 
 /**
  * Helper methods for javafx binding.
@@ -55,6 +57,18 @@ public class BindingsHelper {
             }
         };
         pseudoClassState.bind(condition);
+    }
+
+    /**
+     * Creates a new list in which each element is converted using the provided mapping.
+     * All changes to the underlying list are propagated to the converted list.
+     *
+     * In contrast to {@link org.fxmisc.easybind.EasyBind#map(ObservableList, Function)},
+     * the items are converted when the are inserted (and at the initialization) instead of when they are accessed.
+     * Thus the initial CPU overhead and memory consumption is higher but the access to list items is quicker.
+     */
+    public static <A, B> ObservableList<B> mapBacked(ObservableList<A> source, Function<A, B> mapper) {
+        return new MappedList<>(source, mapper::apply);
     }
 
     /**

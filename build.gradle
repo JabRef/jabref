@@ -114,6 +114,7 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.12'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
+    compile 'net.corda:jfx:0.11.0'
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
 

@@ -67,7 +67,7 @@ public class GroupNodeViewModel {
                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
-            children = EasyBind.map(groupNode.getChildren(), this::toViewModel);
+            children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
