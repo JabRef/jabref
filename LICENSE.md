@@ -1,4 +1,5 @@
 MIT License
+============
 
 Copyright © 2003-2016 [JabRef Authors](https://github.com/JabRef/jabref/blob/master/AUTHORS)
 
