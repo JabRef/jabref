@@ -64,7 +64,7 @@ In Windows download it from [www.eclipse.org](http://www.eclipse.org/downloads/)
 * If you use Eclipse: run `./gradlew eclipse` 
 * If you use IntelliJ: No extra setup is required
 * In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. 
-* './gradlew tasks' shows many other runnable tasks.  
+* `./gradlew tasks` shows many other runnable tasks.  
 
 ### Building it into your IDE
 * Open Eclipse (or your preferred IDE)
