@@ -33,15 +33,16 @@ public class Date {
     public static Optional<Date> parse(String dateString) {
         List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
                 "d.M.uuuu", "uuuu.M.d", "uuuu");
-        for (String formatString : formatStrings) {
-            try {
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                return Optional.of(new Date(parsedDate));
-            } catch (DateTimeParseException ignored) {
-                // Ignored
+        if (dateString != null) {
+            for (String formatString : formatStrings) {
+                try {
+                    TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
+                    return Optional.of(new Date(parsedDate));
+                } catch (DateTimeParseException ignored) {
+                    // Ignored
+                }
             }
         }
-
         return Optional.empty();
     }
 
@@ -76,6 +77,7 @@ public class Date {
         }
     }
 
+
     public String getNormalized() {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
         return dateFormatter.format(date);
@@ -107,8 +109,12 @@ public class Date {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
         Date date1 = (Date) o;
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&

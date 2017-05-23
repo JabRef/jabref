@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.Date;
 import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
@@ -25,14 +26,6 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
  */
 class MSBibEntry {
-
-    /**
-     * Allows 20.3-2007|||20/3-  2007 etc.
-     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
-     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-     */
-    private static final Pattern DATE_PATTERN = Pattern
-            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
@@ -165,22 +158,11 @@ class MSBibEntry {
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        StringBuilder sbDateAccesed = new StringBuilder();
-        if (monthAccessed != null) {
-            sbDateAccesed.append(monthAccessed);
-            sbDateAccesed.append(' ');
-        }
-        if (dayAccessed != null) {
-            sbDateAccesed.append(dayAccessed);
-            sbDateAccesed.append(", ");
-        }
-        if (yearAccessed != null) {
-            sbDateAccesed.append(yearAccessed);
-        }
-        dateAccessed = sbDateAccesed.toString().trim();
-        if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
-            dateAccessed = null;
-        }
+        Optional<Date> parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),
+                Optional.ofNullable(monthAccessed),
+                Optional.ofNullable(dayAccessed));
+
+        dateAccessed = parsedDateAcessed.map(Date::getNormalized).orElse(null);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -262,15 +244,16 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        // based on bibtex content
-        if (dateAccessed != null) {
-            Matcher matcher = DATE_PATTERN.matcher(dateAccessed);
-            if (matcher.matches() && (matcher.groupCount() >= 3)) {
-                addField(document, rootNode, "Month" + "Accessed", matcher.group(1));
-                addField(document, rootNode, "Day" + "Accessed", matcher.group(2));
-                addField(document, rootNode, "Year" + "Accessed", matcher.group(3));
-            }
-        }
+        Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
+        String yearAccessed = parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString())
+                .orElse(null);
+        String monthAcessed = parsedDateAcesseField.flatMap(Date::getMonth)
+                .map(accMonth -> accMonth.getTwoDigitNumber()).orElse(null);
+        String dayAccessed = parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).orElse(null);
+
+        addField(document, rootNode, "Year" + "Accessed", yearAccessed);
+        addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+        addField(document, rootNode, "Day" + "Accessed", dayAccessed);
 
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
