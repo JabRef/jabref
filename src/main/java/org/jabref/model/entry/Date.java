@@ -31,7 +31,8 @@ public class Date {
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     public static Optional<Date> parse(String dateString) {
-        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
+        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu",
+                "MMMM, uuuu",
                 "d.M.uuuu", "uuuu.M.d", "uuuu");
         if (dateString != null) {
             for (String formatString : formatStrings) {
@@ -46,7 +47,8 @@ public class Date {
         return Optional.empty();
     }
 
-    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue, Optional<String> dayValue) {
+    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
+            Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
@@ -76,7 +78,6 @@ public class Date {
             return Optional.empty();
         }
     }
-
 
     public String getNormalized() {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
