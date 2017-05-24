@@ -254,6 +254,51 @@ public class GroupNodeViewModel {
         //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
         //panel.markBaseChanged();
         //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+    }
 
+    public void moveTo(GroupTreeNode target, int targetIndex) {
+        getGroupNode().moveTo(target, targetIndex);
+    }
+
+    public Optional<GroupTreeNode> getParent() {
+        return groupNode.getParent();
+    }
+
+    public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+        Optional<GroupTreeNode> targetParent = target.getParent();
+        if (targetParent.isPresent()) {
+            int targetIndex = target.getPositionInParent();
+
+            // In case we want to move an item in the same parent
+            // and the item is moved down, we need to adjust the target index
+            if (targetParent.equals(getParent())) {
+                int sourceIndex = this.getPositionInParent();
+                if (sourceIndex < targetIndex) {
+                    targetIndex--;
+                }
+            }
+
+            // Different actions depending on where the user releases the drop in the target row
+            // Bottom + top -> insert source row before / after this row
+            // Center -> add as child
+            switch (mouseLocation) {
+                case BOTTOM:
+                    this.moveTo(targetParent.get(), targetIndex + 1);
+                    break;
+                case CENTER:
+                    this.moveTo(target);
+                    break;
+                case TOP:
+                    this.moveTo(targetParent.get(), targetIndex);
+                    break;
+            }
+        } else {
+            // No parent = root -> just add
+            this.moveTo(target);
+        }
+    }
+
+    private int getPositionInParent() {
+        return groupNode.getPositionInParent();
     }
 }
