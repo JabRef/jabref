@@ -16,10 +16,6 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class LibraryOfCongress implements IdBasedParserFetcher {
 
-    public LibraryOfCongress() {
-
-    }
-
     @Override
     public String getName() {
         return "Library of Congress";
