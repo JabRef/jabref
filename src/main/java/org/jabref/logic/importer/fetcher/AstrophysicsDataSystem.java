@@ -158,6 +158,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         // Remove ADS note
         new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
         // Move adsurl to url field
-        new MoveFieldCleanup("adsurl","url").cleanup(entry);
+        new MoveFieldCleanup("adsurl", FieldName.URL).cleanup(entry);
     }
 }
