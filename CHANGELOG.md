@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - Removed the hidden feature that a double click in the editor inserted the current date.
 - All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
 - Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
+- We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)
 
 ### Fixed
 - We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
