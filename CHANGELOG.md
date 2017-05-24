@@ -28,7 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
 - We fixed an issue that prevented new entries to be automatically assigned to the currently selected group [#2783](https://github.com/JabRef/jabref/issues/2783).
 - We fixed a bug that only allowed parsing positive timezones from a FileAnnotation [#2839](https://github.com/JabRef/jabref/issues/22839)
-
+- We fixed a bug that did not allow the correct re-export of the MS-Office XML field `msbib-accessed` with a different date format [#2859](https://github.com/JabRef/jabref/issues/2859).
 
 ### Removed
 
