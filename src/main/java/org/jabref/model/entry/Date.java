@@ -31,10 +31,11 @@ public class Date {
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     public static Optional<Date> parse(String dateString) {
+        Objects.requireNonNull(dateString);
         List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu",
                 "MMMM, uuuu",
                 "d.M.uuuu", "uuuu.M.d", "uuuu");
-        if (dateString != null) {
+
             for (String formatString : formatStrings) {
                 try {
                     TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
@@ -43,7 +44,7 @@ public class Date {
                     // Ignored
                 }
             }
-        }
+
         return Optional.empty();
     }
 

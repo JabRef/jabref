@@ -162,7 +162,7 @@ class MSBibEntry {
                 Optional.ofNullable(monthAccessed),
                 Optional.ofNullable(dayAccessed));
 
-        dateAccessed = parsedDateAcessed.map(Date::getNormalized).orElse(null);
+        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -244,16 +244,8 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
-        String yearAccessed = parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString())
-                .orElse(null);
-        String monthAcessed = parsedDateAcesseField.flatMap(Date::getMonth)
-                .map(accMonth -> accMonth.getTwoDigitNumber()).orElse(null);
-        String dayAccessed = parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).orElse(null);
+        Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
 
-        addField(document, rootNode, "Year" + "Accessed", yearAccessed);
-        addField(document, rootNode, "Month" + "Accessed", monthAcessed);
-        addField(document, rootNode, "Day" + "Accessed", dayAccessed);
 
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
@@ -341,6 +333,23 @@ class MSBibEntry {
             authorTop.appendChild(nameList);
         }
         allAuthors.appendChild(authorTop);
+
+    }
+
+    private void addDateAcessedFields(Document document, Element rootNode) {
+        Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
+        parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString()).ifPresent(yearAccessed -> {
+            addField(document, rootNode, "Year" + "Accessed", yearAccessed);
+        });
+
+        parsedDateAcesseField.flatMap(Date::getMonth)
+                .map(accMonth -> accMonth.getTwoDigitNumber()).ifPresent(monthAcessed -> {
+                    addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+
+                });
+        parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).ifPresent(dayAccessed -> {
+            addField(document, rootNode, "Day" + "Accessed", dayAccessed);
+        });
 
     }
 
