@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LibraryOfCongressTest {
 
-    LibraryOfCongress fetcher = new LibraryOfCongress();
+    private LibraryOfCongress fetcher = new LibraryOfCongress();
 
     @Test
     public void performSearchById() throws Exception {
