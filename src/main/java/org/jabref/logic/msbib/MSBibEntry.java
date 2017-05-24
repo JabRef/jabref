@@ -246,7 +246,6 @@ class MSBibEntry {
 
         Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
 
-
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
         addAuthor(document, allAuthors, "Author", authors);
