@@ -25,6 +25,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
@@ -59,6 +60,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
+
+    private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
+        for (PseudoClass pseudoClass : pseudoClasses) {
+            row.pseudoClassStateChanged(pseudoClass, false);
+        }
+    }
 
     @FXML
     public void initialize() {
@@ -141,6 +148,11 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         // Set pseudo-classes to indicate if row is root or sub-item ( > 1 deep)
         PseudoClass rootPseudoClass = PseudoClass.getPseudoClass("root");
         PseudoClass subElementPseudoClass = PseudoClass.getPseudoClass("sub");
+
+        // Pseudo-classes for drag and drop
+        PseudoClass dragOverBottom = PseudoClass.getPseudoClass("dragOver-bottom");
+        PseudoClass dragOverCenter = PseudoClass.getPseudoClass("dragOver-center");
+        PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
@@ -183,8 +195,24 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 Dragboard dragboard = event.getDragboard();
                 if ((event.getGestureSource() != row) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
+
+                    removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
+                    switch (getDroppingMouseLocation(row, event)) {
+                        case BOTTOM:
+                            row.pseudoClassStateChanged(dragOverBottom, true);
+                            break;
+                        case CENTER:
+                            row.pseudoClassStateChanged(dragOverCenter, true);
+                            break;
+                        case TOP:
+                            row.pseudoClassStateChanged(dragOverTop, true);
+                            break;
+                    }
                 }
                 event.consume();
+            });
+            row.setOnDragExited(event -> {
+                removePseudoClasses(row, dragOverBottom, dragOverCenter, dragOverTop);
             });
 
             row.setOnDragDropped(event -> {
@@ -195,7 +223,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                     Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
                             .getChildByPath(pathToSource);
                     if (source.isPresent()) {
-                        source.get().moveTo(row.getItem());
+                        source.get().draggedOn(row.getItem(), getDroppingMouseLocation(row, event));
                         success = true;
                     }
                 }
@@ -313,6 +341,19 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
+        }
+    }
+
+    /**
+     * Determines where the mouse is in the given row.
+     */
+    private DroppingMouseLocation getDroppingMouseLocation(TreeTableRow<GroupNodeViewModel> row, DragEvent event) {
+        if ((row.getHeight() * 0.25) > event.getY()) {
+            return DroppingMouseLocation.TOP;
+        } else if ((row.getHeight() * 0.75) < event.getY()) {
+            return DroppingMouseLocation.BOTTOM;
+        } else {
+            return DroppingMouseLocation.CENTER;
         }
     }
 }
