@@ -55,7 +55,6 @@ class EntryEditorTab {
     private final BasePanel basePanel;
     private FieldEditorFX activeField;
     private BibEntry entry;
-    private boolean updating;
 
 
     public EntryEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
@@ -155,6 +154,7 @@ class EntryEditorTab {
             */
 
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
+            fieldEditor.bindToEntry(entry);
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -245,18 +245,6 @@ class EntryEditorTab {
         }
 
         return "";
-    }
-
-    public void setEntry(BibEntry entry) {
-        try {
-            updating = true;
-            for (FieldEditorFX editor : editors.values()) {
-                editor.bindToEntry(entry);
-            }
-            this.entry = entry;
-        } finally {
-            updating = false;
-        }
     }
 
     /**
