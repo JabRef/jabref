@@ -217,12 +217,11 @@ class EntryEditorTab {
 
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
-
         if (rows == 0) {
-            rows = 1;
+            rowExpand.setPercentHeight(100);
+        } else {
+            rowExpand.setPercentHeight(100 / rows);
         }
-
-        rowExpand.setPercentHeight(100 / rows);
         for (int i = 0; i < rows; i++) {
             gridPane.getRowConstraints().add(rowExpand);
         }
