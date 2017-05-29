@@ -107,7 +107,7 @@ dependencies {
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
 
-    compile 'com.google.guava:guava:21.0'
+    compile 'com.google.guava:guava:22.0'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
@@ -310,26 +310,26 @@ shadowJar {
 
         // this is an adapter required for generating a fat jar with correct log4j2 output
 
-        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer();
+        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer()
 
         @Override
         boolean canTransformResource(FileTreeElement element) {
-            return target.canTransformResource(element.getPath());
+            return target.canTransformResource(element.getPath())
         }
 
         @Override
         void transform(String path, InputStream is, List<com.github.jengelman.gradle.plugins.shadow.relocation.Relocator> relocators) {
-            target.processResource(path, is, relocators);
+            target.processResource(path, is, relocators)
         }
 
         @Override
         boolean hasTransformedResource() {
-            return target.hasTransformedResource();
+            return target.hasTransformedResource()
         }
 
         @Override
         void modifyOutputStream(org.apache.tools.zip.ZipOutputStream jos) {
-            target.modifyOutputStream(jos);
+            target.modifyOutputStream(jos)
         }
     })
 }
@@ -358,7 +358,7 @@ if (hasProperty('dev')) {
     // In the context of github, the branch name could be something like "pull/277"
     // "/" is an illegal character. To be safe, all illegal filename characters are replaced by "_"
     // http://stackoverflow.com/a/15075907/873282 describes the used pattern.
-    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_");
+    branchName = branchName.trim().replaceAll("[^a-zA-Z0-9.-]", "_")
 
     // hack string
     // first the date (%cd), then the branch name, and finally the commit id (%h)
