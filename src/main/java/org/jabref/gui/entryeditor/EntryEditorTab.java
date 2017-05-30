@@ -56,9 +56,8 @@ class EntryEditorTab {
     private FieldEditorFX activeField;
     private BibEntry entry;
 
-
     public EntryEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
-                          boolean addKeyField, boolean compressed, String tabTitle, BibEntry entry) {
+            boolean addKeyField, boolean compressed, String tabTitle, BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
         if (fields == null) {
             this.fields = new ArrayList<>();
@@ -83,8 +82,7 @@ class EntryEditorTab {
                 root.setStyle(
                         "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
                                 + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                                + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
-                );
+                                + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
             }
 
             root.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
@@ -109,7 +107,7 @@ class EntryEditorTab {
     }
 
     private Region setupPanel(JabRefFrame frame, BasePanel bPanel, boolean addKeyField,
-                              boolean compressed, String title) {
+            boolean compressed, String title) {
 
         setupKeyBindings(panel.getInputMap(JComponent.WHEN_FOCUSED), panel.getActionMap());
 
@@ -139,9 +137,9 @@ class EntryEditorTab {
                 //parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
-
+            
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
-
+            
             // Add autocompleter listener, if required for this field:
             /*
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
@@ -155,6 +153,7 @@ class EntryEditorTab {
 
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
             fieldEditor.bindToEntry(entry);
+          
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -204,7 +203,8 @@ class EntryEditorTab {
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode).limit(rows));
             addColumn(gridPane, 4, editors.values().stream().map(FieldEditorFX::getNode).skip(rows));
 
-            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10), columnDoNotContract, columnExpand);
+            gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10),
+                    columnDoNotContract, columnExpand);
         } else {
             rows = fields.size();
 
@@ -216,7 +216,11 @@ class EntryEditorTab {
 
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
-        rowExpand.setPercentHeight(100 / rows);
+        if (rows == 0) {
+            rowExpand.setPercentHeight(100);
+        } else {
+            rowExpand.setPercentHeight(100 / rows);
+        }
         for (int i = 0; i < rows; i++) {
             gridPane.getRowConstraints().add(rowExpand);
         }
@@ -236,12 +240,12 @@ class EntryEditorTab {
         }
 
         switch (field) {
-            case FieldName.YEAR:
-                return "YYYY";
-            case FieldName.MONTH:
-                return "MM or #mmm#";
-            case FieldName.URL:
-                return "https://";
+        case FieldName.YEAR:
+            return "YYYY";
+        case FieldName.MONTH:
+            return "MM or #mmm#";
+        case FieldName.URL:
+            return "https://";
         }
 
         return "";
@@ -278,7 +282,7 @@ class EntryEditorTab {
         if (fieldEditor.getText().equals(content)) {
             return true;
         }
-
+        
         // trying to preserve current edit position (fixes SF bug #1285)
         if (fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
