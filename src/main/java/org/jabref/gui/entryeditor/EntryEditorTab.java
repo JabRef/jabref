@@ -19,7 +19,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -222,13 +221,7 @@ class EntryEditorTab {
             gridPane.getRowConstraints().add(rowExpand);
         }
 
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setHmax(500);
-        scrollPane.setPrefHeight(100);
-        scrollPane.setContent(gridPane);
-        return scrollPane;
+        return gridPane;
     }
 
     private String getPrompt(String field) {
