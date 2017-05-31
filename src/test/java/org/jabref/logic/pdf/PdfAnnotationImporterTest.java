@@ -55,6 +55,26 @@ public class PdfAnnotationImporterTest {
     }
 
     @Test
+    public void popupNoteMinimalFoxit() {
+        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 5,38), 1,
+                "This is a foxit note", FileAnnotationType.TEXT, Optional.empty());
+
+        assertEquals(Collections.singletonList(expected),
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-foxitnote.pdf")));
+    }
+
+    @Test
+    public void highlightMinimalFoxit() {
+
+        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
+                "this is a foxit highlight", FileAnnotationType.HIGHLIGHT, Optional.empty());
+        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
+                "Hello", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
+        assertEquals(Collections.singletonList(expected),
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-foxithighlight.pdf")));
+    }
+
+    @Test
     public void highlightNoNoteMinimal() {
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
                 "", FileAnnotationType.HIGHLIGHT, Optional.empty());
