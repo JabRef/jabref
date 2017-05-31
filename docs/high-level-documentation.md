@@ -33,7 +33,7 @@ All packages and classes which are currently not part of these packages (we are 
 
 ![Package Diagram](http://yuml.me/b1215eef)
 
-Visualization as a package diagram: http://yuml.me/edit/b1215eef
+Visualization as a package diagram: http://yuml.me/b1215eef
 
 ## Most Important Classes and their Relation
 
