@@ -41,4 +41,4 @@ Both GUI and CLI are started via the `JabRefMain` which will in turn call `JabRe
 
 ![Class Diagram](http://yuml.me/20975ef4)
 
-Visualization as a class diagram: http://yuml.me/edit/20975ef4
+Visualization as a class diagram: http://yuml.me/20975ef4
