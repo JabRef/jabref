@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -38,7 +39,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withTooltip(LinkedFileViewModel::getDescription)
                 .withGraphic(LinkedFilesEditor::createFileDisplay);
         listView.setCellFactory(cellFactory);
-        listView.itemsProperty().bind(viewModel.filesProperty());
+        Bindings.bindContent(listView.itemsProperty().get(), viewModel.filesProperty());
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
