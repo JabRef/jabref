@@ -17,6 +17,21 @@ public class PdfAnnotationImporterTest {
     private final AnnotationImporter importer = new PdfAnnotationImporter();
 
     @Test
+    public void invalidPath() {
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("/asdf/does/not/exist.pdf")));
+    }
+
+    @Test
+    public void invalidDirectory() {
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs")));
+    }
+
+    @Test
+    public void invalidDocumentType() {
+        assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.docx")));
+    }
+
+    @Test
     public void noAnnotationsWriteProtected() {
         assertEquals(Collections.emptyList(), importer.importAnnotations(Paths.get("src/test/resources/pdfs/write-protected.pdf")));
     }
@@ -55,17 +70,7 @@ public class PdfAnnotationImporterTest {
     }
 
     @Test
-    public void popupNoteMinimalFoxit() {
-        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 5,38), 1,
-                "This is a foxit note", FileAnnotationType.TEXT, Optional.empty());
-
-        assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-foxitnote.pdf")));
-    }
-
-    @Test
     public void highlightMinimalFoxit() {
-
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
                 "this is a foxit highlight", FileAnnotationType.HIGHLIGHT, Optional.empty());
         final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
@@ -83,6 +88,28 @@ public class PdfAnnotationImporterTest {
 
         assertEquals(Collections.singletonList(expected),
                 importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf")));
+    }
+
+    @Test
+    public void ernst() {
+        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
+                "", FileAnnotationType.HIGHLIGHT, Optional.empty());
+        final FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
+                "World", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
+
+        assertEquals(Collections.singletonList(expected),
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf")));
+    }
+
+    @Test
+    public void squigglyWithNoteMinimal() {
+        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 2, 40, 25), 1,
+                "Squiggly note", FileAnnotationType.SQUIGGLY, Optional.empty());
+        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 2, 40, 25), 1,
+                "ello", FileAnnotationType.SQUIGGLY, Optional.of(expectedLinkedAnnotation));
+
+        assertEquals(Collections.singletonList(expected),
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-squiggly.pdf")));
     }
 
     @Test

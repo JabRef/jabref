@@ -12,26 +12,29 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
  */
 
 public enum FileAnnotationType {
-    TEXT("Text"),
-    HIGHLIGHT("Highlight"),
-    UNDERLINE("Underline"),
-    POLYGON("Polygon"),
-    POPUP("Popup"),
-    LINE("Line"),
-    CIRCLE("Circle"),
-    FREETEXT("FreeText"),
-    STRIKEOUT("Strikeout"),
-    LINK("Link"),
-    INK("Ink"),
-    UNKNOWN("Unknown"),
-    NONE("None");
+    TEXT("Text", false),
+    HIGHLIGHT("Highlight", true),
+    SQUIGGLY("Squiggly", true),
+    UNDERLINE("Underline", true),
+    POLYGON("Polygon", false),
+    POPUP("Popup", false),
+    LINE("Line", false),
+    CIRCLE("Circle", false),
+    FREETEXT("FreeText", false),
+    STRIKEOUT("Strikeout", false),
+    LINK("Link", false),
+    INK("Ink", false),
+    UNKNOWN("Unknown", false),
+    NONE("None", false);
 
     private static final Log LOGGER = LogFactory.getLog(FileAnnotationType.class);
 
     private final String name;
+    private final boolean isLinkedAnnotationType;
 
-    FileAnnotationType(String name) {
+    FileAnnotationType(String name, boolean isLinkedAnnotationType) {
         this.name = name;
+        this.isLinkedAnnotationType = isLinkedAnnotationType;
     }
 
     /**
@@ -48,6 +51,10 @@ public enum FileAnnotationType {
             LOGGER.info(String.format("FileAnnotationType %s is not supported and was converted into 'Unknown'!", annotation.getSubtype()));
             return UNKNOWN;
         }
+    }
+
+    public boolean isLinkedAnnotationType() {
+        return isLinkedAnnotationType;
     }
 
     public String toString() {

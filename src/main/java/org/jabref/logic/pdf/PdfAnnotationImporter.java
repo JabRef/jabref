@@ -54,7 +54,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                         continue;
                     }
                     if (FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype()) ||
-                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype())) {
+                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) ||
+                            FileAnnotationType.SQUIGGLY.toString().equals(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
@@ -87,7 +88,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
         try {
-            if (FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) || FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype())) {
+            if (annotationBelongingToMarking.getAnnotationType().isLinkedAnnotationType()) {
                 annotation.setContents(extractMarkedText(page, annotation));
             }
         } catch (IOException e) {
@@ -144,17 +145,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(String.format("File %s does not end with .pdf!", path));
+            LOGGER.warn(String.format("File '%s' does not end with .pdf!", path));
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn(String.format("File %s does not exist!", path));
+            LOGGER.warn(String.format("File '%s' does not exist!", path));
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn(String.format("File %s is not readable!", path));
+            LOGGER.warn(String.format("File '%s' is not readable!", path));
             return false;
         }
 
