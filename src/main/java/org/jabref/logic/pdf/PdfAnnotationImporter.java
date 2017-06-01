@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
+import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -108,37 +109,51 @@ public class PdfAnnotationImporter implements AnnotationImporter {
              k = 0;
              j <= (quadsArray.size() / 8);
              j++) {
+            try {
+                float upperLeftX = toFloat(quadsArray, k);
+                float upperLeftY = toFloat(quadsArray, 1 + k);
+                float upperRightX = toFloat(quadsArray, 2 + k);
+                float upperRightY = toFloat(quadsArray, 3 + k);
+                float lowerLeftX = toFloat(quadsArray, 4 + k);
+                float lowerLeftY = toFloat(quadsArray, 5 + k);
 
-            COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
-            COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
-            COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
-            COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
-            COSFloat lowerLeftX = (COSFloat) quadsArray.get(4 + k);
-            COSFloat lowerLeftY = (COSFloat) quadsArray.get(5 + k);
+                k += 8;
 
-            k += 8;
+                float ulx = upperLeftX - 1;
+                float uly = upperLeftY;
+                float width = upperRightX - lowerLeftX;
+                float height = upperRightY - lowerLeftY;
 
-            float ulx = upperLeftX.floatValue() - 1;
-            float uly = upperLeftY.floatValue();
-            float width = upperRightX.floatValue() - lowerLeftX.floatValue();
-            float height = upperRightY.floatValue() - lowerLeftY.floatValue();
+                PDRectangle pageSize = page.getMediaBox();
+                uly = pageSize.getHeight() - uly;
 
-            PDRectangle pageSize = page.getMediaBox();
-            uly = pageSize.getHeight() - uly;
+                Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
+                stripperByArea.addRegion("markedRegion", rectangle);
+                stripperByArea.extractRegions(page);
+                String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
 
-            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-            stripperByArea.addRegion("markedRegion", rectangle);
-            stripperByArea.extractRegions(page);
-            String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
-
-            if (j > 1) {
-                markedText = markedText.concat(markedTextInLine);
-            } else {
-                markedText = markedTextInLine;
+                if (j > 1) {
+                    markedText = markedText.concat(markedTextInLine);
+                } else {
+                    markedText = markedTextInLine;
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IOException("Cannot read annotation coordinates!", e);
             }
         }
 
         return markedText.trim();
+    }
+
+    private float toFloat(COSArray quadsArray, int k) {
+        Object cosNumber = quadsArray.get(k);
+        if (cosNumber instanceof COSFloat) {
+            return ((COSFloat) cosNumber).floatValue();
+        }
+        if (cosNumber instanceof COSInteger) {
+            return ((COSInteger) cosNumber).floatValue();
+        }
+        throw new IllegalArgumentException("The number type of the annotation is not supported!");
     }
 
     private boolean validatePath(Path path) {

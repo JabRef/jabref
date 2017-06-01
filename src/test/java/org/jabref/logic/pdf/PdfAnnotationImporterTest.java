@@ -71,9 +71,9 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void highlightMinimalFoxit() {
-        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
+        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16, 1), 1,
                 "this is a foxit highlight", FileAnnotationType.HIGHLIGHT, Optional.empty());
-        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16,1), 1,
+        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 5, 31, 15, 16, 1), 1,
                 "Hello", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
         assertEquals(Collections.singletonList(expected),
                 importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-foxithighlight.pdf")));
@@ -81,17 +81,6 @@ public class PdfAnnotationImporterTest {
 
     @Test
     public void highlightNoNoteMinimal() {
-        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
-                "", FileAnnotationType.HIGHLIGHT, Optional.empty());
-        final FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
-                "World", FileAnnotationType.HIGHLIGHT, Optional.of(expectedLinkedAnnotation));
-
-        assertEquals(Collections.singletonList(expected),
-                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-highlight-no-note.pdf")));
-    }
-
-    @Test
-    public void ernst() {
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
                 "", FileAnnotationType.HIGHLIGHT, Optional.empty());
         final FileAnnotation expected = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 28, 39), 1,
