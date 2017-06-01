@@ -102,6 +102,18 @@ public class PdfAnnotationImporterTest {
     }
 
     @Test
+
+    public void strikeoutWithNoteMinimal() {
+        final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 13, 2, 3), 1,
+                "striked out", FileAnnotationType.STRIKEOUT, Optional.empty());
+        final FileAnnotation expected = new FileAnnotation("lynyus", LocalDateTime.of(2017, 6, 1, 13, 2, 3), 1,
+                "World", FileAnnotationType.STRIKEOUT, Optional.of(expectedLinkedAnnotation));
+
+        assertEquals(Collections.singletonList(expected),
+                importer.importAnnotations(Paths.get("src/test/resources/pdfs/minimal-strikeout.pdf")));
+    }
+
+    @Test
     public void highlightWithNoteMinimal() {
         final FileAnnotation expectedLinkedAnnotation = new FileAnnotation("Linus Dietz", LocalDateTime.of(2017, 3, 12, 20, 32, 2), 1,
                 "linked note to highlight", FileAnnotationType.HIGHLIGHT, Optional.empty());

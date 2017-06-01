@@ -1,10 +1,14 @@
 package org.jabref.model.pdf;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Our representation of the type of the FileAnnotation. This is needed as some FileAnnotationTypes require special
@@ -16,12 +20,12 @@ public enum FileAnnotationType {
     HIGHLIGHT("Highlight", true),
     SQUIGGLY("Squiggly", true),
     UNDERLINE("Underline", true),
+    STRIKEOUT("StrikeOut", true),
     POLYGON("Polygon", false),
     POPUP("Popup", false),
     LINE("Line", false),
     CIRCLE("Circle", false),
     FREETEXT("FreeText", false),
-    STRIKEOUT("Strikeout", false),
     LINK("Link", false),
     INK("Ink", false),
     UNKNOWN("Unknown", false),
@@ -51,6 +55,22 @@ public enum FileAnnotationType {
             LOGGER.info(String.format("FileAnnotationType %s is not supported and was converted into 'Unknown'!", annotation.getSubtype()));
             return UNKNOWN;
         }
+    }
+
+    /**
+     * Determines if a String is a supported marked FileAnnotation type.
+     *
+     * @param annotationType a type descriptor
+     * @return true if annotationType is a supported marked FileAnnotation type
+     */
+    public static boolean isMarkedFileAnnotationType(String annotationType) {
+        for (FileAnnotationType type : Collections.unmodifiableList(Arrays.stream(FileAnnotationType.values())
+                .filter(FileAnnotationType::isLinkedAnnotationType).collect(toList()))) {
+            if (type.toString().equals(annotationType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isLinkedAnnotationType() {

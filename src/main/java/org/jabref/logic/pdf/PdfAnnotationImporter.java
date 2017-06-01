@@ -48,9 +48,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                     if (!isSupportedAnnotationType(annotation)) {
                         continue;
                     }
-                    if (FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype()) ||
-                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) ||
-                            FileAnnotationType.SQUIGGLY.toString().equals(annotation.getSubtype())) {
+
+                    if (FileAnnotationType.isMarkedFileAnnotationType(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
@@ -93,7 +92,6 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         //Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
-
 
     private boolean validatePath(Path path) {
         Objects.requireNonNull(path);
