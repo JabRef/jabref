@@ -1,6 +1,5 @@
 package org.jabref.logic.pdf;
 
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,15 +16,10 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.pdfbox.cos.COSArray;
-import org.apache.pdfbox.cos.COSFloat;
-import org.apache.pdfbox.cos.COSInteger;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
-import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
@@ -88,65 +82,18 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
                 pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
-        try {
-            if (annotationBelongingToMarking.getAnnotationType().isLinkedAnnotationType()) {
-                annotation.setContents(extractMarkedText(page, annotation));
+        if (annotationBelongingToMarking.getAnnotationType().isLinkedAnnotationType()) {
+            try {
+                annotation.setContents(new TextExtractor(page, annotation).extractMarkedText());
+            } catch (IOException e) {
+                annotation.setContents("JabRef: Could not extract any marked text!");
             }
-        } catch (IOException e) {
-            annotation.setContents("JabRef: Could not extract any marked text!");
         }
 
         //Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
-    private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
-        // Text has to be extracted by the rectangle calculated from the marking
-        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
-        String markedText = "";
-
-        // Iterates over the array of segments of the quadsArray. Each segment consists of 8 elements.
-        int totalSegments = quadsArray.size() / 8;
-        for (int currentSegment = 1, segmentPointer = 0; currentSegment <= totalSegments; currentSegment++, segmentPointer += 8) {
-            try {
-                // Extract coordinate values
-                float upperLeftX = toFloat(quadsArray, segmentPointer);
-                float upperLeftY = toFloat(quadsArray, 1 + segmentPointer);
-                float upperRightX = toFloat(quadsArray, 2 + segmentPointer);
-                float upperRightY = toFloat(quadsArray, 3 + segmentPointer);
-                float lowerLeftX = toFloat(quadsArray, 4 + segmentPointer);
-                float lowerLeftY = toFloat(quadsArray, 5 + segmentPointer);
-
-                // Post-processing of the raw coordinates.
-                PDRectangle pageSize = page.getMediaBox();
-                float ulx = upperLeftX - 1; // It is magic.
-                float uly = pageSize.getHeight() - upperLeftY;
-                float width = upperRightX - lowerLeftX;
-                float height = upperRightY - lowerLeftY;
-
-                stripperByArea.addRegion("markedRegion", new Rectangle2D.Float(ulx, uly, width, height));
-                stripperByArea.extractRegions(page);
-
-                markedText = markedText.concat(stripperByArea.getTextForRegion("markedRegion"));
-            } catch (IllegalArgumentException e) {
-                throw new IOException("Cannot read annotation coordinates!", e);
-            }
-        }
-
-        return markedText.trim();
-    }
-
-    private float toFloat(COSArray quadsArray, int k) {
-        Object cosNumber = quadsArray.get(k);
-        if (cosNumber instanceof COSFloat) {
-            return ((COSFloat) cosNumber).floatValue();
-        }
-        if (cosNumber instanceof COSInteger) {
-            return ((COSInteger) cosNumber).floatValue();
-        }
-        throw new IllegalArgumentException("The number type of the annotation is not supported!");
-    }
 
     private boolean validatePath(Path path) {
         Objects.requireNonNull(path);
