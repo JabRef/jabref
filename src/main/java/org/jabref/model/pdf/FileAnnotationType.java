@@ -26,7 +26,6 @@ public enum FileAnnotationType {
     LINE("Line", false),
     CIRCLE("Circle", false),
     FREETEXT("FreeText", false),
-    LINK("Link", false),
     INK("Ink", false),
     UNKNOWN("Unknown", false),
     NONE("None", false);
