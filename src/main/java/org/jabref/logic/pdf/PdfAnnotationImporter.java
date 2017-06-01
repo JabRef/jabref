@@ -101,42 +101,34 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     }
 
     private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
-        //highlighted or underlined text has to be extracted by the rectangle calculated from the marking
+        // Text has to be extracted by the rectangle calculated from the marking
         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
         String markedText = "";
-        for (int j = 1,
-             k = 0;
-             j <= (quadsArray.size() / 8);
-             j++) {
+
+        // Iterates over the array of segments of the quadsArray. Each segment consists of 8 elements.
+        int totalSegments = quadsArray.size() / 8;
+        for (int currentSegment = 1, segmentPointer = 0; currentSegment <= totalSegments; currentSegment++, segmentPointer += 8) {
             try {
-                float upperLeftX = toFloat(quadsArray, k);
-                float upperLeftY = toFloat(quadsArray, 1 + k);
-                float upperRightX = toFloat(quadsArray, 2 + k);
-                float upperRightY = toFloat(quadsArray, 3 + k);
-                float lowerLeftX = toFloat(quadsArray, 4 + k);
-                float lowerLeftY = toFloat(quadsArray, 5 + k);
+                // Extract coordinate values
+                float upperLeftX = toFloat(quadsArray, segmentPointer);
+                float upperLeftY = toFloat(quadsArray, 1 + segmentPointer);
+                float upperRightX = toFloat(quadsArray, 2 + segmentPointer);
+                float upperRightY = toFloat(quadsArray, 3 + segmentPointer);
+                float lowerLeftX = toFloat(quadsArray, 4 + segmentPointer);
+                float lowerLeftY = toFloat(quadsArray, 5 + segmentPointer);
 
-                k += 8;
-
-                float ulx = upperLeftX - 1;
-                float uly = upperLeftY;
+                // Post-processing of the raw coordinates.
+                PDRectangle pageSize = page.getMediaBox();
+                float ulx = upperLeftX - 1; // It is magic.
+                float uly = pageSize.getHeight() - upperLeftY;
                 float width = upperRightX - lowerLeftX;
                 float height = upperRightY - lowerLeftY;
 
-                PDRectangle pageSize = page.getMediaBox();
-                uly = pageSize.getHeight() - uly;
-
-                Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-                stripperByArea.addRegion("markedRegion", rectangle);
+                stripperByArea.addRegion("markedRegion", new Rectangle2D.Float(ulx, uly, width, height));
                 stripperByArea.extractRegions(page);
-                String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
 
-                if (j > 1) {
-                    markedText = markedText.concat(markedTextInLine);
-                } else {
-                    markedText = markedTextInLine;
-                }
+                markedText = markedText.concat(stripperByArea.getTextForRegion("markedRegion"));
             } catch (IllegalArgumentException e) {
                 throw new IOException("Cannot read annotation coordinates!", e);
             }
