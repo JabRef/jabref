@@ -89,7 +89,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
                 pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
-        if (annotationBelongingToMarking.getAnnotationType().isLinkedAnnotationType()) {
+        if (annotationBelongingToMarking.getAnnotationType().isLinkedFileAnnotationType()) {
             try {
                 COSArray boundingBoxes = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                 annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());

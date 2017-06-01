@@ -1,14 +1,10 @@
 package org.jabref.model.pdf;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Our representation of the type of the FileAnnotation. This is needed as some FileAnnotationTypes require special
@@ -33,11 +29,11 @@ public enum FileAnnotationType {
     private static final Log LOGGER = LogFactory.getLog(FileAnnotationType.class);
 
     private final String name;
-    private final boolean isLinkedAnnotationType;
+    private final boolean linkedFileAnnotationType;
 
-    FileAnnotationType(String name, boolean isLinkedAnnotationType) {
+    FileAnnotationType(String name, boolean linkedFileAnnotationType) {
         this.name = name;
-        this.isLinkedAnnotationType = isLinkedAnnotationType;
+        this.linkedFileAnnotationType = linkedFileAnnotationType;
     }
 
     /**
@@ -63,17 +59,15 @@ public enum FileAnnotationType {
      * @return true if annotationType is a supported marked FileAnnotation type
      */
     public static boolean isMarkedFileAnnotationType(String annotationType) {
-        for (FileAnnotationType type : Collections.unmodifiableList(Arrays.stream(FileAnnotationType.values())
-                .filter(FileAnnotationType::isLinkedAnnotationType).collect(toList()))) {
-            if (type.toString().equals(annotationType)) {
-                return true;
-            }
+        try {
+            return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;
+        } catch (IllegalArgumentException e) {
+            return false;
         }
-        return false;
     }
 
-    public boolean isLinkedAnnotationType() {
-        return isLinkedAnnotationType;
+    public boolean isLinkedFileAnnotationType() {
+        return linkedFileAnnotationType;
     }
 
     public String toString() {
