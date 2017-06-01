@@ -16,6 +16,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -83,7 +84,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
 
         if (annotationBelongingToMarking.getAnnotationType().isLinkedAnnotationType()) {
             try {
-                annotation.setContents(new TextExtractor(page, annotation).extractMarkedText());
+                COSArray boundingBoxes = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
+                annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
             } catch (IOException e) {
                 annotation.setContents("JabRef: Could not extract any marked text!");
             }

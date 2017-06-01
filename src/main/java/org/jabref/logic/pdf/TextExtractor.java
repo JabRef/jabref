@@ -7,27 +7,25 @@ import java.util.Objects;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSInteger;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 /**
- * Extracts the text of marked annotations.
+ * Extracts the text of marked annotations using bounding boxes.
  */
 public final class TextExtractor {
 
-    private final PDAnnotation annotation;
+    private final COSArray boundingBoxes;
     private final PDPage page;
 
     /**
      * @param page       the page the annotation is on, must not be null
-     * @param annotation the raw annotation, must not be null
+     * @param boundingBoxes the raw annotation, must not be null
      */
-    public TextExtractor(PDPage page, PDAnnotation annotation) {
+    public TextExtractor(PDPage page, COSArray boundingBoxes) {
         this.page = Objects.requireNonNull(page);
-        this.annotation = Objects.requireNonNull(annotation);
+        this.boundingBoxes = Objects.requireNonNull(boundingBoxes);
     }
 
     /**
@@ -39,14 +37,13 @@ public final class TextExtractor {
     public String extractMarkedText() throws IOException {
         // Text has to be extracted by the rectangle calculated from the marking
         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
         String markedText = "";
 
-        // Iterates over the array of segments of the quadsArray. Each segment consists of 8 elements.
-        int totalSegments = quadsArray.size() / 8;
+        // Iterates over the array of segments. Each segment consists of 8 points forming a bounding box.
+        int totalSegments = boundingBoxes.size() / 8;
         for (int currentSegment = 1, segmentPointer = 0; currentSegment <= totalSegments; currentSegment++, segmentPointer += 8) {
             try {
-                stripperByArea.addRegion("markedRegion", calculateSegmentRectangle(quadsArray, segmentPointer));
+                stripperByArea.addRegion("markedRegion", calculateSegmentBoundingBox(boundingBoxes, segmentPointer));
                 stripperByArea.extractRegions(page);
 
                 markedText = markedText.concat(stripperByArea.getTextForRegion("markedRegion"));
@@ -58,7 +55,7 @@ public final class TextExtractor {
         return markedText.trim();
     }
 
-    private Rectangle2D calculateSegmentRectangle(COSArray quadsArray, int segmentPointer) {
+    private Rectangle2D calculateSegmentBoundingBox(COSArray quadsArray, int segmentPointer) {
         // Extract coordinate values
         float upperLeftX = toFloat(quadsArray.get(segmentPointer));
         float upperLeftY = toFloat(quadsArray.get(segmentPointer + 1));
