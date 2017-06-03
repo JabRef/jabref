@@ -11,15 +11,27 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- Continued to redesign the user interface: this time the editor got a fresh coat of paint:
+- We moved the `adsurl` field to `url` field when fetching with the ADS fetcher. 
+- We continued to improve the new groups interface:
+  - You can now again select multiple groups (and a few related settings were added to the preferences) [#2786](https://github.com/JabRef/jabref/issues/2786).
+  - We further improved performance of group operations, especially of the new filter feature [#2852](https://github.com/JabRef/jabref/issues/2852). 
+  - It is now possible to resort groups using drag & drop [#2785](https://github.com/JabRef/jabref/issues/2785).
+- The entry editor got a fresh coat of paint:
+  - Homogenize the size of text fields.
   - The buttons were changed to icons.
+  - Completely new interface to add or modify linked files.
   - Removed the hidden feature that a double click in the editor inserted the current date.
 - All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
-- Improved wording of "Show recommendationns: into "Show 'Related Articles' tab" in the preferences
+- Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
+- We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)
 
 ### Fixed
 - We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
 - We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
+- We fixed an issue that prevented new entries to be automatically assigned to the currently selected group [#2783](https://github.com/JabRef/jabref/issues/2783).
+- We fixed a bug that only allowed parsing positive timezones from a FileAnnotation [#2839](https://github.com/JabRef/jabref/issues/2839)
+- We fixed a bug that did not allow the correct re-export of the MS-Office XML field `msbib-accessed` with a different date format [#2859](https://github.com/JabRef/jabref/issues/2859).
+- We fixed some bugs that prevented the display of FileAnnotations that were created using the Foxit Reader. [#2839, comment](https://github.com/JabRef/jabref/issues/2839#issuecomment-302058227).
 ### Removed
 
 

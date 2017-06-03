@@ -34,6 +34,24 @@
     -fx-font-size: 12px;
 }
 
+.tree-table-row-cell:dragOver-bottom {
+    -fx-border-color: #eea82f;
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -2 0;
+}
+
+.tree-table-row-cell:dragOver-center {
+    -fx-border-color: #eea82f;
+    -fx-border-width: 2 2 2 2;
+    -fx-padding: -2 -2 -2 -2;
+}
+
+.tree-table-row-cell:dragOver-top {
+    -fx-border-color: #eea82f;
+    -fx-border-width: 2 0 0 0;
+    -fx-padding: -2 0 0 0;
+}
+
 .tree-table-row-cell:sub > .tree-table-cell {
     -fx-padding: 0.20em 0em 0.20em 0em;
 }

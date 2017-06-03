@@ -219,7 +219,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
-        this.entry = entry;
+        this.entry = Objects.requireNonNull(entry);
 
         entry.registerListener(this);
         entry.registerListener(SpecialFieldUpdateListener.getInstance());
@@ -238,8 +238,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.setSelectedIndex(sourceIndex);
         }
-
-        updateAllFields();
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
@@ -293,7 +291,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add tabs
                 EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
-                        false, true, Localization.lang("Optional fields 2"));
+                        false, true, Localization.lang("Optional fields 2"), entry);
                 tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                         optPan2.getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
@@ -301,7 +299,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
                     EntryEditorTab optPan3;
                     optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
-                            false, true, Localization.lang("Deprecated fields"));
+                            false, true, Localization.lang("Deprecated fields"), entry);
                     tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                             optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
@@ -346,7 +344,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 0; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
-                    false, tabList.getTabName(i));
+                    false, tabList.getTabName(i), entry);
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
@@ -381,7 +379,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void addOtherTab(List<String> otherFields) {
         EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
-                false, false, Localization.lang("Other fields"));
+                false, false, Localization.lang("Other fields"), entry);
         tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
                 .getPane(), Localization.lang("Show remaining fields"));
         tabs.add(otherPanel);
@@ -391,7 +389,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         List<String> requiredFields = type.getRequiredFieldsFlat();
 
         EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false,
-                Localization.lang("Required fields"));
+                Localization.lang("Required fields"), entry);
         tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
                 .getPane(), Localization.lang("Show required fields"));
         tabs.add(requiredPanel);
@@ -422,7 +420,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void addOptionalTab(EntryType type) {
         EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
-                false, true, Localization.lang("Optional fields"));
+                false, true, Localization.lang("Optional fields"), entry);
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
                 optionalPanel.getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
@@ -588,19 +586,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
                     storeFieldAction);
-        } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return FieldExtraComponents.getMonthExtraComponent(editor, this,
-                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return FieldExtraComponents.getGenderExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return FieldExtraComponents.getPaginationExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperty.TYPE)) {
-            return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
         }
         return Optional.empty();
     }
@@ -724,19 +709,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     @Override
     public boolean isEnabled() {
         return source.isEnabled();
-    }
-
-    /**
-     * Sets the enabled status of all text fields of the entry editor.
-     */
-    @Override
-    public void setEnabled(boolean enabled) {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEnabled(enabled);
-            }
-        }
-        source.setEnabled(enabled);
     }
 
     /**
@@ -908,17 +880,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).updateField(fieldName, newFieldData);
-            }
-        }
-    }
-
-    /**
-     * Sets all the text areas according to the shown entry.
-     */
-    private void updateAllFields() {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEntry(entry);
             }
         }
     }
@@ -1116,7 +1077,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
-                    ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
                 }
 

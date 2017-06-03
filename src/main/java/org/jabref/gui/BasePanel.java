@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -37,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -69,8 +67,6 @@ import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
-import org.jabref.gui.groups.GroupSelector;
-import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -1313,9 +1309,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
-                final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path
-                        .getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
@@ -1479,7 +1472,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         showEntryEditor(entryEditor);
 
         newEntryShowing(be);
-        setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
     /**
@@ -1905,10 +1897,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return this.bibDatabaseContext;
     }
 
-    public GroupSelector getGroupSelector() {
-        return frame.getGroupSelector();
-    }
-
     public boolean isUpdatedExternally() {
         return updatedExternally;
     }
@@ -2121,68 +2109,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private class GroupTreeListener {
-
-        private final Runnable task = new Runnable() {
-
-            @Override
-            public void run() {
-                // Update group display (for example to reflect that the number of contained entries has changed)
-                frame.getGroupSelector().revalidateGroups();
-            }
-        };
-
-        /**
-         * Only access when you have the lock of the task instance
-         *
-         * Guarded by "task"
-         */
-        private TimerTask timerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-                task.run();
-            }
-        };
-
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
             if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
-                scheduleUpdate();
                 return;
             }
 
             // Automatically add new entry to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
-                    && frame.getGroupSelector().getToggleAction().isSelected()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
-                final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
-                if (selection != null) {
-                    // it is possible that the user selected nothing. Therefore, checked for "!= null"
-                    for (final TreePath tree : selection) {
-                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
-                    }
-                }
-                SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
-            }
-
-            scheduleUpdate();
-        }
-
-        private void scheduleUpdate() {
-            // This is a quickfix/dirty hack.
-            // a better solution would be using RxJava or something reactive instead
-            // nevertheless it works correctly
-            synchronized (task) {
-                timerTask.cancel();
-                timerTask = new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        task.run();
-                    }
-                };
-                JabRefExecutorService.INSTANCE.submit(timerTask, 200);
+                Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
+                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
         }
     }
