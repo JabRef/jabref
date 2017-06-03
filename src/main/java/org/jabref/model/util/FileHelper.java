@@ -118,8 +118,8 @@ public class FileHelper {
         Path file = Paths.get(filename);
         //Explicitly check for an empty String, as File.exists returns true on that empty path, because it maps to the default jar location
         // if we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here
-        if (!filename.isEmpty() && Files.exists(file)) {
-            return Optional.of(file);
+        if (filename.isEmpty()) {
+            return Optional.of(directory);
         }
 
         Path resolvedFile = directory.resolve(file);

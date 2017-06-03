@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
@@ -75,6 +76,10 @@ public class RenamePdfCleanup implements CleanupJob {
 
         for (LinkedFile flEntry : fileList) {
             String realOldFilename = flEntry.getLink();
+
+            if (StringUtil.isBlank(realOldFilename)) {
+                continue; //Skip empty filenames
+            }
 
             if (onlyRelativePaths && Paths.get(realOldFilename).isAbsolute()) {
                 newFileList.add(flEntry);
