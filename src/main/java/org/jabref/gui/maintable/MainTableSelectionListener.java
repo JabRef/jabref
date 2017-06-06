@@ -62,16 +62,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     private final BasePanel panel;
 
     private final EventList<BibEntry> tableRows;
-    private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
-
-    private boolean workingOnPreview;
-
-    private boolean enabled = true;
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
+    private PreviewPanel preview;
+    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
+    private boolean workingOnPreview;
+    private boolean enabled = true;
     private int lastPressedCount;
 
     private long lastPressedTime;
@@ -118,7 +116,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 EntryEditor oldEditor = panel.getCurrentEditor();
                 String visName = null;
                 if (oldEditor != null) {
-                    visName = oldEditor.getVisiblePanelName();
+                    visName = oldEditor.getVisibleTabName();
                 }
                 // Get a new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(newSelected);
@@ -127,7 +125,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
 
                     if (visName != null) {
-                        newEditor.setVisiblePanel(visName);
+                        newEditor.setVisibleTab(visName);
                     }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
