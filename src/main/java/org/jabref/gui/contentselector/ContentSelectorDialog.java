@@ -72,12 +72,12 @@ public class ContentSelectorDialog extends JabRefDialog {
     private final JTextField fieldNameField = new JTextField("", 20);
     private final JTextField wordEditField = new JTextField("", 20);
     private final JScrollPane fPane = new JScrollPane(fieldList);
-    private final JScrollPane wPane = new JScrollPane(wordList);
     private final Map<String, DefaultListModel<String>> wordListModels = new HashMap<>();
+    private final JScrollPane wPane = new JScrollPane(wordList);
     private final List<String> removedFields = new ArrayList<>();
-    private String currentField;
     private DefaultListModel<String> wordListModel = new DefaultListModel<>();
     private final JList<String> wordList = new JList<>(wordListModel);
+    private String currentField;
 
 
     /**
