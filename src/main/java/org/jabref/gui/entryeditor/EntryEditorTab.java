@@ -15,6 +15,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -216,6 +217,7 @@ class EntryEditorTab {
 
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setValignment(VPos.TOP);
         if (rows == 0) {
             rowExpand.setPercentHeight(100);
         } else {
