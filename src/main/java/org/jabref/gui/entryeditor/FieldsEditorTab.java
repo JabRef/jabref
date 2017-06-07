@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -185,6 +186,7 @@ class FieldsEditorTab extends EntryEditorTab {
 
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setValignment(VPos.TOP);
         if (rows == 0) {
             rowExpand.setPercentHeight(100);
         } else {
