@@ -236,7 +236,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         popup.add(deleteListener);
         popup.addSeparator();
-        if (!newDatabase && (bibDatabaseContext != null)) {
+        if (!newDatabase && (bibDatabaseContext != null) && bibDatabaseContext.getMetaData().getGroups().isPresent()) {
             GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups().get();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
