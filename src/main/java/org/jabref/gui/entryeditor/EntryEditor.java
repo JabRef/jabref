@@ -197,11 +197,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         helpAction.actionPerformed(null);
                         event.consume();
                         break;
+                    default:
+                        // Pass other keys to children
                 }
             }
         });
     }
-
 
     private void addTabs() {
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
