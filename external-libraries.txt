@@ -145,6 +145,11 @@ Project: Flowless
 URL:     https://github.com/TomasMikula/Flowless
 License: BSD-2-Clause
 
+Id:      org.fxmisc.richtext:richtextfx
+Project: RichTextFX
+URL:     https://github.com/TomasMikula/RichTextFX
+License: BSD-2-Clause
+
 Id:      de.jensd:fontawesomefx-materialdesignfont
 Project: FontAwesomeFX
 URL:     https://bitbucket.org/Jerady/fontawesomefx
