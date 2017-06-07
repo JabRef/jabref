@@ -163,8 +163,8 @@ public class IntegrityCheckTest {
             // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
