@@ -14,6 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 
 public class OtherFieldsTab extends FieldsEditorTab {
+
     public OtherFieldsTab(JabRefFrame frame, BasePanel basePanel, EntryType entryType, EntryEditor parent, BibEntry entry) {
         super(frame, basePanel, getOtherFields(entryType, entry), parent, false, false, entry);
 

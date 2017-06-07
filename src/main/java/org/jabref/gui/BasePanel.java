@@ -1595,7 +1595,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
-
     public void markBaseChanged() {
         baseChanged = true;
 

@@ -190,7 +190,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         });
     }
 
-
     private void addTabs() {
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
                 this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());

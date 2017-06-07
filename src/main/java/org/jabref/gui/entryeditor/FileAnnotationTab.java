@@ -213,8 +213,7 @@ class FileAnnotationTab extends EntryEditorTab {
         markedTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
-
-
+        
         swingNode.setContent(FormBuilder.create()
                 .columns("0:grow, $lcgap, 0:grow")
                 .rows("fill:pref:grow")
