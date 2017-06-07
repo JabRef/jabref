@@ -21,7 +21,7 @@ public class DOI implements Identifier {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
     // DOI resolver
-    private static final URI RESOLVER = URI.create("http://doi.org");
+    private static final URI RESOLVER = URI.create("https://doi.org");
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""

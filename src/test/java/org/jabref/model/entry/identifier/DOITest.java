@@ -102,30 +102,30 @@ public class DOITest {
     public void correctlyEncodeDOIs() {
         // See http://www.doi.org/doi_handbook/2_Numbering.html#2.5.2.4
         // % -> (%25)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%25.0001",
-                new DOI("http://doi.org/10.1006/rwei.1999%25.0001").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1006/rwei.1999%25.0001",
+                new DOI("https://doi.org/10.1006/rwei.1999%25.0001").getURIAsASCIIString());
         // " -> (%22)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%22.0001",
-                new DOI("http://doi.org/10.1006/rwei.1999%22.0001").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1006/rwei.1999%22.0001",
+                new DOI("https://doi.org/10.1006/rwei.1999%22.0001").getURIAsASCIIString());
         // # -> (%23)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%23.0001",
-                new DOI("http://doi.org/10.1006/rwei.1999%23.0001").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1006/rwei.1999%23.0001",
+                new DOI("https://doi.org/10.1006/rwei.1999%23.0001").getURIAsASCIIString());
         // SPACE -> (%20)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%20.0001",
-                new DOI("http://doi.org/10.1006/rwei.1999%20.0001").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1006/rwei.1999%20.0001",
+                new DOI("https://doi.org/10.1006/rwei.1999%20.0001").getURIAsASCIIString());
         // ? -> (%3F)
-        Assert.assertEquals("http://doi.org/10.1006/rwei.1999%3F.0001",
-                new DOI("http://doi.org/10.1006/rwei.1999%3F.0001").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1006/rwei.1999%3F.0001",
+                new DOI("https://doi.org/10.1006/rwei.1999%3F.0001").getURIAsASCIIString());
     }
 
     @Test
     public void constructCorrectURLForDoi() {
         // add / to RESOLVER url if missing
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354",
+        Assert.assertEquals("https://doi.org/10.1006/jmbi.1998.2354",
                 new DOI("10.1006/jmbi.1998.2354").getURIAsASCIIString());
-        Assert.assertEquals("http://doi.org/10.1006/jmbi.1998.2354",
-                new DOI("http://doi.org/10.1006/jmbi.1998.2354").getURIAsASCIIString());
-        Assert.assertEquals("http://doi.org/10.1109/VLHCC.2004.20",
+        Assert.assertEquals("https://doi.org/10.1006/jmbi.1998.2354",
+                new DOI("https://doi.org/10.1006/jmbi.1998.2354").getURIAsASCIIString());
+        Assert.assertEquals("https://doi.org/10.1109/VLHCC.2004.20",
                 new DOI("doi:10.1109/VLHCC.2004.20").getURIAsASCIIString());
     }
 

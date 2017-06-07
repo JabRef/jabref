@@ -100,7 +100,7 @@ dependencies {
     compile 'org.antlr:antlr4-runtime:4.7'
 
     // VersionEye states that 6.0.5 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
-    compile 'mysql:mysql-connector-java:5.1.40'
+    compile 'mysql:mysql-connector-java:5.1.42'
 
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
@@ -126,7 +126,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.10.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.23'
+    compile 'info.debatty:java-string-similarity:0.24'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
     compile 'org.apache.logging.log4j:log4j-api:2.8.2'
@@ -291,7 +291,7 @@ tasks.withType(Test) {
 }
 
 task jacocoMerge(type: JacocoMerge) {
-    executionData test, fetcherTest, databaseTest
+    executionData test, databaseTest
 }
 
 jacocoTestReport {
