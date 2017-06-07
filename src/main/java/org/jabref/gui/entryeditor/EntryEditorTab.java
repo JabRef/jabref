@@ -15,6 +15,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 
 import javafx.embed.swing.JFXPanel;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -55,7 +56,6 @@ class EntryEditorTab {
     private final BasePanel basePanel;
     private FieldEditorFX activeField;
     private BibEntry entry;
-    private boolean updating;
 
     public EntryEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
             boolean addKeyField, boolean compressed, String tabTitle, BibEntry entry) {
@@ -152,9 +152,9 @@ class EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(),
-                    Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    bPanel.getBibDatabaseContext(), entry.getType());
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
+            fieldEditor.bindToEntry(entry);
+          
             editors.put(fieldName, fieldEditor);
             /*
             // TODO: Reenable this
@@ -217,6 +217,7 @@ class EntryEditorTab {
 
         RowConstraints rowExpand = new RowConstraints();
         rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setValignment(VPos.TOP);
         if (rows == 0) {
             rowExpand.setPercentHeight(100);
         } else {
@@ -250,18 +251,6 @@ class EntryEditorTab {
         }
 
         return "";
-    }
-
-    public void setEntry(BibEntry entry) {
-        try {
-            updating = true;
-            for (FieldEditorFX editor : editors.values()) {
-                editor.bindToEntry(entry);
-            }
-            this.entry = entry;
-        } finally {
-            updating = false;
-        }
     }
 
     /**
