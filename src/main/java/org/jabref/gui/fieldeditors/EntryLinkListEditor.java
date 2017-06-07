@@ -274,7 +274,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
         ParsedEntryLink entry = new ParsedEntryLink("", databaseContext.getDatabase());
         tableModel.addEntry(row, entry);
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         adjustColumnWidth();
         updateButtonStates();
     }
@@ -286,7 +286,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 tableModel.removeEntry(rows[i]);
             }
         }
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         adjustColumnWidth();
         updateButtonStates();
     }
@@ -318,7 +318,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         ParsedEntryLink entry = tableModel.getEntry(sel[0]);
         tableModel.removeEntry(sel[0]);
         tableModel.addEntry(toIdx, entry);
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         setRowSelectionInterval(toIdx, toIdx);
         adjustColumnWidth();
     }

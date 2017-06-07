@@ -6,8 +6,6 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.text.JTextComponent;
-
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -90,51 +88,6 @@ public class SourceTab extends EntryEditorTab {
     @Override
     protected void initialize() {
         this.setContent(createSourceEditor(entry, mode));
-    }
-
-    /**
-     * NOTE: This method is only used for the source panel, not for the
-     * other tabs. Look at EntryEditorTab for the setup of text components
-     * in the other tabs.
-     */
-    private void setupJTextComponent(JTextComponent textComponent) {
-        /*
-        // TODO: Set up key bindings and focus listener for the code editor.
-        InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap actionMap = textComponent.getActionMap();
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", storeFieldAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("right", switchRightAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("left", switchLeftAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", helpAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
-        actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
-        actionMap.put("prevtab", frame.prevTab);
-
-        Set<AWTKeyStroke> keys = new HashSet<>(
-                textComponent.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
-        textComponent.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-        keys = new HashSet<>(textComponent
-                .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
-        textComponent.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-
-        textComponent.addFocusListener(new EntryEditor.FieldListener());
-        */
     }
 
     private void storeSource() {

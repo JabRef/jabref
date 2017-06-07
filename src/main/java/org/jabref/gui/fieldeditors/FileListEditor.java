@@ -318,7 +318,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                 tableModel.removeEntry(rows[i]);
             }
         }
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         adjustColumnWidth();
     }
 
@@ -337,7 +337,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         FileListEntry entry = tableModel.getEntry(sel[0]);
         tableModel.removeEntry(sel[0]);
         tableModel.addEntry(toIdx, entry);
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         setRowSelectionInterval(toIdx, toIdx);
         adjustColumnWidth();
     }
@@ -359,7 +359,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         if (editor.okPressed()) {
             tableModel.fireTableDataChanged();
         }
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         adjustColumnWidth();
         return editor.okPressed();
     }
@@ -373,7 +373,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     @Override
     public void downloadComplete(FileListEntry file) {
         tableModel.addEntry(0, file);
-        entryEditor.updateField(this);
+        //entryEditor.updateField(this);
         adjustColumnWidth();
     }
 

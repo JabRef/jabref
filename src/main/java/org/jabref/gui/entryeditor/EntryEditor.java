@@ -38,6 +38,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -78,8 +79,6 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -127,20 +126,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
     /**
-     * The action concerned with storing a field value.
-     */
-    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
-
-    /**
-     * The action for switching to the next tab
-     */
-    private final SwitchLeftAction switchLeftAction = new SwitchLeftAction();
-    /**
-     * The action for switching to the previous tab
-     */
-    private final SwitchRightAction switchRightAction = new SwitchRightAction();
-
-    /**
      * The action which generates a BibTeX key for this entry.
      */
     private final GenerateKeyAction generateKeyAction = new GenerateKeyAction();
@@ -159,8 +144,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Indicates that we are about to go to the next or previous entry
      */
     private boolean movingToDifferentEntry;
-
-    private Action saveDatabaseAction;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
@@ -188,7 +171,37 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 activeTab.notifyAboutFocus();
             }
         });
+
+        setupKeyBindings();
     }
+
+    /**
+     * Set-up key bindings specific for the entry editor.
+     */
+    private void setupKeyBindings() {
+        tabbed.addEventFilter(KeyEvent.ANY, event -> {
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case ENTRY_EDITOR_NEXT_PANEL:
+                    case ENTRY_EDITOR_NEXT_PANEL_2:
+                        tabbed.getSelectionModel().selectNext();
+                        event.consume();
+                        break;
+                    case ENTRY_EDITOR_PREVIOUS_PANEL:
+                    case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                        tabbed.getSelectionModel().selectPrevious();
+                        event.consume();
+                        break;
+                    case HELP:
+                        helpAction.actionPerformed(null);
+                        event.consume();
+                        break;
+                }
+            }
+        });
+    }
+
 
     private void addTabs() {
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
@@ -231,6 +244,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 tabbed.getTabs().add(tab);
             }
         }
+        tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.getSelectionModel().select(sourceTab);
@@ -269,8 +283,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", storeFieldAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
@@ -355,9 +367,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
      * added to the field editor, even if no component is returned.
      *
-     * @param editor Field editor
      * @return Component to show, or null if none.
      */
+    /*
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
@@ -369,6 +381,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
         return Optional.empty();
     }
+    */
 
     void addSearchListener(SearchQueryHighlightListener listener) {
         // TODO: Highlight search text in entry editors
@@ -432,10 +445,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    public void updateField(final Object sourceObject) {
-        storeFieldAction.actionPerformed(new ActionEvent(sourceObject, 0, ""));
-    }
-
     public void setMovingToDifferentEntry() {
         movingToDifferentEntry = true;
         unregisterListeners();
@@ -443,38 +452,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void unregisterListeners() {
         removeSearchListeners();
-    }
-
-    public GenerateKeyAction getGenerateKeyAction() {
-        return generateKeyAction;
-    }
-
-    public AbstractAction getPrevEntryAction() {
-        return prevEntryAction;
-    }
-
-    public AbstractAction getNextEntryAction() {
-        return nextEntryAction;
-    }
-
-    public StoreFieldAction getStoreFieldAction() {
-        return storeFieldAction;
-    }
-
-    public SwitchLeftAction getSwitchLeftAction() {
-        return switchLeftAction;
-    }
-
-    public SwitchRightAction getSwitchRightAction() {
-        return switchRightAction;
-    }
-
-    public HelpAction getHelpAction() {
-        return helpAction;
-    }
-
-    public Action getSaveDatabaseAction() {
-        return saveDatabaseAction;
     }
 
     private void showChangeEntryTypePopupMenu() {
@@ -751,32 +728,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     panel.getMainTable().ensureVisible(entry);
                 });
             }
-        }
-    }
-
-    private class SwitchLeftAction extends AbstractAction {
-
-        private SwitchLeftAction() {
-            super("Switch to the panel to the left");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            tabbed.getSelectionModel().selectPrevious();
-            requestFocus();
-        }
-    }
-
-    private class SwitchRightAction extends AbstractAction {
-
-        private SwitchRightAction() {
-            super("Switch to the panel to the right");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            tabbed.getSelectionModel().selectNext();
-            requestFocus();
         }
     }
 
