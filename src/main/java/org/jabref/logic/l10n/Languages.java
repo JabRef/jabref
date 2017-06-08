@@ -14,23 +14,24 @@ public class Languages {
         LANGUAGES = new TreeMap<>();
 
         // LANGUAGES contains mappings for supported languages.
+        LANGUAGES.put("Bahasa Indonesia", "in");
+        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
         LANGUAGES.put("Dansk", "da");
         LANGUAGES.put("Deutsch", "de");
         LANGUAGES.put("English", "en");
         LANGUAGES.put("Español", "es");
-        LANGUAGES.put("Persian (فارسی)", "fa");
         LANGUAGES.put("Français", "fr");
-        LANGUAGES.put("Bahasa Indonesia", "in");
         LANGUAGES.put("Italiano", "it");
         LANGUAGES.put("Japanese", "ja");
         LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
-        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
+        LANGUAGES.put("Persian (فارسی)", "fa");
         LANGUAGES.put("Russian", "ru");
+        LANGUAGES.put("Simplified Chinese", "zh");
         LANGUAGES.put("Svenska", "sv");
         LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Vietnamese", "vi");
-        LANGUAGES.put("Simplified Chinese", "zh");
+        LANGUAGES.put("ελληνικά", "el");
     }
 
     private Languages() {
