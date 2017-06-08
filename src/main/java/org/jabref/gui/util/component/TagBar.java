@@ -1,6 +1,7 @@
 package org.jabref.gui.util.component;
 
 import java.util.Collection;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -11,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 
@@ -26,6 +28,7 @@ public class TagBar<T> extends HBox {
     private StringConverter<T> stringConverter;
     @FXML private TextField inputTextField;
     @FXML private HBox tagList;
+    private BiConsumer<T, MouseEvent> onTagClicked;
 
     public TagBar() {
         tags = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -62,6 +65,9 @@ public class TagBar<T> extends HBox {
         Tag<T> tag = new Tag<>(stringConverter::toString);
         tag.setOnTagRemoved(tags::remove);
         tag.setValue(item);
+        if (onTagClicked != null) {
+            tag.setOnMouseClicked(event -> onTagClicked.accept(item, event));
+        }
         return tag;
     }
 
@@ -79,5 +85,9 @@ public class TagBar<T> extends HBox {
 
     public void setStringConverter(StringConverter<T> stringConverter) {
         this.stringConverter = stringConverter;
+    }
+
+    public void setOnTagClicked(BiConsumer<T, MouseEvent> onTagClicked) {
+        this.onTagClicked = onTagClicked;
     }
 }

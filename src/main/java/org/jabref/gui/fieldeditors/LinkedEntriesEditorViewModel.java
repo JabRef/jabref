@@ -45,4 +45,11 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
             }
         };
     }
+
+    public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
+        // TODO: Implement jump to entry
+        //parsedEntryLink.getLinkedEntry().ifPresent(
+        //        e -> frame.getCurrentBasePanel().highlightEntry(e)
+        //);
+    }
 }
