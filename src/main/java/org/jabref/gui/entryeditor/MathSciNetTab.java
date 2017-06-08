@@ -1,22 +1,27 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Objects;
+import java.util.Optional;
 
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.MathSciNetId;
 
-public class MathSciNetPaneView {
+public class MathSciNetTab extends EntryEditorTab {
 
-    private MathSciNetId mathSciNetId;
+    private Optional<MathSciNetId> mathSciNetId;
 
-    public MathSciNetPaneView(MathSciNetId mathSciNetId) {
-        this.mathSciNetId = Objects.requireNonNull(mathSciNetId);
+    public MathSciNetTab(BibEntry entry) {
+        this.mathSciNetId = entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse);
+
+        setText(Localization.lang("MathSciNet Review"));
     }
 
-    StackPane getPane() {
+    private StackPane getPane() {
         StackPane root = new StackPane();
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
@@ -28,7 +33,8 @@ public class MathSciNetPaneView {
 
         root.getChildren().addAll(browser, progress);
 
-        mathSciNetId.getExternalURI().ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
+        mathSciNetId.flatMap(MathSciNetId::getExternalURI)
+                .ifPresent(url -> browser.getEngine().load(url.toASCIIString()));
 
         // Hide progress indicator if finished (over 70% loaded)
         browser.getEngine().getLoadWorker().progressProperty().addListener((observable, oldValue, newValue) -> {
@@ -37,5 +43,15 @@ public class MathSciNetPaneView {
             }
         });
         return root;
+    }
+
+    @Override
+    public boolean shouldShow() {
+        return mathSciNetId.isPresent();
+    }
+
+    @Override
+    protected void initialize() {
+        setContent(getPane());
     }
 }

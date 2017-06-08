@@ -256,8 +256,16 @@ public class PreferencesDialog extends JabRefDialog {
         MainTable.updateRenderers();
         GUIGlobals.updateEntryEditorColors();
         frame.setupAllTables();
-        frame.getGroupSelector().revalidateGroups(); // icons may have changed
         frame.output(Localization.lang("Preferences recorded."));
+    }
+
+    public void setValues() {
+        // Update all field values in the tabs:
+        int count = main.getComponentCount();
+        Component[] comps = main.getComponents();
+        for (int i = 0; i < count; i++) {
+            ((PrefsTab) comps[i]).setValues();
+        }
     }
 
     class OkAction extends AbstractAction {
@@ -300,15 +308,6 @@ public class PreferencesDialog extends JabRefDialog {
                             Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
                 }
             });
-        }
-    }
-
-    public void setValues() {
-        // Update all field values in the tabs:
-        int count = main.getComponentCount();
-        Component[] comps = main.getComponents();
-        for (int i = 0; i < count; i++) {
-            ((PrefsTab) comps[i]).setValues();
         }
     }
 

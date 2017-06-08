@@ -1,32 +1,23 @@
 package org.jabref.gui.entryeditor;
 
-import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -39,22 +30,15 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.JTextComponent;
 
-import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
@@ -67,52 +51,39 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.contentselector.FieldContentSelector;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
-import org.jabref.gui.fieldeditors.FieldEditorFocusListener;
-import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
 import org.jabref.gui.mergeentries.EntryFetchAndMergeWorker;
-import org.jabref.gui.specialfields.SpecialFieldUpdateListener;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.autocompleter.AutoCompleter;
-import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.identifier.MathSciNetId;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
@@ -155,74 +126,29 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final AbstractAction prevEntryAction = new PrevEntryAction();
 
     /**
-     * The action concerned with storing a field value.
-     */
-    private final StoreFieldAction storeFieldAction = new StoreFieldAction();
-
-    /**
-     * The action for switching to the next tab
-     */
-    private final SwitchLeftAction switchLeftAction = new SwitchLeftAction();
-    /**
-     * The action for switching to the previous tab
-     */
-    private final SwitchRightAction switchRightAction = new SwitchRightAction();
-
-    /**
      * The action which generates a BibTeX key for this entry.
      */
     private final GenerateKeyAction generateKeyAction = new GenerateKeyAction();
     private final AutoLinkAction autoLinkAction = new AutoLinkAction();
     private final AbstractAction writeXmp;
-    private final JPanel srcPanel = new JPanel();
-    private final JPanel relatedArticlePanel = new JPanel();
-    private final JTabbedPane tabbed = new JTabbedPane();
+    private final TabPane tabbed = new TabPane();
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
-    private final List<Object> tabs = new ArrayList<>();
     private final HelpAction helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
-    private final TabListener tabListener = new TabListener();
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
-    private EntryEditorTabRelatedArticles relatedArticlesTab;
-    private JTextArea source;
-    private FileAnnotationTab fileAnnotationTab;
-    /**
-     * This can be set to false to stop the source text area from getting updated. This is used in cases where the
-     * source couldn't be parsed, and the user is given the option to edit it.
-     */
-    private boolean updateSource = true;
+
     /**
      * Indicates that we are about to go to the next or previous entry
      */
     private boolean movingToDifferentEntry;
-    private boolean validEntry = true;
-    private boolean lastFieldAccepted = true;
-    /**
-     * This indicates whether the last attempt at parsing the source was successful. It is used to determine whether
-     * the dialog should close; it should stay open if the user received an error message about the source,
-     * whatever he or she chose to do about it.
-     */
-    private boolean lastSourceAccepted = true;
-    /**
-     * This is used to prevent double updates after editing source.
-     */
-    private String lastSourceStringAccepted;
-    /**
-     * The index the source panel has in tabbed.
-     */
-    private int sourceIndex = -1;
-    private Action saveDatabaseAction;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
         this.entry = Objects.requireNonNull(entry);
-
-        entry.registerListener(this);
-        entry.registerListener(SpecialFieldUpdateListener.getInstance());
 
         displayedBibEntryType = entry.getType();
 
@@ -231,216 +157,98 @@ public class EntryEditor extends JPanel implements EntryContainer {
         BorderLayout borderLayout = new BorderLayout();
         setLayout(borderLayout);
         setupToolBar();
-        setupFieldPanels();
-        setupSourcePanel();
-        add(tabbed, BorderLayout.CENTER);
-        tabbed.addChangeListener(tabListener);
-        if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
-            tabbed.setSelectedIndex(sourceIndex);
-        }
 
-        updateAllFields();
+        JFXPanel container = new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            addTabs();
+            container.setScene(new Scene(tabbed));
+        });
+        add(container, BorderLayout.CENTER);
+
+        EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
+            EntryEditorTab activeTab = (EntryEditorTab) tab;
+            if (activeTab != null) {
+                activeTab.notifyAboutFocus();
+            }
+        });
+
+        setupKeyBindings();
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
-
-        return stringWriter.getBuffer().toString();
-    }
-
-    private void setupFieldPanels() {
-        tabbed.removeAll();
-        tabs.clear();
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
-                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-
-        // required fields
-        addRequiredTab(type);
-
-        // optional fields
-        Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-        Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
-
-        if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
-            if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-                addOptionalTab(type);
-            } else {
-                addOptionalTab(type);
-
-                deprecatedFields.add(FieldName.YEAR);
-                deprecatedFields.add(FieldName.MONTH);
-                List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
-                List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(secondaryOptionalFields);
-                optionalFieldsNotPrimaryOrDeprecated.removeAll(deprecatedFields);
-
-                // Get list of all optional fields of this entry and their aliases
-                Set<String> optionalFieldsAndAliases = new HashSet<>();
-                for (String field : type.getOptionalFields()) {
-                    optionalFieldsAndAliases.add(field);
-                    if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field)) {
-                        optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field));
-                    }
-                }
-
-                // Get all optional fields which are deprecated
-                usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
-
-                // Get other deprecated fields
-                usedOptionalFieldsDeprecated.add(FieldName.MONTH);
-
-                // Add tabs
-                EntryEditorTab optPan2 = new EntryEditorTab(frame, panel, optionalFieldsNotPrimaryOrDeprecated, this,
-                        false, true, Localization.lang("Optional fields 2"), entry);
-                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
-                        optPan2.getPane(), Localization.lang("Show optional fields"));
-                tabs.add(optPan2);
-
-                if (!usedOptionalFieldsDeprecated.isEmpty()) {
-                    EntryEditorTab optPan3;
-                    optPan3 = new EntryEditorTab(frame, panel, new ArrayList<>(usedOptionalFieldsDeprecated), this,
-                            false, true, Localization.lang("Deprecated fields"), entry);
-                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
-                            optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
-                    tabs.add(optPan3);
+    /**
+     * Set-up key bindings specific for the entry editor.
+     */
+    private void setupKeyBindings() {
+        tabbed.addEventFilter(KeyEvent.ANY, event -> {
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case ENTRY_EDITOR_NEXT_PANEL:
+                    case ENTRY_EDITOR_NEXT_PANEL_2:
+                        tabbed.getSelectionModel().selectNext();
+                        event.consume();
+                        break;
+                    case ENTRY_EDITOR_PREVIOUS_PANEL:
+                    case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                        tabbed.getSelectionModel().selectPrevious();
+                        event.consume();
+                        break;
+                    case HELP:
+                        helpAction.actionPerformed(null);
+                        event.consume();
+                        break;
+                    default:
+                        // Pass other keys to children
                 }
             }
-        }
-
-        // other fields
-        List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
-                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-        if (!usedOptionalFieldsDeprecated.isEmpty()) {
-            otherFields.removeAll(usedOptionalFieldsDeprecated);
-        }
-        otherFields.remove(BibEntry.KEY_FIELD);
-        otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
-
-        if (!otherFields.isEmpty()) {
-            addOtherTab(otherFields);
-        }
-
-        // general fields from preferences
-        addGeneralTabs();
-
-        // special tabs (like MathSciNet Reviews)
-        addSpecialTabs();
-
-        // pdf annotations tab
-        addPDFAnnotationTab();
-
-        //related articles
-        if (Globals.prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS)) {
-            addRelatedArticlesTab();
-        }
-
-        // source tab
-        addSourceTab();
-    }
-
-    private void addGeneralTabs() {
-        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
-                    false, tabList.getTabName(i), entry);
-            tabbed.addTab(tabList.getTabName(i), newTab.getPane());
-            tabs.add(newTab);
-        }
-    }
-
-    private void addSpecialTabs() {
-
-        // MathSciNet Review
-        entry.getField(FieldName.MR_NUMBER).flatMap(MathSciNetId::parse).ifPresent(mrNumber -> {
-            JFXPanel reviewPane = new JFXPanel();
-            tabbed.addTab(Localization.lang("MathSciNet Review"), reviewPane);
-            tabs.add(reviewPane);
-
-            // Execute on JavaFX Application Thread
-            Platform.runLater(() -> {
-                StackPane root = new MathSciNetPaneView(mrNumber).getPane();
-                reviewPane.setScene(new Scene(root));
-            });
         });
     }
 
-    private void addSourceTab() {
-        String panelName = Localization.lang("%0 source", panel.getBibDatabaseContext().getMode().getFormattedName());
-        String toolTip = Localization.lang("Show/edit %0 source",
-                panel.getBibDatabaseContext().getMode().getFormattedName());
-        srcPanel.setName(panelName);
-        tabbed.addTab(panelName, IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel, toolTip);
-        tabs.add(srcPanel);
-        sourceIndex = tabs.size() - 1;
-        srcPanel.setFocusCycleRoot(true);
-    }
+    private void addTabs() {
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
+                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
-    private void addOtherTab(List<String> otherFields) {
-        EntryEditorTab otherPanel = new EntryEditorTab(frame, panel, otherFields, this,
-                false, false, Localization.lang("Other fields"), entry);
-        tabbed.addTab(Localization.lang("Other fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), otherPanel
-                .getPane(), Localization.lang("Show remaining fields"));
-        tabs.add(otherPanel);
-    }
+        List<EntryEditorTab> tabs = new ArrayList<>();
 
-    private List<String> addRequiredTab(EntryType type) {
-        List<String> requiredFields = type.getRequiredFieldsFlat();
+        // Required fields
+        tabs.add(new RequiredFieldsTab(frame, panel, type, this, entry));
 
-        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false,
-                Localization.lang("Required fields"), entry);
-        tabbed.addTab(Localization.lang("Required fields"), IconTheme.JabRefIcon.REQUIRED.getSmallIcon(), requiredPanel
-                .getPane(), Localization.lang("Show required fields"));
-        tabs.add(requiredPanel);
-        return requiredFields;
-    }
+        // Optional fields
+        tabs.add(new OptionalFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new OptionalFields2Tab(frame, panel, type, this, entry));
+        tabs.add(new DeprecatedFieldsTab(frame, panel, type, this, entry));
 
-    /**
-     * Creates the related Article Tab
-     */
-    private void addRelatedArticlesTab() {
-        relatedArticlePanel.setName(Localization.lang("Related articles"));
-        relatedArticlePanel.setLayout(new BorderLayout());
+        // Other fields
+        tabs.add(new OtherFieldsTab(frame, panel, type, this, entry));
 
-        relatedArticlesTab = new EntryEditorTabRelatedArticles(entry);
+        // General fields from preferences
+        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+        for (int i = 0; i < tabList.getTabCount(); i++) {
+            FieldsEditorTab newFieldsEditorTab = new FieldsEditorTab(frame, panel, tabList.getTabFields(i), this, false,
+                    false, entry);
+            newFieldsEditorTab.setText(tabList.getTabName(i));
+            tabs.add(newFieldsEditorTab);
+        }
 
-        JScrollPane relatedArticleScrollPane = new JScrollPane(relatedArticlesTab,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        // Special tabs
+        tabs.add(new MathSciNetTab(entry));
+        tabs.add(new FileAnnotationTab(entry, this, panel.getAnnotationCache()));
+        tabs.add(new RelatedArticlesTab(entry));
 
-        relatedArticlePanel.add(relatedArticleScrollPane, BorderLayout.CENTER);
+        // Source tab
+        SourceTab sourceTab = new SourceTab(panel.getBibDatabaseContext().getMode(), entry);
+        tabs.add(sourceTab);
 
-        tabbed.addTab(Localization.lang("Related articles"), IconTheme.getImage("mdl"),
-                relatedArticlePanel,
-                Localization.lang("Related articles"));
-        tabs.add(relatedArticlePanel);
-        relatedArticlePanel.setFocusCycleRoot(true);
-    }
+        tabbed.getTabs().clear();
+        for (EntryEditorTab tab : tabs) {
+            if (tab.shouldShow()) {
+                tabbed.getTabs().add(tab);
+            }
+        }
+        tabbed.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
-    private void addOptionalTab(EntryType type) {
-        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
-                false, true, Localization.lang("Optional fields"), entry);
-        tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
-                optionalPanel.getPane(), Localization.lang("Show optional fields"));
-        tabs.add(optionalPanel);
-    }
-
-    /**
-     * Add a tab for displaying comments from a PDF
-     */
-    private void addPDFAnnotationTab() {
-        tabbed.remove(fileAnnotationTab);
-        tabs.remove(fileAnnotationTab);
-        Optional<String> field = entry.getField(FieldName.FILE);
-        if (field.isPresent()) {
-            fileAnnotationTab = new FileAnnotationTab(this, panel.getAnnotationCache());
-            tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), fileAnnotationTab,
-
-                    Localization.lang("Show file annotations"));
-            tabs.add(fileAnnotationTab);
+        if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
+            tabbed.getSelectionModel().select(sourceTab);
         }
     }
 
@@ -476,8 +284,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_ENTRY_EDITOR), "close");
         actionMap.put("close", closeAction);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", storeFieldAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOGENERATE_BIBTEX_KEYS), "generateKey");
         actionMap.put("generateKey", generateKeyAction);
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.AUTOMATICALLY_LINK_FILES), "autoLink");
@@ -557,29 +363,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     /**
-     * Rebuild the field tabs. This is called e.g. when a new content selector
-     * has been added.
-     */
-    public void rebuildPanels() {
-        // Remove change listener, because the rebuilding causes meaningless
-        // events and trouble:
-        tabbed.removeChangeListener(tabListener);
-        setupFieldPanels();
-        // Add the change listener again:
-        tabbed.addChangeListener(tabListener);
-        revalidate();
-        repaint();
-    }
-
-    /**
      * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
      * If the name has an entry, the proper component to be shown is created and
      * returned. Otherwise, null is returned. In addition, e.g. listeners can be
      * added to the field editor, even if no component is returned.
      *
-     * @param editor Field editor
      * @return Component to show, or null if none.
      */
+    /*
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
@@ -591,28 +382,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
         return Optional.empty();
     }
-
-    private void setupSourcePanel() {
-        source = new JTextAreaWithHighlighting();
-        addSearchListener((SearchQueryHighlightListener) source);
-
-        source.setEditable(true);
-        source.setLineWrap(true);
-        source.addFocusListener(new FieldEditorFocusListener());
-        // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        source.addFocusListener(Globals.getFocusListener());
-        source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
-        setupJTextComponent(source);
-        updateSource();
-
-        JScrollPane scrollPane = new JScrollPane(source, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        srcPanel.setLayout(new BorderLayout());
-        srcPanel.add(scrollPane, BorderLayout.CENTER);
-    }
+    */
 
     void addSearchListener(SearchQueryHighlightListener listener) {
+        // TODO: Highlight search text in entry editors
         searchListeners.add(listener);
         panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(listener);
     }
@@ -623,85 +396,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    public void updateSource() {
-        if (updateSource) {
-
-            try {
-                String srcString = getSourceString(entry, panel.getBibDatabaseContext().getMode());
-                source.setText(srcString);
-                lastSourceStringAccepted = srcString;
-
-                // Set the current Entry to be selected.
-                // Fixes the bug of losing selection after, e.g. an autogeneration of a BibTeX key.
-                // This is also important for the "select all"-action (else it will always select the first entry except it is already)
-                SwingUtilities.invokeLater(() -> {
-                    panel.getMainTable().ensureVisible(entry);
-                });
-            } catch (IOException ex) {
-                source.setText(ex.getMessage() + "\n\n" +
-                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                source.setEditable(false);
-                LOGGER.debug("Incorrect entry", ex);
-            }
-        }
-    }
-
-    /**
-     * NOTE: This method is only used for the source panel, not for the
-     * other tabs. Look at EntryEditorTab for the setup of text components
-     * in the other tabs.
-     */
-    private void setupJTextComponent(JTextComponent textComponent) {
-        // Set up key bindings and focus listener for the FieldEditor.
-        InputMap inputMap = textComponent.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap actionMap = textComponent.getActionMap();
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_STORE_FIELD), "store");
-        actionMap.put("store", storeFieldAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL), "right");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_NEXT_PANEL_2), "right");
-        actionMap.put("right", switchRightAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL), "left");
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.ENTRY_EDITOR_PREVIOUS_PANEL_2), "left");
-        actionMap.put("left", switchLeftAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
-        actionMap.put("help", helpAction);
-
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
-        actionMap.put("nexttab", frame.nextTab);
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_TAB), "prevtab");
-        actionMap.put("prevtab", frame.prevTab);
-
-        Set<AWTKeyStroke> keys = new HashSet<>(
-                textComponent.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(AWTKeyStroke.getAWTKeyStroke("pressed TAB"));
-        textComponent.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, keys);
-        keys = new HashSet<>(textComponent
-                .getFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS));
-        keys.clear();
-        keys.add(KeyStroke.getKeyStroke("shift pressed TAB"));
-        textComponent.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, keys);
-
-        textComponent.addFocusListener(new FieldListener());
-    }
-
     @Override
     public void requestFocus() {
-        activateVisible();
-    }
-
-    private void activateVisible() {
-        Object activeTab = tabs.get(tabbed.getSelectedIndex());
-        if (activeTab instanceof EntryEditorTab) {
-            ((EntryEditorTab) activeTab).focus();
-        } else if (activeTab instanceof FileAnnotationTab) {
-            ((FileAnnotationTab) activeTab).requestFocus();
-        } else {
-            source.requestFocus();
+        EntryEditorTab activeTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
+        if (activeTab != null) {
+            activeTab.requestFocus();
         }
     }
 
@@ -710,202 +409,31 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     @Override
     public boolean isEnabled() {
-        return source.isEnabled();
+        return true;
     }
 
     /**
-     * Sets the enabled status of all text fields of the entry editor.
+     * Returns the name of the currently selected tab.
      */
-    @Override
-    public void setEnabled(boolean enabled) {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEnabled(enabled);
-            }
-        }
-        source.setEnabled(enabled);
+    public String getVisibleTabName() {
+        return tabbed.getSelectionModel().getSelectedItem().getText();
     }
 
-    /**
-     * Makes sure the current edit is stored.
-     */
-    public void storeCurrentEdit() {
-        Component comp = Globals.getFocusListener().getFocused();
-        if (Objects.equals(comp, source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
-            if (comp instanceof FieldEditor) {
-                ((FieldEditor) comp).clearAutoCompleteSuggestion();
+    public void setVisibleTab(String name) {
+        for (Tab tab : tabbed.getTabs()) {
+            if (tab.getText().equals(name)) {
+                tabbed.getSelectionModel().select(tab);
             }
-            storeFieldAction.actionPerformed(new ActionEvent(comp, 0, ""));
-        }
-    }
-
-    /**
-     * Returns the name of the currently selected component.
-     */
-    public String getVisiblePanelName() {
-        return tabbed.getSelectedComponent().getName();
-    }
-
-    public void setVisiblePanel(String name) {
-        for (int i = 0; i < tabbed.getTabCount(); ++i) {
-            if ((tabbed.getComponent(i).getName() != null) && tabbed.getComponent(i).getName().equals(name)) {
-                tabbed.setSelectedIndex(i);
-                return;
-            }
-        }
-        if (tabbed.getTabCount() > 0) {
-            tabbed.setSelectedIndex(0);
         }
     }
 
     public void setFocusToField(String fieldName) {
-        for (Object tab : tabs) {
-            if ((tab instanceof EntryEditorTab) && ((EntryEditorTab) tab).getFields().contains(fieldName)) {
-                EntryEditorTab entryEditorTab = (EntryEditorTab) tab;
-                setVisiblePanel(entryEditorTab.getTabTitle());
-                entryEditorTab.setActive(fieldName);
-                entryEditorTab.focus();
-            }
-        }
-    }
-
-    private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
-        try {
-            ParserResult parserResult = bibtexParser.parse(new StringReader(source.getText()));
-            BibDatabase database = parserResult.getDatabase();
-
-            if (database.getEntryCount() > 1) {
-                throw new IllegalStateException("More than one entry found.");
-            }
-
-            if (!database.hasEntries()) {
-                if (parserResult.hasWarnings()) {
-                    // put the warning into as exception text -> it will be displayed to the user
-                    throw new IllegalStateException(parserResult.warnings().get(0));
-                } else {
-                    throw new IllegalStateException("No entries found.");
-                }
-            }
-
-            NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
-            BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKeyOptional().orElse(null);
-            boolean entryChanged = false;
-            boolean emptyWarning = (newKey == null) || newKey.isEmpty();
-
-            if (newKey != null) {
-                entry.setCiteKey(newKey);
-            } else {
-                entry.clearCiteKey();
-            }
-
-            // First, remove fields that the user has removed.
-            for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
-                String fieldValue = field.getValue();
-
-                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
-                    compound.addEdit(
-                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
-                    entry.clearField(fieldName);
-                    entryChanged = true;
-                }
-            }
-
-            // Then set all fields that have been set by the user.
-            for (Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
-                String oldValue = entry.getField(fieldName).orElse(null);
-                String newValue = field.getValue();
-                if (!Objects.equals(oldValue, newValue)) {
-                    // Test if the field is legally set.
-                    new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
-                            .format(newValue, fieldName);
-
-                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
-                    entry.setField(fieldName, newValue);
-                    entryChanged = true;
-                }
-            }
-
-            // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), entry.getType())) {
-                compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
-                entry.setType(newEntry.getType());
-                entryChanged = true;
-            }
-            compound.end();
-
-            if (!entryChanged) {
-                return true;
-            }
-
-            panel.getUndoManager().addEdit(compound);
-
-            if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
-                warnDuplicateBibtexkey();
-            } else if (emptyWarning) {
-                warnEmptyBibtexkey();
-            } else {
-                panel.output(Localization.lang("Stored entry") + '.');
-            }
-
-            lastSourceStringAccepted = source.getText();
-            // Update UI
-            // TODO: we need to repaint the entryeditor if fields that are not displayed have been added
-            panel.updateEntryEditorIfShowing();
-            lastSourceAccepted = true;
-            updateSource = true;
-            // TODO: does updating work properly after source stored?
-            panel.markBaseChanged();
-
-            panel.highlightEntry(entry);
-
-            return true;
-        } catch (InvalidFieldValueException | IOException ex) {
-            // The source couldn't be parsed, so the user is given an
-            // error message, and the choice to keep or revert the contents
-            // of the source text field.
-            updateSource = false;
-            lastSourceAccepted = false;
-            tabbed.setSelectedComponent(srcPanel);
-
-            Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
-
-            if (!SwingUtilities.isEventDispatchThread()) {
-                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
-
-                if (answer != 0) {
-                    updateSource = true;
-                    lastSourceAccepted = true;
-                    updateSource();
-                }
-            }
-
-            LOGGER.debug("Incorrect source", ex);
-
-            return false;
-        }
-    }
-
-    private void setField(String fieldName, String newFieldData) {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).updateField(fieldName, newFieldData);
-            }
-        }
-    }
-
-    /**
-     * Sets all the text areas according to the shown entry.
-     */
-    private void updateAllFields() {
-        for (Object tab : tabs) {
-            if (tab instanceof EntryEditorTab) {
-                ((EntryEditorTab) tab).setEntry(entry);
+        for (Tab tab : tabbed.getTabs()) {
+            if ((tab instanceof FieldsEditorTab) && ((FieldsEditorTab) tab).getFields().contains(fieldName)) {
+                FieldsEditorTab fieldsEditorTab = (FieldsEditorTab) tab;
+                tabbed.getSelectionModel().select(tab);
+                fieldsEditorTab.setActive(fieldName);
+                fieldsEditorTab.focus();
             }
         }
     }
@@ -918,88 +446,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    /**
-     * Update the JTextArea when a field has changed.
-     */
-    @Subscribe
-    @SuppressWarnings("unused")
-    public void listen(FieldChangedEvent fieldChangedEvent) {
-        String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
-        if (SwingUtilities.isEventDispatchThread()) {
-            setField(fieldChangedEvent.getFieldName(), newValue);
-        } else {
-            SwingUtilities.invokeLater(() -> setField(fieldChangedEvent.getFieldName(), newValue));
-        }
-    }
-
-    public void updateField(final Object sourceObject) {
-        storeFieldAction.actionPerformed(new ActionEvent(sourceObject, 0, ""));
-    }
-
     public void setMovingToDifferentEntry() {
         movingToDifferentEntry = true;
         unregisterListeners();
     }
 
     private void unregisterListeners() {
-        entry.unregisterListener(this);
         removeSearchListeners();
-    }
-
-    public GenerateKeyAction getGenerateKeyAction() {
-        return generateKeyAction;
-    }
-
-    public AbstractAction getPrevEntryAction() {
-        return prevEntryAction;
-    }
-
-    public AbstractAction getNextEntryAction() {
-        return nextEntryAction;
-    }
-
-    public StoreFieldAction getStoreFieldAction() {
-        return storeFieldAction;
-    }
-
-    public SwitchLeftAction getSwitchLeftAction() {
-        return switchLeftAction;
-    }
-
-    public SwitchRightAction getSwitchRightAction() {
-        return switchRightAction;
-    }
-
-    public HelpAction getHelpAction() {
-        return helpAction;
-    }
-
-    public Action getSaveDatabaseAction() {
-        return saveDatabaseAction;
     }
 
     private void showChangeEntryTypePopupMenu() {
         JPopupMenu typeMenu = new ChangeEntryTypeMenu().getChangeentryTypePopupMenu(panel);
         typeMenu.show(this, 0, 0);
-    }
-
-    public void close() {
-        if (tabbed.getSelectedComponent() == srcPanel) {
-            updateField(source);
-            if (lastSourceAccepted) {
-                panel.entryEditorClosing(EntryEditor.this);
-            } else {
-                panel.runCommand(Actions.SAVE);
-                lastSourceAccepted = true;
-            }
-        } else {
-            if (lastFieldAccepted) {
-                panel.entryEditorClosing(EntryEditor.this);
-            } else {
-                panel.runCommand(Actions.SAVE);
-                lastFieldAccepted = true;
-            }
-        }
     }
 
     private void warnDuplicateBibtexkey() {
@@ -1074,47 +532,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
-    /**
-     * Focus listener that fires the storeFieldAction when a TextArea loses focus.
-     */
-    private class FieldListener extends FocusAdapter {
-
-        @Override
-        public void focusLost(FocusEvent event) {
-            if (!event.isTemporary()) {
-                updateField(event.getSource());
-            }
-        }
-    }
-
-    private class TabListener implements ChangeListener {
-
-        @Override
-        public void stateChanged(ChangeEvent event) {
-            // We tell the editor tab to update all its fields. This makes sure they are updated even if the tab we
-            // just left contained one or more of the same fields as this one:
-            SwingUtilities.invokeLater(() -> {
-                Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                if ((activeTab instanceof FileAnnotationTab) && !((FileAnnotationTab) activeTab).isInitialized()) {
-                    //Initialize by getting notes from cache if they are cached
-
-                    FileAnnotationTab tab = (FileAnnotationTab) activeTab;
-                    tab.initializeTab(tab);
-                }
-
-                if (activeTab instanceof EntryEditorTab) {
-                    ((EntryEditorTab) activeTab).updateAll();
-                    activateVisible();
-                }
-
-                // When the tab "Related articles" gets selected, the request to get the recommendations is started.
-                if (activeTab == relatedArticlePanel) {
-                    relatedArticlesTab.focus();
-                }
-            });
-        }
-    }
-
     private class DeleteAction extends AbstractAction {
         private DeleteAction() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
@@ -1147,7 +564,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            close();
+            panel.entryEditorClosing(EntryEditor.this);
         }
     }
 
@@ -1183,7 +600,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
-                    lastFieldAccepted = false;
                     textField.setInvalidBackgroundColor();
                     if (!SwingUtilities.isEventDispatchThread()) {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
@@ -1223,7 +639,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (textField.hasFocus()) {
                     textField.setActiveBackgroundColor();
                 }
-                updateSource();
+
                 panel.markBaseChanged();
             } else if (event.getSource() instanceof FieldEditor) {
                 String toSet = null;
@@ -1288,10 +704,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         } else {
                             panel.getUndoManager().addEdit(undoableFieldChange);
                         }
-                        updateSource();
+
                         panel.markBaseChanged();
                     } catch (InvalidFieldValueException ex) {
-                        lastFieldAccepted = false;
                         fieldEditor.setInvalidBackgroundColor();
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
@@ -1304,8 +719,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (fieldEditor.hasFocus()) {
                     fieldEditor.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
                 }
-            } else if (source.isEditable() && !source.getText().equals(lastSourceStringAccepted)) {
-                validEntry = storeSource();
             }
 
             // Make sure we scroll to the entry if it moved in the table.
@@ -1316,35 +729,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     panel.getMainTable().ensureVisible(entry);
                 });
             }
-        }
-    }
-
-    private class SwitchLeftAction extends AbstractAction {
-
-        private SwitchLeftAction() {
-            super("Switch to the panel to the left");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int i = tabbed.getSelectedIndex();
-            tabbed.setSelectedIndex(i > 0 ? i - 1 : tabbed.getTabCount() - 1);
-
-            activateVisible();
-        }
-    }
-
-    private class SwitchRightAction extends AbstractAction {
-
-        private SwitchRightAction() {
-            super("Switch to the panel to the right");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int i = tabbed.getSelectedIndex();
-            tabbed.setSelectedIndex(i < (tabbed.getTabCount() - 1) ? i + 1 : 0);
-            activateVisible();
         }
     }
 
@@ -1389,9 +773,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // 1. get BibEntry for selected index (already have)
             // 2. update label
 
-            // Store the current edit in case this action is called during the editing of a field:
-            storeCurrentEdit();
-
             // This is a partial clone of org.jabref.gui.BasePanel.setupActions().new AbstractWorker() {...}.run()
 
             // this updates the table automatically, on close, but not within the tab
@@ -1430,8 +811,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // here we update the field
             String bibtexKeyData = entry.getCiteKeyOptional().get();
-            setField(BibEntry.KEY_FIELD, bibtexKeyData);
-            updateSource();
+            entry.setField(BibEntry.KEY_FIELD, bibtexKeyData);
             panel.markBaseChanged();
         }
     }
@@ -1458,33 +838,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
             panel.runCommand(Actions.REDO);
-        }
-    }
-
-    private class SaveDatabaseAction extends AbstractAction {
-
-        private SaveDatabaseAction() {
-            super("Save library");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Object activeTab = tabs.get(tabbed.getSelectedIndex());
-            if (activeTab instanceof EntryEditorTab) {
-                // Normal panel.
-                EntryEditorTab tab = (EntryEditorTab) activeTab;
-                // TODO: Reenable this
-                //FieldEditor fieldEditor = tab.getActive();
-                //fieldEditor.clearAutoCompleteSuggestion();
-                //updateField(fieldEditor);
-            } else {
-                // Source panel.
-                updateField(activeTab);
-            }
-
-            if (validEntry) {
-                panel.runCommand(Actions.SAVE);
-            }
         }
     }
 

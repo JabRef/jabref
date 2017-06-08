@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -37,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -69,8 +67,6 @@ import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
-import org.jabref.gui.groups.GroupSelector;
-import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -851,8 +847,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void copyTitle() {
         List<BibEntry> selectedBibEntries = mainTable.getSelectedEntries();
         if (!selectedBibEntries.isEmpty()) {
-            storeCurrentEdit();
-
             // Collect all non-null titles.
             List<String> titles = selectedBibEntries.stream()
                     .filter(bibEntry -> bibEntry.getTitle().isPresent())
@@ -881,7 +875,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void copyCiteKey() {
         List<BibEntry> bes = mainTable.getSelectedEntries();
         if (!bes.isEmpty()) {
-            storeCurrentEdit();
             List<String> keys = new ArrayList<>(bes.size());
             // Collect all non-null keys.
             for (BibEntry be : bes) {
@@ -909,7 +902,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void copyKey() {
         List<BibEntry> bes = mainTable.getSelectedEntries();
         if (!bes.isEmpty()) {
-            storeCurrentEdit();
             List<String> keys = new ArrayList<>(bes.size());
             // Collect all non-null keys.
             for (BibEntry be : bes) {
@@ -936,8 +928,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void copyKeyAndTitle() {
         List<BibEntry> bes = mainTable.getSelectedEntries();
         if (!bes.isEmpty()) {
-            storeCurrentEdit();
-
             // OK: in a future version, this string should be configurable to allow arbitrary exports
             StringReader sr = new StringReader(
                     "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
@@ -1265,7 +1255,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     break;
                 case SHOWING_EDITOR:
                 case WILL_SHOW_EDITOR:
-                    getCurrentEditor().close();
+                    entryEditorClosing(getCurrentEditor());
                     break;
                 default:
                     LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
@@ -1313,9 +1303,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
-                final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path
-                        .getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
@@ -1468,18 +1455,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         String visName = null;
         if ((getShowing() != null) && isShowingEditor()) {
-            visName = ((EntryEditor) splitPane.getBottomComponent()).getVisiblePanelName();
+            visName = ((EntryEditor) splitPane.getBottomComponent()).getVisibleTabName();
         }
 
         // We must instantiate a new editor.
         EntryEditor entryEditor = new EntryEditor(frame, BasePanel.this, be);
         if (visName != null) {
-            entryEditor.setVisiblePanel(visName);
+            entryEditor.setVisibleTab(visName);
         }
         showEntryEditor(entryEditor);
 
         newEntryShowing(be);
-        setEntryEditorEnabled(true); // Make sure it is enabled.
     }
 
     /**
@@ -1490,8 +1476,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        // We must instantiate a new editor. First make sure the old one stores its last edit:
-        storeCurrentEdit();
         // Then start the new one:
         return new EntryEditor(frame, BasePanel.this, entry);
     }
@@ -1602,24 +1586,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void updateEntryEditorIfShowing() {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
-            if (currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
-                currentEditor.updateSource();
-            } else {
+            if (!currentEditor.getDisplayedBibEntryType().equals(currentEditor.getEntry().getType())) {
                 // The entry has changed type, so we must get a new editor.
                 newEntryShowing(null);
                 final EntryEditor newEditor = getEntryEditor(currentEditor.getEntry());
                 showEntryEditor(newEditor);
             }
-        }
-    }
-
-    /**
-     * If an entry editor is showing, make sure its currently focused field stores its changes, if any.
-     */
-    public void storeCurrentEdit() {
-        if (isShowingEditor()) {
-            final EntryEditor editor = (EntryEditor) splitPane.getBottomComponent();
-            editor.storeCurrentEdit();
         }
     }
 
@@ -1653,12 +1625,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markNonUndoableBaseChanged() {
         nonUndoableChange = true;
         markBaseChanged();
-    }
-
-    public void rebuildAllEntryEditors() {
-        if (currentEditor != null) {
-            currentEditor.rebuildPanels();
-        }
     }
 
     private synchronized void markChangedOrUnChanged() {
@@ -1905,10 +1871,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return this.bibDatabaseContext;
     }
 
-    public GroupSelector getGroupSelector() {
-        return frame.getGroupSelector();
-    }
-
     public boolean isUpdatedExternally() {
         return updatedExternally;
     }
@@ -2121,68 +2083,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private class GroupTreeListener {
-
-        private final Runnable task = new Runnable() {
-
-            @Override
-            public void run() {
-                // Update group display (for example to reflect that the number of contained entries has changed)
-                frame.getGroupSelector().revalidateGroups();
-            }
-        };
-
-        /**
-         * Only access when you have the lock of the task instance
-         *
-         * Guarded by "task"
-         */
-        private TimerTask timerTask = new TimerTask() {
-
-            @Override
-            public void run() {
-                task.run();
-            }
-        };
-
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
             if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
-                scheduleUpdate();
                 return;
             }
 
             // Automatically add new entry to the selected group (or set of groups)
-            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)
-                    && frame.getGroupSelector().getToggleAction().isSelected()) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP)) {
                 final List<BibEntry> entries = Collections.singletonList(addedEntryEvent.getBibEntry());
-                final TreePath[] selection = frame.getGroupSelector().getGroupsTree().getSelectionPaths();
-                if (selection != null) {
-                    // it is possible that the user selected nothing. Therefore, checked for "!= null"
-                    for (final TreePath tree : selection) {
-                        ((GroupTreeNodeViewModel) tree.getLastPathComponent()).addEntriesToGroup(entries);
-                    }
-                }
-                SwingUtilities.invokeLater(() -> BasePanel.this.getGroupSelector().valueChanged(null));
-            }
-
-            scheduleUpdate();
-        }
-
-        private void scheduleUpdate() {
-            // This is a quickfix/dirty hack.
-            // a better solution would be using RxJava or something reactive instead
-            // nevertheless it works correctly
-            synchronized (task) {
-                timerTask.cancel();
-                timerTask = new TimerTask() {
-
-                    @Override
-                    public void run() {
-                        task.run();
-                    }
-                };
-                JabRefExecutorService.INSTANCE.submit(timerTask, 200);
+                Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
+                        selectedGroup -> selectedGroup.addEntriesToGroup(entries));
             }
         }
     }
@@ -2255,8 +2167,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Check if it is the preamble:
                     if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
                         preambleEditor.storeCurrentEdit();
-                    } else {
-                        storeCurrentEdit();
                     }
                 }
                 getUndoManager().undo();
@@ -2331,11 +2241,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
 
                 JComponent focused = Globals.getFocusListener().getFocused();
-                if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
-                    // User is currently editing a field:
-                    storeCurrentEdit();
-                }
-
                 getUndoManager().redo();
                 markBaseChanged();
                 frame.output(Localization.lang("Redo"));

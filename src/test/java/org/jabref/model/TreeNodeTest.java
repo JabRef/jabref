@@ -173,6 +173,36 @@ public class TreeNodeTest {
     }
 
     @Test
+    public void moveToInSameLevelWhenNodeWasBeforeTargetIndex() {
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child3 = new TreeNodeTestData.TreeNodeMock();
+        root.addChild(child1);
+        root.addChild(child2);
+        root.addChild(child3);
+
+        child1.moveTo(root, 1);
+
+        assertEquals(Arrays.asList(child2, child1, child3), root.getChildren());
+    }
+
+    @Test
+    public void moveToInSameLevelWhenNodeWasAfterTargetIndex() {
+        TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child1 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child2 = new TreeNodeTestData.TreeNodeMock();
+        TreeNodeTestData.TreeNodeMock child3 = new TreeNodeTestData.TreeNodeMock();
+        root.addChild(child1);
+        root.addChild(child2);
+        root.addChild(child3);
+
+        child3.moveTo(root, 1);
+
+        assertEquals(Arrays.asList(child1, child3, child2), root.getChildren());
+    }
+
+    @Test
     public void getPathFromRootInSimpleTree() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
         TreeNodeTestData.TreeNodeMock node = TreeNodeTestData.getNodeInSimpleTree(root);
