@@ -13,6 +13,7 @@ import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -155,8 +156,6 @@ class FieldsEditorTab extends EntryEditorTab {
         }
 
         GridPane gridPane = new GridPane();
-        gridPane.setPrefSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-        gridPane.setMaxSize(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
         gridPane.getStyleClass().add("editorPane");
 
         ColumnConstraints columnExpand = new ColumnConstraints();
@@ -204,7 +203,14 @@ class FieldsEditorTab extends EntryEditorTab {
         }
         gridPane.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
 
-        return gridPane;
+        // Warp everything in a scroll-pane
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setContent(gridPane);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        return scrollPane;
     }
 
     private String getPrompt(String field) {

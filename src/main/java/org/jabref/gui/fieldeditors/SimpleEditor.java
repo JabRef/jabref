@@ -18,7 +18,6 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         this.viewModel = new SimpleEditorViewModel();
 
         EditorTextArea textArea = new EditorTextArea();
-        textArea.prefHeight(0);
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
