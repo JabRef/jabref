@@ -11,5 +11,5 @@
     -fx-hgap: 10;
     -fx-vgap: 6;
     -fx-background-color: text-area-background;
-    -fx-padding: 0 0 0 5;
+    -fx-padding: 5 0 0 5;
 }
