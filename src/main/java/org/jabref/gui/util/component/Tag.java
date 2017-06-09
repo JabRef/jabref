@@ -58,7 +58,6 @@ public class Tag<T> extends HBox {
         }
     }
 
-
     public final void setOnTagRemoved(Consumer<T> tagRemovedConsumer) {
         this.tagRemovedConsumer = tagRemovedConsumer;
     }
