@@ -26,8 +26,6 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
         linkedEntriesBar.setStringConverter(viewModel.getStringConverter());
         linkedEntriesBar.setOnTagClicked((parsedEntryLink, mouseEvent) -> viewModel.jumpToEntry(parsedEntryLink));
         Bindings.bindContentBidirectional(linkedEntriesBar.tagsProperty(), viewModel.linkedEntriesProperty());
-
-        //TODO: Add toolitp for tag: Localization.lang("Jump to entry")
     }
 
     public LinkedEntriesEditorViewModel getViewModel() {
