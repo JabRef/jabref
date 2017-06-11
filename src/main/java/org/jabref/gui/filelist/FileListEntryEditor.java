@@ -86,8 +86,8 @@ public class FileListEntryEditor {
         String fileText = link.getText().trim();
         Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
                 Globals.prefs.getFileDirectoryPreferences());
-        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
 
+        Path workingDir = file.orElse(Paths.get(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)));
         String fileName = Paths.get(fileText).getFileName().toString();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
@@ -125,7 +125,6 @@ public class FileListEntryEditor {
     public FileListEntryEditor(JabRefFrame frame, FileListEntry entry, boolean showProgressBar, boolean showOpenButton,
             BibDatabaseContext databaseContext, boolean showSaveDialog) {
         this(frame, entry, showProgressBar, showOpenButton, databaseContext);
-
         this.showSaveDialog = showSaveDialog;
     }
 
