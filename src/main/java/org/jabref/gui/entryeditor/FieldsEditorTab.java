@@ -46,10 +46,9 @@ class FieldsEditorTab extends EntryEditorTab {
     private final JabRefFrame frame;
     private final BasePanel basePanel;
     private FieldEditorFX activeField;
-    private BibEntry entry;
+    private final BibEntry entry;
 
-    public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent,
-                           boolean addKeyField, boolean compressed, BibEntry entry) {
+    public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent, boolean addKeyField, boolean compressed, BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
         this.fields = new ArrayList<>(Objects.requireNonNull(fields));
 
@@ -108,9 +107,9 @@ class FieldsEditorTab extends EntryEditorTab {
                 //parent.addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
-            
+
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
-            
+
             // Add autocompleter listener, if required for this field:
             /*
             AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
@@ -122,7 +121,9 @@ class FieldsEditorTab extends EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(), Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs, bPanel.getBibDatabaseContext(), entry.getType());
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(),
+                    Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
+                    bPanel.getBibDatabaseContext(), entry.getType());
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
@@ -225,12 +226,12 @@ class FieldsEditorTab extends EntryEditorTab {
         }
 
         switch (field) {
-            case FieldName.YEAR:
-                return "YYYY";
-            case FieldName.MONTH:
-                return "MM or #mmm#";
-            case FieldName.URL:
-                return "https://";
+        case FieldName.YEAR:
+            return "YYYY";
+        case FieldName.MONTH:
+            return "MM or #mmm#";
+        case FieldName.URL:
+            return "https://";
         }
 
         return "";
@@ -267,7 +268,7 @@ class FieldsEditorTab extends EntryEditorTab {
         if (fieldEditor.getText().equals(content)) {
             return true;
         }
-        
+
         // trying to preserve current edit position (fixes SF bug #1285)
         if (fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
@@ -296,7 +297,9 @@ class FieldsEditorTab extends EntryEditorTab {
 
     @Override
     public void requestFocus() {
-        activeField.requestFocus();
+        if (activeField != null) {
+            activeField.requestFocus();
+        }
     }
 
     @Override
