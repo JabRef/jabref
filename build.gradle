@@ -124,7 +124,7 @@ dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.5'
 
-    compile 'org.jsoup:jsoup:1.10.2'
+    compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.24'
 
