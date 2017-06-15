@@ -253,7 +253,7 @@ class RegExpBasedFileFinder implements FileFinder {
         final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                 Pattern.CASE_INSENSITIVE);
         try {
-            List<Path> matches = Files.find(actualDirectory, Integer.MAX_VALUE,
+            List<Path> matches = Files.find(actualDirectory, 1,
                     (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches())
                     .collect(Collectors.toList());
             res.addAll(matches);
