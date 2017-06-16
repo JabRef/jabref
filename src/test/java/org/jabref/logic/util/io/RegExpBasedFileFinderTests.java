@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,6 +61,45 @@ public class RegExpBasedFileFinderTests {
         //then
         assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf")),
                 result);
+    }
+
+    @Test
+    public void testFindFileInSubdirectory() {
+        //given
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        localEntry.setCiteKey("pdfInSubdirectory");
+        localEntry.setField("year", "2017");
+
+        List<String> extensions = Collections.singletonList("pdf");
+
+        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[bibtexkey].*\\\\.[extension]", ',');
+
+        //when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+
+        //then
+        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/pdfInSubdirectory.pdf")),
+                result);
+    }
+
+    @Test
+    public void testFindFileNonRecursive() {
+        //given
+        BibEntry localEntry = new BibEntry(BibtexEntryTypes.ARTICLE.getName());
+        localEntry.setCiteKey("pdfInSubdirectory");
+        localEntry.setField("year", "2017");
+
+        List<String> extensions = Collections.singletonList("pdf");
+
+        List<Path> dirs = Collections.singletonList(Paths.get(filesDirectory));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("*/[bibtexkey].*\\\\.[extension]", ',');
+
+        //when
+        List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
+
+        //then
+        Assert.assertTrue(result.isEmpty());
     }
 
     @Test
