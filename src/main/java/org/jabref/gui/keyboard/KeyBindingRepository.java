@@ -65,21 +65,8 @@ public class KeyBindingRepository {
         if (code == KeyCode.UNDEFINED) {
             return false;
         }
-        // gather the pressed modifier keys
-        String modifiers = "";
-        if (keyEvent.isControlDown()) {
-            modifiers = "ctrl";
-        }
-        if (keyEvent.isShiftDown()) {
-            modifiers += " shift";
-        }
-        if (keyEvent.isAltDown()) {
-            modifiers += " alt";
-        }
-        modifiers = modifiers.trim();
-        String newShortcut = (modifiers.isEmpty()) ? code.toString() : modifiers + " " + code;
-        KeyCombination pressedCombination = KeyCombination.valueOf(newShortcut);
-        return combination.equals(pressedCombination);
+
+        return combination.match(keyEvent);
     }
 
     public Optional<String> get(KeyBinding key) {
