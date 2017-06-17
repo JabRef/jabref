@@ -35,7 +35,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed a bug that did not allow the correct re-export of the MS-Office XML field `msbib-accessed` with a different date format [#2859](https://github.com/JabRef/jabref/issues/2859).
 - We fixed some bugs that prevented the display of FileAnnotations that were created using the Foxit Reader. [#2839, comment](https://github.com/JabRef/jabref/issues/2839#issuecomment-302058227).
 - We fixed an error that prevented the FileAnnotation tab to load when the entry had no bibtexkey [#2903](https://github.com/JabRef/jabref/issues/2903).
-- We fixed a bug that recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
+- We fixed a bug which which could result in an exception when opening/saving files from/to a nonexistent directory [#2917](https://github.com/JabRef/jabref/issues/2917).
+- We fixed a bug where recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
 ### Removed
 
 
