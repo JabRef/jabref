@@ -40,10 +40,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         setSkin(customContextSkin);
     }
 
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 

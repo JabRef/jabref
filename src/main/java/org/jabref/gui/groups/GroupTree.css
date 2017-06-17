@@ -4,7 +4,7 @@
 }
 
 .tree-table-cell {
-    -fx-font-size: 13px;
+    -fx-font-size: 105%;
     -fx-padding: 0.35em 0em 0.25em 0em;
 }
 
@@ -14,11 +14,11 @@
 }
 
 .numberColumn > .hits {
-    -fx-font-size: 11;
+    -fx-font-size: 85%;
     -fx-background-color: #c6c6c4;
     -fx-padding: 0.1em 0.4em 0.1em 0.4em;
     -fx-background-insets: 0;
-    -fx-background-radius: 10px;
+    -fx-background-radius: 0.8em;
 }
 
 .numberColumn > .hits:any-selected {
@@ -31,7 +31,6 @@
 
 .disclosureNodeColumn {
     -fx-alignment: top-right;
-    -fx-font-size: 12px;
 }
 
 .tree-table-row-cell:dragOver-bottom {
@@ -105,8 +104,8 @@
 }
 
 .tree-table-row-cell > .tree-table-cell > .tree-disclosure-node > .arrow {
-    -fx-max-height: 7px;
-    -fx-max-width: 7px;
+    -fx-max-height: 0.5em;
+    -fx-max-width: 0.5em;
     -fx-background-color: #5e5f5e;
     -fx-padding: 0.333333em 0.229em 0.333333em 0.229em; /* 4 */
     -fx-shape: "m64,416l96,96l256,-256l-256,-256l-96,96l160,160l-160,160z";
@@ -117,13 +116,14 @@
 }
 
 .tree-table-row-cell > .tree-table-cell > .icon {
-    -fx-translate-x: -5px;
+    -fx-translate-x: -0.4em;
 }
 
 #barBottom {
     -fx-background-color: #dadad8;
     -fx-border-color: dimgray;
     -fx-border-width: 1 0 0 0;
+    -fx-padding: 0em 1em 0em 1em;
 }
 
 .flatButton {
