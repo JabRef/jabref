@@ -233,7 +233,7 @@ public class JabRefDesktop {
                 throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, databaseContext);
+            FileListEntryEditor editor = new FileListEntryEditor(flEntry.toParsedFileField(), false, true, databaseContext);
             editor.setVisible(true, false);
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
