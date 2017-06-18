@@ -147,7 +147,12 @@ public class BibDatabaseContext {
 
     public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
         // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
-        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(Paths::get).collect(Collectors.toList());
+        return getFileDirectories(preferences).stream()
+                .filter(s -> !s.isEmpty())
+                .map(Paths::get)
+                .map(Path::toAbsolutePath)
+                .map(Path::normalize)
+                .collect(Collectors.toList());
     }
 
     /**
