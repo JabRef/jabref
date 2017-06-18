@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.util.FileHelper;
@@ -110,25 +107,6 @@ public class LinkedFile {
             return Optional.of(file);
         } else {
             return FileHelper.expandFilenameAsPath(link, directories);
-        }
-    }
-
-    public Optional<ExternalFileType> getExternalFileType(boolean deduceUnknownType, ExternalFileTypes externalFileTypes) {
-        Optional<ExternalFileType> type = externalFileTypes.getExternalFileTypeByName(getFileType());
-        boolean isUnknownType = !type.isPresent() || (type.get() instanceof UnknownExternalFileType);
-
-        if (isUnknownType && deduceUnknownType) {
-            // No file type was recognized. Try to find a usable file type based on mime type:
-            Optional<ExternalFileType> mimeType = externalFileTypes.getExternalFileTypeByMimeType(getFileType());
-            if (mimeType.isPresent()) {
-                return mimeType;
-            }
-
-            // No type could be found from mime type. Try based on the extension:
-            return FileHelper.getFileExtension(getLink())
-                    .flatMap(externalFileTypes::getExternalFileTypeByExt);
-        } else {
-            return type;
         }
     }
 }

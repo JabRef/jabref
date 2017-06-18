@@ -336,7 +336,7 @@ public class FileListEntryEditor {
         types.setModel(new DefaultComboBoxModel<>(list.toArray(new ExternalFileType[list.size()])));
         types.setSelectedIndex(-1);
         // See what is a reasonable selection for the type combobox:
-        Optional<ExternalFileType> fileType = entry.getExternalFileType(false, ExternalFileTypes.getInstance());
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().fromLinkedFile(entry, false);
         if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
             types.setSelectedItem(fileType.get());
         } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {

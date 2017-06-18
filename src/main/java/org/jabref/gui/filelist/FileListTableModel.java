@@ -166,7 +166,7 @@ public class FileListTableModel extends AbstractTableModel {
     }
 
     private FileListEntry decodeEntry(LinkedFile entry, boolean deduceUnknownType) {
-        Optional<ExternalFileType> type = entry.getExternalFileType(deduceUnknownType, ExternalFileTypes.getInstance());
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(entry, deduceUnknownType);
 
         return new FileListEntry(entry.getDescription(), entry.getLink(), type);
     }

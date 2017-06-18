@@ -105,7 +105,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
 
     public void open() {
         try {
-            Optional<ExternalFileType> type = linkedFile.getExternalFileType(true, ExternalFileTypes.getInstance());
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
             JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
         } catch (IOException e) {
             LOGGER.warn("Cannot open selected file.", e);
