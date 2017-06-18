@@ -416,7 +416,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Returns the name of the currently selected tab.
      */
     public String getVisibleTabName() {
-        return tabbed.getSelectionModel().getSelectedItem().getText();
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (selectedTab != null) {
+            return selectedTab.getText();
+        }
+        return "";
     }
 
     public void setVisibleTab(String name) {
