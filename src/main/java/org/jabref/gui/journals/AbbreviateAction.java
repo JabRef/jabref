@@ -1,8 +1,11 @@
 package org.jabref.gui.journals;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.jabref.Globals;
+import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.worker.AbstractWorker;
@@ -42,12 +45,25 @@ public class AbbreviateAction extends AbstractWorker {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;
+
+        List<Boolean> futures = new ArrayList<>();
         for (BibEntry entry : entries) {
-            for (String journalField : InternalBibtexFields.getJournalNameFields()) {
-                if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
-                    count++;
+            Callable<Boolean> callable = () -> {
+                for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+                    if (undoableAbbreviator.abbreviate(panel.getDatabase(), entry, journalField, ce)) {
+                        return true;
+                    }
                 }
-            }
+
+                return false;
+            };
+            JabRefExecutorService.INSTANCE.executeAndWait(callable);
+            futures.add(JabRefExecutorService.INSTANCE.executeAndWait(callable));
+        }
+
+        for (Boolean future : futures) {
+            if (future)
+                count++;
         }
 
         if (count > 0) {
