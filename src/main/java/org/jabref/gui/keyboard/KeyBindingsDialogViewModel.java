@@ -20,7 +20,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final ObjectProperty<KeyBindingViewModel> selectedKeyBinding = new SimpleObjectProperty<>();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
-    private DialogService dialogService;
+    private final DialogService dialogService;
 
     public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
@@ -85,10 +85,10 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         ButtonType resetButtonType = new ButtonType("Reset", ButtonBar.ButtonData.OK_DONE);
         dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,
                 ButtonType.CANCEL).ifPresent(response -> {
-            if (response == resetButtonType) {
-                keyBindingRepository.resetToDefault();
-                populateTable();
-            }
-        });
+                    if (response == resetButtonType) {
+                        keyBindingRepository.resetToDefault();
+                        populateTable();
+                    }
+                });
     }
 }

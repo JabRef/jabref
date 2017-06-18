@@ -24,8 +24,8 @@ public class KeyBindingViewModel {
 
     private KeyBinding keyBinding = null;
     private String realBinding = "";
-    private ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
-    private KeyBindingRepository keyBindingRepository;
+    private final ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
+    private final KeyBindingRepository keyBindingRepository;
     private final SimpleStringProperty displayName = new SimpleStringProperty();
     private final SimpleStringProperty shownBinding = new SimpleStringProperty();
 
@@ -91,6 +91,7 @@ public class KeyBindingViewModel {
      */
     public boolean setNewBinding(KeyEvent evt) {
         // validate the shortcut is no modifier key
+
         KeyCode code = evt.getCode();
         if (code.isModifierKey() || (code == KeyCode.BACK_SPACE) || (code == KeyCode.SPACE) || (code == KeyCode.TAB)
                 || (code == KeyCode.ENTER) || (code == KeyCode.UNDEFINED)) {
@@ -100,13 +101,13 @@ public class KeyBindingViewModel {
         // gather the pressed modifier keys
         String modifiers = "";
         if (evt.isControlDown()) {
-            modifiers = "ctrl ";
+            modifiers = "ctrl+";
         }
         if (evt.isShiftDown()) {
-            modifiers += "shift ";
+            modifiers += "shift+";
         }
         if (evt.isAltDown()) {
-            modifiers += "alt ";
+            modifiers += "alt+";
         }
 
         // if no modifier keys are pressed, only special keys can be shortcuts

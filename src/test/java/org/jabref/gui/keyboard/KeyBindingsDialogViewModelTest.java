@@ -8,7 +8,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -23,7 +22,7 @@ import static org.mockito.Mockito.mock;
 public class KeyBindingsDialogViewModelTest {
 
     private KeyBindingsDialogViewModel model;
-    private KeyBindingRepository keyBindingRepository ;
+    private KeyBindingRepository keyBindingRepository;
     private DialogService dialogService;
 
     @Before
@@ -47,7 +46,6 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Ignore
     public void testSpecialKeysValidKeyBindingIsSaved() {
         setKeyBindingViewModel(KeyBinding.IMPORT_INTO_NEW_DATABASE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_RELEASED, "F1", "F1", KeyCode.F1, false, false, false,
@@ -78,7 +76,6 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Ignore
     public void testRandomNewKeyKeyBindingInRepository() {
         setKeyBindingViewModel(KeyBinding.CLEANUP);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "K", "K", KeyCode.K, true, true, true, false);
@@ -89,7 +86,7 @@ public class KeyBindingsDialogViewModelTest {
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLEANUP, shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultBinding()), shortcutKeyEvent));
     }
 
     @Test
@@ -119,7 +116,6 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Ignore
     public void testSetAllKeyBindingsToDefault() {
         setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "C", "C", KeyCode.C, true, true, true, false);
@@ -138,7 +134,6 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    @Ignore
     public void testSetSingleKeyBindingToDefault() {
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         model.selectedKeyBindingProperty().set(viewModel);
