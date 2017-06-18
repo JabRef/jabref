@@ -12,6 +12,7 @@ import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
@@ -324,5 +325,24 @@ public final class ExternalFileTypes {
         final String filePath = file.toString();
         final Optional<String> extension = FileHelper.getFileExtension(filePath);
         return extension.flatMap(this::getExternalFileTypeByExt);
+    }
+
+    public Optional<ExternalFileType> fromLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
+        Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType());
+        boolean isUnknownType = !type.isPresent() || (type.get() instanceof UnknownExternalFileType);
+
+        if (isUnknownType && deduceUnknownType) {
+            // No file type was recognized. Try to find a usable file type based on mime type:
+            Optional<ExternalFileType> mimeType = getExternalFileTypeByMimeType(linkedFile.getFileType());
+            if (mimeType.isPresent()) {
+                return mimeType;
+            }
+
+            // No type could be found from mime type. Try based on the extension:
+            return FileHelper.getFileExtension(linkedFile.getLink())
+                    .flatMap(this::getExternalFileTypeByExt);
+        } else {
+            return type;
+        }
     }
 }

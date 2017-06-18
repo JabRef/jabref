@@ -1,11 +1,15 @@
 package org.jabref.gui.filelist;
 
+import java.util.Optional;
+
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 
 public class AttachFileAction implements BaseAction {
 
@@ -23,22 +27,19 @@ public class AttachFileAction implements BaseAction {
             return;
         }
         BibEntry entry = panel.getSelectedEntries().get(0);
-        FileListEntry flEntry = new FileListEntry("", "");
-        FileListEntryEditor editor = new FileListEntryEditor(panel.frame(), flEntry, false, true,
+        LinkedFile flEntry = new LinkedFile("", "", "");
+        FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true,
                 panel.getBibDatabaseContext());
         editor.setVisible(true, true);
         if (editor.okPressed()) {
-            FileListTableModel model = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(model::setContent);
-            model.addEntry(model.getRowCount(), flEntry);
-            String newVal = model.getStringRepresentation();
+            Optional<FieldChange> fieldChange = entry.addFile(flEntry);
 
-            UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
-                    entry.getField(FieldName.FILE).orElse(null), newVal);
-            entry.setField(FieldName.FILE, newVal);
-            panel.getUndoManager().addEdit(ce);
-            panel.markBaseChanged();
+            if (fieldChange.isPresent()) {
+                UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
+                        entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+                panel.getUndoManager().addEdit(ce);
+                panel.markBaseChanged();
+            }
         }
     }
-
 }

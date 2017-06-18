@@ -17,17 +17,15 @@ import org.jabref.model.util.FileHelper;
 public class LinkedFile {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
-
-    private final String description;
-    private final String link;
-    private final String fileType;
+    private String description;
+    private String link;
+    private String fileType;
 
     public LinkedFile(String description, String link, String fileType) {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
     }
-
     public LinkedFile(String description, URL link, String fileType) {
         this(description, Objects.requireNonNull(link).toString(), fileType);
     }
@@ -36,12 +34,24 @@ public class LinkedFile {
         return fileType;
     }
 
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
     public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getLink() {
         return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 
     @Override
