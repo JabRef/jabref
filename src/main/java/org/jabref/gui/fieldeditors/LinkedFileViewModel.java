@@ -239,6 +239,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+            return true;
         }
         return false;
     }
