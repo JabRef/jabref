@@ -13,3 +13,21 @@
     -fx-background-color: text-area-background;
     -fx-padding: 5 0 0 5;
 }
+
+.date-picker > .date-picker-display-node {
+    -fx-text-fill: text-area-foreground;
+    -fx-text-origin: baseline;
+}
+
+.date-picker > .date-picker-display-node *.text {
+    -fx-text-origin: bottom;
+}
+
+.label > *.text {
+    -fx-translate-y: 0;
+}
+
+.combo-box > *.text {
+    -fx-text-fill: text-area-foreground;
+    -fx-text-origin: baseline;
+}
