@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
@@ -40,6 +41,7 @@
                     </Button>
                 </buttons>
             </ButtonBar>
+            <Region prefWidth="20.0" HBox.hgrow="ALWAYS"/>
             <CustomTextField fx:id="searchField" promptText="Filter groups"/>
         </HBox>
     </bottom>
