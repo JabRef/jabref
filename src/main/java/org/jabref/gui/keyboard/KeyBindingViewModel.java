@@ -101,13 +101,13 @@ public class KeyBindingViewModel {
         // gather the pressed modifier keys
         String modifiers = "";
         if (evt.isControlDown()) {
-            modifiers = "ctrl+ ";
+            modifiers = "ctrl+";
         }
         if (evt.isShiftDown()) {
-            modifiers += "shift+ ";
+            modifiers += "shift+";
         }
         if (evt.isAltDown()) {
-            modifiers += "alt+ ";
+            modifiers += "alt+";
         }
 
         // if no modifier keys are pressed, only special keys can be shortcuts
