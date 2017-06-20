@@ -178,7 +178,25 @@ public class GroupNodeViewModel {
     }
 
     public String getIconCode() {
+
         return groupNode.getGroup().getIconCode().orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode());
+        /*
+        Optional<String> iconCode = groupNode.getGroup().getIconCode();
+        
+        if (StringUtil.isBlank(iconCode)) {
+            return "";
+        }
+        if (iconCode.isPresent()) {
+            MaterialDesignIcon icon = EnumUtils.getEnum(MaterialDesignIcon.class, iconCode.get().toUpperCase(Locale.ENGLISH));
+            if (icon != null) {
+                return icon.unicode();
+            } else {
+                return iconCode.get();
+            }
+        }
+        
+        return IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode();
+        */
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -241,7 +259,7 @@ public class GroupNodeViewModel {
         // TODO: we should also check isNodeDescendant
         boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
         boolean canDropEntries = dragboard.hasContent(DragAndDropDataFormats.ENTRIES)
-                && groupNode.getGroup() instanceof GroupEntryChanger;
+                && (groupNode.getGroup() instanceof GroupEntryChanger);
         return canDropOtherGroup || canDropEntries;
     }
 
@@ -282,15 +300,15 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-                case BOTTOM:
-                    this.moveTo(targetParent.get(), targetIndex + 1);
-                    break;
-                case CENTER:
-                    this.moveTo(target);
-                    break;
-                case TOP:
-                    this.moveTo(targetParent.get(), targetIndex);
-                    break;
+            case BOTTOM:
+                this.moveTo(targetParent.get(), targetIndex + 1);
+                break;
+            case CENTER:
+                this.moveTo(target);
+                break;
+            case TOP:
+                this.moveTo(targetParent.get(), targetIndex);
+                break;
             }
         } else {
             // No parent = root -> just add

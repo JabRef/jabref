@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -10,9 +9,6 @@ import javafx.scene.paint.Color;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
-
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.lang3.EnumUtils;
 
 /**
  * Base class for all groups.
@@ -31,7 +27,6 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconCode = Optional.empty();
-    protected MaterialDesignIcon icon = null;
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;
@@ -101,15 +96,11 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     public Optional<String> getIconCode() {
-        if (icon != null) {
-            return Optional.of(icon.unicode());
-        }
         return iconCode;
     }
 
     public void setIconCode(String iconCode) {
         this.iconCode = Optional.of(iconCode);
-        this.icon = EnumUtils.getEnum(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH));
 
     }
 
