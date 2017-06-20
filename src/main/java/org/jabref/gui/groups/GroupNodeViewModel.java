@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,6 +34,8 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.Subscribe;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import org.apache.commons.lang3.EnumUtils;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -178,11 +181,8 @@ public class GroupNodeViewModel {
     }
 
     public String getIconCode() {
-
-        return groupNode.getGroup().getIconCode().orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode());
-        /*
         Optional<String> iconCode = groupNode.getGroup().getIconCode();
-        
+
         if (StringUtil.isBlank(iconCode)) {
             return "";
         }
@@ -194,9 +194,7 @@ public class GroupNodeViewModel {
                 return iconCode.get();
             }
         }
-        
         return IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode();
-        */
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -208,8 +206,8 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Gets invoked if an entry in the current database changes.
-     */
+    * Gets invoked if an entry in the current database changes.
+    */
     @Subscribe
     public void listen(@SuppressWarnings("unused") EntryEvent entryEvent) {
         calculateNumberOfMatches();
