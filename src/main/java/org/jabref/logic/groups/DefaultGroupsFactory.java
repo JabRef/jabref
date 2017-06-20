@@ -14,7 +14,7 @@ public class DefaultGroupsFactory {
 
     public static AllEntriesGroup getAllEntriesGroup() {
         AllEntriesGroup group = new AllEntriesGroup(Localization.lang("All entries"));
-        group.setIconCode(ALL_ENTRIES_GROUP_DEFAULT_ICON.unicode());
+        group.setIconName(ALL_ENTRIES_GROUP_DEFAULT_ICON.name());
         return group;
     }
 }
