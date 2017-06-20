@@ -369,7 +369,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
                     // Ignore invalid color (we should probably notify the user instead...)
                 }
                 resultingGroup.setDescription(descriptionField.getText());
-                resultingGroup.setIconCode(iconField.getText());
+                resultingGroup.setIconName(iconField.getText());
 
                 dispose();
             } catch (IllegalArgumentException exception) {
@@ -401,7 +401,7 @@ class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
             nameField.setText(editedGroup.getName());
             colorField.setText(editedGroup.getColor().map(Color::toString).orElse(""));
             descriptionField.setText(editedGroup.getDescription().orElse(""));
-            iconField.setText(editedGroup.getIconCode().orElse(""));
+            iconField.setText(editedGroup.getIconName().orElse(""));
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;

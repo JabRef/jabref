@@ -292,6 +292,14 @@ public class IconTheme {
             return new FontBasedIcon(this.unicode, this.color);
         }
 
+        public List<MaterialDesignIcon> getUnderlyingIcons() {
+            return icons;
+        }
+
+        public MaterialDesignIcon getUnderlyingIcon() {
+            return icons.get(0);
+        }
+
         public FontBasedIcon getSmallIcon() {
             return new FontBasedIcon(this.unicode, this.color, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
         }

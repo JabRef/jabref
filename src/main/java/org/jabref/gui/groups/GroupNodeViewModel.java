@@ -167,7 +167,7 @@ public class GroupNodeViewModel {
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
-                ", iconCode='" + getIconCode() + '\'' +
+                ", icon='" + getIcon() + '\'' +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -180,21 +180,14 @@ public class GroupNodeViewModel {
         return groupNode.hashCode();
     }
 
-    public String getIconCode() {
-        Optional<String> iconCode = groupNode.getGroup().getIconCode();
+    public MaterialDesignIcon getIcon() {
+        Optional<String> iconName = groupNode.getGroup().getIconName();
+        return iconName.flatMap(this::parseIcon)
+                .orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getUnderlyingIcon());
+    }
 
-        if (StringUtil.isBlank(iconCode)) {
-            return "";
-        }
-        if (iconCode.isPresent()) {
-            MaterialDesignIcon icon = EnumUtils.getEnum(MaterialDesignIcon.class, iconCode.get().toUpperCase(Locale.ENGLISH));
-            if (icon != null) {
-                return icon.unicode();
-            } else {
-                return iconCode.get();
-            }
-        }
-        return IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode();
+    private Optional<MaterialDesignIcon> parseIcon(String iconCode) {
+        return Optional.ofNullable(EnumUtils.getEnum(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH)));
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
