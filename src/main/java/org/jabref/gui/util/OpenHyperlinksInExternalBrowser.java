@@ -24,15 +24,15 @@ import org.w3c.dom.html.HTMLAnchorElement;
  * A Hyperlink Click Listener for javafx.WebView to open links on click in the browser
  *  Code adapted from: <a href="https://stackoverflow.com/a/33445383/">https://stackoverflow.com/a/33445383/</a>
  */
-public class HyperLinkListener implements ChangeListener<Worker.State>, EventListener {
+public class OpenHyperlinksInExternalBrowser implements ChangeListener<Worker.State>, EventListener {
 
-    private static final Log LOGGER = LogFactory.getLog(HyperLinkListener.class);
+    private static final Log LOGGER = LogFactory.getLog(OpenHyperlinksInExternalBrowser.class);
     private static final String CLICK_EVENT = "click";
     private static final String ANCHOR_TAG = "a";
 
     private final WebView webView;
 
-    public HyperLinkListener(WebView webView) {
+    public OpenHyperlinksInExternalBrowser(WebView webView) {
         this.webView = webView;
     }
 

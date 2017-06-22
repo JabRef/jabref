@@ -12,7 +12,7 @@ import javafx.scene.web.WebView;
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.HyperLinkListener;
+import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -46,7 +46,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 })
                 .executeWith(Globals.taskExecutor);
 
-        browser.getEngine().getLoadWorker().stateProperty().addListener(new HyperLinkListener(browser));
+        browser.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(browser));
 
         return root;
     }
