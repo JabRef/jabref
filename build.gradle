@@ -122,7 +122,7 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'org.apache.commons:commons-lang3:3.6'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
