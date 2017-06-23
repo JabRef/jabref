@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
@@ -96,6 +97,7 @@ import org.fxmisc.easybind.EasyBind;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
+
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
@@ -159,6 +161,26 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setupToolBar();
 
         JFXPanel container = new JFXPanel();
+
+        container.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(java.awt.event.KeyEvent e) {
+                //empty
+            }
+
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                // empty
+
+            }
+
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+                e.consume();
+            }
+        });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             addTabs();
             container.setScene(new Scene(tabbed));
@@ -173,6 +195,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         });
 
         setupKeyBindings();
+
     }
 
     /**
@@ -183,22 +206,24 @@ public class EntryEditor extends JPanel implements EntryContainer {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                    case ENTRY_EDITOR_NEXT_PANEL:
-                    case ENTRY_EDITOR_NEXT_PANEL_2:
-                        tabbed.getSelectionModel().selectNext();
-                        event.consume();
-                        break;
-                    case ENTRY_EDITOR_PREVIOUS_PANEL:
-                    case ENTRY_EDITOR_PREVIOUS_PANEL_2:
-                        tabbed.getSelectionModel().selectPrevious();
-                        event.consume();
-                        break;
-                    case HELP:
-                        helpAction.actionPerformed(null);
-                        event.consume();
-                        break;
-                    default:
-                        // Pass other keys to children
+                case ENTRY_EDITOR_NEXT_PANEL:
+                case ENTRY_EDITOR_NEXT_PANEL_2:
+                    tabbed.getSelectionModel().selectNext();
+                    event.consume();
+                    break;
+                case ENTRY_EDITOR_PREVIOUS_PANEL:
+                case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                    tabbed.getSelectionModel().selectPrevious();
+                    event.consume();
+                    break;
+                case HELP:
+                    helpAction.actionPerformed(null);
+                    event.consume();
+                    break;
+
+                default:
+
+                    // Pass other keys to children
                 }
             }
         });
@@ -490,6 +515,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class TypeButton extends JButton {
+
         private TypeButton() {
             super(IconTheme.JabRefIcon.EDIT.getIcon());
             setToolTipText(Localization.lang("Change entry type"));
@@ -498,6 +524,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class TypeLabel extends JLabel {
+
         private TypeLabel(String type) {
             super(type);
             setUI(new VerticalLabelUI(false));
@@ -537,6 +564,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class DeleteAction extends AbstractAction {
+
         private DeleteAction() {
             super(Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Delete entry"));
@@ -804,7 +832,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
@@ -821,6 +849,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class UndoAction extends AbstractAction {
+
         private UndoAction() {
             super("Undo", IconTheme.JabRefIcon.UNDO.getIcon());
             putValue(Action.SHORT_DESCRIPTION, "Undo");
