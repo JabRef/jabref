@@ -12,6 +12,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
@@ -33,6 +35,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class LinkedFileViewModel extends AbstractEditorViewModel {
+
     private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
@@ -100,7 +103,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
     }
 
     public Observable[] getObservables() {
-        return new Observable[]{this.downloadProgress, this.isAutomaticallyFound};
+        return new Observable[] {this.downloadProgress, this.isAutomaticallyFound};
     }
 
     public void open() {
@@ -219,28 +222,38 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
     public boolean delete() {
         Optional<Path> file = linkedFile.findIn(databaseContext, Globals.prefs.getFileDirectoryPreferences());
         if (file.isPresent()) {
-            boolean confirm = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("Delete file"),
-                    Localization.lang("Delete '%0'?", file.get().getFileName().toString()),
-                    Localization.lang("Delete"));
 
-            if (confirm) {
-                try {
-                    Files.delete(file.get());
+            ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+            ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
+            Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
+                    Localization.lang("Delete '%0'", file.get().toString()),
+                    Localization.lang("Delete the selected file permanently from disk, or just remove the file from the entry? Pressing Delete will delete the file permanently from disk."),
+                    deleteFromEntry, removeFromEntry, ButtonType.CANCEL);
+
+            if (buttonType.isPresent()) {
+                if (buttonType.get().equals(removeFromEntry)) {
                     return true;
-                } catch (IOException ex) {
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Cannot delete file"),
-                            Localization.lang("File permission error"));
-                    LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
                 }
+                if (buttonType.get().equals(deleteFromEntry)) {
+
+                    try {
+                        Files.delete(file.get());
+                        return true;
+                    } catch (IOException ex) {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Cannot delete file"),
+                                Localization.lang("File permission error"));
+                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                    }
+                }
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("File not found"),
+                        Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+                return true;
             }
-        } else {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("File not found"),
-                    Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
-            return true;
         }
+
         return false;
     }
 
