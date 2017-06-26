@@ -644,6 +644,8 @@ public class BibtexKeyPatternUtil {
                 }
             } else if ("firstpage".equals(val)) {
                 return firstPage(entry.getField(FieldName.PAGES).orElse(""));
+            } else if ("pageprefix".equals(val)) {
+                return pagePrefix(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("title".equals(val)) {
@@ -1301,6 +1303,26 @@ public class BibtexKeyPatternUtil {
             return "";
         } else {
             return String.valueOf(result);
+        }
+    }
+
+    /**
+     * Return the non-digit prefix of pages
+     *
+     * @param pages
+     *            a pages string such as L42--111 or L7,41,73--97 or L43+
+     *
+     * @return the non-digit prefix of pages (like "L" of L7)
+     *         or "" if no non-digit prefix is found in the string
+     *
+     * @throws NullPointerException
+     *             if pages is null.
+     */
+    public static String pagePrefix(String pages) {
+        if (pages.matches("^\\D+.*$")) {
+            return (pages.split("\\d+"))[0];
+        } else {
+            return "";
         }
     }
 
