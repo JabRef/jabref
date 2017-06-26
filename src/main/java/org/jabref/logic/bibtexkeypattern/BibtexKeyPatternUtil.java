@@ -1318,7 +1318,7 @@ public class BibtexKeyPatternUtil {
      * @throws NullPointerException
      *             if pages is null.
      */
-    private static String pagePrefix(String pages) {
+    public static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
             return (pages.split("\\d+"))[0];
         } else {

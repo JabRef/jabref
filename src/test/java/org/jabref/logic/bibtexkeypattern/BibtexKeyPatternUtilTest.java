@@ -595,6 +595,28 @@ public class BibtexKeyPatternUtilTest {
         BibtexKeyPatternUtil.firstPage(null);
     }
 
+    public void testPagePrefix() {
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7--27"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L--27"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L42--111"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7,L41,L73--97"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L41,L7,L73--97"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L43+"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7--27"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("--27"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix(""));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("42--111"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7,41,73--97"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("41,7,73--97"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("43+"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testPagePrefixNull() {
+        BibtexKeyPatternUtil.pagePrefix(null);
+    }
+
     @Test
     public void testLastPage() {
 
