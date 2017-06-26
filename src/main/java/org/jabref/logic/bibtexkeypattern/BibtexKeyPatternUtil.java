@@ -645,7 +645,7 @@ public class BibtexKeyPatternUtil {
             } else if ("firstpage".equals(val)) {
                 return firstPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("pageprefix".equals(val)) {
-                return Pageprefix(entry.getField(FieldName.PAGES).orElse(""));
+                return pagePrefix(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("title".equals(val)) {
@@ -1318,7 +1318,7 @@ public class BibtexKeyPatternUtil {
      * @throws NullPointerException
      *             if pages is null.
      */
-    public static String Pageprefix(String pages) {
+    private static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
             return (pages.split("\\d+"))[0];
         } else {
