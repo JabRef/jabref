@@ -405,7 +405,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
-            Localization.lang("Look up full text documents"));
+            Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
@@ -1434,7 +1434,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers));
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
+        atLeastOneEntryActions.clear();
+        atLeastOneEntryActions.addAll(Arrays.asList(lookupIdentifiers));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
