@@ -14,6 +14,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 
 import org.jabref.Globals;
+import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -32,7 +33,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class LinkedFileViewModel extends AbstractEditorViewModel {
+public class LinkedFileViewModel extends AbstractViewModel {
     private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
@@ -42,6 +43,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
 
     private final DialogService dialogService = new FXDialogService();
+    private final BibEntry entry;
 
     public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext) {
         this.linkedFile = linkedFile;

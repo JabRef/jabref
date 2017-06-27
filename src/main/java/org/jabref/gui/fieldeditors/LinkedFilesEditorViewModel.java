@@ -28,6 +28,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -55,7 +56,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
 
-    public LinkedFilesEditorViewModel(DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+    public LinkedFilesEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+        super(fieldName, autoCompleter);
+
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
@@ -131,8 +134,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     @Override
-    public void bindToEntry(String fieldName, BibEntry entry) {
-        super.bindToEntry(fieldName, entry);
+    public void bindToEntry(BibEntry entry) {
+        super.bindToEntry(entry);
 
         if (entry != null) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask

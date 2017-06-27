@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class IdentifierEditorViewModelTest {
 
     @Before
     public void setUp() throws Exception {
-        viewModel = new IdentifierEditorViewModel("DOI", new CurrentThreadTaskExecutor(), mock(DialogService.class));
+        viewModel = new IdentifierEditorViewModel("DOI", new ContentAutoCompleters(), new CurrentThreadTaskExecutor(), mock(DialogService.class));
     }
 
     @Test

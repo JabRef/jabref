@@ -45,8 +45,8 @@ class FieldsEditorTab extends EntryEditorTab {
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    private FieldEditorFX activeField;
     private final BibEntry entry;
+    private FieldEditorFX activeField;
 
     public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent, boolean addKeyField, boolean compressed, BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
@@ -123,7 +123,8 @@ class FieldsEditorTab extends EntryEditorTab {
 
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    bPanel.getBibDatabaseContext(), entry.getType());
+                    bPanel.getBibDatabaseContext(), entry.getType(),
+                    bPanel.getAutoCompleters());
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);

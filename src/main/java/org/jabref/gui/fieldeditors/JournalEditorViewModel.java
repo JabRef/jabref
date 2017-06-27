@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -11,7 +12,9 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
     private final JournalAbbreviationLoader journalAbbreviationLoader;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public JournalEditorViewModel(JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public JournalEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        super(fieldName, autoCompleter);
+
         this.journalAbbreviationLoader = journalAbbreviationLoader;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
     }

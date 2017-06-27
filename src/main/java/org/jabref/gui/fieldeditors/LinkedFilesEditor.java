@@ -26,6 +26,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,13 +36,11 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        this.fieldName = fieldName;
-        this.viewModel = new LinkedFilesEditorViewModel(dialogService, databaseContext, taskExecutor);
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, ContentAutoCompleters autoCompleter) {
+        this.viewModel = new LinkedFilesEditorViewModel(fieldName, autoCompleter, dialogService, databaseContext, taskExecutor);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -99,7 +98,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

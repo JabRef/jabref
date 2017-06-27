@@ -5,12 +5,18 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
+
 import com.google.common.collect.BiMap;
 
 /**
  * View model for a field editor that shows various options backed by a map.
  */
 public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T> {
+
+    public MapBasedEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
+        super(fieldName, autoCompleter);
+    }
 
     protected abstract BiMap<String, T> getItemMap();
 

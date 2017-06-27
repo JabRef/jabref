@@ -12,24 +12,24 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class NameFieldAutoCompleterTest {
+public class PersonNameSuggestionProviderTest {
 
     @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullPreferenceThrowsException() {
-        new NameFieldAutoCompleter("field", null);
+        new PersonNameSuggestionProvider("field", null);
     }
 
     @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullFieldThrowsException() {
-        new NameFieldAutoCompleter(null, mock(AutoCompletePreferences.class));
+        new PersonNameSuggestionProvider(null, mock(AutoCompletePreferences.class));
     }
 
     @Test
     public void completeWithoutAddingAnythingReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         List<String> result = autoCompleter.complete("test");
         Assert.assertEquals(Collections.emptyList(), result);
@@ -38,7 +38,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeAfterAddingNullReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         autoCompleter.addBibtexEntry(null);
 
@@ -49,7 +49,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeAfterAddingEmptyEntryReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         autoCompleter.addBibtexEntry(entry);
@@ -61,7 +61,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
@@ -74,7 +74,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeNameReturnsName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
@@ -87,7 +87,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginnigOfNameReturnsName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
@@ -100,7 +100,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeLowercaseNameReturnsName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
@@ -113,7 +113,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeNullReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
@@ -126,7 +126,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeEmptyStringReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
@@ -139,7 +139,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeReturnsMultipleResults() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testNameOne");
@@ -156,7 +156,7 @@ public class NameFieldAutoCompleterTest {
     public void completeTooShortInputReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getShortestLengthToComplete()).thenReturn(100);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Testname");
@@ -169,7 +169,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completePartOfNameReturnsNothing() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -182,7 +182,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginningOfFirstNameReturnsCompleteName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -195,7 +195,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginningOfFirstNameReturnsCompleteNameWithJr() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
@@ -208,7 +208,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginningOfFirstNameReturnsCompleteNameWithVon() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
@@ -222,7 +222,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfLastNameReturnsNameWithUmlauts() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Honig Bär");
@@ -235,7 +235,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginningOfLastNameReturnsNameAndNameWithInitialFirstname() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -249,7 +249,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfLastNameReturnsNameIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -263,7 +263,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfLastNameReturnsNameWithJrIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
@@ -277,7 +277,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfLastNameReturnsNameWithInitialFirstnameIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -291,7 +291,7 @@ public class NameFieldAutoCompleterTest {
     public void completeVonReturnsNameWithInitialFirstnameIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
@@ -304,7 +304,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeBeginningOfNameReturnsCompleteName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -318,7 +318,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfLastNameReturnsNothingIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getOnlyCompleteFirstLast()).thenReturn(true);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -332,7 +332,7 @@ public class NameFieldAutoCompleterTest {
     public void completeBeginningOfFirstNameReturnsNothingIfPref() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         when(preferences.getOnlyCompleteLastFirst()).thenReturn(true);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
@@ -345,7 +345,7 @@ public class NameFieldAutoCompleterTest {
     @Test
     public void completeShortNameReturnsName() {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        NameFieldAutoCompleter autoCompleter = new NameFieldAutoCompleter("field", preferences);
+        PersonNameSuggestionProvider autoCompleter = new PersonNameSuggestionProvider("field", preferences);
 
         BibEntry entry = new BibEntry();
         entry.setField("field", "nam");

@@ -11,13 +11,9 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * Delivers possible completions for a given string.
- * Interprets the given values as names and stores them in different
- * permutations so we can complete by beginning with last name or first name.
- *
- * @author kahlert, cordes
+ * Delivers possible completions as a list of {@link Author}s.
  */
-class NameFieldAutoCompleter extends AbstractAutoCompleter {
+class PersonNameSuggestionProvider extends AbstractAutoCompleter {
 
     private final List<String> fieldNames;
     /**
@@ -34,12 +30,12 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
     /**
      * @see AutoCompleterFactory
      */
-    NameFieldAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
+    PersonNameSuggestionProvider(String fieldName, AutoCompletePreferences preferences) {
         this(Collections.singletonList(Objects.requireNonNull(fieldName)), false, preferences);
     }
 
-    public NameFieldAutoCompleter(List<String> fieldNames, boolean lastNameOnlyAndSeparationBySpace,
-            AutoCompletePreferences preferences) {
+    public PersonNameSuggestionProvider(List<String> fieldNames, boolean lastNameOnlyAndSeparationBySpace,
+                                        AutoCompletePreferences preferences) {
         super(preferences);
 
         this.fieldNames = Objects.requireNonNull(fieldNames);

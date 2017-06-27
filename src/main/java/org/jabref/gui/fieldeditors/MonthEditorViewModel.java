@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
@@ -12,7 +13,8 @@ import org.jabref.model.strings.StringUtil;
 public class MonthEditorViewModel extends OptionEditorViewModel<Month> {
     private BibDatabaseMode databaseMode;
 
-    public MonthEditorViewModel(BibDatabaseMode databaseMode) {
+    public MonthEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, BibDatabaseMode databaseMode) {
+        super(fieldName, autoCompleter);
         this.databaseMode = databaseMode;
     }
 

@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
@@ -15,7 +16,9 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(BibDatabaseContext databaseContext) {
+    public LinkedEntriesEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, BibDatabaseContext databaseContext) {
+        super(fieldName, autoCompleter);
+
         this.databaseContext = databaseContext;
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
         BindingsHelper.bindContentBidirectional(

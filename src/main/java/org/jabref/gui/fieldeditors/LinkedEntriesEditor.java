@@ -7,19 +7,18 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.component.TagBar;
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedEntryLink;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private LinkedEntriesEditorViewModel viewModel;
     @FXML private TagBar<ParsedEntryLink> linkedEntriesBar;
 
-    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext) {
-        this.fieldName = fieldName;
-        this.viewModel = new LinkedEntriesEditorViewModel(databaseContext);
+    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext, ContentAutoCompleters autoCompleter) {
+        this.viewModel = new LinkedEntriesEditorViewModel(fieldName, autoCompleter, databaseContext);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -34,7 +33,7 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

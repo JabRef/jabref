@@ -8,11 +8,11 @@ import org.jabref.model.entry.BibEntry;
 
 class AutoCompleters {
 
-    protected final Map<String, AutoCompleter<String>> autoCompleters = new HashMap<>();
+    protected final Map<String, AutoCompleteSuggestionProvider<?>> autoCompleters = new HashMap<>();
     // Hashtable that holds as keys the names of the fields where
     // autocomplete is active, and references to the autocompleter objects.
 
-    public AutoCompleter<String> get(String fieldName) {
+    public AutoCompleteSuggestionProvider<?> get(String fieldName) {
         return autoCompleters.get(fieldName);
     }
 
@@ -27,12 +27,12 @@ class AutoCompleters {
      * respective Completers, if any.
      */
     public void addEntry(BibEntry bibEntry) {
-        for (AutoCompleter<String> autoCompleter : autoCompleters.values()) {
-            autoCompleter.addBibtexEntry(bibEntry);
+        for (AutoCompleteSuggestionProvider<?> autoCompleter : autoCompleters.values()) {
+            autoCompleter.indexBibtexEntry(bibEntry);
         }
     }
 
-    protected void put(String field, AutoCompleter<String> autoCompleter) {
+    protected void put(String field, AutoCompleteSuggestionProvider<?> autoCompleter) {
         autoCompleters.put(field, autoCompleter);
     }
 

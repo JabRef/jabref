@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.BiMap;
@@ -9,7 +10,9 @@ public class PaginationEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(7);
 
-    public PaginationEditorViewModel() {
+    public PaginationEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
+        super(fieldName, autoCompleter);
+
         itemMap.put("page", Localization.lang("Page"));
         itemMap.put("column", Localization.lang("Column"));
         itemMap.put("line", Localization.lang("Line"));

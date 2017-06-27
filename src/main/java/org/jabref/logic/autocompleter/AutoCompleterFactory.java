@@ -27,19 +27,27 @@ public class AutoCompleterFactory {
         Objects.requireNonNull(fieldName);
 
         if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
-            return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new BibtexKeyAutoCompleter(preferences);
-        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
-                || FieldName.PUBLISHER.equals(fieldName)) {
-            return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
+            return new PersonNameSuggestionProvider(fieldName, preferences);
         } else {
-            return new DefaultAutoCompleter(fieldName, preferences);
+            return null;
         }
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(InternalBibtexFields.getPersonNameFields(), true, preferences);
+        return new PersonNameSuggestionProvider(InternalBibtexFields.getPersonNameFields(), true, preferences);
     }
 
+    public AutoCompleteSuggestionProvider<?> getForField(String fieldName) {
+        //if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
+        //    return new NameFieldAutoCompleter(fieldName, preferences);
+        //} else
+        if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            return new BibEntrySuggestionProvider();
+        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
+                || FieldName.PUBLISHER.equals(fieldName)) {
+            return new JournalsSuggestionProvider(fieldName, preferences, abbreviationLoader);
+        } else {
+            return new WordSuggestionProvider(fieldName);
+        }
+    }
 }

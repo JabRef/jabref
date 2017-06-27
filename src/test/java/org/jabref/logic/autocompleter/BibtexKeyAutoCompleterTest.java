@@ -1,162 +1,118 @@
 package org.jabref.logic.autocompleter;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.jabref.logic.autocompleter.AutoCompleterTestUtil.getRequest;
 
 public class BibtexKeyAutoCompleterTest {
+    private BibEntrySuggestionProvider autoCompleter;
 
-    @SuppressWarnings("unused")
-    @Test(expected = NullPointerException.class)
-    public void initAutoCompleterWithNullPreferenceThrowsException() {
-        new BibtexKeyAutoCompleter(null);
+    @Before
+    public void setUp() throws Exception {
+        autoCompleter = new BibEntrySuggestionProvider();
     }
 
     @Test
     public void completeWithoutAddingAnythingReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
-        List<String> result = autoCompleter.complete("test");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     public void completeAfterAddingNullReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
+        autoCompleter.indexBibtexEntry(null);
 
-        autoCompleter.addBibtexEntry(null);
-
-        List<String> result = autoCompleter.complete("test");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     public void completeAfterAddingEmptyEntryReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("test");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     public void completeKeyReturnsKey() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("testKey");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
     public void completeBeginnigOfKeyReturnsKey() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("test");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
     public void completeLowercaseKeyReturnsKey() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("testkey");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("testkey")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
     }
 
     @Test
     public void completeNullReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete(null);
+        Collection<BibEntry> result = autoCompleter.call(getRequest((null)));
         Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     public void completeEmptyStringReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("")));
         Assert.assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     public void completeReturnsMultipleResults() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entryOne = new BibEntry();
         entryOne.setCiteKey("testKeyOne");
-        autoCompleter.addBibtexEntry(entryOne);
+        autoCompleter.indexBibtexEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setCiteKey("testKeyTwo");
-        autoCompleter.addBibtexEntry(entryTwo);
+        autoCompleter.indexBibtexEntry(entryTwo);
 
-        List<String> result = autoCompleter.complete("testKey");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
         Assert.assertEquals(Arrays.asList("testKeyOne", "testKeyTwo"), result);
     }
 
     @Test
     public void completeShortKeyReturnsKey() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
         BibEntry entry = new BibEntry();
         entry.setCiteKey("key");
-        autoCompleter.addBibtexEntry(entry);
+        autoCompleter.indexBibtexEntry(entry);
 
-        List<String> result = autoCompleter.complete("k");
+        Collection<BibEntry> result = autoCompleter.call(getRequest(("k")));
         Assert.assertEquals(Arrays.asList("key"), result);
-    }
-
-    @Test
-    public void completeTooShortInputReturnsNothing() {
-        AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
-        when(preferences.getShortestLengthToComplete()).thenReturn(100);
-        BibtexKeyAutoCompleter autoCompleter = new BibtexKeyAutoCompleter(preferences);
-
-        BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
-        autoCompleter.addBibtexEntry(entry);
-
-        List<String> result = autoCompleter.complete("test");
-        Assert.assertEquals(Collections.emptyList(), result);
     }
 }
