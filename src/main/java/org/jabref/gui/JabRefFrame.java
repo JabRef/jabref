@@ -1434,9 +1434,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText));
-        atLeastOneEntryActions.clear();
-        atLeastOneEntryActions.addAll(Arrays.asList(lookupIdentifiers));
+        atLeastOneEntryActions.addAll(Arrays.asList(downloadFullText, lookupIdentifiers));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
