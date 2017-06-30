@@ -3,6 +3,9 @@ package org.jabref.gui.actions;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.maintable.MainTable;
@@ -44,8 +47,20 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(OS.NEWLINE);
             }
 
-            ClipBoardManager clipboard = new ClipBoardManager();
-            clipboard.setClipboardContents(sb.toString());
+//            // This works only on Mac, not on Windows 10 and Ubuntu 16.04
+//            ClipBoardManager clipboard = new ClipBoardManager();
+//            clipboard.setTransferableClipboardContents(new HtmlTransferable(sb.toString()));
+
+            // This works on Mac and Windows 10, but not on Ubuntu 16.04
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    final Clipboard clipboard = Clipboard.getSystemClipboard();
+                    final ClipboardContent content = new ClipboardContent();
+                    content.putHtml(sb.toString());
+                    clipboard.setContent(content);
+                }
+            });
 
             int copied = entriesWithKey.size();
             int toCopy = entries.size();
