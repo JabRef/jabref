@@ -47,10 +47,6 @@ public class CopyBibTeXKeyAndLinkAction implements BaseAction {
                 sb.append(OS.NEWLINE);
             }
 
-//            // This works only on Mac, not on Windows 10 and Ubuntu 16.04
-//            ClipBoardManager clipboard = new ClipBoardManager();
-//            clipboard.setTransferableClipboardContents(new HtmlTransferable(sb.toString()));
-
             // This works on Mac and Windows 10, but not on Ubuntu 16.04
             Platform.runLater(new Runnable() {
                 @Override
