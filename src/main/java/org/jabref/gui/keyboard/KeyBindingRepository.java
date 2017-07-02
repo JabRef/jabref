@@ -44,7 +44,7 @@ public class KeyBindingRepository {
         if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Use default key bindings
             for (KeyBinding keyBinding : KeyBinding.values()) {
-                put(keyBinding, keyBinding.getDefaultBinding());
+                put(keyBinding, keyBinding.getDefaultKeyBinding());
             }
         } else {
             for (int i = 0; i < bindNames.size(); i++) {
@@ -80,7 +80,7 @@ public class KeyBindingRepository {
         if (result.isPresent()) {
             return result.get();
         } else if (keyBinding.isPresent()) {
-            return keyBinding.get().getDefaultBinding();
+            return keyBinding.get().getDefaultKeyBinding();
         } else {
             return "Not associated";
         }
@@ -102,15 +102,15 @@ public class KeyBindingRepository {
     }
 
     private Optional<KeyBinding> getKeyBinding(String key) {
-        return Arrays.stream(KeyBinding.values()).filter(b -> b.getKey().equals(key)).findFirst();
+        return Arrays.stream(KeyBinding.values()).filter(b -> b.getConstant().equals(key)).findFirst();
     }
 
     public void resetToDefault(String key) {
-        getKeyBinding(key).ifPresent(b -> bindings.put(b, b.getDefaultBinding()));
+        getKeyBinding(key).ifPresent(b -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public void resetToDefault() {
-        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultBinding()));
+        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public int size() {
@@ -131,7 +131,7 @@ public class KeyBindingRepository {
      */
     public KeyStroke getKey(KeyBinding bindName) {
 
-        String s = get(bindName.getKey());
+        String s = get(bindName.getConstant());
 
         if (OS.OS_X) {
             return getKeyForMac(KeyStroke.getKeyStroke(s));
@@ -141,7 +141,7 @@ public class KeyBindingRepository {
     }
 
     private KeyCombination getKeyCombination(KeyBinding bindName) {
-        String binding = get(bindName.getKey());
+        String binding = get(bindName.getConstant());
         return KeyCombination.valueOf(binding);
     }
 
@@ -191,7 +191,7 @@ public class KeyBindingRepository {
     }
 
     public List<String> getBindNames() {
-        return bindings.keySet().stream().map(KeyBinding::getKey).collect(Collectors.toList());
+        return bindings.keySet().stream().map(KeyBinding::getConstant).collect(Collectors.toList());
     }
 
     public List<String> getBindings() {
