@@ -35,7 +35,7 @@ public class DefaultAutoCompleterTest {
 
     @Test
     public void completeAfterAddingNullReturnsNothing() {
-        autoCompleter.indexBibtexEntry(null);
+        autoCompleter.indexEntry(null);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -44,7 +44,7 @@ public class DefaultAutoCompleterTest {
     @Test
     public void completeAfterAddingEmptyEntryReturnsNothing() {
         BibEntry entry = new BibEntry();
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -54,7 +54,7 @@ public class DefaultAutoCompleterTest {
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -64,7 +64,7 @@ public class DefaultAutoCompleterTest {
     public void completeValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -74,7 +74,7 @@ public class DefaultAutoCompleterTest {
     public void completeBeginnigOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -84,7 +84,7 @@ public class DefaultAutoCompleterTest {
     public void completeLowercaseValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testvalue")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -94,7 +94,7 @@ public class DefaultAutoCompleterTest {
     public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         autoCompleter.call(getRequest((null)));
     }
@@ -103,7 +103,7 @@ public class DefaultAutoCompleterTest {
     public void completeEmptyStringReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -113,10 +113,10 @@ public class DefaultAutoCompleterTest {
     public void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testValueOne");
-        autoCompleter.indexBibtexEntry(entryOne);
+        autoCompleter.indexEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testValueTwo");
-        autoCompleter.indexBibtexEntry(entryTwo);
+        autoCompleter.indexEntry(entryTwo);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
         Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
@@ -126,7 +126,7 @@ public class DefaultAutoCompleterTest {
     public void completeShortStringReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "val");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("va")));
         Assert.assertEquals(Collections.singletonList("val"), result);
@@ -136,7 +136,7 @@ public class DefaultAutoCompleterTest {
     public void completeBeginnigOfSecondWordReturnsWord() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("val")));
         Assert.assertEquals(Collections.singletonList("value"), result);
@@ -146,7 +146,7 @@ public class DefaultAutoCompleterTest {
     public void completePartOfWordReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("lue")));
         Assert.assertEquals(Collections.singletonList("value"), result);

@@ -34,7 +34,7 @@ public class FieldValueSuggestionProviderTest {
 
     @Test
     public void completeAfterAddingNullReturnsNothing() {
-        autoCompleter.indexBibtexEntry(null);
+        autoCompleter.indexEntry(null);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -43,7 +43,7 @@ public class FieldValueSuggestionProviderTest {
     @Test
     public void completeAfterAddingEmptyEntryReturnsNothing() {
         BibEntry entry = new BibEntry();
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -53,7 +53,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("title", "testTitle");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -63,7 +63,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -73,7 +73,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeBeginnigOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -83,7 +83,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeLowercaseValueReturnsValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testValue");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("testvalue")));
         Assert.assertEquals(Arrays.asList("testValue"), result);
@@ -93,7 +93,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeNullReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest((null)));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -103,7 +103,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeEmptyStringReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -113,10 +113,10 @@ public class FieldValueSuggestionProviderTest {
     public void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
         entryOne.setField("field", "testValueOne");
-        autoCompleter.indexBibtexEntry(entryOne);
+        autoCompleter.indexEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setField("field", "testValueTwo");
-        autoCompleter.indexBibtexEntry(entryTwo);
+        autoCompleter.indexEntry(entryTwo);
 
         Collection<String> result = autoCompleter.call(getRequest(("testValue")));
         Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
@@ -126,7 +126,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeShortStringReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "val");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("va")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -136,7 +136,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeBeginnigOfSecondWordReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("val")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -146,7 +146,7 @@ public class FieldValueSuggestionProviderTest {
     public void completePartOfWordReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("lue")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -156,7 +156,7 @@ public class FieldValueSuggestionProviderTest {
     public void completeReturnsWholeFieldValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("te")));
         Assert.assertEquals(Arrays.asList("test value"), result);

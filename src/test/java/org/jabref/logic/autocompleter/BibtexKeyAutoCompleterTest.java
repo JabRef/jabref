@@ -28,7 +28,7 @@ public class BibtexKeyAutoCompleterTest {
 
     @Test
     public void completeAfterAddingNullReturnsNothing() {
-        autoCompleter.indexBibtexEntry(null);
+        autoCompleter.indexEntry(null);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -37,7 +37,7 @@ public class BibtexKeyAutoCompleterTest {
     @Test
     public void completeAfterAddingEmptyEntryReturnsNothing() {
         BibEntry entry = new BibEntry();
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -47,7 +47,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeKeyReturnsKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -57,7 +57,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeBeginnigOfKeyReturnsKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -67,7 +67,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeLowercaseKeyReturnsKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testkey")));
         Assert.assertEquals(Arrays.asList("testKey"), result);
@@ -77,7 +77,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeNullReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest((null)));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -87,7 +87,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeEmptyStringReturnsNothing() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("")));
         Assert.assertEquals(Collections.emptyList(), result);
@@ -97,10 +97,10 @@ public class BibtexKeyAutoCompleterTest {
     public void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
         entryOne.setCiteKey("testKeyOne");
-        autoCompleter.indexBibtexEntry(entryOne);
+        autoCompleter.indexEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
         entryTwo.setCiteKey("testKeyTwo");
-        autoCompleter.indexBibtexEntry(entryTwo);
+        autoCompleter.indexEntry(entryTwo);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
         Assert.assertEquals(Arrays.asList("testKeyOne", "testKeyTwo"), result);
@@ -110,7 +110,7 @@ public class BibtexKeyAutoCompleterTest {
     public void completeShortKeyReturnsKey() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("key");
-        autoCompleter.indexBibtexEntry(entry);
+        autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("k")));
         Assert.assertEquals(Arrays.asList("key"), result);
