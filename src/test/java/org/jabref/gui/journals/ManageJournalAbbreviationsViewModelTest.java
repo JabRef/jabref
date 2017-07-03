@@ -76,8 +76,8 @@ public class ManageJournalAbbreviationsViewModelTest {
 
     @Test
     public void testInitialHasNoFilesAndNoAbbreviations() {
-        Assert.assertEquals(viewModel.journalFilesProperty().size(), 0);
-        Assert.assertEquals(viewModel.abbreviationsProperty().size(), 0);
+        Assert.assertEquals(0, viewModel.journalFilesProperty().size());
+        Assert.assertEquals(0, viewModel.abbreviationsProperty().size());
     }
 
     @Test
