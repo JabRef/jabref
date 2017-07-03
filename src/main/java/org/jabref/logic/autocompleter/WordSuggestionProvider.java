@@ -8,13 +8,13 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Stores all words in the given field which are separated by SEPARATING_CHARS.
  */
-class WordSuggestionProvider extends StringSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
+public class WordSuggestionProvider extends StringSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
 
     private static final String SEPARATING_CHARS = ";,\n ";
 
     private final String fieldName;
 
-    WordSuggestionProvider(String fieldName) {
+    public WordSuggestionProvider(String fieldName) {
         this.fieldName = Objects.requireNonNull(fieldName);
     }
 
