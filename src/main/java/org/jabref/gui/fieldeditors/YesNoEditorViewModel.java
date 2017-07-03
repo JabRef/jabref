@@ -1,6 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -9,8 +9,8 @@ public class YesNoEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(2);
 
-    public YesNoEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
-        super(fieldName, autoCompleter);
+    public YesNoEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        super(fieldName, suggestionProvider);
 
         itemMap.put("yes", "Yes");
         itemMap.put("no", "No");

@@ -1,13 +1,13 @@
 package org.jabref.gui.fieldeditors;
 
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.preferences.JabRefPreferences;
 
 public class OwnerEditorViewModel extends AbstractEditorViewModel {
     private final JabRefPreferences preferences;
 
-    public OwnerEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, JabRefPreferences preferences) {
-        super(fieldName, autoCompleter);
+    public OwnerEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JabRefPreferences preferences) {
+        super(fieldName, suggestionProvider);
         this.preferences = preferences;
     }
 

@@ -16,7 +16,7 @@ class FieldValueSuggestionProvider extends StringSuggestionProvider implements A
     }
 
     @Override
-    public void indexBibtexEntry(BibEntry entry) {
+    public void indexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }

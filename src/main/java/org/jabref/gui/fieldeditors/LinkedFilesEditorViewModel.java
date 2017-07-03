@@ -28,7 +28,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -56,8 +56,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
 
-    public LinkedFilesEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        super(fieldName, autoCompleter);
+    public LinkedFilesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+        super(fieldName, suggestionProvider);
 
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;

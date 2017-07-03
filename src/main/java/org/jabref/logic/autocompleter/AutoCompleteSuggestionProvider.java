@@ -9,5 +9,5 @@ import org.jabref.model.entry.BibEntry;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 public interface AutoCompleteSuggestionProvider<T> extends Callback<AutoCompletionBinding.ISuggestionRequest, Collection<T>> {
-    void indexBibtexEntry(BibEntry entry);
+    void indexEntry(BibEntry entry);
 }

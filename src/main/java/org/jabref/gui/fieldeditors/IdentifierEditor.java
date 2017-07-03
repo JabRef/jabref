@@ -16,7 +16,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -29,8 +29,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, ContentAutoCompleters autoCompleter) {
-        this.viewModel = new IdentifierEditorViewModel(fieldName, autoCompleter, taskExecutor, dialogService);
+    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new IdentifierEditorViewModel(fieldName, suggestionProvider, taskExecutor, dialogService);
 
         ControlHelper.loadFXMLForControl(this);
 

@@ -9,7 +9,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -20,8 +20,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     private Optional<BibEntry> entry;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, ContentAutoCompleters autoCompleter) {
-        this.viewModel = new JournalEditorViewModel(fieldName, autoCompleter, journalAbbreviationLoader, journalAbbreviationPreferences);
+    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, journalAbbreviationPreferences);
 
         ControlHelper.loadFXMLForControl(this);
 

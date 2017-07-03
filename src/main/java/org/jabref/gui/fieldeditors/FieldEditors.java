@@ -6,7 +6,8 @@ import java.util.Set;
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.logic.autocompleter.SuggestionProviders;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,46 +17,48 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class FieldEditors {
 
-    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, ContentAutoCompleters autoCompleter) {
+    public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
+
+        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(fieldName);
 
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), autoCompleter);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider);
             } else {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)), autoCompleter);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)), suggestionProvider);
             }
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(fieldName, dialogService, autoCompleter);
+            return new UrlEditor(fieldName, dialogService, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, autoCompleter);
+            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(fieldName, taskExecutor, dialogService, autoCompleter);
+            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return new OwnerEditor(fieldName, preferences, autoCompleter);
+            return new OwnerEditor(fieldName, preferences, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, autoCompleter);
+            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, autoCompleter));
+            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider));
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, autoCompleter, databaseContext.getMode()));
+            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode()));
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, autoCompleter));
+            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider));
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, autoCompleter));
+            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider));
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, autoCompleter));
+            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider));
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, autoCompleter));
+                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider));
             } else {
-                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, autoCompleter));
+                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider));
             }
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(fieldName, databaseContext, autoCompleter);
+            return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider);
         }
 
         // default
-        return new SimpleEditor(fieldName, autoCompleter);
+        return new SimpleEditor(fieldName, suggestionProvider);
     }
 }

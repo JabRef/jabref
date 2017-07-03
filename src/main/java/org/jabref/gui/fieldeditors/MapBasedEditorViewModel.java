@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 
 import com.google.common.collect.BiMap;
 
@@ -14,8 +14,8 @@ import com.google.common.collect.BiMap;
  */
 public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T> {
 
-    public MapBasedEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
-        super(fieldName, autoCompleter);
+    public MapBasedEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        super(fieldName, suggestionProvider);
     }
 
     protected abstract BiMap<String, T> getItemMap();

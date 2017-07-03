@@ -6,7 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -15,8 +15,8 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences, ContentAutoCompleters autoCompleter) {
-        this.viewModel = new OwnerEditorViewModel(fieldName, autoCompleter, preferences);
+    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences);
 
         ControlHelper.loadFXMLForControl(this);
 

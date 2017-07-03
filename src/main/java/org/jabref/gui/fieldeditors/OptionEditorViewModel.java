@@ -4,12 +4,12 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 
 public abstract class OptionEditorViewModel<T> extends AbstractEditorViewModel {
 
-    public OptionEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
-        super(fieldName, autoCompleter);
+    public OptionEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        super(fieldName, suggestionProvider);
     }
 
     public abstract StringConverter<T> getStringConverter();

@@ -7,7 +7,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.component.TagBar;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedEntryLink;
@@ -17,8 +17,8 @@ public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
     @FXML private LinkedEntriesEditorViewModel viewModel;
     @FXML private TagBar<ParsedEntryLink> linkedEntriesBar;
 
-    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext, ContentAutoCompleters autoCompleter) {
-        this.viewModel = new LinkedEntriesEditorViewModel(fieldName, autoCompleter, databaseContext);
+    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new LinkedEntriesEditorViewModel(fieldName, suggestionProvider, databaseContext);
 
         ControlHelper.loadFXMLForControl(this);
 

@@ -7,7 +7,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 
 public class UrlEditor extends HBox implements FieldEditorFX {
@@ -15,8 +15,8 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @FXML private UrlEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public UrlEditor(String fieldName, DialogService dialogService, ContentAutoCompleters autoCompleter) {
-        this.viewModel = new UrlEditorViewModel(fieldName, autoCompleter, dialogService);
+    public UrlEditor(String fieldName, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new UrlEditorViewModel(fieldName, suggestionProvider, dialogService);
 
         ControlHelper.loadFXMLForControl(this);
 

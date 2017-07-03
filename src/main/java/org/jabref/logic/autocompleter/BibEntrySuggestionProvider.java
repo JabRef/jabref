@@ -14,7 +14,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> implements AutoCompleteSuggestionProvider<BibEntry> {
 
     @Override
-    public void indexBibtexEntry(BibEntry entry) {
+    public void indexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }

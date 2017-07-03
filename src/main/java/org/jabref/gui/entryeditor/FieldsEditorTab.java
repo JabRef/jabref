@@ -112,7 +112,7 @@ class FieldsEditorTab extends EntryEditorTab {
 
             // Add autocompleter listener, if required for this field:
             /*
-            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
+            AutoCompleter<String> autoCompleter = bPanel.getSuggestionProviders().get(field);
             AutoCompleteListener autoCompleteListener = null;
             if (autoCompleter != null) {
                 autoCompleteListener = new AutoCompleteListener(autoCompleter);
@@ -124,7 +124,7 @@ class FieldsEditorTab extends EntryEditorTab {
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
                     bPanel.getBibDatabaseContext(), entry.getType(),
-                    bPanel.getAutoCompleters());
+                    bPanel.getSuggestionProviders());
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);

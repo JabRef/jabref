@@ -8,7 +8,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.model.entry.BibEntry;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -17,11 +16,11 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected final String fieldName;
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
-    private final ContentAutoCompleters autoCompleter;
+    private final AutoCompleteSuggestionProvider<?> suggestionProvider;
 
-    public AbstractEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter) {
+    public AbstractEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
         this.fieldName = fieldName;
-        this.autoCompleter = autoCompleter;
+        this.suggestionProvider = suggestionProvider;
     }
 
     public StringProperty textProperty() {
@@ -41,7 +40,6 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     }
 
     public Collection<?> complete(AutoCompletionBinding.ISuggestionRequest request) {
-        AutoCompleteSuggestionProvider<?> suggestionProvider = autoCompleter.get(fieldName);
         return suggestionProvider.call(request);
     }
 }

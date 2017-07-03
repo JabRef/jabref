@@ -13,7 +13,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
@@ -31,8 +31,8 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
-    public IdentifierEditorViewModel(String fieldName, ContentAutoCompleters autoCompleter, TaskExecutor taskExecutor, DialogService dialogService) {
-        super(fieldName, autoCompleter);
+    public IdentifierEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService) {
+        super(fieldName, suggestionProvider);
 
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;

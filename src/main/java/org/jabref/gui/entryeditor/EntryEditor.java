@@ -688,7 +688,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         //TODO: See if we need to update an AutoCompleter instance:
                         /*
-                        AutoCompleter<String> aComp = panel.getAutoCompleters().get(fieldEditor.getFieldName());
+                        AutoCompleter<String> aComp = panel.getSuggestionProviders().get(fieldEditor.getFieldName());
                         if (aComp != null) {
                             aComp.addBibtexEntry(entry);
                         }

@@ -19,7 +19,7 @@ class WordSuggestionProvider extends StringSuggestionProvider implements AutoCom
     }
 
     @Override
-    public void indexBibtexEntry(BibEntry entry) {
+    public void indexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }
