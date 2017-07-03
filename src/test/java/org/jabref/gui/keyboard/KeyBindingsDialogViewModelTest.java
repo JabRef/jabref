@@ -10,6 +10,7 @@ import org.jabref.preferences.PreferencesService;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -86,7 +87,7 @@ public class KeyBindingsDialogViewModelTest {
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
-        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultBinding()), shortcutKeyEvent));
+        assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.CLEANUP.getDefaultKeyBinding()), shortcutKeyEvent));
     }
 
     @Test
@@ -134,6 +135,21 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
+    public void testCloseEntryEditorCloseEntryKeybinding() {
+        KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.CLOSE_ENTRY_EDITOR);
+        model.selectedKeyBindingProperty().set(viewModel);
+        KeyEvent closeEditorEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE, false, false, false, false);
+
+        assertEquals(KeyBinding.CLOSE_ENTRY_EDITOR.getDefaultKeyBinding(), KeyCode.ESCAPE.getName());
+
+        KeyCombination combi = KeyCombination.valueOf(KeyBinding.CLOSE_ENTRY_EDITOR.getDefaultKeyBinding());
+
+        assertTrue(combi.match(closeEditorEvent));
+        assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE_ENTRY_EDITOR, closeEditorEvent));
+
+    }
+
+    @Test
     public void testSetSingleKeyBindingToDefault() {
         KeyBindingViewModel viewModel = setKeyBindingViewModel(KeyBinding.ABBREVIATE);
         model.selectedKeyBindingProperty().set(viewModel);
@@ -153,7 +169,7 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
-        KeyBindingViewModel bindViewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultBinding());
+        KeyBindingViewModel bindViewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
         model.selectedKeyBindingProperty().set(bindViewModel);
         return bindViewModel;
     }

@@ -178,7 +178,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
                 //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+
                 e.consume();
+
             }
         });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -220,9 +222,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     helpAction.actionPerformed(null);
                     event.consume();
                     break;
-
+                case CLOSE_ENTRY_EDITOR:
+                    closeAction.actionPerformed(null);
+                    event.consume();
+                    break;
                 default:
-
                     // Pass other keys to children
                 }
             }
