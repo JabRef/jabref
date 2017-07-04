@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;

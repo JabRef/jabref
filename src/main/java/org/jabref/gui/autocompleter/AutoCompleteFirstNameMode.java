@@ -1,4 +1,4 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 public enum AutoCompleteFirstNameMode {
     ONLY_FULL,

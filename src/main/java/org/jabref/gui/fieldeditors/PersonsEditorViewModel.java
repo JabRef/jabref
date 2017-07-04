@@ -5,10 +5,10 @@ import java.util.Collection;
 import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionStrategy;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.logic.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.model.entry.Author;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;

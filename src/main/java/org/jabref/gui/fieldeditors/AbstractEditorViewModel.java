@@ -6,8 +6,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;

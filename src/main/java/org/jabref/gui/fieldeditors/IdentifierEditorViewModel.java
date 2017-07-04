@@ -9,11 +9,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;

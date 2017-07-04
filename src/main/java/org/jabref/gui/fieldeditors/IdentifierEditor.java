@@ -13,10 +13,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;

@@ -1,4 +1,4 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.entry.event.EntryChangedEvent;
@@ -8,11 +8,11 @@ import com.google.common.eventbus.Subscribe;
 /**
  * Ensures that suggestion providers are up to date when entries are changed or added.
  */
-public class AutoCompleteListener {
+public class AutoCompleteUpdater {
 
     private final SuggestionProviders suggestionProviders;
 
-    public AutoCompleteListener(SuggestionProviders suggestionProviders) {
+    public AutoCompleteUpdater(SuggestionProviders suggestionProviders) {
         this.suggestionProviders = suggestionProviders;
     }
 

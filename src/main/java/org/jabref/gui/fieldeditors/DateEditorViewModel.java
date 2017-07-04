@@ -6,7 +6,7 @@ import java.time.temporal.TemporalAccessor;
 
 import javafx.util.StringConverter;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.Date;
 import org.jabref.model.strings.StringUtil;
 

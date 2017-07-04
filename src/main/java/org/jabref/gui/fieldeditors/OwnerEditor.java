@@ -5,8 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 

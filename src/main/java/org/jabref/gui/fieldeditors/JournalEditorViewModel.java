@@ -2,7 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;

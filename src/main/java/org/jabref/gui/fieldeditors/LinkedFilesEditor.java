@@ -22,11 +22,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

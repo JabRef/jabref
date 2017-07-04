@@ -50,6 +50,10 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.autocompleter.AutoCompleteUpdater;
+import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -96,10 +100,6 @@ import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.autocompleter.AutoCompleteListener;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
-import org.jabref.logic.autocompleter.PersonNameSuggestionProvider;
-import org.jabref.logic.autocompleter.SuggestionProviders;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -1392,7 +1392,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
             suggestionProviders.indexDatabase(getDatabase());
             // Ensure that the suggestion providers are in sync with entries
-            this.getDatabase().registerListener(new AutoCompleteListener(suggestionProviders));
+            this.getDatabase().registerListener(new AutoCompleteUpdater(suggestionProviders));
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();

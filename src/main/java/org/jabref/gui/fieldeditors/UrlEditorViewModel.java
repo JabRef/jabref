@@ -6,8 +6,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLUtil;
 import org.jabref.model.strings.StringUtil;

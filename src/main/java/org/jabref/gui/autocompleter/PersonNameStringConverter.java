@@ -1,4 +1,4 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 import javafx.util.StringConverter;
 

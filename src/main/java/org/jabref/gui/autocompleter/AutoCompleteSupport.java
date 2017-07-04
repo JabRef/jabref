@@ -20,8 +20,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
-
 /**
  * Endows a textbox with the ability to autocomplete the input. Based on code by Santhosh Kumar
  * (http://www.jroller.com/santhosh/date/20050620) James Lemieux (Glazed Lists AutoCompleteSupport)

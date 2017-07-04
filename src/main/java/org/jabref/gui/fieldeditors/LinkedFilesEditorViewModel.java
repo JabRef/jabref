@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -28,7 +29,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;

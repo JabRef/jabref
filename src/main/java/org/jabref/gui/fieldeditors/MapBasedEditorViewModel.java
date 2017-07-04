@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 
 import com.google.common.collect.BiMap;
 

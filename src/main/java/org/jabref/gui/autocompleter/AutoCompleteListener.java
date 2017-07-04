@@ -11,8 +11,6 @@ import java.util.List;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

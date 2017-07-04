@@ -7,9 +7,9 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;

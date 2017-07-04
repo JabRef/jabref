@@ -6,8 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 
 public class UrlEditor extends HBox implements FieldEditorFX {

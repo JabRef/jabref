@@ -5,10 +5,10 @@ import java.util.Set;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.logic.autocompleter.SuggestionProviders;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.database.BibDatabaseContext;

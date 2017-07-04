@@ -1,6 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
-import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 
 public class SimpleEditorViewModel extends AbstractEditorViewModel {
 

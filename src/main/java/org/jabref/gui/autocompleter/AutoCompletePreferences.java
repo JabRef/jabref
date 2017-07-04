@@ -1,4 +1,4 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 import java.util.List;
 import java.util.Map;
@@ -76,12 +76,12 @@ public class AutoCompletePreferences {
         return preferences.getStringList(AUTOCOMPLETER_COMPLETE_FIELDS);
     }
 
-    public String getCompleteNamesAsString() {
-        return preferences.get(AUTOCOMPLETER_COMPLETE_FIELDS);
-    }
-
     public void setCompleteNames(String value) {
         preferences.put(AUTOCOMPLETER_COMPLETE_FIELDS, value);
+    }
+
+    public String getCompleteNamesAsString() {
+        return preferences.get(AUTOCOMPLETER_COMPLETE_FIELDS);
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
