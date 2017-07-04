@@ -1,169 +1,61 @@
 package org.jabref.logic.autocompleter;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 
+import impl.org.controlsfx.autocompletion.SuggestionProvider;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+
 /**
  * Delivers possible completions as a list of {@link Author}s.
  */
-class PersonNameSuggestionProvider extends AbstractAutoCompleter {
+public class PersonNameSuggestionProvider extends SuggestionProvider<Author> implements AutoCompleteSuggestionProvider<Author> {
 
     private final List<String> fieldNames;
-    /**
-     * true if only last names should be completed and there is NO separation by " and ", but by " "
-     */
-    private final boolean lastNameOnlyAndSeparationBySpace;
-    private final boolean autoCompFF;
-    private final boolean autoCompLF;
-    private final AutoCompleteFirstNameMode autoCompFirstnameMode;
+    private final Comparator<Author> authorComparator = Comparator.comparing(Author::getNameForAlphabetization);
 
-    private String prefix = "";
-
-
-    /**
-     * @see AutoCompleterFactory
-     */
-    PersonNameSuggestionProvider(String fieldName, AutoCompletePreferences preferences) {
-        this(Collections.singletonList(Objects.requireNonNull(fieldName)), false, preferences);
+    PersonNameSuggestionProvider(String fieldName) {
+        this(Collections.singletonList(Objects.requireNonNull(fieldName)));
     }
 
-    public PersonNameSuggestionProvider(List<String> fieldNames, boolean lastNameOnlyAndSeparationBySpace,
-                                        AutoCompletePreferences preferences) {
-        super(preferences);
+    public PersonNameSuggestionProvider(List<String> fieldNames) {
+        super();
 
         this.fieldNames = Objects.requireNonNull(fieldNames);
-        this.lastNameOnlyAndSeparationBySpace = lastNameOnlyAndSeparationBySpace;
-        if (preferences.getOnlyCompleteFirstLast()) {
-            autoCompFF = true;
-            autoCompLF = false;
-        } else if (preferences.getOnlyCompleteLastFirst()) {
-            autoCompFF = false;
-            autoCompLF = true;
-        } else {
-            autoCompFF = true;
-            autoCompLF = true;
-        }
-        autoCompFirstnameMode = preferences.getFirstnameMode() == null ? AutoCompleteFirstNameMode.BOTH : preferences
-                .getFirstnameMode();
+
     }
 
     @Override
-    public boolean isSingleUnitField() {
-        // quick hack
-        // when used at entry fields (!this.lastNameOnlyAndSeparationBySpace), this is a single unit field
-        // when used at the search form (this.lastNameOnlyAndSeparationBySpace), this is NOT a single unit field
-        // reason: search keywords are separated by space.
-        //    This is OK for last names without prefix. "Lastname" works perfectly.
-        //    querying for "van der Lastname" can be interpreted as
-        //      a) "van" "der" "Lastname"
-        //      b) "van der Lastname" (autocompletion lastname)
-        return !this.lastNameOnlyAndSeparationBySpace;
-    }
-
-    @Override
-    public void addBibtexEntry(BibEntry entry) {
+    public void indexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }
+
         for (String fieldName : fieldNames) {
             entry.getField(fieldName).ifPresent(fieldValue ->  {
                 AuthorList authorList = AuthorList.parse(fieldValue);
                 for (Author author : authorList.getAuthors()) {
-                    handleAuthor(author);
+                    addPossibleSuggestions(author);
                 }
             });
         }
     }
 
-    /**
-     * SIDE EFFECT: sets class variable prefix
-     * Delimiter: " and " or " "
-     *
-     * @return String without prefix
-     */
-    private String determinePrefixAndReturnRemainder(String str, String delimiter) {
-        String result = str;
-        int index = result.toLowerCase(Locale.ROOT).lastIndexOf(delimiter);
-        if (index >= 0) {
-            prefix = result.substring(0, index + delimiter.length());
-            result = result.substring(index + delimiter.length());
-        } else {
-            prefix = "";
-        }
-        return result;
-    }
-
-    private void handleAuthor(Author author) {
-        if (lastNameOnlyAndSeparationBySpace) {
-            addItemToIndex(author.getLastOnly());
-        } else {
-            if (autoCompLF) {
-                switch (autoCompFirstnameMode) {
-                case ONLY_ABBREVIATED:
-                    addItemToIndex(author.getLastFirst(true));
-                    break;
-                case ONLY_FULL:
-                    addItemToIndex(author.getLastFirst(false));
-                    break;
-                case BOTH:
-                    addItemToIndex(author.getLastFirst(true));
-                    addItemToIndex(author.getLastFirst(false));
-                    break;
-                default:
-                    break;
-                }
-            }
-            if (autoCompFF) {
-                switch (autoCompFirstnameMode) {
-                case ONLY_ABBREVIATED:
-                    addItemToIndex(author.getFirstLast(true));
-                    break;
-                case ONLY_FULL:
-                    addItemToIndex(author.getFirstLast(false));
-                    break;
-                case BOTH:
-                    addItemToIndex(author.getFirstLast(true));
-                    addItemToIndex(author.getFirstLast(false));
-                    break;
-                default:
-                    break;
-                }
-            }
-        }
-
+    @Override
+    protected Comparator<Author> getComparator() {
+        return authorComparator;
     }
 
     @Override
-    public List<String> complete(String toComplete) {
-        if (toComplete == null) {
-            return new ArrayList<>();
-        }
-
-        String result;
-        // Normally, one would implement that using
-        // class inheritance. But this seemed overengineered
-        if (this.lastNameOnlyAndSeparationBySpace) {
-            result = determinePrefixAndReturnRemainder(toComplete, " ");
-        } else {
-            result = determinePrefixAndReturnRemainder(toComplete, " and ");
-        }
-        return super.complete(result);
-    }
-
-    @Override
-    public String getPrefix() {
-        return prefix;
-    }
-
-    @Override
-    protected int getLengthOfShortestWordToAdd() {
-        return 1;
+    protected boolean isMatch(Author suggestion, AutoCompletionBinding.ISuggestionRequest request) {
+        String userTextLower = request.getUserText().toLowerCase();
+        String suggestionStr = suggestion.getNameForAlphabetization().toLowerCase();
+        return suggestionStr.contains(userTextLower);
     }
 }

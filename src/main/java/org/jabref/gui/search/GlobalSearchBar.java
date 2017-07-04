@@ -31,12 +31,13 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
-import org.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.logic.util.OS;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
@@ -51,16 +52,13 @@ public class GlobalSearchBar extends JPanel {
 
     private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     private final JTextFieldWithPlaceholder searchField = new JTextFieldWithPlaceholder(Localization.lang("Search") + "...");
-    private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
-
     private final JToggleButton caseSensitive;
     private final JToggleButton regularExp;
     private final JButton searchModeButton = new JButton();
     private final JLabel currentResults = new JLabel("");
-
-    private AutoCompleteSupport<String> autoCompleteSupport = new AutoCompleteSupport<>(searchField);
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-
+    private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+    private AutoCompleteSupport<Author> autoCompleteSupport = new AutoCompleteSupport<>(searchField);
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
@@ -355,7 +353,7 @@ public class GlobalSearchBar extends JPanel {
         openCurrentResultsInDialog.setEnabled(false);
     }
 
-    public void setAutoCompleter(AutoCompleter<String> searchCompleter) {
+    public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
         this.autoCompleteSupport.setAutoCompleter(searchCompleter);
     }
 

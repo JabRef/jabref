@@ -3,7 +3,7 @@ package org.jabref.gui.autocompleter;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -30,7 +30,7 @@ public class ListAutoCompleteRenderer<E> extends AutoCompleteRenderer<E> {
     private Boolean interpretSelectionChangeAsAccept = true;
 
     @Override
-    public void update(List<E> autoCompletions) {
+    public void update(Collection<E> autoCompletions) {
         if (autoCompletions == null) {
             model.removeAllElements();
         } else {

@@ -24,12 +24,11 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.jabref.gui.util;
+package org.jabref.gui.autocompleter;
 
 import java.util.Collection;
 
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TextInputControl;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -45,90 +44,56 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
  */
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 
-    /***************************************************************************
-     *                                                                         *
-     * Event Listeners                                                         *
-     *                                                                         *
-     **************************************************************************/
-
-
-    private final ChangeListener<String> textChangeListener = new ChangeListener<String>() {
-        @Override
-        public void changed(ObservableValue<? extends String> obs, String oldText, String newText) {
-            if (getCompletionTarget().isFocused()) {
-                setUserInput(newText);
-            }
+    private final ChangeListener<Boolean> focusChangedListener = (obs, oldFocused, newFocused) -> {
+        if (!newFocused) {
+            hidePopup();
         }
     };
-
-    /***************************************************************************
-     *                                                                         *
-     * Private fields                                                          *
-     *                                                                         *
-     **************************************************************************/
-    private final ChangeListener<Boolean> focusChangedListener = new ChangeListener<Boolean>() {
-        @Override
-        public void changed(ObservableValue<? extends Boolean> obs, Boolean oldFocused, Boolean newFocused) {
-            if (newFocused == false)
-                hidePopup();
-        }
-    };
-
-
-    /***************************************************************************
-     *                                                                         *
-     * Constructors                                                            *
-     *                                                                         *
-     **************************************************************************/
     /**
      * String converter to be used to convert suggestions to strings.
      */
     private StringConverter<T> converter;
+    private AutoCompletionStrategy inputAnalyzer;
+    private final ChangeListener<String> textChangeListener = (obs, oldText, newText) -> {
+        if (getCompletionTarget().isFocused()) {
+            AutoCompletionInput input = inputAnalyzer.analyze(newText);
+            setUserInput(input.getUnfinishedPart());
+        }
+    };
+
 
     /**
      * Creates a new auto-completion binding between the given textInputControl
      * and the given suggestion provider.
-     *
-     * @param textInputControl
-     * @param suggestionProvider
      */
-    public AutoCompletionTextInputBinding(final TextInputControl textInputControl,
-                                          Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
+    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+                                           Callback<ISuggestionRequest, Collection<T>> suggestionProvider) {
 
-        this(textInputControl, suggestionProvider, AutoCompletionTextInputBinding
-                .<T>defaultStringConverter());
+        this(textInputControl,
+                suggestionProvider,
+                AutoCompletionTextInputBinding.defaultStringConverter(),
+                new ReplaceStrategy());
     }
 
+    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+                                           final Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+                                           final StringConverter<T> converter) {
+        this(textInputControl, suggestionProvider, converter, new ReplaceStrategy());
+    }
 
-    /***************************************************************************
-     *                                                                         *
-     * Public API                                                              *
-     *                                                                         *
-     **************************************************************************/
-
-    /**
-     * Creates a new auto-completion binding between the given textInputControl
-     * and the given suggestion provider.
-     *
-     * @param textInputControl
-     * @param suggestionProvider
-     */
-    public AutoCompletionTextInputBinding(final TextInputControl textInputControl,
-                                          Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
-                                          final StringConverter<T> converter) {
+    private AutoCompletionTextInputBinding(final TextInputControl textInputControl,
+                                           final Callback<ISuggestionRequest, Collection<T>> suggestionProvider,
+                                           final StringConverter<T> converter,
+                                           final AutoCompletionStrategy inputAnalyzer) {
 
         super(textInputControl, suggestionProvider, converter);
         this.converter = converter;
+        this.inputAnalyzer = inputAnalyzer;
 
         getCompletionTarget().textProperty().addListener(textChangeListener);
         getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
-    /***************************************************************************
-     *                                                                         *
-     * Static properties and methods                                           *
-     *                                                                         *
-     **************************************************************************/
 
     private static <T> StringConverter<T> defaultStringConverter() {
         return new StringConverter<T>() {
@@ -149,23 +114,30 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         new AutoCompletionTextInputBinding<>(textArea, suggestionProvider);
     }
 
-    /** {@inheritDoc} */
+    public static <T> void autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, StringConverter<T> converter) {
+        new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter);
+    }
+
+    public static <T> void autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, StringConverter<T> converter, AutoCompletionStrategy inputAnalyzer) {
+        new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter, inputAnalyzer);
+    }
+
     @Override
     public TextInputControl getCompletionTarget() {
         return (TextInputControl) super.getCompletionTarget();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void dispose() {
         getCompletionTarget().textProperty().removeListener(textChangeListener);
         getCompletionTarget().focusedProperty().removeListener(focusChangedListener);
     }
 
-    /** {@inheritDoc} */
     @Override
     protected void completeUserInput(T completion) {
-        String newText = converter.toString(completion);
+        String completionText = converter.toString(completion);
+        AutoCompletionInput input = inputAnalyzer.analyze(getCompletionTarget().getText());
+        String newText = input.getPrefix() + completionText;
         getCompletionTarget().setText(newText);
         getCompletionTarget().positionCaret(newText.length());
     }

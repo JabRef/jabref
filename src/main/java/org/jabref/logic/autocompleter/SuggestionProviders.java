@@ -8,6 +8,9 @@ import java.util.Objects;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.FieldProperty;
+import org.jabref.model.entry.InternalBibtexFields;
 
 public class SuggestionProviders {
 
@@ -27,10 +30,9 @@ public class SuggestionProviders {
                                JournalAbbreviationLoader abbreviationLoader) {
         Objects.requireNonNull(preferences);
 
-        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader);
         List<String> completeFields = preferences.getCompleteNames();
         for (String field : completeFields) {
-            AutoCompleteSuggestionProvider<?> autoCompleter = autoCompleterFactory.getForField(field);
+            AutoCompleteSuggestionProvider<?> autoCompleter = initalizeSuggestionProvider(field, preferences, abbreviationLoader);
             providers.put(field, autoCompleter);
         }
     }
@@ -51,6 +53,19 @@ public class SuggestionProviders {
     public void indexEntry(BibEntry bibEntry) {
         for (AutoCompleteSuggestionProvider<?> autoCompleter : providers.values()) {
             autoCompleter.indexEntry(bibEntry);
+        }
+    }
+
+    private AutoCompleteSuggestionProvider<?> initalizeSuggestionProvider(String fieldName, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
+        if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
+            return new PersonNameSuggestionProvider(fieldName);
+        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+            return new BibEntrySuggestionProvider();
+        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
+                || FieldName.PUBLISHER.equals(fieldName)) {
+            return new JournalsSuggestionProvider(fieldName, preferences, abbreviationLoader);
+        } else {
+            return new WordSuggestionProvider(fieldName);
         }
     }
 }

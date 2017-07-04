@@ -2,7 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Renders the list of possible autocomplete items. Also takes care of the currently selected item.
@@ -16,7 +16,7 @@ public abstract class AutoCompleteRenderer<E> {
      *
      * @param items list of possible autocomplete items
      */
-    public abstract void update(List<E> items);
+    public abstract void update(Collection<E> items);
 
     /**
      * Creates the control which will be shown in the autocomplete popup.

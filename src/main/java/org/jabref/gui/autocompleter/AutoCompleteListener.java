@@ -5,12 +5,13 @@ import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
-import org.jabref.logic.autocompleter.AutoCompleter;
+import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +21,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     //TODO: The logging behavior in this class is probably too fine-grained and only understandable to its original author
     private static final Log LOGGER = LogFactory.getLog(AutoCompleteListener.class);
 
-    private final AutoCompleter<String> completer;
+    private final AutoCompleteSuggestionProvider<String> completer;
 
     // These variables keep track of the situation from time to time.
     private String toSetIn; // null indicates that there are no completions available
@@ -35,7 +36,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     // run before the focus listener responsible for storing the current edit.
     private FocusListener nextFocusListener;
 
-    public AutoCompleteListener(AutoCompleter<String> completer) {
+    public AutoCompleteListener(AutoCompleteSuggestionProvider<String> completer) {
         //    	if (logger.getHandlers().length == 0) {
         //	    	logger.setLevel(Level.FINEST);
         //	    	ConsoleHandler ch = new ConsoleHandler();
@@ -216,7 +217,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         JTextComponent comp = (JTextComponent) e.getSource();
 
         List<String> completed = findCompletions(currentword.toString());
-        String prefix = completer.getPrefix();
+        String prefix = null;
         String cWord = (prefix != null) && (!prefix.isEmpty()) ? currentword.toString()
                 .substring(prefix.length()) : currentword.toString();
 
@@ -275,7 +276,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
         if ((e.getModifiers() | InputEvent.SHIFT_MASK) == InputEvent.SHIFT_MASK) {
             // plain key or SHIFT + key is pressed, no handling of CTRL+key,  META+key, ...
             if (Character.isLetter(ch) || Character.isDigit(ch)
-                    || (Character.isWhitespace(ch) && completer.isSingleUnitField())) {
+                    || (Character.isWhitespace(ch))) {
 
                 JTextComponent comp = (JTextComponent) e.getSource();
 
@@ -377,7 +378,6 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 return;
             } else {
                 if (Character.isWhitespace(ch)) {
-                    assert (!completer.isSingleUnitField());
                     LOGGER.debug("whitespace && !singleUnitField");
                     // start a new search if end-of-field is reached
 
@@ -407,7 +407,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
     }
 
     private List<String> findCompletions(String beginning) {
-        return completer.complete(beginning);
+        return new ArrayList<>(completer.call(AutoCompleterUtil.getRequest((beginning))));
     }
 
     private StringBuffer getCurrentWord(JTextComponent comp) {
@@ -419,8 +419,8 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
             // We now have the text from the start of the field up to the caret position.
             // In most fields, we are only interested in the currently edited word, so we
             // seek from the caret backward to the closest space:
-            if (!completer.isSingleUnitField()) {
-                if ((comp.getCaretPosition() < comp.getText().length())
+
+            if ((comp.getCaretPosition() < comp.getText().length())
                         && Character.isWhitespace(comp.getText().charAt(comp.getCaretPosition()))) {
                     // caret is in the middle of the text AND current character is a whitespace
                     // that means: a new word is started and there is no current word
@@ -434,11 +434,7 @@ public class AutoCompleteListener extends KeyAdapter implements FocusListener {
                 // piv points to whitespace char or piv is -1
                 // copy everything from the next char up to the end of "upToCaret"
                 res.append(upToCaret.substring(piv + 1));
-            } else {
-                // For fields such as "journal" it is more reasonable to try to complete on the entire
-                // text field content, so we skip the searching and keep the entire part up to the caret:
-                res.append(upToCaret);
-            }
+
             LOGGER.debug("AutoCompListener: " + res);
         } catch (BadLocationException ignore) {
             // Ignored

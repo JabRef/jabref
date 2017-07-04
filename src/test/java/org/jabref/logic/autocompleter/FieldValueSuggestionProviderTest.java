@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.jabref.logic.autocompleter.AutoCompleterTestUtil.getRequest;
+import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 
 public class FieldValueSuggestionProviderTest {
     private FieldValueSuggestionProvider autoCompleter;

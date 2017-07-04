@@ -1,9 +1,9 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
-public class AutoCompleterTestUtil {
-    static AutoCompletionBinding.ISuggestionRequest getRequest(String text) {
+public class AutoCompleterUtil {
+    public static AutoCompletionBinding.ISuggestionRequest getRequest(String text) {
         return new AutoCompletionBinding.ISuggestionRequest() {
             @Override
             public boolean isCancelled() {

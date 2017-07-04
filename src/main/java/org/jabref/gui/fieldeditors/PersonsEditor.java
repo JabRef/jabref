@@ -7,15 +7,16 @@ import javafx.scene.layout.Priority;
 
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.model.entry.BibEntry;
 
-public class SimpleEditor extends HBox implements FieldEditorFX {
+public class PersonsEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final SimpleEditorViewModel viewModel;
+    @FXML private final PersonsEditorViewModel viewModel;
 
-    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider);
+    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences) {
+        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, autoCompletePreferences);
 
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
@@ -23,7 +24,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
         this.getChildren().add(textArea);
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
+        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
     }
 
     @Override
