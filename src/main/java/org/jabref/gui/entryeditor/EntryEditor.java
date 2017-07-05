@@ -186,14 +186,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     KeyEvent event = new KeyEvent(e.getSource(), null, KeyEvent.KEY_PRESSED, "", "", code, e.isShiftDown(), e.isControlDown(), e.isAltDown(), e.isMetaDown());
 
                     Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
-                    System.out.println(keyBinding);
                     if (keyBinding.isPresent()) {
 
                         switch (keyBinding.get()) {
                         case CUT:
                         case COPY:
+                        case PASTE:
                         case CLOSE_ENTRY_EDITOR:
                         case DELETE_ENTRY:
+                        case SELECT_ALL:
                             e.consume();
                             break;
                         default:

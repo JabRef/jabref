@@ -142,6 +142,7 @@ public class KeyBindingRepository {
 
     private KeyCombination getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
+        binding = binding.replaceAll(" ", "+"); //javafdx expects plus signs between modifiers, swing not
         return KeyCombination.valueOf(binding);
     }
 

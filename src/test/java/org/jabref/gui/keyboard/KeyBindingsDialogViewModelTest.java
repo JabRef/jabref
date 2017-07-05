@@ -175,18 +175,13 @@ public class KeyBindingsDialogViewModelTest {
     }
 
     @Test
-    public void testKeyEvent() {
+    public void testConversionAwtKeyEventJavafxKeyEvent() {
         java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
 
-        System.out.println(evt);
         Optional<KeyCode> found = Arrays.stream(KeyCode.values()).filter(k -> k.getName().equals(evt.getKeyText(evt.getKeyCode()))).findFirst();
-
-        System.out.println(found);
-
-        KeyEvent javafxevrent = new KeyEvent(evt.getSource(), null, KeyEvent.KEY_PRESSED, "", "", found.get(), evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown());
-
-        boolean match = KeyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.SAVE_DATABASE.getDefaultKeyBinding()), javafxevrent);
-        System.out.println(match);
+        KeyEvent javafxEvent = new KeyEvent(evt.getSource(), null, KeyEvent.KEY_PRESSED, "", "", found.get(), evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown());
+        boolean match = KeyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf("ctrl+s"), javafxEvent);
+        assertEquals(true, match);
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
@@ -194,6 +189,5 @@ public class KeyBindingsDialogViewModelTest {
         model.selectedKeyBindingProperty().set(bindViewModel);
         return bindViewModel;
     }
-
 
 }
