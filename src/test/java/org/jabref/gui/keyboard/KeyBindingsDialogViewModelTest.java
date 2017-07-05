@@ -1,5 +1,11 @@
 package org.jabref.gui.keyboard;
 
+import java.awt.event.InputEvent;
+import java.util.Arrays;
+import java.util.Optional;
+
+import javax.swing.JFrame;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -168,10 +174,26 @@ public class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
 
+    @Test
+    public void testKeyEvent() {
+        java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
+
+        System.out.println(evt);
+        Optional<KeyCode> found = Arrays.stream(KeyCode.values()).filter(k -> k.getName().equals(evt.getKeyText(evt.getKeyCode()))).findFirst();
+
+        System.out.println(found);
+
+        KeyEvent javafxevrent = new KeyEvent(evt.getSource(), null, KeyEvent.KEY_PRESSED, "", "", found.get(), evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown());
+
+        boolean match = KeyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf(KeyBinding.SAVE_DATABASE.getDefaultKeyBinding()), javafxevrent);
+        System.out.println(match);
+    }
+
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
         KeyBindingViewModel bindViewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
         model.selectedKeyBindingProperty().set(bindViewModel);
         return bindViewModel;
     }
+
 
 }
