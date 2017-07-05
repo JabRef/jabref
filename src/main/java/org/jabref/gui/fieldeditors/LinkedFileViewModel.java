@@ -224,6 +224,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
         if (file.isPresent()) {
 
             ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+
             ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
             Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
                     Localization.lang("Delete '%0'", file.get().toString()),

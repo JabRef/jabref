@@ -47,13 +47,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
+
     private static final Log LOGGER = LogFactory.getLog(LinkedFilesEditorViewModel.class);
 
-    private ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
-    private BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
-    private DialogService dialogService;
-    private BibDatabaseContext databaseContext;
-    private TaskExecutor taskExecutor;
+    private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
+    private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
+    private final DialogService dialogService;
+    private final BibDatabaseContext databaseContext;
+    private final TaskExecutor taskExecutor;
 
     public LinkedFilesEditorViewModel(DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
@@ -63,8 +64,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 files,
                 text,
                 LinkedFilesEditorViewModel::getStringRepresentation,
-                this::parseToFileViewModel
-        );
+                this::parseToFileViewModel);
     }
 
     private static String getStringRepresentation(List<LinkedFileViewModel> files) {
@@ -126,8 +126,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 newFile -> {
                     LinkedFile newLinkedFile = fromFile(newFile, fileDirectories);
                     files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
-                }
-        );
+                });
     }
 
     @Override
@@ -193,8 +192,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             } catch (MalformedURLException exception) {
                 dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid URL"),
-                        exception
-                );
+                        exception);
             }
         }
     }
@@ -217,8 +215,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             LinkedFile newLinkedFile = fromFile(destination, fileDirectories);
             files.add(new LinkedFileViewModel(newLinkedFile, entry, databaseContext));
         });
-        downloadTask.setOnFailed(event ->
-                dialogService.showErrorDialogAndWait("", downloadTask.getException()));
+        downloadTask.setOnFailed(event -> dialogService.showErrorDialogAndWait("", downloadTask.getException()));
         taskExecutor.execute(downloadTask);
     }
 
@@ -302,5 +299,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         if (deleteSuccessful) {
             files.remove(file);
         }
+    }
+
+    public void removeFileLink(LinkedFileViewModel file) {
+        files.remove(file);
     }
 }
