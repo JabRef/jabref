@@ -1,7 +1,6 @@
 package org.jabref.gui.keyboard;
 
 import java.awt.event.InputEvent;
-import java.util.Arrays;
 import java.util.Optional;
 
 import javax.swing.JFrame;
@@ -176,12 +175,13 @@ public class KeyBindingsDialogViewModelTest {
 
     @Test
     public void testConversionAwtKeyEventJavafxKeyEvent() {
+
+
         java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
 
-        Optional<KeyCode> found = Arrays.stream(KeyCode.values()).filter(k -> k.getName().equals(evt.getKeyText(evt.getKeyCode()))).findFirst();
-        KeyEvent javafxEvent = new KeyEvent(evt.getSource(), null, KeyEvent.KEY_PRESSED, "", "", found.get(), evt.isShiftDown(), evt.isControlDown(), evt.isAltDown(), evt.isMetaDown());
-        boolean match = KeyBindingRepository.checkKeyCombinationEquality(KeyCombination.valueOf("ctrl+s"), javafxEvent);
-        assertEquals(true, match);
+        Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(evt);
+        assertEquals(Optional.of(KeyBinding.SAVE_DATABASE), keyBinding);
+
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {

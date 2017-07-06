@@ -14,7 +14,6 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +39,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.Globals;
@@ -180,31 +178,21 @@ public class EntryEditor extends JPanel implements EntryContainer {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
                 //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-
-                Optional<KeyCode> keyCode = Arrays.stream(KeyCode.values()).filter(k -> k.getName().equals(e.getKeyText(e.getKeyCode()))).findFirst();
-                keyCode.ifPresent(code -> {
-                    KeyEvent event = new KeyEvent(e.getSource(), null, KeyEvent.KEY_PRESSED, "", "", code, e.isShiftDown(), e.isControlDown(), e.isAltDown(), e.isMetaDown());
-
-                    Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
-                    if (keyBinding.isPresent()) {
-
-                        switch (keyBinding.get()) {
-                        case CUT:
-                        case COPY:
-                        case PASTE:
-                        case CLOSE_ENTRY_EDITOR:
-                        case DELETE_ENTRY:
-                        case SELECT_ALL:
-                            e.consume();
-                            break;
-                        default:
-                            //do nothing
-
-                        }
+                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+                if (keyBinding.isPresent()) {
+                    switch (keyBinding.get()) {
+                    case CUT:
+                    case COPY:
+                    case PASTE:
+                    case CLOSE_ENTRY_EDITOR:
+                    case DELETE_ENTRY:
+                    case SELECT_ALL:
+                        e.consume();
+                        break;
+                    default:
+                        //do nothing
                     }
-
-                });
-
+                }
             }
         });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
