@@ -126,12 +126,25 @@ public class KeyBindingRepository {
         return Optional.empty();
     }
 
+    public Optional<KeyBinding> mapToKeyBinding(java.awt.event.KeyEvent keyEvent) {
+        Optional<KeyCode> keyCode = Arrays.stream(KeyCode.values()).filter(k -> k.getName().equals(keyEvent.getKeyText(keyEvent.getKeyCode()))).findFirst();
+        if (keyCode.isPresent()) {
+            KeyEvent event = new KeyEvent(keyEvent.getSource(), null, KeyEvent.KEY_PRESSED, "", "", keyCode.get(), keyEvent.isShiftDown(), keyEvent.isControlDown(), keyEvent.isAltDown(), keyEvent.isMetaDown());
+            return mapToKeyBinding(event);
+
+        }
+
+        return Optional.empty();
+
+    }
+
     /**
      * Returns the KeyStroke for this binding, as defined by the defaults, or in the Preferences.
      */
     public KeyStroke getKey(KeyBinding bindName) {
 
         String s = get(bindName.getConstant());
+        s = s.replace("+", " "); //swing needs the keys without pluses but whitespace between the modifiers
 
         if (OS.OS_X) {
             return getKeyForMac(KeyStroke.getKeyStroke(s));
