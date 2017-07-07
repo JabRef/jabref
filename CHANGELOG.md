@@ -11,10 +11,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- We moved the `adsurl` field to `url` field when fetching with the ADS fetcher. 
+- We moved the `adsurl` field to `url` field when fetching with the ADS fetcher.
 - We continued to improve the new groups interface:
   - You can now again select multiple groups (and a few related settings were added to the preferences) [#2786](https://github.com/JabRef/jabref/issues/2786).
-  - We further improved performance of group operations, especially of the new filter feature [#2852](https://github.com/JabRef/jabref/issues/2852). 
+  - We further improved performance of group operations, especially of the new filter feature [#2852](https://github.com/JabRef/jabref/issues/2852).
   - It is now possible to resort groups using drag & drop [#2785](https://github.com/JabRef/jabref/issues/2785).
 - The entry editor got a fresh coat of paint:
   - Homogenize the size of text fields.
@@ -39,6 +39,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an error that prevented the FileAnnotation tab to load when the entry had no bibtexkey [#2903](https://github.com/JabRef/jabref/issues/2903).
 - We fixed a bug which which could result in an exception when opening/saving files from/to a nonexistent directory [#2917](https://github.com/JabRef/jabref/issues/2917).
 - We fixed a bug where recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
+- We fixed a bug where new groups information was not stored on save [#2932](https://github.com/JabRef/jabref/issues/2932)
+
 ### Removed
 
 
@@ -140,7 +142,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - JabRef will now no longer delete meta data it does not know, but keeps such entries and tries to keep their formatting as far as possible.
 - Switch to the [latex2unicode library](https://github.com/tomtung/latex2unicode) for converting LaTeX to unicode
 - Single underscores are not converted during the LaTeX to unicode conversion, which does not follow the rules of LaTeX, but is what users require. [#2664](https://github.com/JabRef/jabref/issues/2664)
-- The bibtexkey field is not converted to unicode 
+- The bibtexkey field is not converted to unicode
 
 ### Fixed
  - ArXiV fetcher now checks similarity of entry when using DOI retrieval to avoid false positives [#2575](https://github.com/JabRef/jabref/issues/2575)
@@ -156,7 +158,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Sciencedirect/Elsevier fetcher is now able to scrape new HTML structure [#2576](https://github.com/JabRef/jabref/issues/2576)
  - Fixed the synchronization logic of keywords and special fields and vice versa [#2580](https://github.com/JabRef/jabref/issues/2580)
  - We fixed an exception that prevented JabRef from starting in rare cases [bug report in the forum](http://discourse.jabref.org/t/jabref-not-opening/476).
- - We fixed an unhandled exception when saving an entry containing unbalanced braces [#2571](https://github.com/JabRef/jabref/issues/2571) 
+ - We fixed an unhandled exception when saving an entry containing unbalanced braces [#2571](https://github.com/JabRef/jabref/issues/2571)
  - Fixed a display issue when removing a group with a long name [#1407](https://github.com/JabRef/jabref/issues/1407)
  - We fixed an issue where the "find unlinked files" functionality threw an error when only one PDF was imported but not assigned to an entry [#2577](https://github.com/JabRef/jabref/issues/2577)
  - We fixed issue where escaped braces were incorrectly counted when calculating brace balance in a field [#2561](https://github.com/JabRef/jabref/issues/2561)
@@ -174,7 +176,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue where the dialog for selecting the main file directory in the preferences opened the wrong folder
  - OpenOffice text formatting now handles nested tags properly [#2483](https://github.com/JabRef/jabref/issues/#2483)
  - The group selection is no longer lost when switching tabs [#1104](https://github.com/JabRef/jabref/issues/1104)
- 
+
 
 ## [3.8.2] – 2017-01-29
 
@@ -300,7 +302,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
-- [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title_case` for Title Case, `capitalize` for Capitalized first character of each word (difference is that title case will leave prepositions etc in lower case), and `sentence_case` for normal sentence case (first word capitalized). In addition `lower_case` and `upper_case` can be used instead of `lower` and `upper`. 
+- [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title_case` for Title Case, `capitalize` for Capitalized first character of each word (difference is that title case will leave prepositions etc in lower case), and `sentence_case` for normal sentence case (first word capitalized). In addition `lower_case` and `upper_case` can be used instead of `lower` and `upper`.
 - Added two new pseudo-fields for search: `anykeyword` to search for a specific keyword and `anyfield` to search in all fields (useful in combination with search in specific fields)
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
@@ -532,7 +534,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added \SOFTWARE\Jabref 'Path' registry entry for installation path inside the installer
 - Added an additional icon to distinguish DOI and URL links ([feature request #696](https://github.com/JabRef/jabref/issues/696))
 - Added nbib fields to Medlineplain importer and to MedlineImporter
-- Implemented [#1342](https://github.com/JabRef/jabref/issues/1342): show description of case converters as tooltip 
+- Implemented [#1342](https://github.com/JabRef/jabref/issues/1342): show description of case converters as tooltip
 - Updated German translation
 
 ### Fixed
@@ -541,8 +543,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1234](https://github.com/JabRef/jabref/issues/1234): NPE when getting information from retrieved DOI
 - Fixed [#1245](https://github.com/JabRef/jabref/issues/1245): Empty jstyle properties can now be specified as ""
 - Fixed [#1259](https://github.com/JabRef/jabref/issues/1259): NPE when sorting tabs
-- Fixed display bug in the cleanup dialog: field formatters are now correctly displayed using their name 
-- Fixed [#1271](https://github.com/JabRef/jabref/issues/1271): Authors with compound first names are displayed properly 
+- Fixed display bug in the cleanup dialog: field formatters are now correctly displayed using their name
+- Fixed [#1271](https://github.com/JabRef/jabref/issues/1271): Authors with compound first names are displayed properly
 - Fixed: Selecting invalid jstyle causes NPE and prevents opening of style selection dialog
 - Fixed: Move linked files to default directory works again
 - Fixed [#1327](https://github.com/JabRef/jabref/issues/1327): PDF cleanup changes order of linked pdfs
@@ -592,7 +594,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Add ability to run arbitrary formatters as cleanup actions (some old cleanup jobs are replaced by this functionality)
 - Add "Move linked files to default file directory" as cleanup procedure
 - Implemented [#756](https://github.com/JabRef/jabref/issues/756): Add possibility to reformat all entries on save (under Preferences, File)
-- All fields in a bib entry are written without any leading and trailing whitespace 
+- All fields in a bib entry are written without any leading and trailing whitespace
 - Comments and preamble are serialized with capitalized first letter, i.e. `@Comment` instead of `@comment` and `@Preamble` instead of `@PREAMBLE`.
 - Global sorting options and preferences are removed. Databases can still be sorted on save, but this is configured locally and stored in the file
 - OvidImporter now also imports fields: doi, issn, language and keywords
@@ -721,7 +723,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implements [#565](https://github.com/JabRef/jabref/issues/565): Highlighting matches works now also for regular expressions in preview panel and entry editor
 - IEEEXplore search now downloads the full Bibtex record instead of parsing the fields from the HTML webpage result (fixes [bug 1146](https://sourceforge.net/p/jabref/bugs/1146/) and [bug 1267](https://sourceforge.net/p/jabref/bugs/1267/))
 - Christmas color theme (red and green)
-- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field. 
+- Implements #444: The search is cleared by either clicking the clear-button or by pressing ESC with having focus in the search field.
 - Added command line switch --debug to show more detailed logging messages
 
 ### Fixed
@@ -781,8 +783,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
    - Search options are available via a drop-down list, this implements [feature request 853](https://sourceforge.net/p/jabref/feature-requests/853/)
    - "Clear search" button also clears search field, this implements [feature request 601](https://sourceforge.net/p/jabref/feature-requests/601/)
    - Every search is done automatically (live) as soon as the search text is changed
-   - Search is local by default. To do a global search, one has to do a local search and then this search can be done globally as well, opening a new window. 
-   - The local search results can be shown in a new window. 
+   - Search is local by default. To do a global search, one has to do a local search and then this search can be done globally as well, opening a new window.
+   - The local search results can be shown in a new window.
  - Feature: Merge information from a DOI generated BibTex entry to an entry
  - Added more characters to HTML/Unicode converter
  - Feature: Push citations to Texmaker ([bug 318](https://sourceforge.net/p/jabref/bugs/318/), [bug 582](https://sourceforge.net/p/jabref/bugs/582/))
@@ -818,7 +820,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - Update supported LookAndFeels
  - Show replaced journal abbreviations on console
  - Integrated [GVK-Plugin](http://www.gbv.de/wikis/cls/Jabref-GVK-Plugin)
- - The three options to manage file references are moved to their own separated group in the Tools menu. 
+ - The three options to manage file references are moved to their own separated group in the Tools menu.
  - Default preferences: Remote server (port 6050) always started on first JabRef instance. This prevents JabRef loaded twice when opening a bib file.
 
 ### Fixed
