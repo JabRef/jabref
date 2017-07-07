@@ -1,5 +1,5 @@
 ## Prerequisites:
-* Java Development Kit ([Download JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp))
+* Java Development Kit ([Download JDK from Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html?ssSourceSiteId=otnjp) - or execute `choco install jdk8` when using [chocolatey](https://chocolatey.org/))
 
 An indication that `JAVA_HOME` is not correctly set or no JDK is installed is following error message:
 
