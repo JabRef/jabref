@@ -26,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)
 - The integrity check for person names now also tests that the names are specified in one of the standard BibTeX formats.
 - Links in the Recommended Articles tab (Mr.DLib), when clicked, are now opened in the system's default browser. [2931](https://github.com/JabRef/jabref/issues/2931)
+- We improved the duplicate checker such that different editions of the same publication are not marked as duplicates. [2960](https://github.com/JabRef/jabref/issues/2960)
 
 ### Fixed
 - We fixed the function "Edit - Copy BibTeX key and link" to pass a hyperlink rather than an HTML statement.
