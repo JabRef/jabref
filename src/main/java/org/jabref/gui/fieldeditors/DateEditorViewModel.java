@@ -33,7 +33,6 @@ public class DateEditorViewModel extends AbstractEditorViewModel {
             @Override
             public TemporalAccessor fromString(String string) {
                 if (StringUtil.isNotBlank(string)) {
-
                     try {
                         return dateFormatter.parse(string);
                     } catch (DateTimeParseException exception) {

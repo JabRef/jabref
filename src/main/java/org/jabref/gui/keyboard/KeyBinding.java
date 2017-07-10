@@ -14,7 +14,7 @@ public enum KeyBinding {
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE", KeyBindingCategory.FILE),
-    CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "ESCAPE", KeyBindingCategory.VIEW),
+    CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
     COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl+K", KeyBindingCategory.EDIT),
@@ -25,6 +25,7 @@ public enum KeyBinding {
     CUT("Cut", Localization.lang("Cut"), "ctrl+X", KeyBindingCategory.EDIT),
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl+MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
+    DOWNLOAD_FULL_TEXT("Look up full text documents", Localization.lang("Look up full text documents"), "alt+F7", KeyBindingCategory.QUALITY),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl+E", KeyBindingCategory.BIBTEX),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl+T", KeyBindingCategory.BIBTEX),
     ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "ctrl+shift+DOWN", KeyBindingCategory.VIEW),
@@ -92,27 +93,35 @@ public enum KeyBinding {
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
     WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS);
 
-    private final String key;
+    private final String constant;
     private final String localization;
     private final String defaultBinding;
     private final KeyBindingCategory category;
 
-    KeyBinding(String key, String localization, String defaultBinding, KeyBindingCategory category) {
-        this.key = key;
+    KeyBinding(String constantName, String localization, String defaultKeyBinding, KeyBindingCategory category) {
+        this.constant = constantName;
         this.localization = localization;
-        this.defaultBinding = defaultBinding;
+        this.defaultBinding = defaultKeyBinding;
         this.category = category;
     }
 
-    public String getKey() {
-        return key;
+    /**
+     * This method returns the enum constant value
+     * @return
+     */
+    public String getConstant() {
+        return constant;
     }
 
     public String getLocalization() {
         return localization;
     }
 
-    public String getDefaultBinding() {
+    /**
+     * This method returns the default key binding, the key(s) which are assigned
+     * @return The default key binding
+     */
+    public String getDefaultKeyBinding() {
         return defaultBinding;
     }
 

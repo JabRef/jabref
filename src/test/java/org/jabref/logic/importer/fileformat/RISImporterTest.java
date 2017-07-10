@@ -24,12 +24,12 @@ public class RISImporterTest {
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals(importer.getName(), "RIS");
+        Assert.assertEquals("RIS", importer.getName());
     }
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals(importer.getId(), "ris");
+        Assert.assertEquals("ris", importer.getId());
     }
 
     @Test

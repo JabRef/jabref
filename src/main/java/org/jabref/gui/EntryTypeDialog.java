@@ -165,7 +165,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
         WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
         // set DOI as default
-        comboBox.setSelectedItem(DoiFetcher.name);
+        comboBox.setSelectedItem(DoiFetcher.NAME);
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();

@@ -12,6 +12,7 @@ import javafx.scene.web.WebView;
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +44,10 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     progress.setVisible(false);
                     browser.getEngine().loadContent(convertToHtml(relatedArticles));
                 })
-                .executeWith(Globals.taskExecutor);
+                .executeWith(Globals.TASK_EXECUTOR);
+
+        browser.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(browser));
+
         return root;
     }
 
@@ -68,7 +72,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         htmlContent.append("</ul>");
         htmlContent.append("<br><div style='margin-left: 5px'>");
         htmlContent.append(
-                "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#'>");
+                "<a href='http://mr-dlib.org/information-for-users/information-about-mr-dlib-for-jabref-users/#' target=\"_blank\">");
         htmlContent.append(Localization.lang("What_is_Mr._DLib?"));
         htmlContent.append("</a></div>");
         htmlContent.append("</body></html>");

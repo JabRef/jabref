@@ -34,7 +34,7 @@ import org.jabref.gui.util.BindingsHelper;
  * Inspiration taken from https://github.com/edvin/tornadofx-controls/blob/master/src/main/java/tornadofx/control/DateTimePicker.java
  */
 public class TemporalAccessorPicker extends DatePicker {
-    private ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(LocalDateTime.now());
+    private ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
 
     private DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private ObjectProperty<StringConverter<TemporalAccessor>> converter = new SimpleObjectProperty<StringConverter<TemporalAccessor>>(null);
