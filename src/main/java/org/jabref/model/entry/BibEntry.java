@@ -605,7 +605,8 @@ public class BibEntry implements Cloneable {
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
-        this.commentsBeforeEntry = parsedComments;
+        // delete trailing whitespaces (between entry and text)
+        this.commentsBeforeEntry = REMOVE_TRAILING_WHITESPACE.matcher(parsedComments).replaceFirst("");
     }
 
     public boolean hasChanged() {
@@ -700,7 +701,9 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type, entry.type) && Objects.equals(fields, entry.fields);
+        return Objects.equals(type, entry.type)
+                && Objects.equals(fields, entry.fields)
+                && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
@@ -730,8 +733,7 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-        // delete trailing whitespaces (between entry and text) from stored serialization
-        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+        return commentsBeforeEntry;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
