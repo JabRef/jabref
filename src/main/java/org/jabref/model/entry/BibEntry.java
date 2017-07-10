@@ -214,15 +214,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -605,7 +605,8 @@ public class BibEntry implements Cloneable {
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
-        this.commentsBeforeEntry = parsedComments;
+        // delete trailing whitespaces (between entry and text)
+        this.commentsBeforeEntry = REMOVE_TRAILING_WHITESPACE.matcher(parsedComments).replaceFirst("");
     }
 
     public boolean hasChanged() {
@@ -732,8 +733,7 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-        // delete trailing whitespaces (between entry and text) from stored serialization
-        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+        return commentsBeforeEntry;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
