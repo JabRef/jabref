@@ -34,7 +34,7 @@ public class HelpAction extends MnemonicAwareAction {
     /**
      * New languages of the help have to be added here
      */
-    private static final Set<String> avaiableLangFiles = Stream.of("en", "de", "fr", "in", "ja")
+    private static final Set<String> AVAIABLE_LANG_FILES = Stream.of("en", "de", "fr", "in", "ja")
             .collect(Collectors.toCollection(HashSet::new));
 
     private HelpFile helpPage;
@@ -99,7 +99,7 @@ public class HelpAction extends MnemonicAwareAction {
         String lang = Globals.prefs.get(JabRefPreferences.LANGUAGE);
         StringBuilder sb = new StringBuilder("https://help.jabref.org/");
 
-        if (avaiableLangFiles.contains(lang)) {
+        if (AVAIABLE_LANG_FILES.contains(lang)) {
             sb.append(lang);
             sb.append("/");
         } else {

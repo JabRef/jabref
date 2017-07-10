@@ -22,11 +22,11 @@ import org.apache.commons.logging.LogFactory;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
-    private static final String homepageUrl = "https://www.jabref.org";
-    private static final String donationUrl = "https://donations.jabref.org";
-    private static final String librariesUrl = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
-    private static final String githubUrl = "https://github.com/JabRef/jabref";
-    private static final String licenseUrl = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String HOMEPAGE_URL = "https://www.jabref.org";
+    private static final String DONATION_URL = "https://donations.jabref.org";
+    private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
+    private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
+    private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
     private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
@@ -115,15 +115,15 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openJabrefWebsite() {
-        openWebsite(homepageUrl);
+        openWebsite(HOMEPAGE_URL);
     }
 
     public void openExternalLibrariesWebsite() {
-        openWebsite(librariesUrl);
+        openWebsite(LIBRARIES_URL);
     }
 
     public void openGithub() {
-        openWebsite(githubUrl);
+        openWebsite(GITHUB_URL);
     }
 
     public void openChangeLog() {
@@ -131,11 +131,11 @@ public class AboutDialogViewModel extends AbstractViewModel {
     }
 
     public void openLicense() {
-        openWebsite(licenseUrl);
+        openWebsite(LICENSE_URL);
     }
 
     public void openDonation() {
-        openWebsite(donationUrl);
+        openWebsite(DONATION_URL);
     }
 
     private void openWebsite(String url) {

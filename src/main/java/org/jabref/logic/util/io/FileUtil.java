@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
-    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
@@ -51,7 +51,7 @@ public class FileUtil {
      * Adds an extension to the given file name. The original extension is not replaced. That means,
      * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
      *
-     * @param path the path to add the extension to
+     * @param path      the path to add the extension to
      * @param extension the extension to add
      * @return the with the modified file name
      */
@@ -108,7 +108,6 @@ public class FileUtil {
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
-     * @throws IOException
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
@@ -142,11 +141,10 @@ public class FileUtil {
     /**
      * Renames a given file
      *
-     * @param fromFile The source filename to rename
-     * @param toFile   The target fileName
+     * @param fromFile        The source filename to rename
+     * @param toFile          The target fileName
      * @param replaceExisting Wether to replace existing files or not
      * @return True if the rename was successful, false if an exception occurred
-     *
      */
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
@@ -188,9 +186,8 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes list of BibTeX entries
+     * @param bes      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
-     *
      * @return list of files. May be empty
      */
     public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
@@ -213,7 +210,7 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
-            LayoutFormatterPreferences prefs) {
+                                                   LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
@@ -239,7 +236,7 @@ public class FileUtil {
      * Finds a file inside a directory structure.
      * Will also look for the file inside nested directories.
      *
-     * @param filename the name of the file that should be found
+     * @param filename      the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
@@ -259,7 +256,7 @@ public class FileUtil {
      * Finds a file inside a list of directory structures.
      * Will also look for the file inside nested directories.
      *
-     * @param filename the name of the file that should be found
+     * @param filename    the name of the file that should be found
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */
