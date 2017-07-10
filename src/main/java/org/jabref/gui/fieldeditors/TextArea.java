@@ -10,7 +10,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.util.DefaultTaskExecutor;
 
 import org.apache.commons.logging.Log;
@@ -28,8 +27,6 @@ public class TextArea implements FieldEditor {
 
     private final EditorTextArea textArea;
     private String fieldName;
-
-    private AutoCompleteListener autoCompleteListener;
 
     public TextArea(String fieldName, String content) {
         this(fieldName, content, "");
@@ -161,20 +158,6 @@ public class TextArea implements FieldEditor {
     @Override
     public void redo() {
         // Nothing
-    }
-
-    @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-        autoCompleteListener = listener;
-    }
-
-    @Override
-    public void clearAutoCompleteSuggestion() {
-        /*
-        if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
-        }
-        */
     }
 
     @Override

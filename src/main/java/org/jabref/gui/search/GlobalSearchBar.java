@@ -19,27 +19,37 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
+import javafx.css.PseudoClass;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Scene;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
+import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
-import org.jabref.gui.autocompleter.AutoCompleteSupport;
+import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.PersonNameStringConverter;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
-import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
-import org.jabref.logic.util.OS;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
+
+import org.fxmisc.easybind.EasyBind;
 
 public class GlobalSearchBar extends JPanel {
 
@@ -48,17 +58,20 @@ public class GlobalSearchBar extends JPanel {
     private static final Color RESULTS_FOUND_COLOR = new Color(217, 232, 202);
     private static final Color ADVANCED_SEARCH_COLOR = new Color(102, 255, 255);
 
+    private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
+    private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
+
+
     private final JabRefFrame frame;
 
     private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
-    private final JTextFieldWithPlaceholder searchField = new JTextFieldWithPlaceholder(Localization.lang("Search") + "...");
+    private final TextField searchField = new TextField();
     private final JToggleButton caseSensitive;
     private final JToggleButton regularExp;
     private final JButton searchModeButton = new JButton();
     private final JLabel currentResults = new JLabel("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
     private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
-    private AutoCompleteSupport<Author> autoCompleteSupport = new AutoCompleteSupport<>(searchField);
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
@@ -81,7 +94,6 @@ public class GlobalSearchBar extends JPanel {
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPreferredSize(new Dimension(150, 5));
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
-        searchField.setColumns(30);
 
         JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
@@ -145,10 +157,9 @@ public class GlobalSearchBar extends JPanel {
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
         clearSearchButton.addActionListener(event -> endSearch());
 
-        searchField.addFocusListener(Globals.getFocusListener());
-        searchField.addActionListener(event -> performSearch());
-        JTextFieldChangeListenerUtil.addChangeListener(searchField, e -> performSearch());
+        EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
+        /*
         String endSearch = "endSearch";
         searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
         searchField.getActionMap().put(endSearch, new AbstractAction() {
@@ -161,9 +172,9 @@ public class GlobalSearchBar extends JPanel {
                 }
             }
         });
+        */
 
-        autoCompleteSupport.install();
-
+        /*
         String acceptSearch = "acceptSearch";
         searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
         searchField.getActionMap().put(acceptSearch, new AbstractAction() {
@@ -175,18 +186,20 @@ public class GlobalSearchBar extends JPanel {
                 currentBasePanel.getMainTable().requestFocus();
             }
         });
+        */
+
+        JFXPanel container = new JFXPanel();
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            container.setScene(new Scene(searchField));
+        });
+        searchField.setPromptText(Localization.lang("Search") + "...");
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
-        if (OS.OS_X) {
-            searchField.putClientProperty("JTextField.variant", "search");
-            toolBar.add(searchField);
-        } else {
-            toolBar.add(searchIcon);
-            toolBar.add(searchField);
-            toolBar.add(clearSearchButton);
-        }
+        toolBar.add(searchIcon);
+        toolBar.add(container);
+        toolBar.add(clearSearchButton);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
         toolBar.addSeparator();
@@ -286,7 +299,7 @@ public class GlobalSearchBar extends JPanel {
      * Focuses the search field if it is not focused.
      */
     public void focus() {
-        if (!searchField.hasFocus()) {
+        if (!searchField.isFocused()) {
             searchField.requestFocus();
         }
         searchField.selectAll();
@@ -295,7 +308,6 @@ public class GlobalSearchBar extends JPanel {
     private void clearSearch(BasePanel currentBasePanel) {
         currentResults.setText("");
         searchField.setText("");
-        searchField.setBackground(NEUTRAL_COLOR);
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         searchQueryHighlightObservable.reset();
         openCurrentResultsInDialog.setEnabled(false);
@@ -339,7 +351,7 @@ public class GlobalSearchBar extends JPanel {
     }
 
     private void informUserAboutInvalidSearchQuery() {
-        searchField.setBackground(NO_RESULTS_COLOR);
+        searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
 
         searchQueryHighlightObservable.reset();
 
@@ -354,7 +366,10 @@ public class GlobalSearchBar extends JPanel {
     }
 
     public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        this.autoCompleteSupport.setAutoCompleter(searchCompleter);
+        AutoCompletionTextInputBinding.autoComplete(searchField,
+                searchCompleter,
+                new PersonNameStringConverter(true, true, AutoCompleteFirstNameMode.BOTH),
+                new AppendPersonNamesStrategy());
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -376,12 +391,12 @@ public class GlobalSearchBar extends JPanel {
     public void updateResults(int matched, String description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
-            this.searchField.setBackground(NO_RESULTS_COLOR);
+            searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
         } else {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
-            this.searchField.setBackground(RESULTS_FOUND_COLOR);
+            searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        this.searchField.setToolTipText("<html>" + description + "</html>");
+        searchField.setTooltip(new Tooltip(description));
 
         if (grammarBasedSearch) {
             searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(ADVANCED_SEARCH_COLOR));
@@ -405,8 +420,6 @@ public class GlobalSearchBar extends JPanel {
 
         setDontSelectSearchBar(dontSelectSearchBar);
         searchField.setText(searchTerm);
-        // to hinder the autocomplete window to popup
-        autoCompleteSupport.setVisible(false);
     }
 
     public void setDontSelectSearchBar(boolean dontSelectSearchBar) {

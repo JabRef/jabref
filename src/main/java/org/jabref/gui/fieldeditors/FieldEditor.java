@@ -4,8 +4,6 @@ import java.awt.Color;
 
 import javax.swing.JComponent;
 
-import org.jabref.gui.autocompleter.AutoCompleteListener;
-
 /**
  * FieldEditors is a common interface between the TextField and TextArea.
  */
@@ -71,8 +69,4 @@ public interface FieldEditor {
     void undo();
 
     void redo();
-
-    void setAutoCompleteListener(AutoCompleteListener listener);
-
-    void clearAutoCompleteSuggestion();
 }

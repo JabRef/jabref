@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
@@ -58,7 +57,7 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, new AutoCompletePreferences(preferences));
+            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences());
         }
 
         // default

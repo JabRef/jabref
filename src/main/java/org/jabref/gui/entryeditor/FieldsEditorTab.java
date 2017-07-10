@@ -109,16 +109,6 @@ class FieldsEditorTab extends EntryEditorTab {
             }
 
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
-
-            // Add autocompleter listener, if required for this field:
-            /*
-            AutoCompleter<String> autoCompleter = bPanel.getSuggestionProviders().get(field);
-            AutoCompleteListener autoCompleteListener = null;
-            if (autoCompleter != null) {
-                autoCompleteListener = new AutoCompleteListener(autoCompleter);
-            }
-            setupJTextComponent(fieldEditor.getTextComponent(), autoCompleteListener);
-            fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
             FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),

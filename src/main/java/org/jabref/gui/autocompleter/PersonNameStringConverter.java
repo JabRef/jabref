@@ -11,6 +11,12 @@ public class PersonNameStringConverter extends StringConverter<Author> {
     private final boolean autoCompLF;
     private final AutoCompleteFirstNameMode autoCompleteFirstNameMode;
 
+    public PersonNameStringConverter(boolean autoCompFF, boolean autoCompLF, AutoCompleteFirstNameMode autoCompleteFirstNameMode) {
+        this.autoCompFF = autoCompFF;
+        this.autoCompLF = autoCompLF;
+        this.autoCompleteFirstNameMode = autoCompleteFirstNameMode;
+    }
+
     public PersonNameStringConverter(AutoCompletePreferences preferences) {
         if (preferences.getOnlyCompleteFirstLast()) {
             autoCompFF = true;
@@ -22,8 +28,8 @@ public class PersonNameStringConverter extends StringConverter<Author> {
             autoCompFF = true;
             autoCompLF = true;
         }
-        autoCompleteFirstNameMode = preferences.getFirstnameMode() == null ? AutoCompleteFirstNameMode.BOTH : preferences
-                .getFirstnameMode();
+
+        autoCompleteFirstNameMode = preferences.getFirstNameMode();
     }
 
     @Override

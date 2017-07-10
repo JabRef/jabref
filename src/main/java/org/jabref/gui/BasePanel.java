@@ -1387,7 +1387,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Set up auto completion for this database
      */
     private void setupAutoCompletion() {
-        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
+        AutoCompletePreferences autoCompletePreferences = Globals.prefs.getAutoCompletePreferences();
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
             suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
             suggestionProviders.indexDatabase(getDatabase());
