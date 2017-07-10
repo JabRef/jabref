@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * This class contains utility method for duplicate checking of entries.
  */
 public class DuplicateCheck {
-    private static final double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
+    private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
     private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
     /*
@@ -88,18 +88,18 @@ public class DuplicateCheck {
             req = DuplicateCheck.compareFieldSet(var, one, two);
         }
 
-        if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
+        if (Math.abs(req[0] - DuplicateCheck.DUPLICATE_THRESHOLD) > DuplicateCheck.DOUBT_RANGE) {
             // Far from the threshold value, so we base our decision on the req. fields only
-            return req[0] >= DuplicateCheck.duplicateThreshold;
+            return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
         List<String> optionalFields = type.getOptionalFields();
         if (optionalFields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
-            return totValue >= DuplicateCheck.duplicateThreshold;
+            return totValue >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-        return req[0] >= DuplicateCheck.duplicateThreshold;
+        return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
     }
 
     private static boolean haveDifferentEditions(BibEntry one, BibEntry two) {
