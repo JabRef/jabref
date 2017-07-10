@@ -36,7 +36,7 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private final String fieldName;
-    @FXML private LinkedFilesEditorViewModel viewModel;
+    @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
     public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
@@ -79,15 +79,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                    case DELETE_ENTRY:
-                        LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
-                        if (selectedItem != null) {
-                            viewModel.deleteFile(selectedItem);
-                        }
-                        event.consume();
-                        break;
-                    default:
-                        // Pass other keys to children
+                case DELETE_ENTRY:
+                    LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
+                    if (selectedItem != null) {
+                        viewModel.deleteFile(selectedItem);
+                    }
+                    event.consume();
+                    break;
+                default:
+                    // Pass other keys to children
                 }
             }
         });
@@ -146,11 +146,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
         deleteFile.setDisable(linkedFile.getFile().isOnlineLink());
 
+        MenuItem deleteLink = new MenuItem(Localization.lang("Remove link"));
+        deleteLink.setOnAction(event -> viewModel.removeFileLink(linkedFile));
+        deleteLink.setDisable(linkedFile.getFile().isOnlineLink());
+
         menu.getItems().add(edit);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().addAll(openFile, openFolder);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(renameFile, moveFile, deleteFile);
+        menu.getItems().addAll(renameFile, moveFile, deleteLink, deleteFile);
 
         return menu;
     }
