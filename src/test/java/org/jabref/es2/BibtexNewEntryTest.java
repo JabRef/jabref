@@ -192,4 +192,103 @@ public class BibtexNewEntryTest {
         //        Verifica se a entrada gerada e a entrada esperada são iguais
         assertEquals(stringEsperada, stringGerada);
     }
+    
+    //      Testes de Null Pointer Exception
+    //          Artigos
+    @Test(expected = NullPointerException.class)
+    public void testAuthorNullArticle() {
+        BibEntry be = new BibEntry("article");
+        
+        be.setField("author", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testTitleNullArticle() {
+        BibEntry be = new BibEntry("article");
+        
+        be.setField("title", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testJournalNullArticle() {
+        BibEntry be = new BibEntry("article");
+        
+        be.setField("journal", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testYearNullArticle() {
+        BibEntry be = new BibEntry("article");
+        
+        be.setField("year", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testKeyNullArticle() {
+        BibEntry be = new BibEntry("article");
+        
+        be.setField("bibtexkey", null);
+        Assert.fail();
+    }
+    
+    //          Livros
+    @Test(expected = NullPointerException.class)
+    public void testAuthorNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("author", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testTitleNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("title", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testJournalNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("journal", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testYearNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("year", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testKeyNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("bibtexkey", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testPublisherNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("publisher", null);
+        Assert.fail();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void testEditorNullBook() {
+        BibEntry be = new BibEntry("book");
+        
+        be.setField("editor", null);
+        Assert.fail();
+    }
 }
