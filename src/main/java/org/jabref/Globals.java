@@ -29,7 +29,7 @@ public class Globals {
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
 
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
-    public static final TaskExecutor taskExecutor = new DefaultTaskExecutor();
+    public static final TaskExecutor TASK_EXECUTOR = new DefaultTaskExecutor();
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required
     public static JabRefPreferences prefs;
@@ -107,7 +107,7 @@ public class Globals {
     }
 
     public static void shutdownThreadPools() {
-        taskExecutor.shutdown();
+        TASK_EXECUTOR.shutdown();
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

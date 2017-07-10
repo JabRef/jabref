@@ -178,7 +178,21 @@ public class EntryEditor extends JPanel implements EntryContainer {
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
                 //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-                e.consume();
+                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+                if (keyBinding.isPresent()) {
+                    switch (keyBinding.get()) {
+                    case CUT:
+                    case COPY:
+                    case PASTE:
+                    case CLOSE_ENTRY_EDITOR:
+                    case DELETE_ENTRY:
+                    case SELECT_ALL:
+                        e.consume();
+                        break;
+                    default:
+                        //do nothing
+                    }
+                }
             }
         });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
@@ -220,9 +234,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     helpAction.actionPerformed(null);
                     event.consume();
                     break;
-
+                case CLOSE_ENTRY_EDITOR:
+                    closeAction.actionPerformed(null);
+                    event.consume();
+                    break;
                 default:
-
                     // Pass other keys to children
                 }
             }

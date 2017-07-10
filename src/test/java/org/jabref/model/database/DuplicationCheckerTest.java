@@ -23,7 +23,7 @@ public class DuplicationCheckerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -31,9 +31,9 @@ public class DuplicationCheckerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
         database.removeEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 0);
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -41,10 +41,10 @@ public class DuplicationCheckerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
         entry.setCiteKey("BBB");
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 0);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"), 1);
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
     }
 
 
@@ -56,12 +56,12 @@ public class DuplicationCheckerTest {
         BibEntry entry1 = new BibEntry();
         entry1.setCiteKey("BBB");
         database.insertEntry(entry1);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
 
         entry1.setCiteKey("AAA");
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 2);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"), 0);
+        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
     }
 
     @Test
@@ -75,16 +75,16 @@ public class DuplicationCheckerTest {
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("AAA");
         database.insertEntry(entry2);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 3);
+        assertEquals(3, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
 
         database.removeEntry(entry2);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 2);
+        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
 
         database.removeEntry(entry1);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
 
         database.removeEntry(entry0);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 0);
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class DuplicationCheckerTest {
         entry.setCiteKey("");
         database.insertEntry(entry);
 
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences(""), 0);
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences(""));
     }
 
     @Test
@@ -101,11 +101,11 @@ public class DuplicationCheckerTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
 
         entry.setCiteKey("");
         database.removeEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 0);
+        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
 }

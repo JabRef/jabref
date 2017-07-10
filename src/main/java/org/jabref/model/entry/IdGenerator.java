@@ -9,12 +9,12 @@ import java.text.NumberFormat;
  */
 public class IdGenerator {
 
-    private static final NumberFormat idFormat;
+    private static final NumberFormat ID_FORMAT;
 
     static {
-        idFormat = NumberFormat.getInstance();
-        IdGenerator.idFormat.setMinimumIntegerDigits(8);
-        IdGenerator.idFormat.setGroupingUsed(false);
+        ID_FORMAT = NumberFormat.getInstance();
+        IdGenerator.ID_FORMAT.setMinimumIntegerDigits(8);
+        IdGenerator.ID_FORMAT.setGroupingUsed(false);
     }
 
     private static int idCounter;
@@ -23,7 +23,7 @@ public class IdGenerator {
     }
 
     public static synchronized String next() {
-        String result = idFormat.format(idCounter);
+        String result = ID_FORMAT.format(idCounter);
         idCounter++;
         return result;
     }

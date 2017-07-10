@@ -122,7 +122,7 @@ public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
     // Avoid partition where these values are contained
-    private final static Collection<String> avoidTermsInLowerCase = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
     private final String[] authorsFirstFirst = new String[4];
     private final String[] authorsLastOnly = new String[2];
@@ -196,7 +196,7 @@ public class AuthorList {
                 Collection<Integer> avoidIndex = new HashSet<>();
 
                 for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
+                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
                         avoidIndex.add(i);
                         valuePartsCount--;
                     }
@@ -405,7 +405,8 @@ public class AuthorList {
      *
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
         int abbrInt = oxfordComma ? 0 : 1;
@@ -455,7 +456,8 @@ public class AuthorList {
      * @param abbreviate  whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         int abbrInt = abbreviate ? 0 : 1;
@@ -556,7 +558,8 @@ public class AuthorList {
      * @param abbr        whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
 

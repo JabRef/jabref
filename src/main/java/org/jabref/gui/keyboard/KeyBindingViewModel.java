@@ -128,7 +128,7 @@ public class KeyBindingViewModel {
      */
     public void resetToDefault() {
         if (!isCategory()) {
-            String key = getKeyBinding().getKey();
+            String key = getKeyBinding().getConstant();
             keyBindingRepository.resetToDefault(key);
             setBinding(keyBindingRepository.get(key));
         }

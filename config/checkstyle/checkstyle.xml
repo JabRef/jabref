@@ -45,6 +45,10 @@
                       PLUS, PLUS_ASSIGN, QUESTION,
                       SL, SLIST, SL_ASSIGN, SR, SR_ASSIGN, STAR, STAR_ASSIGN, LITERAL_ASSERT, TYPE_EXTENSION_AND"/>
         </module>
+
+        <module name="ConstantName">
+            <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+        </module>
     </module>
 
     <module name="SuppressionFilter">
