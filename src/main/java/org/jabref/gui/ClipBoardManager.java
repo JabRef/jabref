@@ -73,17 +73,17 @@ public class ClipBoardManager implements ClipboardOwner {
         StringSelection stringSelection = new StringSelection(aString);
         CLIPBOARD.setContents(stringSelection, this);
     }
-	
+
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);
         List<BibEntry> result = new ArrayList<>();
 
-        if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
+        if (content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)) {
             // We have determined that the clipboard data is a set of entries.
             try  {
                 @SuppressWarnings("unchecked")
-                List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+                List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.ENTRY_FLAVOR);
                 result = contents;
             } catch (UnsupportedFlavorException | ClassCastException ex) {
                 LOGGER.warn("Could not paste this type", ex);

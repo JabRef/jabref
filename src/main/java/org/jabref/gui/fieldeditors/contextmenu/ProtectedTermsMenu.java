@@ -14,7 +14,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final Menu externalFiles;
     private final TextArea opener;
 
@@ -30,7 +30,7 @@ class ProtectedTermsMenu extends Menu {
         });
 
         MenuItem formatItem = new MenuItem(Localization.lang("Format field"));
-        formatItem.setOnAction(event -> opener.setText(formatter.format(opener.getText())));
+        formatItem.setOnAction(event -> opener.setText(FORMATTER.format(opener.getText())));
 
         externalFiles = new Menu(Localization.lang("Add selected text to list"));
         updateFiles();
@@ -67,7 +67,5 @@ class ProtectedTermsMenu extends Menu {
             }
         });
         externalFiles.getItems().add(addToNewFileItem);
-
     }
-
 }
