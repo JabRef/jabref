@@ -214,15 +214,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
@@ -700,7 +700,9 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type, entry.type) && Objects.equals(fields, entry.fields);
+        return Objects.equals(type, entry.type)
+                && Objects.equals(fields, entry.fields)
+                && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
