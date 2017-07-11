@@ -325,6 +325,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                     .putAllDBMSConnectionProperties(properties);
         }
 
+        // close previous AutosaveManager and BackupManager
+        AutosaveManager.shutdown(context);
+        BackupManager.shutdown(context);
+        
         context.setDatabaseFile(file);
         if (file.getParent() != null) {
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
