@@ -94,7 +94,6 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
-
     private static <T> StringConverter<T> defaultStringConverter() {
         return new StringConverter<T>() {
             @Override

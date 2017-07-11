@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - The buttons were changed to icons.
   - Completely new interface to add or modify linked files.
   - Removed the hidden feature that a double click in the editor inserted the current date.
+  - Complete new implementation of the the auto complete feature.
 - All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
 - Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
 - We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)

@@ -9,18 +9,28 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 public class AutoCompletePreferences {
 
     private static final String DELIMITER = ";";
+    private boolean shouldAutoComplete;
     private AutoCompleteFirstNameMode firstNameMode;
     private boolean onlyCompleteLastFirst;
     private boolean onlyCompleteFirstLast;
     private List<String> completeNames;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeNames, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeNames, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
         this.onlyCompleteLastFirst = onlyCompleteLastFirst;
         this.onlyCompleteFirstLast = onlyCompleteFirstLast;
         this.completeNames = completeNames;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
+    }
+
+    public void setShouldAutoComplete(boolean shouldAutoComplete) {
+        this.shouldAutoComplete = shouldAutoComplete;
+    }
+
+    public boolean shouldAutoComplete() {
+        return shouldAutoComplete;
     }
 
     /**
@@ -54,12 +64,12 @@ public class AutoCompletePreferences {
         return completeNames;
     }
 
-    public void setCompleteNames(String input) {
-        setCompleteNames(Arrays.asList(input.split(DELIMITER)));
-    }
-
     public void setCompleteNames(List<String> completeNames) {
         this.completeNames = completeNames;
+    }
+
+    public void setCompleteNames(String input) {
+        setCompleteNames(Arrays.asList(input.split(DELIMITER)));
     }
 
     public String getCompleteNamesAsString() {

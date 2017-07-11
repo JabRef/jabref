@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.IconTheme;

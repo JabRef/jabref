@@ -181,7 +181,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREFS_EXPORT_PATH = "prefsExportPath";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
-    public static final String AUTO_COMPLETE = "autoComplete";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -392,6 +391,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String PREVIEW_ENABLED = "previewEnabled";
     // Auto completion
+    private static final String AUTO_COMPLETE = "autoComplete";
     private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
     private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
     private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
@@ -571,7 +571,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
+        defaults.put(AUTO_COMPLETE, Boolean.TRUE);
         defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
@@ -1613,11 +1613,20 @@ public class JabRefPreferences implements PreferencesService {
 
     public AutoCompletePreferences getAutoCompletePreferences() {
         return new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE),
                 AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
                 getBoolean(AUTOCOMPLETER_LAST_FIRST),
                 getBoolean(AUTOCOMPLETER_FIRST_LAST),
                 getStringList(AUTOCOMPLETER_COMPLETE_FIELDS),
                 getJournalAbbreviationPreferences()
         );
+    }
+
+    public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
+        putBoolean(AUTO_COMPLETE, autoCompletePreferences.shouldAutoComplete());
+        put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
+        putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
+        putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteNames());
     }
 }

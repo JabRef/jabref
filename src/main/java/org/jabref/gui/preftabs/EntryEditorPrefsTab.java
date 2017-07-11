@@ -154,7 +154,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         emacsRebindCtrlA.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CA));
         emacsRebindCtrlF.setSelected(prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS_REBIND_CF));
         recommendations.setSelected(prefs.getBoolean(JabRefPreferences.SHOW_RECOMMENDATIONS));
-        autoComplete.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE));
+        autoComplete.setSelected(autoCompletePreferences.shouldAutoComplete());
         autoCompFields.setText(autoCompletePreferences.getCompleteNamesAsString());
 
         if (autoCompletePreferences.getOnlyCompleteFirstLast()) {
@@ -210,7 +210,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
                 EmacsKeyBindings.load();
             }
         }
-        prefs.putBoolean(JabRefPreferences.AUTO_COMPLETE, autoComplete.isSelected());
+        autoCompletePreferences.setShouldAutoComplete(autoComplete.isSelected());
         autoCompletePreferences.setCompleteNames(autoCompFields.getText());
         if (autoCompBoth.isSelected()) {
             autoCompletePreferences.setOnlyCompleteFirstLast(false);
@@ -231,6 +231,7 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
         } else {
             autoCompletePreferences.setFirstNameMode(AutoCompleteFirstNameMode.BOTH);
         }
+        prefs.storeAutoCompletePreferences(autoCompletePreferences);
     }
 
     @Override
