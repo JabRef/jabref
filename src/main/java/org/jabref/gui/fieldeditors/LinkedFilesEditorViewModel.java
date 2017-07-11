@@ -19,6 +19,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
 import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -56,7 +57,9 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
 
-    public LinkedFilesEditorViewModel(DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+    public LinkedFilesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+        super(fieldName, suggestionProvider);
+
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.taskExecutor = taskExecutor;
@@ -130,8 +133,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     @Override
-    public void bindToEntry(String fieldName, BibEntry entry) {
-        super.bindToEntry(fieldName, entry);
+    public void bindToEntry(BibEntry entry) {
+        super.bindToEntry(entry);
 
         if (entry != null) {
             BackgroundTask<List<LinkedFileViewModel>> findAssociatedNotLinkedFiles = BackgroundTask

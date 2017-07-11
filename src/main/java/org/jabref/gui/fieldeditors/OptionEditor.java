@@ -14,12 +14,10 @@ import org.jabref.model.entry.BibEntry;
  */
 public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
 
     public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel) {
-        this.fieldName = fieldName;
         this.viewModel = viewModel;
 
         ControlHelper.loadFXMLForControl(this);
@@ -36,7 +34,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

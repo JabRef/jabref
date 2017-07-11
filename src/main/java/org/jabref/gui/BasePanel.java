@@ -50,6 +50,10 @@ import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.actions.CleanupAction;
 import org.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
+import org.jabref.gui.autocompleter.AutoCompleteUpdater;
+import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import org.jabref.gui.contentselector.ContentSelectorDialog;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -96,10 +100,6 @@ import org.jabref.gui.worker.CallBack;
 import org.jabref.gui.worker.CitationStyleToClipboardWorker;
 import org.jabref.gui.worker.MarkEntriesAction;
 import org.jabref.gui.worker.SendAsEMailAction;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
-import org.jabref.logic.autocompleter.AutoCompleter;
-import org.jabref.logic.autocompleter.AutoCompleterFactory;
-import org.jabref.logic.autocompleter.ContentAutoCompleters;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -131,6 +131,7 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
@@ -179,7 +180,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private boolean saving;
     private boolean updatedExternally;
     // AutoCompleter used in the search bar
-    private AutoCompleter<String> searchAutoCompleter;
+    private PersonNameSuggestionProvider searchAutoCompleter;
     private boolean baseChanged;
     private boolean nonUndoableChange;
     // Used to track whether the base has changed since last save.
@@ -193,7 +194,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private PreambleEditor preambleEditor;
     // Keeps track of the preamble dialog if it is open.
     private StringDialog stringDialog;
-    private ContentAutoCompleters autoCompleters;
+    private SuggestionProviders suggestionProviders;
 
     /** the query the user searches when this basepanel is active */
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
@@ -258,9 +259,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         clb.update(); // Runs the update() method on the EDT.
     }
 
-    // Returns a collection of AutoCompleters, which are populated from the current library
-    public ContentAutoCompleters getAutoCompleters() {
-        return autoCompleters;
+    /**
+     * Returns a collection of suggestion providers, which are populated from the current library.
+     */
+    public SuggestionProviders getSuggestionProviders() {
+        return suggestionProviders;
     }
 
     public String getTabTitle() {
@@ -1364,17 +1367,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         instantiateSearchAutoCompleter();
         this.getDatabase().registerListener(new SearchAutoCompleteListener());
 
-        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
-        // Set up AutoCompleters for this panel:
-        if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
-                    autoCompletePreferences, Globals.journalAbbreviationLoader);
-            // ensure that the autocompleters are in sync with entries
-            this.getDatabase().registerListener(new AutoCompleteListener());
-        } else {
-            // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters();
-        }
+        setupAutoCompletion();
 
         // restore floating search result
         // (needed if preferences have been changed which causes a recreation of the main table)
@@ -1390,17 +1383,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, event -> saveDividerLocation());
     }
 
+    /**
+     * Set up auto completion for this database
+     */
+    private void setupAutoCompletion() {
+        AutoCompletePreferences autoCompletePreferences = Globals.prefs.getAutoCompletePreferences();
+        if (autoCompletePreferences.shouldAutoComplete()) {
+            suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
+            suggestionProviders.indexDatabase(getDatabase());
+            // Ensure that the suggestion providers are in sync with entries
+            this.getDatabase().registerListener(new AutoCompleteUpdater(suggestionProviders));
+        } else {
+            // Create empty suggestion providers if auto completion is deactivated
+            suggestionProviders = new SuggestionProviders();
+        }
+    }
+
     public void updateSearchManager() {
         frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
-        AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
-        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences,
-                Globals.journalAbbreviationLoader);
-        searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
+        searchAutoCompleter = new PersonNameSuggestionProvider(InternalBibtexFields.getPersonNameFields());
         for (BibEntry entry : bibDatabaseContext.getDatabase().getEntries()) {
-            searchAutoCompleter.addBibtexEntry(entry);
+            searchAutoCompleter.indexEntry(entry);
         }
     }
 
@@ -2107,29 +2113,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
-            searchAutoCompleter.addBibtexEntry(addedEntryEvent.getBibEntry());
+            searchAutoCompleter.indexEntry(addedEntryEvent.getBibEntry());
         }
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            searchAutoCompleter.addBibtexEntry(entryChangedEvent.getBibEntry());
-        }
-    }
-
-    /**
-     * Ensures that auto completers are up to date when entries are changed AKA Let the auto completer, if any, harvest
-     * words from the entry
-     */
-    private class AutoCompleteListener {
-
-        @Subscribe
-        public void listen(EntryAddedEvent addedEntryEvent) {
-            BasePanel.this.autoCompleters.addEntry(addedEntryEvent.getBibEntry());
-        }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
+            searchAutoCompleter.indexEntry(entryChangedEvent.getBibEntry());
         }
     }
 
@@ -2145,7 +2134,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().setDontSelectSearchBar();
             frame.getGlobalSearchBar().performSearch();
         }
 
