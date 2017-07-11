@@ -55,7 +55,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> imp
     @Override
     protected boolean isMatch(Author suggestion, AutoCompletionBinding.ISuggestionRequest request) {
         String userTextLower = request.getUserText().toLowerCase();
-        String suggestionStr = suggestion.getNameForAlphabetization().toLowerCase();
+        String suggestionStr = suggestion.getLastFirst(false).toLowerCase();
         return suggestionStr.contains(userTextLower);
     }
 }

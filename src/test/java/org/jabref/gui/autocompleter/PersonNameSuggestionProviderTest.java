@@ -15,7 +15,9 @@ import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 
 public class PersonNameSuggestionProviderTest {
 
-    PersonNameSuggestionProvider autoCompleter;
+    private static final Author vassilisKostakos = new Author("Vassilis", "V.", "", "Kostakos", "");
+    private PersonNameSuggestionProvider autoCompleter;
+    private BibEntry entry;
 
     @Test(expected = NullPointerException.class)
     public void initAutoCompleterWithNullFieldThrowsException() {
@@ -25,6 +27,9 @@ public class PersonNameSuggestionProviderTest {
     @Before
     public void setUp() throws Exception {
         autoCompleter = new PersonNameSuggestionProvider("field");
+
+        entry = new BibEntry();
+        entry.setField("field", "Vassilis Kostakos");
     }
 
     @Test
@@ -62,48 +67,35 @@ public class PersonNameSuggestionProviderTest {
 
     @Test
     public void completeNameReturnsName() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Testname");
         autoCompleter.indexEntry(entry);
 
-        Collection<Author> result = autoCompleter.call(getRequest(("Testname")));
-        Assert.assertEquals(Arrays.asList("Testname"), result);
+        Collection<Author> result = autoCompleter.call(getRequest(("Kostakos")));
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
-    public void completeBeginnigOfNameReturnsName() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Testname");
+    public void completeBeginningOfNameReturnsName() {
         autoCompleter.indexEntry(entry);
 
-        Collection<Author> result = autoCompleter.call(getRequest(("Test")));
-        Assert.assertEquals(Arrays.asList("Testname"), result);
+        Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
-    public void completeLowercaseNameReturnsName() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Testname");
+    public void completeLowercaseBeginningOfNameReturnsName() {
         autoCompleter.indexEntry(entry);
 
-        Collection<Author> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Arrays.asList("Testname"), result);
+        Collection<Author> result = autoCompleter.call(getRequest(("kosta")));
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
-    @Test
-    public void completeNullReturnsNothing() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest((null)));
-        Assert.assertEquals(Collections.emptyList(), result);
+    @Test(expected = NullPointerException.class)
+    public void completeNullThrowsException() {
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
     public void completeEmptyStringReturnsNothing() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("")));
@@ -112,168 +104,83 @@ public class PersonNameSuggestionProviderTest {
 
     @Test
     public void completeReturnsMultipleResults() {
-        BibEntry entryOne = new BibEntry();
-        entryOne.setField("field", "testNameOne");
-        autoCompleter.indexEntry(entryOne);
+        autoCompleter.indexEntry(entry);
         BibEntry entryTwo = new BibEntry();
-        entryTwo.setField("field", "testNameTwo");
+        entryTwo.setField("field", "Kosta");
         autoCompleter.indexEntry(entryTwo);
+        Author authorTwo = new Author("", "", "", "Kosta", "");
 
-        Collection<Author> result = autoCompleter.call(getRequest(("testName")));
-        Assert.assertEquals(Arrays.asList("testNameOne", "testNameTwo"), result);
+        Collection<Author> result = autoCompleter.call(getRequest(("Ko")));
+        Assert.assertEquals(Arrays.asList(authorTwo, vassilisKostakos), result);
     }
 
     @Test
-    public void completePartOfNameReturnsNothing() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
+    public void completePartOfNameReturnsName() {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("osta")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
-    public void completeBeginningOfFirstNameReturnsCompleteName() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
+    public void completeBeginningOfFirstNameReturnsName() {
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Vas")));
-        Assert.assertEquals(Arrays.asList("Vassilis Kostakos"), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 
     @Test
-    public void completeBeginningOfFirstNameReturnsCompleteNameWithJr() {
+    public void completeBeginningOfFirstNameReturnsNameWithJr() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "Reagle, Jr., Joseph M.");
         autoCompleter.indexEntry(entry);
+        Author author = new Author("Joseph M.", "J. M.", "", "Reagle", "Jr.");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Jos")));
-        Assert.assertEquals(Arrays.asList("Joseph M. Reagle, Jr."), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
-    public void completeBeginningOfFirstNameReturnsCompleteNameWithVon() {
+    public void completeBeginningOfFirstNameReturnsNameWithVon() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
         autoCompleter.indexEntry(entry);
+        Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Eric")));
-        Assert.assertEquals(Arrays.asList("Eric von Hippel"), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
     public void completeBeginningOfLastNameReturnsNameWithUmlauts() {
-        //when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
-
         BibEntry entry = new BibEntry();
         entry.setField("field", "Honig Bär");
         autoCompleter.indexEntry(entry);
+        Author author = new Author("Honig", "H.", "", "Bär", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("Bä")));
-        Assert.assertEquals(Arrays.asList("Bär, Honig"), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
-    public void completeBeginningOfLastNameReturnsNameAndNameWithInitialFirstname() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
-        Assert.assertEquals(Arrays.asList("Kostakos, V.", "Kostakos, Vassilis"), result);
-    }
-
-    @Test
-    public void completeBeginningOfLastNameReturnsNameIfPref() {
-        //when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_FULL);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
-        Assert.assertEquals(Arrays.asList("Kostakos, Vassilis"), result);
-    }
-
-    @Test
-    public void completeBeginningOfLastNameReturnsNameWithJrIfPref() {
-        //when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Reagle, Jr., Joseph M.");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Rea")));
-        Assert.assertEquals(Arrays.asList("Reagle, Jr., J. M."), result);
-    }
-
-    @Test
-    public void completeBeginningOfLastNameReturnsNameWithInitialFirstnameIfPref() {
-        //when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
-        Assert.assertEquals(Arrays.asList("Kostakos, V."), result);
-    }
-
-    @Test
-    public void completeVonReturnsNameWithInitialFirstnameIfPref() {
-        //when(preferences.getFirstnameMode()).thenReturn(AutoCompleteFirstNameMode.ONLY_ABBREVIATED);
-
+    public void completeVonReturnsName() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "Eric von Hippel");
         autoCompleter.indexEntry(entry);
+        Author author = new Author("Eric", "E.", "von", "Hippel", "");
 
         Collection<Author> result = autoCompleter.call(getRequest(("von")));
-        Assert.assertEquals(Arrays.asList("von Hippel, E."), result);
+        Assert.assertEquals(Collections.singletonList(author), result);
     }
 
     @Test
-    public void completeBeginningOfNameReturnsCompleteName() {
+    public void completeBeginningOfFullNameReturnsName() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "Vassilis Kostakos");
         autoCompleter.indexEntry(entry);
 
         Collection<Author> result = autoCompleter.call(getRequest(("Kostakos, Va")));
-        Assert.assertEquals(Arrays.asList("Kostakos, Vassilis"), result);
-    }
-
-    @Test
-    public void completeBeginningOfLastNameReturnsNothingIfPref() {
-        //when(preferences.getOnlyCompleteFirstLast()).thenReturn(true);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Kosta")));
-        Assert.assertEquals(Collections.emptyList(), result);
-    }
-
-    @Test
-    public void completeBeginningOfFirstNameReturnsNothingIfPref() {
-        //when(preferences.getOnlyCompleteLastFirst()).thenReturn(true);
-
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "Vassilis Kostakos");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("Vas")));
-        Assert.assertEquals(Collections.emptyList(), result);
-    }
-
-    @Test
-    public void completeShortNameReturnsName() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "nam");
-        autoCompleter.indexEntry(entry);
-
-        Collection<Author> result = autoCompleter.call(getRequest(("n")));
-        Assert.assertEquals(Arrays.asList("nam"), result);
+        Assert.assertEquals(Collections.singletonList(vassilisKostakos), result);
     }
 }

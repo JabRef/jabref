@@ -89,14 +89,13 @@ public class FieldValueSuggestionProviderTest {
         Assert.assertEquals(Arrays.asList("testValue"), result);
     }
 
-    @Test
-    public void completeNullReturnsNothing() {
+    @Test(expected = NullPointerException.class)
+    public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "testKey");
         autoCompleter.indexEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest((null)));
-        Assert.assertEquals(Collections.emptyList(), result);
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
@@ -123,33 +122,33 @@ public class FieldValueSuggestionProviderTest {
     }
 
     @Test
-    public void completeShortStringReturnsNothing() {
+    public void completeShortStringReturnsFieldValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "val");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("va")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.singletonList("val"), result);
     }
 
     @Test
-    public void completeBeginnigOfSecondWordReturnsNothing() {
+    public void completeBeginnigOfSecondWordReturnsWholeFieldValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("val")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 
     @Test
-    public void completePartOfWordReturnsNothing() {
+    public void completePartOfWordReturnsWholeFieldValue() {
         BibEntry entry = new BibEntry();
         entry.setField("field", "test value");
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("lue")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 
     @Test
@@ -159,6 +158,6 @@ public class FieldValueSuggestionProviderTest {
         autoCompleter.indexEntry(entry);
 
         Collection<String> result = autoCompleter.call(getRequest(("te")));
-        Assert.assertEquals(Arrays.asList("test value"), result);
+        Assert.assertEquals(Collections.singletonList("test value"), result);
     }
 }

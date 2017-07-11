@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 
-public class BibtexKeyAutoCompleterTest {
+public class BibEntrySuggestionProviderTest {
     private BibEntrySuggestionProvider autoCompleter;
 
     @Before
@@ -50,7 +50,7 @@ public class BibtexKeyAutoCompleterTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
-        Assert.assertEquals(Arrays.asList("testKey"), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class BibtexKeyAutoCompleterTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Arrays.asList("testKey"), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
@@ -70,17 +70,16 @@ public class BibtexKeyAutoCompleterTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testkey")));
-        Assert.assertEquals(Arrays.asList("testKey"), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 
-    @Test
-    public void completeNullReturnsNothing() {
+    @Test(expected = NullPointerException.class)
+    public void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("testKey");
         autoCompleter.indexEntry(entry);
 
-        Collection<BibEntry> result = autoCompleter.call(getRequest((null)));
-        Assert.assertEquals(Collections.emptyList(), result);
+        autoCompleter.call(getRequest((null)));
     }
 
     @Test
@@ -103,7 +102,7 @@ public class BibtexKeyAutoCompleterTest {
         autoCompleter.indexEntry(entryTwo);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("testKey")));
-        Assert.assertEquals(Arrays.asList("testKeyOne", "testKeyTwo"), result);
+        Assert.assertEquals(Arrays.asList(entryTwo, entryOne), result);
     }
 
     @Test
@@ -113,6 +112,6 @@ public class BibtexKeyAutoCompleterTest {
         autoCompleter.indexEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.call(getRequest(("k")));
-        Assert.assertEquals(Arrays.asList("key"), result);
+        Assert.assertEquals(Collections.singletonList(entry), result);
     }
 }
