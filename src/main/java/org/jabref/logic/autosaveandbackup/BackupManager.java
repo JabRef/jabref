@@ -22,6 +22,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -40,13 +41,16 @@ public class BackupManager {
 
     private static final String BACKUP_EXTENSION = ".sav";
 
+    private static final int MINOR_CHANGES_LIMIT = 5;
+
     private static Set<BackupManager> runningInstances = new HashSet<>();
+
+    private int minorChangesCount = 0;
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
-
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -129,7 +133,18 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        startBackupTask();
+        if (!(event instanceof FieldChangedEvent)) {
+            startBackupTask();
+        } else {
+            // only do a backup if the field changes are more than one character or if there are enough of them
+            FieldChangedEvent fieldChange = (FieldChangedEvent) event;
+            if (fieldChange.getDelta() > 1 || minorChangesCount >= MINOR_CHANGES_LIMIT) {
+                startBackupTask();
+                minorChangesCount = 0;
+            } else {
+                minorChangesCount++;
+            }
+        }
     }
 
     private void startBackupTask() {
