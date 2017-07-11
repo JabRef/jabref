@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
