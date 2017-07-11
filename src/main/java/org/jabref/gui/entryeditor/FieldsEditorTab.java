@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -37,7 +38,7 @@ import org.jabref.model.entry.InternalBibtexFields;
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
-class FieldsEditorTab extends EntryEditorTab {
+public class FieldsEditorTab extends EntryEditorTab {
 
     private final Region panel;
     private final List<String> fields;
@@ -65,6 +66,10 @@ class FieldsEditorTab extends EntryEditorTab {
 
         // The following line makes sure focus cycles inside tab instead of being lost to other parts of the frame:
         //panel.setFocusCycleRoot(true);
+    }
+
+    public void markAsDirty() {
+        basePanel.markBaseChanged();
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
@@ -121,7 +126,7 @@ class FieldsEditorTab extends EntryEditorTab {
             fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, this, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
                     bPanel.getBibDatabaseContext(), entry.getType());
             fieldEditor.bindToEntry(entry);

@@ -13,6 +13,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -29,13 +30,14 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
+    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = new IdentifierEditorViewModel(fieldName, taskExecutor, dialogService);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(fieldName))));

@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.model.entry.BibEntry;
 
@@ -13,7 +14,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     protected final String fieldName;
     @FXML private final SimpleEditorViewModel viewModel;
 
-    public SimpleEditor(String fieldName) {
+    public SimpleEditor(String fieldName, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = new SimpleEditorViewModel();
 
@@ -21,6 +22,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
         this.getChildren().add(textArea);
     }
 

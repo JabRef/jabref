@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
@@ -18,13 +19,14 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     private Optional<BibEntry> entry;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences) {
+    public OwnerEditor(String fieldName, JabRefPreferences preferences, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = new OwnerEditorViewModel(preferences);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
     }
 
     public OwnerEditorViewModel getViewModel() {
