@@ -11,7 +11,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final String fieldName;
     private final String newValue;
     private final String oldValue;
-    private int delta = 0;
+    private final int delta = 0;
 
 
     /**
