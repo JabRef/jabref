@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -20,13 +21,14 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     private Optional<BibEntry> entry;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = new JournalEditorViewModel(journalAbbreviationLoader, journalAbbreviationPreferences);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
 
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
     }

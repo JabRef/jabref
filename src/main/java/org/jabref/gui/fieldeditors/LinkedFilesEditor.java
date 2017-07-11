@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -39,7 +40,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = new LinkedFilesEditorViewModel(dialogService, databaseContext, taskExecutor);
 
@@ -52,6 +53,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 .withOnMouseClickedEvent(this::handleItemMouseClick);
         listView.setCellFactory(cellFactory);
         Bindings.bindContent(listView.itemsProperty().get(), viewModel.filesProperty());
+        listView.itemsProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
         setUpKeyBindings();
     }
 

@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.entryeditor.FieldsEditorTab;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
@@ -18,7 +19,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
     @FXML private OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
 
-    public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel) {
+    public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel, FieldsEditorTab editorTab) {
         this.fieldName = fieldName;
         this.viewModel = viewModel;
 
@@ -28,6 +29,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
         comboBox.setCellFactory(new ViewModelListCellFactory<T>().withText(viewModel::convertToDisplayText));
         comboBox.getItems().setAll(viewModel.getItems());
         comboBox.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+        comboBox.getEditor().textProperty().addListener((observable, oldValue, newValue) -> editorTab.markAsDirty());
     }
 
     public OptionEditorViewModel<T> getViewModel() {
