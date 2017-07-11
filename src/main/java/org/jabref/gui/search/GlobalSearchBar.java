@@ -64,8 +64,7 @@ public class GlobalSearchBar extends JPanel {
 
     private final JabRefFrame frame;
 
-    private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
-    private final TextField searchField = new TextField();
+    private final TextField searchField = SearchTextField.create();
     private final JToggleButton caseSensitive;
     private final JToggleButton regularExp;
     private final JButton searchModeButton = new JButton();
@@ -153,10 +152,6 @@ public class GlobalSearchBar extends JPanel {
         updateSearchModeButtonText();
         searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
 
-        JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
-        clearSearchButton.setToolTipText(Localization.lang("Clear"));
-        clearSearchButton.addActionListener(event -> endSearch());
-
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
         /*
@@ -192,14 +187,11 @@ public class GlobalSearchBar extends JPanel {
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
         });
-        searchField.setPromptText(Localization.lang("Search") + "...");
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
-        toolBar.add(searchIcon);
         toolBar.add(container);
-        toolBar.add(clearSearchButton);
         toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
         toolBar.addSeparator();
@@ -308,7 +300,6 @@ public class GlobalSearchBar extends JPanel {
     private void clearSearch(BasePanel currentBasePanel) {
         currentResults.setText("");
         searchField.setText("");
-        searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
         searchQueryHighlightObservable.reset();
         openCurrentResultsInDialog.setEnabled(false);
 
@@ -358,9 +349,7 @@ public class GlobalSearchBar extends JPanel {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
-        searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
-        searchIcon.setToolTipText(illegalSearch);
         currentResults.setText(illegalSearch);
         openCurrentResultsInDialog.setEnabled(false);
     }
@@ -397,15 +386,6 @@ public class GlobalSearchBar extends JPanel {
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
         searchField.setTooltip(new Tooltip(description));
-
-        if (grammarBasedSearch) {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(ADVANCED_SEARCH_COLOR));
-            searchIcon.setToolTipText(Localization.lang("Advanced search active."));
-        } else {
-            searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
-            searchIcon.setToolTipText(Localization.lang("Normal search active."));
-        }
-
         openCurrentResultsInDialog.setEnabled(true);
     }
 
@@ -413,17 +393,17 @@ public class GlobalSearchBar extends JPanel {
         this.searchResultFrame = searchResultFrame;
     }
 
-    public void setSearchTerm(String searchTerm, boolean dontSelectSearchBar) {
+    public void setSearchTerm(String searchTerm) {
         if (searchTerm.equals(searchField.getText())) {
             return;
         }
 
-        setDontSelectSearchBar(dontSelectSearchBar);
+        setDontSelectSearchBar();
         searchField.setText(searchTerm);
     }
 
-    public void setDontSelectSearchBar(boolean dontSelectSearchBar) {
-        this.dontSelectSearchBar = dontSelectSearchBar;
+    public void setDontSelectSearchBar() {
+        this.dontSelectSearchBar = true;
     }
 
     private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {

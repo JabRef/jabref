@@ -2134,7 +2134,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().setDontSelectSearchBar();
             frame.getGlobalSearchBar().performSearch();
         }
 
