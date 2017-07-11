@@ -41,17 +41,17 @@ public class BackupManager {
 
     private static final String BACKUP_EXTENSION = ".sav";
 
+    private final static int MINOR_CHANGES_LIMIT = 5;
+
+    private int minorChangesCount = 0;
+
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
-
-    private int minorChangesCount = 0;
-    private final static int MINOR_CHANGES_LIMIT = 5;
-
-
+    
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.preferences = JabRefPreferences.getInstance();

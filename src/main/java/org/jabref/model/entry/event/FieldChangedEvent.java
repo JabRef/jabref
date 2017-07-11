@@ -57,6 +57,10 @@ public class FieldChangedEvent extends EntryChangedEvent {
         delta = computeDelta(oldValue, newValue);
     }
 
+    public FieldChangedEvent(FieldChange fieldChange) {
+        this(fieldChange, EntryEventSource.LOCAL);
+    }
+
     private int computeDelta(String oldValue, String newValue) {
         if (oldValue == newValue) {
             return 0;
@@ -67,10 +71,6 @@ public class FieldChangedEvent extends EntryChangedEvent {
         } else {
             return Math.abs(newValue.length() - oldValue.length());
         }
-    }
-
-    public FieldChangedEvent(FieldChange fieldChange) {
-        this(fieldChange, EntryEventSource.LOCAL);
     }
 
     public String getFieldName() {
