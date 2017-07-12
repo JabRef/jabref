@@ -2,7 +2,6 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Comparator;
 
-import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 class StringSuggestionProvider extends SuggestionProvider<String> {

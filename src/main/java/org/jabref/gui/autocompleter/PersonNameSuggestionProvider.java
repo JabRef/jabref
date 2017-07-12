@@ -9,7 +9,6 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 
-import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**

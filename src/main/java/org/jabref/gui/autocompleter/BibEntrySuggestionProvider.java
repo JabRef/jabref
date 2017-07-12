@@ -5,7 +5,6 @@ import java.util.Comparator;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.model.entry.BibEntry;
 
-import impl.org.controlsfx.autocompletion.SuggestionProvider;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 
 /**
