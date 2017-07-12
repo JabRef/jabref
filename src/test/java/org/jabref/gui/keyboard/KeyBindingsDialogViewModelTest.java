@@ -14,7 +14,6 @@ import org.jabref.preferences.PreferencesService;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -175,13 +174,10 @@ public class KeyBindingsDialogViewModelTest {
 
     @Test
     public void testConversionAwtKeyEventJavafxKeyEvent() {
-
-
         java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
 
         Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(evt);
         assertEquals(Optional.of(KeyBinding.SAVE_DATABASE), keyBinding);
-
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {
