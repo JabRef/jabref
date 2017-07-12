@@ -121,6 +121,10 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter, inputAnalyzer);
     }
 
+    public static <T> void autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, AutoCompletionStrategy inputAnalyzer) {
+        autoComplete(textArea, suggestionProvider, AutoCompletionTextInputBinding.defaultStringConverter(), inputAnalyzer);
+    }
+
     @Override
     public TextInputControl getCompletionTarget() {
         return (TextInputControl) super.getCompletionTarget();

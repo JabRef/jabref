@@ -23,7 +23,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
         this.getChildren().add(textArea);
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
+        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionStrategy());
     }
 
     @Override

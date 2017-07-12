@@ -1,8 +1,6 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Locale;
-
-public class AppendPersonNamesStrategy implements AutoCompletionStrategy {
+public class AppendPersonNamesStrategy extends AppendWordsStrategy {
 
     /**
      * true if the input should be split at a single white space instead of the usual delimiter " and " for names.
@@ -19,22 +17,11 @@ public class AppendPersonNamesStrategy implements AutoCompletionStrategy {
     }
 
     @Override
-    public AutoCompletionInput analyze(String input) {
+    public String getDelimiter() {
         if (this.separationBySpace) {
-            return determinePrefixAndReturnRemainder(input, " ");
+            return " ";
         } else {
-            return determinePrefixAndReturnRemainder(input, " and ");
-        }
-    }
-
-    private AutoCompletionInput determinePrefixAndReturnRemainder(String input, String delimiter) {
-        int index = input.toLowerCase(Locale.ROOT).lastIndexOf(delimiter);
-        if (index >= 0) {
-            String prefix = input.substring(0, index + delimiter.length());
-            String rest = input.substring(index + delimiter.length());
-            return new AutoCompletionInput(prefix, rest);
-        } else {
-            return new AutoCompletionInput("", input);
+            return " and ";
         }
     }
 }
