@@ -204,8 +204,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         Objects.requireNonNull(bibDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
-        bibDatabaseContext.getDatabase().registerListener(new DatabaseChangeListener(this));
-        bibDatabaseContext.getMetaData().registerListener(new DatabaseChangeListener(this));
+        DatabaseChangeListener databaseChangeListener = new DatabaseChangeListener(this);
+        bibDatabaseContext.getDatabase().registerListener(databaseChangeListener);
+        bibDatabaseContext.getMetaData().registerListener(databaseChangeListener);
 
         this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
