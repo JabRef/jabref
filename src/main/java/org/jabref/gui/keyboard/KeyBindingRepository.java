@@ -155,6 +155,10 @@ public class KeyBindingRepository {
 
     private KeyCombination getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
+        if (OS.OS_X) {
+            binding = binding.replace("ctrl", "meta");
+        }
+
         return KeyCombination.valueOf(binding);
     }
 
