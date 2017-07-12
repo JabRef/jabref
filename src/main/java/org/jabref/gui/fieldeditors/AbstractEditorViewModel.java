@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
 
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -17,6 +18,7 @@ public class AbstractEditorViewModel extends AbstractViewModel {
     protected StringProperty text = new SimpleStringProperty("");
     protected BibEntry entry;
     private final AutoCompleteSuggestionProvider<?> suggestionProvider;
+    private ObjectBinding<String> fieldBinding;
 
     public AbstractEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
         this.fieldName = fieldName;
@@ -29,9 +31,13 @@ public class AbstractEditorViewModel extends AbstractViewModel {
 
     public void bindToEntry(BibEntry entry) {
         this.entry = entry;
+
+        // We need to keep a reference to the binding since it otherwise gets discarded
+        fieldBinding = entry.getFieldBinding(fieldName);
+
         BindingsHelper.bindBidirectional(
                 this.textProperty(),
-                entry.getFieldBinding(fieldName),
+                fieldBinding,
                 newValue -> {
                     if (newValue != null) {
                         entry.setField(fieldName, newValue);
