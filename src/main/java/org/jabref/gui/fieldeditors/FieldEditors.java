@@ -1,11 +1,13 @@
 package org.jabref.gui.fieldeditors;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -13,14 +15,20 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FieldEditors {
+
+    private static final Log LOGGER = LogFactory.getLog(FieldEditors.class);
 
     public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
-        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(fieldName);
+        AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
@@ -62,5 +70,23 @@ public class FieldEditors {
 
         // default
         return new SimpleEditor(fieldName, suggestionProvider);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static AutoCompleteSuggestionProvider<?> getSuggestionProvider(String fieldName, SuggestionProviders suggestionProviders, MetaData metaData) {
+        AutoCompleteSuggestionProvider<?> suggestionProvider = suggestionProviders.getForField(fieldName);
+
+        List<String> contentSelectorValues = metaData.getContentSelectorValuesForField(fieldName);
+        if (!contentSelectorValues.isEmpty()) {
+            // Enrich auto completion by content selector values
+            try {
+                return new ContentSelectorSuggestionProvider((AutoCompleteSuggestionProvider<String>) suggestionProvider, contentSelectorValues);
+            } catch (ClassCastException exception) {
+                LOGGER.error("Content selectors are only supported for normal fields with string-based auto completion.");
+                return suggestionProvider;
+            }
+        } else {
+            return suggestionProvider;
+        }
     }
 }

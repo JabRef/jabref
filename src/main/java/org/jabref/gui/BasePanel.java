@@ -1989,15 +1989,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
-     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
-     * after the user has made changes in the Manage dialog.
-     */
-    public void updateAllContentSelectors() {
-        currentEditor.updateAllContentSelectors();
-    }
-
-    /**
      * Set the preview active state for all BasePanel instances.
      */
     private void setPreviewActiveBasePanels(boolean enabled) {
