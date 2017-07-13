@@ -126,6 +126,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.KeyCollisionException;
+import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -204,9 +205,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         Objects.requireNonNull(bibDatabaseContext);
 
         this.bibDatabaseContext = bibDatabaseContext;
-        DatabaseChangeListener databaseChangeListener = new DatabaseChangeListener(this);
-        bibDatabaseContext.getDatabase().registerListener(databaseChangeListener);
-        bibDatabaseContext.getMetaData().registerListener(databaseChangeListener);
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
 
         this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
@@ -260,6 +260,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // without freezing the GUI. The magic is that THIS line
         // of execution will not continue until run() is finished.
         clb.update(); // Runs the update() method on the EDT.
+    }
+
+    @Subscribe
+    public void listen(BibDatabaseContextChangedEvent event) {
+        this.markBaseChanged();
     }
 
     /**
