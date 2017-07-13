@@ -395,6 +395,7 @@ checkstyle {
 }
 
 checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'
