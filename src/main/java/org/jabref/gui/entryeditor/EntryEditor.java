@@ -14,11 +14,9 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -49,7 +47,6 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.contentselector.FieldContentSelector;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextField;
@@ -135,7 +132,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final TabPane tabbed = new TabPane();
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
     private final HelpAction helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
@@ -402,28 +398,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         add(leftPan, BorderLayout.WEST);
     }
 
-    /**
-     * getExtra checks the field name against InternalBibtexFields.getFieldExtras(name).
-     * If the name has an entry, the proper component to be shown is created and
-     * returned. Otherwise, null is returned. In addition, e.g. listeners can be
-     * added to the field editor, even if no component is returned.
-     *
-     * @return Component to show, or null if none.
-     */
-    /*
-    public Optional<JComponent> getExtra(final FieldEditor editor) {
-        final String fieldName = editor.getFieldName();
-
-        final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
-
-        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
-            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors,
-                    storeFieldAction);
-        }
-        return Optional.empty();
-    }
-    */
-
     void addSearchListener(SearchQueryHighlightListener listener) {
         // TODO: Highlight search text in entry editors
         searchListeners.add(listener);
@@ -478,14 +452,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 tabbed.getSelectionModel().select(tab);
                 fieldsEditorTab.setActive(fieldName);
                 fieldsEditorTab.focus();
-            }
-        }
-    }
-
-    public void updateAllContentSelectors() {
-        if (!contentSelectors.isEmpty()) {
-            for (FieldContentSelector contentSelector : contentSelectors) {
-                contentSelector.rebuildComboBox();
             }
         }
     }

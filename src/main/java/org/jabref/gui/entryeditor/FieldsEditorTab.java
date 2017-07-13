@@ -132,18 +132,6 @@ class FieldsEditorTab extends EntryEditorTab {
             }
             */
 
-            /*
-            // TODO: Reenable content selector
-            if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
-                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
-                        ", ");
-                contentSelectors.add(ws);
-                controls.add(ws, BorderLayout.NORTH);
-            }
-            //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
-            //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
-             */
-
             labels.add(new FieldNameLabel(fieldName));
         }
 

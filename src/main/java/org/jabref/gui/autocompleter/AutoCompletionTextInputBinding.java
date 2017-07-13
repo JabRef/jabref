@@ -44,11 +44,6 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
  */
 public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> {
 
-    private final ChangeListener<Boolean> focusChangedListener = (obs, oldFocused, newFocused) -> {
-        if (!newFocused) {
-            hidePopup();
-        }
-    };
     /**
      * String converter to be used to convert suggestions to strings.
      */
@@ -56,11 +51,19 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
     private AutoCompletionStrategy inputAnalyzer;
     private final ChangeListener<String> textChangeListener = (obs, oldText, newText) -> {
         if (getCompletionTarget().isFocused()) {
-            AutoCompletionInput input = inputAnalyzer.analyze(newText);
-            setUserInput(input.getUnfinishedPart());
+            setUserInputText(newText);
         }
     };
-
+    private boolean showOnFocus;
+    private final ChangeListener<Boolean> focusChangedListener = (obs, oldFocused, newFocused) -> {
+        if (newFocused) {
+            if (showOnFocus) {
+                setUserInputText(getCompletionTarget().getText());
+            }
+        } else {
+            hidePopup();
+        }
+    };
 
     /**
      * Creates a new auto-completion binding between the given textInputControl
@@ -117,12 +120,20 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter);
     }
 
-    public static <T> void autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, StringConverter<T> converter, AutoCompletionStrategy inputAnalyzer) {
-        new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter, inputAnalyzer);
+    public static <T> AutoCompletionTextInputBinding<T> autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, StringConverter<T> converter, AutoCompletionStrategy inputAnalyzer) {
+        return new AutoCompletionTextInputBinding<>(textArea, suggestionProvider, converter, inputAnalyzer);
     }
 
-    public static <T> void autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, AutoCompletionStrategy inputAnalyzer) {
-        autoComplete(textArea, suggestionProvider, AutoCompletionTextInputBinding.defaultStringConverter(), inputAnalyzer);
+    public static <T> AutoCompletionTextInputBinding<T> autoComplete(TextInputControl textArea, Callback<ISuggestionRequest, Collection<T>> suggestionProvider, AutoCompletionStrategy inputAnalyzer) {
+        return autoComplete(textArea, suggestionProvider, AutoCompletionTextInputBinding.defaultStringConverter(), inputAnalyzer);
+    }
+
+    private void setUserInputText(String newText) {
+        if (newText == null) {
+            newText = "";
+        }
+        AutoCompletionInput input = inputAnalyzer.analyze(newText);
+        setUserInput(input.getUnfinishedPart());
     }
 
     @Override
@@ -139,9 +150,17 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
     @Override
     protected void completeUserInput(T completion) {
         String completionText = converter.toString(completion);
-        AutoCompletionInput input = inputAnalyzer.analyze(getCompletionTarget().getText());
+        String inputText = getCompletionTarget().getText();
+        if (inputText == null) {
+            inputText = "";
+        }
+        AutoCompletionInput input = inputAnalyzer.analyze(inputText);
         String newText = input.getPrefix() + completionText;
         getCompletionTarget().setText(newText);
         getCompletionTarget().positionCaret(newText.length());
+    }
+
+    public void setShowOnFocus(boolean showOnFocus) {
+        this.showOnFocus = showOnFocus;
     }
 }
