@@ -1,10 +1,10 @@
 package org.jabref.gui.entryeditor;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import org.jabref.gui.BasePanel;
@@ -31,7 +31,7 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
         this.panel = setupPanel(frame, basePanel);
         this.cache = cache;
-        setText(Localization.lang("File annotations NEW")); // TODO: rename in "File annotations"
+        setText(Localization.lang("File annotations")); // TODO: rename in "File annotations"
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
         setGraphic(IconTheme.JabRefIcon.REQUIRED.getGraphicNode());
     }
@@ -39,14 +39,12 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private Region setupPanel(JabRefFrame frame, BasePanel basePanel) {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("editorPane");
+        ColumnConstraints leftSideConstraint = new ColumnConstraints();
+        leftSideConstraint.setPercentWidth(50);
+        gridPane.getColumnConstraints().addAll(leftSideConstraint);
 
-        ColumnConstraints columnExpand = new ColumnConstraints();
-        columnExpand.setHgrow(Priority.ALWAYS);
-
-        ColumnConstraints columnDoNotContract = new ColumnConstraints();
-        columnDoNotContract.setMinWidth(Region.USE_PREF_SIZE);
-
-        // TODO: actual content
+        gridPane.addColumn(0, setupLeftSide());
+        gridPane.addColumn(1, setupRightSide());
 
         // Warp everything in a scroll-pane
         ScrollPane scrollPane = new ScrollPane();
@@ -58,11 +56,30 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         return scrollPane;
     }
 
+    private GridPane setupRightSide() {
+        GridPane rightSide = new GridPane();
+
+        rightSide.addRow(0, new Label("Author"));
+        rightSide.addRow(1, new Label("date"));
+
+        rightSide.addRow(2, new Label("page"));
+        rightSide.addRow(3, new Label("content"));
+
+        rightSide.addRow(4, new Label("highlight"));
+        return rightSide;
+    }
+
+    private GridPane setupLeftSide() {
+        GridPane leftSide = new GridPane();
+        leftSide.addRow(0, new Label("filename"));
+        leftSide.addRow(1, new Label("AnnotationsList"));
+        return leftSide;
+    }
+
     @Override
     public boolean shouldShow() {
         return parent.getEntry().getField(FieldName.FILE).isPresent();
     }
-
 
     @Override
     public void requestFocus() {
