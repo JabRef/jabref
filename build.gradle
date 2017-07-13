@@ -392,6 +392,7 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '7.6.1'
+    ignoreFailures = true
 }
 
 task release(dependsOn: ["media", "releaseJar"]) {
