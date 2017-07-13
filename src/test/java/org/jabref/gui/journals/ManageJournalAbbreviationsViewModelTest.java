@@ -430,7 +430,7 @@ public class ManageJournalAbbreviationsViewModelTest {
 
         Assert.assertEquals(expected, actual);
 
-        expected = "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE
+        expected = "EntryEntry = EE" + NEWLINE + "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE
                 + "SomeOtherEntry = SOE" + NEWLINE + "";
         actual = Files.contentOf(testFile5EntriesWithDuplicate.toFile(), StandardCharsets.UTF_8);
 

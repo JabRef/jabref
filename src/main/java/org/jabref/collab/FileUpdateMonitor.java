@@ -20,9 +20,19 @@ public class FileUpdateMonitor implements Runnable {
     private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
-
-    private int numberOfUpdateListener;
     private final Map<String, Entry> entries = new HashMap<>();
+    private int numberOfUpdateListener;
+
+    private static synchronized Path getTempFile() {
+        Path temporaryFile = null;
+        try {
+            temporaryFile = Files.createTempFile("jabref", null);
+            temporaryFile.toFile().deleteOnExit();
+        } catch (IOException ex) {
+            LOGGER.warn("Could not create temporary file.", ex);
+        }
+        return temporaryFile;
+    }
 
     @Override
     public void run() {
@@ -119,7 +129,7 @@ public class FileUpdateMonitor implements Runnable {
      * is used for comparison with the changed on-disk version.
      * @param key String The handle for this monitor.
      * @throws IllegalArgumentException If the handle doesn't correspond to an entry.
-     * @return File The temporary file.
+     * @return Path The temporary file.
      */
     public Path getTempFile(String key) throws IllegalArgumentException {
         Entry entry = entries.get(key);
@@ -128,7 +138,6 @@ public class FileUpdateMonitor implements Runnable {
         }
         return entry.getTmpFile();
     }
-
 
     /**
      * A class containing the File, the FileUpdateListener and the current time stamp for one file.
@@ -208,16 +217,5 @@ public class FileUpdateMonitor implements Runnable {
         public void decreaseTimeStamp() {
             timeStamp--;
         }
-    }
-
-    private static synchronized Path getTempFile() {
-        Path temporaryFile = null;
-        try {
-            temporaryFile = Files.createTempFile("jabref", null);
-            temporaryFile.toFile().deleteOnExit();
-        } catch (IOException ex) {
-            LOGGER.warn("Could not create temporary file.", ex);
-        }
-        return temporaryFile;
     }
 }
