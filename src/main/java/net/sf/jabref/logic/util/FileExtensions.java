@@ -15,6 +15,7 @@ public enum FileExtensions {
     BIBTEXML(Localization.lang("%0 file", "BibTeXML"), "bibx", "xml"),
     BILBIOSCAPE(Localization.lang("%0 file", "Biblioscape"), "txt"),
     COPAC(Localization.lang("%0 file", "Copac"), "txt"),
+    CSV(Localization.lang("%0 file", "CSV"), "csv"),
     CITATION_STYLE(Localization.lang("%0 file", "CSL"), "csl"),
     ENDNOTE(Localization.lang("%0 file", "Endnote/Refer"), "ref", "enw"),
     FREECITE(Localization.lang("%0 file", "FreeCite"), "txt", "xml"),

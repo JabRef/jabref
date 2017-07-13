@@ -27,6 +27,7 @@ import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
 import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
+import net.sf.jabref.logic.importer.fileformat.CSVImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.database.BibDatabases;
@@ -55,6 +56,7 @@ public class ImportFormatReader {
         formats.add(new BibtexImporter(importFormatPreferences));
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
+        formats.add(new CSVImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
