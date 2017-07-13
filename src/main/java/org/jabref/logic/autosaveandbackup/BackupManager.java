@@ -41,11 +41,9 @@ public class BackupManager {
 
     private static final String BACKUP_EXTENSION = ".sav";
 
-    private static final int MINOR_CHANGES_LIMIT = 5;
-
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
-    private int minorChangesCount = 0;
+    private String lastFieldChanged;
 
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
@@ -136,13 +134,13 @@ public class BackupManager {
         if (!(event instanceof FieldChangedEvent)) {
             startBackupTask();
         } else {
-            // only do a backup if the field changes are more than one character or if there are enough of them
+            // only do a backup if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-            if (fieldChange.getDelta() > 1 || minorChangesCount >= MINOR_CHANGES_LIMIT) {
+            boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getFieldName());
+
+            if (fieldChange.getDelta() > 1 || isEditOnNewField) {
+                lastFieldChanged = fieldChange.getFieldName();
                 startBackupTask();
-                minorChangesCount = 0;
-            } else {
-                minorChangesCount++;
             }
         }
     }
