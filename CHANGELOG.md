@@ -43,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed a bug where recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
 - We fixed a bug where new groups information was not stored on save [#2932](https://github.com/JabRef/jabref/issues/2932)
 - We fixed a bug where the language files for Brazilian Portugese could not be loaded and the GUI localization remained in English [#1128](https://github.com/JabRef/jabref/issues/1182)
+- We fixed a bug where the database was not marked as dirty when entries or groups were changed [#2787](https://github.com/JabRef/jabref/issues/2787)
 
 ### Removed
 
