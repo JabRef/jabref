@@ -107,11 +107,13 @@ public class CSVImporter extends Importer {
     // os campos sao separados essas virgulas "internas" nao influenciam. Por exemplo, para:
     // "Ito Nagura, V.","2017",5, o resultado sera "Ito Nagura### V.","2017",5.
     private static String substituteInsideCommaByTripleHash(String inputString) {
+        // Substitui inicialmente \" por %%. Por exemplo, em "Ahlberg, J{\"o}rgen"
+        String stringAfterReplacingInsideQuotes = inputString.replace("\\" + "\"", "%%");
         // Utiliza RegEx para localizar os campos entre aspas, pois considera que as virgulas
-        // internas estao presente apenas em campos entre aspas
+        // internas estao presente apenas em campos entre aspas (aspas internas foram removidas)
         Pattern p = Pattern.compile("\\" + "\"" + "(.*?)\\" + "\"");
-        Matcher matcherForCounter = p.matcher(inputString);
-        Matcher matcherForCorrection = p.matcher(inputString);
+        Matcher matcherForCounter = p.matcher(stringAfterReplacingInsideQuotes);
+        Matcher matcherForCorrection = p.matcher(stringAfterReplacingInsideQuotes);
 
         // O primeiro matcher conta quantos campos entre aspas existem
         int counter = 0;
@@ -134,11 +136,11 @@ public class CSVImporter extends Importer {
             }
 
             // Efetua a correcao de maneira "recursiva" sobre a entrada
-            correction[0] = inputString.replace(uncorrectedFields[0], correctedFields[0]);
+            correction[0] = stringAfterReplacingInsideQuotes.replace(uncorrectedFields[0], correctedFields[0]);
             for (int j = 1; j < counter; j++)
                 correction[j] = correction[j - 1].replace(uncorrectedFields[j], correctedFields[j]);
 
-            return correction[counter - 1];
+            return correction[counter - 1].replace("%%", "\\" + "\"");
         }
         else
             return inputString;
