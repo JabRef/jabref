@@ -392,8 +392,10 @@ checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
     toolVersion = '8.0'
-    ignoreFailures = true
 }
+
+checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'
