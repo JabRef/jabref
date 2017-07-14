@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.jabref.logic.importer.fetcher;
 
 import java.io.BufferedReader;
@@ -22,15 +19,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
  * This class is responible to get the recommendations from MDL
  */
 public class MrDLibFetcher implements EntryBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MrDLibFetcher.class);
 
     private static final String NAME = "MDL_FETCHER";
     private final String LANGUAGE;
@@ -67,7 +62,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
                     parserResult = new ParserResult(errorBibDataBase);
                 }
             } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                Logger.error(this, e.getMessage(), e);
                 throw new FetcherException("XML Parser IOException.");
             }
             return parserResult.getDatabase().getEntries();
@@ -119,7 +114,7 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         try {
             uri = builder.build();
         } catch (URISyntaxException e) {
-            LOGGER.error(e.getMessage(), e);
+            Logger.error(this, e.getMessage(), e);
         }
         System.out.println("Query: " + uri.toString());
         return uri.toString();

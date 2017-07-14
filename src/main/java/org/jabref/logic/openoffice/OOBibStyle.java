@@ -33,8 +33,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
+
 
 /**
  * This class embodies a bibliography formatting for OpenOffice, which is composed
@@ -101,7 +101,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
-    private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
     private String name = "";
 
@@ -374,7 +373,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 }
 
             } catch (IOException ex) {
-                LOGGER.warn("Cannot parse bibliography structure", ex);
+                Logger.warn(this, "Cannot parse bibliography structure", ex);
             }
         }
     }

@@ -18,6 +18,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
+import com.jcabi.log.Logger;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
@@ -25,8 +26,6 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -46,7 +45,6 @@ public class VM implements Warn {
 
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
-    private static final Log LOGGER = LogFactory.getLog(VM.class);
 
     private List<BstEntry> entries;
 
@@ -500,7 +498,7 @@ public class VM implements Warn {
          */
         buildInFunctions.put("stack$", context -> {
             while (!stack.empty()) {
-                LOGGER.debug(stack.pop());
+                Logger.debug(this, stack.pop().toString());
             }
         });
 
@@ -564,7 +562,7 @@ public class VM implements Warn {
         /**
          * Pops and prints the top of the stack to the log file. It's useful for debugging.
          */
-        buildInFunctions.put("top$", context -> LOGGER.debug(stack.pop()));
+        buildInFunctions.put("top$", context -> Logger.debug(this, stack.pop().toString()));
 
         /**
          * Pushes the current entry's type (book, article, etc.), but pushes
@@ -589,7 +587,7 @@ public class VM implements Warn {
 
             @Override
             public void execute(BstEntry context) {
-                LOGGER.warn("Warning (#" + (warning++) + "): " + stack.pop());
+                Logger.warn(this, "Warning (#" + (warning++) + "): " + stack.pop());
             }
         });
 
@@ -892,7 +890,7 @@ public class VM implements Warn {
                 macro(child);
                 break;
             default:
-                LOGGER.info("Unknown type: " + child.getType());
+                Logger.info(this, "Unknown type: " + child.getType());
                 break;
             }
         }
@@ -1085,9 +1083,9 @@ public class VM implements Warn {
                     }
                 } catch (VMException e) {
                     if (file == null) {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + c.getLine() + ")");
+                        Logger.error(this, "ERROR " + e.getMessage() + " (" + c.getLine() + ")");
                     } else {
-                        LOGGER.error("ERROR " + e.getMessage() + " (" + file.getPath() + ":"
+                        Logger.error(this, "ERROR " + e.getMessage() + " (" + file.getPath() + ":"
                                 + c.getLine() + ")");
                     }
                     throw e;
@@ -1235,7 +1233,7 @@ public class VM implements Warn {
 
     @Override
     public void warn(String string) {
-        LOGGER.warn(string);
+        Logger.warn(this, string);
     }
 
 }

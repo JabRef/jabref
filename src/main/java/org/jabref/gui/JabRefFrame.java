@@ -143,17 +143,15 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
+import com.jcabi.log.Logger;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import osx.macadapter.MacAdapter;
 
 /**
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     // Frame titles.
     private static final String FRAME_TITLE = "JabRef";
@@ -651,7 +649,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                LOGGER.fatal("Could not interface with Mac OS X methods.", e);
+                Logger.error(this, "Could not interface with Mac OS X methods.", e);
             }
         }
 
@@ -1517,7 +1515,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     dbPaths.add("");
                 }
             } catch (IOException ex) {
-                LOGGER.error("Invalid database file path: " + ex.getMessage());
+                Logger.error(this, "Invalid database file path: " + ex.getMessage());
             }
         }
         return dbPaths;
@@ -1685,7 +1683,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
             } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
+                Logger.error(this, "Problem " + (blocked ? "" : "un") + "blocking UI", e);
             }
         }
     }
@@ -2042,10 +2040,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 try {
                     ((BasePanel) tabbedPane.getSelectedComponent()).runCommand(command);
                 } catch (Throwable ex) {
-                    LOGGER.error("Problem with executing command: " + command, ex);
+                    Logger.error(this, "Problem with executing command: " + command, ex);
                 }
             } else {
-                LOGGER.info("Action '" + command + "' must be disabled when no database is open.");
+                Logger.info(this, "Action '" + command + "' must be disabled when no database is open.");
             }
         }
     }
@@ -2127,7 +2125,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override public void actionPerformed(ActionEvent e) {
 
-            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
+            Logger.debug(this, Globals.getFocusListener().getFocused().toString());
             JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {

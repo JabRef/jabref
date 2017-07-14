@@ -26,8 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks
@@ -43,7 +42,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DownloadExternalFile {
 
-    private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
@@ -162,7 +160,7 @@ public class DownloadExternalFile {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            LOGGER.info("Error while downloading " + "'" + res + "'", ex);
+            Logger.info(this, "Error while downloading " + "'" + res + "'", ex);
             return;
         }
         final URL urlF = url;
@@ -178,7 +176,7 @@ public class DownloadExternalFile {
                 }
                 JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + e2.getMessage(),
                         Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                LOGGER.info("Error while downloading " + "'" + urlF + "'", e2);
+                Logger.info(this, "Error while downloading " + "'" + urlF + "'", e2);
                 return;
             }
             // Download finished: call the method that stops the progress bar etc.:
@@ -187,7 +185,7 @@ public class DownloadExternalFile {
 
         Optional<ExternalFileType> suggestedType = Optional.empty();
         if (mimeType != null) {
-            LOGGER.debug("MIME Type suggested: " + mimeType);
+            Logger.debug(this, "MIME Type suggested: " + mimeType);
             suggestedType = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
         }
         // Then, while the download is proceeding, let the user choose the details of the file:
@@ -255,7 +253,7 @@ public class DownloadExternalFile {
             boolean success = FileUtil.copyFile(Paths.get(tmp.toURI()), Paths.get(toFile.toURI()), true);
             if (!success) {
                 // OOps, the file exists!
-                LOGGER.error("File already exists! DownloadExternalFile.download()");
+                Logger.error(this, "File already exists! DownloadExternalFile.download()");
             }
 
             // If the local file is in or below the main file directory, change the
@@ -268,12 +266,12 @@ public class DownloadExternalFile {
             callback.downloadComplete(fileListEntry);
 
             if (!tmp.delete()) {
-                LOGGER.info("Cannot delete temporary file");
+                Logger.info(this, "Cannot delete temporary file");
             }
         } else {
             // Canceled. Just delete the temp file:
             if (downloadFinished && !tmp.delete()) {
-                LOGGER.info("Cannot delete temporary file");
+                Logger.info(this, "Cannot delete temporary file");
             }
         }
 

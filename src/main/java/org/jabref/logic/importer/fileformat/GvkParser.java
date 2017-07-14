@@ -15,8 +15,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,7 +23,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class GvkParser implements Parser {
-    private static final Log LOGGER = LogFactory.getLog(GvkParser.class);
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
@@ -98,7 +96,7 @@ public class GvkParser implements Parser {
         List<Element> datafields = getChildren("datafield", e);
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
-            LOGGER.debug("tag: " + tag);
+            Logger.debug(this, "tag: " + tag);
 
             // mak
             if ("002@".equals(tag)) {

@@ -14,8 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,7 +25,6 @@ import org.jsoup.select.Elements;
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  */
 public class DoiResolution implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(DoiResolution.class);
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -67,11 +65,11 @@ public class DoiResolution implements FulltextFetcher {
                     }
                     // return if only one link was found (high accuracy)
                     if (links.size() == 1) {
-                        LOGGER.info("Fulltext PDF found @ " + sciLink);
+                        Logger.info(this, "Fulltext PDF found @ " + sciLink);
                         pdfLink = links.get(0);
                     }
                 } catch (IOException e) {
-                    LOGGER.warn("DoiResolution fetcher failed: ", e);
+                    Logger.warn(this, "DoiResolution fetcher failed: ", e);
                 }
             }
         }

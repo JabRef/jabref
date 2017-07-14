@@ -9,8 +9,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Class for working with Digital object identifiers (DOIs)
@@ -18,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
  * @see https://en.wikipedia.org/wiki/Digital_object_identifier
  */
 public class DOI implements Identifier {
-    private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
     // DOI resolver
     private static final URI RESOLVER = URI.create("https://doi.org");
@@ -156,7 +154,7 @@ public class DOI implements Identifier {
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen
-            LOGGER.error(doi + " could not be encoded as URI.", e);
+            Logger.error(this, doi + " could not be encoded as URI.", e);
             return Optional.empty();
         }
     }

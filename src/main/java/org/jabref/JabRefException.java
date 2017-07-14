@@ -1,11 +1,9 @@
 package org.jabref;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class JabRefException extends Exception {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefException.class);
     private String localizedMessage;
 
     public JabRefException(String message) {
@@ -33,7 +31,7 @@ public class JabRefException extends Exception {
     @Override
     public String getLocalizedMessage() {
         if (localizedMessage == null) {
-            LOGGER.debug("No localized message exception message defined. Falling back to getMessage().");
+            Logger.debug(this, "No localized message exception message defined. Falling back to getMessage().");
             return getMessage();
         } else {
             return localizedMessage;

@@ -44,6 +44,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
+import com.jcabi.log.Logger;
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
@@ -89,8 +90,6 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for manipulating the Bibliography of the currently start document in OpenOffice.
@@ -110,7 +109,6 @@ class OOBibBase {
     private static final int AUTHORYEAR_INTEXT = 2;
     private static final int INVISIBLE_CIT = 3;
 
-    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
@@ -167,7 +165,7 @@ class OOBibBase {
                 return Optional
                         .of(String.valueOf(OOUtil.getProperty(mxDoc.getCurrentController().getFrame(), "Title")));
             } catch (UnknownPropertyException | WrappedTargetException e) {
-                LOGGER.warn("Could not get document title", e);
+                Logger.warn(this, "Could not get document title", e);
                 return Optional.empty();
             }
         }
@@ -225,12 +223,12 @@ class OOBibBase {
                 method.setAccessible(true);
                 method.invoke(cl, new File(pathToExecutable).toURI().toURL());
             } catch (SecurityException | NoSuchMethodException | MalformedURLException t) {
-                LOGGER.error("Error, could not add URL to system classloader", t);
+                Logger.error(this, "Error, could not add URL to system classloader", t);
                 cl.close();
                 throw new IOException("Error, could not add URL to system classloader", t);
             }
         } else {
-            LOGGER.error("Error occured, URLClassLoader expected but " + loader.getClass()
+            Logger.error(this, "Error occured, URLClassLoader expected but " + loader.getClass()
                     + " received. Could not continue.");
         }
 
@@ -344,7 +342,7 @@ class OOBibBase {
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
-                LOGGER.info("Storing page info: " + pageInfo);
+                Logger.info(this, "Storing page info: " + pageInfo);
                 setCustomProperty(bName, pageInfo);
             }
 
@@ -510,8 +508,8 @@ class OOBibBase {
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
-                        LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
+                        Logger.info(this, "BibTeX key not found: '" + keys[j] + '\'');
+                        Logger.info(this, "Problem with reference mark: '" + names.get(i) + '\'');
                         cEntries[j] = new UndefinedBibtexEntry(keys[j]);
                     }
                 }
@@ -880,8 +878,8 @@ class OOBibBase {
                             newList.put(origEntry.get(), database);
                         }
                     } else {
-                        LOGGER.info("BibTeX key not found: '" + key + "'");
-                        LOGGER.info("Problem with reference mark: '" + name + "'");
+                        Logger.info(this, "BibTeX key not found: '" + key + "'");
+                        Logger.info(this, "Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(key), null);
                     }
                 }
@@ -954,7 +952,7 @@ class OOBibBase {
                     break;
                 }
             } catch (IndexOutOfBoundsException ex) {
-                LOGGER.warn("Problem going left", ex);
+                Logger.warn(this, "Problem going left", ex);
             }
         }
         int length = cursor.getString().length();
@@ -970,7 +968,7 @@ class OOBibBase {
                     }
                 }
             } catch (IndexOutOfBoundsException ex) {
-                LOGGER.warn("Problem going right", ex);
+                Logger.warn(this, "Problem going right", ex);
             }
         }
 

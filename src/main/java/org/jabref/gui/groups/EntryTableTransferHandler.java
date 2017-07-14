@@ -34,18 +34,18 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportMenuItem;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.util.FileHelper;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
-import org.apache.commons.logging.Log;
+import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
     private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -70,7 +70,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            LOGGER.info("Unable to configure drag and drop for main table", e);
+            Logger.info(this, "Unable to configure drag and drop for main table", e);
         }
     }
 
@@ -127,20 +127,20 @@ public class EntryTableTransferHandler extends TransferHandler {
                 return handleDropTransfer(dropLink);
             } else if (t.isDataFlavorSupported(stringFlavor)) {
                 String dropStr = (String) t.getTransferData(stringFlavor);
-                LOGGER.debug("Received stringFlavor: " + dropStr);
+                Logger.debug(this, "Received stringFlavor: " + dropStr);
                 return handleDropTransfer(dropStr, dropRow);
             }
         } catch (IOException ioe) {
-            LOGGER.error("Failed to read dropped data", ioe);
+            Logger.error(this, "Failed to read dropped data", ioe);
         } catch (UnsupportedFlavorException | ClassCastException ufe) {
-            LOGGER.error("Drop type error", ufe);
+            Logger.error(this, "Drop type error", ufe);
         }
 
         // all supported flavors failed
-        LOGGER.info("Can't transfer input: ");
+        Logger.info(this, "Can't transfer input: ");
         DataFlavor[] inflavs = t.getTransferDataFlavors();
         for (DataFlavor inflav : inflavs) {
-            LOGGER.info("  " + inflav);
+            Logger.info(this, "  " + inflav);
         }
 
         return false;
@@ -175,7 +175,7 @@ public class EntryTableTransferHandler extends TransferHandler {
             int columnIndex = entryTable.columnAtPoint(((MouseEvent) e).getPoint());
             int modelIndex = entryTable.getColumnModel().getColumn(columnIndex).getModelIndex();
             if (entryTable.isFileColumn(modelIndex)) {
-                LOGGER.info("Dragging file");
+                Logger.info(this, "Dragging file");
                 draggingFile = true;
             }
         }
@@ -247,7 +247,7 @@ public class EntryTableTransferHandler extends TransferHandler {
                 URL url = new URL(line);
                 fl = new File(url.toURI());
             } catch (MalformedURLException | URISyntaxException e) {
-                LOGGER.warn("Could not get file", e);
+                LogFactory.getLog(EntryTableTransferHandler.class).warn("Could not get file", e);
             }
 
             // Unless an exception was thrown, we should have the sanitized path:

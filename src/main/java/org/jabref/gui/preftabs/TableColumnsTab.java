@@ -44,15 +44,13 @@ import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(TableColumnsTab.class);
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -664,7 +662,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                         }
                     }
                 } catch (Throwable ex) {
-                    LOGGER.warn("Problem with table columns", ex);
+                    Logger.warn(this, "Problem with table columns", ex);
                 }
                 colSetup.revalidate();
                 colSetup.repaint();

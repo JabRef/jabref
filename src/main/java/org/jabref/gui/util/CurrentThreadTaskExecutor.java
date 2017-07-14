@@ -4,8 +4,7 @@ import java.util.function.Consumer;
 
 import org.jabref.gui.externalfiles.FileDownloadTask;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Implementation of {@link TaskExecutor} that runs every task on the current thread, i.e. in a sequential order.
@@ -14,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CurrentThreadTaskExecutor implements TaskExecutor {
 
-    private static final Log LOGGER = LogFactory.getLog(CurrentThreadTaskExecutor.class);
 
     /**
      * Executes the task on the current thread.
@@ -38,7 +36,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             if (onException != null) {
                 onException.accept(exception);
             } else {
-                LOGGER.error("Unhandled exception", exception);
+                Logger.error(this, "Unhandled exception", exception);
             }
         }
     }

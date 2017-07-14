@@ -32,8 +32,7 @@ import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
@@ -42,7 +41,6 @@ import org.apache.http.client.utils.URIBuilder;
  * See <a href="http://help.jabref.org/en/MedlineRIS">help.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
@@ -167,11 +165,11 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             List<String> idList = getPubMedIdsFromQuery(searchTerm);
 
             if (idList.isEmpty()) {
-                LOGGER.info("No results found.");
+                Logger.info(this, "No results found.");
                 return Collections.emptyList();
             }
             if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info(
+                Logger.info(this,
                         numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
             }
 
@@ -207,7 +205,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
             ParserResult result = new MedlineImporter().importDatabase(
                     new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));
             if (result.hasWarnings()) {
-                LOGGER.warn(result.getErrorMessage());
+                Logger.warn(this, result.getErrorMessage());
             }
             List<BibEntry> resultList = result.getDatabase().getEntries();
             resultList.forEach(this::doPostCleanup);

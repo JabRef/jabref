@@ -20,12 +20,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToLyx.class);
 
     @Override
     public String getApplicationName() {
@@ -107,7 +105,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
                 fw.close();
             } catch (IOException excep) {
                 couldNotCall = true;
-                LOGGER.warn("Problem pushing to LyX/Kile.", excep);
+                Logger.warn(this, "Problem pushing to LyX/Kile.", excep);
             }
         });
     }

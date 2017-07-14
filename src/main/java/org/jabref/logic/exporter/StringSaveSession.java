@@ -7,12 +7,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class StringSaveSession extends SaveSession {
 
-    private static final Log LOGGER = LogFactory.getLog(StringSaveSession.class);
 
     private final ByteArrayOutputStream outputStream;
 
@@ -29,7 +27,7 @@ public class StringSaveSession extends SaveSession {
         try {
             return outputStream.toString(encoding.name());
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn(e);
+            Logger.warn(this, "error during string conversion", e);
             return "";
         }
     }
@@ -48,7 +46,7 @@ public class StringSaveSession extends SaveSession {
         try {
             outputStream.close();
         } catch (IOException e) {
-            LOGGER.warn(e);
+            Logger.warn(this, "error during stream closing", e);
         }
     }
 }

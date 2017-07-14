@@ -11,15 +11,13 @@ import java.util.Objects;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class StyleLoader {
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
 
-    private static final Log LOGGER = LogFactory.getLog(StyleLoader.class);
 
     // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
@@ -60,19 +58,19 @@ public class StyleLoader {
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
-                LOGGER.info("External style file " + filename + " already existing.");
+                Logger.info(this, "External style file " + filename + " already existing.");
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
                 return true;
             } else {
-                LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                Logger.error(this, String.format("Style with filename %s is invalid", filename));
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            LOGGER.info("Cannot find external style file " + filename, e);
+            Logger.info(this, "Cannot find external style file " + filename, e);
         } catch (IOException e) {
-            LOGGER.info("Problem reading external style file " + filename, e);
+            Logger.info(this, "Problem reading external style file " + filename, e);
         }
         return false;
 
@@ -88,13 +86,13 @@ public class StyleLoader {
                 if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
-                    LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                    Logger.error(this, String.format("Style with filename %s is invalid", filename));
                 }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
-                LOGGER.info("Cannot find external style file " + filename, e);
+                Logger.info(this, "Cannot find external style file " + filename, e);
             } catch (IOException e) {
-                LOGGER.info("Problem reading external style file " + filename, e);
+                Logger.info(this, "Problem reading external style file " + filename, e);
             }
         }
     }
@@ -105,7 +103,7 @@ public class StyleLoader {
             try {
                 internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
             } catch (IOException e) {
-                LOGGER.info("Problem reading internal style file " + filename, e);
+                Logger.info(this, "Problem reading internal style file " + filename, e);
             }
         }
     }

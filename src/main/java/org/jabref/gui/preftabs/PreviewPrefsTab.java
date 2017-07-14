@@ -27,15 +27,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.preferences.PreviewPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPrefsTab.class);
 
     private SwingWorker<List<CitationStyle>, Void> discoverCitationStyleWorker;
 
@@ -121,7 +119,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 testPane.setPreferredSize(new Dimension(800, 350));
                 JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException exception) {
-                LOGGER.warn("Parsing error.", exception);
+                Logger.warn(this, "Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
                                 + ".\n" + exception.getMessage(),
@@ -173,7 +171,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 chosenModel.addElement(CitationStyle.createCitationStyleFromFile(style));
             } else {
                 if (isPreviewChosen) {
-                    LOGGER.error("Preview is already in the list, something went wrong");
+                    Logger.error(this, "Preview is already in the list, something went wrong");
                     continue;
                 }
                 isPreviewChosen = true;
@@ -214,7 +212,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
                     btnRight.setEnabled(!availableModel.isEmpty());
                 } catch (InterruptedException | ExecutionException e) {
-                    LOGGER.error("something went wrong while adding the discovered CitationStyles to the list ");
+                    Logger.error(this, "something went wrong while adding the discovered CitationStyles to the list ");
                 }
             }
         };

@@ -25,8 +25,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,7 +35,6 @@ import org.jsoup.select.Elements;
  * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
  */
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
-    private static final Log LOGGER = LogFactory.getLog(GoogleScholar.class);
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
@@ -81,7 +79,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                     if (!"".equals(s)) {
                         // TODO: check title inside pdf + length?
                         // TODO: report error function needed?! query -> result
-                        LOGGER.info("Fulltext PDF found @ Google: " + s);
+                        Logger.info(this, "Fulltext PDF found @ Google: " + s);
                         pdfLink = Optional.of(new URL(s));
                         break;
                     }
@@ -158,7 +156,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         } else {
             Collection<BibEntry> entries = result.getDatabase().getEntries();
             if (entries.size() != 1) {
-                LOGGER.debug(entries.size() + " entries found! (" + link + ")");
+                Logger.debug(this, entries.size() + " entries found! (" + link + ")");
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
             } else {
                 BibEntry entry = entries.iterator().next();

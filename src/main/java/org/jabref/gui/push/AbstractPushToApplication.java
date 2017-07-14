@@ -20,17 +20,15 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract class for pushing entries into different editors.
  */
 public abstract class AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(AbstractPushToApplication.class);
 
     protected boolean couldNotCall; // Set to true in case the command could not be executed, e.g., if the file is not found
     protected boolean couldNotConnect; // Set to true in case the tunnel to the program (if one is used) does not operate
@@ -81,7 +79,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         catch (IOException excep) {
             couldNotCall = true;
 
-            LOGGER.warn("Error: Could not call executable '" + commandPath + "'.", excep);
+            Logger.warn(this, "Error: Could not call executable '" + commandPath + "'.", excep);
         }
     }
 

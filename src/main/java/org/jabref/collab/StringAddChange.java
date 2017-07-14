@@ -11,12 +11,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class StringAddChange extends Change {
 
-    private static final Log LOGGER = LogFactory.getLog(StringAddChange.class);
 
     private final BibtexString string;
     private final InfoPane tp = new InfoPane();
@@ -37,7 +35,7 @@ class StringAddChange extends Change {
 
         if (panel.getDatabase().hasStringLabel(string.getName())) {
             // The name to change to is already in the database, so we can't comply.
-            LOGGER.info("Cannot add string '" + string.getName() + "' because the name "
+            Logger.info(this, "Cannot add string '" + string.getName() + "' because the name "
                     + "is already in use.");
         }
 
@@ -45,12 +43,12 @@ class StringAddChange extends Change {
             panel.getDatabase().addString(string);
             undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), string));
         } catch (KeyCollisionException ex) {
-            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
         try {
             secondary.addString(new BibtexString(string.getName(), string.getContent()));
         } catch (KeyCollisionException ex) {
-            LOGGER.info("Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage(), ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "' to tmp database: " + ex.getMessage(), ex);
         }
         return true;
     }

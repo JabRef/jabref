@@ -42,10 +42,9 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -56,7 +55,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SaveDatabaseAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
     private final BasePanel panel;
     private final JabRefFrame frame;
@@ -169,7 +167,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 fileLockedError = true;
                 return;
             }
-            LOGGER.error("Problem saving file", ex);
+            Logger.error(this, "Problem saving file", ex);
         }
     }
 
@@ -208,7 +206,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // Error occured during processing of an entry. Highlight it!
                 panel.highlightEntry(entry);
             } else {
-                LOGGER.error("A problem occured when trying to save the file", ex);
+                Logger.error(this, "A problem occured when trying to save the file", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
@@ -347,7 +345,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
                     context.getDatabaseFile().orElse(null)));
         } catch (IOException ex) {
-            LOGGER.error("Problem registering file change notifications", ex);
+            Logger.error(this, "Problem registering file change notifications", ex);
         }
 
         if (readyForAutosave(context)) {
@@ -423,7 +421,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     if (!FileBasedLock
                             .waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().get().toPath())) {
                         // TODO: GUI handling of the situation when the externally modified file keeps being locked.
-                        LOGGER.error("File locked, this will be trouble.");
+                        Logger.error(this, "File locked, this will be trouble.");
                     }
 
                     ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,

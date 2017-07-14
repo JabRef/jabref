@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 
+import com.jcabi.log.Logger;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -67,7 +68,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         if (fetchedEntries.isEmpty()) {
             return Optional.empty();
         } else if (fetchedEntries.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+            Logger.info(this, "Fetcher " + getName() + "found more than one result for identifier " + identifier
                     + ". We will use the first entry.");
         }
 

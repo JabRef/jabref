@@ -11,12 +11,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
+import com.jcabi.log.Logger;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +29,6 @@ import org.jsoup.nodes.Element;
  * @see http://dev.elsevier.com/
  */
 public class ScienceDirect implements FulltextFetcher {
-    private static final Log LOGGER = LogFactory.getLog(ScienceDirect.class);
 
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";
@@ -57,7 +55,7 @@ public class ScienceDirect implements FulltextFetcher {
                     Element link = html.getElementById("pdfLink");
 
                     if (link != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (old page).");
+                        Logger.info(this, "Fulltext PDF found @ ScienceDirect (old page).");
                         Optional<URL> pdfLink = Optional.of(new URL(link.attr("pdfurl")));
                         return pdfLink;
                     }
@@ -65,13 +63,13 @@ public class ScienceDirect implements FulltextFetcher {
                     String url = html.getElementsByClass("pdf-download-btn-link").attr("href");
 
                     if (url != null) {
-                        LOGGER.info("Fulltext PDF found @ ScienceDirect (new page).");
+                        Logger.info(this, "Fulltext PDF found @ ScienceDirect (new page).");
                         Optional<URL> pdfLink = Optional.of(new URL("http://www.sciencedirect.com" + url));
                         return pdfLink;
                     }
                 }
             } catch (UnirestException e) {
-                LOGGER.warn("ScienceDirect API request failed", e);
+                Logger.warn(this, "ScienceDirect API request failed", e);
             }
         }
         return Optional.empty();
@@ -97,7 +95,7 @@ public class ScienceDirect implements FulltextFetcher {
             }
             return sciLink;
         } catch (JSONException e) {
-            LOGGER.debug("No ScienceDirect link found in API request", e);
+            Logger.debug(this, "No ScienceDirect link found in API request", e);
             return sciLink;
         }
     }

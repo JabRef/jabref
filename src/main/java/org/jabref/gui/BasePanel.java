@@ -142,14 +142,12 @@ import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
 
 import com.google.common.eventbus.Subscribe;
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
-    private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
     private static final int SPLIT_PANE_DIVIDER_SIZE = 4;
@@ -230,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
             } catch (IOException ex) {
-                LOGGER.warn("Could not register FileUpdateMonitor", ex);
+                Logger.warn(this, "Could not register FileUpdateMonitor", ex);
             }
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
@@ -541,7 +539,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
-                    LOGGER.info("Could not open folder", e);
+                    Logger.info(this, "Could not open folder", e);
                 }
             }
         }));
@@ -635,7 +633,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 output(outputStr);
             } catch (Throwable ex) {
-                LOGGER.warn("Could not unmark", ex);
+                Logger.warn(this, "Could not unmark", ex);
             }
         });
 
@@ -946,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                         .getLayoutFromText();
             } catch (IOException e) {
-                LOGGER.info("Could not get layout", e);
+                Logger.info(this, "Could not get layout", e);
                 return;
             }
 
@@ -1015,7 +1013,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void runCommand(final String _command) {
         if (!actions.containsKey(_command)) {
-            LOGGER.info("No action defined for '" + _command + '\'');
+            Logger.info(this, "No action defined for '" + _command + '\'');
             return;
         }
 
@@ -1031,7 +1029,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // The call to unblock will simply hide the glasspane, so there is no harm in calling
             // it even if the frame hasn't been blocked.
             frame.unblock();
-            LOGGER.error("runCommand error: " + ex.getMessage(), ex);
+            Logger.error(this, "runCommand error: " + ex.getMessage(), ex);
         }
     }
 
@@ -1066,7 +1064,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 highlightEntry(ex.getEntry());
                 showEntry(ex.getEntry());
             } else {
-                LOGGER.warn("Could not save", ex);
+                Logger.warn(this, "Could not save", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
@@ -1176,7 +1174,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 return be;
             } catch (KeyCollisionException ex) {
-                LOGGER.info(ex.getMessage(), ex);
+                Logger.info(this, ex.getMessage(), ex);
             }
         }
         return null;
@@ -1205,7 +1203,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 highlightEntry(bibEntry);
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Collision for bibtex key" + bibEntry.getId(), ex);
+                Logger.info(this, "Collision for bibtex key" + bibEntry.getId(), ex);
             }
         }
     }
@@ -1264,7 +1262,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         entryEditorClosing(getCurrentEditor());
                         break;
                     default:
-                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
+                        Logger.warn(this, "unknown BasePanelMode: '" + mode + "', doing nothing");
                         break;
                 }
             }
@@ -1277,7 +1275,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.CUT);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Could not cut", ex);
+                    Logger.warn(this, "Could not cut", ex);
                 }
             }
         });
@@ -1288,7 +1286,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.COPY);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Could not copy", ex);
+                    Logger.warn(this, "Could not copy", ex);
                 }
             }
         });
@@ -1299,7 +1297,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.PASTE);
                 } catch (Throwable ex) {
-                    LOGGER.warn("Could not paste", ex);
+                    Logger.warn(this, "Could not paste", ex);
                 }
             }
         });
@@ -1328,7 +1326,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     try {
                         runCommand(Actions.EDIT);
                     } catch (Throwable ex) {
-                        LOGGER.warn("Could not run action based on key press", ex);
+                        Logger.warn(this, "Could not run action based on key press", ex);
                     }
                 }
             }
@@ -1613,7 +1611,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 SwingUtilities.invokeAndWait(() -> markBasedChangedInternal());
             } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem marking database as changed", e);
+                Logger.info(this, "Problem marking database as changed", e);
             }
         }
     }
@@ -1670,7 +1668,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void changeType(List<BibEntry> entries, String newType) {
         if ((entries == null) || (entries.isEmpty())) {
-            LOGGER.error("At least one entry must be selected to be able to change the type.");
+            Logger.error(this, "At least one entry must be selected to be able to change the type.");
             return;
         }
 
@@ -1808,7 +1806,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if ((getBibDatabaseContext().getDatabaseFile().isPresent())
                 && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile().get().toPath())) {
             // The file is locked even after the maximum wait. Do nothing.
-            LOGGER.error("File updated externally, but change scan failed because the file is locked.");
+            Logger.error(this, "File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
             Globals.getFileUpdateMonitor().perturbTimestamp(getFileMonitorHandle());
             return;
@@ -1842,7 +1840,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        LOGGER.info("File '" + getBibDatabaseContext().getDatabaseFile().get().getPath() + "' has been deleted.");
+        Logger.info(this, "File '" + getBibDatabaseContext().getDatabaseFile().get().getPath() + "' has been deleted.");
     }
 
     /**
@@ -2151,7 +2149,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 markBaseChanged();
                 frame.output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
-                LOGGER.warn("Nothing to undo", ex);
+                Logger.warn(this, "Nothing to undo", ex);
                 frame.output(Localization.lang("Nothing to undo") + '.');
             }
 
@@ -2202,7 +2200,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
-                            LOGGER.info("Could not open link", e);
+                            Logger.info(this, "Could not open link", e);
                         }
                     }
                 }

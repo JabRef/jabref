@@ -78,8 +78,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Importer for the Medline/Pubmed format.
@@ -89,7 +88,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MedlineImporter extends Importer implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
@@ -179,7 +177,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
         } catch (JAXBException | XMLStreamException e) {
-            LOGGER.debug("could not parse document", e);
+            Logger.debug(this, "could not parse document", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
@@ -276,7 +274,7 @@ public class MedlineImporter extends Importer implements Parser {
                     handleAuthors(fields, authorList);
                 }
             } else {
-                LOGGER.info(String.format("Size of authorlist was %s", authorLists.size()));
+                Logger.info(this, String.format("Size of authorlist was %s", authorLists.size()));
             }
         }
 
@@ -690,7 +688,7 @@ public class MedlineImporter extends Importer implements Parser {
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
 
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage(), e);
+            Logger.error(this, e.getLocalizedMessage(), e);
         }
         return Collections.emptyList();
     }

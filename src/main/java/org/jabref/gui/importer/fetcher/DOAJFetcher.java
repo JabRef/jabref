@@ -12,19 +12,17 @@ import org.jabref.logic.importer.util.JSONEntryParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
+import com.jcabi.log.Logger;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class DOAJFetcher implements EntryFetcher {
 
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
-    private static final Log LOGGER = LogFactory.getLog(DOAJFetcher.class);
     private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
 
@@ -94,7 +92,7 @@ public class DOAJFetcher implements EntryFetcher {
                 return false;
             }
         } catch (UnirestException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
             return false;
         }

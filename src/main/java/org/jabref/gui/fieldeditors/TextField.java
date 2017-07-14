@@ -1,5 +1,4 @@
 package org.jabref.gui.fieldeditors;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -17,8 +16,7 @@ import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
@@ -26,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextField extends JTextFieldWithPlaceholder implements FieldEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(TextField.class);
 
     private final String fieldName;
     private UndoManager undo;
@@ -106,7 +103,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
             try {
                 SwingUtilities.invokeAndWait(() -> setBackground(color));
             } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem setting background color", e);
+                Logger.info(this, "Problem setting background color", e);
             }
         }
 

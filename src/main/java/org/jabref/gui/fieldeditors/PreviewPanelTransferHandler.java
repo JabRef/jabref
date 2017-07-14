@@ -15,12 +15,10 @@ import org.jabref.gui.EntryContainer;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPanelTransferHandler.class);
 
     public PreviewPanelTransferHandler(JabRefFrame frame, EntryContainer entryContainer, TransferHandler textTransferHandler) {
         super(frame, entryContainer, textTransferHandler);
@@ -50,7 +48,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             try {
                 editorPane.getEditorKit().write(stringWriter, editorPane.getDocument(), editorPane.getSelectionStart(), editorPane.getSelectionEnd());
             } catch (BadLocationException | IOException e) {
-                LOGGER.warn("Cannot write preview", e);
+                Logger.warn(this, "Cannot write preview", e);
             }
 
             // Second, return the HTML (and text as fallback)

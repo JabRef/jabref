@@ -29,12 +29,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class ImportFormats {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
 
     private ImportFormats() {
     }
@@ -102,7 +100,7 @@ public class ImportFormats {
                         // Set last working dir for import
                         Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
                     } catch (Exception ex) {
-                        LOGGER.warn("Cannot import file", ex);
+                        Logger.warn(this, "Cannot import file", ex);
                     }
                 });
             }

@@ -48,15 +48,13 @@ import org.jabref.preferences.PreviewPreferences;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
  * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener, KeyListener, FocusListener {
-    private static final Log LOGGER = LogFactory.getLog(MainTableSelectionListener.class);
 
     private final MainTable table;
     private final BasePanel panel;
@@ -298,7 +296,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
-                                LOGGER.info("Unable to open link", ex);
+                                Logger.info(this, "Unable to open link", ex);
                             }
                         }
                         break; // only open the first link

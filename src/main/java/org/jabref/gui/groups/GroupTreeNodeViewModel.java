@@ -28,13 +28,11 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public static final DataFlavor FLAVOR;
-    private static final Log LOGGER = LogFactory.getLog(GroupTreeNodeViewModel.class);
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
     private static final Icon GROUP_REGULAR_ICON = null;
@@ -46,7 +44,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
                     + ";class=" + GroupTreeNode.class.getCanonicalName());
         } catch (ClassNotFoundException e) {
-            LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
+            LogFactory.getLog(GroupTreeNodeViewModel.class).error("Creating DataFlavor failed. This should not happen.", e);
         }
         FLAVOR = df;
         FLAVORS = new DataFlavor[] {GroupTreeNodeViewModel.FLAVOR};

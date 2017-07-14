@@ -12,8 +12,7 @@ import javafx.scene.Scene;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.util.DefaultTaskExecutor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * An implementation of the FieldEditor backed by a {@link EditorTextArea}.
@@ -21,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextArea implements FieldEditor {
 
-    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
 
     private final JFXPanel swingPanel;
 
@@ -113,7 +111,7 @@ public class TextArea implements FieldEditor {
             try {
                 SwingUtilities.invokeAndWait(() -> setBackground(color));
             } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem setting background color", e);
+                Logger.info(this, "Problem setting background color", e);
             }
         }
     }

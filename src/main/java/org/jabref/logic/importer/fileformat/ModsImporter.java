@@ -59,8 +59,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Importer for the MODS format.<br>
@@ -69,7 +68,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ModsImporter extends Importer implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
             .getKeywordSeparator() + " ";
 
@@ -107,10 +105,10 @@ public class ModsImporter extends Importer implements Parser {
                 ModsDefinition modsDefinition = mods.get();
                 parseMods(bibItems, modsDefinition);
             } else {
-                LOGGER.warn("Not expected root element found");
+                Logger.warn(this, "Not expected root element found");
             }
         } catch (JAXBException e) {
-            LOGGER.debug("could not parse document", e);
+            Logger.debug(this, "could not parse document", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
@@ -487,7 +485,7 @@ public class ModsImporter extends Importer implements Parser {
         try {
             return importDatabase(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
         } catch (IOException e) {
-            LOGGER.error(e.getLocalizedMessage(), e);
+            Logger.error(this, e.getLocalizedMessage(), e);
         }
         return Collections.emptyList();
     }

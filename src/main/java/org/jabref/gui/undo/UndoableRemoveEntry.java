@@ -7,8 +7,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -18,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveEntry.class);
     private final BibDatabase base;
     private final BibEntry entry;
 
@@ -53,7 +51,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
-            LOGGER.warn("Problem to redo `remove entry`", ex);
+            Logger.warn(this, "Problem to redo `remove entry`", ex);
         }
     }
 

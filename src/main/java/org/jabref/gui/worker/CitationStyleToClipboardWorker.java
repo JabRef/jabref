@@ -26,8 +26,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard.
@@ -35,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationStyleToClipboardWorker.class);
 
     private final BasePanel basePanel;
     private final List<BibEntry> selectedEntries;
@@ -99,7 +97,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
                         transferable = processText(citations);
                         break;
                     default:
-                        LOGGER.warn("unknown output format: '" + outputFormat + "', processing it via the default.");
+                        Logger.warn(this, "unknown output format: '" + outputFormat + "', processing it via the default.");
                         transferable = processText(citations);
                         break;
                 }
@@ -108,7 +106,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
 
             basePanel.frame().setStatus(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while copying citations to the clipboard", e);
+            Logger.error(this, "Error while copying citations to the clipboard", e);
         }
     }
 

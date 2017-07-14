@@ -29,6 +29,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -40,15 +41,12 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog for modifying existing citations.
  */
 class CitationManager {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationManager.class);
     private final OOBibBase ooBase;
     private final JDialog diag;
     private final EventList<CitationEntry> list;
@@ -93,7 +91,7 @@ class CitationManager {
                 storeSettings();
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                     IllegalArgumentException ex) {
-                LOGGER.warn("Problem modifying citation", ex);
+                Logger.warn(this, "Problem modifying citation", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
             }
             diag.dispose();

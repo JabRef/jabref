@@ -10,12 +10,10 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.cleanup.Formatter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(HtmlToLatexFormatter.class);
 
     private static final int MAX_TAG_LENGTH = 100;
 
@@ -91,7 +89,7 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         m = ESCAPED_PATTERN3.matcher(result);
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
-            LOGGER.warn("HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
+            Logger.warn(this, "HTML escaped char not converted: " + m.group(1) + m.group(2) + m.group(3) + " = " + Integer.toString(num));
         }
 
         // Remove $$ in case of two adjacent conversions
@@ -100,7 +98,7 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         // Find non-covered special characters with alphabetic codes
         m = ESCAPED_PATTERN4.matcher(result);
         while (m.find()) {
-            LOGGER.warn("HTML escaped char not converted: " + m.group(1));
+            Logger.warn(this, "HTML escaped char not converted: " + m.group(1));
         }
 
         return result.trim();

@@ -27,8 +27,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -44,7 +43,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class OAI2Fetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(OAI2Fetcher.class);
     private static final String OAI2_ARXIV_PREFIXIDENTIFIER = "oai%3AarXiv.org%3A";
     private static final String OAI2_ARXIV_HOST = "export.arxiv.org";
     private static final String OAI2_ARXIV_SCRIPT = "oai2";
@@ -88,7 +86,7 @@ public class OAI2Fetcher implements EntryFetcher {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
         } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error("Error creating SAXParser for OAI2Fetcher", e);
+            Logger.error(this, "Error creating SAXParser for OAI2Fetcher", e);
         }
     }
 
@@ -251,7 +249,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     be = importOai2Entry(key);
                 } catch (SAXException e) {
                     String url = constructUrl(OAI2Fetcher.fixKey(key));
-                    LOGGER.error("Error while fetching from " + getTitle(), e);
+                    Logger.error(this, "Error while fetching from " + getTitle(), e);
                     ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) + "\n" +
                                     Localization.lang("A SAX exception occurred while parsing '%0':", url),
                             Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
@@ -272,7 +270,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
             return true;
         } catch (IOException | InterruptedException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
     }
         return false;

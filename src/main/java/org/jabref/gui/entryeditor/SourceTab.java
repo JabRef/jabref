@@ -27,15 +27,13 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 
 public class SourceTab extends EntryEditorTab {
 
-    private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
     private final BibEntry entry;
     private CodeArea codeArea;
@@ -74,7 +72,7 @@ public class SourceTab extends EntryEditorTab {
             codeArea.appendText(ex.getMessage() + "\n\n" +
                     Localization.lang("Correct the entry, and reopen editor to display/edit source."));
             codeArea.setEditable(false);
-            LOGGER.debug("Incorrect entry", ex);
+            Logger.debug(this, "Incorrect entry", ex);
         }
 
         return new VirtualizedScrollPane<>(codeArea);
@@ -180,7 +178,7 @@ public class SourceTab extends EntryEditorTab {
             // error message, and the choice to keep or revert the contents
             // of the source text field.
 
-            LOGGER.debug("Incorrect source", ex);
+            Logger.debug(this, "Incorrect source", ex);
             DialogService dialogService = new FXDialogService();
             boolean keepEditing = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Problem with parsing entry"),
@@ -194,7 +192,7 @@ public class SourceTab extends EntryEditorTab {
                 try {
                     codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
                 } catch (IOException e) {
-                    LOGGER.debug("Incorrect source", e);
+                    Logger.debug(this, "Incorrect source", e);
                 }
             }
         }

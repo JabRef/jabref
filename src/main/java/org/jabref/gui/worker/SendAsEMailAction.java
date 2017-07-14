@@ -20,8 +20,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Sends the selected entry as email - by Oliver Kopp
@@ -35,7 +34,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SendAsEMailAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(SendAsEMailAction.class);
     private final JabRefFrame frame;
     private String message;
 
@@ -71,7 +69,7 @@ public class SendAsEMailAction extends AbstractWorker {
             try {
                 bibtexEntryWriter.write(entry, sw, panel.getBibDatabaseContext().getMode());
             } catch (IOException e) {
-                LOGGER.warn("Problem creating BibTeX file for mailing.", e);
+                Logger.warn(this, "Problem creating BibTeX file for mailing.", e);
             }
         }
 
@@ -89,7 +87,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
-                    LOGGER.debug("Cannot open file", e);
+                    Logger.debug(this, "Cannot open file", e);
                 }
             }
         }
@@ -107,7 +105,7 @@ public class SendAsEMailAction extends AbstractWorker {
             uriMailTo = new URI("mailto", mailTo, null);
         } catch (URISyntaxException e1) {
             message = Localization.lang("Error creating email");
-            LOGGER.warn(message, e1);
+            Logger.warn(this, message, e1);
             return;
         }
 
@@ -116,7 +114,7 @@ public class SendAsEMailAction extends AbstractWorker {
             desktop.mail(uriMailTo);
         } catch (IOException e) {
             message = Localization.lang("Error creating email");
-            LOGGER.warn(message, e);
+            Logger.warn(this, message, e);
             return;
         }
 

@@ -22,14 +22,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 class AppearancePrefsTab extends JPanel implements PrefsTab {
-    private static final Log LOGGER = LogFactory.getLog(AppearancePrefsTab.class);
 
     private final JabRefPreferences prefs;
 
@@ -302,7 +300,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             // should not happen as values are checked beforehand
-            LOGGER.error("Invalid data value, integer expected", ex);
+            Logger.error(this, "Invalid data value, integer expected", ex);
         }
     }
 

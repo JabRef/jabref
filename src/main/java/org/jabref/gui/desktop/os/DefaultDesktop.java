@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class DefaultDesktop implements NativeDesktop {
-    private static final Log LOGGER = LogFactory.getLog(NativeDesktop.class);
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
@@ -30,7 +28,7 @@ public class DefaultDesktop implements NativeDesktop {
 
     @Override
     public void openConsole(String absolutePath) throws IOException {
-        LOGGER.error("This feature is not supported by your Operating System.");
+        Logger.error(this, "This feature is not supported by your Operating System.");
     }
 
     @Override

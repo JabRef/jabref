@@ -23,12 +23,10 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class RenamePdfCleanup implements CleanupJob {
 
-    private static final Log LOGGER = LogFactory.getLog(RenamePdfCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
@@ -106,7 +104,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
                 // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-                LOGGER.debug("There already exists a file with that name " + newPath.getFileName()
+                Logger.debug(this, "There already exists a file with that name " + newPath.getFileName()
                         + " so I won't rename it");
                 newFileList.add(flEntry);
                 continue;
@@ -117,7 +115,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     Files.createDirectories(newPath);
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not create necessary target directoires for renaming", e);
+                Logger.error(this, "Could not create necessary target directoires for renaming", e);
             }
 
             boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);

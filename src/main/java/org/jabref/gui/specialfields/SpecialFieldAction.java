@@ -14,12 +14,10 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.specialfields.SpecialField;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class SpecialFieldAction implements BaseAction {
 
-    private static final Log LOGGER = LogFactory.getLog(SpecialFieldAction.class);
     private final JabRefFrame frame;
     private final SpecialField specialField;
     private final String value;
@@ -76,7 +74,7 @@ public class SpecialFieldAction implements BaseAction {
                 // even no output message
             }
         } catch (Throwable ex) {
-            LOGGER.error("Problem setting special fields", ex);
+            Logger.error(this, "Problem setting special fields", ex);
         }
     }
 
@@ -97,7 +95,7 @@ public class SpecialFieldAction implements BaseAction {
             return Localization.lang("Cleared '%0' for %1 entries", viewModel.getLocalization(), params[0]);
         } else {
             // invalid usage
-            LOGGER.info("Creation of special field status change message failed: illegal argument combination.");
+            Logger.info(this, "Creation of special field status change message failed: illegal argument combination.");
             return "";
         }
     }

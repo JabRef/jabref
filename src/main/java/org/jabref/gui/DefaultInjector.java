@@ -10,12 +10,11 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
-import org.apache.commons.logging.Log;
+import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class DefaultInjector implements PresenterFactory {
 
-    private static final Log LOGGER = LogFactory.getLog(DefaultInjector.class);
 
     /**
      * This method takes care of creating dependencies.
@@ -39,7 +38,7 @@ public class DefaultInjector implements PresenterFactory {
             try {
                 return clazz.newInstance();
             } catch (InstantiationException | IllegalAccessException ex) {
-                LOGGER.error("Cannot instantiate dependency: " + clazz, ex);
+                LogFactory.getLog(DefaultInjector.class).error("Cannot instantiate dependency: " + clazz, ex);
                 return null;
             }
         }
@@ -47,7 +46,7 @@ public class DefaultInjector implements PresenterFactory {
 
     @Override
     public <T> T instantiatePresenter(Class<T> clazz, Function<String, Object> injectionContext) {
-        LOGGER.debug("Instantiate " + clazz.getName());
+        Logger.debug(this, "Instantiate " + clazz.getName());
 
         // Use our own method to construct dependencies
         Injector.setInstanceSupplier(DefaultInjector::createDependency);

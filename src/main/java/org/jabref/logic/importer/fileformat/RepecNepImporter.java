@@ -16,8 +16,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.
@@ -141,7 +140,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RepecNepImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
     private final ImportFormatPreferences importFormatPreferences;
@@ -420,7 +418,7 @@ public class RepecNepImporter extends Importer {
                 message += ", paper no. " + paperNoStr + ": ";
             }
             message += e.getLocalizedMessage();
-            LOGGER.error(message, e);
+            Logger.error(this, message, e);
             return ParserResult.fromErrorMessage(message);
         }
 

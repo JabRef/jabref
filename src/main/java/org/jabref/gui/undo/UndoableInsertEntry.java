@@ -6,8 +6,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * This class represents the removal of an entry. The constructor needs
@@ -17,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableInsertEntry.class);
     private final BibDatabase base;
     private final BibEntry entry;
 
@@ -46,7 +44,7 @@ public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
-            LOGGER.warn("Problem to undo `insert entry`", ex);
+            Logger.warn(this, "Problem to undo `insert entry`", ex);
         }
     }
 

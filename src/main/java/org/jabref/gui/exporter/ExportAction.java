@@ -26,12 +26,10 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class ExportAction {
 
-    private static final Log LOGGER = LogFactory.getLog(ExportAction.class);
 
     private ExportAction() {
     }
@@ -130,7 +128,7 @@ public class ExportAction {
                                                 .orElse(Globals.prefs.getDefaultEncoding()),
                                         finEntries);
                             } catch (Exception ex) {
-                                LOGGER.warn("Problem exporting", ex);
+                                Logger.warn(this, "Problem exporting", ex);
                                 if (ex.getMessage() == null) {
                                     errorMessage = ex.toString();
                                 } else {

@@ -21,15 +21,13 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
 
@@ -45,7 +43,7 @@ public class FindFullTextAction extends AbstractWorker {
         if (!basePanel.getSelectedEntries().isEmpty()) {
             basePanel.output(Localization.lang("Looking for full text document..."));
         } else {
-            LOGGER.debug("No entry selected for fulltext download.");
+            Logger.debug(this, "No entry selected for fulltext download.");
         }
     }
 
@@ -103,7 +101,7 @@ public class FindFullTextAction extends AbstractWorker {
                         }
                     });
                 } catch (IOException e) {
-                    LOGGER.warn("Problem downloading file", e);
+                    Logger.warn(this, "Problem downloading file", e);
                 }
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));

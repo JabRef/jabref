@@ -12,12 +12,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class StringChange extends Change {
 
-    private static final Log LOGGER = LogFactory.getLog(StringChange.class);
     private final BibtexString string;
     private final String mem;
     private final String disk;
@@ -63,7 +61,7 @@ class StringChange extends Change {
                 panel.getDatabase().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
+                Logger.info(this, "Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
             }
         } else {
             string.setContent(disk);

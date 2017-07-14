@@ -39,12 +39,11 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
+import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class AppendDatabaseAction implements BaseAction {
 
-    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
 
     private final JabRefFrame frame;
     private final BasePanel panel;
@@ -102,7 +101,7 @@ public class AppendDatabaseAction implements BaseAction {
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (IllegalArgumentException e) {
-                        LOGGER.error(e);
+                        LogFactory.getLog(AppendDatabaseAction.class).error("unknown error", e);
                     }
                 }
 
@@ -186,7 +185,7 @@ public class AppendDatabaseAction implements BaseAction {
                         importSelectorWords);
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
-                LOGGER.warn("Could not open database", ex);
+                Logger.warn(this, "Could not open database", ex);
                 JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
                         JOptionPane.ERROR_MESSAGE);
             }

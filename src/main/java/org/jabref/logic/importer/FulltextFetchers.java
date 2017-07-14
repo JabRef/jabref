@@ -18,14 +18,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
 public class FulltextFetchers {
-    private static final Log LOGGER = LogFactory.getLog(FulltextFetchers.class);
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
@@ -57,7 +55,7 @@ public class FulltextFetchers {
                         .findIdentifier(clonedEntry)
                         .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
             } catch (FetcherException e) {
-                LOGGER.debug("Failed to find DOI", e);
+                Logger.debug(this, "Failed to find DOI", e);
             }
         }
 
@@ -69,7 +67,7 @@ public class FulltextFetchers {
                     return result;
                 }
             } catch (IOException | FetcherException e) {
-                LOGGER.debug("Failed to find fulltext PDF at given URL", e);
+                Logger.debug(this, "Failed to find fulltext PDF at given URL", e);
             }
         }
         return Optional.empty();

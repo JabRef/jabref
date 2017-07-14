@@ -20,12 +20,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
 
     private final JTextField additionalParams = new JTextField(30);
 
@@ -109,20 +107,20 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                             sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        LOGGER.warn("Could not read from stderr.", e);
+                        Logger.warn(this, "Could not read from stderr.", e);
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        LOGGER.warn("Push to Emacs error: " + sb);
+                        Logger.warn(this, "Push to Emacs error: " + sb);
                         couldNotConnect = true;
                     }
                 } catch (IOException e) {
-                    LOGGER.warn("File problem.", e);
+                    Logger.warn(this, "File problem.", e);
                 }
             });
         } catch (IOException excep) {
             couldNotCall = true;
-            LOGGER.warn("Problem pushing to Emacs.", excep);
+            Logger.warn(this, "Problem pushing to Emacs.", excep);
         }
     }
 

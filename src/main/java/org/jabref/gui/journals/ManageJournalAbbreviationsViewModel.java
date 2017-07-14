@@ -27,8 +27,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.PreferencesService;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * This class provides a model for managing journal abbreviation lists.
@@ -38,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
-    private final Log logger = LogFactory.getLog(ManageJournalAbbreviationsViewModel.class);
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
@@ -187,7 +185,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
             try {
                 abbreviationsFile.readAbbreviations();
             } catch (FileNotFoundException e) {
-                logger.debug(e.getLocalizedMessage());
+                Logger.debug(this, e.getLocalizedMessage(), e);
             }
         }
         journalFiles.add(abbreviationsFile);
@@ -309,7 +307,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
             try {
                 file.writeOrCreate();
             } catch (IOException e) {
-                logger.debug(e.getLocalizedMessage());
+                Logger.debug(this, e.getLocalizedMessage());
             }
         });
     }

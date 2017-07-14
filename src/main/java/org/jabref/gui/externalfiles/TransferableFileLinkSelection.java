@@ -1,5 +1,4 @@
 package org.jabref.gui.externalfiles;
-
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -13,15 +12,13 @@ import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  *
  */
 public class TransferableFileLinkSelection implements Transferable {
 
-    private static final Log LOGGER = LogFactory.getLog(TransferableFileLinkSelection.class);
 
     private final List<Path> fileList = new ArrayList<>();
 
@@ -43,7 +40,7 @@ public class TransferableFileLinkSelection implements Transferable {
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor dataFlavor) {
-        LOGGER.debug("Query: " + dataFlavor.getHumanPresentableName() + " , "
+        Logger.debug(this, "Query: " + dataFlavor.getHumanPresentableName() + " , "
                 +
                 dataFlavor.getDefaultRepresentationClass() + " , " + dataFlavor.getMimeType());
         return dataFlavor.equals(DataFlavor.javaFileListFlavor)

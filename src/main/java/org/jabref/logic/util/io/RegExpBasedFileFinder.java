@@ -19,11 +19,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class RegExpBasedFileFinder implements FileFinder {
-    private static final Log LOGGER = LogFactory.getLog(RegExpBasedFileFinder.class);
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
@@ -242,7 +240,7 @@ class RegExpBasedFileFinder implements FileFinder {
                         }
                     });
                 } catch (IOException e) {
-                    LOGGER.debug(e);
+                    Logger.debug(this, "I/O issues", e);
                 }
             } // End process directory information
         }
@@ -258,7 +256,7 @@ class RegExpBasedFileFinder implements FileFinder {
                     .collect(Collectors.toList());
             res.addAll(matches);
         } catch (IOException e) {
-            LOGGER.debug(e);
+            Logger.debug(this, "I/O issues", e);
         }
         return res;
     }

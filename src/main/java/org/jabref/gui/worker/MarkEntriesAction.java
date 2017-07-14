@@ -15,12 +15,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(MarkEntriesAction.class);
     private final JabRefFrame frame;
     private final int level;
     private final JMenuItem menuItem;
@@ -50,7 +48,7 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
             getWorker().run();
             getCallBack().update();
         } catch (Throwable t) {
-            LOGGER.warn("Problem marking entries", t);
+            Logger.warn(this, "Problem marking entries", t);
         }
     }
 

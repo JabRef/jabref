@@ -31,16 +31,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog for creating or modifying custom exports.
  */
 class CustomExportDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
@@ -71,7 +69,7 @@ class CustomExportDialog extends JabRefDialog {
             if (layoutFile.getText().isEmpty() || name.getText().isEmpty() || extension.getText().isEmpty()
                     || !layoutFile.getText().endsWith(".layout")) {
 
-                LOGGER.info("One field is empty!"); //TODO: Better error message
+                Logger.info(this, "One field is empty!"); //TODO: Better error message
                 return;
             }
 

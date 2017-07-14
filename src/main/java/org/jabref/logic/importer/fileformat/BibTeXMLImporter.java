@@ -29,8 +29,7 @@ import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Importer for the BibTeXML format.
@@ -40,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibTeXMLImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 
     private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
 
@@ -145,7 +143,7 @@ public class BibTeXMLImporter extends Importer {
                 bibItems.add(bibEntry);
             }
         } catch (JAXBException e) {
-            LOGGER.error("Error with XML parser configuration", e);
+            Logger.error(this, "Error with XML parser configuration", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
@@ -179,7 +177,7 @@ public class BibTeXMLImporter extends Importer {
                     putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
                 }
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
-                LOGGER.error("Could not invoke method", e);
+                Logger.error(this, "Could not invoke method", e);
             }
         }
     }
@@ -218,10 +216,10 @@ public class BibTeXMLImporter extends Importer {
                 if (FieldName.YEAR.equals(localName)) {
                     putYear(fields, value);
                 } else {
-                    LOGGER.info("Unexpected field was found");
+                    Logger.info(this, "Unexpected field was found");
                 }
             } else {
-                LOGGER.info("Unexpected field was found");
+                Logger.info(this, "Unexpected field was found");
             }
         }
     }

@@ -11,15 +11,13 @@ import org.jabref.gui.shared.ConnectToSharedDatabaseDialog;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.security.Password;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Stores and reads persistent data for {@link ConnectToSharedDatabaseDialog}.
  */
 public class SharedDatabasePreferences {
 
-    private static final Log LOGGER = LogFactory.getLog(SharedDatabasePreferences.class);
 
     private static final String DEFAULT_NODE = "default";
     private static final String PARENT_NODE = "jabref-shared";
@@ -128,7 +126,7 @@ public class SharedDatabasePreferences {
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            LOGGER.error("Could not store the password due to encryption problems.", e);
+            Logger.error(this, "Could not store the password due to encryption problems.", e);
         }
     }
 }

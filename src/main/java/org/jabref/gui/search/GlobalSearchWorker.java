@@ -15,12 +15,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(GlobalSearchWorker.class);
 
     private final JabRefFrame frame;
     private final SearchQuery searchQuery;
@@ -61,7 +59,7 @@ class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Voi
             dialog.selectFirstEntry();
             dialog.setVisible(true);
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("something went wrong during the search", e);
+            Logger.error(this, "something went wrong during the search", e);
         }
     }
 

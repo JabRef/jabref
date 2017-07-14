@@ -38,11 +38,9 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
-    private static final Log LOGGER = LogFactory.getLog(RightClickMenu.class);
 
     private final BasePanel panel;
     private final JMenuItem groupAdd;
@@ -311,7 +309,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             try {
                 panel.runCommand(command);
             } catch (Throwable ex) {
-                LOGGER.debug("Cannot execute command " + command + ".", ex);
+                Logger.debug(this, "Cannot execute command " + command + ".", ex);
             }
         }
     }

@@ -44,12 +44,10 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFilesEditorViewModel.class);
 
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
@@ -250,13 +248,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             // TODO: what if this takes long time?
             String mimeType = urlDownload.getMimeType(); // Read MIME type
             if (mimeType != null) {
-                LOGGER.debug("MIME Type suggested: " + mimeType);
+                Logger.debug(this, "MIME Type suggested: " + mimeType);
                 return ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(mimeType);
             } else {
                 return Optional.empty();
             }
         } catch (IOException ex) {
-            LOGGER.debug("Error while inferring MIME type for URL " + urlDownload.getSource(), ex);
+            Logger.debug(this, "Error while inferring MIME type for URL " + urlDownload.getSource(), ex);
             return Optional.empty();
         }
     }

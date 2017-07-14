@@ -14,8 +14,7 @@ import java.util.Optional;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -24,7 +23,6 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
-    private static final Log LOGGER = LogFactory.getLog(PdfAnnotationImporter.class);
 
     /**
      * Imports the comments from a pdf specified by its path
@@ -61,7 +59,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error(String.format("Failed to read file '%s'.", path), e);
+            Logger.error(this, String.format("Failed to read file '%s'.", path), e);
         }
         return annotationsList;
     }
@@ -71,7 +69,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             return false;
         }
         if ("Link".equals(annotation.getSubtype()) || "Widget".equals(annotation.getSubtype())) {
-            LOGGER.debug(annotation.getSubtype() + " is excluded from the supported file annotations");
+            Logger.debug(this, annotation.getSubtype() + " is excluded from the supported file annotations");
             return false;
         }
         try {
@@ -79,7 +77,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 return false;
             }
         } catch (IllegalArgumentException e) {
-            LOGGER.debug(String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
+            Logger.debug(this, String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
         }
         return true;
     }
@@ -106,17 +104,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(String.format("File '%s' does not end with .pdf!", path));
+            Logger.warn(this, String.format("File '%s' does not end with .pdf!", path));
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn(String.format("File '%s' does not exist!", path));
+            Logger.warn(this, String.format("File '%s' does not exist!", path));
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn(String.format("File '%s' is not readable!", path));
+            Logger.warn(this, String.format("File '%s' is not readable!", path));
             return false;
         }
 

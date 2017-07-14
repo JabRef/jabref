@@ -10,11 +10,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class StringRemoveChange extends Change {
-    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
     private final BibtexString string;
 
     private final BibtexString inMem;
@@ -42,7 +40,7 @@ class StringRemoveChange extends Change {
             panel.getDatabase().removeString(inMem.getId());
             undoEdit.addEdit(new UndoableRemoveString(panel, panel.getDatabase(), string));
         } catch (Exception ex) {
-            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
         }
 
         // Update tmp database:

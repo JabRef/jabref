@@ -88,9 +88,8 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * import from plain text => simple mark/copy/paste into bibtex entry
@@ -104,7 +103,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class TextInputDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
 
     private final JButton okButton = new JButton(Localization.lang("Accept"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -200,7 +198,7 @@ public class TextInputDialog extends JabRefDialog {
         try {
             document.insertString(0, "", document.getStyle("regular"));
         } catch (BadLocationException ex) {
-            LOGGER.warn("Problem setting style", ex);
+            Logger.warn(this, "Problem setting style", ex);
 
         }
 
@@ -500,7 +498,7 @@ public class TextInputDialog extends JabRefDialog {
                     false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
-            LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
+            Logger.error(this, "Error in entry" + ": " + ex.getMessage(), ex);
         }
 
         fieldList.clearSelection();
@@ -541,7 +539,7 @@ public class TextInputDialog extends JabRefDialog {
             try {
                 document.insertString(cPos, data, document.getStyle("regular"));
             } catch (BadLocationException ex) {
-                LOGGER.warn("Could not paste text", ex);
+                Logger.warn(this, "Could not paste text", ex);
             }
         }
     }
@@ -576,7 +574,7 @@ public class TextInputDialog extends JabRefDialog {
                     }
                 }
             } catch (BadLocationException | IOException ex) {
-                LOGGER.warn("Problem reading or inserting file", ex);
+                Logger.warn(this, "Problem reading or inserting file", ex);
             }
         }
     }

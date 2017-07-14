@@ -22,12 +22,10 @@ import org.jabref.gui.util.component.JTextAreaWithPlaceholder;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implements SearchQueryHighlightListener {
 
-    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
     private Optional<Pattern> highlightPattern = Optional.empty();
 
@@ -148,7 +146,7 @@ public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implemen
                     highlighter.addHighlight(matcher.start(), matcher.end(), DefaultHighlighter.DefaultPainter);
                 } catch (BadLocationException ble) {
                     // should not occur if matcher works right
-                    LOGGER.warn("Highlighting not possible, bad location", ble);
+                    Logger.warn(this, "Highlighting not possible, bad location", ble);
                 }
             }
         });

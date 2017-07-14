@@ -19,12 +19,10 @@ import java.util.stream.Stream;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 class CiteKeyBasedFileFinder implements FileFinder {
 
-    private static final Log LOGGER = LogFactory.getLog(CiteKeyBasedFileFinder.class);
     private final boolean exactKeyOnly;
 
     CiteKeyBasedFileFinder(boolean exactKeyOnly) {
@@ -91,7 +89,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             try (Stream<Path> files = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
                 result.addAll(files.collect(Collectors.toSet()));
             } catch (IOException e) {
-                LOGGER.error("Problem in finding files", e);
+                Logger.error(this, "Problem in finding files", e);
             }
         }
         return result;

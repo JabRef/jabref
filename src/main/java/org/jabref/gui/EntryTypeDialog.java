@@ -41,9 +41,8 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.VerticalLayout;
 
 /**
@@ -52,7 +51,6 @@ import org.jdesktop.swingx.VerticalLayout;
  */
 public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
     private static final int COLUMN = 3;
     private final JabRefFrame frame;
     private final CancelAction cancelAction = new CancelAction();
@@ -291,7 +289,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);
                 } catch (FetcherException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    Logger.error(this, e.getMessage(), e);
                     fetcherException = true;
                     fetcherExceptionMessage = e.getMessage();
                 }
@@ -327,7 +325,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     generateButton.setEnabled(true);
                 });
             } catch (ExecutionException | InterruptedException e) {
-                LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
+                Logger.error(this, String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
             }
         }
     }

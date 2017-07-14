@@ -8,15 +8,13 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Main class for formatting DOCUMENT ME!
  */
 public class Layout {
 
-    private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
     private final List<LayoutEntry> layoutEntries;
 
@@ -53,8 +51,8 @@ public class Layout {
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
-                        LOGGER.debug(blockStart + '\n' + parsedEntry.s);
-                        LOGGER.warn("Nested field/group entries are not implemented!");
+                        Logger.debug(this, blockStart + '\n' + parsedEntry.s);
+                        Logger.warn(this, "Nested field/group entries are not implemented!");
                         Thread.dumpStack();
                     }
                 }

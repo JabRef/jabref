@@ -38,8 +38,7 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Class for importing BibTeX-files.
@@ -58,7 +57,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibtexParser implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -252,7 +250,7 @@ public class BibtexParser implements Parser {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             }
         } catch (IOException ex) {
-            LOGGER.debug("Could not parse entry", ex);
+            Logger.debug(this, "Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + Localization.lang("Skipped entry."));
 
@@ -268,7 +266,7 @@ public class BibtexParser implements Parser {
             * which means that we should just return and the comment will be picked up as arbitrary text
             *  by the parser
              */
-            LOGGER.info("Found unbracketed comment");
+            Logger.info(this, "Found unbracketed comment");
             return;
         }
 
@@ -492,18 +490,18 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         consume('{', '(');
         skipWhitespace();
-        LOGGER.debug("Parsing string name");
+        Logger.debug(this, "Parsing string name");
         String name = parseTextToken();
-        LOGGER.debug("Parsed string name");
+        Logger.debug(this, "Parsed string name");
         skipWhitespace();
-        LOGGER.debug("Now the contents");
+        Logger.debug(this, "Now the contents");
         consume('=');
         String content = parseFieldContent(name);
-        LOGGER.debug("Now I'm going to consume a }");
+        Logger.debug(this, "Now I'm going to consume a }");
         consume('}', ')');
         // Consume new line which signals end of entry
         skipOneNewline();
-        LOGGER.debug("Finished string parsing.");
+        Logger.debug(this, "Finished string parsing.");
 
         return new BibtexString(name, content);
     }

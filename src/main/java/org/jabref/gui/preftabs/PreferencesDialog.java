@@ -42,9 +42,8 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
+import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -57,7 +56,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PreferencesDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     private final JPanel main;
 
@@ -180,7 +178,7 @@ public class PreferencesDialog extends JabRefDialog {
                             Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
                     this.dispose();
                 } catch (JabRefException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
+                    Logger.warn(this, ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
                 }
@@ -200,7 +198,7 @@ public class PreferencesDialog extends JabRefDialog {
                             Localization.lang("You must restart JabRef for this to come into effect."),
                             Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (BackingStoreException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
+                    Logger.warn(this, ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
                 }
@@ -303,7 +301,7 @@ public class PreferencesDialog extends JabRefDialog {
                     Globals.prefs.exportPreferences(exportFile.toString());
                     Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
+                    Logger.warn(this, ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
                 }

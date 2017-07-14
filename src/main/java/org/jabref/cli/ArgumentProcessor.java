@@ -51,13 +51,11 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
+import com.jcabi.log.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
 
-    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
     private final JabRefCLI cli;
     private final List<ParserResult> parserResults;
     private final Mode startupMode;
@@ -210,13 +208,13 @@ public class ArgumentProcessor {
             }
         }
 
-        LOGGER.debug("Finished export");
+        Logger.debug(this, "Finished export");
 
         if (cli.isPreferencesExport()) {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (JabRefException ex) {
-                LOGGER.error("Cannot export preferences", ex);
+                Logger.error(this, "Cannot export preferences", ex);
             }
         }
 
@@ -470,7 +468,7 @@ public class ArgumentProcessor {
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
-            LOGGER.error("Cannot import preferences", ex);
+            Logger.error(this, "Cannot import preferences", ex);
         }
     }
 
@@ -482,7 +480,7 @@ public class ArgumentProcessor {
                 new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
-                LOGGER.error("Unable to clear preferences", e);
+                Logger.error(this, "Unable to clear preferences", e);
             }
         } else {
             String[] keys = value.split(",");
@@ -500,7 +498,7 @@ public class ArgumentProcessor {
     private void automaticallySetFileLinks(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
-            LOGGER.info(Localization.lang("Automatically setting file links"));
+            Logger.info(this, Localization.lang("Automatically setting file links"));
             AutoSetLinks.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
         }
     }
@@ -511,7 +509,7 @@ public class ArgumentProcessor {
 
             MetaData metaData = parserResult.getMetaData();
             if (metaData != null) {
-                LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
+                Logger.info(this, Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
                     BibtexKeyPatternUtil.makeAndSetLabel(
@@ -519,7 +517,7 @@ public class ArgumentProcessor {
                             database, entry, Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
+                Logger.info(this, Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
             }
         }
     }

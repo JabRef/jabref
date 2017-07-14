@@ -13,8 +13,7 @@ import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 
 /**
@@ -22,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CitationStyleWorker extends SwingWorker<String, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationStyleWorker.class);
 
     private final PreviewPanel previewPanel;
 
@@ -62,7 +60,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         try {
             text = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while generating citation style", e);
+            Logger.error(this, "Error while generating citation style", e);
             text = Localization.lang("Error while generating citation style");
             success = false;
         }

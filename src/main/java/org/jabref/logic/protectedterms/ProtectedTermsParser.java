@@ -17,15 +17,13 @@ import java.util.Objects;
 
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
  */
 public class ProtectedTermsParser {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsParser.class);
 
     private final List<String> terms = new ArrayList<>();
     private String description = Localization.lang("The text after the last line starting with # will be used");
@@ -40,7 +38,7 @@ public class ProtectedTermsParser {
         try {
             readTermsList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            LOGGER.info("Could not read protected terms from resource " + resourceFileName, e);
+            Logger.info(this, "Could not read protected terms from resource " + resourceFileName, e);
         }
     }
 
@@ -51,7 +49,7 @@ public class ProtectedTermsParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read terms from file " + file.getAbsolutePath(), e);
+            Logger.warn(this, "Could not read terms from file " + file.getAbsolutePath(), e);
         }
     }
 
@@ -63,7 +61,7 @@ public class ProtectedTermsParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read terms from file " + file.getAbsolutePath(), e);
+            Logger.warn(this, "Could not read terms from file " + file.getAbsolutePath(), e);
         }
     }
 
@@ -81,7 +79,7 @@ public class ProtectedTermsParser {
             }
 
         } catch (IOException ex) {
-            LOGGER.info("Could not read journal list from file ", ex);
+            Logger.info(this, "Could not read journal list from file ", ex);
         }
     }
 

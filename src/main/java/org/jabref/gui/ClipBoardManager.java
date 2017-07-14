@@ -21,11 +21,9 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class ClipBoardManager implements ClipboardOwner {
-    private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
 
@@ -59,7 +57,7 @@ public class ClipBoardManager implements ClipboardOwner {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
                 //highly unlikely since we are using a standard DataFlavor
-                LOGGER.info("problem with getting clipboard contents", e);
+                Logger.info(this, "problem with getting clipboard contents", e);
             }
         }
         return result;
@@ -86,33 +84,33 @@ public class ClipBoardManager implements ClipboardOwner {
                 List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.ENTRY_FLAVOR);
                 result = contents;
             } catch (UnsupportedFlavorException | ClassCastException ex) {
-                LOGGER.warn("Could not paste this type", ex);
+                Logger.warn(this, "Could not paste this type", ex);
             } catch (IOException ex) {
-                LOGGER.warn("Could not paste", ex);
+                Logger.warn(this, "Could not paste", ex);
             }
         } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 String data = (String) content.getTransferData(DataFlavor.stringFlavor);
                 // fetch from doi
                 if (DOI.parse(data).isPresent()) {
-                    LOGGER.info("Found DOI in clipboard");
+                    Logger.info(this, "Found DOI in clipboard");
                     Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(new DOI(data).getDOI());
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
                     BibtexParser bp = new BibtexParser(Globals.prefs.getImportFormatPreferences());
                     BibDatabase db = bp.parse(new StringReader(data)).getDatabase();
-                    LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
+                    Logger.info(this, "Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {
                         result = db.getEntries();
                     }
                 }
             } catch (UnsupportedFlavorException ex) {
-                LOGGER.warn("Could not parse this type", ex);
+                Logger.warn(this, "Could not parse this type", ex);
             } catch (IOException ex) {
-                LOGGER.warn("Data is no longer available in the requested flavor", ex);
+                Logger.warn(this, "Data is no longer available in the requested flavor", ex);
             } catch (FetcherException ex) {
-                LOGGER.error("Error while fetching", ex);
+                Logger.error(this, "Error while fetching", ex);
             }
 
         }

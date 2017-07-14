@@ -8,12 +8,10 @@ import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.cleanup.Formatter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(UnicodeToLatexFormatter.class);
 
     @Override
     public String format(String text) {
@@ -56,7 +54,7 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
         for (int i = 0; i <= (result.length() - 1); i++) {
             int cp = result.codePointAt(i);
             if (cp >= 129) {
-                LOGGER.warn("Unicode character not converted: " + cp);
+                Logger.warn(this, "Unicode character not converted: " + cp);
             }
         }
         return result;

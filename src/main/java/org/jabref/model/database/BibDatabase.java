@@ -35,14 +35,12 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 /**
  * A bibliography database.
  */
 public class BibDatabase {
-    private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
     /**
      * State attributes
@@ -464,7 +462,7 @@ public class BibDatabase {
                 // circular reference, and have to stop to avoid
                 // infinite recursion.
                 if (usedIds.contains(string.getId())) {
-                    LOGGER.info("Stopped due to circular reference in strings: " + label);
+                    Logger.info(this, "Stopped due to circular reference in strings: " + label);
                     return label;
                 }
                 // If not, log this string's ID now.
@@ -570,8 +568,7 @@ public class BibDatabase {
         try {
             this.eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            Logger.debug(this, "occurs if the event source has not been registered, should not prevent shutdown", e);
         }
     }
 

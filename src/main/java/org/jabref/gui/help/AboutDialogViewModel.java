@@ -17,8 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 
@@ -29,7 +28,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
-    private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();
@@ -143,7 +141,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
             JabRefDesktop.openBrowser(url);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
-            logger.error("Could not open default browser.", e);
+            Logger.error(this, "Could not open default browser.", e);
         }
     }
 

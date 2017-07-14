@@ -15,8 +15,7 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 
 /**
@@ -24,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
  */
 class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
 
     private final BasePanel basePanel;
     private final BibDatabase database;
@@ -37,7 +35,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         this.database = Objects.requireNonNull(basePanel.getDatabase());
         this.searchQuery = Objects.requireNonNull(searchQuery);
         this.searchDisplayMode = Objects.requireNonNull(searchDisplayMode);
-        LOGGER.debug("Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
+        Logger.debug(this, "Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
     }
 
     @Override
@@ -56,7 +54,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         try {
             updateUIWithSearchResult(get());
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("something went wrong during the search", e);
+            Logger.error(this, "something went wrong during the search", e);
         }
     }
 
@@ -88,7 +86,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
                 basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
                 break;
             default:
-                LOGGER.error("Following searchDisplayMode was not defined: " + searchDisplayMode);
+                Logger.error(this, "Following searchDisplayMode was not defined: " + searchDisplayMode);
                 break;
         }
 

@@ -7,12 +7,10 @@ import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.jcabi.log.Logger;
 
 public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
-    private static final Log LOGGER = LogFactory.getLog(UndoableRemoveString.class);
     private final BibDatabase base;
     private final BibtexString string;
 
@@ -38,7 +36,7 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
         try {
             base.addString(string);
         } catch (KeyCollisionException ex) {
-            LOGGER.warn("Problem to undo `remove string`", ex);
+            Logger.warn(this, "Problem to undo `remove string`", ex);
         }
 
         panel.updateStringDialog();
