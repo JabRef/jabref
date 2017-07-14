@@ -197,7 +197,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private StringDialog stringDialog;
     private SuggestionProviders suggestionProviders;
 
-    /** the query the user searches when this basepanel is active */
+    // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
@@ -379,7 +379,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             } else {
                 preambleEditor.setVisible(true);
             }
-
         });
 
         // The action for opening the string editor
@@ -391,7 +390,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             } else {
                 stringDialog.setVisible(true);
             }
-
         });
 
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
@@ -722,6 +720,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     /**
      * Generates and copies citations based on the selected entries to the clipboard
+     *
      * @param outputFormat the desired {@link CitationStyleOutputFormat}
      */
     private void copyCitationToClipboard(CitationStyleOutputFormat outputFormat) {
@@ -762,9 +761,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     /**
      * Removes the selected entries from the database
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized
-     *            as "deleted".
-     *            If true the action will be localized as "cut"
+     *
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
+     *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
         List<BibEntry> entries = mainTable.getSelectedEntries();
@@ -839,7 +838,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 bibDatabaseContext.getDatabase().insertEntry(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
-
             }
             ce.end();
             getUndoManager().addEdit(ce);
@@ -946,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 layout = new LayoutHelper(sr,
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
-                                .getLayoutFromText();
+                        .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1038,7 +1036,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset enc,
-            SavePreferences.DatabaseSaveType saveType) throws SaveException {
+                                 SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SaveSession session;
         frame.block();
         final String SAVE_DATABASE = Localization.lang("Save library");
@@ -1074,7 +1072,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
                     SAVE_DATABASE, JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
-
         } finally {
             frame.unblock();
         }
@@ -1092,7 +1089,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), SAVE_DATABASE,
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -1103,12 +1100,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 } else {
                     Charset newEncoding = Charset.forName((String) choice);
                     return saveDatabase(file, selectedOnly, newEncoding, saveType);
-
                 }
             } else if (answer == JOptionPane.CANCEL_OPTION) {
                 commit = false;
             }
-
         }
 
         if (commit) {
@@ -1258,19 +1253,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void actionPerformed(ActionEvent e) {
                 // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
                 switch (mode) {
-                case SHOWING_NOTHING:
-                    frame.getGlobalSearchBar().endSearch();
-                    break;
-                case SHOWING_PREVIEW:
-                    getPreviewPanel().close();
-                    break;
-                case SHOWING_EDITOR:
-                case WILL_SHOW_EDITOR:
-                    entryEditorClosing(getCurrentEditor());
-                    break;
-                default:
-                    LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
-                    break;
+                    case SHOWING_NOTHING:
+                        frame.getGlobalSearchBar().endSearch();
+                        break;
+                    case SHOWING_PREVIEW:
+                        getPreviewPanel().close();
+                        break;
+                    case SHOWING_EDITOR:
+                    case WILL_SHOW_EDITOR:
+                        entryEditorClosing(getCurrentEditor());
+                        break;
+                    default:
+                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
+                        break;
                 }
             }
         });
@@ -1317,16 +1312,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
-                    case KeyEvent.VK_PAGE_DOWN:
-                        frame.nextTab.actionPerformed(null);
-                        e.consume();
-                        break;
-                    case KeyEvent.VK_PAGE_UP:
-                        frame.prevTab.actionPerformed(null);
-                        e.consume();
-                        break;
-                    default:
-                        break;
+                        case KeyEvent.VK_PAGE_DOWN:
+                            frame.nextTab.actionPerformed(null);
+                            e.consume();
+                            break;
+                        case KeyEvent.VK_PAGE_UP:
+                            frame.prevTab.actionPerformed(null);
+                            e.consume();
+                            break;
+                        default:
+                            break;
                     }
                 } else if (keyCode == KeyEvent.VK_ENTER) {
                     e.consume();
@@ -1443,7 +1438,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             splitPane.setDividerLocation(
                     splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
-
         }
     }
 
@@ -1451,9 +1445,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return (splitPane.getBottomComponent() != null) && (splitPane.getBottomComponent() instanceof EntryEditor);
     }
 
-    public void showEntry(final BibEntry be) {
+    public void showEntry(final BibEntry bibEntry) {
 
-        if (getShowing() == be) {
+        if (getShowing() == bibEntry) {
             if (splitPane.getBottomComponent() == null) {
                 // This is the special occasion when showing is set to an
                 // entry, but no entry editor is in fact shown. This happens
@@ -1461,10 +1455,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // must make sure the same entry is shown again. We do this by
                 // setting showing to null, and recursively calling this method.
                 newEntryShowing(null);
-                showEntry(be);
+                showEntry(bibEntry);
             }
             return;
-
         }
 
         String visName = null;
@@ -1473,25 +1466,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         // We must instantiate a new editor.
-        EntryEditor entryEditor = new EntryEditor(frame, BasePanel.this, be);
+        EntryEditor entryEditor = getEntryEditor(bibEntry);
         if (visName != null) {
             entryEditor.setVisibleTab(visName);
         }
         showEntryEditor(entryEditor);
 
-        newEntryShowing(be);
+        newEntryShowing(bibEntry);
     }
 
     /**
-     * Get an entry editor ready to edit the given entry. If an appropriate editor is already cached, it will be updated
-     * and returned.
+     * Get an entry editor ready to edit the given entry.
      *
      * @param entry The entry to be edited.
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        // Then start the new one:
-        return new EntryEditor(frame, BasePanel.this, entry);
+        String lastTabName = "";
+        if (currentEditor != null) {
+            lastTabName = currentEditor.getVisibleTabName();
+        }
+        return new EntryEditor(frame, BasePanel.this, entry, lastTabName);
     }
 
     public EntryEditor getCurrentEditor() {
@@ -1621,7 +1616,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 LOGGER.info("Problem marking database as changed", e);
             }
         }
-
     }
 
     private void markBasedChangedInternal() {
@@ -1723,7 +1717,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             return true;
         }
-
     }
 
     /**
@@ -1737,7 +1730,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     BibtexKeyPatternUtil.makeAndSetLabel(bibDatabaseContext.getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     bes.getCiteKeyOptional().ifPresent(
@@ -1756,8 +1749,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     /**
      * Activates or deactivates the entry preview, depending on the argument. When deactivating, makes sure that any
      * visible preview is hidden.
-     *
-     * @param enabled
      */
     private void setPreviewActive(boolean enabled) {
         selectionListener.setPreviewActive(enabled);
@@ -1954,7 +1945,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             showing = entry;
             setBackAndForwardEnabledState();
         }
-
     }
 
     /**

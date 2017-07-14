@@ -142,7 +142,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private boolean movingToDifferentEntry;
 
-    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
+    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
         this.panel = panel;
         this.entry = Objects.requireNonNull(entry);
@@ -176,22 +176,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
                 if (keyBinding.isPresent()) {
                     switch (keyBinding.get()) {
-                    case CUT:
-                    case COPY:
-                    case PASTE:
-                    case CLOSE_ENTRY_EDITOR:
-                    case DELETE_ENTRY:
-                    case SELECT_ALL:
-                        e.consume();
-                        break;
-                    default:
-                        //do nothing
+                        case CUT:
+                        case COPY:
+                        case PASTE:
+                        case CLOSE_ENTRY_EDITOR:
+                        case DELETE_ENTRY:
+                        case SELECT_ALL:
+                            e.consume();
+                            break;
+                        default:
+                            //do nothing
                     }
                 }
             }
         });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            addTabs();
+            addTabs(lastTabName);
             container.setScene(new Scene(tabbed));
         });
         add(container, BorderLayout.CENTER);
@@ -204,7 +204,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         });
 
         setupKeyBindings();
+    }
 
+    private void selectLastUsedTab(String lastTabName) {
+        tabbed.getTabs().stream().filter(tab -> lastTabName.equals(tab.getText())).findFirst().ifPresent(tab -> tabbed.getSelectionModel().select(tab));
     }
 
     /**
@@ -215,32 +218,32 @@ public class EntryEditor extends JPanel implements EntryContainer {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                case ENTRY_EDITOR_NEXT_PANEL:
-                case ENTRY_EDITOR_NEXT_PANEL_2:
-                    tabbed.getSelectionModel().selectNext();
-                    event.consume();
-                    break;
-                case ENTRY_EDITOR_PREVIOUS_PANEL:
-                case ENTRY_EDITOR_PREVIOUS_PANEL_2:
-                    tabbed.getSelectionModel().selectPrevious();
-                    event.consume();
-                    break;
-                case HELP:
-                    helpAction.actionPerformed(null);
-                    event.consume();
-                    break;
-                case CLOSE_ENTRY_EDITOR:
-                    closeAction.actionPerformed(null);
-                    event.consume();
-                    break;
-                default:
-                    // Pass other keys to children
+                    case ENTRY_EDITOR_NEXT_PANEL:
+                    case ENTRY_EDITOR_NEXT_PANEL_2:
+                        tabbed.getSelectionModel().selectNext();
+                        event.consume();
+                        break;
+                    case ENTRY_EDITOR_PREVIOUS_PANEL:
+                    case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                        tabbed.getSelectionModel().selectPrevious();
+                        event.consume();
+                        break;
+                    case HELP:
+                        helpAction.actionPerformed(null);
+                        event.consume();
+                        break;
+                    case CLOSE_ENTRY_EDITOR:
+                        closeAction.actionPerformed(null);
+                        event.consume();
+                        break;
+                    default:
+                        // Pass other keys to children
                 }
             }
         });
     }
 
-    private void addTabs() {
+    private void addTabs(String lastTabName) {
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
                 this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
@@ -285,6 +288,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
             tabbed.getSelectionModel().select(sourceTab);
+        } else {
+            selectLastUsedTab(lastTabName);
         }
     }
 
@@ -815,7 +820,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
