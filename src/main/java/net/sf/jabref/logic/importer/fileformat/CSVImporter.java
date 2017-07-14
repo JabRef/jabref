@@ -4,14 +4,11 @@ import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -19,7 +16,7 @@ import java.util.regex.Pattern;
  * Neste caso, os campos do arquivo devem ser separados por virgula!
  */
 public class CSVImporter extends Importer {
-    private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
+    private static final Pattern CSV_PATTERN = Pattern.compile("((\"([^\"]*),+([^\"]*)\")||([^\"]*),([^\"]*))\n?");
 
     @Override
     public String getName() {
@@ -76,7 +73,7 @@ public class CSVImporter extends Importer {
             for (String entry : entries) {
 
                 // Primeiro, os valores de cada campo sao separados
-                String[] fieldValues = entry.split(",");
+                String[] fieldValues = substituteInsideCommaByTripleHash(entry).split(",");
 
                 // Em seguida, verifica-se se o campo de tipo nao esta vazio
                 if (!fieldValues[0].equals("")) {
@@ -86,7 +83,16 @@ public class CSVImporter extends Importer {
 
                     // E, em seguida, completa com os demais campos
                     for (int i = 1; i < headerFields.length; i++) {
-                        newBibEntry.setField(headerFields[i], fieldValues[i]);
+                        // Insere campo apenas se nao for vazio
+                        if(!fieldValues[i].equals("\"" + "\"") && !fieldValues[i].equals("")) {
+                            // Remove as "s de alguns campos cujos valores sao envoltos
+                            // por " (o export do jabref gera alguns com estas "s)
+                            if (String.valueOf(fieldValues[i].charAt(0)).equals("\"") &&
+                                    String.valueOf(fieldValues[i].charAt(fieldValues[i].length() - 1)).equals("\""))
+                                newBibEntry.setField(headerFields[i], fieldValues[i].substring(1, fieldValues[i].length() - 1).replace("###", ","));
+                            else
+                                newBibEntry.setField(headerFields[i], fieldValues[i]);
+                        }
                     }
                     results.add(newBibEntry);
                 }
@@ -95,5 +101,46 @@ public class CSVImporter extends Importer {
         }
 
         return new ParserResult(results);
+    }
+
+    // substituteInsideCommaByTripleHash substitui as virgulas dentro de campos por ###. Assim, quando
+    // os campos sao separados essas virgulas "internas" nao influenciam. Por exemplo, para:
+    // "Ito Nagura, V.","2017",5, o resultado sera "Ito Nagura### V.","2017",5.
+    private static String substituteInsideCommaByTripleHash(String inputString) {
+        // Utiliza RegEx para localizar os campos entre aspas, pois considera que as virgulas
+        // internas estao presente apenas em campos entre aspas
+        Pattern p = Pattern.compile("\\" + "\"" + "(.*?)\\" + "\"");
+        Matcher matcherForCounter = p.matcher(inputString);
+        Matcher matcherForCorrection = p.matcher(inputString);
+
+        // O primeiro matcher conta quantos campos entre aspas existem
+        int counter = 0;
+        while(matcherForCounter.find()) {
+            counter++;
+        }
+
+        // Se existir algum campo entre aspas para ser verificado:
+        if (counter > 0) {
+            String[] uncorrectedFields = new String[counter];
+            String[] correctedFields = new String[counter];
+            String[] correction = new String[counter];
+
+            // Cria dois arrays para correcao das strings
+            int i = 0;
+            while(matcherForCorrection.find()) {
+                uncorrectedFields[i] = matcherForCorrection.group();
+                correctedFields[i] = matcherForCorrection.group().replace(",", "###");
+                i++;
+            }
+
+            // Efetua a correcao de maneira "recursiva" sobre a entrada
+            correction[0] = inputString.replace(uncorrectedFields[0], correctedFields[0]);
+            for (int j = 1; j < counter; j++)
+                correction[j] = correction[j - 1].replace(uncorrectedFields[j], correctedFields[j]);
+
+            return correction[counter - 1];
+        }
+        else
+            return inputString;
     }
 }
