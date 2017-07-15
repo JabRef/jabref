@@ -1,4 +1,4 @@
-package org.jabref.logic.autocompleter;
+package org.jabref.gui.autocompleter;
 
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -6,37 +6,20 @@ import java.util.StringTokenizer;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * Delivers possible completions for a given string.
  * Stores all words in the given field which are separated by SEPARATING_CHARS.
- *
- * @author kahlert, cordes
  */
-class DefaultAutoCompleter extends AbstractAutoCompleter {
+public class WordSuggestionProvider extends StringSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
 
     private static final String SEPARATING_CHARS = ";,\n ";
 
     private final String fieldName;
 
-    /**
-     * @see AutoCompleterFactory
-     */
-    DefaultAutoCompleter(String fieldName, AutoCompletePreferences preferences) {
-        super(preferences);
-
+    public WordSuggestionProvider(String fieldName) {
         this.fieldName = Objects.requireNonNull(fieldName);
     }
 
     @Override
-    public boolean isSingleUnitField() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * Stores all words in the given field which are separated by SEPARATING_CHARS.
-     */
-    @Override
-    public void addBibtexEntry(BibEntry entry) {
+    public void indexEntry(BibEntry entry) {
         if (entry == null) {
             return;
         }
@@ -44,7 +27,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
         entry.getField(fieldName).ifPresent(fieldValue -> {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
-                addItemToIndex(tok.nextToken());
+                addPossibleSuggestions(tok.nextToken());
             }
         });
     }

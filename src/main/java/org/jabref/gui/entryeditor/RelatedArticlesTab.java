@@ -44,7 +44,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
                     progress.setVisible(false);
                     browser.getEngine().loadContent(convertToHtml(relatedArticles));
                 })
-                .executeWith(Globals.taskExecutor);
+                .executeWith(Globals.TASK_EXECUTOR);
 
         browser.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(browser));
 

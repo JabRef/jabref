@@ -45,8 +45,8 @@ class FieldsEditorTab extends EntryEditorTab {
     private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    private FieldEditorFX activeField;
     private final BibEntry entry;
+    private FieldEditorFX activeField;
 
     public FieldsEditorTab(JabRefFrame frame, BasePanel basePanel, List<String> fields, EntryEditor parent, boolean addKeyField, boolean compressed, BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
@@ -109,21 +109,12 @@ class FieldsEditorTab extends EntryEditorTab {
             }
 
             Optional<JComponent> extra = parent.getExtra(fieldEditor);
-
-            // Add autocompleter listener, if required for this field:
-            /*
-            AutoCompleter<String> autoCompleter = bPanel.getAutoCompleters().get(field);
-            AutoCompleteListener autoCompleteListener = null;
-            if (autoCompleter != null) {
-                autoCompleteListener = new AutoCompleteListener(autoCompleter);
-            }
-            setupJTextComponent(fieldEditor.getTextComponent(), autoCompleteListener);
-            fieldEditor.setAutoCompleteListener(autoCompleteListener);
             */
 
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.taskExecutor, new FXDialogService(),
+            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
                     Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    bPanel.getBibDatabaseContext(), entry.getType());
+                    bPanel.getBibDatabaseContext(), entry.getType(),
+                    bPanel.getSuggestionProviders());
             fieldEditor.bindToEntry(entry);
 
             editors.put(fieldName, fieldEditor);
@@ -140,18 +131,6 @@ class FieldsEditorTab extends EntryEditorTab {
                 fieldEditor.getPane().setPreferredSize(new Dimension(100, Math.max(defaultHeight, wHeight)));
             }
             */
-
-            /*
-            // TODO: Reenable content selector
-            if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(editor.getFieldName()).isEmpty()) {
-                FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
-                        ", ");
-                contentSelectors.add(ws);
-                controls.add(ws, BorderLayout.NORTH);
-            }
-            //} else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectorValuesForField(fieldName).isEmpty()) {
-            //return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, storeFieldAction);
-             */
 
             labels.add(new FieldNameLabel(fieldName));
         }

@@ -1,5 +1,10 @@
 package org.jabref.gui.keyboard;
 
+import java.awt.event.InputEvent;
+import java.util.Optional;
+
+import javax.swing.JFrame;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
@@ -9,7 +14,6 @@ import org.jabref.preferences.PreferencesService;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -166,6 +170,14 @@ public class KeyBindingsDialogViewModelTest {
         model.saveKeyBindings();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
+    }
+
+    @Test
+    public void testConversionAwtKeyEventJavafxKeyEvent() {
+        java.awt.event.KeyEvent evt = new java.awt.event.KeyEvent(mock(JFrame.class), 0, 0, InputEvent.CTRL_MASK, java.awt.event.KeyEvent.VK_S, java.awt.event.KeyEvent.CHAR_UNDEFINED);
+
+        Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(evt);
+        assertEquals(Optional.of(KeyBinding.SAVE_DATABASE), keyBinding);
     }
 
     private KeyBindingViewModel setKeyBindingViewModel(KeyBinding binding) {

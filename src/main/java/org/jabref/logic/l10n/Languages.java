@@ -41,17 +41,22 @@ public class Languages {
         Objects.requireNonNull(language);
 
         if (!LANGUAGES.values().contains(language)) {
-            if (!language.contains("_")) {
-                return Optional.empty();
-            }
-
-            String lang = language.split("_")[0];
-            if (!LANGUAGES.values().contains(lang)) {
-                return Optional.empty();
-            }
-            return Optional.of(new Locale(lang));
+            return Optional.empty();
+        }
+        //Very important to split languages like pt_BR into two parts, because otherwise the country would be threated lowercase
+        //and create problems in loading
+        String[] languageParts = language.split("_");
+        Locale locale;
+        if (languageParts.length == 1) {
+            locale = new Locale(languageParts[0]);
+        } else if (languageParts.length == 2) {
+            locale = new Locale(languageParts[0], languageParts[1]);
+        } else {
+            locale = Locale.ENGLISH;
         }
 
-        return Optional.of(new Locale(language));
+        return Optional.of(locale);
+
     }
+
 }

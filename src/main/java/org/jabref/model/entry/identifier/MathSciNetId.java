@@ -21,7 +21,21 @@ public class MathSciNetId implements Identifier {
 
     public static Optional<MathSciNetId> parse(String mrNumberRaw) {
         // Take everything before whitespace or open bracket, so something like `619693 (82j:58046)` gets parsed correctly
-        return Optional.of(new MathSciNetId(StringUtil.tokenizeToList(mrNumberRaw, " (").get(0)));
+        String identifier = StringUtil.tokenizeToList(mrNumberRaw, " (").get(0).trim();
+        return Optional.of(new MathSciNetId(identifier));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MathSciNetId that = (MathSciNetId) o;
+        return Objects.equals(identifier, that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
     }
 
     @Override

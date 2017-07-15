@@ -13,6 +13,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -22,16 +23,14 @@ import org.jabref.model.entry.FieldName;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private IdentifierEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
-        this.fieldName = fieldName;
-        this.viewModel = new IdentifierEditorViewModel(fieldName, taskExecutor, dialogService);
+    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new IdentifierEditorViewModel(fieldName, suggestionProvider, taskExecutor, dialogService);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -57,7 +56,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.entry = Optional.of(entry);
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

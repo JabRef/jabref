@@ -76,6 +76,7 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields

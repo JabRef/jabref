@@ -391,8 +391,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
-    toolVersion = '7.6.1'
+    toolVersion = '8.0'
 }
+
+checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'

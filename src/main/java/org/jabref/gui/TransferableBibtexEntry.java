@@ -22,7 +22,7 @@ import org.jabref.model.entry.BibEntry;
  */
 public class TransferableBibtexEntry implements Transferable {
 
-    public static final DataFlavor entryFlavor = new DataFlavor(BibEntry.class, "JabRef entry");
+    public static final DataFlavor ENTRY_FLAVOR = new DataFlavor(BibEntry.class, "JabRef entry");
     private final List<BibEntry> data;
 
 
@@ -32,19 +32,19 @@ public class TransferableBibtexEntry implements Transferable {
 
     @Override
     public DataFlavor[] getTransferDataFlavors() {
-        return new DataFlavor[] {TransferableBibtexEntry.entryFlavor,
+        return new DataFlavor[]{TransferableBibtexEntry.ENTRY_FLAVOR,
                 DataFlavor.stringFlavor};
     }
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor.equals(TransferableBibtexEntry.entryFlavor) || flavor.equals(DataFlavor.stringFlavor);
+        return flavor.equals(TransferableBibtexEntry.ENTRY_FLAVOR) || flavor.equals(DataFlavor.stringFlavor);
     }
 
     @Override
     public Object getTransferData(DataFlavor flavor)
             throws UnsupportedFlavorException {
-        if (flavor.equals(TransferableBibtexEntry.entryFlavor)) {
+        if (flavor.equals(TransferableBibtexEntry.ENTRY_FLAVOR)) {
             return data;
         } else if (flavor.equals(DataFlavor.stringFlavor)) {
             try {

@@ -11,73 +11,70 @@ import org.jabref.model.entry.FieldName;
 import com.google.common.collect.HashBiMap;
 
 /**
- * Mapping between Msbib and biblatex
- * All Fields: <a href = "https://msdn.microsoft.com/de-de/library/office/documentformat.openxml.bibliography">List of all MSBib fields</a>
- *
+ * Mapping between Msbib and biblatex All Fields: <a href = "https://msdn.microsoft.com/de-de/library/office/documentformat.openxml.bibliography">List
+ * of all MSBib fields</a>
  */
 public class MSBibMapping {
 
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
 
-    private static final HashBiMap<String, String> biblatexToMsBib = HashBiMap.create();
+    private static final HashBiMap<String, String> BIBLATEX_TO_MS_BIB = HashBiMap.create();
 
     static {
-        biblatexToMsBib.put(BibEntry.KEY_FIELD, "Tag");
-        biblatexToMsBib.put(FieldName.TITLE, "Title");
-        biblatexToMsBib.put(FieldName.YEAR, "Year");
-        biblatexToMsBib.put(FieldName.NOTE, "Comments");
-        biblatexToMsBib.put(FieldName.VOLUME, "Volume");
-        biblatexToMsBib.put(FieldName.LANGUAGE, "LCID");
-        biblatexToMsBib.put(FieldName.EDITION, "Edition");
-        biblatexToMsBib.put(FieldName.PUBLISHER, "Publisher");
-        biblatexToMsBib.put(FieldName.BOOKTITLE, "BookTitle");
-        biblatexToMsBib.put("shorttitle", "ShortTitle");
-        biblatexToMsBib.put(FieldName.NOTE, "Comments");
-        biblatexToMsBib.put(FieldName.VOLUMES, "NumberVolumes");
+        BIBLATEX_TO_MS_BIB.put(BibEntry.KEY_FIELD, "Tag");
+        BIBLATEX_TO_MS_BIB.put(FieldName.TITLE, "Title");
+        BIBLATEX_TO_MS_BIB.put(FieldName.YEAR, "Year");
+        BIBLATEX_TO_MS_BIB.put(FieldName.NOTE, "Comments");
+        BIBLATEX_TO_MS_BIB.put(FieldName.VOLUME, "Volume");
+        BIBLATEX_TO_MS_BIB.put(FieldName.LANGUAGE, "LCID");
+        BIBLATEX_TO_MS_BIB.put(FieldName.EDITION, "Edition");
+        BIBLATEX_TO_MS_BIB.put(FieldName.PUBLISHER, "Publisher");
+        BIBLATEX_TO_MS_BIB.put(FieldName.BOOKTITLE, "BookTitle");
+        BIBLATEX_TO_MS_BIB.put("shorttitle", "ShortTitle");
+        BIBLATEX_TO_MS_BIB.put(FieldName.NOTE, "Comments");
+        BIBLATEX_TO_MS_BIB.put(FieldName.VOLUMES, "NumberVolumes");
 
-        //biblatexToMsBib.put(FieldName.BOOKTITLE, "ConferenceName");
-        //biblatexToMsBib.put(FieldName.PAGES, "Pages");
-        biblatexToMsBib.put(FieldName.CHAPTER, "ChapterNumber");
+        BIBLATEX_TO_MS_BIB.put(FieldName.CHAPTER, "ChapterNumber");
 
-        biblatexToMsBib.put(FieldName.ISSUE, "Issue");
-        biblatexToMsBib.put(FieldName.SCHOOL, "Department");
-        biblatexToMsBib.put(FieldName.INSTITUTION, "Institution");
-        biblatexToMsBib.put(FieldName.DOI, "DOI");
-        biblatexToMsBib.put(FieldName.URL, "URL");
+        BIBLATEX_TO_MS_BIB.put(FieldName.ISSUE, "Issue");
+        BIBLATEX_TO_MS_BIB.put(FieldName.SCHOOL, "Department");
+        BIBLATEX_TO_MS_BIB.put(FieldName.INSTITUTION, "Institution");
+        BIBLATEX_TO_MS_BIB.put(FieldName.DOI, "DOI");
+        BIBLATEX_TO_MS_BIB.put(FieldName.URL, "URL");
         // BibTeX/Biblatex only fields
 
-        biblatexToMsBib.put(FieldName.SERIES, BIBTEX_PREFIX + "Series");
-        biblatexToMsBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
-        biblatexToMsBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
-        biblatexToMsBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
-        biblatexToMsBib.put(FieldName.HOWPUBLISHED, BIBTEX_PREFIX + "HowPublished");
-        biblatexToMsBib.put(FieldName.PUBSTATE, BIBTEX_PREFIX + "Pubstate");
-        biblatexToMsBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
-        biblatexToMsBib.put("contents", BIBTEX_PREFIX + "Contents");
-        biblatexToMsBib.put("copyright", BIBTEX_PREFIX + "Copyright");
-        biblatexToMsBib.put("price", BIBTEX_PREFIX + "Price");
-        biblatexToMsBib.put("size", BIBTEX_PREFIX + "Size");
-        biblatexToMsBib.put("intype", BIBTEX_PREFIX + "InType");
-        biblatexToMsBib.put("paper", BIBTEX_PREFIX + "Paper");
-        biblatexToMsBib.put(FieldName.KEY, BIBTEX_PREFIX + "Key");
+        BIBLATEX_TO_MS_BIB.put(FieldName.SERIES, BIBTEX_PREFIX + "Series");
+        BIBLATEX_TO_MS_BIB.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
+        BIBLATEX_TO_MS_BIB.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
+        BIBLATEX_TO_MS_BIB.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
+        BIBLATEX_TO_MS_BIB.put(FieldName.HOWPUBLISHED, BIBTEX_PREFIX + "HowPublished");
+        BIBLATEX_TO_MS_BIB.put(FieldName.PUBSTATE, BIBTEX_PREFIX + "Pubstate");
+        BIBLATEX_TO_MS_BIB.put("affiliation", BIBTEX_PREFIX + "Affiliation");
+        BIBLATEX_TO_MS_BIB.put("contents", BIBTEX_PREFIX + "Contents");
+        BIBLATEX_TO_MS_BIB.put("copyright", BIBTEX_PREFIX + "Copyright");
+        BIBLATEX_TO_MS_BIB.put("price", BIBTEX_PREFIX + "Price");
+        BIBLATEX_TO_MS_BIB.put("size", BIBTEX_PREFIX + "Size");
+        BIBLATEX_TO_MS_BIB.put("intype", BIBTEX_PREFIX + "InType");
+        BIBLATEX_TO_MS_BIB.put("paper", BIBTEX_PREFIX + "Paper");
+        BIBLATEX_TO_MS_BIB.put(FieldName.KEY, BIBTEX_PREFIX + "Key");
 
         // MSBib only fields
-        biblatexToMsBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        biblatexToMsBib.put(MSBIB_PREFIX + FieldName.DAY, "Day");
-        biblatexToMsBib.put(MSBIB_PREFIX + "accessed", "Accessed");
-        biblatexToMsBib.put(MSBIB_PREFIX + "medium", "Medium");
-        biblatexToMsBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
-        biblatexToMsBib.put(MSBIB_PREFIX + "theater", "Theater");
-        biblatexToMsBib.put(MSBIB_PREFIX + "distributor", "Distributor");
-        biblatexToMsBib.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
-        biblatexToMsBib.put(MSBIB_PREFIX + "station", "Station");
-        biblatexToMsBib.put(MSBIB_PREFIX + FieldName.TYPE, "Type");
-        biblatexToMsBib.put(MSBIB_PREFIX + "court", "Court");
-        biblatexToMsBib.put(MSBIB_PREFIX + "reporter", "Reporter");
-        biblatexToMsBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
-        biblatexToMsBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
-        biblatexToMsBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + FieldName.DAY, "Day");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "accessed", "Accessed");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "medium", "Medium");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "theater", "Theater");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "distributor", "Distributor");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "station", "Station");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + FieldName.TYPE, "Type");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "court", "Court");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "reporter", "Reporter");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
+        BIBLATEX_TO_MS_BIB.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
 
     private MSBibMapping() {
@@ -128,6 +125,7 @@ public class MSBibMapping {
     /**
      * Only English is supported <br>
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
+     *
      * @param language The language to transform
      * @return Returns 0 for English
      */
@@ -140,7 +138,7 @@ public class MSBibMapping {
     /**
      * Only English is supported <br>
      * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
-     * @param language
+     *
      * @return Returns english
      */
     public static String getLanguage(int LCID) {
@@ -149,10 +147,10 @@ public class MSBibMapping {
     }
 
     public static String getMSBibField(String bibtexFieldName) {
-        return biblatexToMsBib.get(bibtexFieldName);
+        return BIBLATEX_TO_MS_BIB.get(bibtexFieldName);
     }
 
     public static String getBibTeXField(String msbibFieldName) {
-        return biblatexToMsBib.inverse().get(msbibFieldName);
+        return BIBLATEX_TO_MS_BIB.inverse().get(msbibFieldName);
     }
 }

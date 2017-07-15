@@ -316,7 +316,8 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
-
+        Path oldFile = context.getDatabasePath().get();
+        
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
             DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor()
@@ -334,8 +335,14 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (!success) {
             return;
         }
-        // Register so we get notifications about outside changes to the file.
 
+        //closing AutosaveManager and BackupManager for original library 
+        context.setDatabaseFile(oldFile.toFile());
+        AutosaveManager.shutdown(context);
+        BackupManager.shutdown(context);
+        context.setDatabaseFile(file);
+        
+        // Register so we get notifications about outside changes to the file.
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
                     context.getDatabaseFile().orElse(null)));
