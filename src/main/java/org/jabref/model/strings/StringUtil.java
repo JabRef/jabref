@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
+//@ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
 public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
@@ -624,7 +625,11 @@ public class StringUtil {
         return !isNotBlank(string);
     }
 
+    /**
+     * Checks if a CharSequence is not empty (""), not null and not whitespace only.
+     */
     public static boolean isNotBlank(String string) {
+        // No Guava equivalent existing
         return StringUtils.isNotBlank(string);
     }
 
@@ -679,6 +684,7 @@ public class StringUtil {
     }
 
     public static String stripAccents(String searchQuery) {
+        // No Guava equivalent existing - see https://stackoverflow.com/q/3322152/873282 for a list of other implementations
         return StringUtils.stripAccents(searchQuery);
     }
 
@@ -708,6 +714,7 @@ public class StringUtil {
     }
 
     public static boolean containsIgnoreCase(String text, String searchString) {
+        // No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282
         return StringUtils.containsIgnoreCase(text, searchString);
     }
 }
