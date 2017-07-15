@@ -10,8 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<DialogPane prefHeight="100.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+<DialogPane prefHeight="100.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.filelist.FileLIstDialogController">
    <content>
       <VBox maxWidth="1.7976931348623157E308">
          <children>
@@ -59,8 +58,8 @@
             </HBox>
             <ButtonBar>
               <buttons>
-                <Button defaultButton="true" mnemonicParsing="false" text="OK" />
-                  <Button cancelButton="true" mnemonicParsing="false" text="Cancel" />
+                <Button fx:id="btnOk" defaultButton="true" mnemonicParsing="false" onAction="#ok_clicked" text="OK" />
+                  <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#cancel" text="Cancel" />
               </buttons>
             </ButtonBar>
          </children>
