@@ -463,7 +463,19 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.put(fieldName, value.intern());
+        /* Validar ano */
+        if(fieldName.equals("year")) {
+            Calendar c = Calendar.getInstance();
+            int year_to_validate = Integer.parseInt(value.intern());
+            if ((year_to_validate > +c.get(Calendar.YEAR)) || (year_to_validate < 0)) {
+                fields.put(fieldName, "");
+                throw new IllegalArgumentException();
+            }
+            else {
+                fields.put(fieldName, value.intern());
+            }
+        }
+
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
