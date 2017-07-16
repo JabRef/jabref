@@ -9,7 +9,7 @@ import org.junit.runner.RunWith;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @RunWith(ArchUnitRunner.class)
-@AnalyzeClasses(packages = "org.jabref")
+@AnalyzeClasses(packages = "org.jabref.logic.formatter.bibtexfields")
 public class MainArchitectureTestsWithArchUnit {
 
     @ArchTest
