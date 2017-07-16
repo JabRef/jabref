@@ -1,14 +1,6 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.AWTKeyStroke;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -1067,10 +1059,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
             movingToDifferentEntry = false;
 
             if (event.getSource() instanceof TextField) {
+
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
                 String oldValue = entry.getCiteKeyOptional().orElse(null);
                 String newValue = textField.getText();
+                try {
 
                 if (newValue.isEmpty()) {
                     newValue = null;
@@ -1121,6 +1115,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     panel.getUndoManager().addEdit(undoableKeyChange);
                 }
 
+
                 textField.setValidBackgroundColor();
 
                 if (textField.getTextComponent().hasFocus()) {
@@ -1128,6 +1123,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
                 updateSource();
                 panel.markBaseChanged();
+
+                /* Acrescenta mensagem de erro para bibtexkey invalida */
+                } catch (IllegalArgumentException ex) {
+                    if (!SwingUtilities.isEventDispatchThread() || ex.getMessage().startsWith("Campo invalido!")) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.debug("Error setting field", ex);
+                        requestFocus();
+                    }
+                }
             } else if (event.getSource() instanceof FieldEditor) {
                 String toSet = null;
                 FieldEditor fieldEditor = (FieldEditor) event.getSource();
@@ -1197,7 +1202,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     } catch (IllegalArgumentException ex) {
                         lastFieldAccepted = false;
                         fieldEditor.setInvalidBackgroundColor();
-                        if (!SwingUtilities.isEventDispatchThread()) {
+                        /* Acrescenta mensagem de erro para campos invalidos */
+                        if (!SwingUtilities.isEventDispatchThread() || ex.getMessage().startsWith("Campo invalido!")) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                     Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                             LOGGER.debug("Error setting field", ex);

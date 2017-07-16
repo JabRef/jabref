@@ -463,18 +463,34 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        /* Validar ano */
-        if(fieldName.equals("year")) {
-            Calendar c = Calendar.getInstance();
-            int year_to_validate = Integer.parseInt(value.intern());
-            if ((year_to_validate > +c.get(Calendar.YEAR)) || (year_to_validate < 0)) {
-                fields.put(fieldName, "");
-                throw new IllegalArgumentException();
+        if(!(fieldName.equals("year") || fieldName.equals("bibtexkey"))) {
+            fields.put(fieldName, value.intern());
+        }
+        else {
+            /* Validar ano */
+            if (fieldName.equals("year")) {
+                Calendar c = Calendar.getInstance();
+                int year_to_validate = Integer.parseInt(value.intern());
+                if ((year_to_validate > +c.get(Calendar.YEAR)) || (year_to_validate < 0)) {
+                    fields.put(fieldName, "");
+                    throw new IllegalArgumentException("Campo invalido! Insira um ano valido!");
+                } else {
+                    fields.put(fieldName, value.intern());
+                }
             }
-            else {
-                fields.put(fieldName, value.intern());
+
+            /* Validar Bibtex key */
+            if (fieldName.equals("bibtexkey")) {
+                if (value.intern().length() >= 2 && value.substring(0, 1).matches("[A-Z]|[a-z]")) {
+                    fields.put(fieldName, value.intern());
+                }
+                else {
+                    fields.put(fieldName, "");
+                    throw new IllegalArgumentException("Campo invalido! Deve comecar com letra e possuir menos menos 2 caracteres!");
+                }
             }
         }
+
 
         invalidateFieldCache(fieldName);
 
