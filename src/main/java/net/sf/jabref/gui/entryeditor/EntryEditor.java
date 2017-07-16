@@ -1059,71 +1059,68 @@ public class EntryEditor extends JPanel implements EntryContainer {
             movingToDifferentEntry = false;
 
             if (event.getSource() instanceof TextField) {
-
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
                 String oldValue = entry.getCiteKeyOptional().orElse(null);
                 String newValue = textField.getText();
+
                 try {
-
-                if (newValue.isEmpty()) {
-                    newValue = null;
-                }
-
-                if (((oldValue == null) && (newValue == null)) || (Objects.equals(oldValue, newValue))) {
-                    return; // No change.
-                }
-
-                // Make sure the key is legal:
-                String cleaned = BibtexKeyPatternUtil.checkLegalKey(newValue,
-                        Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-                if ((cleaned == null) || cleaned.equals(newValue)) {
-                    textField.setValidBackgroundColor();
-                } else {
-                    lastFieldAccepted = false;
-                    textField.setInvalidBackgroundColor();
-                    if (!SwingUtilities.isEventDispatchThread()) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
-                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                        requestFocus();
+                    if (newValue.isEmpty()) {
+                        newValue = null;
                     }
-                    return;
-                }
 
-                if (newValue == null) {
-                    entry.clearCiteKey();
-                    warnEmptyBibtexkey();
-                } else {
-                    entry.setCiteKey(newValue);
-                    boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
-                    if (isDuplicate) {
-                        warnDuplicateBibtexkey();
+                    if (((oldValue == null) && (newValue == null)) || (Objects.equals(oldValue, newValue))) {
+                        return; // No change.
+                    }
+
+                    // Make sure the key is legal:
+                    String cleaned = BibtexKeyPatternUtil.checkLegalKey(newValue,
+                            Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+                    if ((cleaned == null) || cleaned.equals(newValue)) {
+                        textField.setValidBackgroundColor();
                     } else {
-                        panel.output(Localization.lang("BibTeX key is unique."));
+                        lastFieldAccepted = false;
+                        textField.setInvalidBackgroundColor();
+                        if (!SwingUtilities.isEventDispatchThread()) {
+                            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
+                                    Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                            requestFocus();
+                        }
+                        return;
                     }
-                }
 
-                // Add an UndoableKeyChange to the baseframe's undoManager.
-                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(entry, oldValue, newValue);
-                if (updateTimeStampIsSet()) {
-                    NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
-                    ce.addEdit(undoableKeyChange);
-                    doUpdateTimeStamp().ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-                    ce.end();
-                    panel.getUndoManager().addEdit(ce);
-                } else {
-                    panel.getUndoManager().addEdit(undoableKeyChange);
-                }
+                    if (newValue == null) {
+                        entry.clearCiteKey();
+                        warnEmptyBibtexkey();
+                    } else {
+                        entry.setCiteKey(newValue);
+                        boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
+                        if (isDuplicate) {
+                            warnDuplicateBibtexkey();
+                        } else {
+                            panel.output(Localization.lang("BibTeX key is unique."));
+                        }
+                    }
 
+                    // Add an UndoableKeyChange to the baseframe's undoManager.
+                    UndoableKeyChange undoableKeyChange = new UndoableKeyChange(entry, oldValue, newValue);
+                    if (updateTimeStampIsSet()) {
+                        NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
+                        ce.addEdit(undoableKeyChange);
+                        doUpdateTimeStamp().ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                        ce.end();
+                        panel.getUndoManager().addEdit(ce);
+                    } else {
+                        panel.getUndoManager().addEdit(undoableKeyChange);
+                    }
 
-                textField.setValidBackgroundColor();
+                    textField.setValidBackgroundColor();
 
-                if (textField.getTextComponent().hasFocus()) {
-                    textField.setActiveBackgroundColor();
-                }
-                updateSource();
-                panel.markBaseChanged();
-
+                    if (textField.getTextComponent().hasFocus()) {
+                        textField.setActiveBackgroundColor();
+                    }
+                    updateSource();
+                    panel.markBaseChanged();
                 /* Acrescenta mensagem de erro para bibtexkey invalida */
                 } catch (IllegalArgumentException ex) {
                     if (!SwingUtilities.isEventDispatchThread() || ex.getMessage().startsWith("Campo invalido!")) {

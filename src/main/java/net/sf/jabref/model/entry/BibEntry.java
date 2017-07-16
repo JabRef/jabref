@@ -463,10 +463,9 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        if(!(fieldName.equals("year") || fieldName.equals("bibtexkey"))) {
+        if (!(fieldName.equals("year") || fieldName.equals("bibtexkey"))) {
             fields.put(fieldName, value.intern());
-        }
-        else {
+        } else {
             /* Validar ano */
             if (fieldName.equals("year")) {
                 Calendar c = Calendar.getInstance();
@@ -483,14 +482,12 @@ public class BibEntry implements Cloneable {
             if (fieldName.equals("bibtexkey")) {
                 if (value.intern().length() >= 2 && value.substring(0, 1).matches("[A-Z]|[a-z]")) {
                     fields.put(fieldName, value.intern());
-                }
-                else {
+                } else {
                     fields.put(fieldName, "");
                     throw new IllegalArgumentException("Campo invalido! Deve comecar com letra e possuir menos menos 2 caracteres!");
                 }
             }
         }
-
 
         invalidateFieldCache(fieldName);
 
