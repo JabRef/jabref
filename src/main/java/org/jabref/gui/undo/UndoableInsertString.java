@@ -46,7 +46,7 @@ public class UndoableInsertString extends AbstractUndoableJabRefEdit {
         try {
             base.addString(string);
         } catch (KeyCollisionException ex) {
-            Logger.warn(this, "Problem to redo `insert entry`", ex);
+            Logger.warn(this, "Problem to redo `insert entry`: %[exception]s", ex);
         }
 
         panel.updateStringDialog();

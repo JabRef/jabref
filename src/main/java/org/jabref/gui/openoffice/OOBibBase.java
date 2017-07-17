@@ -952,7 +952,7 @@ class OOBibBase {
                     break;
                 }
             } catch (IndexOutOfBoundsException ex) {
-                Logger.warn(this, "Problem going left", ex);
+                Logger.warn(this, "Problem going left: %[exception]s", ex);
             }
         }
         int length = cursor.getString().length();
@@ -968,7 +968,7 @@ class OOBibBase {
                     }
                 }
             } catch (IndexOutOfBoundsException ex) {
-                Logger.warn(this, "Problem going right", ex);
+                Logger.warn(this, "Problem going right: %[exception]s", ex);
             }
         }
 

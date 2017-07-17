@@ -41,7 +41,7 @@ public class Protocol {
                 result.append((char) c);
             }
         } catch (SocketTimeoutException ex) {
-            Logger.info(this, "Connection timed out.", ex);
+            Logger.info(this, "Connection timed out.: %[exception]s", ex);
         }
         return result.toString();
     }

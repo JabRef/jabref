@@ -167,7 +167,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 fileLockedError = true;
                 return;
             }
-            Logger.error(this, "Problem saving file", ex);
+            Logger.error(this, "Problem saving file: %[exception]s", ex);
         }
     }
 
@@ -206,7 +206,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 // Error occured during processing of an entry. Highlight it!
                 panel.highlightEntry(entry);
             } else {
-                Logger.error(this, "A problem occured when trying to save the file", ex);
+                Logger.error(this, "A problem occured when trying to save the file: %[exception]s", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
@@ -345,7 +345,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
                     context.getDatabaseFile().orElse(null)));
         } catch (IOException ex) {
-            Logger.error(this, "Problem registering file change notifications", ex);
+            Logger.error(this, "Problem registering file change notifications: %[exception]s", ex);
         }
 
         if (readyForAutosave(context)) {

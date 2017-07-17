@@ -216,7 +216,7 @@ public class FreeCiteImporter extends Importer {
             }
             parser.close();
         } catch (IOException | XMLStreamException ex) {
-            Logger.warn(this, "Could not parse", ex);
+            Logger.warn(this, "Could not parse: %[exception]s", ex);
             return new ParserResult();
         }
 

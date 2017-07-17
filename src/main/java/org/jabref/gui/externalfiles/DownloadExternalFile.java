@@ -160,7 +160,7 @@ public class DownloadExternalFile {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            Logger.info(this, "Error while downloading " + "'" + res + "'", ex);
+            Logger.info(this, "Error while downloading " + "'" + res + "': %[exception]s", ex);
             return;
         }
         final URL urlF = url;
@@ -176,7 +176,7 @@ public class DownloadExternalFile {
                 }
                 JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + e2.getMessage(),
                         Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-                Logger.info(this, "Error while downloading " + "'" + urlF + "'", e2);
+                Logger.info(this, "Error while downloading " + "'" + urlF + "': %[exception]s", e2);
                 return;
             }
             // Download finished: call the method that stops the progress bar etc.:

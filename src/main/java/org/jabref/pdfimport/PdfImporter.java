@@ -266,7 +266,7 @@ public class PdfImporter {
 
                 return Optional.of(bibEntry);
             } catch (KeyCollisionException ex) {
-                Logger.info(this, "Key collision occurred", ex);
+                Logger.info(this, "Key collision occurred: %[exception]s", ex);
             }
         }
         return Optional.empty();

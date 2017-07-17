@@ -71,7 +71,7 @@ public class AbbreviationParser {
             }
 
         } catch (IOException ex) {
-            Logger.info(this, "Could not read journal list from file ", ex);
+            Logger.info(this, "Could not read journal list from file : %[exception]s", ex);
         }
     }
 

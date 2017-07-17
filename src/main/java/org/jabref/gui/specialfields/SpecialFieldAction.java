@@ -74,7 +74,7 @@ public class SpecialFieldAction implements BaseAction {
                 // even no output message
             }
         } catch (Throwable ex) {
-            Logger.error(this, "Problem setting special fields", ex);
+            Logger.error(this, "Problem setting special fields: %[exception]s", ex);
         }
     }
 

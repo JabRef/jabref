@@ -936,7 +936,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                                         JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(),
                                         fnw.file.getAbsolutePath(), FieldName.PDF);
                             } catch (IOException e1) {
-                                Logger.info(this, "Error opening file", e1);
+                                Logger.info(this, "Error opening file: %[exception]s", e1);
                             }
                         }
                     } else {

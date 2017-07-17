@@ -36,7 +36,7 @@ public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
         try {
             base.addString(string);
         } catch (KeyCollisionException ex) {
-            Logger.warn(this, "Problem to undo `remove string`", ex);
+            Logger.warn(this, "Problem to undo `remove string`: %[exception]s", ex);
         }
 
         panel.updateStringDialog();

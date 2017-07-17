@@ -51,7 +51,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
-            Logger.warn(this, "Problem to redo `remove entry`", ex);
+            Logger.warn(this, "Problem to redo `remove entry`: %[exception]s", ex);
         }
     }
 

@@ -128,7 +128,7 @@ public class ExportAction {
                                                 .orElse(Globals.prefs.getDefaultEncoding()),
                                         finEntries);
                             } catch (Exception ex) {
-                                Logger.warn(this, "Problem exporting", ex);
+                                Logger.warn(this, "Problem exporting: %[exception]s", ex);
                                 if (ex.getMessage() == null) {
                                     errorMessage = ex.toString();
                                 } else {

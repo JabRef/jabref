@@ -97,7 +97,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 return false;
             }
 
-            Logger.warn(this, "Unable to open link", ex);
+            Logger.warn(this, "Unable to open link: %[exception]s", ex);
         }
         return false;
     }

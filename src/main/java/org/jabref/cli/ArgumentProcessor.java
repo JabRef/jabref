@@ -214,7 +214,7 @@ public class ArgumentProcessor {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (JabRefException ex) {
-                Logger.error(this, "Cannot export preferences", ex);
+                Logger.error(this, "Cannot export preferences: %[exception]s", ex);
             }
         }
 
@@ -468,7 +468,7 @@ public class ArgumentProcessor {
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
-            Logger.error(this, "Cannot import preferences", ex);
+            Logger.error(this, "Cannot import preferences: %[exception]s", ex);
         }
     }
 

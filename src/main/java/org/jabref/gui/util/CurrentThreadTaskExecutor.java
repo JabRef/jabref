@@ -36,7 +36,7 @@ public class CurrentThreadTaskExecutor implements TaskExecutor {
             if (onException != null) {
                 onException.accept(exception);
             } else {
-                Logger.error(this, "Unhandled exception", exception);
+                Logger.error(this, "Unhandled exception: %[exception]s", exception);
             }
         }
     }

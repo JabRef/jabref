@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
             } catch (IOException ex) {
-                Logger.warn(this, "Could not register FileUpdateMonitor", ex);
+                Logger.warn(this, "Could not register FileUpdateMonitor: %[exception]s", ex);
             }
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
@@ -633,7 +633,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 output(outputStr);
             } catch (Throwable ex) {
-                Logger.warn(this, "Could not unmark", ex);
+                Logger.warn(this, "Could not unmark: %[exception]s", ex);
             }
         });
 
@@ -1064,7 +1064,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 highlightEntry(ex.getEntry());
                 showEntry(ex.getEntry());
             } else {
-                Logger.warn(this, "Could not save", ex);
+                Logger.warn(this, "Could not save: %[exception]s", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
@@ -1275,7 +1275,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.CUT);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not cut", ex);
+                    Logger.warn(this, "Could not cut: %[exception]s", ex);
                 }
             }
         });
@@ -1286,7 +1286,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.COPY);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not copy", ex);
+                    Logger.warn(this, "Could not copy: %[exception]s", ex);
                 }
             }
         });
@@ -1297,7 +1297,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.PASTE);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not paste", ex);
+                    Logger.warn(this, "Could not paste: %[exception]s", ex);
                 }
             }
         });
@@ -1326,7 +1326,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     try {
                         runCommand(Actions.EDIT);
                     } catch (Throwable ex) {
-                        Logger.warn(this, "Could not run action based on key press", ex);
+                        Logger.warn(this, "Could not run action based on key press: %[exception]s", ex);
                     }
                 }
             }
@@ -2149,7 +2149,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 markBaseChanged();
                 frame.output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
-                Logger.warn(this, "Nothing to undo", ex);
+                Logger.warn(this, "Nothing to undo: %[exception]s", ex);
                 frame.output(Localization.lang("Nothing to undo") + '.');
             }
 

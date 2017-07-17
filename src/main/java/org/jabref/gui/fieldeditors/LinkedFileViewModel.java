@@ -137,7 +137,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
             }
         } catch (IOException ex) {
-            Logger.debug(this, "Cannot open folder", ex);
+            Logger.debug(this, "Cannot open folder: %[exception]s", ex);
         }
     }
 

@@ -250,7 +250,7 @@ public class BibtexParser implements Parser {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             }
         } catch (IOException ex) {
-            Logger.debug(this, "Could not parse entry", ex);
+            Logger.debug(this, "Could not parse entry: %[exception]s", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + Localization.lang("Skipped entry."));
 

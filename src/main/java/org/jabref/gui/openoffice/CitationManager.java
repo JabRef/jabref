@@ -91,7 +91,7 @@ class CitationManager {
                 storeSettings();
             } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                     IllegalArgumentException ex) {
-                Logger.warn(this, "Problem modifying citation", ex);
+                Logger.warn(this, "Problem modifying citation: %[exception]s", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Problem modifying citation"));
             }
             diag.dispose();

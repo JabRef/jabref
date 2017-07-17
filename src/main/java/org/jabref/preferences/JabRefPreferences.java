@@ -916,7 +916,7 @@ public class JabRefPreferences implements PreferencesService {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
-            Logger.debug(this, "Hostname not found.", ex);
+            Logger.debug(this, "Hostname not found.: %[exception]s", ex);
             return get(DEFAULT_OWNER);
         }
     }
@@ -1140,7 +1140,7 @@ public class JabRefPreferences implements PreferencesService {
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            Logger.warn(this, "Cannot communicate with backing store", ex);
+            Logger.warn(this, "Cannot communicate with backing store: %[exception]s", ex);
         }
     }
 
@@ -1161,7 +1161,7 @@ public class JabRefPreferences implements PreferencesService {
                 }
             }
         } catch (BackingStoreException ex) {
-            Logger.info(this, "BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+            Logger.info(this, "BackingStoreException in JabRefPreferences.getKeyPattern: %[exception]s", ex);
         }
         return keyPattern;
     }
@@ -1179,7 +1179,7 @@ public class JabRefPreferences implements PreferencesService {
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            Logger.info(this, "BackingStoreException in JabRefPreferences.putKeyPattern", ex);
+            Logger.info(this, "BackingStoreException in JabRefPreferences.putKeyPattern: %[exception]s", ex);
         }
 
         Set<String> allKeys = pattern.getAllKeys();

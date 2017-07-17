@@ -80,7 +80,7 @@ public class FileSaveSession extends SaveSession {
                     }
                 }
             } catch (IOException ex) {
-                Logger.error(this, "Error when creating lock file.", ex);
+                Logger.error(this, "Error when creating lock file.: %[exception]s", ex);
             }
 
             // Try to save file permissions to restore them later (by default: 664)
@@ -93,7 +93,7 @@ public class FileSaveSession extends SaveSession {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
-                    Logger.warn(this, "Error getting file permissions.", exception);
+                    Logger.warn(this, "Error getting file permissions.: %[exception]s", exception);
                 }
             }
 

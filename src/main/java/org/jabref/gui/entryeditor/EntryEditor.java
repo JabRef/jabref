@@ -729,7 +729,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                     Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                            Logger.debug(this, "Error setting field", ex);
+                            Logger.debug(this, "Error setting field: %[exception]s", ex);
                             requestFocus();
                         }
                     }

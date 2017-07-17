@@ -1067,7 +1067,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 try {
                     JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
-                    Logger.warn(this, "Could not open link", ex);
+                    Logger.warn(this, "Could not open link: %[exception]s", ex);
                 }
             });
         }
@@ -1246,7 +1246,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             try {
                 def.download(this);
             } catch (IOException ex) {
-                Logger.warn(this, "Could not download file", ex);
+                Logger.warn(this, "Could not download file: %[exception]s", ex);
             }
         }
 

@@ -52,7 +52,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                Logger.debug(this, "FileUpdateMonitor has been interrupted. Terminating...", ex);
+                Logger.debug(this, "FileUpdateMonitor has been interrupted. Terminating...: %[exception]s", ex);
                 return;
             }
         }
