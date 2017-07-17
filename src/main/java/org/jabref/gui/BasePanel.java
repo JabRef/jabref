@@ -1029,7 +1029,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // The call to unblock will simply hide the glasspane, so there is no harm in calling
             // it even if the frame hasn't been blocked.
             frame.unblock();
-            Logger.error(this, "runCommand error: " + ex.getMessage(), ex);
+            Logger.error(this, "runCommand error: %[exception]s", ex);
         }
     }
 

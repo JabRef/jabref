@@ -61,7 +61,7 @@ class StringChange extends Change {
                 panel.getDatabase().addString(bs);
                 undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
             } catch (KeyCollisionException ex) {
-                Logger.info(this, "Error: could not add string '" + bs.getName() + "': " + ex.getMessage(), ex);
+                Logger.info(this, "Error: could not add string '" + bs.getName() + "': %[exception]s", ex);
             }
         } else {
             string.setContent(disk);
