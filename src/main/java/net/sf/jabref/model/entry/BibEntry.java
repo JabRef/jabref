@@ -311,7 +311,7 @@ public class BibEntry implements Cloneable {
         
         int valor = Integer.parseInt(ano);
         boolean flag = true;
-        while (flag &&((anoAtual < valor))){
+        if (flag &&((anoAtual < valor))){
             if(valor > anoAtual || ano == null || ano == ""){
                 flag = false;
                 valor = -1;
@@ -332,6 +332,27 @@ public class BibEntry implements Cloneable {
     *   Fim da validacao do ano
     */
 
+    /*
+    *   
+    */
+    
+    public String verificaBibtexkey(String bibtexkey, boolean flag) {
+        //charAt(0) verifica o caracter na primeira posicao
+        if(Character.isLetter(bibtexkey.charAt(0)) && (bibtexkey.length() > 1) ){
+            return bibtexkey;
+        }
+        /*
+        caso a string Bibtexkey nao esteja correta, é exibida uma mensagem de 
+        erro e é gerada uma string automaticamente usando concat()
+        */
+        JOptionPane.showMessageDialog(null, "A Bibtexkey " + bibtexkey + " não "
+                    + "pode ser inserida. \n Uma chave foi criada automaticamente.");
+        if (flag){
+            return "Article".concat(this.getId());
+        }
+        return "Book".concat(this.getId());
+        
+    }
     /**
      * Internal method used to get the content of a field (or its alias)
      *
@@ -518,6 +539,11 @@ public class BibEntry implements Cloneable {
                     value = null;
                 }
             }                            
+        }
+        
+        //verifica se o BibTexKey eh valido
+        if (name.equals("bibtexkey")){
+            value = verificaBibtexkey(value, true);
         }
         
         
