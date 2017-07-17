@@ -96,11 +96,11 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
             // steps to reproduce
             String howToReproduce = "Steps to reproduce:\n\n1. ...\n2. ...\n3. ...";
             // log messages
-            String issueDetails = "<details>\n" + "<summary>" + "Detail information:" + "</summary>\n\n```\n"
+            String issueDetails = "<details>\n<summary>Detail information:</summary>\n\n```\n"
                     + getLogMessagesAsString(allMessagesData) + "\n```\n\n</details>";
             clipBoardManager.setClipboardContents(issueDetails);
             // bug report body
-            String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\n" + "Paste your log details here.";
+            String issueBody = systemInfo + "\n\n" + howToReproduce + "\n\nPaste your log details here.";
 
             dialogService.notify(Localization.lang("Issue on GitHub successfully reported."));
             dialogService.showInformationDialogAndWait(Localization.lang("Issue report successful"),

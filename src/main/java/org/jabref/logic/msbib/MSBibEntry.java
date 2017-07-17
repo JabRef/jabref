@@ -338,16 +338,16 @@ class MSBibEntry {
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
         parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString()).ifPresent(yearAccessed -> {
-            addField(document, rootNode, "Year" + "Accessed", yearAccessed);
+            addField(document, rootNode, "YearAccessed", yearAccessed);
         });
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                 .map(accMonth -> accMonth.getTwoDigitNumber()).ifPresent(monthAcessed -> {
-                    addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+                    addField(document, rootNode, "MonthAccessed", monthAcessed);
 
                 });
         parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).ifPresent(dayAccessed -> {
-            addField(document, rootNode, "Day" + "Accessed", dayAccessed);
+            addField(document, rootNode, "DayAccessed", dayAccessed);
         });
 
     }

@@ -609,7 +609,7 @@ public class BibtexParser implements Parser {
                 String textToken = parseTextToken();
                 if (textToken.isEmpty()) {
                     throw new IOException("Error in line " + line + " or above: "
-                            + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
+                            + "Empty text token.\nThis could be caused by a missing comma between two fields.");
                 }
                 value.append('#').append(textToken).append('#');
             }
@@ -791,7 +791,7 @@ public class BibtexParser implements Parser {
                     // the entry lacked a comma signifying the end of the key.
                     return token.toString();
                 } else {
-                    throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
+                    throw new IOException("Error in line " + line + ":Character '" + (char) character + "' is not "
                             + "allowed in bibtex keys.");
                 }
 

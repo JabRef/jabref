@@ -271,7 +271,7 @@ public class URLDownload {
 
     @Override
     public String toString() {
-        return "URLDownload{" + "source=" + this.source + '}';
+        return "URLDownload{source=" + this.source + '}';
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {

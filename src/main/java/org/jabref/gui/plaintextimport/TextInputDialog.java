@@ -498,7 +498,7 @@ public class TextInputDialog extends JabRefDialog {
                     false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
-            Logger.error(this, "Error in entry" + ": %[exception]s", ex);
+            Logger.error(this, "Error in entry: %[exception]s", ex);
         }
 
         fieldList.clearSelection();

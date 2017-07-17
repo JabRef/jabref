@@ -406,7 +406,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
-                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
+                    Localization.lang("File has been updated externally. What do you want to do?"),
                     Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
 

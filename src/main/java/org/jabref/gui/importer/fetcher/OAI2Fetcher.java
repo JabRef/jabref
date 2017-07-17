@@ -114,7 +114,7 @@ public class OAI2Fetcher implements EntryFetcher {
         } catch (UnsupportedEncodingException e) {
             return "";
         }
-        return "http://" + oai2Host + "/" + oai2Script + "?" + "verb=GetRecord" + "&identifier=" + oai2PrefixIdentifier
+        return "http://" + oai2Host + "/" + oai2Script + "?verb=GetRecord&identifier=" + oai2PrefixIdentifier
                 + identifier + "&metadataPrefix=" + oai2MetaDataPrefix;
     }
 

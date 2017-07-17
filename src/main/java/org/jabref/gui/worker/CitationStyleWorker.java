@@ -33,7 +33,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         if (basePanel.isPresent()) {
             CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
             previewPane.setText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
-                    ": " + citationStyle.getTitle() + " ..." + "</i>");
+                    ": " + citationStyle.getTitle() + " ...</i>");
         }
         previewPane.revalidate();
     }

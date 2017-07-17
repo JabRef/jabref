@@ -422,7 +422,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
-                            + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
+                            + "\n\n" + Localization.lang("Error message:") + " " + e.getMessage());
         } finally {
             if (progressDialog != null) {
                 progressDialog.dispose();
