@@ -36,12 +36,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
-        Logger.debug(this, String.format("Loading Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
+        Logger.debug(this, "Loading Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId()));
         return annotationCache.getUnchecked(entry);
     }
 
     public void remove(BibEntry entry) {
-        Logger.debug(this, String.format("Deleted Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
+        Logger.debug(this, "Deleted Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId()));
         annotationCache.invalidate(entry);
     }
 }

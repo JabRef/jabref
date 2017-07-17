@@ -64,7 +64,7 @@ public class StyleLoader {
                 storeExternalStyles();
                 return true;
             } else {
-                Logger.error(this, String.format("Style with filename %s is invalid", filename));
+                Logger.error(this, "Style with filename %s is invalid", filename);
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
@@ -86,7 +86,7 @@ public class StyleLoader {
                 if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
-                    Logger.error(this, String.format("Style with filename %s is invalid", filename));
+                    Logger.error(this, "Style with filename %s is invalid", filename);
                 }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?

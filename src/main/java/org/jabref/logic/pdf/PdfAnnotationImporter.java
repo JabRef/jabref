@@ -59,7 +59,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            Logger.error(this, String.format("Failed to read file '%s'.", path), e);
+            Logger.error(this, "Failed to read file '%s'.", path), e;
         }
         return annotationsList;
     }
@@ -77,7 +77,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 return false;
             }
         } catch (IllegalArgumentException e) {
-            Logger.debug(this, String.format("Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype()));
+            Logger.debug(this, "Could not parse the FileAnnotation %s into any known FileAnnotationType. It was %s!", annotation, annotation.getSubtype());
         }
         return true;
     }
@@ -104,17 +104,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            Logger.warn(this, String.format("File '%s' does not end with .pdf!", path));
+            Logger.warn(this, "File '%s' does not end with .pdf!", path);
             return false;
         }
 
         if (!Files.exists(path)) {
-            Logger.warn(this, String.format("File '%s' does not exist!", path));
+            Logger.warn(this, "File '%s' does not exist!", path);
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            Logger.warn(this, String.format("File '%s' is not readable!", path));
+            Logger.warn(this, "File '%s' is not readable!", path);
             return false;
         }
 

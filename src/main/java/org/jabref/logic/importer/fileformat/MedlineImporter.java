@@ -274,7 +274,7 @@ public class MedlineImporter extends Importer implements Parser {
                     handleAuthors(fields, authorList);
                 }
             } else {
-                Logger.info(this, String.format("Size of authorlist was %s", authorLists.size()));
+                Logger.info(this, "Size of authorlist was %s", authorLists.size());
             }
         }
 
