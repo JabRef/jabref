@@ -397,6 +397,25 @@ public class BibEntryWriterTest {
 
         assertEquals(expected, actual);
     }
+    
+    @Test
+    public void doNotWriteEmptyBookFields() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry("book");
+        entry.setField("title", "  ");
+        entry.setField("note", "some note");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+
+        String actual = stringWriter.toString();
+
+        String expected = OS.NEWLINE + "@Book{," + OS.NEWLINE + "  note  = {some note}," + OS.NEWLINE
+                + "}" + OS.NEWLINE;
+        
+
+        assertEquals(expected, actual);
+    }
 
     @Test
     public void trimFieldContents() throws IOException {
