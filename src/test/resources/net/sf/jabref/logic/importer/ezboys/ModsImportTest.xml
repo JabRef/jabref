@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mods:modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods ID="HumanAction">
+        <mods:identifier type="citekey">HumanAction</mods:identifier>
+        <mods:genre>book</mods:genre>
+        <mods:name type="personal">
+            <mods:namePart type="family">Ludwig von Mises</mods:namePart>
+        </mods:name>
+        <mods:titleInfo>
+            <mods:title>Human Action: A Treatise on Economics</mods:title>
+        </mods:titleInfo>
+        <mods:originInfo>
+            <mods:dateIssued keyDate="yes">2007</mods:dateIssued>
+            <mods:publisher>Liberty Fund</mods:publisher>
+        </mods:originInfo>
+        <mods:relatedItem type="host">
+            <mods:part/>
+        </mods:relatedItem>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</mods:modsCollection>

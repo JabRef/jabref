@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2017//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_170101.dtd">
+<PubmedArticleSet>
+
+    <PubmedArticle>
+        <MedlineCitation Status="Publisher" Owner="NLM">
+            <PMID Version="1">28711570</PMID>
+            <DateCreated>
+                <Year>2017</Year>
+                <Month>07</Month>
+                <Day>16</Day>
+            </DateCreated>
+            <DateRevised>
+                <Year>2017</Year>
+                <Month>07</Month>
+                <Day>16</Day>
+            </DateRevised>
+            <Article PubModel="Print-Electronic">
+                <Journal>
+                    <ISSN IssnType="Electronic">1531-5053</ISSN>
+                    <JournalIssue CitedMedium="Internet">
+                        <PubDate>
+                            <Year>2017</Year>
+                            <Month>Jun</Month>
+                            <Day>14</Day>
+                        </PubDate>
+                    </JournalIssue>
+                    <Title>Journal of oral and maxillofacial surgery : official journal of the American Association of Oral and Maxillofacial Surgeons</Title>
+                    <ISOAbbreviation>J. Oral Maxillofac. Surg.</ISOAbbreviation>
+                </Journal>
+                <ArticleTitle>Anesthetic Management of Reversible Cerebral Vasoconstriction Syndrome: A Case Report.</ArticleTitle>
+                <ELocationID EIdType="pii" ValidYN="Y">S0278-2391(17)30627-4</ELocationID>
+                <ELocationID EIdType="doi" ValidYN="Y">10.1016/j.joms.2017.06.011</ELocationID>
+                <Abstract>
+                    <AbstractText>Reversible cerebral vasoconstriction syndrome (RCVS) is a group of disorders characterized by prolonged reversible cerebral vasoconstriction, associated with acute-onset, severe, episodic &quot;thunderclap&quot; headaches with or without other neurologic clinical features.Â We describe the first reported case, to our knowledge, of a patient with RCVS who was managed under general anesthesia in the field of oral and maxillofacial surgery. A 67-year-old woman with a diagnosis of RCVS made 2Â months earlier was scheduled to undergo surgical extraction of the mandibular right third molar. Standard monitoring included noninvasive blood pressure measurement, pulse oximetry, and electrocardiography; a bispectral index (BIS) monitor sensor was placed on her forehead. General anesthesia was induced by target-controlled infusion of propofol to an effect site concentration of 5.0Â Î¼g Â· mL(-1), with remifentanil, 0.50Â Î¼g Â· kg(-1) per minute, and rocuronium, 40Â mg.Â After tracheal intubation, anesthesia was maintained uneventfully with remifentanil, 0.15 to 0.2Â Î¼g Â· kg(-1) per minute, and propofol, 2.0 to 3.0Â Î¼g Â· mL(-1), in oxygen and air. The end-tidal carbon dioxide concentration was maintained at 38 to 42Â mm Hg. The BIS reading was 40 to 60. Fentanyl, 0.1Â mg, and acetaminophen, 750Â mg, were administered before the end of surgery for postoperative analgesia. The postoperative course was uneventful, with no headaches or hypertensive complications. We successfully achieved anesthetic management with no appreciable clinical signs of cerebral ischemia or recurrence in a patient with RCVS. We used propofol as the anesthetic agent with BIS monitoring to detect cerebral ischemia. However, there is no definitive evidence of the utility of these measures for the prevention or diagnosis of RCVS, and further study is needed.</AbstractText>
+                    <CopyrightInformation>Copyright Â© 2017 American Association of Oral and Maxillofacial Surgeons. Published by Elsevier Inc. All rights reserved.</CopyrightInformation>
+                </Abstract>
+                <AuthorList CompleteYN="Y">
+                    <Author ValidYN="Y">
+                        <LastName>Hoshijima</LastName>
+                        <ForeName>Hiroshi</ForeName>
+                        <Initials>H</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Assistant Professor, Department of Anesthesiology, Saitama Medical University Hospital, Saitama, Japan. Electronic address: hhoshi@saitama-med.ac.jp.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Itoh</LastName>
+                        <ForeName>Naoki</ForeName>
+                        <Initials>N</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Instructor, Department of Anesthesiology, Saitama Medical University Hospital, Saitama, Japan.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Iwase</LastName>
+                        <ForeName>Yoshinori</ForeName>
+                        <Initials>Y</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Professor, Department of Anesthesiology, Saitama Medical University Hospital, Saitama, Japan.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                    <Author ValidYN="Y">
+                        <LastName>Nagasaka</LastName>
+                        <ForeName>Hiroshi</ForeName>
+                        <Initials>H</Initials>
+                        <AffiliationInfo>
+                            <Affiliation>Professor, Department of Anesthesiology, Saitama Medical University Hospital, Saitama, Japan.</Affiliation>
+                        </AffiliationInfo>
+                    </Author>
+                </AuthorList>
+                <Language>eng</Language>
+                <PublicationTypeList>
+                    <PublicationType UI="D016428">Journal Article</PublicationType>
+                </PublicationTypeList>
+                <ArticleDate DateType="Electronic">
+                    <Year>2017</Year>
+                    <Month>06</Month>
+                    <Day>14</Day>
+                </ArticleDate>
+            </Article>
+            <MedlineJournalInfo>
+                <Country>United States</Country>
+                <MedlineTA>J Oral Maxillofac Surg</MedlineTA>
+                <NlmUniqueID>8206428</NlmUniqueID>
+                <ISSNLinking>0278-2391</ISSNLinking>
+            </MedlineJournalInfo>
+        </MedlineCitation>
+        <PubmedData>
+            <History>
+                <PubMedPubDate PubStatus="received">
+                    <Year>2017</Year>
+                    <Month>04</Month>
+                    <Day>19</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="revised">
+                    <Year>2017</Year>
+                    <Month>06</Month>
+                    <Day>01</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="accepted">
+                    <Year>2017</Year>
+                    <Month>06</Month>
+                    <Day>06</Day>
+                </PubMedPubDate>
+                <PubMedPubDate PubStatus="entrez">
+                    <Year>2017</Year>
+                    <Month>7</Month>
+                    <Day>17</Day>
+                    <Hour>6</Hour>
+                    <Minute>0</Minute>
+                </PubMedPubDate>
+            </History>
+            <PublicationStatus>aheadofprint</PublicationStatus>
+            <ArticleIdList>
+                <ArticleId IdType="pubmed">28711570</ArticleId>
+                <ArticleId IdType="pii">S0278-2391(17)30627-4</ArticleId>
+                <ArticleId IdType="doi">10.1016/j.joms.2017.06.011</ArticleId>
+            </ArticleIdList>
+        </PubmedData>
+    </PubmedArticle>
+
+</PubmedArticleSet>

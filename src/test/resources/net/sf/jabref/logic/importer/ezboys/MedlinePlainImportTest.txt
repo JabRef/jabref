@@ -1,0 +1,72 @@
+
+PMID- 28711570
+OWN - NLM
+STAT- Publisher
+DA  - 20170716
+LR  - 20170716
+IS  - 1531-5053 (Electronic)
+IS  - 0278-2391 (Linking)
+DP  - 2017 Jun 14
+TI  - Anesthetic Management of Reversible Cerebral Vasoconstriction Syndrome: A Case
+      Report.
+LID - S0278-2391(17)30627-4 [pii]
+LID - 10.1016/j.joms.2017.06.011 [doi]
+AB  - Reversible cerebral vasoconstriction syndrome (RCVS) is a group of disorders
+      characterized by prolonged reversible cerebral vasoconstriction, associated with
+      acute-onset, severe, episodic "thunderclap" headaches with or without other
+      neurologic clinical features. We describe the first reported case, to our
+      knowledge, of a patient with RCVS who was managed under general anesthesia in the
+      field of oral and maxillofacial surgery. A 67-year-old woman with a diagnosis of
+      RCVS made 2 months earlier was scheduled to undergo surgical extraction of the
+      mandibular right third molar. Standard monitoring included noninvasive blood
+      pressure measurement, pulse oximetry, and electrocardiography; a bispectral index
+      (BIS) monitor sensor was placed on her forehead. General anesthesia was induced
+      by target-controlled infusion of propofol to an effect site concentration of 5.0
+      mug . mL-1, with remifentanil, 0.50 mug . kg-1 per minute, and rocuronium, 40 mg.
+      After tracheal intubation, anesthesia was maintained uneventfully with
+      remifentanil, 0.15 to 0.2 mug . kg-1 per minute, and propofol, 2.0 to 3.0 mug .
+      mL-1, in oxygen and air. The end-tidal carbon dioxide concentration was
+      maintained at 38 to 42 mm Hg. The BIS reading was 40 to 60. Fentanyl, 0.1 mg, and
+      acetaminophen, 750 mg, were administered before the end of surgery for
+      postoperative analgesia. The postoperative course was uneventful, with no
+      headaches or hypertensive complications. We successfully achieved anesthetic
+      management with no appreciable clinical signs of cerebral ischemia or recurrence
+      in a patient with RCVS. We used propofol as the anesthetic agent with BIS
+      monitoring to detect cerebral ischemia. However, there is no definitive evidence
+      of the utility of these measures for the prevention or diagnosis of RCVS, and
+      further study is needed.
+CI  - Copyright (c) 2017 American Association of Oral and Maxillofacial Surgeons.
+      Published by Elsevier Inc. All rights reserved.
+FAU - Hoshijima, Hiroshi
+AU  - Hoshijima H
+AD  - Assistant Professor, Department of Anesthesiology, Saitama Medical University
+      Hospital, Saitama, Japan. Electronic address: hhoshi@saitama-med.ac.jp.
+FAU - Itoh, Naoki
+AU  - Itoh N
+AD  - Instructor, Department of Anesthesiology, Saitama Medical University Hospital,
+      Saitama, Japan.
+FAU - Iwase, Yoshinori
+AU  - Iwase Y
+AD  - Professor, Department of Anesthesiology, Saitama Medical University Hospital,
+      Saitama, Japan.
+FAU - Nagasaka, Hiroshi
+AU  - Nagasaka H
+AD  - Professor, Department of Anesthesiology, Saitama Medical University Hospital,
+      Saitama, Japan.
+LA  - eng
+PT  - Journal Article
+DEP - 20170614
+PL  - United States
+TA  - J Oral Maxillofac Surg
+JT  - Journal of oral and maxillofacial surgery : official journal of the American
+      Association of Oral and Maxillofacial Surgeons
+JID - 8206428
+CRDT- 2017/07/17 06:00
+PHST- 2017/04/19 [received]
+PHST- 2017/06/01 [revised]
+PHST- 2017/06/06 [accepted]
+AID - S0278-2391(17)30627-4 [pii]
+AID - 10.1016/j.joms.2017.06.011 [doi]
+PST - aheadofprint
+SO  - J Oral Maxillofac Surg. 2017 Jun 14. pii: S0278-2391(17)30627-4. doi:
+      10.1016/j.joms.2017.06.011.

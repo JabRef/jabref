@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="HumanAction">
+        <book>
+            <author>Ludwig von Mises</author>
+            <editor>Bettina Bien Greaves</editor>
+            <title>Human Action: A Treatise on Economics</title>
+            <publisher>Liberty Fund</publisher>
+            <year>2007</year>
+        </book>
+    </entry>
+</file>
