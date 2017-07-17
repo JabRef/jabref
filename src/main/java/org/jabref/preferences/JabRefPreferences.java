@@ -432,7 +432,7 @@ public class JabRefPreferences implements PreferencesService {
                 importPreferences("jabref.xml");
             }
         } catch (JabRefException e) {
-            Logger.warn(this, "Could not import preferences from jabref.xml: " + e.getMessage(), e);
+            Logger.warn(this, "Could not import preferences from jabref.xml: %[exception]s", e);
         }
 
         // load user preferences
@@ -1134,7 +1134,7 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 exportPreferences("jabref.xml");
             } catch (JabRefException e) {
-                Logger.warn(this, "Could not export preferences for memory stick mode: " + e.getMessage(), e);
+                Logger.warn(this, "Could not export preferences for memory stick mode: %[exception]s", e);
             }
         }
         try {
