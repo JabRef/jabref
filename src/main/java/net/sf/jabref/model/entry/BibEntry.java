@@ -35,6 +35,8 @@ import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.swing.*;
+
 public class BibEntry implements Cloneable {
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
@@ -285,7 +287,72 @@ public class BibEntry implements Cloneable {
 
         return fieldName.toLowerCase(Locale.ENGLISH);
     }
+    
+    /*
+    *   Funções para validar o ano
+    */
+    /*
+    *   Verifica se a entrada eh numerica
+    */
+    
+    public static boolean numerico(String str){
+        for (char c : str.toCharArray()){
+            if (!Character.isDigit(c)){
+                JOptionPane.showMessageDialog(null, "Error!", "Invalid character", 0);
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static String validaAno(String ano){
+        Calendar cal = Calendar.getInstance();
+        int anoAtual = cal.get(Calendar.YEAR);
+        
+        int valor = Integer.parseInt(ano);
+        boolean flag = true;
+        if (flag &&((anoAtual < valor))){
+            if(valor > anoAtual || ano == null || ano == ""){
+                flag = false;
+                valor = -1;
+                JOptionPane.showMessageDialog(null, "Error!", "Year over presente year", 0);
+            }
+            else{
+                valor = Integer.parseInt(ano);
+            }
+        }
+        
+        ano = Integer.toString(valor);
+        
+        return ano;
+        
+    }
+    
+    /*
+    *   Fim da validacao do ano
+    */
 
+    /*
+    *   
+    */
+    
+    public String verificaBibtexkey(String bibtexkey, boolean flag) {
+        //charAt(0) verifica o caracter na primeira posicao
+        if(Character.isLetter(bibtexkey.charAt(0)) && (bibtexkey.length() > 1) ){
+            return bibtexkey;
+        }
+        /*
+        caso a string Bibtexkey nao esteja correta, é exibida uma mensagem de 
+        erro e é gerada uma string automaticamente usando concat()
+        */
+        JOptionPane.showMessageDialog(null, "A Bibtexkey " + bibtexkey + " não "
+                    + "pode ser inserida. \n Uma chave foi criada automaticamente.");
+        if (flag){
+            return "Article".concat(this.getId());
+        }
+        return "Book".concat(this.getId());
+        
+    }
     /**
      * Internal method used to get the content of a field (or its alias)
      *
@@ -460,7 +527,26 @@ public class BibEntry implements Cloneable {
         if (BibEntry.ID_FIELD.equals(fieldName)) {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
-
+        
+        //Verificacao se ano eh valido
+        if (name.equals("year")){
+            if (!numerico(value)){
+                value = null;
+            }
+            else{
+                value = validaAno(value);            
+                if (value.equals("-1")){
+                    value = null;
+                }
+            }                            
+        }
+        
+        //verifica se o BibTexKey eh valido
+        if (name.equals("bibtexkey")){
+            value = verificaBibtexkey(value, true);
+        }
+        
+        
         changed = true;
 
         fields.put(fieldName, value.intern());
