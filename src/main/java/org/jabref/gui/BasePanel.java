@@ -1174,7 +1174,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 return be;
             } catch (KeyCollisionException ex) {
-                Logger.info(this, ex.getMessage(), ex);
+                Logger.info(this, "%[exception]s", ex);
             }
         }
         return null;
