@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.eventbus.Subscribe;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
@@ -32,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.jabref.model.entry.event.EntryChangedEvent;
 
 public class SourceTab extends EntryEditorTab {
 
@@ -40,12 +43,28 @@ public class SourceTab extends EntryEditorTab {
     private final BibEntry entry;
     private CodeArea codeArea;
 
-    public SourceTab(BibDatabaseMode mode, BibEntry entry) {
-        this.mode = mode;
+    public SourceTab(BibDatabaseContext context, BibEntry entry) {
+        this.mode = context.getMode();
         this.entry = entry;
+        context.getDatabase().registerListener(this);
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
+    }
+
+    @Subscribe
+    public void listen(EntryChangedEvent event){
+        if(this.entry.equals(event.getBibEntry())) {
+            try {
+                codeArea.clear();
+                codeArea.appendText(getSourceString(entry, mode));
+            } catch (IOException ex) {
+                codeArea.appendText(ex.getMessage() + "\n\n" +
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                codeArea.setEditable(false);
+                LOGGER.debug("Incorrect entry", ex);
+            }
+        }
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
