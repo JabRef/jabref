@@ -70,7 +70,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            Logger.info(this, "Unable to configure drag and drop for main table", e);
+            Logger.info(this, "Unable to configure drag and drop for main table: %[exception]s", e);
         }
     }
 

@@ -107,7 +107,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                             sb.append((char) c);
                         }
                     } catch (IOException e) {
-                        Logger.warn(this, "Could not read from stderr.", e);
+                        Logger.warn(this, "Could not read from stderr.: %[exception]s", e);
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
@@ -115,7 +115,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
                         couldNotConnect = true;
                     }
                 } catch (IOException e) {
-                    Logger.warn(this, "File problem.", e);
+                    Logger.warn(this, "File problem.: %[exception]s", e);
                 }
             });
         } catch (IOException excep) {

@@ -103,7 +103,7 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
             try {
                 SwingUtilities.invokeAndWait(() -> setBackground(color));
             } catch (InvocationTargetException | InterruptedException e) {
-                Logger.info(this, "Problem setting background color", e);
+                Logger.info(this, "Problem setting background color: %[exception]s", e);
             }
         }
 

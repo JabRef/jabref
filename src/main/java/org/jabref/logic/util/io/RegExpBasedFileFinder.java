@@ -240,7 +240,7 @@ class RegExpBasedFileFinder implements FileFinder {
                         }
                     });
                 } catch (IOException e) {
-                    Logger.debug(this, "I/O issues", e);
+                    Logger.debug(this, "I/O issues: %[exception]s", e);
                 }
             } // End process directory information
         }
@@ -256,7 +256,7 @@ class RegExpBasedFileFinder implements FileFinder {
                     .collect(Collectors.toList());
             res.addAll(matches);
         } catch (IOException e) {
-            Logger.debug(this, "I/O issues", e);
+            Logger.debug(this, "I/O issues: %[exception]s", e);
         }
         return res;
     }

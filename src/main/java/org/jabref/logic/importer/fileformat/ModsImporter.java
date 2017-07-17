@@ -108,7 +108,7 @@ public class ModsImporter extends Importer implements Parser {
                 Logger.warn(this, "Not expected root element found");
             }
         } catch (JAXBException e) {
-            Logger.debug(this, "could not parse document", e);
+            Logger.debug(this, "could not parse document: %[exception]s", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);

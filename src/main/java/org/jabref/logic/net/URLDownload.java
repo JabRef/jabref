@@ -133,7 +133,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (Exception e) {
-            Logger.debug(this, "Error getting MIME type of URL via HEAD request", e);
+            Logger.debug(this, "Error getting MIME type of URL via HEAD request: %[exception]s", e);
         }
 
         // Use GET request as alternative if no HEAD request is available
@@ -143,7 +143,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (Exception e) {
-            Logger.debug(this, "Error getting MIME type of URL via GET request", e);
+            Logger.debug(this, "Error getting MIME type of URL via GET request: %[exception]s", e);
         }
 
         // Try to resolve local URIs
@@ -155,7 +155,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (IOException e) {
-            Logger.debug(this, "Error trying to get MIME type of local URI", e);
+            Logger.debug(this, "Error trying to get MIME type of local URI: %[exception]s", e);
         }
 
         return "";
@@ -220,7 +220,7 @@ public class URLDownload {
         try {
             return cookieManager.getCookieStore().get(this.source.toURI());
         } catch (URISyntaxException e) {
-            Logger.error(this, "Unable to convert download URL to URI", e);
+            Logger.error(this, "Unable to convert download URL to URI: %[exception]s", e);
             return Collections.emptyList();
         }
     }
@@ -234,7 +234,7 @@ public class URLDownload {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            Logger.warn(this, "Could not copy input", e);
+            Logger.warn(this, "Could not copy input: %[exception]s", e);
             throw e;
         }
     }

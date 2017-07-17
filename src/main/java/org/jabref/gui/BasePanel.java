@@ -539,7 +539,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
-                    Logger.info(this, "Could not open folder", e);
+                    Logger.info(this, "Could not open folder: %[exception]s", e);
                 }
             }
         }));
@@ -944,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                         .getLayoutFromText();
             } catch (IOException e) {
-                Logger.info(this, "Could not get layout", e);
+                Logger.info(this, "Could not get layout: %[exception]s", e);
                 return;
             }
 
@@ -1611,7 +1611,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 SwingUtilities.invokeAndWait(() -> markBasedChangedInternal());
             } catch (InvocationTargetException | InterruptedException e) {
-                Logger.info(this, "Problem marking database as changed", e);
+                Logger.info(this, "Problem marking database as changed: %[exception]s", e);
             }
         }
     }
@@ -2200,7 +2200,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
-                            Logger.info(this, "Could not open link", e);
+                            Logger.info(this, "Could not open link: %[exception]s", e);
                         }
                     }
                 }

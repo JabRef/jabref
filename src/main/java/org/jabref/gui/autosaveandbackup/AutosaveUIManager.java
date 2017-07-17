@@ -25,7 +25,7 @@ public class AutosaveUIManager {
         try {
             new SaveDatabaseAction(panel).runCommand();
         } catch (Throwable e) {
-            Logger.error(this, "Problem occured while saving.", e);
+            Logger.error(this, "Problem occured while saving.: %[exception]s", e);
         }
     }
 }

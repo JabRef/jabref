@@ -58,7 +58,7 @@ public class StyleLoader {
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
-                Logger.info(this, "External style file " + filename + " already existing.");
+                Logger.info(this, "External style file %s already existing.", filename);
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
@@ -68,9 +68,9 @@ public class StyleLoader {
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            Logger.info(this, "Cannot find external style file " + filename, e);
+            Logger.info(this, "Cannot find external style file %s: %[exception]s", filename, e);
         } catch (IOException e) {
-            Logger.info(this, "Problem reading external style file " + filename, e);
+            Logger.info(this, "Problem reading external style file %s: %[exception]s", filename, e);
         }
         return false;
 

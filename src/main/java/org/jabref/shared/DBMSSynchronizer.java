@@ -246,7 +246,7 @@ public class DBMSSynchronizer {
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: ", e);
+            Logger.error(this, "SQL Error: %[exception]s", e);
         }
     }
 
@@ -261,7 +261,7 @@ public class DBMSSynchronizer {
         try {
             MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
-            Logger.error(this, "Parse error", e);
+            Logger.error(this, "Parse error: %[exception]s", e);
         }
     }
 
@@ -275,7 +275,7 @@ public class DBMSSynchronizer {
         try {
             dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: ", e);
+            Logger.error(this, "SQL Error: %[exception]s", e);
         }
     }
 
@@ -294,7 +294,7 @@ public class DBMSSynchronizer {
                 } catch (OfflineLockException exception) {
                     eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
                 } catch (SQLException e) {
-                    Logger.error(this, "SQL Error: ", e);
+                    Logger.error(this, "SQL Error: %[exception]s", e);
                 }
             }
         }
@@ -327,7 +327,7 @@ public class DBMSSynchronizer {
             return isValid;
 
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error:", e);
+            Logger.error(this, "SQL Error: %[exception]s", e);
             return false;
         }
     }
@@ -361,7 +361,7 @@ public class DBMSSynchronizer {
             dbmsProcessor.stopNotificationListener();
             currentConnection.close();
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error:", e);
+            Logger.error(this, "SQL Error: %[exception]s", e);
         }
     }
 

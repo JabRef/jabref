@@ -141,7 +141,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
             JabRefDesktop.openBrowser(url);
         } catch (IOException e) {
             dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
-            Logger.error(this, "Could not open default browser.", e);
+            Logger.error(this, "Could not open default browser.: %[exception]s", e);
         }
     }
 

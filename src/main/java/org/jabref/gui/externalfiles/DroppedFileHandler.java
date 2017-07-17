@@ -228,7 +228,7 @@ public class DroppedFileHandler {
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
-            Logger.warn(this, "Problem reading XMP", e);
+            Logger.warn(this, "Problem reading XMP: %[exception]s", e);
             return false;
         }
 
@@ -491,7 +491,7 @@ public class DroppedFileHandler {
                     Files.createDirectories(destFile);
                 }
             } catch (IOException e) {
-                Logger.error(this, "Problem creating target directories", e);
+                Logger.error(this, "Problem creating target directories: %[exception]s", e);
             }
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
@@ -555,7 +555,7 @@ public class DroppedFileHandler {
             }
             FileUtil.copyFile(Paths.get(fileName), destFile, true);
         } catch (IOException e) {
-            Logger.error(this, "Problem copying file", e);
+            Logger.error(this, "Problem copying file: %[exception]s", e);
             return false;
         }
         return true;

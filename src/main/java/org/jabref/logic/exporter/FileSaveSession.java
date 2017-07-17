@@ -113,7 +113,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            Logger.warn(this, "Cannot delete temporary file", e);
+            Logger.warn(this, "Cannot delete temporary file: %[exception]s", e);
         }
     }
 
@@ -122,7 +122,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            Logger.warn(this, "Cannot delete temporary file", e);
+            Logger.warn(this, "Cannot delete temporary file: %[exception]s", e);
         }
     }
 }

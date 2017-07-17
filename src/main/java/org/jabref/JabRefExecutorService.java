@@ -59,7 +59,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                Logger.error(this, "Problem executing command", e);
+                Logger.error(this, "Problem executing command: %[exception]s", e);
             }
         }
     }
@@ -78,7 +78,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                Logger.error(this, "Problem executing command", e);
+                Logger.error(this, "Problem executing command: %[exception]s", e);
                 return false;
             }
         }
@@ -106,7 +106,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                Logger.error(this, "Problem executing command", e);
+                Logger.error(this, "Problem executing command: %[exception]s", e);
             }
         }
     }

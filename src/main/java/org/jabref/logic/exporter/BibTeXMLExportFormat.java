@@ -215,7 +215,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                         break;
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    Logger.error(this, "Could not invoke method", e);
+                    Logger.error(this, "Could not invoke method: %[exception]s", e);
                 }
             }
 

@@ -171,7 +171,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 try {
                     style.ensureUpToDate();
                 } catch (IOException e) {
-                    Logger.warn(this, "Unable to reload style file '" + style.getPath() + "'", e);
+                    Logger.warn(this, "Unable to reload style file '" + style.getPath() + "': %[exception]s", e);
                 }
                 frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
             });
@@ -345,7 +345,7 @@ public class OpenOfficePanel extends AbstractWorker {
         } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                 UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
                 CreationException e) {
-            Logger.warn(this, "Problem generating new database.", e);
+            Logger.warn(this, "Problem generating new database.: %[exception]s", e);
         }
 
     }
@@ -412,12 +412,12 @@ public class OpenOfficePanel extends AbstractWorker {
             exportCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
-            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice", e);
+            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice: %[exception]s", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
         } catch (IOException e) {
-            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice", e);
+            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice: %[exception]s", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"

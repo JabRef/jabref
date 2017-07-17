@@ -649,7 +649,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 new MacAdapter().registerMacEvents(this);
             } catch (Exception e) {
-                Logger.error(this, "Could not interface with Mac OS X methods.", e);
+                Logger.error(this, "Could not interface with Mac OS X methods.: %[exception]s", e);
             }
         }
 
@@ -1683,7 +1683,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             try {
                 SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
             } catch (InvocationTargetException | InterruptedException e) {
-                Logger.error(this, "Problem " + (blocked ? "" : "un") + "blocking UI", e);
+                Logger.error(this, "Problem " + (blocked ? "" : "un") + "blocking UI: %[exception]s", e);
             }
         }
     }

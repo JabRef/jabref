@@ -55,7 +55,7 @@ public class OpenHyperlinksInExternalBrowser implements ChangeListener<Worker.St
         try {
             JabRefDesktop.openBrowser(href);
         } catch (IOException e) {
-            Logger.error(this, "error at open browser", e);
+            Logger.error(this, "error at open browser: %[exception]s", e);
         }
         event.preventDefault();
     }

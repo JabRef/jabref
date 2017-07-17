@@ -192,7 +192,7 @@ public class SourceTab extends EntryEditorTab {
                 try {
                     codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
                 } catch (IOException e) {
-                    Logger.debug(this, "Incorrect source", e);
+                    Logger.debug(this, "Incorrect source: %[exception]s", e);
                 }
             }
         }

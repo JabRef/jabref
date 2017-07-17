@@ -48,7 +48,7 @@ public class PreviewPanelTransferHandler extends FileListEditorTransferHandler {
             try {
                 editorPane.getEditorKit().write(stringWriter, editorPane.getDocument(), editorPane.getSelectionStart(), editorPane.getSelectionEnd());
             } catch (BadLocationException | IOException e) {
-                Logger.warn(this, "Cannot write preview", e);
+                Logger.warn(this, "Cannot write preview: %[exception]s", e);
             }
 
             // Second, return the HTML (and text as fallback)

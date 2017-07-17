@@ -145,7 +145,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
                 try {
                     new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
                 } catch (Throwable e) {
-                    Logger.error(this, "Error while saving the database", e);
+                    Logger.error(this, "Error while saving the database: %[exception]s", e);
                 }
             }
 
@@ -252,7 +252,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
                 passwordField.setText(
                         new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                Logger.error(this, "Could not read the password due to decryption problems.", e);
+                Logger.error(this, "Could not read the password due to decryption problems.: %[exception]s", e);
             }
         }
 
@@ -400,7 +400,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
             try {
                 prefs.setPassword(new Password(passwordField.getPassword(), userField.getText()).encrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                Logger.error(this, "Could not store the password due to encryption problems.", e);
+                Logger.error(this, "Could not store the password due to encryption problems.: %[exception]s", e);
             }
         } else {
             prefs.clearPassword(); // for the case that the password is already set

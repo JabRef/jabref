@@ -122,7 +122,7 @@ public class DBMSConnectionProperties {
                 try {
                     this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
                 } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                    Logger.error(this, "Could not decrypt password", e);
+                    Logger.error(this, "Could not decrypt password: %[exception]s", e);
                 }
             }
         }

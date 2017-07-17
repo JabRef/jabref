@@ -86,7 +86,7 @@ public class OAI2Fetcher implements EntryFetcher {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             saxParser = parserFactory.newSAXParser();
         } catch (ParserConfigurationException | SAXException e) {
-            Logger.error(this, "Error creating SAXParser for OAI2Fetcher", e);
+            Logger.error(this, "Error creating SAXParser for OAI2Fetcher: %[exception]s", e);
         }
     }
 

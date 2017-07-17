@@ -34,7 +34,7 @@ public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Vo
             List<BibEntry> fetchedEntries = fetcher.performSearch(entry);
             return fetchedEntries.stream().findFirst();
         } catch (FetcherException e) {
-            Logger.error(this, "Info cannot be found", e);
+            Logger.error(this, "Info cannot be found: %[exception]s", e);
             return Optional.empty();
         }
     }
@@ -55,7 +55,7 @@ public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Vo
                 panel.frame().setStatus(Localization.lang("Could not find any bibliographic information."));
             }
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "Error while fetching Entry", e);
+            Logger.error(this, "Error while fetching Entry: %[exception]s", e);
         }
     }
 

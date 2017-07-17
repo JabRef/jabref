@@ -44,7 +44,7 @@ public class RemoteListenerServer implements Runnable {
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
-                    Logger.warn(this, "RemoteListenerServer crashed", e);
+                    Logger.warn(this, "RemoteListenerServer crashed: %[exception]s", e);
                 }
             }
         } finally {

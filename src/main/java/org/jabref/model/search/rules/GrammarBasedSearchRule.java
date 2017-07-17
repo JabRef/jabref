@@ -94,7 +94,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         try {
             return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, bibEntry).visit(tree);
         } catch (Exception e) {
-            Logger.debug(this, "Search failed", e);
+            Logger.debug(this, "Search failed: %[exception]s", e);
             return false;
         }
     }
@@ -105,7 +105,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             init(query);
             return true;
         } catch (ParseCancellationException e) {
-            Logger.debug(this, "Search query invalid", e);
+            Logger.debug(this, "Search query invalid: %[exception]s", e);
             return false;
         }
     }

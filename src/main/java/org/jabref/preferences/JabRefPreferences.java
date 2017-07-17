@@ -1210,7 +1210,7 @@ public class JabRefPreferences implements PreferencesService {
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
-            Logger.info(this, "Updating stored custom entry types failed.", e);
+            Logger.info(this, "Updating stored custom entry types failed.: %[exception]s", e);
         }
     }
 
@@ -1223,7 +1223,7 @@ public class JabRefPreferences implements PreferencesService {
                     .filter(Objects::nonNull)
                     .forEach(typeString -> CustomEntryType.parse(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
-            Logger.info(this, "Parsing customized entry types failed.", e);
+            Logger.info(this, "Parsing customized entry types failed.: %[exception]s", e);
         }
         return storedEntryTypes;
     }
@@ -1247,7 +1247,7 @@ public class JabRefPreferences implements PreferencesService {
                 result.put(key, value);
             }
         } catch (BackingStoreException e) {
-            Logger.info(this, "could not retrieve preference keys", e);
+            Logger.info(this, "could not retrieve preference keys: %[exception]s", e);
         }
         return result;
     }

@@ -126,7 +126,7 @@ public class SharedDatabasePreferences {
         try {
             setPassword(new Password(properties.getPassword().toCharArray(), properties.getUser()).encrypt());
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            Logger.error(this, "Could not store the password due to encryption problems.", e);
+            Logger.error(this, "Could not store the password due to encryption problems.: %[exception]s", e);
         }
     }
 }

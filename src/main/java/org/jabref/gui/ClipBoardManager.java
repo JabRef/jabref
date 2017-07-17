@@ -57,7 +57,7 @@ public class ClipBoardManager implements ClipboardOwner {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
                 //highly unlikely since we are using a standard DataFlavor
-                Logger.info(this, "problem with getting clipboard contents", e);
+                Logger.info(this, "problem with getting clipboard contents: %[exception]s", e);
             }
         }
         return result;

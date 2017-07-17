@@ -172,7 +172,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                     String address = hyperlinkEvent.getURL().toString();
                     JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
-                    Logger.warn(this, "Could not open external viewer", e);
+                    Logger.warn(this, "Could not open external viewer: %[exception]s", e);
                 }
             }
         });
@@ -227,7 +227,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                             .getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
-            Logger.debug(this, "no layout could be set", e);
+            Logger.debug(this, "no layout could be set: %[exception]s", e);
         }
     }
 
@@ -355,7 +355,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                     JOptionPane.showMessageDialog(PreviewPanel.this,
                             Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
                             Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
-                    Logger.info(this, "Could not print preview", e);
+                    Logger.info(this, "Could not print preview: %[exception]s", e);
                 }
             });
         }

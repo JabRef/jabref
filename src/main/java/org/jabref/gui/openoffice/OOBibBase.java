@@ -165,7 +165,7 @@ class OOBibBase {
                 return Optional
                         .of(String.valueOf(OOUtil.getProperty(mxDoc.getCurrentController().getFrame(), "Title")));
             } catch (UnknownPropertyException | WrappedTargetException e) {
-                Logger.warn(this, "Could not get document title", e);
+                Logger.warn(this, "Could not get document title: %[exception]s", e);
                 return Optional.empty();
             }
         }

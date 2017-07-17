@@ -46,7 +46,7 @@ public class FetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
                 return Optional.empty();
             }
         } catch (FetcherException e) {
-            Logger.error(this, "Info cannot be found", e);
+            Logger.error(this, "Info cannot be found: %[exception]s", e);
             return Optional.empty();
         }
     }
@@ -67,7 +67,7 @@ public class FetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
                 panel.frame().setStatus(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
             }
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "Error while fetching Entry", e);
+            Logger.error(this, "Error while fetching Entry: %[exception]s", e);
         }
     }
 

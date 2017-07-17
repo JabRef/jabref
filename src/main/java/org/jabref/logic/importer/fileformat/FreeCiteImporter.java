@@ -69,7 +69,7 @@ public class FreeCiteImporter extends Importer {
         try {
             urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            Logger.warn(this, "Unsupported encoding", e);
+            Logger.warn(this, "Unsupported encoding: %[exception]s", e);
         }
 
         // Send the request
@@ -79,10 +79,10 @@ public class FreeCiteImporter extends Importer {
             url = new URL("http://freecite.library.brown.edu/citations/create");
             conn = url.openConnection();
         } catch (MalformedURLException e) {
-            Logger.warn(this, "Bad URL", e);
+            Logger.warn(this, "Bad URL: %[exception]s", e);
             return new ParserResult();
         } catch (IOException e) {
-            Logger.warn(this, "Could not download", e);
+            Logger.warn(this, "Could not download: %[exception]s", e);
             return new ParserResult();
         }
         try {
@@ -95,9 +95,9 @@ public class FreeCiteImporter extends Importer {
             writer.write(data);
             writer.flush();
         } catch (IllegalStateException e) {
-            Logger.warn(this, "Already connected.", e);
+            Logger.warn(this, "Already connected.: %[exception]s", e);
         } catch (IOException e) {
-            Logger.warn(this, "Unable to connect to FreeCite online service.", e);
+            Logger.warn(this, "Unable to connect to FreeCite online service.: %[exception]s", e);
             return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();

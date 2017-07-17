@@ -50,7 +50,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            Logger.info(this, "Unable to configure drag and drop for file link table", e);
+            Logger.info(this, "Unable to configure drag and drop for file link table: %[exception]s", e);
         }
     }
 

@@ -185,7 +185,7 @@ class OOCalcDatabase {
 
             result.appendChild(collection);
         } catch (Exception e) {
-            Logger.warn(this, "Exception caught...", e);
+            Logger.warn(this, "Exception caught...: %[exception]s", e);
         }
         return result;
     }

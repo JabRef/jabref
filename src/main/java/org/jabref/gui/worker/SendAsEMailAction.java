@@ -69,7 +69,7 @@ public class SendAsEMailAction extends AbstractWorker {
             try {
                 bibtexEntryWriter.write(entry, sw, panel.getBibDatabaseContext().getMode());
             } catch (IOException e) {
-                Logger.warn(this, "Problem creating BibTeX file for mailing.", e);
+                Logger.warn(this, "Problem creating BibTeX file for mailing.: %[exception]s", e);
             }
         }
 
@@ -87,7 +87,7 @@ public class SendAsEMailAction extends AbstractWorker {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
-                    Logger.debug(this, "Cannot open file", e);
+                    Logger.debug(this, "Cannot open file: %[exception]s", e);
                 }
             }
         }
