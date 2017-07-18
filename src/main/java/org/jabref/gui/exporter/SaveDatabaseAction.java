@@ -331,12 +331,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         try {
             final Path oldFile = context.getDatabasePath().get();
             context.setDatabaseFile(oldFile.toFile());
+            //closing AutosaveManager and BackupManager for original library
+            AutosaveManager.shutdown(context);
+            BackupManager.shutdown(context);
         } catch (NoSuchElementException e) {
             LOGGER.info("Old file not found, just creating a new file", e);
         }
-        //closing AutosaveManager and BackupManager for original library
-        AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context);
+
         context.setDatabaseFile(file);
 
         // Register so we get notifications about outside changes to the file.
