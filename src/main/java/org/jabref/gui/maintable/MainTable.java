@@ -27,6 +27,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.GUIGlobals;
@@ -59,7 +60,6 @@ import ca.odell.glazedlists.matchers.Matcher;
 import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import com.jcabi.log.Logger;
 
 public class MainTable extends JTable {
     private static GeneralRenderer defRenderer;

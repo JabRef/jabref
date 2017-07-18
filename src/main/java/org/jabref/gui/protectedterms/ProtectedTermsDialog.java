@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
@@ -56,7 +57,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

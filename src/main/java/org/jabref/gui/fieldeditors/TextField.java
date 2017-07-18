@@ -1,4 +1,5 @@
 package org.jabref.gui.fieldeditors;
+
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
@@ -12,11 +13,10 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
-
-import com.jcabi.log.Logger;
 
 /**
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the

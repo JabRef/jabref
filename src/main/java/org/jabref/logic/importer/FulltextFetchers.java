@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.DoiResolution;
@@ -17,8 +18,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
-
-import com.jcabi.log.Logger;
 
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.

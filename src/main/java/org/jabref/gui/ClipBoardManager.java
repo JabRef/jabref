@@ -14,14 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
-
-import com.jcabi.log.Logger;
 
 public class ClipBoardManager implements ClipboardOwner {
 

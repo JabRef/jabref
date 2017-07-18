@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
+import org.jabref.Logger;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
@@ -26,8 +27,6 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.PreferencesService;
-
-import com.jcabi.log.Logger;
 
 /**
  * This class provides a model for managing journal abbreviation lists.

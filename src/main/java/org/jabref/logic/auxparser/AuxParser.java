@@ -12,11 +12,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 /**
  * LaTeX Aux to BibTeX Parser

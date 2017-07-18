@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
@@ -18,8 +19,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class PushToVim extends AbstractPushToApplication implements PushToApplication {
 

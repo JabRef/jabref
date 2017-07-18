@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.

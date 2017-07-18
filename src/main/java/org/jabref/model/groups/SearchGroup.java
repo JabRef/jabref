@@ -2,10 +2,9 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
-
-import com.jcabi.log.Logger;
 
 /**
  * This group matches entries by a complex search pattern, which might include conditions about the values of

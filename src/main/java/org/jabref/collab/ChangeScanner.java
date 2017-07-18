@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -38,8 +39,6 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
-
-import com.jcabi.log.Logger;
 
 public class ChangeScanner implements Runnable {
 

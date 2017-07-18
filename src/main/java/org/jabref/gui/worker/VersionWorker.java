@@ -10,12 +10,11 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.NewVersionDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
-
-import com.jcabi.log.Logger;
 
 
 /**

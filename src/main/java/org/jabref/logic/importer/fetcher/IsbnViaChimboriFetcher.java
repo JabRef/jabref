@@ -6,12 +6,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntry;
 
-import com.jcabi.log.Logger;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;

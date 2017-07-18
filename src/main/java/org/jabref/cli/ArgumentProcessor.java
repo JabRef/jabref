@@ -15,6 +15,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
+import org.jabref.Logger;
 import org.jabref.gui.externalfiles.AutoSetLinks;
 import org.jabref.gui.importer.fetcher.EntryFetcher;
 import org.jabref.gui.importer.fetcher.EntryFetchers;
@@ -52,7 +53,6 @@ import org.jabref.preferences.SearchPreferences;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.google.common.base.Throwables;
-import com.jcabi.log.Logger;
 
 public class ArgumentProcessor {
 

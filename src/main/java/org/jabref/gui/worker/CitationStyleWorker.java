@@ -7,13 +7,12 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 
 /**

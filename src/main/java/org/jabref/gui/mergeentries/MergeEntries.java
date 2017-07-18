@@ -28,6 +28,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -40,7 +41,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;

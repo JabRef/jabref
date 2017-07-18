@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
@@ -14,7 +15,6 @@ import org.jabref.logic.importer.util.JSONEntryParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import com.jcabi.log.Logger;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;

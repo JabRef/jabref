@@ -7,6 +7,7 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.JabRefFrame;
@@ -14,8 +15,6 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class MarkEntriesAction extends AbstractWorker implements ActionListener {
 

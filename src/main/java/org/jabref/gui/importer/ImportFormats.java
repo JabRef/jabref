@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javafx.stage.FileChooser;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
@@ -28,8 +29,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class ImportFormats {
 

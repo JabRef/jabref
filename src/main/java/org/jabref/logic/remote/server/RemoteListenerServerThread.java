@@ -2,7 +2,7 @@ package org.jabref.logic.remote.server;
 
 import java.io.IOException;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 /**
  * This thread wrapper is required to be able to interrupt the remote listener while listening on a port.

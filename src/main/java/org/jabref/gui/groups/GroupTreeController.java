@@ -31,6 +31,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+import org.jabref.Logger;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -41,7 +42,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
-import com.jcabi.log.Logger;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;

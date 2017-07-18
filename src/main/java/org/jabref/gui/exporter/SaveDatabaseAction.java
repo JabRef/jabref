@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.collab.ChangeScanner;
 import org.jabref.collab.FileUpdatePanel;
 import org.jabref.gui.BasePanel;
@@ -42,7 +43,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
@@ -315,7 +315,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
         Path oldFile = context.getDatabasePath().get();
-        
+
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
             DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor()
@@ -334,12 +334,12 @@ public class SaveDatabaseAction extends AbstractWorker {
             return;
         }
 
-        //closing AutosaveManager and BackupManager for original library 
+        //closing AutosaveManager and BackupManager for original library
         context.setDatabaseFile(oldFile.toFile());
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context);
         context.setDatabaseFile(file);
-        
+
         // Register so we get notifications about outside changes to the file.
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,

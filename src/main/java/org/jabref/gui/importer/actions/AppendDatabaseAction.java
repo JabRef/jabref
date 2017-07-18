@@ -10,6 +10,7 @@ import javax.swing.undo.CompoundEdit;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -39,7 +40,6 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class AppendDatabaseAction implements BaseAction {

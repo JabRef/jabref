@@ -26,11 +26,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-
-import com.jcabi.log.Logger;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.

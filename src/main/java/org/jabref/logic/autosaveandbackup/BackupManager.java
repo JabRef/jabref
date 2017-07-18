@@ -15,11 +15,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
@@ -27,7 +27,6 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 /**

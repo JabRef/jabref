@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -17,8 +18,6 @@ import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 class EntryChange extends Change {
 

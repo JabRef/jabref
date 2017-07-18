@@ -97,6 +97,10 @@ public class Logger {
         com.jcabi.log.Logger.info(source, msg);
     }
 
+    public static void info(final Object source, final Throwable e) {
+        com.jcabi.log.Logger.info(source, "%[exception]s", e);
+    }
+
     public static void info(
             final Object source,
             final String msg, final Throwable e, final Object... args

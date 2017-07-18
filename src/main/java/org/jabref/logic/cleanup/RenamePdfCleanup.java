@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.Logger;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -22,8 +23,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
-
-import com.jcabi.log.Logger;
 
 public class RenamePdfCleanup implements CleanupJob {
 

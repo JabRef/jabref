@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -36,7 +37,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

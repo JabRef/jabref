@@ -17,12 +17,11 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.util.component.JTextAreaWithPlaceholder;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class JTextAreaWithHighlighting extends JTextAreaWithPlaceholder implements SearchQueryHighlightListener {
 

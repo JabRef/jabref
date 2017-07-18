@@ -9,13 +9,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
-import com.jcabi.log.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

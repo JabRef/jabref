@@ -9,14 +9,13 @@ import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
-
-import com.jcabi.log.Logger;
 
 /**
  * The menu item used in the popup menu for opening external resources associated

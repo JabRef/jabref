@@ -11,9 +11,8 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.LayeredHighlighter.LayerPainter;
 
+import org.jabref.Logger;
 import org.jabref.logic.search.SearchQueryHighlightListener;
-
-import com.jcabi.log.Logger;
 
 public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQueryHighlightListener {
 

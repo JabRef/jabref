@@ -6,9 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.jabref.Logger;
 import org.jabref.logic.remote.shared.Protocol;
-
-import com.jcabi.log.Logger;
 
 public class RemoteListenerServer implements Runnable {
 

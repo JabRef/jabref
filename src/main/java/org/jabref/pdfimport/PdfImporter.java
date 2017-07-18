@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.EntryTypeDialog;
@@ -36,8 +37,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class PdfImporter {
 

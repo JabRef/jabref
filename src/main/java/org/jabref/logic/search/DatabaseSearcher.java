@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 /**
  * @author Silberer, Zirn

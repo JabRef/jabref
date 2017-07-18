@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.worker.AbstractWorker;
@@ -25,8 +26,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class ExportAction {
 

@@ -4,9 +4,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.jabref.Logger;
 import org.jabref.shared.listener.OracleNotificationListener;
 
-import com.jcabi.log.Logger;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;
 import oracle.jdbc.dcn.DatabaseChangeRegistration;

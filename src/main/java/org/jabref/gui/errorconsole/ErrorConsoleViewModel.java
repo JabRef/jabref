@@ -13,6 +13,7 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.ObservableList;
 
+import org.jabref.Logger;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -22,7 +23,6 @@ import org.jabref.logic.logging.LogMessages;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 
-import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.logging.log4j.core.LogEvent;
 import org.fxmisc.easybind.EasyBind;

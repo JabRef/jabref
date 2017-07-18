@@ -3,6 +3,7 @@ package org.jabref.logic.pdf;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
@@ -10,7 +11,6 @@ import org.jabref.model.pdf.FileAnnotation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.jcabi.log.Logger;
 
 public class FileAnnotationCache {
 

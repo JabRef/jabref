@@ -7,9 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 /**
  * Class for working with Eprint identifiers

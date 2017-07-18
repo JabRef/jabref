@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -32,7 +33,6 @@ import org.jabref.shared.exception.OfflineLockException;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 
 /**
  * Synchronizes the shared or local databases with their opposite side.

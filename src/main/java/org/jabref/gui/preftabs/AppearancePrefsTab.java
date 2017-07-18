@@ -17,12 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
+import org.jabref.Logger;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

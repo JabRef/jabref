@@ -36,6 +36,7 @@ import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.Logger;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -78,8 +79,6 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 public class JabRefPreferences implements PreferencesService {
 

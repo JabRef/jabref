@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -13,8 +14,6 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 /**
  * Wrapper around {@link SearchBasedFetcher} which implements the old {@link EntryFetcher} interface.

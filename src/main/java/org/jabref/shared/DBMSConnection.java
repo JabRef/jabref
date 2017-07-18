@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class DBMSConnection {

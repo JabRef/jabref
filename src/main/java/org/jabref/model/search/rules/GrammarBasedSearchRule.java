@@ -8,13 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchLexer;
 import org.jabref.search.SearchParser;
 
-import com.jcabi.log.Logger;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BailErrorStrategy;
 import org.antlr.v4.runtime.BaseErrorListener;

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
@@ -16,7 +17,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import com.jcabi.log.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;

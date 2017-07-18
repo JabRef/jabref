@@ -1,11 +1,10 @@
 package org.jabref.logic.layout.format;
 
+import org.jabref.Logger;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 /**
  * Transform a LaTeX-String to RTF.

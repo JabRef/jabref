@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -19,8 +20,6 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 

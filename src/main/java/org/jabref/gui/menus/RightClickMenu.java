@@ -17,6 +17,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryMarker;
 import org.jabref.gui.IconTheme;
@@ -37,8 +38,6 @@ import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
-
-import com.jcabi.log.Logger;
 
 public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 

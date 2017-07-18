@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.NamedCompound;
@@ -14,8 +15,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
-
-import com.jcabi.log.Logger;
 
 public class LookupIdentifiersWorker<T extends Identifier> extends AbstractWorker {
 

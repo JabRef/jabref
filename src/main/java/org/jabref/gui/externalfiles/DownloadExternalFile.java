@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -25,8 +26,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 /**
  * This class handles the download of an external file. Typically called when the user clicks

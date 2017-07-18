@@ -10,9 +10,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.OS;
-
-import com.jcabi.log.Logger;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 

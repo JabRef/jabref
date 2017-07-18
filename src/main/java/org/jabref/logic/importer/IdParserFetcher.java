@@ -11,11 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
-
-import com.jcabi.log.Logger;
 
 /**
  * Provides a convenient interface for {@link IdFetcher}, which follow the usual three-step procedure:

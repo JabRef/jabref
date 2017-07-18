@@ -3,6 +3,7 @@ package org.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertString;
@@ -11,8 +12,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.entry.BibtexString;
-
-import com.jcabi.log.Logger;
 
 class StringNameChange extends Change {
 

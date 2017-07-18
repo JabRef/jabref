@@ -8,13 +8,13 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import com.jcabi.log.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

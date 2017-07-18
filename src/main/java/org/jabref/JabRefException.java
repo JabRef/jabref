@@ -1,7 +1,5 @@
 package org.jabref;
 
-import com.jcabi.log.Logger;
-
 public class JabRefException extends Exception {
 
     private String localizedMessage;

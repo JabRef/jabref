@@ -1,4 +1,5 @@
 package org.jabref.gui.externalfiles;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -8,11 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-
-import com.jcabi.log.Logger;
 
 /**
  *

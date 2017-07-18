@@ -36,11 +36,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.jabref.logic.util.Version;
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
-import com.jcabi.log.Logger;
 import com.mashape.unirest.http.Unirest;
 import org.apache.commons.logging.LogFactory;
 

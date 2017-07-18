@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -25,7 +26,6 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

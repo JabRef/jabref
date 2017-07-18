@@ -20,9 +20,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.OS;
-
-import com.jcabi.log.Logger;
 
 public class KeyBindingRepository {
 

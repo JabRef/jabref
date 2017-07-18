@@ -50,6 +50,7 @@ import javax.swing.table.TableModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -113,7 +114,6 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
 

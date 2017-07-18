@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtex.FieldContentParser;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
@@ -37,8 +38,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
-
-import com.jcabi.log.Logger;
 
 /**
  * Class for importing BibTeX-files.

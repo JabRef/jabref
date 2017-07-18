@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -14,8 +15,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 public class FetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
 

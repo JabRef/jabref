@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.function.Function;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -10,7 +11,6 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class DefaultInjector implements PresenterFactory {

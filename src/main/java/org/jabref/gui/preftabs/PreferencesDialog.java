@@ -23,6 +23,7 @@ import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefException;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.GUIGlobals;
@@ -42,7 +43,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.JabRefPreferencesFilter;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**

@@ -28,6 +28,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -45,7 +46,6 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 
 /**
  * Displays an BibEntry using the given layout format.

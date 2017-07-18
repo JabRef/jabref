@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -15,8 +16,6 @@ import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 /**
  * Imports a New Economics Papers-Message from the REPEC-NEP Service.

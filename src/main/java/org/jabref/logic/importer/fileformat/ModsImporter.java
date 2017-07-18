@@ -20,6 +20,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -59,7 +60,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;
-import com.jcabi.log.Logger;
 
 /**
  * Importer for the MODS format.<br>

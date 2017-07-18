@@ -9,6 +9,7 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
 
+import org.jabref.Logger;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -17,7 +18,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 
 import com.google.common.collect.Lists;
-import com.jcabi.log.Logger;
 
 public class AboutDialogViewModel extends AbstractViewModel {
 

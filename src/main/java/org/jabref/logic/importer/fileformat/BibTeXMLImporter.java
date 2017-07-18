@@ -19,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.bibtexml.Entry;
@@ -28,8 +29,6 @@ import org.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 /**
  * Importer for the BibTeXML format.

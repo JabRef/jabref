@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.exporter.RtfTransferable;
@@ -25,8 +26,6 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreviewPreferences;
-
-import com.jcabi.log.Logger;
 
 /**
  * Copies the selected entries and formats them with the selected citation style (or preview), then it is copied to the clipboard.

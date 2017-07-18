@@ -14,12 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 class RegExpBasedFileFinder implements FileFinder {
 

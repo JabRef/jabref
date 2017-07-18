@@ -32,6 +32,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
@@ -49,7 +50,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

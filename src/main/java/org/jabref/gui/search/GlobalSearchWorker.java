@@ -9,13 +9,12 @@ import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Void> {
 

@@ -31,6 +31,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
@@ -44,7 +45,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import com.jcabi.log.Logger;
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;

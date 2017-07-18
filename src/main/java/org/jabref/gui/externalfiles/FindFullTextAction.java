@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.worker.AbstractWorker;
@@ -20,8 +21,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import com.jcabi.log.Logger;
 
 /**
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.

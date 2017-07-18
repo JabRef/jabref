@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.AuthorAbbreviator;
@@ -79,8 +80,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 class LayoutEntry {
 

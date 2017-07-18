@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.externalfiles.DownloadExternalFile;
@@ -43,8 +44,6 @@ import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 

@@ -9,8 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.jcabi.log.Logger;
-
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
  */

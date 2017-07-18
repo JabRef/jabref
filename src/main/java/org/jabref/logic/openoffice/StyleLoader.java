@@ -9,9 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-
-import com.jcabi.log.Logger;
 
 public class StyleLoader {
 

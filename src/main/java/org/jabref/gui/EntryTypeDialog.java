@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
@@ -41,7 +42,6 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.jdesktop.swingx.VerticalLayout;
 

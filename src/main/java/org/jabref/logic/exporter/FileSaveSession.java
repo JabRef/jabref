@@ -8,10 +8,9 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
-
-import com.jcabi.log.Logger;
 
 /**
  * Class used to handle safe storage to disk.

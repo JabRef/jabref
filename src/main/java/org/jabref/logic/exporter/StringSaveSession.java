@@ -7,7 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 public class StringSaveSession extends SaveSession {
 

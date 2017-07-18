@@ -20,6 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.fileformat.bibtexml.Article;
 import org.jabref.logic.importer.fileformat.bibtexml.Book;
 import org.jabref.logic.importer.fileformat.bibtexml.Booklet;
@@ -38,8 +39,6 @@ import org.jabref.logic.importer.fileformat.bibtexml.Techreport;
 import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 /**
  * Export format for the BibTeXML format.

@@ -11,10 +11,10 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-import com.jcabi.log.Logger;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -59,7 +59,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            Logger.error(this, "Failed to read file '%s'.", path), e;
+            Logger.error(this, "Failed to read file '%s'.", e, path);
         }
         return annotationsList;
     }

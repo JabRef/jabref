@@ -4,8 +4,7 @@ import java.io.IOException;
 import java.net.BindException;
 
 import org.jabref.JabRefExecutorService;
-
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 /**
  * Manages the RemoteListenerServerThread through typical life cycle methods.

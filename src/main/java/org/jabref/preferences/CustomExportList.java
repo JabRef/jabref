@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -15,7 +16,6 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
-import com.jcabi.log.Logger;
 
 /**
  * This class handles user defined custom export formats. They are initially

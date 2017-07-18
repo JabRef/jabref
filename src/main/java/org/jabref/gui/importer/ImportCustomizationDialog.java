@@ -27,6 +27,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
@@ -41,7 +42,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**

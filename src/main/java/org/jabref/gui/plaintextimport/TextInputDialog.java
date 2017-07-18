@@ -59,6 +59,7 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
@@ -88,7 +89,6 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**

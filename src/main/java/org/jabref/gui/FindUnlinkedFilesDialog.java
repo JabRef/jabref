@@ -67,6 +67,7 @@ import javax.swing.tree.TreePath;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
@@ -82,7 +83,6 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 /**

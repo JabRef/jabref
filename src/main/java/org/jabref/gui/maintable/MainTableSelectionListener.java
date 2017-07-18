@@ -21,6 +21,7 @@ import javax.swing.Timer;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.GUIGlobals;
@@ -48,7 +49,6 @@ import org.jabref.preferences.PreviewPreferences;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import com.jcabi.log.Logger;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the

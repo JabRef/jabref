@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.FetcherPreviewDialog;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -41,8 +42,6 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
-
-import com.jcabi.log.Logger;
 
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 

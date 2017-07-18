@@ -22,6 +22,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -78,7 +79,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
-import com.jcabi.log.Logger;
 
 /**
  * Importer for the Medline/Pubmed format.

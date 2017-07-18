@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
@@ -27,7 +28,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 
-import com.jcabi.log.Logger;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;

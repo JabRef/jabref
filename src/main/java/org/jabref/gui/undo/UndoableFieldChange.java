@@ -1,11 +1,10 @@
 package org.jabref.gui.undo;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 /**
  * This class represents a change in any field value. The relevant

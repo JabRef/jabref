@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -45,8 +46,6 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.NotASharedDatabaseException;
-
-import com.jcabi.log.Logger;
 
 // The action concerned with opening an existing database.
 

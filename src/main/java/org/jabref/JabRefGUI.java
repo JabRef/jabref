@@ -35,7 +35,6 @@ import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.exception.NotASharedDatabaseException;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
 

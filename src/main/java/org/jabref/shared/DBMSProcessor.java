@@ -15,11 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.shared.exception.OfflineLockException;
-
-import com.jcabi.log.Logger;
 
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.

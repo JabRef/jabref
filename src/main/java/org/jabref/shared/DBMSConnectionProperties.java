@@ -5,10 +5,9 @@ import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 import org.jabref.shared.security.Password;
-
-import com.jcabi.log.Logger;
 
 /**
  * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.

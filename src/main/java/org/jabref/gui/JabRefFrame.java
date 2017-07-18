@@ -64,6 +64,7 @@ import javax.swing.WindowConstants;
 import javafx.application.Platform;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.actions.AutoLinkFilesAction;
 import org.jabref.gui.actions.ConnectToSharedDatabaseAction;
@@ -143,7 +144,6 @@ import org.jabref.preferences.LastFocusedTabPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import osx.macadapter.MacAdapter;

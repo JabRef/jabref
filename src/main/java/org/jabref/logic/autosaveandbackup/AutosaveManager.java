@@ -9,13 +9,13 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 
 /**
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.

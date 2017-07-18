@@ -16,10 +16,9 @@ import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
-
-import com.jcabi.log.Logger;
 
 class CiteKeyBasedFileFinder implements FileFinder {
 

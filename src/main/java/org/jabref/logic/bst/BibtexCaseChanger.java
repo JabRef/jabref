@@ -3,7 +3,7 @@ package org.jabref.logic.bst;
 import java.util.Locale;
 import java.util.Optional;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 public final class BibtexCaseChanger {
 

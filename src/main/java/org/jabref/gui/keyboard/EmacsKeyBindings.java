@@ -23,9 +23,9 @@ import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
 import javax.swing.text.Utilities;
 
+import org.jabref.Logger;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 /**

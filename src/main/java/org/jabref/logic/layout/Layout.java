@@ -4,11 +4,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 /**
  * Main class for formatting DOCUMENT ME!

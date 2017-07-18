@@ -3,12 +3,11 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.cleanup.Formatter;
-
-import com.jcabi.log.Logger;
 
 public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 

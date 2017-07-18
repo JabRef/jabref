@@ -15,14 +15,13 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.jabref.Logger;
 import org.jabref.gui.EntryContainer;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.model.util.FileHelper;
-
-import com.jcabi.log.Logger;
 
 class FileListEditorTransferHandler extends TransferHandler {
 

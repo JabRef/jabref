@@ -7,10 +7,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.xmp.XMPUtil;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 /**

@@ -8,9 +8,9 @@ import javafx.concurrent.Worker;
 import javafx.concurrent.Worker.State;
 import javafx.scene.web.WebView;
 
+import org.jabref.Logger;
 import org.jabref.gui.desktop.JabRefDesktop;
 
-import com.jcabi.log.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

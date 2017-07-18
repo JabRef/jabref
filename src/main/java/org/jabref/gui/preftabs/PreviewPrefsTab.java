@@ -20,6 +20,7 @@ import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
@@ -28,7 +29,6 @@ import org.jabref.logic.util.TestEntry;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.primitives.Ints;
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 

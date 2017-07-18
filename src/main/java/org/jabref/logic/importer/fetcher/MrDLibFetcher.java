@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
@@ -19,7 +20,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 
 /**

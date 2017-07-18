@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import org.jabref.Logger;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -12,8 +13,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 public class NewEntryAction extends MnemonicAwareAction {
 

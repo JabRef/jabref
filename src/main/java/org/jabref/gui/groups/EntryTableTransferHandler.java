@@ -25,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
@@ -34,13 +35,11 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportMenuItem;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.util.FileHelper;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {

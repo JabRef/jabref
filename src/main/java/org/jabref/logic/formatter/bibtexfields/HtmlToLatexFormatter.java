@@ -5,12 +5,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import org.jabref.model.cleanup.Formatter;
-
-import com.jcabi.log.Logger;
 
 public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 

@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -56,8 +57,6 @@ import org.jabref.shared.exception.DatabaseNotSupportedException;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 import org.jabref.shared.security.Password;
-
-import com.jcabi.log.Logger;
 
 public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 

@@ -17,13 +17,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.JabRefMain;
+import org.jabref.Logger;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 /**
  * Base class for export formats based on templates.

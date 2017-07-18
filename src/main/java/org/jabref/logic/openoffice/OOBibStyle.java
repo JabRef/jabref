@@ -22,6 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -32,8 +33,6 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
-
-import com.jcabi.log.Logger;
 
 
 /**

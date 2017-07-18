@@ -20,6 +20,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -29,7 +30,6 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

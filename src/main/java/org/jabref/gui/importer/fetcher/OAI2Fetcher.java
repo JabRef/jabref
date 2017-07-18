@@ -17,6 +17,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
@@ -27,7 +28,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
-import com.jcabi.log.Logger;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 

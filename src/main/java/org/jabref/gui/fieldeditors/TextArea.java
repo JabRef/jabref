@@ -9,10 +9,9 @@ import javax.swing.SwingUtilities;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
+import org.jabref.Logger;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.util.DefaultTaskExecutor;
-
-import com.jcabi.log.Logger;
 
 /**
  * An implementation of the FieldEditor backed by a {@link EditorTextArea}.

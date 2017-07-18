@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.l10n.Localization;
 
-import com.jcabi.log.Logger;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;

@@ -43,6 +43,7 @@ import javafx.application.Platform;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.collab.ChangeScanner;
 import org.jabref.collab.FileUpdateListener;
 import org.jabref.collab.FileUpdatePanel;
@@ -142,7 +143,6 @@ import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
 
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 

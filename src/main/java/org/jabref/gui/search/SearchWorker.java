@@ -8,14 +8,13 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-
-import com.jcabi.log.Logger;
 
 
 /**

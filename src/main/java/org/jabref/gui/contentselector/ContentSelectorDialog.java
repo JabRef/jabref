@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -40,7 +41,6 @@ import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class ContentSelectorDialog extends JabRefDialog {

@@ -2,9 +2,8 @@ package org.jabref.gui.util;
 
 import java.util.function.Consumer;
 
+import org.jabref.Logger;
 import org.jabref.gui.externalfiles.FileDownloadTask;
-
-import com.jcabi.log.Logger;
 
 /**
  * Implementation of {@link TaskExecutor} that runs every task on the current thread, i.e. in a sequential order.

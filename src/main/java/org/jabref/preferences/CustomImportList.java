@@ -4,10 +4,9 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.fileformat.CustomImporter;
-
-import com.jcabi.log.Logger;
 
 /**
  * Collection of user defined custom import formats.

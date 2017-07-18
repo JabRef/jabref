@@ -7,13 +7,12 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
-
-import com.jcabi.log.Logger;
 
 /**
  * Class for finding PDF URLs for entries on IEEE

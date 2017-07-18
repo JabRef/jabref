@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.Logger;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -35,7 +36,6 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
-import com.jcabi.log.Logger;
 import org.apache.http.client.utils.URIBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;

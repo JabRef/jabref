@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 /**
  * Every message is terminated with '\0'.

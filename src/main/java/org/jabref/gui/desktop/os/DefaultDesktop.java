@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 public class DefaultDesktop implements NativeDesktop {
 

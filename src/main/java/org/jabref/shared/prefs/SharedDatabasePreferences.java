@@ -7,11 +7,10 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.jabref.JabRefMain;
+import org.jabref.Logger;
 import org.jabref.gui.shared.ConnectToSharedDatabaseDialog;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.security.Password;
-
-import com.jcabi.log.Logger;
 
 /**
  * Stores and reads persistent data for {@link ConnectToSharedDatabaseDialog}.

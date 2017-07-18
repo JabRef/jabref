@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.BaseAction;
 import org.jabref.gui.undo.NamedCompound;
@@ -13,8 +14,6 @@ import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.specialfields.SpecialField;
-
-import com.jcabi.log.Logger;
 
 public class SpecialFieldAction implements BaseAction {
 

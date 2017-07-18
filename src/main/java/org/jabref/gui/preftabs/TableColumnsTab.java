@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -44,7 +45,6 @@ import org.jabref.model.entry.BibtexSingleField;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;

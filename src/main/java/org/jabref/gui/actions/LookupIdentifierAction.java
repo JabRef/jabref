@@ -4,12 +4,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.LookupIdentifiersWorker;
 import org.jabref.logic.importer.IdFetcher;
-
-import com.jcabi.log.Logger;
 
 public class LookupIdentifierAction extends MnemonicAwareAction {
 

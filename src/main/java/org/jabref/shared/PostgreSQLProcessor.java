@@ -6,13 +6,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.listener.PostgresSQLNotificationListener;
 
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import com.impossibl.postgres.jdbc.ThreadedHousekeeper;
-import com.jcabi.log.Logger;
 
 /**
  * Processes all incoming or outgoing bib data to PostgreSQL database and manages its structure.

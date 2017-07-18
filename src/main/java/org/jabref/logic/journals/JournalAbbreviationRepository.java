@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import com.jcabi.log.Logger;
+import org.jabref.Logger;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.

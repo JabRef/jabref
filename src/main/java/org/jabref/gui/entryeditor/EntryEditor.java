@@ -40,6 +40,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryContainer;
 import org.jabref.gui.GUIGlobals;
@@ -78,7 +79,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-import com.jcabi.log.Logger;
 import org.fxmisc.easybind.EasyBind;
 
 /**

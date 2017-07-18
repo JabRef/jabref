@@ -15,9 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
-
-import com.jcabi.log.Logger;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.

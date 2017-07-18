@@ -36,6 +36,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
@@ -72,7 +73,6 @@ import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
 import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
-import com.jcabi.log.Logger;
 
 /**
  * Dialog to display search results, potentially from more than one BasePanel, with

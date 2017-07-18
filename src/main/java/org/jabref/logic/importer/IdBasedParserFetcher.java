@@ -10,10 +10,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
-import com.jcabi.log.Logger;
 import org.jsoup.helper.StringUtil;
 
 /**

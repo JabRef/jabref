@@ -1,11 +1,11 @@
 package org.jabref.gui.autosaveandbackup;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 
 import com.google.common.eventbus.Subscribe;
-import com.jcabi.log.Logger;
 
 /**
  * This class has an abstract UI role as it listens for an {@link AutosaveEvent}
