@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.eventbus.Subscribe;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -27,14 +26,15 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.InternalBibtexFields;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
-import org.jabref.model.entry.event.EntryChangedEvent;
 
 public class SourceTab extends EntryEditorTab {
 
@@ -53,8 +53,8 @@ public class SourceTab extends EntryEditorTab {
     }
 
     @Subscribe
-    public void listen(EntryChangedEvent event){
-        if(this.entry.equals(event.getBibEntry())) {
+    public void listen(EntryChangedEvent event) {
+        if (this.entry.equals(event.getBibEntry())) {
             try {
                 codeArea.clear();
                 codeArea.appendText(getSourceString(entry, mode));
