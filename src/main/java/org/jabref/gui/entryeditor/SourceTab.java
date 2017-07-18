@@ -54,7 +54,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
-        if (this.entry.equals(event.getBibEntry())) {
+        if (codeArea != null && this.entry.equals(event.getBibEntry())) {
             try {
                 codeArea.clear();
                 codeArea.appendText(getSourceString(entry, mode));
