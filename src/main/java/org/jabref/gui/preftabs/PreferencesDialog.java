@@ -178,7 +178,7 @@ public class PreferencesDialog extends JabRefDialog {
                             Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
                     this.dispose();
                 } catch (JabRefException ex) {
-                    Logger.warn(this, "%[exception]s", ex);
+                    Logger.warn(this, ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Import preferences"), JOptionPane.ERROR_MESSAGE);
                 }
@@ -198,7 +198,7 @@ public class PreferencesDialog extends JabRefDialog {
                             Localization.lang("You must restart JabRef for this to come into effect."),
                             Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (BackingStoreException ex) {
-                    Logger.warn(this, "%[exception]s", ex);
+                    Logger.warn(this, ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Reset preferences"), JOptionPane.ERROR_MESSAGE);
                 }
@@ -301,7 +301,7 @@ public class PreferencesDialog extends JabRefDialog {
                     Globals.prefs.exportPreferences(exportFile.toString());
                     Globals.prefs.put(JabRefPreferences.PREFS_EXPORT_PATH, exportFile.toString());
                 } catch (JabRefException ex) {
-                    Logger.warn(this, "%[exception]s", ex);
+                    Logger.warn(this, ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
                 }

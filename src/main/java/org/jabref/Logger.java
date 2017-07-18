@@ -110,6 +110,10 @@ public class Logger {
         com.jcabi.log.Logger.warn(source, msg);
     }
 
+    public static void warn(final Object source, final Throwable e) {
+        com.jcabi.log.Logger.warn(source, "%[exception]s", e);
+    }
+
     public static void warn(
             final Object source,
             final String msg, final Throwable e, final Object... args
