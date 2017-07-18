@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.architecture;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import static org.jabref.MainArchitectureTests.CLASS_ORG_JABREF_GLOBALS;
+import static org.jabref.architecture.MainArchitectureTests.CLASS_ORG_JABREF_GLOBALS;
 
 @RunWith(Parameterized.class)
 public class TestArchitectureTests {

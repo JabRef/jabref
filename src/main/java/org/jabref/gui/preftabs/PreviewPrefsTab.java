@@ -27,10 +27,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.preferences.PreviewPreferences;
 
+import com.google.common.primitives.Ints;
 import com.jcabi.log.Logger;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
-import org.apache.commons.lang3.ArrayUtils;
 
 public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
@@ -93,7 +93,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 newSelectedIndices.add(newIndex);
             }
-            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
+            chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
         });
 
         btnDown.addActionListener(event -> {
@@ -106,7 +106,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 chosenModel.add(newIndex, chosenModel.remove(oldIndex));
                 newSelectedIndices.add(newIndex);
             }
-            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
+            chosen.setSelectedIndices(Ints.toArray(newSelectedIndices));
         });
 
         btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()

@@ -51,8 +51,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.SearchPreferences;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
+import com.google.common.base.Throwables;
 import com.jcabi.log.Logger;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public class ArgumentProcessor {
 
@@ -271,7 +271,7 @@ public class ArgumentProcessor {
                             matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
-                            + ExceptionUtils.getStackTrace(ex));
+                            + Throwables.getStackTraceAsString(ex));
                 }
             }
         } else {
@@ -449,7 +449,7 @@ public class ArgumentProcessor {
                 } catch (Exception ex) {
 
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
-                            + ExceptionUtils.getStackTrace(ex));
+                            + Throwables.getStackTraceAsString(ex));
                 }
             }
 

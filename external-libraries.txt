@@ -1,6 +1,9 @@
 This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
+One can list all depdencies by using Gradle task `depdencyReport`.
+It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
+
 # Legend
 
 ## License
