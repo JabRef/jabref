@@ -1,5 +1,17 @@
 package org.jabref.gui.exporter;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
@@ -18,7 +30,11 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.exporter.*;
+import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.FileSaveSession;
+import org.jabref.logic.exporter.SaveException;
+import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
@@ -30,15 +46,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
-
-import javax.swing.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
@@ -184,7 +191,6 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             panel.registerUndoableChanges(session);
-
         } catch (UnsupportedCharsetException ex) {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not save file.")
@@ -385,19 +391,20 @@ public class SaveDatabaseAction extends AbstractWorker {
     /**
      * Query whether the last operation was canceled.
      *
-     * @return true if the last Save/SaveAs operation was canceled from the file dialog or from another
-     * query dialog, false otherwise.
+     * @return true if the last Save/SaveAs operation was canceled from the file dialog or from another query dialog,
+     * false otherwise.
      */
     public boolean isCanceled() {
         return canceled;
     }
 
     /**
-     * Check whether or not the external database has been modified. If so need to alert the user to accept external updates prior to
-     * saving the database. This is necessary to avoid overwriting other users work when using a multiuser database file.
+     * Check whether or not the external database has been modified. If so need to alert the user to accept external
+     * updates prior to saving the database. This is necessary to avoid overwriting other users work when using a
+     * multiuser database file.
      *
-     * @return true if the external database file has been modified and the user must choose to accept the changes and false if no modifications
-     * were found or there is no requested protection for the database file.
+     * @return true if the external database file has been modified and the user must choose to accept the changes and
+     * false if no modifications were found or there is no requested protection for the database file.
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
