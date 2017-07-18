@@ -38,9 +38,9 @@ before_script:
   - mysql -u root -e 'create database jabref'
 
 script:
-  # -Dscan enables the Gradle build scan, which can be used to investiage the time each action consumes
+  # --scan enables the Gradle build scan, which can be used to investiage the time each action consumes
   # For more information see https://gradle.com/scans/get-started
-  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ]; then ./gradlew $TEST_SUITE $OPTIONS -Dscan; fi
+  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
 
