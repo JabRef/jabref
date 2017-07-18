@@ -46,6 +46,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed a bug where the language files for Brazilian Portugese could not be loaded and the GUI localization remained in English [#1128](https://github.com/JabRef/jabref/issues/1182)
 - We fixed a bug where the database was not marked as dirty when entries or groups were changed [#2787](https://github.com/JabRef/jabref/issues/2787)
 - We restored the original functionality that when browsing through the MainTable, the Entry Editor remembers which tab was opened before [#2896](https://github.com/JabRef/jabref/issues/2896)
+- We fixed a bug where the source tab was not updated when one the fields was changed [#2888](https://github.com/JabRef/jabref/issues/2888)
+
 ### Removed
 
 
