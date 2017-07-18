@@ -5,17 +5,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.collab.ChangeScanner;
@@ -47,10 +42,15 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
  * save operations when closing a database or quitting the applications.
- * <p>
+ *
  * The operations run synchronously, but offload the save operation from the event thread using Spin.
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
@@ -73,7 +73,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     /**
-     * @param panel    BasePanel which contains the database to be saved
+     * @param panel BasePanel which contains the database to be saved
      * @param filePath Path to the file the database should be saved to
      */
     public SaveDatabaseAction(BasePanel panel, Path filePath) {
@@ -191,6 +191,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
 
             panel.registerUndoableChanges(session);
+
         } catch (UnsupportedCharsetException ex) {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not save file.")
@@ -233,7 +234,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save library"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -334,16 +335,16 @@ public class SaveDatabaseAction extends AbstractWorker {
             return;
         }
 
-        try {
-            final Path oldFile = context.getDatabasePath().get();
+        Optional<Path> databasePath = context.getDatabasePath();
+        if (databasePath.isPresent()) {
+            final Path oldFile = databasePath.get();
             context.setDatabaseFile(oldFile.toFile());
             //closing AutosaveManager and BackupManager for original library
             AutosaveManager.shutdown(context);
             BackupManager.shutdown(context);
-        } catch (NoSuchElementException e) {
-            LOGGER.info("Old file not found, just creating a new file", e);
+        } else {
+            LOGGER.info("Old file not found, just creating a new file");
         }
-
         context.setDatabaseFile(file);
 
         // Register so we get notifications about outside changes to the file.
@@ -391,26 +392,25 @@ public class SaveDatabaseAction extends AbstractWorker {
     /**
      * Query whether the last operation was canceled.
      *
-     * @return true if the last Save/SaveAs operation was canceled from the file dialog or from another query dialog,
-     * false otherwise.
+     * @return true if the last Save/SaveAs operation was canceled from the file dialog or from another
+     * query dialog, false otherwise.
      */
     public boolean isCanceled() {
         return canceled;
     }
 
     /**
-     * Check whether or not the external database has been modified. If so need to alert the user to accept external
-     * updates prior to saving the database. This is necessary to avoid overwriting other users work when using a
-     * multiuser database file.
+     * Check whether or not the external database has been modified. If so need to alert the user to accept external updates prior to
+     * saving the database. This is necessary to avoid overwriting other users work when using a multiuser database file.
      *
-     * @return true if the external database file has been modified and the user must choose to accept the changes and
-     * false if no modifications were found or there is no requested protection for the database file.
+     * @return true if the external database file has been modified and the user must choose to accept the changes and false if no modifications
+     * were found or there is no requested protection for the database file.
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
         if (panel.isUpdatedExternally()
                 || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
-            String[] opts = new String[]{Localization.lang("Review changes"), Localization.lang("Save"),
+            String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
                     Localization.lang("File has been updated externally. " + "What do you want to do?"),
