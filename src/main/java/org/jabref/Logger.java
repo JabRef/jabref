@@ -66,7 +66,6 @@ public class Logger {
 
     /** end of direct pass through **/
 
-
     public static void trace(final Object source, final String msg, Throwable e) {
         com.jcabi.log.Logger.trace(source, msg);
     }

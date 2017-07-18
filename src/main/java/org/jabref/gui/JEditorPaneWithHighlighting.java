@@ -16,7 +16,6 @@ import org.jabref.logic.search.SearchQueryHighlightListener;
 
 public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQueryHighlightListener {
 
-
     public void highlightPattern(Optional<Pattern> highlightPattern) {
         Highlighter highlighter = getHighlighter();
         highlighter.removeAllHighlights();

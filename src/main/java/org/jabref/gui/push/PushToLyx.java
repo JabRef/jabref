@@ -23,7 +23,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
-
     @Override
     public String getApplicationName() {
         return "LyX/Kile";

@@ -11,7 +11,6 @@ import org.jabref.model.cleanup.Formatter;
 
 public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
 
-
     @Override
     public String format(String text) {
         String result = Objects.requireNonNull(text);
