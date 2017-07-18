@@ -26,8 +26,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
