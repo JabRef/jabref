@@ -1,16 +1,9 @@
 package org.jabref.gui.exporter;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
-import java.util.Optional;
-
-import javax.swing.JOptionPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-
+import com.jgoodies.forms.builder.FormBuilder;
+import com.jgoodies.forms.layout.FormLayout;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.collab.ChangeScanner;
@@ -25,11 +18,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
-import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
+import org.jabref.logic.exporter.*;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
@@ -42,15 +31,19 @@ import org.jabref.preferences.JabRefPreferences;
 import org.jabref.shared.DBMSConnectionProperties;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 
-import com.jgoodies.forms.builder.FormBuilder;
-import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Path;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * Action for the "Save" and "Save as" operations called from BasePanel. This class is also used for
  * save operations when closing a database or quitting the applications.
- *
+ * <p>
  * The operations run synchronously, but offload the save operation from the event thread using Spin.
  * Callers can query whether the operation was canceled, or whether it was successful.
  */
@@ -73,7 +66,7 @@ public class SaveDatabaseAction extends AbstractWorker {
     }
 
     /**
-     * @param panel BasePanel which contains the database to be saved
+     * @param panel    BasePanel which contains the database to be saved
      * @param filePath Path to the file the database should be saved to
      */
     public SaveDatabaseAction(BasePanel panel, Path filePath) {
@@ -234,7 +227,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save library"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
+                    new String[]{Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -316,8 +309,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
-        Path oldFile = context.getDatabasePath().get();
-        
+
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
             DBMSConnectionProperties properties = context.getDBMSSynchronizer().getDBProcessor()
@@ -336,12 +328,17 @@ public class SaveDatabaseAction extends AbstractWorker {
             return;
         }
 
-        //closing AutosaveManager and BackupManager for original library 
-        context.setDatabaseFile(oldFile.toFile());
+        try {
+            final Path oldFile = context.getDatabasePath().get();
+            context.setDatabaseFile(oldFile.toFile());
+        } catch (NoSuchElementException e) {
+            LOGGER.info("Old file not found, just creating a new file", e);
+        }
+        //closing AutosaveManager and BackupManager for original library
         AutosaveManager.shutdown(context);
         BackupManager.shutdown(context);
         context.setDatabaseFile(file);
-        
+
         // Register so we get notifications about outside changes to the file.
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
@@ -405,7 +402,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         // Check for external modifications:
         if (panel.isUpdatedExternally()
                 || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
-            String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
+            String[] opts = new String[]{Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
                     Localization.lang("File has been updated externally. " + "What do you want to do?"),
