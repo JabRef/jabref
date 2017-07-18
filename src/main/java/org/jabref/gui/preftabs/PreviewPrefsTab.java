@@ -119,7 +119,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 testPane.setPreferredSize(new Dimension(800, 350));
                 JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
             } catch (StringIndexOutOfBoundsException exception) {
-                Logger.warn(this, "Parsing error.: %[exception]s", exception);
+                Logger.warn(this, "Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
                                 + ".\n" + exception.getMessage(),

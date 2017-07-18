@@ -131,12 +131,12 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
-                    Logger.info(this, "Could not open ZIP-archive.: %[exception]s", exc);
+                    Logger.info(this, "Could not open ZIP-archive.", exc);
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Could not open %0", jarZipFile.get().toString()) + "\n"
                                     + Localization.lang("Have you chosen the correct package path?"));
                 } catch (NoClassDefFoundError exc) {
-                    Logger.info(this, "Could not instantiate ZIP-archive reader.: %[exception]s", exc);
+                    Logger.info(this, "Could not instantiate ZIP-archive reader.", exc);
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Could not instantiate %0", jarZipFile.get().toString()) + "\n"
                                     + Localization.lang("Have you chosen the correct package path?"));

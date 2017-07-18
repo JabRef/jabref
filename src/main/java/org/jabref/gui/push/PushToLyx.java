@@ -105,7 +105,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
                 fw.close();
             } catch (IOException excep) {
                 couldNotCall = true;
-                Logger.warn(this, "Problem pushing to LyX/Kile.: %[exception]s", excep);
+                Logger.warn(this, "Problem pushing to LyX/Kile.", excep);
             }
         });
     }

@@ -325,7 +325,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     generateButton.setEnabled(true);
                 });
             } catch (ExecutionException | InterruptedException e) {
-                Logger.error(this, "Exception during fetching when using fetcher '%s' with entry id '%s': %[exception]s", searchID, fetcher.getName(), e);
+                Logger.error(this, "Exception during fetching when using fetcher '%s' with entry id '%s'", e, searchID, fetcher.getName());
             }
         }
     }

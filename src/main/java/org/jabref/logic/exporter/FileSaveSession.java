@@ -93,7 +93,7 @@ public class FileSaveSession extends SaveSession {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
-                    Logger.warn(this, "Error getting file permissions.: %[exception]s", exception);
+                    Logger.warn(this, "Error getting file permissions.", exception);
                 }
             }
 

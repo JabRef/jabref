@@ -79,7 +79,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         catch (IOException excep) {
             couldNotCall = true;
 
-            Logger.warn(this, "Error: Could not call executable '" + commandPath + "'.: %[exception]s", excep);
+            Logger.warn(this, "Error: Could not call executable '" + commandPath + "'.", excep);
         }
     }
 

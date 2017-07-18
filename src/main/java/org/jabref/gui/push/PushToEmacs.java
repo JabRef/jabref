@@ -120,7 +120,7 @@ public class PushToEmacs extends AbstractPushToApplication implements PushToAppl
             });
         } catch (IOException excep) {
             couldNotCall = true;
-            Logger.warn(this, "Problem pushing to Emacs.: %[exception]s", excep);
+            Logger.warn(this, "Problem pushing to Emacs.", excep);
         }
     }
 

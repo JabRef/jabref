@@ -102,7 +102,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
             });
         } catch (IOException excep) {
             couldNotCall = true;
-            Logger.warn(this, "Problem pushing to Vim.: %[exception]s", excep);
+            Logger.warn(this, "Problem pushing to Vim.", excep);
         }
 
     }
