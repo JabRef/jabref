@@ -108,5 +108,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         new MoveFieldCleanup("mrclass", FieldName.KEYWORDS).cleanup(entry);
         new FieldFormatterCleanup("mrreviewer", new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.URL, new ClearFormatter()).cleanup(entry);
+
+        // Remove comments: MathSciNet prepends a <pre> html tag
+        entry.setCommentsBeforeEntry("");
     }
 }

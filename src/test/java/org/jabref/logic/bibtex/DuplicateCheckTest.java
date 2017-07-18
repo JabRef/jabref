@@ -142,4 +142,83 @@ public class DuplicateCheckTest {
         assertTrue(DuplicateCheck.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
     }
 
+    @Test
+    public void twoBooksWithDifferentEditionsAreNotDuplicates() {
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionOne.setField(FieldName.TITLE, "Effective Java");
+        editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionOne.setField(FieldName.DATE, "2001");
+        editionOne.setField(FieldName.EDITION, "1");
+
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionTwo.setField(FieldName.TITLE, "Effective Java");
+        editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionTwo.setField(FieldName.DATE, "2008");
+        editionTwo.setField(FieldName.EDITION, "2");
+
+        assertFalse(DuplicateCheck.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void sameBooksWithMissingEditionAreDuplicates() {
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionOne.setField(FieldName.TITLE, "Effective Java");
+        editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionOne.setField(FieldName.DATE, "2001");
+
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionTwo.setField(FieldName.TITLE, "Effective Java");
+        editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionTwo.setField(FieldName.DATE, "2008");
+
+        assertTrue(DuplicateCheck.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void sameBooksWithPartiallyMissingEditionAreDuplicates() {
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionOne.setField(FieldName.TITLE, "Effective Java");
+        editionOne.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionOne.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionOne.setField(FieldName.DATE, "2001");
+
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionTwo.setField(FieldName.TITLE, "Effective Java");
+        editionTwo.setField(FieldName.AUTHOR, "Bloch, Joshua");
+        editionTwo.setField(FieldName.PUBLISHER, "Prentice Hall");
+        editionTwo.setField(FieldName.DATE, "2008");
+        editionTwo.setField(FieldName.EDITION, "2");
+
+        assertTrue(DuplicateCheck.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void sameBooksWithDifferentEditionsAreNotDuplicates() {
+        BibEntry editionTwo = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionTwo.setCiteKey("Sutton17reinfLrnIntroBook");
+        editionTwo.setField(FieldName.TITLE, "Reinforcement learning:An introduction");
+        editionTwo.setField(FieldName.PUBLISHER, "MIT Press");
+        editionTwo.setField(FieldName.YEAR, "2017");
+        editionTwo.setField(FieldName.AUTHOR, "Sutton, Richard S and Barto, Andrew G");
+        editionTwo.setField(FieldName.ADDRESS, "Cambridge, MA.USA");
+        editionTwo.setField(FieldName.EDITION, "Second");
+        editionTwo.setField(FieldName.JOURNAL, "MIT Press");
+        editionTwo.setField(FieldName.URL, "https://webdocs.cs.ualberta.ca/~sutton/book/the-book-2nd.html");
+
+        BibEntry editionOne = new BibEntry(BibtexEntryTypes.BOOK.getName());
+        editionOne.setCiteKey("Sutton98reinfLrnIntroBook");
+        editionOne.setField(FieldName.TITLE, "Reinforcement learning: An introduction");
+        editionOne.setField(FieldName.PUBLISHER, "MIT press Cambridge");
+        editionOne.setField(FieldName.YEAR, "1998");
+        editionOne.setField(FieldName.AUTHOR, "Sutton, Richard S and Barto, Andrew G");
+        editionOne.setField(FieldName.VOLUME, "1");
+        editionOne.setField(FieldName.NUMBER, "1");
+        editionOne.setField(FieldName.EDITION, "First");
+
+        assertFalse(DuplicateCheck.isDuplicate(editionOne, editionTwo, BibDatabaseMode.BIBTEX));
+    }
 }

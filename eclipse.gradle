@@ -216,7 +216,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.indent_statements_compare_to_block=true
         org.eclipse.jdt.core.formatter.indent_statements_compare_to_body=true
         org.eclipse.jdt.core.formatter.indent_switchstatements_compare_to_cases=true
-        org.eclipse.jdt.core.formatter.indent_switchstatements_compare_to_switch=false
+        org.eclipse.jdt.core.formatter.indent_switchstatements_compare_to_switch=true
         org.eclipse.jdt.core.formatter.indentation.size=4
         org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_field=do not insert
         org.eclipse.jdt.core.formatter.insert_new_line_after_annotation_on_local_variable=insert
@@ -413,6 +413,11 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.number_of_blank_lines_at_beginning_of_method_body=0
         org.eclipse.jdt.core.formatter.number_of_empty_lines_to_preserve=1
         org.eclipse.jdt.core.formatter.put_empty_statement_on_new_line=true
+        org.eclipse.jdt.core.formatter.parentheses_positions_in_for_statment=common_lines
+        org.eclipse.jdt.core.formatter.parentheses_positions_in_method_invocationc=common_lines
+        org.eclipse.jdt.core.formatter.parentheses_positions_in_switch_statement=common_lines
+        org.eclipse.jdt.core.formatter.parentheses_positions_in_enum_constant_declaration=common_lines
+        org.eclipse.jdt.core.formatter.parentheses_positions_in_if_while_statement=common_lines
         org.eclipse.jdt.core.formatter.tabulation.char=space
         org.eclipse.jdt.core.formatter.tabulation.size=4
         org.eclipse.jdt.core.formatter.use_on_off_tags=true

@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.util.BackgroundTask;
@@ -23,7 +24,6 @@ import org.jabref.model.entry.identifier.Identifier;
 import org.fxmisc.easybind.EasyBind;
 
 public class IdentifierEditorViewModel extends AbstractEditorViewModel {
-    private final String fieldName;
     private BooleanProperty validIdentifierIsNotPresent = new SimpleBooleanProperty(true);
     private BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     private BooleanProperty idFetcherAvailable = new SimpleBooleanProperty(true);
@@ -31,8 +31,9 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
 
-    public IdentifierEditorViewModel(String fieldName, TaskExecutor taskExecutor, DialogService dialogService) {
-        this.fieldName = fieldName;
+    public IdentifierEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService) {
+        super(fieldName, suggestionProvider);
+
         this.taskExecutor = taskExecutor;
         this.dialogService = dialogService;
 

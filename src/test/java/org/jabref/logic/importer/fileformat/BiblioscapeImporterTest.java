@@ -23,7 +23,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals(importer.getName(), "Biblioscape");
+        Assert.assertEquals("Biblioscape", importer.getName());
     }
 
     @Test
@@ -39,7 +39,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testGetCLIID() {
-        Assert.assertEquals(importer.getId(), "biblioscape");
+        Assert.assertEquals("biblioscape", importer.getId());
     }
 
     @Test

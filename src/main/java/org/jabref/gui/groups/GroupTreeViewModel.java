@@ -145,8 +145,13 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 //parent.expand();
 
                 dialogService.notify(Localization.lang("Added group \"%0\".", group.getName()));
+                writeGroupChangesToMetaData();
             });
         });
+    }
+
+    private void writeGroupChangesToMetaData() {
+        currentDatabase.get().getMetaData().setGroups(rootGroup.get().getGroupNode());
     }
 
     /**
@@ -191,6 +196,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     //}
 
                     dialogService.notify(Localization.lang("Modified group \"%0\".", group.getName()));
+                    writeGroupChangesToMetaData();
                 });
             });
         });
@@ -206,6 +212,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //panel.getUndoManager().addEdit(undo);
             group.getGroupNode().removeAllChildren();
             dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
+            writeGroupChangesToMetaData();
         }
     }
 
@@ -224,6 +231,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             groupNode.removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+            writeGroupChangesToMetaData();
         }
     }
 
@@ -243,6 +251,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             group.getGroupNode().removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+            writeGroupChangesToMetaData();
         }
     }
 

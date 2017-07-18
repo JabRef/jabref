@@ -114,7 +114,10 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.12'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'net.corda:jfx:0.12.1'
+    compile('net.corda:jfx:0.12.1') {
+        transitive = false
+    }
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.2' // required by net.corda:jfxc
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
@@ -139,7 +142,7 @@ dependencies {
     compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
     compile 'de.undercouch:citeproc-java:1.0.1'
 
-    compile 'com.github.tomtung:latex2unicode_2.12:0.2'
+    compile 'com.github.tomtung:latex2unicode_2.12:0.2.1'
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
@@ -391,8 +394,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
-    toolVersion = '7.6.1'
+    toolVersion = '8.0'
 }
+
+checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'

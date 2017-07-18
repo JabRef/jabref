@@ -16,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
+import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -34,7 +35,7 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class LinkedFileViewModel extends AbstractEditorViewModel {
+public class LinkedFileViewModel extends AbstractViewModel {
 
     private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
 
@@ -45,6 +46,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
     private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
 
     private final DialogService dialogService = new FXDialogService();
+    private final BibEntry entry;
 
     public LinkedFileViewModel(LinkedFile linkedFile, BibEntry entry, BibDatabaseContext databaseContext) {
         this.linkedFile = linkedFile;
@@ -224,6 +226,7 @@ public class LinkedFileViewModel extends AbstractEditorViewModel {
         if (file.isPresent()) {
 
             ButtonType removeFromEntry = new ButtonType(Localization.lang("Remove from entry"));
+
             ButtonType deleteFromEntry = new ButtonType(Localization.lang("Delete from disk"));
             Optional<ButtonType> buttonType = dialogService.showCustomButtonDialogAndWait(AlertType.INFORMATION,
                     Localization.lang("Delete '%0'", file.get().toString()),

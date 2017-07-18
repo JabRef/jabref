@@ -11,9 +11,11 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +27,7 @@ public class AbbreviationParser {
 
     private static final Log LOGGER = LogFactory.getLog(AbbreviationParser.class);
 
-    private final List<Abbreviation> abbreviations = new LinkedList<>();
+    private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 
     public void readJournalListFromResource(String resourceFileName) {
         URL url = Objects.requireNonNull(JournalAbbreviationRepository.class.getResource(Objects.requireNonNull(resourceFileName)));
@@ -90,9 +92,7 @@ public class AbbreviationParser {
             }
 
             Abbreviation abbreviation = new Abbreviation(fullName, abbrName);
-            if (!abbreviations.contains(abbreviation)) {
-                this.abbreviations.add(abbreviation);
-            }
+            this.abbreviations.add(abbreviation);
         }
     }
 

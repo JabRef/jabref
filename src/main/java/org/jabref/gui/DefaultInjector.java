@@ -26,7 +26,7 @@ public class DefaultInjector implements PresenterFactory {
         if (clazz == DialogService.class) {
             return new FXDialogService();
         } else if (clazz == TaskExecutor.class) {
-            return Globals.taskExecutor;
+            return Globals.TASK_EXECUTOR;
         } else if (clazz == PreferencesService.class) {
             return Globals.prefs;
         } else if (clazz == KeyBindingRepository.class) {
