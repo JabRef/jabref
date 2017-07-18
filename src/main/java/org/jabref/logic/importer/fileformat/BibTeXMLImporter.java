@@ -143,7 +143,7 @@ public class BibTeXMLImporter extends Importer {
                 bibItems.add(bibEntry);
             }
         } catch (JAXBException e) {
-            Logger.error(this, "Error with XML parser configuration: %[exception]s", e);
+            Logger.error(this, "Error with XML parser configuration", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);
@@ -177,7 +177,7 @@ public class BibTeXMLImporter extends Importer {
                     putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
                 }
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
-                Logger.error(this, "Could not invoke method: %[exception]s", e);
+                Logger.error(this, "Could not invoke method", e);
             }
         }
     }

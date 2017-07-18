@@ -258,7 +258,7 @@ class StyleSelectDialog {
                             new UnknownExternalFileType("jstyle"));
                 }
             } catch (IOException e) {
-                Logger.warn(this, "Problem open style file editor: %[exception]s", e);
+                Logger.warn(this, "Problem open style file editor", e);
             }
         }));
 
@@ -284,7 +284,7 @@ class StyleSelectDialog {
             try {
                 style.ensureUpToDate();
             } catch (IOException e) {
-                Logger.warn(this, "Problem with style file '" + style.getPath() + "': %[exception]s", e);
+                Logger.warn(this, "Problem with style file '" + style.getPath() + "'", e);
             }
         }));
 

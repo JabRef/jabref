@@ -30,7 +30,7 @@ public class JabRefCLI {
             this.cl = new DefaultParser().parse(options, args);
             this.leftOver = Arrays.asList(cl.getArgs());
         } catch (ParseException e) {
-            Logger.warn(this, "Problem parsing arguments: %[exception]s", e);
+            Logger.warn(this, "Problem parsing arguments", e);
 
             this.printUsage();
             throw new RuntimeException();

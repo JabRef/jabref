@@ -116,7 +116,7 @@ public class ErrorConsoleViewModel extends AbstractViewModel {
                     .setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
         } catch (IOException | URISyntaxException e) {
-            Logger.error(this, "URI issue: %[exception]s", e);
+            Logger.error(this, "URI issue", e);
         }
     }
 }

@@ -161,7 +161,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -192,7 +192,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
         return false;
     }
@@ -226,7 +226,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -283,7 +283,7 @@ public abstract class DBMSProcessor {
                 throw new OfflineLockException(localBibEntry, sharedBibEntry);
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
             connection.rollback(); // undo changes made in current transaction
         } finally {
             connection.setAutoCommit(true); // enable auto commit mode again
@@ -403,7 +403,7 @@ public abstract class DBMSProcessor {
             preparedStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
 
     }
@@ -472,7 +472,7 @@ public abstract class DBMSProcessor {
                 sharedEntries.add(bibEntry);
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return sharedEntries;
@@ -494,7 +494,7 @@ public abstract class DBMSProcessor {
                 sharedIDVersionMapping.put(selectEntryResultSet.getInt("SHARED_ID"), selectEntryResultSet.getInt("VERSION"));
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return sharedIDVersionMapping;
@@ -511,7 +511,7 @@ public abstract class DBMSProcessor {
                 data.put(resultSet.getString("KEY"), resultSet.getString("VALUE"));
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return data;
@@ -541,7 +541,7 @@ public abstract class DBMSProcessor {
                 preparedStatement.setString(2, metaEntry.getValue());
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                Logger.error(this, "SQL Error: %[exception]s", e);
+                Logger.error(this, "SQL Error", e);
             }
         }
     }

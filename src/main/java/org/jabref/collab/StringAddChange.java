@@ -43,12 +43,12 @@ class StringAddChange extends Change {
             panel.getDatabase().addString(string);
             undoEdit.addEdit(new UndoableInsertString(panel, panel.getDatabase(), string));
         } catch (KeyCollisionException ex) {
-            Logger.info(this, "Error: could not add string '" + string.getName() + "': %[exception]s", ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "'", ex);
         }
         try {
             secondary.addString(new BibtexString(string.getName(), string.getContent()));
         } catch (KeyCollisionException ex) {
-            Logger.info(this, "Error: could not add string '" + string.getName() + "' to tmp database: %[exception]s", ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "' to tmp database", ex);
         }
         return true;
     }

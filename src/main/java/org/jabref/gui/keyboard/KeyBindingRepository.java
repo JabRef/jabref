@@ -197,7 +197,7 @@ public class KeyBindingRepository {
                 try {
                     shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
                 } catch (AWTError | HeadlessException e) {
-                    Logger.warn(this, "Problem geting shortcut mask: %[exception]s", e);
+                    Logger.warn(this, "Problem geting shortcut mask", e);
                 }
             }
 

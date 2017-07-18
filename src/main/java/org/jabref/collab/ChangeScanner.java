@@ -113,7 +113,7 @@ public class ChangeScanner implements Runnable {
             scanGroups(metadataInTemp, metadataOnDisk);
 
         } catch (IOException ex) {
-            Logger.warn(this, "Problem running: %[exception]s", ex);
+            Logger.warn(this, "Problem running", ex);
         }
     }
 
@@ -153,7 +153,7 @@ public class ChangeScanner implements Runnable {
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
-                Logger.warn(this, "Problem updating tmp file after accepting external changes: %[exception]s", ex);
+                Logger.warn(this, "Problem updating tmp file after accepting external changes", ex);
             }
         });
     }

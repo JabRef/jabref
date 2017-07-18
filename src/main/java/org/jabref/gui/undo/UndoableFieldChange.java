@@ -54,7 +54,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
 
             // this is the only exception explicitly thrown here
         } catch (IllegalArgumentException ex) {
-            Logger.info(this, "Cannot perform undo: %[exception]s", ex);
+            Logger.info(this, "Cannot perform undo", ex);
         }
     }
 
@@ -71,7 +71,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
             }
 
         } catch (IllegalArgumentException ex) {
-            Logger.info(this, "Cannot perform redo: %[exception]s", ex);
+            Logger.info(this, "Cannot perform redo", ex);
         }
     }
 

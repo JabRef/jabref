@@ -442,7 +442,7 @@ public class MergeEntries {
             new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(mergedEntry, writer, databaseType);
         } catch (IOException ex) {
-            Logger.error(this, "Error in entry: %[exception]s", ex);
+            Logger.error(this, "Error in entry", ex);
         }
         sourceView.setText(writer.getBuffer().toString());
         sourceView.setCaretPosition(0);

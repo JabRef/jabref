@@ -100,7 +100,7 @@ public class ImportFormats {
                         // Set last working dir for import
                         Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
                     } catch (Exception ex) {
-                        Logger.warn(this, "Cannot import file: %[exception]s", ex);
+                        Logger.warn(this, "Cannot import file", ex);
                     }
                 });
             }

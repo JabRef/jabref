@@ -373,7 +373,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 }
 
             } catch (IOException ex) {
-                Logger.warn(this, "Cannot parse bibliography structure: %[exception]s", ex);
+                Logger.warn(this, "Cannot parse bibliography structure", ex);
             }
         }
     }

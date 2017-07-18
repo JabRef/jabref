@@ -30,7 +30,7 @@ public class LookupIdentifierAction extends MnemonicAwareAction {
         try {
             BasePanel.runWorker(new LookupIdentifiersWorker(frame, fetcher));
         } catch (Exception e) {
-            Logger.error(this, "worker error: %[exception]s", e);
+            Logger.error(this, "worker error", e);
         }
     }
 }

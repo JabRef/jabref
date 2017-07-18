@@ -300,7 +300,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
             prefs.putInt(JabRefPreferences.TABLE_ROW_PADDING, padding);
         } catch (NumberFormatException ex) {
             // should not happen as values are checked beforehand
-            Logger.error(this, "Invalid data value, integer expected: %[exception]s", ex);
+            Logger.error(this, "Invalid data value, integer expected", ex);
         }
     }
 

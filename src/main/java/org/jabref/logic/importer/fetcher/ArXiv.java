@@ -78,7 +78,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             }
             return pdfUrl;
         } catch (FetcherException e) {
-            Logger.warn(this, "arXiv API request failed: %[exception]s", e);
+            Logger.warn(this, "arXiv API request failed", e);
         }
 
         return Optional.empty();
@@ -115,7 +115,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
                 // Get pdf of entry with the specified id
                 return OptionalUtil.toList(searchForEntryById(identifier.get()));
             } catch (FetcherException e) {
-                Logger.warn(this, "arXiv eprint API request failed: %[exception]s", e);
+                Logger.warn(this, "arXiv eprint API request failed", e);
             }
         }
 

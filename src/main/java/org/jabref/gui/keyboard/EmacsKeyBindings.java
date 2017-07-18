@@ -543,7 +543,7 @@ public class EmacsKeyBindings {
                     KillRing.getInstance().add(jtc.getText(YankAction.start, YankAction.end));
                     KillRing.getInstance().setCurrentTextComponent(jtc);
                 } catch (BadLocationException e) {
-                    Logger.info(this, "Bad location when yanking: %[exception]s", e);
+                    Logger.info(this, "Bad location when yanking", e);
                 }
             }
         }

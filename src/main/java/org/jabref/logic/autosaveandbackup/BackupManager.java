@@ -125,7 +125,7 @@ public class BackupManager {
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);
         } catch (SaveException e) {
-            Logger.error(this, "Error while saving file.: %[exception]s", e);
+            Logger.error(this, "Error while saving file.", e);
         }
     }
 
@@ -170,7 +170,7 @@ public class BackupManager {
                 Files.delete(backupPath);
             }
         } catch (IOException e) {
-            Logger.error(this, "Error while deleting the backup file.: %[exception]s", e);
+            Logger.error(this, "Error while deleting the backup file.", e);
         }
     }
 }

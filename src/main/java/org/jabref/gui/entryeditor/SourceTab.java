@@ -72,7 +72,7 @@ public class SourceTab extends EntryEditorTab {
             codeArea.appendText(ex.getMessage() + "\n\n" +
                     Localization.lang("Correct the entry, and reopen editor to display/edit source."));
             codeArea.setEditable(false);
-            Logger.debug(this, "Incorrect entry: %[exception]s", ex);
+            Logger.debug(this, "Incorrect entry", ex);
         }
 
         return new VirtualizedScrollPane<>(codeArea);
@@ -178,7 +178,7 @@ public class SourceTab extends EntryEditorTab {
             // error message, and the choice to keep or revert the contents
             // of the source text field.
 
-            Logger.debug(this, "Incorrect source: %[exception]s", ex);
+            Logger.debug(this, "Incorrect source", ex);
             DialogService dialogService = new FXDialogService();
             boolean keepEditing = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Problem with parsing entry"),
@@ -192,7 +192,7 @@ public class SourceTab extends EntryEditorTab {
                 try {
                     codeArea.replaceText(0, codeArea.getText().length(), getSourceString(entry, mode));
                 } catch (IOException e) {
-                    Logger.debug(this, "Incorrect source: %[exception]s", e);
+                    Logger.debug(this, "Incorrect source", e);
                 }
             }
         }

@@ -60,7 +60,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         try {
             text = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "Error while generating citation style: %[exception]s", e);
+            Logger.error(this, "Error while generating citation style", e);
             text = Localization.lang("Error while generating citation style");
             success = false;
         }

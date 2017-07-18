@@ -57,7 +57,7 @@ public class ClipBoardManager implements ClipboardOwner {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
                 //highly unlikely since we are using a standard DataFlavor
-                Logger.info(this, "problem with getting clipboard contents: %[exception]s", e);
+                Logger.info(this, "problem with getting clipboard contents", e);
             }
         }
         return result;
@@ -84,9 +84,9 @@ public class ClipBoardManager implements ClipboardOwner {
                 List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.ENTRY_FLAVOR);
                 result = contents;
             } catch (UnsupportedFlavorException | ClassCastException ex) {
-                Logger.warn(this, "Could not paste this type: %[exception]s", ex);
+                Logger.warn(this, "Could not paste this type", ex);
             } catch (IOException ex) {
-                Logger.warn(this, "Could not paste: %[exception]s", ex);
+                Logger.warn(this, "Could not paste", ex);
             }
         } else if (content.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
@@ -106,11 +106,11 @@ public class ClipBoardManager implements ClipboardOwner {
                     }
                 }
             } catch (UnsupportedFlavorException ex) {
-                Logger.warn(this, "Could not parse this type: %[exception]s", ex);
+                Logger.warn(this, "Could not parse this type", ex);
             } catch (IOException ex) {
-                Logger.warn(this, "Data is no longer available in the requested flavor: %[exception]s", ex);
+                Logger.warn(this, "Data is no longer available in the requested flavor", ex);
             } catch (FetcherException ex) {
-                Logger.error(this, "Error while fetching: %[exception]s", ex);
+                Logger.error(this, "Error while fetching", ex);
             }
 
         }

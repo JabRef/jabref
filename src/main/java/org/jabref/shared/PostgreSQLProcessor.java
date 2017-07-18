@@ -76,7 +76,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -106,7 +106,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Otherwise the listener is going to be deleted by GC.
             pgConnection.addNotificationListener(listener);
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             pgConnection.close();
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -124,7 +124,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             pgConnection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 }

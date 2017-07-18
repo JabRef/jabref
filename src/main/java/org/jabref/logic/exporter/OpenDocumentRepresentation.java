@@ -191,7 +191,7 @@ class OpenDocumentRepresentation {
 
             result.appendChild(collection);
         } catch (Exception e) {
-            Logger.warn(this, "Exception caught...: %[exception]s", e);
+            Logger.warn(this, "Exception caught...", e);
         }
         return result;
     }

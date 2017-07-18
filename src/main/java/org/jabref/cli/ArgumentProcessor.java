@@ -214,7 +214,7 @@ public class ArgumentProcessor {
             try {
                 Globals.prefs.exportPreferences(cli.getPreferencesExport());
             } catch (JabRefException ex) {
-                Logger.error(this, "Cannot export preferences: %[exception]s", ex);
+                Logger.error(this, "Cannot export preferences", ex);
             }
         }
 
@@ -468,7 +468,7 @@ public class ArgumentProcessor {
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
-            Logger.error(this, "Cannot import preferences: %[exception]s", ex);
+            Logger.error(this, "Cannot import preferences", ex);
         }
     }
 
@@ -480,7 +480,7 @@ public class ArgumentProcessor {
                 new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
-                Logger.error(this, "Unable to clear preferences: %[exception]s", e);
+                Logger.error(this, "Unable to clear preferences", e);
             }
         } else {
             String[] keys = value.split(",");

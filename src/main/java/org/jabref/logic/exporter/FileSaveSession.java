@@ -80,7 +80,7 @@ public class FileSaveSession extends SaveSession {
                     }
                 }
             } catch (IOException ex) {
-                Logger.error(this, "Error when creating lock file.: %[exception]s", ex);
+                Logger.error(this, "Error when creating lock file.", ex);
             }
 
             // Try to save file permissions to restore them later (by default: 664)
@@ -113,7 +113,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            Logger.warn(this, "Cannot delete temporary file: %[exception]s", e);
+            Logger.warn(this, "Cannot delete temporary file", e);
         }
     }
 
@@ -122,7 +122,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            Logger.warn(this, "Cannot delete temporary file: %[exception]s", e);
+            Logger.warn(this, "Cannot delete temporary file", e);
         }
     }
 }

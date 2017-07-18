@@ -74,7 +74,7 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
             }
 
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "Error while checking for updates: %[exception]s", e);
+            Logger.error(this, "Error while checking for updates", e);
         }
     }
 

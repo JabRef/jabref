@@ -92,7 +92,7 @@ public class OracleProcessor extends DBMSProcessor {
             }
 
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
 
     }
@@ -103,7 +103,7 @@ public class OracleProcessor extends DBMSProcessor {
             oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
             oracleConnection.close();
         } catch (SQLException e) {
-            Logger.error(this, "SQL Error: %[exception]s", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 

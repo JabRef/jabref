@@ -569,7 +569,7 @@ class LayoutEntry {
                 results.add(f);
                 continue;
             } catch (Exception ex) {
-                Logger.info(this, "Problem with formatter: %[exception]s", ex);
+                Logger.info(this, "Problem with formatter", ex);
             }
 
             // Then check whether this is a user defined formatter

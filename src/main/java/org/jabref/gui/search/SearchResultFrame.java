@@ -478,7 +478,7 @@ public class SearchResultFrame {
                     entry.getField(FieldName.URL).ifPresent(link -> { try {
                         JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL);
                     } catch (IOException ex) {
-                            Logger.warn(this, "Could not open viewer: %[exception]s", ex);
+                            Logger.warn(this, "Could not open viewer", ex);
                         }
                     });
                     break;

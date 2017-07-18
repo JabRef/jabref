@@ -27,7 +27,7 @@ public class StringSaveSession extends SaveSession {
         try {
             return outputStream.toString(encoding.name());
         } catch (UnsupportedEncodingException e) {
-            Logger.warn(this, "error during string conversion: %[exception]s", e);
+            Logger.warn(this, "error during string conversion", e);
             return "";
         }
     }
@@ -46,7 +46,7 @@ public class StringSaveSession extends SaveSession {
         try {
             outputStream.close();
         } catch (IOException e) {
-            Logger.warn(this, "error during stream closing: %[exception]s", e);
+            Logger.warn(this, "error during stream closing", e);
         }
     }
 }

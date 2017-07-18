@@ -111,7 +111,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
             JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
         } catch (IOException e) {
-            Logger.warn(this, "Cannot open selected file.: %[exception]s", e);
+            Logger.warn(this, "Cannot open selected file.", e);
         }
     }
 
@@ -137,7 +137,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
             }
         } catch (IOException ex) {
-            Logger.debug(this, "Cannot open folder: %[exception]s", ex);
+            Logger.debug(this, "Cannot open folder", ex);
         }
     }
 

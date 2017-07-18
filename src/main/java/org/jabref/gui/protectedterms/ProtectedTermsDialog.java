@@ -242,7 +242,7 @@ public class ProtectedTermsDialog {
                     }
                 }
             } catch (IOException e) {
-                Logger.warn(this, "Problem open protected terms file editor: %[exception]s", e);
+                Logger.warn(this, "Problem open protected terms file editor", e);
             }
         }));
 

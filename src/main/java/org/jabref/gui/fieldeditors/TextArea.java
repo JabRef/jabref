@@ -111,7 +111,7 @@ public class TextArea implements FieldEditor {
             try {
                 SwingUtilities.invokeAndWait(() -> setBackground(color));
             } catch (InvocationTargetException | InterruptedException e) {
-                Logger.info(this, "Problem setting background color: %[exception]s", e);
+                Logger.info(this, "Problem setting background color", e);
             }
         }
     }

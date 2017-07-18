@@ -101,7 +101,7 @@ public class FindFullTextAction extends AbstractWorker {
                         }
                     });
                 } catch (IOException e) {
-                    Logger.warn(this, "Problem downloading file: %[exception]s", e);
+                    Logger.warn(this, "Problem downloading file", e);
                 }
                 basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));

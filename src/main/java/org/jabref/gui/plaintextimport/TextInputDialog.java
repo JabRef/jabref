@@ -198,7 +198,7 @@ public class TextInputDialog extends JabRefDialog {
         try {
             document.insertString(0, "", document.getStyle("regular"));
         } catch (BadLocationException ex) {
-            Logger.warn(this, "Problem setting style: %[exception]s", ex);
+            Logger.warn(this, "Problem setting style", ex);
 
         }
 
@@ -498,7 +498,7 @@ public class TextInputDialog extends JabRefDialog {
                     false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
-            Logger.error(this, "Error in entry: %[exception]s", ex);
+            Logger.error(this, "Error in entry", ex);
         }
 
         fieldList.clearSelection();
@@ -539,7 +539,7 @@ public class TextInputDialog extends JabRefDialog {
             try {
                 document.insertString(cPos, data, document.getStyle("regular"));
             } catch (BadLocationException ex) {
-                Logger.warn(this, "Could not paste text: %[exception]s", ex);
+                Logger.warn(this, "Could not paste text", ex);
             }
         }
     }
@@ -574,7 +574,7 @@ public class TextInputDialog extends JabRefDialog {
                     }
                 }
             } catch (BadLocationException | IOException ex) {
-                Logger.warn(this, "Problem reading or inserting file: %[exception]s", ex);
+                Logger.warn(this, "Problem reading or inserting file", ex);
             }
         }
     }

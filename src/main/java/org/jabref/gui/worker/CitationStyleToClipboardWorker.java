@@ -106,7 +106,7 @@ public class CitationStyleToClipboardWorker extends SwingWorker<List<String>, Vo
 
             basePanel.frame().setStatus(Localization.lang("Copied %0 citations.", String.valueOf(selectedEntries.size())));
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "Error while copying citations to the clipboard: %[exception]s", e);
+            Logger.error(this, "Error while copying citations to the clipboard", e);
         }
     }
 

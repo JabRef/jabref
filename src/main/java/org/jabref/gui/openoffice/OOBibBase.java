@@ -165,7 +165,7 @@ class OOBibBase {
                 return Optional
                         .of(String.valueOf(OOUtil.getProperty(mxDoc.getCurrentController().getFrame(), "Title")));
             } catch (UnknownPropertyException | WrappedTargetException e) {
-                Logger.warn(this, "Could not get document title: %[exception]s", e);
+                Logger.warn(this, "Could not get document title", e);
                 return Optional.empty();
             }
         }
@@ -952,7 +952,7 @@ class OOBibBase {
                     break;
                 }
             } catch (IndexOutOfBoundsException ex) {
-                Logger.warn(this, "Problem going left: %[exception]s", ex);
+                Logger.warn(this, "Problem going left", ex);
             }
         }
         int length = cursor.getString().length();
@@ -968,7 +968,7 @@ class OOBibBase {
                     }
                 }
             } catch (IndexOutOfBoundsException ex) {
-                Logger.warn(this, "Problem going right: %[exception]s", ex);
+                Logger.warn(this, "Problem going right", ex);
             }
         }
 

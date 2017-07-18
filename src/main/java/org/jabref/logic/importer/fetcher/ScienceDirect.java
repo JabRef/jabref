@@ -69,7 +69,7 @@ public class ScienceDirect implements FulltextFetcher {
                     }
                 }
             } catch (UnirestException e) {
-                Logger.warn(this, "ScienceDirect API request failed: %[exception]s", e);
+                Logger.warn(this, "ScienceDirect API request failed", e);
             }
         }
         return Optional.empty();
@@ -95,7 +95,7 @@ public class ScienceDirect implements FulltextFetcher {
             }
             return sciLink;
         } catch (JSONException e) {
-            Logger.debug(this, "No ScienceDirect link found in API request: %[exception]s", e);
+            Logger.debug(this, "No ScienceDirect link found in API request", e);
             return sciLink;
         }
     }

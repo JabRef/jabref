@@ -72,7 +72,7 @@ public class MSBibDatabase {
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            Logger.warn(this, "Could not parse document: %[exception]s", e);
+            Logger.warn(this, "Could not parse document", e);
             return Collections.emptyList();
         }
         NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
@@ -126,7 +126,7 @@ public class MSBibDatabase {
             }
             document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
-            Logger.warn(this, "Could not build XML document: %[exception]s", e);
+            Logger.warn(this, "Could not build XML document", e);
         }
         return document;
     }

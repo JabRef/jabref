@@ -52,7 +52,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                Logger.debug(this, "FileUpdateMonitor has been interrupted. Terminating...: %[exception]s", ex);
+                Logger.debug(this, "FileUpdateMonitor has been interrupted. Terminating...", ex);
                 return;
             }
         }
@@ -119,7 +119,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 entry.updateTimeStamp();
             } catch (IOException e) {
-                Logger.error(this, "Couldn't update timestamp: %[exception]s", e);
+                Logger.error(this, "Couldn't update timestamp", e);
             }
         }
     }

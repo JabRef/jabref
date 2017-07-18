@@ -40,7 +40,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
                     super.add(new CustomImporter(s.get(3), s.get(2)));
                 }
             } catch (Exception e) {
-                Logger.warn(this, "Could not load " + s.get(0) + " from preferences. Will ignore.: %[exception]s", e);
+                Logger.warn(this, "Could not load " + s.get(0) + " from preferences. Will ignore.", e);
             }
             i++;
         }

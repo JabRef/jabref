@@ -228,7 +228,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
             } catch (IOException ex) {
-                Logger.warn(this, "Could not register FileUpdateMonitor: %[exception]s", ex);
+                Logger.warn(this, "Could not register FileUpdateMonitor", ex);
             }
         } else {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
@@ -539,7 +539,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.toAbsolutePath());
                 } catch (IOException e) {
-                    Logger.info(this, "Could not open folder: %[exception]s", e);
+                    Logger.info(this, "Could not open folder", e);
                 }
             }
         }));
@@ -633,7 +633,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
                 output(outputStr);
             } catch (Throwable ex) {
-                Logger.warn(this, "Could not unmark: %[exception]s", ex);
+                Logger.warn(this, "Could not unmark", ex);
             }
         });
 
@@ -944,7 +944,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                         .getLayoutFromText();
             } catch (IOException e) {
-                Logger.info(this, "Could not get layout: %[exception]s", e);
+                Logger.info(this, "Could not get layout", e);
                 return;
             }
 
@@ -1029,7 +1029,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // The call to unblock will simply hide the glasspane, so there is no harm in calling
             // it even if the frame hasn't been blocked.
             frame.unblock();
-            Logger.error(this, "runCommand error: %[exception]s", ex);
+            Logger.error(this, "runCommand error", ex);
         }
     }
 
@@ -1064,7 +1064,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 highlightEntry(ex.getEntry());
                 showEntry(ex.getEntry());
             } else {
-                Logger.warn(this, "Could not save: %[exception]s", ex);
+                Logger.warn(this, "Could not save", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + "\n" + ex.getMessage(),
@@ -1275,7 +1275,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.CUT);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not cut: %[exception]s", ex);
+                    Logger.warn(this, "Could not cut", ex);
                 }
             }
         });
@@ -1286,7 +1286,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.COPY);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not copy: %[exception]s", ex);
+                    Logger.warn(this, "Could not copy", ex);
                 }
             }
         });
@@ -1297,7 +1297,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 try {
                     runCommand(Actions.PASTE);
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Could not paste: %[exception]s", ex);
+                    Logger.warn(this, "Could not paste", ex);
                 }
             }
         });
@@ -1326,7 +1326,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     try {
                         runCommand(Actions.EDIT);
                     } catch (Throwable ex) {
-                        Logger.warn(this, "Could not run action based on key press: %[exception]s", ex);
+                        Logger.warn(this, "Could not run action based on key press", ex);
                     }
                 }
             }
@@ -1611,7 +1611,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             try {
                 SwingUtilities.invokeAndWait(() -> markBasedChangedInternal());
             } catch (InvocationTargetException | InterruptedException e) {
-                Logger.info(this, "Problem marking database as changed: %[exception]s", e);
+                Logger.info(this, "Problem marking database as changed", e);
             }
         }
     }
@@ -2149,7 +2149,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 markBaseChanged();
                 frame.output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
-                Logger.warn(this, "Nothing to undo: %[exception]s", ex);
+                Logger.warn(this, "Nothing to undo", ex);
                 frame.output(Localization.lang("Nothing to undo") + '.');
             }
 
@@ -2200,7 +2200,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("External viewer called") + '.');
                         } catch (IOException e) {
                             output(Localization.lang("Could not open link"));
-                            Logger.info(this, "Could not open link: %[exception]s", e);
+                            Logger.info(this, "Could not open link", e);
                         }
                     }
                 }

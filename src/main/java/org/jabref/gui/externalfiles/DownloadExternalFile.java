@@ -160,7 +160,7 @@ public class DownloadExternalFile {
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
                     Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
-            Logger.info(this, "Error while downloading '" + res + "': %[exception]s", ex);
+            Logger.info(this, "Error while downloading '" + res + "'", ex);
             return;
         }
         final URL urlF = url;

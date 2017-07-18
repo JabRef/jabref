@@ -193,7 +193,7 @@ public class ExportFormat implements IExportFormat {
             } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
-                Logger.warn(this, "Cannot get save session.: %[exception]s", ex);
+                Logger.warn(this, "Cannot get save session.", ex);
             }
         }
         if (ss == null) {
@@ -350,7 +350,7 @@ public class ExportFormat implements IExportFormat {
 
             } catch (IOException ex) {
                 // TODO: show error message here?
-                Logger.warn(this, "Problem opening formatter file.: %[exception]s", ex);
+                Logger.warn(this, "Problem opening formatter file.", ex);
             }
         }
     }

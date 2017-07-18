@@ -80,9 +80,9 @@ public class AuxParser {
                     matchNestedAux(result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
-                Logger.info(this, "Cannot locate input file: %[exception]s", e);
+                Logger.info(this, "Cannot locate input file", e);
             } catch (IOException e) {
-                Logger.warn(this, "Problem opening file: %[exception]s", e);
+                Logger.warn(this, "Problem opening file", e);
             }
 
             fileIndex++;

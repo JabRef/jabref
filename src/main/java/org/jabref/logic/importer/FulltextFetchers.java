@@ -55,7 +55,7 @@ public class FulltextFetchers {
                         .findIdentifier(clonedEntry)
                         .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
             } catch (FetcherException e) {
-                Logger.debug(this, "Failed to find DOI: %[exception]s", e);
+                Logger.debug(this, "Failed to find DOI", e);
             }
         }
 
@@ -67,7 +67,7 @@ public class FulltextFetchers {
                     return result;
                 }
             } catch (IOException | FetcherException e) {
-                Logger.debug(this, "Failed to find fulltext PDF at given URL: %[exception]s", e);
+                Logger.debug(this, "Failed to find fulltext PDF at given URL", e);
             }
         }
         return Optional.empty();

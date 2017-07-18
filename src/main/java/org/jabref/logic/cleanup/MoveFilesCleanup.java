@@ -106,7 +106,7 @@ public class MoveFilesCleanup implements CleanupJob {
                     Files.createDirectories(newTargetFile);
                 }
             } catch (IOException e) {
-                Logger.error(this, "Could no create necessary target directoires for renaming: %[exception]s", e);
+                Logger.error(this, "Could no create necessary target directoires for renaming", e);
             }
 
             if (FileUtil.renameFile(oldFile.get(), newTargetFile, true)) {

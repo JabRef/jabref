@@ -54,7 +54,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         try {
             updateUIWithSearchResult(get());
         } catch (InterruptedException | ExecutionException e) {
-            Logger.error(this, "something went wrong during the search: %[exception]s", e);
+            Logger.error(this, "something went wrong during the search", e);
         }
     }
 

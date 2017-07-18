@@ -89,7 +89,7 @@ class CiteKeyBasedFileFinder implements FileFinder {
             try (Stream<Path> files = Files.find(directory, Integer.MAX_VALUE, isFileWithCorrectExtension)) {
                 result.addAll(files.collect(Collectors.toSet()));
             } catch (IOException e) {
-                Logger.error(this, "Problem in finding files: %[exception]s", e);
+                Logger.error(this, "Problem in finding files", e);
             }
         }
         return result;

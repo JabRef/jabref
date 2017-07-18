@@ -118,7 +118,7 @@ public class JabRefGUI {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
-                        Logger.error(this, "Connection error: %[exception]s", e);
+                        Logger.error(this, "Connection error", e);
                         JOptionPane.showMessageDialog(mainFrame,
                                 e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                                 Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
@@ -267,11 +267,11 @@ public class JabRefGUI {
                             Localization
                                     .lang("Unable to find the requested look and feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
-                    Logger.warn(this, "Unable to find requested look and feel: %[exception]s", e);
+                    Logger.warn(this, "Unable to find requested look and feel", e);
                 }
             }
         } catch (Exception e) {
-            Logger.warn(this, "Look and feel could not be set: %[exception]s", e);
+            Logger.warn(this, "Look and feel could not be set", e);
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms

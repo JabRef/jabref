@@ -662,7 +662,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                         }
                     }
                 } catch (Throwable ex) {
-                    Logger.warn(this, "Problem with table columns: %[exception]s", ex);
+                    Logger.warn(this, "Problem with table columns", ex);
                 }
                 colSetup.revalidate();
                 colSetup.repaint();

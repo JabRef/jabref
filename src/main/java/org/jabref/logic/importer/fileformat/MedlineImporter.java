@@ -177,7 +177,7 @@ public class MedlineImporter extends Importer implements Parser {
                 }
             }
         } catch (JAXBException | XMLStreamException e) {
-            Logger.debug(this, "could not parse document: %[exception]s", e);
+            Logger.debug(this, "could not parse document", e);
             return ParserResult.fromError(e);
         }
         return new ParserResult(bibItems);

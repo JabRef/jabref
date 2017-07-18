@@ -52,7 +52,7 @@ public class SpringerLink implements FulltextFetcher {
                     pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
                 }
             } catch (UnirestException e) {
-                Logger.warn(this, "SpringerLink API request failed: %[exception]s", e);
+                Logger.warn(this, "SpringerLink API request failed", e);
             }
         }
         return pdfLink;

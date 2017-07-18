@@ -328,7 +328,7 @@ public class MainTable extends JTable {
                             // set preferred width by using found index j in the width array
                             cm.getColumn(i).setPreferredWidth(Integer.parseInt(widthsFromPreferences.get(j)));
                         } catch (NumberFormatException e) {
-                            Logger.info(this, "Exception while setting column widths. Choosing default.: %[exception]s", e);
+                            Logger.info(this, "Exception while setting column widths. Choosing default.", e);
                             cm.getColumn(i).setPreferredWidth(BibtexSingleField.DEFAULT_FIELD_LENGTH);
                         }
                         break;

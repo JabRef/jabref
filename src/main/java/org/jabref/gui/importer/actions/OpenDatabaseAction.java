@@ -240,7 +240,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         NotASharedDatabaseException e) {
                     result.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                     result.getDatabase().clearSharedDatabaseID();
-                    Logger.error(this, "Connection error: %[exception]s", e);
+                    Logger.error(this, "Connection error", e);
                     JOptionPane.showMessageDialog(frame,
                             e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                             Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);

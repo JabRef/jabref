@@ -115,7 +115,7 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
-            Logger.error(this, "Error exporting to clipboard: %[exception]s", e); //To change body of catch statement use File | Settings | File Templates.
+            Logger.error(this, "Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:

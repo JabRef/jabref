@@ -296,7 +296,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                                 JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                             } catch (IOException ex) {
                                 panel.output(Localization.lang("Unable to open link."));
-                                Logger.info(this, "Unable to open link: %[exception]s", ex);
+                                Logger.info(this, "Unable to open link", ex);
                             }
                         }
                         break; // only open the first link

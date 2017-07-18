@@ -338,7 +338,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             m.setAccessible(true);
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            Logger.error(this, "Failed to decorate text field with clear button: %[exception]s", ex);
+            Logger.error(this, "Failed to decorate text field with clear button", ex);
         }
     }
 

@@ -185,7 +185,7 @@ public class AppendDatabaseAction implements BaseAction {
                         importSelectorWords);
                 panel.output(Localization.lang("Imported from library") + " '" + file + "'");
             } catch (IOException | KeyCollisionException ex) {
-                Logger.warn(this, "Could not open database: %[exception]s", ex);
+                Logger.warn(this, "Could not open database", ex);
                 JOptionPane.showMessageDialog(panel, ex.getMessage(), Localization.lang("Open library"),
                         JOptionPane.ERROR_MESSAGE);
             }

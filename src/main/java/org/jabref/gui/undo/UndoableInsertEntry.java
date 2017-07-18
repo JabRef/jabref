@@ -44,7 +44,7 @@ public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
             // If the entry has an editor currently open, we must close it.
             panel.ensureNotShowingBottomPanel(entry);
         } catch (Throwable ex) {
-            Logger.warn(this, "Problem to undo `insert entry`: %[exception]s", ex);
+            Logger.warn(this, "Problem to undo `insert entry`", ex);
         }
     }
 

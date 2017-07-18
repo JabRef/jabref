@@ -40,7 +40,7 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         try {
             result = new RemoteListenerServerThread(messageHandler, port);
         } catch (BindException e) {
-            Logger.warn(this, "Port is blocked: %[exception]s", e);
+            Logger.warn(this, "Port is blocked", e);
             result = null;
         } catch (IOException e) {
             result = null;

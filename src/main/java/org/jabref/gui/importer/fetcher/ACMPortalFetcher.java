@@ -325,7 +325,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
 
             } catch (IOException | ParseException e) {
-                Logger.info(this, "Download of BibTeX information from ACM Portal failed.: %[exception]s", e);
+                Logger.info(this, "Download of BibTeX information from ACM Portal failed.", e);
             }
             if ((items == null) || items.isEmpty()) {
                 return Optional.empty();
@@ -351,9 +351,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     "Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
                     e);
         } catch (MalformedURLException e) {
-            Logger.info(this, "Malformed URL.: %[exception]s", e);
+            Logger.info(this, "Malformed URL.", e);
         } catch (IOException e) {
-            Logger.info(this, "Cannot connect.: %[exception]s", e);
+            Logger.info(this, "Cannot connect.", e);
         } catch (InterruptedException ignored) {
             // Ignored
         }

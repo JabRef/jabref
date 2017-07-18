@@ -69,7 +69,7 @@ public class DoiResolution implements FulltextFetcher {
                         pdfLink = links.get(0);
                     }
                 } catch (IOException e) {
-                    Logger.warn(this, "DoiResolution fetcher failed: %[exception]s", e);
+                    Logger.warn(this, "DoiResolution fetcher failed", e);
                 }
             }
         }
