@@ -125,8 +125,6 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
-    compile 'org.apache.commons:commons-lang3:3.6'
-
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.24'
@@ -152,6 +150,9 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.6.0'
     testCompile 'org.assertj:assertj-swing-junit:3.6.0'
     testCompile 'org.reflections:reflections:0.9.11'
+
+    testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
+    testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }
 
 sourceSets {
