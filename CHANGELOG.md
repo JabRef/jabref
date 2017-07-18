@@ -8,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased]
+## [4.0-beta2] – 2017-07-18
 
 ### Changed
 - We moved the `adsurl` field to `url` field when fetching with the ADS fetcher.
@@ -48,49 +48,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed a bug where editors in the DocBook export were not exported [#3020](https://github.com/JabRef/jabref/issues/3020)
 - We fixed a bug where the source tab was not updated when one the fields was changed [#2888](https://github.com/JabRef/jabref/issues/2888)
 - We restored the original functionality that when browsing through the MainTable, the Entry Editor remembers which tab was opened before [#2896](https://github.com/JabRef/jabref/issues/2896)
-
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## [4.0-beta] – 2017-04-17
 
@@ -881,7 +838,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta2...HEAD
+[4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1
