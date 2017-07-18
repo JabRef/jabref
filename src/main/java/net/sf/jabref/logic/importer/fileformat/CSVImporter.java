@@ -79,7 +79,7 @@ public class CSVImporter extends Importer {
                 if (!fieldValues[0].equals("")) {
 
                     // Se nao estiver vazio, cria uma entrada bib
-                    BibEntry newBibEntry = new BibEntry(fieldValues[0]);
+                    BibEntry newBibEntry = new BibEntry(matchType(fieldValues[0]));
 
                     // E, em seguida, completa com os demais campos
                     for (int i = 1; i < headerFields.length; i++) {
@@ -144,5 +144,54 @@ public class CSVImporter extends Importer {
         }
         else
             return inputString;
+    }
+
+    // Realiza a conversao inversa da presente em GetOpenOfficeType, inserindo os tipos como
+    // "strings", e nao "numeros"
+    private static String matchType(String fieldType) {
+        if ("7".equalsIgnoreCase(fieldType)) {
+            return "Article";
+        }
+        if ("1".equalsIgnoreCase(fieldType)) {
+            return "Book";
+        }
+        if ("2".equalsIgnoreCase(fieldType)) {
+            return "Booklet";
+        }
+        if ("5".equalsIgnoreCase(fieldType)) {
+            return "Inbook";
+        }
+        if ("5".equalsIgnoreCase(fieldType)) {
+            return "Incollection";
+        }
+        if ("6".equalsIgnoreCase(fieldType)) {
+            return "Inproceedings";
+        }
+        if ("8".equalsIgnoreCase(fieldType)) {
+            return "Manual";
+        }
+        if ("9".equalsIgnoreCase(fieldType)) {
+            return "Mastersthesis";
+        }
+        if ("10".equalsIgnoreCase(fieldType)) {
+            return "Misc";
+        }
+        if ("10".equalsIgnoreCase(fieldType)) {
+            return "Other";
+        }
+        if ("9".equalsIgnoreCase(fieldType)) {
+            return "Phdthesis";
+        }
+        if ("3".equalsIgnoreCase(fieldType)) {
+            return "Proceedings";
+        }
+        if ("13".equalsIgnoreCase(fieldType)) {
+            return "Techreport";
+        }
+        if ("14".equalsIgnoreCase(fieldType)) {
+            return "Unpublished";
+        }
+        // Default
+        return fieldType;
     }
 }
