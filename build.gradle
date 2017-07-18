@@ -117,15 +117,13 @@ dependencies {
     compile('net.corda:jfx:0.12.1') {
         transitive = false
     }
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.2' // required by net.corda:jfxc
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.3' // required by net.corda:jfxc
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
 
 
     compile 'commons-logging:commons-logging:1.2'
-
-    compile 'org.apache.commons:commons-lang3:3.6'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -150,8 +148,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'
     testCompile 'com.github.tomakehurst:wiremock:2.6.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.6.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.7.0'
     testCompile 'org.reflections:reflections:0.9.11'
+
+    testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
+    testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }
 
 sourceSets {

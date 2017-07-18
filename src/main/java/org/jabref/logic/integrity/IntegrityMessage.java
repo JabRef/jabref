@@ -4,11 +4,10 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-
 public final class IntegrityMessage implements Cloneable {
 
     private final BibEntry entry;
+
     private final String fieldName;
     private final String message;
 
@@ -41,22 +40,13 @@ public final class IntegrityMessage implements Cloneable {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (obj == this) {
-            return true;
-        }
-        if (obj.getClass() != getClass()) {
-            return false;
-        }
-        IntegrityMessage that = (IntegrityMessage) obj;
-        return new EqualsBuilder()
-                .append(entry, that.entry)
-                .append(fieldName, that.fieldName)
-                .append(message, that.message)
-                .isEquals();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntegrityMessage that = (IntegrityMessage) o;
+        return Objects.equals(entry, that.entry) &&
+                Objects.equals(fieldName, that.fieldName) &&
+                Objects.equals(message, that.message);
     }
 
     @Override
