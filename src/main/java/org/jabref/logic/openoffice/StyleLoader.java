@@ -68,9 +68,9 @@ public class StyleLoader {
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            Logger.info(this, "Cannot find external style file %s: %[exception]s", filename, e);
+            Logger.info(this, "Cannot find external style file %s", e, filename);
         } catch (IOException e) {
-            Logger.info(this, "Problem reading external style file %s: %[exception]s", filename, e);
+            Logger.info(this, "Problem reading external style file %s", e, filename);
         }
         return false;
 
