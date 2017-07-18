@@ -11,7 +11,8 @@ wget --quiet -nc http://download-keycdn.ej-technologies.com/install4j/install4j_
 
 # extract tar archive of install4j into the source directory of JabRef
 cd ~/jabref
-tar -xzf ~/downloads/install4j_unix_6_1_6.tar.gz
+# version 6.1.6 is NOT zipped any more - old command line: "-xzf"
+tar -xf ~/downloads/install4j_unix_6_1_6.tar.gz
 
 # fetch JREs
 if [ ! -d ~/.install4j6/jres/ ]; then
