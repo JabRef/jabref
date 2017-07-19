@@ -11,6 +11,7 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.Book;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -21,21 +22,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-
-/**
- * Created by felipe on 7/14/17.
- */
 public class BibtexEntryTypes_bookTest {
 
     private BibEntryWriter writer;
-    private static ImportFormatPreferences importFormatPreferences;
-
 
     @Before
     public void setUpWriter() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
         writer = new BibEntryWriter(
                 new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences()), true);
     }
@@ -49,7 +42,7 @@ public class BibtexEntryTypes_bookTest {
 
     //apenas com os campos obrigatorios/requeridos
     @Test
-    public void testBibtexEntryType_book_reqFields() throws Exception{
+    public void testBibtexEntryType_book_reqFields() throws Exception {
 
         StringWriter stringWriter = new StringWriter();
 
@@ -61,7 +54,6 @@ public class BibtexEntryTypes_bookTest {
         entry.setCiteKey("testeKey");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-
         String actual = stringWriter.toString();
 
         // @formatter:off
@@ -74,29 +66,28 @@ public class BibtexEntryTypes_bookTest {
         // @formatter:on
 
         assertEquals(expected, actual);
-        System.out.print(actual);
+        //System.out.print(actual);
     }
 
     //com todos os campos preenchidos
     @Test
-    public void testBibtexEntryType_book_allFields() throws Exception{
+    public void testBibtexEntryType_book_allFields() throws Exception {
 
         StringWriter stringWriter = new StringWriter();
 
         BibEntry entry = new BibEntry("book");
         entry.setField("author", "George R.R. Martin");
-        entry.setField("title","A Tormenta De Espadas");
-        entry.setField("publisher","LeYa");
-        entry.setField("year","2011");
+        entry.setField("title", "A Tormenta De Espadas");
+        entry.setField("publisher", "LeYa");
+        entry.setField("year", "2011");
         entry.setCiteKey("testeKey");
-        entry.setField("volume","3");
-        entry.setField("series","As Cronicas De Gelo E Fogo");
-        entry.setField("address","Sao Paulo");
-        entry.setField("month","setembro");
-        entry.setField("note","livro grande");
+        entry.setField("volume", "3");
+        entry.setField("series", "As Cronicas De Gelo E Fogo");
+        entry.setField("address", "Sao Paulo");
+        entry.setField("month", "setembro");
+        entry.setField("note", "livro grande");
 
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
-
         String actual = stringWriter.toString();
 
         // @formatter:off
@@ -114,8 +105,5 @@ public class BibtexEntryTypes_bookTest {
         // @formatter:on
 
         assertEquals(expected, actual);
-        //System.out.print(actual);
     }
-
-
 }
