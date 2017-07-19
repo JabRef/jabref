@@ -17,4 +17,9 @@ public class MainArchitectureTestsWithArchUnit {
             noClasses().that().areNotAnnotatedWith(ApacheCommonsLang3Allowed.class)
             .should().accessClassesThat().resideInAPackage("org.apache.commons.lang3");
 
+    @ArchTest
+    public static final ArchRule doNotUseApacheCommonsLogging =
+            noClasses()
+            .should().accessClassesThat().resideInAPackage("org.apache.commons.logging");
+
 }
