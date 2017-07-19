@@ -15,9 +15,9 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests to complement the equivalence classes of importing database
+ * Testes para complementar as classes de equivalência para importar uma database
  *
- * Formats already being tested by {@link ImportFormatReaderIntegrationTest}:
+ * Formatos já testados por {@link ImportFormatReaderIntegrationTest}:
  * Ris
  * Isi
  * SilverPlatter
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  * MsBib
  * Bibtex
  *
- * Formats to be tested by this class:
+ * Formatos testados por essa classe:
  * Biblioscape
  * BibTeXML
  * Copac
@@ -36,10 +36,10 @@ import static org.junit.Assert.assertEquals;
  * MedlinePlain
  * Mods
  *
- * Cannot be tested:
+ * Não foi possível testar:
  * FreeCite
  *
- * Did not find any examples:
+ * Não foi achado nenhum exemplo:
  * PdfContent
  * PdfXmp
  */
