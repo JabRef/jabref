@@ -1,5 +1,7 @@
 package org.jabref;
 
+import com.google.common.collect.ObjectArrays;
+
 /**
  * Separate class for logging.
  *
@@ -75,7 +77,7 @@ public class Logger {
             final String msg, final Throwable e, final Object... args
     ) {
         if (com.jcabi.log.Logger.isTraceEnabled(source)) {
-            com.jcabi.log.Logger.trace(source, msg + ": %[exception]s", merge(args, e));
+            com.jcabi.log.Logger.trace(source, msg + ": %[exception]s", ObjectArrays.concat(args, e));
         }
     }
 
@@ -88,7 +90,7 @@ public class Logger {
             final String msg, final Throwable e, final Object... args
     ) {
         if (com.jcabi.log.Logger.isDebugEnabled(source)) {
-            com.jcabi.log.Logger.debug(source, msg + ": %[exception]s", merge(args, e));
+            com.jcabi.log.Logger.debug(source, msg + ": %[exception]s", ObjectArrays.concat(args, e));
         }
     }
 
@@ -105,7 +107,7 @@ public class Logger {
             final String msg, final Throwable e, final Object... args
     ) {
         if (com.jcabi.log.Logger.isInfoEnabled(source)) {
-            com.jcabi.log.Logger.info(source, msg + ": %[exception]s", merge(args, e));
+            com.jcabi.log.Logger.info(source, msg + ": %[exception]s", ObjectArrays.concat(args, e));
         }
     }
 
@@ -122,7 +124,7 @@ public class Logger {
             final String msg, final Throwable e, final Object... args
     ) {
         if (com.jcabi.log.Logger.isWarnEnabled(source)) {
-            com.jcabi.log.Logger.warn(source, msg + ": %[exception]s", merge(args, e));
+            com.jcabi.log.Logger.warn(source, msg + ": %[exception]s", ObjectArrays.concat(args, e));
         }
     }
 
@@ -133,21 +135,7 @@ public class Logger {
     public static void error(final Object source,
                              final String msg, final Throwable e, final Object... args) {
         // error is always logged. Therefore, no isErrorEnabled(Object) exists
-        com.jcabi.log.Logger.error(source, msg + ": %[exception]s", merge(args, e));
+        com.jcabi.log.Logger.error(source, msg + ": %[exception]s", ObjectArrays.concat(args, e));
     }
 
-    /**
-     * Merges args and e together into an array starting with args
-     */
-    private static Object[] merge(Object[] args, Throwable e) {
-        final int length = args.length;
-        if (length == 0) {
-            return new Object[]{e};
-        } else {
-            Object[] res = new Object[length + 1];
-            System.arraycopy(args, 0, res, 0, length);
-            res[length - 1] = e;
-            return res;
-        }
-    }
 }
