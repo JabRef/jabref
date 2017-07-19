@@ -1,21 +1,23 @@
 package net.sf.jabref.logic.importer.fileformat;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * Importer para o formato CSV.
  * Neste caso, os campos do arquivo devem ser separados por virgula!
  */
-public class CSVImporter extends Importer {
+public class CsvImporter extends Importer {
     private static final Pattern CSV_PATTERN = Pattern.compile("((\"([^\"]*),+([^\"]*)\")||([^\"]*),([^\"]*))\n?");
 
     @Override
@@ -55,7 +57,7 @@ public class CSVImporter extends Importer {
 
             // Se for o cabecalho (primeira linha), verifica a RegEx e computa o nro de campos
             if(inHeader) {
-                if(!CSVImporter.CSV_PATTERN.matcher(readLine).find())
+                if(!CsvImporter.CSV_PATTERN.matcher(readLine).find())
                     return false;
                 else {
                     headerSize = substituteInsideCommaByTripleHash(readLine).split(",").length;
@@ -67,7 +69,7 @@ public class CSVImporter extends Importer {
             // se a RegEx eh satisfeita
             else {
                 lineSize = substituteInsideCommaByTripleHash(readLine).split(",").length;
-                if(((lineSize != headerSize) && (lineSize > 0)) || (!CSVImporter.CSV_PATTERN.matcher(readLine).find()))
+                if(((lineSize != headerSize) && (lineSize > 0)) || (!CsvImporter.CSV_PATTERN.matcher(readLine).find()))
                     return false;
             }
         }
