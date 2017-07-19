@@ -314,7 +314,6 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public void saveAs(File file) throws Exception {
         BibDatabaseContext context = panel.getBibDatabaseContext();
-        Path oldFile = context.getDatabasePath().get();
 
         if (context.getLocation() == DatabaseLocation.SHARED) {
             // Save all properties dependent on the ID. This makes it possible to restore them.
@@ -334,10 +333,16 @@ public class SaveDatabaseAction extends AbstractWorker {
             return;
         }
 
-        //closing AutosaveManager and BackupManager for original library
-        context.setDatabaseFile(oldFile.toFile());
-        AutosaveManager.shutdown(context);
-        BackupManager.shutdown(context);
+        Optional<Path> databasePath = context.getDatabasePath();
+        if (databasePath.isPresent()) {
+            final Path oldFile = databasePath.get();
+            context.setDatabaseFile(oldFile.toFile());
+            //closing AutosaveManager and BackupManager for original library
+            AutosaveManager.shutdown(context);
+            BackupManager.shutdown(context);
+        } else {
+            Logger.info(this, "Old file not found, just creating a new file");
+        }
         context.setDatabaseFile(file);
 
         // Register so we get notifications about outside changes to the file.
@@ -406,7 +411,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
-                    Localization.lang("File has been updated externally. What do you want to do?"),
+                    Localization.lang("File has been updated externally. " + "What do you want to do?"),
                     Localization.lang("File updated externally"), JOptionPane.YES_NO_CANCEL_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, opts, opts[0]);
 

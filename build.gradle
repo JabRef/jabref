@@ -15,11 +15,11 @@ buildscript {
 
 plugins {
     id 'com.gradle.build-scan' version '1.8'
-    id "com.install4j.gradle" version "6.1.5"
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
-    id "com.simonharrer.modernizer" version "1.4.0-1"
-    id 'me.champeau.gradle.jmh' version '0.3.1'
-    id "net.ltgt.errorprone" version "0.0.10"
+    id 'com.install4j.gradle' version '6.1.5'
+    id 'com.github.johnrengelman.shadow' version '1.2.4' // update to 2.0.1 not possible as our "transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {" implemenation does not compile any more
+    id "com.simonharrer.modernizer" version '1.4.0-1'
+    id 'me.champeau.gradle.jmh' version '0.4.3'
+    id 'net.ltgt.errorprone' version '0.0.11'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -28,13 +28,12 @@ buildScan {
     licenseAgree = 'yes'
 }
 
-apply plugin: "java"
-apply plugin: "application"
-apply plugin: "project-report"
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'project-report'
 apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
-
 apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
@@ -42,8 +41,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.0.0-dev"
-project.ext.threeDotVersion = "4.0.0.1"
+version = "4.0-dev"
+project.ext.threeDotVersion = "4.0.1.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -117,7 +116,7 @@ dependencies {
     compile('net.corda:jfx:0.12.1') {
         transitive = false
     }
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.2' // required by net.corda:jfxc
+    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.3' // required by net.corda:jfxc
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
@@ -150,7 +149,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'
     testCompile 'com.github.tomakehurst:wiremock:2.6.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.6.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.7.0'
     testCompile 'org.reflections:reflections:0.9.11'
 
     testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'

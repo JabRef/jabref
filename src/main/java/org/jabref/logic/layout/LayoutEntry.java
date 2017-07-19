@@ -36,6 +36,7 @@ import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBookAuthors;
+import org.jabref.logic.layout.format.CreateDocBookEditors;
 import org.jabref.logic.layout.format.CurrentDate;
 import org.jabref.logic.layout.format.DOICheck;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -445,6 +446,8 @@ class LayoutEntry {
             return new CreateBibORDFAuthors();
         case "CreateDocBookAuthors":
             return new CreateDocBookAuthors();
+        case "CreateDocBookEditors":
+            return new CreateDocBookEditors();
         case "CurrentDate":
             return new CurrentDate();
         case "DateFormatter":
