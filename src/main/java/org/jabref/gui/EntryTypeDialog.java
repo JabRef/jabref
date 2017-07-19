@@ -306,23 +306,23 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
             try {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
-                	final BibEntry bibEntry = result.get();
-                	if((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())){
+                    final BibEntry bibEntry = result.get();
+                    if((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                 		//If there are duplicates starts ImportInspectionDialog
-                		final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                		ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
-                		diag.addEntry(bibEntry);
-                		diag.entryListComplete();
-                		diag.setLocationRelativeTo(frame);
-                		diag.setVisible(true);
-                		diag.toFront();	 
-                	}
-                	else{
+                        ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
+                        diag.addEntry(bibEntry);
+                        diag.entryListComplete();
+                        diag.setLocationRelativeTo(frame);
+                        diag.setVisible(true);
+                        diag.toFront();	 
+                    }
+                    else {
                 		// Regenerate CiteKey of imported BibEntry
-                		BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
-                		frame.getCurrentBasePanel().insertEntry(bibEntry);
-                	}
+                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        frame.getCurrentBasePanel().insertEntry(bibEntry);
+                    }
 
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
