@@ -40,6 +40,39 @@ public class CSVImporter extends Importer {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+
+        // Auxiliar para ler linha a linha o arquivo
+        String readLine;
+        // Boolean que indica se a linha lida eh o cabecalho
+        boolean inHeader = true;
+        // Contador do numero de campos do cabecalho
+        int headerSize = 0;
+        // Contador de campos da linha lida
+        int lineSize;
+
+        // Enquanto uma nova linha eh lida:
+        while((readLine = reader.readLine()) != null) {
+
+            // Se for o cabecalho (primeira linha), verifica a RegEx e computa o nro de campos
+            if(inHeader) {
+                if(!CSVImporter.CSV_PATTERN.matcher(readLine).find())
+                    return false;
+                else {
+                    headerSize = substituteInsideCommaByTripleHash(readLine).split(",").length;
+                    inHeader = false;
+                }
+            }
+
+            // Se for uma linha de entrada, verifica se o tamanho eh o mesmo que o cabecalho e
+            // se a RegEx eh satisfeita
+            else {
+                lineSize = substituteInsideCommaByTripleHash(readLine).split(",").length;
+                if(((lineSize != headerSize) && (lineSize > 0)) || (!CSVImporter.CSV_PATTERN.matcher(readLine).find()))
+                    return false;
+            }
+        }
+
+        // Se todas as linhas foram lidas sem erros, entao o arquivo CSV eh valido!
         return true;
     }
 
