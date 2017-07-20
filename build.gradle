@@ -5,7 +5,7 @@ import org.gradle.internal.os.OperatingSystem
 buildscript {
     repositories {
         maven {
-            url 'http://maven.ej-technologies.com/repository'
+            url 'https://maven.ej-technologies.com/repository'
         }
     }
     dependencies {
