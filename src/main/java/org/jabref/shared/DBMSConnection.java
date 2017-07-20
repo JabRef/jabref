@@ -6,15 +6,14 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class DBMSConnection {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnection.class);
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
@@ -39,7 +38,7 @@ public class DBMSConnection {
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
-            LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
+            Logger.error(this, "Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
 
             throw e;
         }
@@ -65,7 +64,7 @@ public class DBMSConnection {
                 dbmsTypes.add(dbms);
             } catch (ClassNotFoundException e) {
                 // In case that the driver is not available do not perform tests for this system.
-                LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
+                LogFactory.getLog(DBMSConnection.class).info(Localization.lang("%0 driver not available.", dbms.toString()));
             }
         }
         return dbmsTypes;

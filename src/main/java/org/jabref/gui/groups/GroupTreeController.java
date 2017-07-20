@@ -31,6 +31,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
+import org.jabref.Logger;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
@@ -41,15 +42,12 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupTreeController extends AbstractController<GroupTreeViewModel> {
 
-    private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
 
     @FXML private TreeTableView<GroupNodeViewModel> groupTree;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
@@ -340,7 +338,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
             m.setAccessible(true);
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            LOGGER.error("Failed to decorate text field with clear button", ex);
+            Logger.error(this, "Failed to decorate text field with clear button", ex);
         }
     }
 

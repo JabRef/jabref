@@ -12,12 +12,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * LaTeX Aux to BibTeX Parser
@@ -34,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
  * Nested AUX files: \@input{x}
  */
 public class AuxParser {
-    private static final Log LOGGER = LogFactory.getLog(AuxParser.class);
 
     private static final Pattern CITE_PATTERN = Pattern.compile("\\\\(citation|abx@aux@cite)\\{(.+)\\}");
     private static final Pattern INPUT_PATTERN = Pattern.compile("\\\\@input\\{(.+)\\}");
@@ -82,9 +79,9 @@ public class AuxParser {
                     matchNestedAux(result, fileList, line);
                 }
             } catch (FileNotFoundException e) {
-                LOGGER.info("Cannot locate input file", e);
+                Logger.info(this, "Cannot locate input file", e);
             } catch (IOException e) {
-                LOGGER.warn("Problem opening file", e);
+                Logger.warn(this, "Problem opening file", e);
             }
 
             fileIndex++;

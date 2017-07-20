@@ -10,14 +10,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.OS;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsList.class);
 
     private String description;
     private final List<String> termsList;
@@ -93,7 +90,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
             writer.write(s);
             termsList.add(term);
         } catch (IOException ioe) {
-            LOGGER.warn("Problem adding protected term to list", ioe);
+            Logger.warn(this, "Problem adding protected term to list", ioe);
             return false;
         }
         return true;

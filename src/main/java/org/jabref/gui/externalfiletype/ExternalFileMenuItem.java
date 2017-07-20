@@ -9,6 +9,7 @@ import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.logic.l10n.Localization;
@@ -16,16 +17,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * The menu item used in the popup menu for opening external resources associated
  * with an entry. Shows the resource name and icon given, and adds an action listener
  * to process the request if the user clicks this menu item.
  */
 public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
-    private static final Log LOGGER = LogFactory.getLog(ExternalFileMenuItem.class);
 
     private final BibEntry entry;
     private final String link;
@@ -99,7 +96,7 @@ public class ExternalFileMenuItem extends JMenuItem implements ActionListener {
                 return false;
             }
 
-            LOGGER.warn("Unable to open link", ex);
+            Logger.warn(this, "Unable to open link", ex);
         }
         return false;
     }

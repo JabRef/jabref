@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
@@ -18,8 +19,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,7 +26,6 @@ public class SpringerFetcher implements EntryFetcher {
 
     private static final String API_URL = "http://api.springer.com/metadata/json?q=";
     private static final String API_KEY = "b0c7151179b3d9c1119cf325bca8460d";
-    private static final Log LOGGER = LogFactory.getLog(SpringerFetcher.class);
     private static final int MAX_PER_PAGE = 100;
     private boolean shouldContinue;
 
@@ -97,7 +95,7 @@ public class SpringerFetcher implements EntryFetcher {
                 return false;
             }
         } catch (IOException | UnirestException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;

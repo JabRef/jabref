@@ -22,6 +22,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -45,8 +46,6 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class holds the functionality of autolinking to a file that's dropped
@@ -62,7 +61,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DroppedFileHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
 
     private final JabRefFrame frame;
 
@@ -178,7 +176,7 @@ public class DroppedFileHandler {
         Optional<ExternalFileType> optFileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("pdf");
 
         if (!optFileType.isPresent()) {
-            LOGGER.warn("No file type with extension 'pdf' registered.");
+            Logger.warn(this, "No file type with extension 'pdf' registered.");
             return;
         }
 
@@ -230,7 +228,7 @@ public class DroppedFileHandler {
         try {
             xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
-            LOGGER.warn("Problem reading XMP", e);
+            Logger.warn(this, "Problem reading XMP", e);
             return false;
         }
 
@@ -431,7 +429,7 @@ public class DroppedFileHandler {
                 }
             }
 
-            LOGGER.debug("absFilename: " + absFilename);
+            Logger.debug(this, "absFilename: " + absFilename);
 
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
@@ -442,7 +440,7 @@ public class DroppedFileHandler {
                         .map(Path::toString)
                         .orElse(null);
 
-                LOGGER.debug("absName: " + absName);
+                Logger.debug(this, "absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
                 if (absFilename.equals(absName)) {
                     return;
@@ -493,7 +491,7 @@ public class DroppedFileHandler {
                     Files.createDirectories(destFile);
                 }
             } catch (IOException e) {
-                LOGGER.error("Problem creating target directories", e);
+                Logger.error(this, "Problem creating target directories", e);
             }
             if (FileUtil.renameFile(fromFile, destFile, true)) {
                 return true;
@@ -532,7 +530,7 @@ public class DroppedFileHandler {
             // OOps, we don't know which directory to put it in, or the given
             // dir doesn't exist....
             // This should not happen!!
-            LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
+            Logger.warn(this, "Cannot determine destination directory or destination directory does not exist");
             return false;
         }
 
@@ -557,7 +555,7 @@ public class DroppedFileHandler {
             }
             FileUtil.copyFile(Paths.get(fileName), destFile, true);
         } catch (IOException e) {
-            LOGGER.error("Problem copying file", e);
+            Logger.error(this, "Problem copying file", e);
             return false;
         }
         return true;

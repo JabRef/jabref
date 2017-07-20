@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
@@ -20,12 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
-
-    private static final Log LOGGER = LogFactory.getLog(PushToLyx.class);
 
     @Override
     public String getApplicationName() {
@@ -107,7 +103,7 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
                 fw.close();
             } catch (IOException excep) {
                 couldNotCall = true;
-                LOGGER.warn("Problem pushing to LyX/Kile.", excep);
+                Logger.warn(this, "Problem pushing to LyX/Kile.", excep);
             }
         });
     }

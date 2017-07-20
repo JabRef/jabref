@@ -7,10 +7,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.FieldName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for working with Eprint identifiers
@@ -21,7 +19,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class Eprint implements Identifier {
     public static final URI RESOLVER = URI.create("http://arxiv.org");
-    private static final Log LOGGER = LogFactory.getLog(Eprint.class);
 
     // Regex
     // (see https://arxiv.org/help/arxiv_identifier)
@@ -109,7 +106,7 @@ public class Eprint implements Identifier {
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen
-            LOGGER.error(eprint + " could not be encoded as URI.", e);
+            Logger.error(this, eprint + " could not be encoded as URI.", e);
             return Optional.empty();
         }
     }

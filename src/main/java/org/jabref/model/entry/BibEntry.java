@@ -19,6 +19,7 @@ import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
+import org.jabref.Logger;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -31,8 +32,6 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
 
@@ -41,7 +40,6 @@ public class BibEntry implements Cloneable {
     public static final String KEY_FIELD = "bibtexkey";
     public static final String DEFAULT_TYPE = "misc";
     protected static final String ID_FIELD = "id";
-    private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
     private final SharedBibEntryData sharedBibEntryData;
     /**
@@ -327,7 +325,7 @@ public class BibEntry implements Cloneable {
                     return parsedDate.get().getDay().map(Object::toString);
                 }
             } else {
-                LOGGER.warn("Could not parse date " + date.get());
+                Logger.warn(this, "Could not parse date " + date.get());
                 return Optional.empty(); // Date field not in valid format
             }
         }
@@ -719,8 +717,7 @@ public class BibEntry implements Cloneable {
         try {
             this.eventBus.unregister(object);
         } catch (IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            Logger.debug(this, "occurs if the event source has not been registered, should not prevent shutdown", e);
         }
     }
 

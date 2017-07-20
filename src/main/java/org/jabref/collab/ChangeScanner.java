@@ -15,6 +15,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.bibtex.DuplicateCheck;
@@ -39,11 +40,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ChangeScanner implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
 
     private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
@@ -115,7 +112,7 @@ public class ChangeScanner implements Runnable {
             scanGroups(metadataInTemp, metadataOnDisk);
 
         } catch (IOException ex) {
-            LOGGER.warn("Problem running", ex);
+            Logger.warn(this, "Problem running", ex);
         }
     }
 
@@ -155,7 +152,7 @@ public class ChangeScanner implements Runnable {
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
-                LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
+                Logger.warn(this, "Problem updating tmp file after accepting external changes", ex);
             }
         });
     }

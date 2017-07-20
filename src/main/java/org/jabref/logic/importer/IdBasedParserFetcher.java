@@ -10,11 +10,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jsoup.helper.StringUtil;
 
 /**
@@ -24,8 +23,6 @@ import org.jsoup.helper.StringUtil;
  * 3. Post-process fetched entries
  */
 public interface IdBasedParserFetcher extends IdBasedFetcher {
-
-    Log LOGGER = LogFactory.getLog(IdBasedParserFetcher.class);
 
     /**
      * Constructs a URL based on the query.
@@ -69,7 +66,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             }
 
             if (fetchedEntries.size() > 1) {
-                LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+                Logger.info(this, "Fetcher " + getName() + "found more than one result for identifier " + identifier
                         + ". We will use the first entry.");
             }
 
@@ -82,7 +79,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (FileNotFoundException e) {
-            LOGGER.debug("Id not found");
+            Logger.debug(this, "Id not found");
             return Optional.empty();
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource

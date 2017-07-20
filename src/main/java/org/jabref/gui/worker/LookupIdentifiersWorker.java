@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.NamedCompound;
@@ -15,12 +16,8 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class LookupIdentifiersWorker<T extends Identifier> extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(LookupIdentifiersWorker.class);
     private final JabRefFrame frame;
     private final IdFetcher<T> fetcher;
 
@@ -48,7 +45,7 @@ public class LookupIdentifiersWorker<T extends Identifier> extends AbstractWorke
                 try {
                     identifier = fetcher.findIdentifier(bibEntry);
                 } catch (FetcherException e) {
-                    LOGGER.error("Could not fetch " + fetcher.getIdentifierName(), e);
+                    Logger.error(this, "Could not fetch " + fetcher.getIdentifierName(), e);
                 }
                 if (identifier.isPresent() && !bibEntry.hasField(identifier.get().getDefaultField())) {
                     Optional<FieldChange> fieldChange = bibEntry.setField(identifier.get().getDefaultField(), identifier.get().getNormalized());

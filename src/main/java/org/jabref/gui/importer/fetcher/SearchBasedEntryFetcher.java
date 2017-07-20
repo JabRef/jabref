@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -14,15 +15,11 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Wrapper around {@link SearchBasedFetcher} which implements the old {@link EntryFetcher} interface.
  */
 public class SearchBasedEntryFetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchBasedEntryFetcher.class);
     private final SearchBasedFetcher fetcher;
 
     public SearchBasedEntryFetcher(SearchBasedFetcher fetcher) {
@@ -38,7 +35,7 @@ public class SearchBasedEntryFetcher implements EntryFetcher {
             matches.forEach(inspector::addEntry);
             return !matches.isEmpty();
         } catch (FetcherException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
 

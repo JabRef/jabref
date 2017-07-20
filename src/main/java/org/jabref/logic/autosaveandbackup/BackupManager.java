@@ -15,6 +15,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.FileSaveSession;
 import org.jabref.logic.exporter.SaveException;
@@ -26,7 +27,6 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BackupManager {
 
-    private static final Log LOGGER = LogFactory.getLog(BackupManager.class);
 
     private static final String BACKUP_EXTENSION = ".sav";
 
@@ -109,7 +108,7 @@ public class BackupManager {
         try {
             Files.copy(backupPath, originalPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            LOGGER.error("Error while restoring the backup file.", e);
+            LogFactory.getLog(BackupManager.class).error("Error while restoring the backup file.", e);
         }
     }
 
@@ -125,7 +124,7 @@ public class BackupManager {
             new BibtexDatabaseWriter<>(FileSaveSession::new).saveDatabase(bibDatabaseContext, savePreferences).commit
                     (backupPath);
         } catch (SaveException e) {
-            LOGGER.error("Error while saving file.", e);
+            Logger.error(this, "Error while saving file.", e);
         }
     }
 
@@ -149,7 +148,7 @@ public class BackupManager {
         try {
             executor.submit(backupTask);
         } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting while another backup process is already running.");
+            Logger.debug(this, "Rejecting while another backup process is already running.");
         }
     }
 
@@ -170,7 +169,7 @@ public class BackupManager {
                 Files.delete(backupPath);
             }
         } catch (IOException e) {
-            LOGGER.error("Error while deleting the backup file.", e);
+            Logger.error(this, "Error while deleting the backup file.", e);
         }
     }
 }

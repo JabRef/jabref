@@ -15,6 +15,7 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.jabref.Logger;
 import org.jabref.gui.EntryContainer;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
@@ -22,12 +23,8 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class FileListEditorTransferHandler extends TransferHandler {
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
@@ -52,7 +49,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
-            LOGGER.info("Unable to configure drag and drop for file link table", e);
+            Logger.info(this, "Unable to configure drag and drop for file link table", e);
         }
     }
 
@@ -89,7 +86,7 @@ class FileListEditorTransferHandler extends TransferHandler {
 
             if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
-                LOGGER.debug("URL: " + dropLink);
+                Logger.debug(this, "URL: " + dropLink);
             }
 
             // This is used when one or more files are pasted from the file manager
@@ -117,9 +114,9 @@ class FileListEditorTransferHandler extends TransferHandler {
                 return true;
             }
         } catch (IOException ioe) {
-            LOGGER.warn("Failed to read dropped data. ", ioe);
+            Logger.warn(this, "Failed to read dropped data. ", ioe);
         } catch (UnsupportedFlavorException | ClassCastException ufe) {
-            LOGGER.warn("Drop type error. ", ufe);
+            Logger.warn(this, "Drop type error. ", ufe);
         }
 
         // all supported flavors failed
@@ -128,7 +125,7 @@ class FileListEditorTransferHandler extends TransferHandler {
         for (DataFlavor inflav : inflavs) {
             logMessage.append(' ').append(inflav);
         }
-        LOGGER.warn(logMessage.toString());
+        Logger.warn(this, logMessage.toString());
 
         return false;
     }

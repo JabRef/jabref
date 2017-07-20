@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.BindException;
 
 import org.jabref.JabRefExecutorService;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.Logger;
 
 /**
  * Manages the RemoteListenerServerThread through typical life cycle methods.
@@ -18,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteListenerServerLifecycle implements AutoCloseable {
 
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServerLifecycle.class);
 
     private RemoteListenerServerThread remoteListenerServerThread;
 
@@ -42,7 +39,7 @@ public class RemoteListenerServerLifecycle implements AutoCloseable {
         try {
             result = new RemoteListenerServerThread(messageHandler, port);
         } catch (BindException e) {
-            LOGGER.warn("Port is blocked", e);
+            Logger.warn(this, "Port is blocked", e);
             result = null;
         } catch (IOException e) {
             result = null;

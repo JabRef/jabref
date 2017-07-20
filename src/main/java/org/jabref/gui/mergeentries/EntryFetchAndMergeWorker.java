@@ -7,18 +7,15 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryFetchAndMergeWorker.class);
 
     private final BasePanel panel;
     private final BibEntry entry;
@@ -36,7 +33,7 @@ public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Vo
             List<BibEntry> fetchedEntries = fetcher.performSearch(entry);
             return fetchedEntries.stream().findFirst();
         } catch (FetcherException e) {
-            LOGGER.error("Info cannot be found", e);
+            Logger.error(this, "Info cannot be found", e);
             return Optional.empty();
         }
     }
@@ -57,7 +54,7 @@ public class EntryFetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Vo
                 panel.frame().setStatus(Localization.lang("Could not find any bibliographic information."));
             }
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while fetching Entry", e);
+            Logger.error(this, "Error while fetching Entry", e);
         }
     }
 

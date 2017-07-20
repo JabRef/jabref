@@ -3,6 +3,7 @@ package org.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.undo.NamedCompound;
@@ -12,12 +13,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class EntryDeleteChange extends Change {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
 
@@ -36,7 +33,7 @@ class EntryDeleteChange extends Change {
         // Check if it has been modified locally, since last tempfile was saved.
         boolean isModifiedLocally = (matchWithTmp <= 1);
 
-        LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
+        Logger.debug(this, "Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally);
 
         PreviewPanel pp = new PreviewPanel(null, memEntry, null);

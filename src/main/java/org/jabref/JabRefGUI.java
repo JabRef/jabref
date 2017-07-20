@@ -37,11 +37,8 @@ import org.jabref.shared.exception.NotASharedDatabaseException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class JabRefGUI {
-    private static final Log LOGGER = LogFactory.getLog(JabRefGUI.class);
 
     private static JabRefFrame mainFrame;
 
@@ -96,7 +93,7 @@ public class JabRefGUI {
 
         GUIGlobals.init();
 
-        LOGGER.debug("Initializing frame");
+        Logger.debug(this, "Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
 
         // Add all bibDatabases databases to the frame:
@@ -120,7 +117,7 @@ public class JabRefGUI {
                         pr.getDatabaseContext().clearDatabaseFile(); // do not open the original file
                         pr.getDatabase().clearSharedDatabaseID();
 
-                        LOGGER.error("Connection error", e);
+                        Logger.error(this, "Connection error", e);
                         JOptionPane.showMessageDialog(mainFrame,
                                 e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
                                 Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
@@ -182,7 +179,7 @@ public class JabRefGUI {
             OpenDatabaseAction.performPostOpenActions(panel, pr);
         }
 
-        LOGGER.debug("Finished adding panels");
+        Logger.debug(this, "Finished adding panels");
 
         if (!bibDatabases.isEmpty()) {
             JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
@@ -211,7 +208,7 @@ public class JabRefGUI {
                     Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isEmpty()) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
+                Logger.error(this, Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
                 bibDatabases.add(parsedDatabase);
             }
@@ -238,7 +235,7 @@ public class JabRefGUI {
                 if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
                     // Metal L&F
                     lookFeel = UIManager.getCrossPlatformLookAndFeelClassName();
-                    LOGGER.warn(
+                    Logger.warn(this,
                             "There seem to be problems with OpenJDK and the default GTK Look&Feel. Using Metal L&F instead. Change to another L&F with caution.");
                 } else {
                     lookFeel = systemLookFeel;
@@ -269,11 +266,11 @@ public class JabRefGUI {
                             Localization
                                     .lang("Unable to find the requested look and feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
-                    LOGGER.warn("Unable to find requested look and feel", e);
+                    Logger.warn(this, "Unable to find requested look and feel", e);
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Look and feel could not be set", e);
+            Logger.warn(this, "Look and feel could not be set", e);
         }
 
         // In JabRef v2.8, we did it only on NON-Mac. Now, we try on all platforms

@@ -36,11 +36,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import com.mashape.unirest.http.Unirest;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -57,7 +57,6 @@ import org.apache.commons.logging.LogFactory;
 public class URLDownload {
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
 
-    private static final Log LOGGER = LogFactory.getLog(URLDownload.class);
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
@@ -90,7 +89,7 @@ public class URLDownload {
      * Taken from http://stackoverflow.com/a/6055903/873661
      */
     public static void bypassSSLVerification() {
-        LOGGER.warn("Fix SSL exceptions by accepting ALL certificates");
+        LogFactory.getLog(URLDownload.class).warn("Fix SSL exceptions by accepting ALL certificates");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = {new X509TrustManager() {
@@ -114,7 +113,7 @@ public class URLDownload {
             context.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
         } catch (Exception e) {
-            LOGGER.error("A problem occurred when bypassing SSL verification", e);
+            LogFactory.getLog(URLDownload.class).error("A problem occurred when bypassing SSL verification", e);
         }
     }
 
@@ -133,7 +132,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (Exception e) {
-            LOGGER.debug("Error getting MIME type of URL via HEAD request", e);
+            Logger.debug(this, "Error getting MIME type of URL via HEAD request", e);
         }
 
         // Use GET request as alternative if no HEAD request is available
@@ -143,7 +142,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (Exception e) {
-            LOGGER.debug("Error getting MIME type of URL via GET request", e);
+            Logger.debug(this, "Error getting MIME type of URL via GET request", e);
         }
 
         // Try to resolve local URIs
@@ -155,7 +154,7 @@ public class URLDownload {
                 return contentType;
             }
         } catch (IOException e) {
-            LOGGER.debug("Error trying to get MIME type of local URI", e);
+            Logger.debug(this, "Error trying to get MIME type of local URI", e);
         }
 
         return "";
@@ -220,7 +219,7 @@ public class URLDownload {
         try {
             return cookieManager.getCookieStore().get(this.source.toURI());
         } catch (URISyntaxException e) {
-            LOGGER.error("Unable to convert download URL to URI", e);
+            Logger.error(this, "Unable to convert download URL to URI", e);
             return Collections.emptyList();
         }
     }
@@ -234,7 +233,7 @@ public class URLDownload {
         try (InputStream input = new BufferedInputStream(this.openConnection().getInputStream())) {
             Files.copy(input, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            LOGGER.warn("Could not copy input", e);
+            Logger.warn(this, "Could not copy input", e);
             throw e;
         }
     }
@@ -271,7 +270,7 @@ public class URLDownload {
 
     @Override
     public String toString() {
-        return "URLDownload{" + "source=" + this.source + '}';
+        return "URLDownload{source=" + this.source + '}';
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {

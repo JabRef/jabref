@@ -20,6 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.fileformat.bibtexml.Article;
 import org.jabref.logic.importer.fileformat.bibtexml.Book;
 import org.jabref.logic.importer.fileformat.bibtexml.Booklet;
@@ -39,9 +40,6 @@ import org.jabref.logic.importer.fileformat.bibtexml.Unpublished;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Export format for the BibTeXML format.
  */
@@ -49,7 +47,6 @@ public class BibTeXMLExportFormat extends ExportFormat {
 
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
     private static final Locale ENGLISH = Locale.ENGLISH;
-    private static final Log LOGGER = LogFactory.getLog(BibTeXMLExportFormat.class);
     private JAXBContext context;
 
 
@@ -117,7 +114,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                     parse(new Unpublished(), bibEntry, entry);
                     break;
                 default:
-                    LOGGER.warn("unexpected type appeared");
+                    Logger.warn(this, "unexpected type appeared");
                     break;
             }
             file.getEntry().add(entry);
@@ -158,7 +155,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                             new QName(BIBTEXML_NAMESPACE_URI, "year"), XMLGregorianCalendar.class, calendar);
                     inbook.getContent().add(year);
                 } catch (DatatypeConfigurationException e) {
-                    LOGGER.error("A configuration error occured");
+                    Logger.error(this, "A configuration error occured");
                 }
             } else if ("number".equals(key)) {
                 JAXBElement<BigInteger> number = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, "number"),
@@ -206,7 +203,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                                     .newXMLGregorianCalendar(value);
                             method.invoke(entryType, calendar);
                         } catch (DatatypeConfigurationException e) {
-                            LOGGER.error("A configuration error occured");
+                            Logger.error(this, "A configuration error occured");
                         }
                         break;
                     } else if ("number".equals(key) && key.equals(methodNameWithoutSet)) {
@@ -217,7 +214,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                         break;
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    LOGGER.error("Could not invoke method", e);
+                    Logger.error(this, "Could not invoke method", e);
                 }
             }
 
@@ -231,7 +228,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                     try {
                         method.invoke(entry, entryType);
                     } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                        LOGGER.warn("Could not set the type to the entry");
+                        Logger.warn(this, "Could not set the type to the entry");
                     }
                 }
             }

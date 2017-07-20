@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -67,7 +68,7 @@ public class IsbnViaChimboriFetcher extends AbstractIsbnFetcher {
         if (fetchedEntries.isEmpty()) {
             return Optional.empty();
         } else if (fetchedEntries.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+            Logger.info(this, "Fetcher " + getName() + "found more than one result for identifier " + identifier
                     + ". We will use the first entry.");
         }
 

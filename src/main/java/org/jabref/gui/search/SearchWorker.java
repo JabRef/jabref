@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.swing.SwingWorker;
 
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.maintable.MainTableDataModel;
@@ -15,16 +16,12 @@ import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 
 /**
  * Not reusable. Always create a new instance for each search!
  */
 class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchWorker.class);
 
     private final BasePanel basePanel;
     private final BibDatabase database;
@@ -37,7 +34,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         this.database = Objects.requireNonNull(basePanel.getDatabase());
         this.searchQuery = Objects.requireNonNull(searchQuery);
         this.searchDisplayMode = Objects.requireNonNull(searchDisplayMode);
-        LOGGER.debug("Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
+        Logger.debug(this, "Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
     }
 
     @Override
@@ -56,7 +53,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         try {
             updateUIWithSearchResult(get());
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("something went wrong during the search", e);
+            Logger.error(this, "something went wrong during the search", e);
         }
     }
 
@@ -88,7 +85,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
                 basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
                 break;
             default:
-                LOGGER.error("Following searchDisplayMode was not defined: " + searchDisplayMode);
+                Logger.error(this, "Following searchDisplayMode was not defined: " + searchDisplayMode);
                 break;
         }
 

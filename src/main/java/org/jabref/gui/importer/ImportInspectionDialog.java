@@ -50,6 +50,7 @@ import javax.swing.table.TableModel;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DuplicateResolverDialog;
 import org.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -115,8 +116,6 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.ButtonStackBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to allow the selection of entries as part of an Import.
@@ -142,7 +141,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class ImportInspectionDialog extends JabRefDialog implements ImportInspector, OutputPrinter {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportInspectionDialog.class);
     private static final List<String> INSPECTION_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, BibEntry.KEY_FIELD);
     private static final int DUPL_COL = 1;
     private static final int FILE_COL = 2;
@@ -1069,7 +1067,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 try {
                     JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
-                    LOGGER.warn("Could not open link", ex);
+                    Logger.warn(this, "Could not open link", ex);
                 }
             });
         }
@@ -1248,7 +1246,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
             try {
                 def.download(this);
             } catch (IOException ex) {
-                LOGGER.warn("Could not download file", ex);
+                Logger.warn(this, "Could not download file", ex);
             }
         }
 

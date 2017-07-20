@@ -31,6 +31,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -47,12 +48,9 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 class TableColumnsTab extends JPanel implements PrefsTab {
 
-    private static final Log LOGGER = LogFactory.getLog(TableColumnsTab.class);
 
     private final JabRefPreferences prefs;
     private boolean tableChanged;
@@ -664,7 +662,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                         }
                     }
                 } catch (Throwable ex) {
-                    LOGGER.warn("Problem with table columns", ex);
+                    Logger.warn(this, "Problem with table columns", ex);
                 }
                 colSetup.revalidate();
                 colSetup.repaint();

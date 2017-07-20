@@ -6,13 +6,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.jabref.Logger;
 import org.jabref.logic.remote.shared.Protocol;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class RemoteListenerServer implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServer.class);
 
     private static final int BACKLOG = 1;
 
@@ -46,7 +43,7 @@ public class RemoteListenerServer implements Runnable {
                 } catch (SocketException ex) {
                     return;
                 } catch (IOException e) {
-                    LOGGER.warn("RemoteListenerServer crashed", e);
+                    Logger.warn(this, "RemoteListenerServer crashed", e);
                 }
             }
         } finally {

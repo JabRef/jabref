@@ -5,18 +5,15 @@ import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 import org.jabref.shared.security.Password;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnection}.
  */
 public class DBMSConnectionProperties {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnectionProperties.class);
 
     private DBMSType type;
     private String host;
@@ -124,7 +121,7 @@ public class DBMSConnectionProperties {
                 try {
                     this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
                 } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                    LOGGER.error("Could not decrypt password", e);
+                    Logger.error(this, "Could not decrypt password", e);
                 }
             }
         }

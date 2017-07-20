@@ -23,9 +23,9 @@ import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
 import javax.swing.text.Utilities;
 
+import org.jabref.Logger;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -35,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
  * The inner class actions can also be used independently.
  */
 public class EmacsKeyBindings {
-    private static final Log LOGGER = LogFactory.getLog(EmacsKeyBindings.class);
 
     private static final String KILL_LINE_ACTION = "emacs-kill-line";
 
@@ -257,7 +256,7 @@ public class EmacsKeyBindings {
      * JTextComponent}.
      */
     private static void loadEmacsKeyBindings() {
-        EmacsKeyBindings.LOGGER.debug("Loading emacs keybindings");
+        LogFactory.getLog(EmacsKeyBindings.class).debug("Loading emacs keybindings");
 
         for (JTextComponent jtc : EmacsKeyBindings.JTCS) {
             Action[] origActions = jtc.getActions();
@@ -544,7 +543,7 @@ public class EmacsKeyBindings {
                     KillRing.getInstance().add(jtc.getText(YankAction.start, YankAction.end));
                     KillRing.getInstance().setCurrentTextComponent(jtc);
                 } catch (BadLocationException e) {
-                    LOGGER.info("Bad location when yanking", e);
+                    Logger.info(this, "Bad location when yanking", e);
                 }
             }
         }

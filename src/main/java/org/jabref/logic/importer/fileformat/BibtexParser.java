@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtex.FieldContentParser;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
@@ -38,9 +39,6 @@ import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Class for importing BibTeX-files.
  * <p>
@@ -58,7 +56,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibtexParser implements Parser {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentParser fieldContentParser;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -252,7 +249,7 @@ public class BibtexParser implements Parser {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             }
         } catch (IOException ex) {
-            LOGGER.debug("Could not parse entry", ex);
+            Logger.debug(this, "Could not parse entry", ex);
             parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
                     + "'. " + Localization.lang("Skipped entry."));
 
@@ -268,7 +265,7 @@ public class BibtexParser implements Parser {
             * which means that we should just return and the comment will be picked up as arbitrary text
             *  by the parser
              */
-            LOGGER.info("Found unbracketed comment");
+            Logger.info(this, "Found unbracketed comment");
             return;
         }
 
@@ -492,18 +489,18 @@ public class BibtexParser implements Parser {
         skipWhitespace();
         consume('{', '(');
         skipWhitespace();
-        LOGGER.debug("Parsing string name");
+        Logger.debug(this, "Parsing string name");
         String name = parseTextToken();
-        LOGGER.debug("Parsed string name");
+        Logger.debug(this, "Parsed string name");
         skipWhitespace();
-        LOGGER.debug("Now the contents");
+        Logger.debug(this, "Now the contents");
         consume('=');
         String content = parseFieldContent(name);
-        LOGGER.debug("Now I'm going to consume a }");
+        Logger.debug(this, "Now I'm going to consume a }");
         consume('}', ')');
         // Consume new line which signals end of entry
         skipOneNewline();
-        LOGGER.debug("Finished string parsing.");
+        Logger.debug(this, "Finished string parsing.");
 
         return new BibtexString(name, content);
     }
@@ -611,7 +608,7 @@ public class BibtexParser implements Parser {
                 String textToken = parseTextToken();
                 if (textToken.isEmpty()) {
                     throw new IOException("Error in line " + line + " or above: "
-                            + "Empty text token.\nThis could be caused " + "by a missing comma between two fields.");
+                            + "Empty text token.\nThis could be caused by a missing comma between two fields.");
                 }
                 value.append('#').append(textToken).append('#');
             }
@@ -793,7 +790,7 @@ public class BibtexParser implements Parser {
                     // the entry lacked a comma signifying the end of the key.
                     return token.toString();
                 } else {
-                    throw new IOException("Error in line " + line + ":" + "Character '" + (char) character + "' is not "
+                    throw new IOException("Error in line " + line + ":Character '" + (char) character + "' is not "
                             + "allowed in bibtex keys.");
                 }
 

@@ -2,11 +2,9 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This group matches entries by a complex search pattern, which might include conditions about the values of
@@ -14,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SearchGroup extends AbstractGroup {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
     private final GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,
@@ -56,7 +53,7 @@ public class SearchGroup extends AbstractGroup {
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in SearchGroup.deepCopy(). "
+            Logger.error(this, "Internal error in SearchGroup.deepCopy(). "
                     + "Please report this on https://github.com/JabRef/jabref/issues", t);
             return null;
         }

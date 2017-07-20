@@ -1,12 +1,11 @@
 package org.jabref.gui.autosaveandbackup;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class has an abstract UI role as it listens for an {@link AutosaveEvent}
@@ -14,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutosaveUIManager {
 
-    private static final Log LOGGER = LogFactory.getLog(AutosaveUIManager.class);
     private final BasePanel panel;
 
 
@@ -27,7 +25,7 @@ public class AutosaveUIManager {
         try {
             new SaveDatabaseAction(panel).runCommand();
         } catch (Throwable e) {
-            LOGGER.error("Problem occured while saving.", e);
+            Logger.error(this, "Problem occured while saving.", e);
         }
     }
 }

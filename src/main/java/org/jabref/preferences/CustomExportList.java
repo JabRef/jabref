@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -15,8 +16,6 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class handles user defined custom export formats. They are initially
@@ -28,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class CustomExportList {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomExportList.class);
     private final EventList<List<String>> list;
     private final SortedList<List<String>> sorted;
 
@@ -73,7 +71,7 @@ public class CustomExportList {
                 list.add(s);
             } else {
                 String customExportFormat = prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
-                LOGGER.error("Error initializing custom export format from string " + customExportFormat);
+                Logger.error(this, "Error initializing custom export format from string " + customExportFormat);
             }
             i++;
         }

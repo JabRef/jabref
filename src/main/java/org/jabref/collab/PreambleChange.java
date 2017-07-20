@@ -26,13 +26,13 @@ class PreambleChange extends Change {
         text.append("<FONT SIZE=3><H2>").append(Localization.lang("Changed preamble")).append("</H2>");
 
         if ((disk != null) && !disk.isEmpty()) {
-            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3>" + "<CODE>").append(disk).append("</CODE>");
+            text.append("<H3>").append(Localization.lang("Value set externally")).append(":</H3><CODE>").append(disk).append("</CODE>");
         } else {
             text.append("<H3>").append(Localization.lang("Value cleared externally")).append("</H3>");
         }
 
         if ((mem != null) && !mem.isEmpty()) {
-            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3>" + "<CODE>").append(mem).append("</CODE>");
+            text.append("<H3>").append(Localization.lang("Current value")).append(":</H3><CODE>").append(mem).append("</CODE>");
         }
 
         tp.setText(text.toString());

@@ -10,13 +10,11 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.NewVersionDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.Version;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -28,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class VersionWorker extends SwingWorker<List<Version>, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(VersionWorker.class);
 
     private final JabRefFrame mainFrame;
 
@@ -54,7 +51,7 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
         try {
             return Version.getAllAvailableVersions();
         } catch (IOException ioException) {
-            LOGGER.warn("Could not connect to the updateserver.", ioException);
+            Logger.warn(this, "Could not connect to the updateserver.", ioException);
             return Collections.emptyList();
         }
     }
@@ -76,7 +73,7 @@ public class VersionWorker extends SwingWorker<List<Version>, Void> {
             }
 
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while checking for updates", e);
+            Logger.error(this, "Error while checking for updates", e);
         }
     }
 

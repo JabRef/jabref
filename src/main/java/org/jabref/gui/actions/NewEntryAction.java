@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import org.jabref.Logger;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -13,11 +14,7 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class NewEntryAction extends MnemonicAwareAction {
-    private static final Log LOGGER = LogFactory.getLog(NewEntryAction.class);
 
     private final JabRefFrame jabRefFrame;
     private String type; // The type of item to create.
@@ -65,7 +62,7 @@ public class NewEntryAction extends MnemonicAwareAction {
                     EntryTypes.getType(thisType, jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getMode())
                             .get());
         } else {
-            LOGGER.info("Action 'New entry' must be disabled when no database is open.");
+            Logger.info(this, "Action 'New entry' must be disabled when no database is open.");
         }
     }
 }

@@ -1,12 +1,10 @@
 package org.jabref.logic.layout.format;
 
+import org.jabref.Logger;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.StringInt;
 import org.jabref.logic.util.strings.RtfCharMap;
 import org.jabref.model.strings.StringUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Transform a LaTeX-String to RTF.
@@ -25,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RTFChars implements LayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
@@ -133,7 +130,7 @@ public class RTFChars implements LayoutFormatter {
                             i += part.i;
                             sb.append("{\\b ").append(part.s).append('}');
                         } else {
-                            LOGGER.info("Unknown command " + command);
+                            Logger.info(this, "Unknown command " + command);
                         }
                         if (c == ' ') {
                             // command was separated with the content by ' '

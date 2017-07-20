@@ -8,11 +8,9 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.EnumSet;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileBasedLock;
 import org.jabref.logic.util.io.FileUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Class used to handle safe storage to disk.
@@ -30,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FileSaveSession extends SaveSession {
 
-    private static final Log LOGGER = LogFactory.getLog(FileSaveSession.class);
 
     // Filenames.
     private static final String BACKUP_EXTENSION = ".bak";
@@ -82,7 +79,7 @@ public class FileSaveSession extends SaveSession {
                     }
                 }
             } catch (IOException ex) {
-                LOGGER.error("Error when creating lock file.", ex);
+                Logger.error(this, "Error when creating lock file.", ex);
             }
 
             // Try to save file permissions to restore them later (by default: 664)
@@ -95,7 +92,7 @@ public class FileSaveSession extends SaveSession {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
-                    LOGGER.warn("Error getting file permissions.", exception);
+                    Logger.warn(this, "Error getting file permissions.", exception);
                 }
             }
 
@@ -115,7 +112,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            LOGGER.warn("Cannot delete temporary file", e);
+            Logger.warn(this, "Cannot delete temporary file", e);
         }
     }
 
@@ -124,7 +121,7 @@ public class FileSaveSession extends SaveSession {
         try {
             Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
-            LOGGER.warn("Cannot delete temporary file", e);
+            Logger.warn(this, "Cannot delete temporary file", e);
         }
     }
 }

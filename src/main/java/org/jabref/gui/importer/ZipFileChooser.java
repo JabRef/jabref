@@ -26,19 +26,16 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import org.jabref.Logger;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to allow users to choose a file contained in a ZIP file.
  */
 class ZipFileChooser extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ZipFileChooser.class);
 
 
     /**
@@ -85,7 +82,7 @@ class ZipFileChooser extends JabRefDialog {
                     importCustomizationDialog.addOrReplaceImporter(importer);
                     dispose();
                 } catch (ClassNotFoundException exc) {
-                    LOGGER.warn("Could not instantiate importer: " + className, exc);
+                    Logger.warn(this, "Could not instantiate importer: " + className, exc);
                     JOptionPane.showMessageDialog(this, Localization.lang("Could not instantiate %0 %1",
                             className + ":\n", exc.getMessage()));
                 }

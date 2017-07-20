@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.AbstractWorker;
@@ -25,12 +26,8 @@ import org.jabref.logic.exporter.IExportFormat;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ExportToClipboardAction extends AbstractWorker {
 
-    private static final Log LOGGER = LogFactory.getLog(ExportToClipboardAction.class);
 
     private final JabRefFrame frame;
 
@@ -117,12 +114,12 @@ public class ExportToClipboardAction extends AbstractWorker {
             message = Localization.lang("Entries exported to clipboard") + ": " + entries.size();
 
         } catch (Exception e) {
-            LOGGER.error("Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
+            Logger.error(this, "Error exporting to clipboard", e); //To change body of catch statement use File | Settings | File Templates.
             message = Localization.lang("Error exporting to clipboard");
         } finally {
             // Clean up:
             if ((tmp != null) && !tmp.delete()) {
-                LOGGER.info("Cannot delete temporary clipboard file");
+                Logger.info(this, "Cannot delete temporary clipboard file");
             }
         }
     }

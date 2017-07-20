@@ -28,6 +28,7 @@ import javax.swing.event.HyperlinkEvent;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
+import org.jabref.Logger;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -45,15 +46,12 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.PreviewPreferences;
 
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Displays an BibEntry using the given layout format.
  */
 public class PreviewPanel extends JPanel implements SearchQueryHighlightListener, EntryContainer {
 
-    private static final Log LOGGER = LogFactory.getLog(PreviewPanel.class);
 
     /**
      * The bibtex entry currently shown
@@ -174,7 +172,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                     String address = hyperlinkEvent.getURL().toString();
                     JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
-                    LOGGER.warn("Could not open external viewer", e);
+                    Logger.warn(this, "Could not open external viewer", e);
                 }
             }
         });
@@ -195,7 +193,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
 
     public void updateLayout() {
         if (fixedLayout) {
-            LOGGER.debug("cannot change the layout because the layout is fixed");
+            Logger.debug(this, "cannot change the layout because the layout is fixed");
             return;
         }
 
@@ -229,7 +227,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                             .getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
-            LOGGER.debug("no layout could be set", e);
+            Logger.debug(this, "no layout could be set", e);
         }
     }
 
@@ -329,7 +327,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                 basePanel.get().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
             }
         } else {
-            LOGGER.error("unknown style type");
+            Logger.error(this, "unknown style type");
         }
         update();
         return this;
@@ -357,7 +355,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
                     JOptionPane.showMessageDialog(PreviewPanel.this,
                             Localization.lang("Could not print preview") + ".\n" + e.getMessage(),
                             Localization.lang("Print entry preview"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.info("Could not print preview", e);
+                    Logger.info(this, "Could not print preview", e);
                 }
             });
         }

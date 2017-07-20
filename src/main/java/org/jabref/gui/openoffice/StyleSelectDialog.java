@@ -33,6 +33,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
@@ -69,15 +70,12 @@ import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class produces a dialog box for choosing a style file.
  */
 class StyleSelectDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(StyleSelectDialog.class);
 
     private final JabRefFrame frame;
     private EventList<OOBibStyle> styles;
@@ -260,7 +258,7 @@ class StyleSelectDialog {
                             new UnknownExternalFileType("jstyle"));
                 }
             } catch (IOException e) {
-                LOGGER.warn("Problem open style file editor", e);
+                Logger.warn(this, "Problem open style file editor", e);
             }
         }));
 
@@ -273,7 +271,7 @@ class StyleSelectDialog {
                     Localization.lang("Are you sure you want to remove the style?"), Localization.lang("Remove style"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
                 if (!loader.removeStyle(style)) {
-                    LOGGER.info("Problem removing style");
+                    Logger.info(this, "Problem removing style");
                 }
                 updateStyles();
             }
@@ -286,7 +284,7 @@ class StyleSelectDialog {
             try {
                 style.ensureUpToDate();
             } catch (IOException e) {
-                LOGGER.warn("Problem with style file '" + style.getPath() + "'", e);
+                Logger.warn(this, "Problem with style file '" + style.getPath() + "'", e);
             }
         }));
 

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.l10n.Localization;
 
@@ -13,12 +14,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class JabRefCLI {
 
-    private static final Log LOGGER = LogFactory.getLog(JabRefCLI.class);
 
     private List<String> leftOver;
     private final CommandLine cl;
@@ -32,7 +30,7 @@ public class JabRefCLI {
             this.cl = new DefaultParser().parse(options, args);
             this.leftOver = Arrays.asList(cl.getArgs());
         } catch (ParseException e) {
-            LOGGER.warn("Problem parsing arguments", e);
+            Logger.warn(this, "Problem parsing arguments", e);
 
             this.printUsage();
             throw new RuntimeException();

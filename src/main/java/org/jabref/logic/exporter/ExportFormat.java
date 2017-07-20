@@ -17,14 +17,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.JabRefMain;
+import org.jabref.Logger;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Base class for export formats based on templates.
@@ -33,7 +31,6 @@ public class ExportFormat implements IExportFormat {
 
     private static final String LAYOUT_PREFIX = "/resource/layout/";
 
-    private static final Log LOGGER = LogFactory.getLog(ExportFormat.class);
     private String displayName;
     private String consoleName;
     private String lfFileName;
@@ -195,7 +192,7 @@ public class ExportFormat implements IExportFormat {
             } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
-                LOGGER.warn("Cannot get save session.", ex);
+                Logger.warn(this, "Cannot get save session.", ex);
             }
         }
         if (ss == null) {
@@ -245,7 +242,7 @@ public class ExportFormat implements IExportFormat {
             if (defLayout != null) {
                 missingFormatters.addAll(defLayout.getMissingFormatters());
                 if (!missingFormatters.isEmpty()) {
-                    LOGGER.warn(missingFormatters);
+                    Logger.warn(this, "missing formatters is not empty", missingFormatters);
                 }
             }
             Map<String, Layout> layouts = new HashMap<>();
@@ -306,7 +303,7 @@ public class ExportFormat implements IExportFormat {
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
                 sb.append(String.join(", ", missingFormatters));
-                LOGGER.warn(sb);
+                Logger.warn(this, sb.toString());
             }
             finalizeSaveSession(ss, outFile);
         }
@@ -352,7 +349,7 @@ public class ExportFormat implements IExportFormat {
 
             } catch (IOException ex) {
                 // TODO: show error message here?
-                LOGGER.warn("Problem opening formatter file.", ex);
+                Logger.warn(this, "Problem opening formatter file.", ex);
             }
         }
     }
@@ -362,7 +359,7 @@ public class ExportFormat implements IExportFormat {
         ss.getWriter().close();
 
         if (!ss.getWriter().couldEncodeAll()) {
-            LOGGER.warn("Could not encode...");
+            Logger.warn(this, "Could not encode...");
         }
         ss.commit(file);
     }

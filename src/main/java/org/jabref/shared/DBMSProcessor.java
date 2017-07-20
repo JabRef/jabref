@@ -15,12 +15,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.shared.exception.OfflineLockException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Processes all incoming or outgoing bib data to external SQL Database and manages its structure.
@@ -28,9 +26,6 @@ import org.apache.commons.logging.LogFactory;
 public abstract class DBMSProcessor {
 
     public static final String PROCESSOR_ID = UUID.randomUUID().toString();
-
-
-    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
     protected final Connection connection;
 
@@ -102,7 +97,7 @@ public abstract class DBMSProcessor {
 
         if (!checkBaseIntegrity()) {
             // can only happen with users direct intervention on shared database
-            LOGGER.error("Corrupt_shared_database_structure.");
+            Logger.error(this, "Corrupt_shared_database_structure.");
         }
     }
 
@@ -165,7 +160,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -196,7 +191,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
         return false;
     }
@@ -230,7 +225,7 @@ public abstract class DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -287,7 +282,7 @@ public abstract class DBMSProcessor {
                 throw new OfflineLockException(localBibEntry, sharedBibEntry);
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
             connection.rollback(); // undo changes made in current transaction
         } finally {
             connection.setAutoCommit(true); // enable auto commit mode again
@@ -407,7 +402,7 @@ public abstract class DBMSProcessor {
             preparedStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
 
     }
@@ -476,7 +471,7 @@ public abstract class DBMSProcessor {
                 sharedEntries.add(bibEntry);
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return sharedEntries;
@@ -498,7 +493,7 @@ public abstract class DBMSProcessor {
                 sharedIDVersionMapping.put(selectEntryResultSet.getInt("SHARED_ID"), selectEntryResultSet.getInt("VERSION"));
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return sharedIDVersionMapping;
@@ -515,7 +510,7 @@ public abstract class DBMSProcessor {
                 data.put(resultSet.getString("KEY"), resultSet.getString("VALUE"));
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error", e);
+            Logger.error(this, "SQL Error", e);
         }
 
         return data;
@@ -545,7 +540,7 @@ public abstract class DBMSProcessor {
                 preparedStatement.setString(2, metaEntry.getValue());
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                LOGGER.error("SQL Error: ", e);
+                Logger.error(this, "SQL Error", e);
             }
         }
     }

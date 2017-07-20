@@ -7,14 +7,12 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JEditorPane;
 import javax.swing.SwingWorker;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -22,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CitationStyleWorker extends SwingWorker<String, Void> {
 
-    private static final Log LOGGER = LogFactory.getLog(CitationStyleWorker.class);
 
     private final PreviewPanel previewPanel;
 
@@ -35,7 +32,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         if (basePanel.isPresent()) {
             CitationStyle citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
             previewPane.setText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
-                    ": " + citationStyle.getTitle() + " ..." + "</i>");
+                    ": " + citationStyle.getTitle() + " ...</i>");
         }
         previewPane.revalidate();
     }
@@ -62,7 +59,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         try {
             text = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while generating citation style", e);
+            Logger.error(this, "Error while generating citation style", e);
             text = Localization.lang("Error while generating citation style");
             success = false;
         }

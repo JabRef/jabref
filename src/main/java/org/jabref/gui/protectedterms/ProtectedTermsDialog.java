@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
@@ -59,15 +60,12 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class produces a dialog box for managing term list files.
  */
 public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
     private JDialog diag;
@@ -244,7 +242,7 @@ public class ProtectedTermsDialog {
                     }
                 }
             } catch (IOException e) {
-                LOGGER.warn("Problem open protected terms file editor", e);
+                Logger.warn(this, "Problem open protected terms file editor", e);
             }
         }));
 
@@ -259,7 +257,7 @@ public class ProtectedTermsDialog {
                     Localization.lang("Remove protected terms file"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
                 if (!loader.removeProtectedTermsList(list)) {
-                    LOGGER.info("Problem removing protected terms file");
+                    Logger.info(this, "Problem removing protected terms file");
                 }
                 tableModel.fireTableDataChanged();
             }

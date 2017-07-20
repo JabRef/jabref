@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.jabref.Logger;
 import org.jabref.shared.listener.OracleNotificationListener;
 
 import oracle.jdbc.OracleConnection;
@@ -91,7 +92,7 @@ public class OracleProcessor extends DBMSProcessor {
             }
 
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
 
     }
@@ -102,7 +103,7 @@ public class OracleProcessor extends DBMSProcessor {
             oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
             oracleConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 

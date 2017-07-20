@@ -32,6 +32,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
@@ -52,8 +53,6 @@ import org.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class produces a dialog box for editing a single file link from a Bibtex entry.
@@ -68,7 +67,6 @@ public class FileListEntryEditor {
 
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
     private final JTextField link = new JTextField();
     private final JTextField description = new JTextField();
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -281,7 +279,7 @@ public class FileListEntryEditor {
             try {
                 JabRefDesktop.openExternalFileAnyFormat(databaseContext, link.getText(), Optional.of(type));
             } catch (IOException e) {
-                LOGGER.error("File could not be opened", e);
+                Logger.error(this, "File could not be opened", e);
             }
         }
     }

@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.BasePanelMode;
 import org.jabref.gui.EntryTypeDialog;
@@ -37,12 +38,8 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class PdfImporter {
 
-    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final MainTable entryTable;
@@ -159,7 +156,7 @@ public class PdfImporter {
         BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
-            LOGGER.info("Import failed");
+            Logger.info(this, "Import failed");
             createNewBlankEntry(fileName).ifPresent(res::add);
             return;
         }
@@ -268,7 +265,7 @@ public class PdfImporter {
 
                 return Optional.of(bibEntry);
             } catch (KeyCollisionException ex) {
-                LOGGER.info("Key collision occurred", ex);
+                Logger.info(this, "Key collision occurred", ex);
             }
         }
         return Optional.empty();

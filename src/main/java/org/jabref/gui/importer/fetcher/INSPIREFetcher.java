@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportInspector;
@@ -21,9 +22,6 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.INSPIREBibtexFilterReader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -41,7 +39,6 @@ public class INSPIREFetcher implements EntryFetcher {
 
     private static final String INSPIRE_HOST = "inspirehep.net";
 
-    private static final Log LOGGER = LogFactory.getLog(INSPIREFetcher.class);
     /**
      * Construct the query URL
      *
@@ -63,7 +60,7 @@ public class INSPIREFetcher implements EntryFetcher {
         StringBuilder sb = new StringBuilder(87).append("http://").append(INSPIREFetcher.INSPIRE_HOST)
                 .append("/search?ln=en&ln=en&p=find+").append(identifier)
                 .append("&action_search=Search&sf=&so=d&rm=&rg=1000&sc=0&of=hx");
-        LOGGER.debug("Inspire URL: " + sb + "\n");
+        Logger.debug(this, "Inspire URL: " + sb + "\n");
         return sb.toString();
     }
 
@@ -148,7 +145,7 @@ public class INSPIREFetcher implements EntryFetcher {
             bd.getEntries().forEach(dialog::addEntry);
             return true;
         } catch (Exception e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;

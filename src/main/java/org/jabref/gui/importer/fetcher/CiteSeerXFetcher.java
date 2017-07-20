@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.JPanel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.help.HelpFile;
@@ -19,9 +20,6 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class CiteSeerXFetcher implements EntryFetcher {
 
@@ -42,7 +40,6 @@ public class CiteSeerXFetcher implements EntryFetcher {
             .compile(CiteSeerXFetcher.BASE_PATTERN.replace(CiteSeerXFetcher.QUERY_MARKER, "citation_year"));
     private static final Pattern ABSTRACT_PATTERN = Pattern.compile("<h3>Abstract</h3>\\s*<p>(.*)</p>");
 
-    private static final Log LOGGER = LogFactory.getLog(CiteSeerXFetcher.class);
 
     private boolean stopFetching;
 
@@ -63,7 +60,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
             return true;
         } catch (IOException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
             return false;
         }

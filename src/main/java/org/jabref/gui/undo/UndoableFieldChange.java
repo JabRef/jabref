@@ -1,12 +1,10 @@
 package org.jabref.gui.undo;
 
+import org.jabref.Logger;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -14,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
  * new value. Old/new values can be null.
  */
 public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
-    private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
     private final BibEntry entry;
     private final String field;
@@ -56,7 +53,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
 
             // this is the only exception explicitly thrown here
         } catch (IllegalArgumentException ex) {
-            LOGGER.info("Cannot perform undo", ex);
+            Logger.info(this, "Cannot perform undo", ex);
         }
     }
 
@@ -73,7 +70,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
             }
 
         } catch (IllegalArgumentException ex) {
-            LOGGER.info("Cannot perform redo", ex);
+            Logger.info(this, "Cannot perform redo", ex);
         }
     }
 

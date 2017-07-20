@@ -26,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.importer.FetcherPreviewDialog;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -42,12 +43,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ACMPortalFetcher implements PreviewEntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
     private static final String START_URL = "http://portal.acm.org/";
     private static final String SEARCH_URL_PART = "results.cfm?query=";
@@ -165,7 +162,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             return true;
 
         } catch (IOException e) {
-            LOGGER.error("Error while fetching from " + getTitle(), e);
+            Logger.error(this, "Error while fetching from " + getTitle(), e);
             preview.showErrorMessage(this.getTitle(), e.getLocalizedMessage());
             return false;
         }
@@ -239,13 +236,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         }
     }
 
-    private static String getEntryBibTeXURL(String fullCitation) {
+    private String getEntryBibTeXURL(String fullCitation) {
         // Get ID
         Matcher idMatcher = ACMPortalFetcher.ID_PATTERN.matcher(fullCitation);
         if (idMatcher.find()) {
             return idMatcher.group(1);
         }
-        LOGGER.info("Did not find ID in: " + fullCitation);
+        Logger.info(this, "Did not find ID in: " + fullCitation);
         return null;
     }
 
@@ -303,13 +300,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 entries.put(link, preview);
                 return true;
             }
-            LOGGER.warn("Citation unmatched " + Integer.toString(entryNumber));
+            Logger.warn(this, "Citation unmatched " + Integer.toString(entryNumber));
             return false;
         }
         return false;
     }
 
-    private static Optional<BibEntry> downloadEntryBibTeX(String id, boolean downloadAbstract) {
+    private Optional<BibEntry> downloadEntryBibTeX(String id, boolean downloadAbstract) {
         try {
             URL url = new URL(
                     ACMPortalFetcher.START_URL + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END);
@@ -327,7 +324,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parseEntries(bibtexString);
 
             } catch (IOException | ParseException e) {
-                LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
+                Logger.info(this, "Download of BibTeX information from ACM Portal failed.", e);
             }
             if ((items == null) || items.isEmpty()) {
                 return Optional.empty();
@@ -349,13 +346,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             return Optional.of(entry);
         } catch (NoSuchElementException e) {
-            LOGGER.info(
+            Logger.info(this,
                     "Bad BibTeX record read at: " + ACMPortalFetcher.BIBTEX_URL + id + ACMPortalFetcher.BIBTEX_URL_END,
                     e);
         } catch (MalformedURLException e) {
-            LOGGER.info("Malformed URL.", e);
+            Logger.info(this, "Malformed URL.", e);
         } catch (IOException e) {
-            LOGGER.info("Cannot connect.", e);
+            Logger.info(this, "Cannot connect.", e);
         } catch (InterruptedException ignored) {
             // Ignored
         }
@@ -376,7 +373,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
      * Find out how many hits were found.
      * @param page
      */
-    private static int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
+    private int getNumberOfHits(String page, String marker, Pattern pattern) throws IOException {
         int ind = page.indexOf(marker);
         if (ind >= 0) {
             String substring = page.substring(ind, Math.min(ind + 100, page.length()));
@@ -390,7 +387,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                     throw new IOException("Cannot parse number of hits");
                 }
             }
-            LOGGER.info("Unmatched! " + substring);
+            Logger.info(this, "Unmatched! " + substring);
         }
         throw new IOException("Cannot parse number of hits");
     }

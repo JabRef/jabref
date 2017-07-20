@@ -34,6 +34,7 @@ import javax.swing.KeyStroke;
 import org.jabref.Globals;
 import org.jabref.JabRefException;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -57,12 +58,8 @@ import org.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.shared.prefs.SharedDatabasePreferences;
 import org.jabref.shared.security.Password;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class ConnectToSharedDatabaseDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ConnectToSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
@@ -147,7 +144,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
                 try {
                     new SaveDatabaseAction(panel, Paths.get(fileLocationField.getText())).runCommand();
                 } catch (Throwable e) {
-                    LOGGER.error("Error while saving the database", e);
+                    Logger.error(this, "Error while saving the database", e);
                 }
             }
 
@@ -254,7 +251,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
                 passwordField.setText(
                         new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                LOGGER.error("Could not read the password due to decryption problems.", e);
+                Logger.error(this, "Could not read the password due to decryption problems.", e);
             }
         }
 
@@ -402,7 +399,7 @@ public class ConnectToSharedDatabaseDialog extends JabRefDialog {
             try {
                 prefs.setPassword(new Password(passwordField.getPassword(), userField.getText()).encrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-                LOGGER.error("Could not store the password due to encryption problems.", e);
+                Logger.error(this, "Could not store the password due to encryption problems.", e);
             }
         } else {
             prefs.clearPassword(); // for the case that the password is already set

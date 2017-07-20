@@ -20,14 +20,11 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.OS;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class KeyBindingRepository {
 
-    private static final Log LOGGER = LogFactory.getLog(KeyBindingRepository.class);
     /**
      * sorted by localization
      */
@@ -199,7 +196,7 @@ public class KeyBindingRepository {
                 try {
                     shortcutMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
                 } catch (AWTError | HeadlessException e) {
-                    LOGGER.warn("Problem geting shortcut mask", e);
+                    Logger.warn(this, "Problem geting shortcut mask", e);
                 }
             }
 

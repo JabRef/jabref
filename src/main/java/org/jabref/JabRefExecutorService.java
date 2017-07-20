@@ -9,17 +9,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
  */
 public class JabRefExecutorService implements Executor {
 
     public static final JabRefExecutorService INSTANCE = new JabRefExecutorService();
-    private static final Log LOGGER = LogFactory.getLog(JabRefExecutorService.class);
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
         thread.setName("JabRef CachedThreadPool");
@@ -41,7 +36,7 @@ public class JabRefExecutorService implements Executor {
     @Override
     public void execute(Runnable command) {
         if (command == null) {
-            LOGGER.debug("Received null as command for execution");
+            Logger.debug(this, "Received null as command for execution");
             return;
         }
 
@@ -50,7 +45,7 @@ public class JabRefExecutorService implements Executor {
 
     public void executeAndWait(Runnable command) {
         if (command == null) {
-            LOGGER.debug("Received null as command for execution");
+            Logger.debug(this, "Received null as command for execution");
             return;
         }
 
@@ -62,14 +57,14 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
+                Logger.error(this, "Problem executing command", e);
             }
         }
     }
 
     public boolean executeAndWait(Callable command) {
         if (command == null) {
-            LOGGER.debug("Received null as command for execution");
+            Logger.debug(this, "Received null as command for execution");
             return false;
         }
 
@@ -81,7 +76,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
+                Logger.error(this, "Problem executing command", e);
                 return false;
             }
         }
@@ -97,7 +92,7 @@ public class JabRefExecutorService implements Executor {
 
     public void executeInterruptableTaskAndWait(Runnable runnable) {
         if (runnable == null) {
-            LOGGER.debug("Received null as command for execution");
+            Logger.debug(this, "Received null as command for execution");
             return;
         }
 
@@ -109,7 +104,7 @@ public class JabRefExecutorService implements Executor {
             } catch (InterruptedException ignored) {
                 // Ignored
             } catch (ExecutionException e) {
-                LOGGER.error("Problem executing command", e);
+                Logger.error(this, "Problem executing command", e);
             }
         }
     }

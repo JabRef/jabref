@@ -4,17 +4,14 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.worker.LookupIdentifiersWorker;
 import org.jabref.logic.importer.IdFetcher;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class LookupIdentifierAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(LookupIdentifierAction.class);
 
     private final JabRefFrame frame;
     private final IdFetcher fetcher;
@@ -32,7 +29,7 @@ public class LookupIdentifierAction extends MnemonicAwareAction {
         try {
             BasePanel.runWorker(new LookupIdentifiersWorker(frame, fetcher));
         } catch (Exception e) {
-            LOGGER.error(e);
+            Logger.error(this, "worker error", e);
         }
     }
 }

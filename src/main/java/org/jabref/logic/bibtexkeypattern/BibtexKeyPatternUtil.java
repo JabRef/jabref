@@ -26,7 +26,6 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
@@ -34,7 +33,6 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil {
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
 
@@ -414,7 +412,7 @@ public class BibtexKeyPatternUtil {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Cannot make label", e);
+            LogFactory.getLog(BibtexKeyPatternUtil.class).warn("Cannot make label", e);
         }
 
         // Remove all illegal characters from the key.
@@ -498,7 +496,7 @@ public class BibtexKeyPatternUtil {
                             resultingLabel = label;
                         }
                     } else {
-                        LOGGER.info("Key generator warning: unknown modifier '"
+                        LogFactory.getLog(BibtexKeyPatternUtil.class).info("Key generator warning: unknown modifier '"
                                 + modifier + "'.");
                         resultingLabel = label;
                     }
@@ -710,7 +708,7 @@ public class BibtexKeyPatternUtil {
                 return entry.getFieldOrAlias(val).orElse("");
             }
         } catch (NullPointerException ex) {
-            LOGGER.debug("Problem making label", ex);
+            LogFactory.getLog(BibtexKeyPatternUtil.class).debug("Problem making label", ex);
             return "";
         }
 

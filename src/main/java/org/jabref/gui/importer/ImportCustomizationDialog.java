@@ -27,6 +27,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefDialog;
@@ -42,15 +43,12 @@ import org.jabref.logic.util.FileExtensions;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JabRefDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;
@@ -133,12 +131,12 @@ public class ImportCustomizationDialog extends JabRefDialog {
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
-                    LOGGER.info("Could not open ZIP-archive.", exc);
+                    Logger.info(this, "Could not open ZIP-archive.", exc);
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Could not open %0", jarZipFile.get().toString()) + "\n"
                                     + Localization.lang("Have you chosen the correct package path?"));
                 } catch (NoClassDefFoundError exc) {
-                    LOGGER.info("Could not instantiate ZIP-archive reader.", exc);
+                    Logger.info(this, "Could not instantiate ZIP-archive reader.", exc);
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang("Could not instantiate %0", jarZipFile.get().toString()) + "\n"
                                     + Localization.lang("Have you chosen the correct package path?"));

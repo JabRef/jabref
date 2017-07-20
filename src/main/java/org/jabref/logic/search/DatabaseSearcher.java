@@ -5,19 +5,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Silberer, Zirn
  */
 public class DatabaseSearcher {
 
-    private static final Log LOGGER = LogFactory.getLog(DatabaseSearcher.class);
     private final SearchQuery query;
 
     private final BibDatabase database;
@@ -28,10 +25,10 @@ public class DatabaseSearcher {
     }
 
     public List<BibEntry> getMatches() {
-        LOGGER.debug("Search term: " + query);
+        Logger.debug(this, "Search term: " + query);
 
         if (!query.isValid()) {
-            LOGGER.warn("Search failed: illegal search expression");
+            Logger.warn(this, "Search failed: illegal search expression");
             return Collections.emptyList();
         }
 

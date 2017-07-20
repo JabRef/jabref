@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -16,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileExtensions;
@@ -23,8 +21,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -35,7 +31,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class MrDLibImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(MrDLibImporter.class);
     public ParserResult parserResult;
 
     @Override
@@ -53,11 +48,11 @@ public class MrDLibImporter extends Importer {
             try (InputStream stream = new ByteArrayInputStream(recommendationsAsString.getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                Logger.error(this, e.getMessage(), e);
                 return false;
             }
         } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error(e.getMessage(), e);
+            Logger.error(this, e.getMessage(), e);
             return false;
         }
         return true;
@@ -98,7 +93,7 @@ public class MrDLibImporter extends Importer {
                 stringBuilder.append(line);
             }
         } catch (Exception e) {
-            LOGGER.error(e.getMessage());
+            Logger.error(this, e.getMessage());
         }
         return stringBuilder.toString();
     }
@@ -137,14 +132,14 @@ public class MrDLibImporter extends Importer {
             try (InputStream stream = new ByteArrayInputStream(recommendations.getBytes())) {
                 saxParser.parse(stream, handler);
             } catch (SAXException e) {
-                LOGGER.error(e.getMessage(), e);
+                Logger.error(this, e.getMessage(), e);
             }
             List<RankedBibEntry> rankedBibEntries = handler.getRankedBibEntries();
             rankedBibEntries.sort((RankedBibEntry rankedBibEntry1,
                     RankedBibEntry rankedBibEntry2) -> rankedBibEntry1.rank.compareTo(rankedBibEntry2.rank));
             bibEntries = rankedBibEntries.stream().map(e -> e.entry).collect(Collectors.toList());
         } catch (ParserConfigurationException | SAXException e) {
-            LOGGER.error(e.getMessage(), e);
+            Logger.error(this, e.getMessage(), e);
         }
 
         for (BibEntry bibentry : bibEntries) {

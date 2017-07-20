@@ -3,6 +3,7 @@ package org.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveString;
@@ -10,11 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class StringRemoveChange extends Change {
-    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
     private final BibtexString string;
 
     private final BibtexString inMem;
@@ -42,7 +39,7 @@ class StringRemoveChange extends Change {
             panel.getDatabase().removeString(inMem.getId());
             undoEdit.addEdit(new UndoableRemoveString(panel, panel.getDatabase(), string));
         } catch (Exception ex) {
-            LOGGER.info("Error: could not add string '" + string.getName() + "': " + ex.getMessage(), ex);
+            Logger.info(this, "Error: could not add string '" + string.getName() + "'", ex);
         }
 
         // Update tmp database:

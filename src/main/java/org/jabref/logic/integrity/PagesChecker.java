@@ -9,7 +9,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 public class PagesChecker implements ValueChecker {
 
-    private static final String PAGES_EXP_BIBTEX = "" + "\\A" // begin String
+    private static final String PAGES_EXP_BIBTEX = "\\A" // begin String
             + "\\d+" // number
             + "(?:" // non-capture group
             + "\\+|\\-{2}\\d+" // + or --number (range)
@@ -20,7 +20,7 @@ public class PagesChecker implements ValueChecker {
             + ")*" // repeat group 0,*
             + "\\z"; // end String
 
-    private static final String PAGES_EXP_BIBLATEX = "" + "\\A" // begin String
+    private static final String PAGES_EXP_BIBLATEX = "\\A" // begin String
             + "\\d+" // number
             + "(?:" // non-capture group
             + "\\+|\\-{1,2}\\d+" // + or --number (range)

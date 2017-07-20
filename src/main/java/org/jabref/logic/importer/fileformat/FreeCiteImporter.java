@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -32,16 +33,12 @@ import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This importer parses text format citations using the online API of FreeCite -
  * Open Source Citation Parser http://freecite.library.brown.edu/
  */
 public class FreeCiteImporter extends Importer {
 
-    private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -71,7 +68,7 @@ public class FreeCiteImporter extends Importer {
         try {
             urlencodedCitation = URLEncoder.encode(text, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Unsupported encoding", e);
+            Logger.warn(this, "Unsupported encoding", e);
         }
 
         // Send the request
@@ -81,10 +78,10 @@ public class FreeCiteImporter extends Importer {
             url = new URL("http://freecite.library.brown.edu/citations/create");
             conn = url.openConnection();
         } catch (MalformedURLException e) {
-            LOGGER.warn("Bad URL", e);
+            Logger.warn(this, "Bad URL", e);
             return new ParserResult();
         } catch (IOException e) {
-            LOGGER.warn("Could not download", e);
+            Logger.warn(this, "Could not download", e);
             return new ParserResult();
         }
         try {
@@ -97,9 +94,9 @@ public class FreeCiteImporter extends Importer {
             writer.write(data);
             writer.flush();
         } catch (IllegalStateException e) {
-            LOGGER.warn("Already connected.", e);
+            Logger.warn(this, "Already connected.", e);
         } catch (IOException e) {
-            LOGGER.warn("Unable to connect to FreeCite online service.", e);
+            Logger.warn(this, "Unable to connect to FreeCite online service.", e);
             return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();
@@ -218,7 +215,7 @@ public class FreeCiteImporter extends Importer {
             }
             parser.close();
         } catch (IOException | XMLStreamException ex) {
-            LOGGER.warn("Could not parse", ex);
+            Logger.warn(this, "Could not parse", ex);
             return new ParserResult();
         }
 

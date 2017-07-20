@@ -10,6 +10,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -18,12 +19,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class EntryChange extends Change {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryChange.class);
 
     public EntryChange(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
@@ -42,7 +39,7 @@ class EntryChange extends Change {
         // in the same way. Check for this, too.
         boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
 
-        LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
+        Logger.debug(this, "Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
 
         Set<String> allFields = new TreeSet<>();

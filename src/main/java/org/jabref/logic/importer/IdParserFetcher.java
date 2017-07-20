@@ -11,12 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.Identifier;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Provides a convenient interface for {@link IdFetcher}, which follow the usual three-step procedure:
@@ -25,8 +23,6 @@ import org.apache.commons.logging.LogFactory;
  * 3. Extract identifier
  */
 public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
-
-    Log LOGGER = LogFactory.getLog(IdParserFetcher.class);
 
     /**
      * Constructs a URL based on the {@link BibEntry}.
@@ -85,7 +81,7 @@ public interface IdParserFetcher<T extends Identifier> extends IdFetcher<T> {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (FileNotFoundException e) {
-            LOGGER.debug("Id not found");
+            Logger.debug(this, "Id not found");
             return Optional.empty();
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource

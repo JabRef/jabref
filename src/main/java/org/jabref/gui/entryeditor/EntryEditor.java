@@ -40,6 +40,7 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.EntryContainer;
 import org.jabref.gui.GUIGlobals;
@@ -78,8 +79,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
 import org.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 
 /**
@@ -94,7 +93,6 @@ import org.fxmisc.easybind.EasyBind;
  */
 public class EntryEditor extends JPanel implements EntryContainer {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
      * A reference to the entry this object works on.
@@ -731,7 +729,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         if (!SwingUtilities.isEventDispatchThread()) {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                     Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                            LOGGER.debug("Error setting field", ex);
+                            Logger.debug(this, "Error setting field", ex);
                             requestFocus();
                         }
                     }

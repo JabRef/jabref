@@ -4,18 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Month;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JSONEntryParser {
 
-    private static final Log LOGGER = LogFactory.getLog(JSONEntryParser.class);
 
     /**
      * Convert a JSONObject containing a bibJSON entry to a BibEntry
@@ -41,12 +40,12 @@ public class JSONEntryParser {
                 if (authors.getJSONObject(i).has("name")) {
                     authorList.add(authors.getJSONObject(i).getString("name"));
                 } else {
-                    LOGGER.info("Empty author name.");
+                    Logger.info(this, "Empty author name.");
                 }
             }
             entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
         } else {
-            LOGGER.info("No author found.");
+            Logger.info(this, "No author found.");
         }
 
         // Direct accessible fields
@@ -73,7 +72,7 @@ public class JSONEntryParser {
             if (journal.has("title")) {
                 entry.setField(FieldName.JOURNAL, journal.getString("title"));
             } else {
-                LOGGER.info("No journal title found.");
+                Logger.info(this, "No journal title found.");
             }
             // Other journal related fields
             for (String field : journalSingleFieldStrings) {
@@ -82,7 +81,7 @@ public class JSONEntryParser {
                 }
             }
         } else {
-            LOGGER.info("No journal information found.");
+            Logger.info(this, "No journal information found.");
         }
 
         // Keywords
@@ -161,12 +160,12 @@ public class JSONEntryParser {
                 if (authors.getJSONObject(i).has("creator")) {
                     authorList.add(authors.getJSONObject(i).getString("creator"));
                 } else {
-                    LOGGER.info("Empty author name.");
+                    LogFactory.getLog(JSONEntryParser.class).info("Empty author name.");
                 }
             }
             entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
         } else {
-            LOGGER.info("No author found.");
+            LogFactory.getLog(JSONEntryParser.class).info( "No author found.");
         }
 
         // Direct accessible fields

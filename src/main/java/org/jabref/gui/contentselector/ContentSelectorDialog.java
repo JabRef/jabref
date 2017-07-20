@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
@@ -41,14 +42,11 @@ import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ContentSelectorDialog extends JabRefDialog {
 
     private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
     private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
-    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JPanel fieldPan = new JPanel();
@@ -196,7 +194,7 @@ public class ContentSelectorDialog extends JabRefDialog {
                 applyChanges();
                 dispose();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
+                Logger.info(this, "Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -209,7 +207,7 @@ public class ContentSelectorDialog extends JabRefDialog {
             try {
                 applyChanges();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
+                Logger.info(this, "Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });

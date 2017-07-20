@@ -28,6 +28,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.BibEntryWriter;
@@ -44,8 +45,6 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Oscar Gustafsson
@@ -55,7 +54,6 @@ import org.apache.commons.logging.LogFactory;
 
 public class MergeEntries {
 
-    private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
 
     private static final String MARGIN = "10px";
@@ -444,7 +442,7 @@ public class MergeEntries {
             new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(mergedEntry, writer, databaseType);
         } catch (IOException ex) {
-            LOGGER.error("Error in entry", ex);
+            Logger.error(this, "Error in entry", ex);
         }
         sourceView.setText(writer.getBuffer().toString());
         sourceView.setCaretPosition(0);

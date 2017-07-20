@@ -12,11 +12,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,7 +33,6 @@ public class MSBibDatabase {
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
 
-    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
 
@@ -74,7 +72,7 @@ public class MSBibDatabase {
             DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            LOGGER.warn("Could not parse document", e);
+            Logger.warn(this, "Could not parse document", e);
             return Collections.emptyList();
         }
         NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
@@ -128,7 +126,7 @@ public class MSBibDatabase {
             }
             document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
-            LOGGER.warn("Could not build XML document", e);
+            Logger.warn(this, "Could not build XML document", e);
         }
         return document;
     }

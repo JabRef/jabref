@@ -9,14 +9,13 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.jabref.Logger;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.AutosaveEvent;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
@@ -24,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class AutosaveManager {
 
-    private static final Log LOGGER = LogFactory.getLog(AutosaveManager.class);
 
     private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
@@ -48,7 +46,7 @@ public class AutosaveManager {
                 eventBus.post(new AutosaveEvent());
             });
         } catch (RejectedExecutionException e) {
-            LOGGER.debug("Rejecting autosave while another save process is already running.");
+            Logger.debug(this, "Rejecting autosave while another save process is already running.");
         }
     }
 
@@ -92,8 +90,7 @@ public class AutosaveManager {
         try {
             eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug(e);
+            Logger.debug(this, "occurs if the event source has not been registered, should not prevent shutdown", e);
         }
     }
 }

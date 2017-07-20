@@ -16,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -32,12 +33,9 @@ import org.jabref.model.entry.LinkedFile;
 
 import de.jensd.fx.glyphs.GlyphIcons;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class LinkedFileViewModel extends AbstractViewModel {
 
-    private static final Log LOGGER = LogFactory.getLog(LinkedFileViewModel.class);
 
     private final LinkedFile linkedFile;
     private final BibDatabaseContext databaseContext;
@@ -113,7 +111,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(linkedFile, true);
             JabRefDesktop.openExternalFileAnyFormat(databaseContext, linkedFile.getLink(), type);
         } catch (IOException e) {
-            LOGGER.warn("Cannot open selected file.", e);
+            Logger.warn(this, "Cannot open selected file.", e);
         }
     }
 
@@ -139,7 +137,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 dialogService.showErrorDialogAndWait(Localization.lang("File not found"));
             }
         } catch (IOException ex) {
-            LOGGER.debug("Cannot open folder", ex);
+            Logger.debug(this, "Cannot open folder", ex);
         }
     }
 
@@ -246,7 +244,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                         dialogService.showErrorDialogAndWait(
                                 Localization.lang("Cannot delete file"),
                                 Localization.lang("File permission error"));
-                        LOGGER.warn("File permission error while deleting: " + linkedFile, ex);
+                        Logger.warn(this, "File permission error while deleting: " + linkedFile, ex);
                     }
                 }
             } else {

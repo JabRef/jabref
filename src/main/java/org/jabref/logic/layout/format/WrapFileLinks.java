@@ -12,9 +12,6 @@ import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This formatter iterates over all file links, or all file links of a specified
  * type, outputting a format string given as the first argument. The format string
@@ -79,7 +76,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
-    private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
     private static final int STRING = 0;
     private static final int ITERATION_COUNT = 1;
     private static final int FILE_PATH = 2;

@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
@@ -42,8 +43,6 @@ import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.IEEETranEntryTypes;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.VerticalLayout;
 
 /**
@@ -52,7 +51,6 @@ import org.jdesktop.swingx.VerticalLayout;
  */
 public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
-    private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
     private static final int COLUMN = 3;
     private final JabRefFrame frame;
     private final CancelAction cancelAction = new CancelAction();
@@ -291,7 +289,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);
                 } catch (FetcherException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    Logger.error(this, e.getMessage(), e);
                     fetcherException = true;
                     fetcherExceptionMessage = e.getMessage();
                 }
@@ -316,7 +314,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) + ".\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 fetcherWorker = new FetcherWorker();
@@ -327,7 +325,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                     generateButton.setEnabled(true);
                 });
             } catch (ExecutionException | InterruptedException e) {
-                LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
+                Logger.error(this, "Exception during fetching when using fetcher '%s' with entry id '%s'", e, searchID, fetcher.getName());
             }
         }
     }

@@ -33,6 +33,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
@@ -76,7 +77,6 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -85,7 +85,6 @@ import org.apache.commons.logging.LogFactory;
  * between JabRef and OpenOffice.
  */
 public class OpenOfficePanel extends AbstractWorker {
-    private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
     private OpenOfficeSidePanel sidePane;
     private JDialog diag;
@@ -156,7 +155,7 @@ public class OpenOfficePanel extends AbstractWorker {
                     NoSuchElementException | NoDocumentException ex) {
                 JOptionPane.showMessageDialog(frame, ex.getMessage(), Localization.lang("Error"),
                         JOptionPane.ERROR_MESSAGE);
-                LOGGER.warn("Problem connecting", ex);
+                Logger.warn(this, "Problem connecting", ex);
             }
 
         });
@@ -172,7 +171,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 try {
                     style.ensureUpToDate();
                 } catch (IOException e) {
-                    LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                    Logger.warn(this, "Unable to reload style file '" + style.getPath() + "'", e);
                 }
                 frame.setStatus(Localization.lang("Current style is '%0'", style.getName()));
             });
@@ -224,17 +223,17 @@ public class OpenOfficePanel extends AbstractWorker {
                             Localization
                                     .lang("You must select either a valid style file, or use one of the default styles."),
                             Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn("Problem with style file", ex);
+                    Logger.warn(this, "Problem with style file", ex);
                 } catch (BibEntryNotFoundException ex) {
                     JOptionPane.showMessageDialog(frame,
                             Localization.lang(
                                     "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.debug("BibEntry not found", ex);
+                    Logger.debug(this, "BibEntry not found", ex);
                 } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
                         CreationException ex) {
-                    LOGGER.warn("Could not update bibliography", ex);
+                    Logger.warn(this, "Could not update bibliography", ex);
                 }
             }
         };
@@ -249,7 +248,7 @@ public class OpenOfficePanel extends AbstractWorker {
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                     CreationException | NoSuchElementException | WrappedTargetException | IOException |
                     BibEntryNotFoundException ex) {
-                LOGGER.warn("Problem combining cite markers", ex);
+                Logger.warn(this, "Problem combining cite markers", ex);
             }
 
         });
@@ -259,7 +258,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 CitationManager cm = new CitationManager(frame, ooBase);
                 cm.showDialog();
             } catch (NoSuchElementException | WrappedTargetException | UnknownPropertyException ex) {
-                LOGGER.warn("Problem showing citation manager", ex);
+                Logger.warn(this, "Problem showing citation manager", ex);
             }
         });
 
@@ -342,11 +341,11 @@ public class OpenOfficePanel extends AbstractWorker {
                             "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current library.",
                             ex.getBibtexKey()),
                     Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
-            LOGGER.debug("BibEntry not found", ex);
+            Logger.debug(this, "BibEntry not found", ex);
         } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                 UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
                 CreationException e) {
-            LOGGER.warn("Problem generating new database.", e);
+            Logger.warn(this, "Problem generating new database.", e);
         }
 
     }
@@ -413,17 +412,17 @@ public class OpenOfficePanel extends AbstractWorker {
             exportCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
-            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
+            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Unable to connect. One possible reason is that JabRef "
                             + "and OpenOffice/LibreOffice are not both running in either 32 bit mode or 64 bit mode."));
         } catch (IOException e) {
-            LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
+            Logger.warn(this, "Could not connect to running OpenOffice/LibreOffice", e);
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not connect to running OpenOffice/LibreOffice.") + "\n"
                             + Localization.lang("Make sure you have installed OpenOffice/LibreOffice with Java support.") + "\n"
                             + Localization.lang("If connecting manually, please verify program and library paths.")
-                            + "\n" + "\n" + Localization.lang("Error message:") + " " + e.getMessage());
+                            + "\n\n" + Localization.lang("Error message:") + " " + e.getMessage());
         } finally {
             if (progressDialog != null) {
                 progressDialog.dispose();
@@ -469,7 +468,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
         } catch (SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException |
                 InvocationTargetException e) {
-            LOGGER.error("Could not add URL to system classloader", e);
+            LogFactory.getLog(OpenOfficePanel.class).error("Could not add URL to system classloader", e);
             throw new IOException("Error, could not add URL to system classloader", e);
 
         }
@@ -605,7 +604,7 @@ public class OpenOfficePanel extends AbstractWorker {
                             Localization
                                     .lang("You must select either a valid style file, or use one of the default styles."),
                             Localization.lang("No valid style file defined"), JOptionPane.ERROR_MESSAGE);
-                    LOGGER.warn("Problem with style file", ex);
+                    Logger.warn(this, "Problem with style file", ex);
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
@@ -616,7 +615,7 @@ public class OpenOfficePanel extends AbstractWorker {
                         CreationException | NoSuchElementException | WrappedTargetException | IOException |
                         BibEntryNotFoundException | IllegalTypeException | PropertyExistException |
                         NotRemoveableException ex) {
-                    LOGGER.warn("Could not insert entry", ex);
+                    Logger.warn(this, "Could not insert entry", ex);
                 }
             }
 

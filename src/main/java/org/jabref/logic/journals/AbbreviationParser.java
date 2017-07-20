@@ -17,15 +17,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.Logger;
 
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
  */
 public class AbbreviationParser {
 
-    private static final Log LOGGER = LogFactory.getLog(AbbreviationParser.class);
 
     private final Set<Abbreviation> abbreviations = new HashSet<>(5000);
 
@@ -34,7 +32,7 @@ public class AbbreviationParser {
         try {
             readJournalList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            LOGGER.info("Could not read journal list from file " + resourceFileName, e);
+            Logger.info(this, "Could not read journal list from file " + resourceFileName, e);
         }
     }
 
@@ -44,7 +42,7 @@ public class AbbreviationParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
+            Logger.warn(this, "Could not read journal list from file " + file.getAbsolutePath(), e);
         }
     }
 
@@ -55,7 +53,7 @@ public class AbbreviationParser {
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            LOGGER.warn("Could not read journal list from file " + file.getAbsolutePath(), e);
+            Logger.warn(this, "Could not read journal list from file " + file.getAbsolutePath(), e);
         }
     }
 
@@ -73,7 +71,7 @@ public class AbbreviationParser {
             }
 
         } catch (IOException ex) {
-            LOGGER.info("Could not read journal list from file ", ex);
+            Logger.info(this, "Could not read journal list from file ", ex);
         }
     }
 

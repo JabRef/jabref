@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.jabref.Logger;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
@@ -16,8 +17,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -29,7 +28,6 @@ import org.w3c.dom.Text;
  */
 class OOCalcDatabase {
 
-    private static final Log LOGGER = LogFactory.getLog(OOCalcDatabase.class);
 
     private final List<BibEntry> entries;
 
@@ -187,7 +185,7 @@ class OOCalcDatabase {
 
             result.appendChild(collection);
         } catch (Exception e) {
-            LOGGER.warn("Exception caught...", e);
+            Logger.warn(this, "Exception caught...", e);
         }
         return result;
     }

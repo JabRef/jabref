@@ -36,6 +36,7 @@ import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.Logger;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -78,9 +79,6 @@ import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class JabRefPreferences implements PreferencesService {
 
@@ -376,7 +374,6 @@ public class JabRefPreferences implements PreferencesService {
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-    private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
     private static final Class PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
@@ -434,7 +431,7 @@ public class JabRefPreferences implements PreferencesService {
                 importPreferences("jabref.xml");
             }
         } catch (JabRefException e) {
-            LOGGER.warn("Could not import preferences from jabref.xml: " + e.getMessage(), e);
+            Logger.warn(this, "Could not import preferences from jabref.xml", e);
         }
 
         // load user preferences
@@ -917,7 +914,7 @@ public class JabRefPreferences implements PreferencesService {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException ex) {
-            LOGGER.debug("Hostname not found.", ex);
+            Logger.debug(this, "Hostname not found.", ex);
             return get(DEFAULT_OWNER);
         }
     }
@@ -1135,13 +1132,13 @@ public class JabRefPreferences implements PreferencesService {
             try {
                 exportPreferences("jabref.xml");
             } catch (JabRefException e) {
-                LOGGER.warn("Could not export preferences for memory stick mode: " + e.getMessage(), e);
+                Logger.warn(this, "Could not export preferences for memory stick mode", e);
             }
         }
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
-            LOGGER.warn("Cannot communicate with backing store", ex);
+            Logger.warn(this, "Cannot communicate with backing store", ex);
         }
     }
 
@@ -1162,7 +1159,7 @@ public class JabRefPreferences implements PreferencesService {
                 }
             }
         } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+            Logger.info(this, "BackingStoreException in JabRefPreferences.getKeyPattern", ex);
         }
         return keyPattern;
     }
@@ -1180,7 +1177,7 @@ public class JabRefPreferences implements PreferencesService {
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
-            LOGGER.info("BackingStoreException in JabRefPreferences.putKeyPattern", ex);
+            Logger.info(this, "BackingStoreException in JabRefPreferences.putKeyPattern", ex);
         }
 
         Set<String> allKeys = pattern.getAllKeys();
@@ -1211,7 +1208,7 @@ public class JabRefPreferences implements PreferencesService {
 
             prefsNode.flush();
         } catch (BackingStoreException e) {
-            LOGGER.info("Updating stored custom entry types failed.", e);
+            Logger.info(this, "Updating stored custom entry types failed.", e);
         }
     }
 
@@ -1224,7 +1221,7 @@ public class JabRefPreferences implements PreferencesService {
                     .filter(Objects::nonNull)
                     .forEach(typeString -> CustomEntryType.parse(typeString).ifPresent(storedEntryTypes::add));
         } catch (BackingStoreException e) {
-            LOGGER.info("Parsing customized entry types failed.", e);
+            Logger.info(this, "Parsing customized entry types failed.", e);
         }
         return storedEntryTypes;
     }
@@ -1248,7 +1245,7 @@ public class JabRefPreferences implements PreferencesService {
                 result.put(key, value);
             }
         } catch (BackingStoreException e) {
-            LOGGER.info("could not retrieve preference keys", e);
+            Logger.info(this, "could not retrieve preference keys", e);
         }
         return result;
     }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.Logger;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.AuthorAbbreviator;
@@ -81,11 +82,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 class LayoutEntry {
-    private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
     private List<LayoutFormatter> option;
 
@@ -129,7 +126,7 @@ class LayoutEntry {
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
 
         if (!blockStart.equals(blockEnd)) {
-            LOGGER.warn("Field start and end entry must be equal.");
+            Logger.warn(this, "Field start and end entry must be equal.");
         }
 
         type = layoutType;
@@ -152,7 +149,7 @@ class LayoutEntry {
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
-                    LOGGER.warn("Nested field entries are not implemented!");
+                    Logger.warn(this, "Nested field entries are not implemented!");
                 }
                 break;
             case LayoutHelper.IS_LAYOUT_TEXT:
@@ -217,7 +214,7 @@ class LayoutEntry {
         if (BibEntry.TYPE_HEADER.equals(text)) {
             fieldEntry = bibtex.getType();
         } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
-            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+            Logger.warn(this, "'" + BibEntry.OBSOLETE_TYPE_HEADER
                     + "' is an obsolete name for the entry type. Please update your layout to use '"
                     + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
@@ -574,7 +571,7 @@ class LayoutEntry {
                 results.add(f);
                 continue;
             } catch (Exception ex) {
-                LOGGER.info("Problem with formatter", ex);
+                Logger.info(this, "Problem with formatter", ex);
             }
 
             // Then check whether this is a user defined formatter

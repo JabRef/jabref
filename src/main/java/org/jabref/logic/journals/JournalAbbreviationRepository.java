@@ -7,15 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.Logger;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
 
-    private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationRepository.class);
     private final Set<Abbreviation> abbreviations = new HashSet<>(16000); // We have over 15.000 abbreviations in the built-in lists
 
     public JournalAbbreviationRepository(Abbreviation... abbreviations) {
@@ -63,7 +61,7 @@ public class JournalAbbreviationRepository {
         if (abbreviations.contains(abbreviation)) {
             Abbreviation previous = getAbbreviation(abbreviation.getName()).get();
             abbreviations.remove(previous);
-            LOGGER.info("Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
+            Logger.info(this, "Duplicate journal abbreviation - old one will be overwritten by new one\nOLD: "
                     + previous + "\nNEW: " + abbreviation);
         }
 

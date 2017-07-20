@@ -112,7 +112,7 @@ public class FromAuxDialog extends JabRefDialog {
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
                 + Localization.lang("This feature generates a new library based on which entries "
                         + "are needed in an existing LaTeX document.")
-                + "</p>" + "<p>"
+                + "</p><p>"
                 + Localization.lang("You need to select one of your open libraries from which to choose "
                         + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
                 + "</p></html>");

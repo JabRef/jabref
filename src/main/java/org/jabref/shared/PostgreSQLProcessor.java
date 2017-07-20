@@ -5,8 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.jabref.Logger;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.shared.listener.PostgresSQLNotificationListener;
 
@@ -76,7 +76,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         // Disable cleanup output of ThreadedHousekeeper
-        Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
+        java.util.logging.Logger.getLogger(ThreadedHousekeeper.class.getName()).setLevel(Level.SEVERE);
 
         this.listener = new PostgresSQLNotificationListener(dbmsSynchronizer);
 
@@ -106,7 +106,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
             // Otherwise the listener is going to be deleted by GC.
             pgConnection.addNotificationListener(listener);
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -115,7 +115,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             pgConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -124,7 +124,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         try {
             pgConnection.createStatement().execute("NOTIFY jabrefLiveUpdate, '" + PROCESSOR_ID + "';");
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 }

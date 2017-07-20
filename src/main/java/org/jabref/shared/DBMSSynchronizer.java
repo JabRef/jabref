@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.Logger;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
@@ -32,8 +33,6 @@ import org.jabref.shared.exception.OfflineLockException;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Synchronizes the shared or local databases with their opposite side.
@@ -41,7 +40,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DBMSSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
@@ -144,7 +142,7 @@ public class DBMSSynchronizer {
      */
     public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
         if (!dbmsProcessor.checkBaseIntegrity()) {
-            LOGGER.info("Integrity check failed. Fixing...");
+            Logger.info(this, "Integrity check failed. Fixing...");
             dbmsProcessor.setupSharedDatabase();
 
             // This check should only be performed once on initial database setup.
@@ -248,7 +246,7 @@ public class DBMSSynchronizer {
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -263,7 +261,7 @@ public class DBMSSynchronizer {
         try {
             MetaDataParser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
-            LOGGER.error("Parse error", e);
+            Logger.error(this, "Parse error", e);
         }
     }
 
@@ -277,7 +275,7 @@ public class DBMSSynchronizer {
         try {
             dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 
@@ -296,7 +294,7 @@ public class DBMSSynchronizer {
                 } catch (OfflineLockException exception) {
                     eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
                 } catch (SQLException e) {
-                    LOGGER.error("SQL Error: ", e);
+                    Logger.error(this, "SQL Error", e);
                 }
             }
         }
@@ -329,7 +327,7 @@ public class DBMSSynchronizer {
             return isValid;
 
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            Logger.error(this, "SQL Error", e);
             return false;
         }
     }
@@ -363,7 +361,7 @@ public class DBMSSynchronizer {
             dbmsProcessor.stopNotificationListener();
             currentConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            Logger.error(this, "SQL Error", e);
         }
     }
 

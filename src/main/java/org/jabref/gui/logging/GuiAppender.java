@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.logging.LogMessages;
 
+import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -29,7 +30,7 @@ public class GuiAppender extends AbstractAppender {
                                              @PluginElement("Filters") Filter filter) {
 
         if (name == null) {
-            LOGGER.error("No name provided for GuiAppender");
+            LogFactory.getLog(GuiAppender.class).error("No name provided for GuiAppender");
             return null;
         }
 

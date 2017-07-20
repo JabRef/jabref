@@ -7,9 +7,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.Logger;
 import org.jabref.logic.util.io.FileUtil;
 
-import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
  * in the file's last modification time stamp. The
  */
 public class FileUpdateMonitor implements Runnable {
-    private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
     private final Map<String, Entry> entries = new HashMap<>();
@@ -29,7 +28,7 @@ public class FileUpdateMonitor implements Runnable {
             temporaryFile = Files.createTempFile("jabref", null);
             temporaryFile.toFile().deleteOnExit();
         } catch (IOException ex) {
-            LOGGER.warn("Could not create temporary file.", ex);
+            LogFactory.getLog(FileUpdateMonitor.class).warn("Could not create temporary file.", ex);
         }
         return temporaryFile;
     }
@@ -52,7 +51,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 Thread.sleep(WAIT);
             } catch (InterruptedException ex) {
-                LOGGER.debug("FileUpdateMonitor has been interrupted. Terminating...", ex);
+                Logger.debug(this, "FileUpdateMonitor has been interrupted. Terminating...", ex);
                 return;
             }
         }
@@ -119,7 +118,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 entry.updateTimeStamp();
             } catch (IOException e) {
-                LOGGER.error("Couldn't update timestamp", e);
+                Logger.error(this, "Couldn't update timestamp", e);
             }
         }
     }

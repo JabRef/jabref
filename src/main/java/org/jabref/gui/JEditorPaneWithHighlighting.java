@@ -11,15 +11,10 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter;
 import javax.swing.text.LayeredHighlighter.LayerPainter;
 
-import org.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
+import org.jabref.Logger;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQueryHighlightListener {
-
-    private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
     public void highlightPattern(Optional<Pattern> highlightPattern) {
         Highlighter highlighter = getHighlighter();
@@ -38,7 +33,7 @@ public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQu
                 highlighter.addHighlight(matcher.start(), matcher.end(), painter);
             } catch (BadLocationException ble) {
                 // should not occur if matcher works right
-                LOGGER.warn("Highlighting not possible, bad location", ble);
+                Logger.warn(this, "Highlighting not possible, bad location", ble);
             }
         }
     }
@@ -49,7 +44,7 @@ public class JEditorPaneWithHighlighting extends JEditorPane implements SearchQu
         try {
             text = doc.getText(0, doc.getLength());
         } catch (Exception e) {
-            LOGGER.error("Error while getting document text");
+            Logger.error(this, "Error while getting document text");
             text = "";
         }
         return text;

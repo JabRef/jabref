@@ -4,11 +4,9 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.jabref.Globals;
+import org.jabref.Logger;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.fileformat.CustomImporter;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Collection of user defined custom import formats.
@@ -18,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomImportList extends TreeSet<CustomImporter> {
 
-    private static final Log LOGGER = LogFactory.getLog(CustomImportList.class);
 
     private final JabRefPreferences prefs;
 
@@ -42,7 +39,7 @@ public class CustomImportList extends TreeSet<CustomImporter> {
                     super.add(new CustomImporter(s.get(3), s.get(2)));
                 }
             } catch (Exception e) {
-                LOGGER.warn("Could not load " + s.get(0) + " from preferences. Will ignore.", e);
+                Logger.warn(this, "Could not load " + s.get(0) + " from preferences. Will ignore.", e);
             }
             i++;
         }

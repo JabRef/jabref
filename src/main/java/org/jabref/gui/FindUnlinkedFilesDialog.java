@@ -67,6 +67,7 @@ import javax.swing.tree.TreePath;
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.JabRefGUI;
+import org.jabref.Logger;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
@@ -83,8 +84,6 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
@@ -99,7 +98,6 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
     public static final String ACTION_SHORT_DESCRIPTION = Localization
             .lang("Searches for unlinked PDF files on the file system");
 
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
@@ -212,7 +210,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                 String[] dim = store.split(";");
                 dimension = new Dimension(Integer.valueOf(dim[0]), Integer.valueOf(dim[1]));
             } catch (NumberFormatException ignoredEx) {
-                LOGGER.debug("RestoreSizeDialog Exception ", ignoredEx);
+                Logger.debug(this, "RestoreSizeDialog Exception ", ignoredEx);
             }
         }
         if (dimension != null) {
@@ -938,7 +936,7 @@ public class FindUnlinkedFilesDialog extends JabRefDialog {
                                         JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(),
                                         fnw.file.getAbsolutePath(), FieldName.PDF);
                             } catch (IOException e1) {
-                                LOGGER.info("Error opening file", e1);
+                                Logger.info(this, "Error opening file: %[exception]s", e1);
                             }
                         }
                     } else {

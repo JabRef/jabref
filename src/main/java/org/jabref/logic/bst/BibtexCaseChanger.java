@@ -3,12 +3,10 @@ package org.jabref.logic.bst;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.jabref.Logger;
 
 public final class BibtexCaseChanger {
 
-    private static final Log LOGGER = LogFactory.getLog(BibtexCaseChanger.class);
 
     // stores whether the char before the current char was a colon
     private boolean prevColon = true;
@@ -108,7 +106,7 @@ public final class BibtexCaseChanger {
                 sb.append(c[i]);
                 i++;
                 if (braceLevel == 0) {
-                    LOGGER.warn("Too many closing braces in string: " + s);
+                    Logger.warn(this, "Too many closing braces in string: " + s);
                 } else {
                     braceLevel--;
                 }
@@ -123,7 +121,7 @@ public final class BibtexCaseChanger {
             i++;
         }
         if (braceLevel > 0) {
-            LOGGER.warn("No enough closing braces in string: " + s);
+            Logger.warn(this, "No enough closing braces in string: " + s);
         }
         return sb.toString();
     }
@@ -210,7 +208,7 @@ public final class BibtexCaseChanger {
             }
             break;
         default:
-            LOGGER.info("convertAccented - Unknown format: " + format);
+            Logger.info(this, "convertAccented - Unknown format: " + format);
             break;
         }
         return pos;
@@ -229,7 +227,7 @@ public final class BibtexCaseChanger {
             pos++;
             break;
         default:
-            LOGGER.info("convertNonControl - Unknown format: " + format);
+            Logger.info(this, "convertNonControl - Unknown format: " + format);
             break;
         }
         return pos;
@@ -257,7 +255,7 @@ public final class BibtexCaseChanger {
             sb.append(Character.toUpperCase(c[i]));
             break;
         default:
-            LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
+            Logger.info(this, "convertCharIfBraceLevelIsZero - Unknown format: " + format);
             break;
         }
         i++;
