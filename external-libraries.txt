@@ -138,11 +138,6 @@ Project: EasyBind
 URL:     https://github.com/TomasMikula/EasyBind
 License: BSD-2-Clause
 
-Id:      net.corda:jfx
-Project: Corda
-URL:     https://github.com/corda/corda/tree/master/client/jfx
-License: Apache-2.0
-
 Id:      org.fxmisc.flowless:flowless
 Project: Flowless
 URL:     https://github.com/TomasMikula/Flowless
