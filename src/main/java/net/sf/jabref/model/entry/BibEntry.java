@@ -469,7 +469,13 @@ public class BibEntry implements Cloneable {
             /* Validar ano */
             if (fieldName.equals("year")) {
                 Calendar c = Calendar.getInstance();
-                int year_to_validate = Integer.parseInt(value.intern());
+                int year_to_validate;
+                try {
+                    year_to_validate = Integer.parseInt(value.intern());
+                }
+                catch(NumberFormatException ex) {
+                    throw new IllegalArgumentException("Campo invalido! Insira um ano valido!");
+                }
                 if ((year_to_validate > +c.get(Calendar.YEAR)) || (year_to_validate < 0)) {
                     fields.put(fieldName, "");
                     throw new IllegalArgumentException("Campo invalido! Insira um ano valido!");
