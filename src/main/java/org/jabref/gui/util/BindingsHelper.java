@@ -18,8 +18,6 @@ import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
-import net.corda.client.jfx.utils.MappedList;
-
 
 /**
  * Helper methods for javafx binding.
@@ -67,8 +65,8 @@ public class BindingsHelper {
      * the items are converted when the are inserted (and at the initialization) instead of when they are accessed.
      * Thus the initial CPU overhead and memory consumption is higher but the access to list items is quicker.
      */
-    public static <A, B> ObservableList<B> mapBacked(ObservableList<A> source, Function<A, B> mapper) {
-        return new MappedList<>(source, mapper::apply);
+    public static <A, B> MappedList mapBacked(ObservableList<A> source, Function<A, B> mapper) {
+        return new MappedList<>(source, mapper);
     }
 
     /**
@@ -154,7 +152,7 @@ public class BindingsHelper {
         public void changedA(ObservableValue<? extends A> observable, A oldValue, A newValue) {
             updateLocked(updateB, oldValue, newValue);
         }
-        
+
         public void changedB(ObservableValue<? extends B> observable, B oldValue, B newValue) {
             updateLocked(updateA, oldValue, newValue);
         }

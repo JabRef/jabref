@@ -5,7 +5,7 @@ import org.gradle.internal.os.OperatingSystem
 buildscript {
     repositories {
         maven {
-            url 'http://maven.ej-technologies.com/repository'
+            url 'https://maven.ej-technologies.com/repository'
         }
     }
     dependencies {
@@ -113,10 +113,8 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.12'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile('net.corda:jfx:0.12.1') {
-        transitive = false
-    }
-    compile 'org.jetbrains.kotlin:kotlin-stdlib:1.1.3' // required by net.corda:jfxc
+
+
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
