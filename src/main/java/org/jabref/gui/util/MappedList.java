@@ -8,12 +8,17 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.TransformationList;
 
+/**
+ * MappedList implementation based on https://gist.github.com/TomasMikula/8883719
+ *
+ * @author https://github.com/TomasMikula
+ */
 public final class MappedList<A, B> extends TransformationList<A, B> {
 
     private final Function<B, A> mapper;
 
-    public MappedList(ObservableList<? extends B> source, Function<B, A> mapper) {
-        super(source);
+    public MappedList(ObservableList<? extends B> sourceList, Function<B, A> mapper) {
+        super(sourceList);
         this.mapper = mapper;
     }
 
@@ -47,15 +52,15 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
             }
 
             @Override
-            public int getPermutation(int i) {
-                return change.getPermutation(i);
+            public int getPermutation(int index) {
+                return change.getPermutation(index);
             }
 
             @Override
             protected int[] getPermutation() {
                 // This method is only called by the superclass methods
                 // wasPermutated() and getPermutation(int), which are
-                // both overriden by this class. There is no other way
+                // both overridden by this class. There is no other way
                 // this method can be called.
                 throw new AssertionError("Unreachable code");
             }
