@@ -196,9 +196,6 @@ public class CsvImporter extends Importer {
         if ("5".equalsIgnoreCase(fieldType)) {
             return "Inbook";
         }
-        if ("5".equalsIgnoreCase(fieldType)) {
-            return "Incollection";
-        }
         if ("6".equalsIgnoreCase(fieldType)) {
             return "Inproceedings";
         }
@@ -210,12 +207,6 @@ public class CsvImporter extends Importer {
         }
         if ("10".equalsIgnoreCase(fieldType)) {
             return "Misc";
-        }
-        if ("10".equalsIgnoreCase(fieldType)) {
-            return "Other";
-        }
-        if ("9".equalsIgnoreCase(fieldType)) {
-            return "Phdthesis";
         }
         if ("3".equalsIgnoreCase(fieldType)) {
             return "Proceedings";
