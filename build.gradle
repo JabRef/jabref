@@ -2,21 +2,11 @@ import org.gradle.internal.os.OperatingSystem
 
 // to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
 
-buildscript {
-    repositories {
-        maven {
-            url 'https://maven.ej-technologies.com/repository'
-        }
-    }
-    dependencies {
-        classpath 'com.github.edwgiz:maven-shade-plugin.log4j2-cachefile-transformer:2.1'
-    }
-}
-
 plugins {
     id 'com.gradle.build-scan' version '1.8'
     id 'com.install4j.gradle' version '6.1.5'
-    id 'com.github.johnrengelman.shadow' version '1.2.4' // update to 2.0.1 not possible as our "transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {" implemenation does not compile any more
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.0"
     id "com.simonharrer.modernizer" version '1.5.0-1'
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'net.ltgt.errorprone' version '0.0.11'
@@ -307,33 +297,6 @@ jacocoTestReport {
 
 shadowJar {
     classifier 'fat'
-
-    transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {
-
-        // this is an adapter required for generating a fat jar with correct log4j2 output
-
-        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer()
-
-        @Override
-        boolean canTransformResource(FileTreeElement element) {
-            return target.canTransformResource(element.getPath())
-        }
-
-        @Override
-        void transform(String path, InputStream is, List<com.github.jengelman.gradle.plugins.shadow.relocation.Relocator> relocators) {
-            target.processResource(path, is, relocators)
-        }
-
-        @Override
-        boolean hasTransformedResource() {
-            return target.hasTransformedResource()
-        }
-
-        @Override
-        void modifyOutputStream(org.apache.tools.zip.ZipOutputStream jos) {
-            target.modifyOutputStream(jos)
-        }
-    })
 }
 
 /*
