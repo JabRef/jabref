@@ -182,6 +182,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         case CLOSE_ENTRY_EDITOR:
                         case DELETE_ENTRY:
                         case SELECT_ALL:
+                        case ENTRY_EDITOR_NEXT_PANEL:
+                        case ENTRY_EDITOR_NEXT_PANEL_2:
+                        case ENTRY_EDITOR_PREVIOUS_PANEL:
+                        case ENTRY_EDITOR_PREVIOUS_PANEL_2:
                             e.consume();
                             break;
                         default:
