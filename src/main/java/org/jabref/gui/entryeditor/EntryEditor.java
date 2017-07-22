@@ -172,6 +172,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
+
                 //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
                 Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
                 if (keyBinding.isPresent()) {
@@ -218,7 +219,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
-        tabbed.addEventFilter(KeyEvent.ANY, event -> {
+        tabbed.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
@@ -824,7 +825,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
