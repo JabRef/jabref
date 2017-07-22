@@ -15,7 +15,7 @@ import org.jabref.preferences.JabRefPreferences;
  */
 class ConversionMenu extends Menu {
 
-    private final static String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+    private final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
 
     public ConversionMenu(StringProperty text) {
         super(Localization.lang("Convert"));

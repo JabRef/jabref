@@ -16,7 +16,7 @@ import org.jabref.preferences.JabRefPreferences;
 class ProtectedTermsMenu extends Menu {
 
     private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
-    private static final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+    private final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
 
     private final Menu externalFiles;
     private final TextArea opener;

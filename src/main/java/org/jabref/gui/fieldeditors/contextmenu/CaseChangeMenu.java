@@ -14,7 +14,7 @@ import org.jabref.preferences.JabRefPreferences;
 
 class CaseChangeMenu extends Menu {
 
-    private final static String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+    private final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
 
     public CaseChangeMenu(final StringProperty text) {
         super(Localization.lang("Change case"));
