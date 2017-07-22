@@ -5,7 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import javafx.scene.text.Font;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
@@ -16,11 +15,10 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
 
     @FXML private final SimpleEditorViewModel viewModel;
 
-    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, int fontSize) {
+    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
         this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider);
 
         EditorTextArea textArea = new EditorTextArea();
-        textArea.setFont(Font.font("Verdana", fontSize));
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));

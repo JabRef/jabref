@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import javafx.scene.text.Font;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.model.entry.BibEntry;
@@ -16,13 +15,12 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, int fontSize) {
+    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider) {
         this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.setFont(Font.font("Verdana", fontSize));
     }
 
     public OwnerEditorViewModel getViewModel() {
