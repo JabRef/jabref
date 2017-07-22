@@ -17,6 +17,8 @@ import org.jabref.preferences.JabRefPreferences;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
+    private static final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+
     public EditorTextArea() {
         this("");
     }
@@ -61,7 +63,9 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
             @Override
             public void populateContextMenu(ContextMenu contextMenu) {
                 super.populateContextMenu(contextMenu);
+                contextMenu.setStyle(fontStyle);
                 contextMenu.getItems().addAll(0, items);
+                contextMenu.getItems().stream().forEach(item -> item.setStyle(fontStyle));
             }
         };
         setSkin(customContextSkin);
