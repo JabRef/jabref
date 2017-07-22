@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import javafx.scene.text.Font;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
@@ -15,13 +16,14 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     @FXML private final PersonsEditorViewModel viewModel;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences) {
+    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences, int fontSize) {
         this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, autoCompletePreferences);
 
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textArea.setFont(Font.font("Verdana", fontSize));
         this.getChildren().add(textArea);
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());

@@ -25,6 +25,8 @@ public class FieldEditors {
 
     private static final Log LOGGER = LogFactory.getLog(FieldEditors.class);
 
+    private static int fontSize = Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
+
     public static FieldEditorFX getForField(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, JabRefPreferences preferences, BibDatabaseContext databaseContext, String entryType, SuggestionProviders suggestionProviders) {
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
@@ -32,44 +34,44 @@ public class FieldEditors {
 
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fontSize);
             } else {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)), suggestionProvider);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)), suggestionProvider, fontSize);
             }
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(fieldName, dialogService, suggestionProvider);
+            return new UrlEditor(fieldName, dialogService, suggestionProvider, fontSize);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider);
+            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider, fontSize);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider);
+            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fontSize);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return new OwnerEditor(fieldName, preferences, suggestionProvider);
+            return new OwnerEditor(fieldName, preferences, suggestionProvider, fontSize);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
             return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider), fontSize);
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode()));
+            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode()), fontSize);
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider), fontSize);
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider), fontSize);
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider), fontSize);
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider));
+                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider), fontSize);
             } else {
-                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider));
+                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider), fontSize);
             }
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences());
+            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fontSize);
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider);
+        return new SimpleEditor(fieldName, suggestionProvider, fontSize);
     }
 
     @SuppressWarnings("unchecked")

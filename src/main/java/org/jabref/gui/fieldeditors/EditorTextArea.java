@@ -11,6 +11,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import com.sun.javafx.scene.control.skin.TextAreaSkin;
+import javafx.scene.text.Font;
+import org.jabref.Globals;
+import org.jabref.preferences.JabRefPreferences;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
@@ -23,6 +26,8 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
         setMinHeight(1);
         setMinWidth(200);
+
+        this.setFont(Font.font("Verdana", Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);

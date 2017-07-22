@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import javafx.scene.text.Font;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
@@ -16,13 +17,14 @@ public class DateEditor extends HBox implements FieldEditorFX {
     @FXML private DateEditorViewModel viewModel;
     @FXML private TemporalAccessorPicker datePicker;
 
-    public DateEditor(String fieldName, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+    public DateEditor(String fieldName, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider, int fontSize) {
         this.viewModel = new DateEditorViewModel(fieldName, suggestionProvider, dateFormatter);
 
         ControlHelper.loadFXMLForControl(this);
 
         datePicker.setStringConverter(viewModel.getDateToStringConverter());
         datePicker.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+        datePicker.getEditor().setFont(Font.font("Verdana", fontSize));
     }
 
     public DateEditorViewModel getViewModel() {

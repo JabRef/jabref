@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 
+import javafx.scene.text.Font;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
@@ -17,7 +18,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
     @FXML private OptionEditorViewModel<T> viewModel;
     @FXML private ComboBox<T> comboBox;
 
-    public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel) {
+    public OptionEditor(String fieldName, OptionEditorViewModel<T> viewModel, int fontSize) {
         this.viewModel = viewModel;
 
         ControlHelper.loadFXMLForControl(this);
@@ -26,6 +27,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
         comboBox.setCellFactory(new ViewModelListCellFactory<T>().withText(viewModel::convertToDisplayText));
         comboBox.getItems().setAll(viewModel.getItems());
         comboBox.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+        comboBox.getEditor().setFont(Font.font("Verdana", fontSize));
     }
 
     public OptionEditorViewModel<T> getViewModel() {

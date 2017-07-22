@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import org.jabref.preferences.JabRefPreferences;
 
 public class SourceTab extends EntryEditorTab {
 
@@ -79,7 +80,7 @@ public class SourceTab extends EntryEditorTab {
     private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        //codeArea.(Font.font("Monospaced", Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        codeArea.setStyle("-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;");
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
                 storeSource();

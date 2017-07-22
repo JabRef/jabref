@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import javafx.scene.text.Font;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
@@ -15,12 +16,13 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @FXML private UrlEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public UrlEditor(String fieldName, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+    public UrlEditor(String fieldName, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, int fontSize) {
         this.viewModel = new UrlEditorViewModel(fieldName, suggestionProvider, dialogService);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+        textArea.setFont(Font.font("Verdana", fontSize));
     }
 
     public UrlEditorViewModel getViewModel() {

@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import javafx.scene.text.Font;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
@@ -21,13 +22,14 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     private Optional<BibEntry> entry;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, AutoCompleteSuggestionProvider<?> suggestionProvider, int fontSize) {
         this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, journalAbbreviationPreferences);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textArea.setFont(Font.font("Verdana", fontSize));
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
     }
