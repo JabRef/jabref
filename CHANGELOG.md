@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+ - We made the font size in the entry editor customizable by "Menu and label font size"
 
 ### Fixed
 
