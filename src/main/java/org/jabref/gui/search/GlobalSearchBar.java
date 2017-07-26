@@ -192,7 +192,6 @@ public class GlobalSearchBar extends JPanel {
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
         toolBar.add(container);
-        toolBar.addSeparator();
         toolBar.add(openCurrentResultsInDialog);
         toolBar.addSeparator();
         toolBar.add(globalSearch);

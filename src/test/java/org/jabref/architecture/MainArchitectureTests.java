@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.architecture;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

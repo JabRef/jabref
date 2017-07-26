@@ -3,6 +3,7 @@ package org.jabref.logic.exporter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.List;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.google.common.base.Charsets;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class MsBibExportFormatTest {
     @Before
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
-        charset = Charsets.UTF_8;
+        charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExportFormat();
         tempFile = testFolder.newFile();
     }
