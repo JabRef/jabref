@@ -264,7 +264,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.markBaseChanged();
+        SwingUtilities.invokeLater(() -> this.markBaseChanged());
+
     }
 
     /**
