@@ -101,7 +101,7 @@ dependencies {
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
-    compile 'org.controlsfx:controlsfx:8.40.12'
+    compile 'org.controlsfx:controlsfx:8.40.13'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
 
     compile 'org.fxmisc.flowless:flowless:0.5.2'
