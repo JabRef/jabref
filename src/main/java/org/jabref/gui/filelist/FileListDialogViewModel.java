@@ -20,4 +20,16 @@ public class FileListDialogViewModel extends AbstractViewModel {
 
     }
     //
+
+    public StringProperty getLinkProperty() {
+        return linkProperty;
+    }
+
+    public StringProperty getDescriptionProperty() {
+        return descriptionProperty;
+    }
+
+    public ListProperty<ExternalFileType> getExternalfilesTypes() {
+        return externalfilesTypes;
+    }
 }
