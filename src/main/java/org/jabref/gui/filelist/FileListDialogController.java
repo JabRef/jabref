@@ -2,6 +2,7 @@ package org.jabref.gui.filelist;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
@@ -36,6 +38,7 @@ public class FileListDialogController extends AbstractController<FileListDialogV
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
+
     private boolean showSaveDialog;
 
     @FXML
@@ -61,6 +64,18 @@ public class FileListDialogController extends AbstractController<FileListDialogV
         } else {
             path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         }
+        path.ifPresent(newFile -> {
+            // Store the directory for next time:
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, newFile.toString());
+
+            // If the file is below the file directory, make the path relative:
+            List<Path> fileDirectories = this.stateManager.getActiveDatabase().get()
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+            newFile = FileUtil.shortenFileName(newFile, fileDirectories);
+
+            tfLink.setText(newFile.toString());
+            tfLink.requestFocus();
+        });
     }
 
     @FXML
