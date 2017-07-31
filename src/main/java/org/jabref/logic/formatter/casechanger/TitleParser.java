@@ -9,7 +9,7 @@ import java.util.Optional;
  */
 public final class TitleParser {
 
-    private StringBuffer buffer;
+    private StringBuilder buffer;
     private int wordStart;
 
     public List<Word> parse(String title) {
@@ -55,7 +55,7 @@ public final class TitleParser {
 
     private void reset() {
         wordStart = -1;
-        buffer = new StringBuffer();
+        buffer = new StringBuilder();
     }
 
     private static boolean[] determineProtectedChars(String title) {

@@ -150,13 +150,13 @@ public class XMPSchemaBibtex extends XMPSchema {
     private static String getContents(NodeList seqList) {
 
         Element seqNode = (Element) seqList.item(0);
-        StringBuffer seq = null;
+        StringBuilder seq = null;
 
         NodeList items = seqNode.getElementsByTagName("rdf:li");
         for (int j = 0; j < items.getLength(); j++) {
             Element li = (Element) items.item(j);
             if (seq == null) {
-                seq = new StringBuffer();
+                seq = new StringBuilder();
             } else {
                 seq.append(" and ");
             }
