@@ -2144,7 +2144,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     // Check if it is the preamble:
-                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
+
+                    FieldEditor f = (FieldEditor) focused;
+                    if ((preambleEditor != null) && (f.equals(preambleEditor.getFieldEditor()))) {
                         preambleEditor.storeCurrentEdit();
                     }
                 }

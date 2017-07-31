@@ -58,7 +58,7 @@ public class Globals {
     }
 
     // Key binding preferences
-    public static KeyBindingRepository getKeyPrefs() {
+    public static synchronized KeyBindingRepository getKeyPrefs() {
         if (keyBindingRepository == null) {
             keyBindingRepository = prefs.getKeyBindingRepository();
         }
