@@ -1,3 +1,4 @@
+import org.jabref.logic.util.BracketedExpressionExpander;
 
 class BracketedExpressionExpanderRunner {
     public static void main( String[] args ) {
