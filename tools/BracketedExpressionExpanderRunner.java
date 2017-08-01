@@ -3,7 +3,11 @@ import org.jabref.model.entry.BibEntry;
 
 class BracketedExpressionExpanderRunner {
     public static void main( String[] args ) {
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(new BibEntry());
+        BibEntry bibentry = new BibEntry();
+        bibentry.setField( "author", "A. Kizune" );
+        bibentry.setField( "year", "2017" );
+        bibentry.setField( "pages", "213--6" );
+        BracketedExpressionExpander bex = new BracketedExpressionExpander( bibentry );
         if( args.length > 0 ) {
             for( int i = 0; i < args.length; i++ ) {
                 System.out.println( args[i] + "\t" +
