@@ -307,7 +307,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
                     final BibEntry bibEntry = result.get();
-                    if((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
+                    if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
                 		//If there are duplicates starts ImportInspectionDialog
                         final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
@@ -317,8 +317,7 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                         diag.setLocationRelativeTo(frame);
                         diag.setVisible(true);
                         diag.toFront();	 
-                    }
-                    else {
+                    } else {
                 		// Regenerate CiteKey of imported BibEntry
                         BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
                         frame.getCurrentBasePanel().insertEntry(bibEntry);
