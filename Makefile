@@ -1,5 +1,10 @@
 # --*- Makefile -*--
 
+# Set the ARGS variable to pass argumnents to test classes: 'make
+# ARGS="[year]_[auth]_[firstpage]". Default is no arguments. S.G.
+
+ARGS =
+
 JFLAGS = 
 
 MAIN_CLASS_SOURCES = ${wildcard tools/*.java}
@@ -43,7 +48,7 @@ run: ${MAIN_CLASSES}
 	for FILE in $^; do ( \
 		CLASS=$$(basename $$FILE .class); \
 		set -x; \
-		java $${CLASS} ${SMILES} \
+		java $${CLASS} ${ARGS} \
 	) done
 
 clean cleanAll distclean:
