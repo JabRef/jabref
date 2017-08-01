@@ -163,16 +163,22 @@ public class CitationStyle {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (other == null || getClass() != other.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
-        CitationStyle that = (CitationStyle) other;
-        return source != null ? source.equals(that.source) : that.source == null;
+        CitationStyle other = (CitationStyle) o;
+        return Objects.equals(source, other.source);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(source);
     }
 
 }
