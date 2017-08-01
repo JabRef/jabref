@@ -2,7 +2,9 @@
 
 JFLAGS = 
 
-MAIN_CLASSES = ${wildcard tools/*.java}
+MAIN_CLASS_SOURCES = ${wildcard tools/*.java}
+
+MAIN_CLASSES = ${MAIN_CLASS_SOURCES:%.java=%.class}
 
 JFILES   = ${wildcard tools/*.java} \
 	src/main/java/org/jabref/logic/util/BracketedExpressionExpander.java
@@ -34,7 +36,7 @@ display:
 
 run: ${MAIN_CLASSES}
 	for FILE in $^; do ( \
-		CLASS=$$(basename $$FILE .java); \
+		CLASS=$$(basename $$FILE .class); \
 		set -x; \
 		java $${CLASS} ${SMILES} \
 	) done
