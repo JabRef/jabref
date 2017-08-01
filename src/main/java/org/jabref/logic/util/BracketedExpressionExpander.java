@@ -1,5 +1,6 @@
 package org.jabref.logic.util;
 import org.jabref.model.entry.BibEntry;
+
 /**
  * @author saulius
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
