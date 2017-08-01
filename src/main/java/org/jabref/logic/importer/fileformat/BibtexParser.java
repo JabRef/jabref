@@ -510,7 +510,7 @@ public class BibtexParser implements Parser {
 
     private String parsePreamble() throws IOException {
         skipWhitespace();
-        return parseBracketedText().toString();
+        return parseBracketedText();
 
     }
 
@@ -802,8 +802,8 @@ public class BibtexParser implements Parser {
 
     }
 
-    private StringBuffer parseBracketedText() throws IOException {
-        StringBuffer value = new StringBuffer();
+    private String parseBracketedText() throws IOException {
+        StringBuilder value = new StringBuilder();
 
         consume('{', '(');
 
@@ -842,7 +842,7 @@ public class BibtexParser implements Parser {
 
         consume('}', ')');
 
-        return value;
+        return value.toString();
     }
 
     private boolean isClosingBracketNext() {
