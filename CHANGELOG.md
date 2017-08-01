@@ -11,6 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+If fetched article is already in database the ImportInspectionDialog is started
 
 ### Fixed
 We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
