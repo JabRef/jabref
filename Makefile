@@ -24,15 +24,12 @@ space:= ${empty} ${empty}
 CLASSPATH := $(subst ${space},:,$(subst src/main/java/,bin/,$(sort $(dir ${JFILES})))\
 $(sort $(dir ${MAIN_CLASSES}))\
 bin\
-$(shell find /home/saulius/.gradle -name '*.jar' -print0 | xargs -0 -n1 dirname | sort -u)\
-$(shell find -name '*.jar' -print0 | xargs -0 --no-run-if-empty -n1 dirname | sort -u)\
-$(shell find bin -name '*.class' -print0 | xargs -0 -n1 dirname | sort -u)\
+$(shell find ${HOME}/.gradle -name '*.jar' | sort -u)\
 )
 
 CLASSDIR = bin
 
 export CLASSPATH
-
 
 .PHONY: all clean cleanAll distclean display
 
