@@ -6,10 +6,9 @@ MAIN_CLASS_SOURCES = ${wildcard tools/*.java}
 
 MAIN_CLASSES = ${MAIN_CLASS_SOURCES:%.java=%.class}
 
-JFILES   = ${wildcard tools/*.java} \
-	src/main/java/org/jabref/logic/util/BracketedExpressionExpander.java
+JFILES = src/main/java/org/jabref/logic/util/BracketedExpressionExpander.java
 
-CLSFILES = ${JFILES:%.java=%.class}
+CLSFILES = ${JFILES:src/main/java/%.java=bin/%.class} ${MAIN_CLASSES}
 
 # As recommended in
 # https://www.gnu.org/software/make/manual/html_node/Syntax-of-Functions.html#Syntax-of-Functions
@@ -17,7 +16,9 @@ CLSFILES = ${JFILES:%.java=%.class}
 empty:=
 space:= ${empty} ${empty}
 
-CLASSPATH := $(subst ${space},:,$(subst src/main/java/,bin/,$(sort $(dir ${JFILES})))):bin
+CLASSPATH := $(subst ${space},:,$(subst src/main/java/,bin/,$(sort $(dir ${JFILES})))\
+$(sort $(dir ${MAIN_CLASSES}))\
+)bin
 
 CLASSDIR = bin
 
@@ -30,8 +31,12 @@ all: ${CLSFILES}
 
 display:
 	@echo ${CLASSPATH}
+	@echo ${CLSFILES}
 
 %.class: %.java
+	javac $<
+
+bin/%.class: src/main/java/%.java
 	javac -d ${CLASSDIR} $<
 
 run: ${MAIN_CLASSES}
