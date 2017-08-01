@@ -24,7 +24,7 @@ space:= ${empty} ${empty}
 CLASSPATH := $(subst ${space},:,$(subst src/main/java/,bin/,$(sort $(dir ${JFILES})))\
 $(sort $(dir ${MAIN_CLASSES}))\
 bin\
-$(shell find ${HOME}/.gradle -name '*.jar' | sort -u)\
+$(shell find ${HOME}/.gradle -name '*.jar' | grep -v gradle-4.0| sort -u)\
 )
 
 CLASSDIR = bin
