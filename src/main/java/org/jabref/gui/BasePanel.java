@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
@@ -75,6 +76,8 @@ import org.jabref.gui.filelist.AttachFileAction;
 import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.groups.GroupAddRemoveDialog;
+import org.jabref.gui.groups.GroupTreeNodeViewModel;
+import org.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import org.jabref.gui.importer.actions.AppendDatabaseAction;
 import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.journals.UnabbreviateAction;
@@ -773,6 +776,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void delete(boolean cut) {
     	boolean bRemoveFromGroup = false;
     	boolean bDelete = false;
+    	List<FieldChange> changesRemove = new ArrayList<>();
     	
     	List<BibEntry> entries = mainTable.getSelectedEntries();
 
@@ -784,23 +788,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size()>0) {
     		selectedGroup = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).getName();
     	}
-        
 
         //get list of all groups
         Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
 
-if (groups.get().getName().contentEquals(groups.get().getName())) {
-	System.out.println("Nisu aktivni pregledi po grupama ");
-}
+        if (groups.get().getName().contentEquals(groups.get().getName())) { //checks if is selected any group
+        	//TODO define dialog not to offer "remove from group"
+        }
 
-System.out.println(" !!! Brisanje "+entries.get(0).getField("groups")+ " "+ bibDatabaseContext.getDatabase() 
-+ " " + frame.getCurrentBasePanel().getTabTitle()
-+ "\n ime glavne grupe" + groups.get().getName()
-+ "\n nazivi podgrupa" + groups.get().getChildren()
-+ "\n trenutna grupa" + Globals.stateManager.getSelectedGroup(bibDatabaseContext)
-);
-
-//
 		Object[] options = {"Delete from database",
 			"Remove from group \""+ selectedGroup +"\"",
 			"Cancel"};
@@ -821,8 +816,19 @@ System.out.println(" !!! Brisanje "+entries.get(0).getField("groups")+ " "+ bibD
 			return;
 		}
 
+		// removes from the first selected group
 		if (bRemoveFromGroup){
-			Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).removeEntriesFromGroup(entries);
+			GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
+			changesRemove = node.removeEntriesFromGroup(entries);
+			
+			// Remember undo information
+	        if (!changesRemove.isEmpty()) {
+	            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
+	            undoManager.addEdit(undoRemove);
+	        }
+	        
+	        markBaseChanged();
+	        mainTable.requestFocus();
 			return;
 		}
 
