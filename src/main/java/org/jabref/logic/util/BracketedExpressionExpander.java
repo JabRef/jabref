@@ -1,4 +1,7 @@
 package org.jabref.logic.util;
+
+import java.lang.StringBuilder;
+import java.util.StringTokenizer;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -25,9 +28,16 @@ public class BracketedExpressionExpander {
     }
 
     public String expandBrackets(String pattern) {
-        String expandedString = pattern;
+        StringBuilder sb = new StringBuilder();
+        StringTokenizer st = new StringTokenizer(pattern,"[]",true);
 
-        return expandedString;
+        while(st.hasMoreTokens()) {
+            sb.append(", '");
+            sb.append(st.nextToken());
+            sb.append("'");
+        }
+
+        return sb.toString();
     }
 
 }
