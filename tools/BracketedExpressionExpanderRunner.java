@@ -6,7 +6,7 @@ class BracketedExpressionExpanderRunner {
         BibEntry bibentry = new BibEntry();
         bibentry.setField( "author", "A. Kizune" );
         bibentry.setField( "year", "2017" );
-        bibentry.setField( "pages", "213--6" );
+        bibentry.setField( "pages", "213--216" );
         BracketedExpressionExpander bex = new BracketedExpressionExpander( bibentry );
         if( args.length > 0 ) {
             for( int i = 0; i < args.length; i++ ) {
