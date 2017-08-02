@@ -80,7 +80,7 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
 
     @Override
     public A get(int index) {
-        return mapper.apply(super.getSource().get(index));
+        return backingList.get(index);
     }
 
     @Override
