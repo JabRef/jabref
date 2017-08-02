@@ -40,6 +40,10 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
@@ -137,6 +141,7 @@ import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.specialfields.SpecialField;
 import org.jabref.model.entry.specialfields.SpecialFieldValue;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreviewPreferences;
 import org.jabref.shared.DBMSSynchronizer;
@@ -766,12 +771,64 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      *            "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut) {
-        List<BibEntry> entries = mainTable.getSelectedEntries();
+    	boolean bRemoveFromGroup = false;
+    	boolean bDelete = false;
+    	
+    	List<BibEntry> entries = mainTable.getSelectedEntries();
+
         if (entries.isEmpty()) {
             return;
         }
-        if (!cut && !showDeleteConfirmationDialog(entries.size())) {
-            return;
+    	
+    	String selectedGroup = "";
+    	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size()>0) {
+    		selectedGroup = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).getName();
+    	}
+        
+
+        //get list of all groups
+        Optional<GroupTreeNode> groups = bibDatabaseContext.getMetaData().getGroups();
+
+if (groups.get().getName().contentEquals(groups.get().getName())) {
+	System.out.println("Nisu aktivni pregledi po grupama ");
+}
+
+System.out.println(" !!! Brisanje "+entries.get(0).getField("groups")+ " "+ bibDatabaseContext.getDatabase() 
++ " " + frame.getCurrentBasePanel().getTabTitle()
++ "\n ime glavne grupe" + groups.get().getName()
++ "\n nazivi podgrupa" + groups.get().getChildren()
++ "\n trenutna grupa" + Globals.stateManager.getSelectedGroup(bibDatabaseContext)
+);
+
+//
+		Object[] options = {"Delete from database",
+			"Remove from group \""+ selectedGroup +"\"",
+			"Cancel"};
+		int n = JOptionPane.showOptionDialog(frame,
+			"The entry is the member of groups: " + entries.get(0).getField("groups"),
+			"Delete/remove entry",
+			JOptionPane.YES_NO_CANCEL_OPTION,
+			JOptionPane.QUESTION_MESSAGE,
+			null,
+			options,
+			options[2]);
+
+		if (n == 0) { // Delete
+			bDelete = true;
+		} else if (n == 1) { //Remove from group(s) 
+			bRemoveFromGroup = true;
+		} else if (n == 2) { //Cancel
+			return;
+		}
+
+		if (bRemoveFromGroup){
+			Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).removeEntriesFromGroup(entries);
+			return;
+		}
+
+        //if (!cut && !bRemoveFromGroup && !showDeleteConfirmationDialog(entries.size())) {
+        if (!cut && !bDelete) {
+             return;
         }
 
         // select the next entry to stay at the same place as before (or the previous if we're already at the end)
