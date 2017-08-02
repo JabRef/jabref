@@ -888,6 +888,9 @@ public class BracketedExpressionExpander {
      *             if pages is null
      */
     public static String firstPage(String pages) {
+        // FIXME: incorrectly exracts the first page when pages are
+        // specified with ellipse, e.g. "213-6", which should stand
+        // for "213-216". S.G.
         final String[] splitPages = pages.split("\\D+");
         int result = Integer.MAX_VALUE;
         for (String n : splitPages) {
