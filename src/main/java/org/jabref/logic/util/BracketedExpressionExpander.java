@@ -31,10 +31,12 @@ public class BracketedExpressionExpander {
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"[]",true);
 
+        String separator = "'";
         while(st.hasMoreTokens()) {
-            sb.append(", '");
+            sb.append(separator);
             sb.append(st.nextToken());
             sb.append("'");
+            separator = ", '";
         }
 
         return sb.toString();
