@@ -41,11 +41,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.collab.ChangeScanner;
@@ -154,6 +149,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.math3.exception.NoDataException;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
@@ -796,17 +792,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         	//TODO define dialog not to offer "remove from group"
         }
 
-		Object[] options = {"Delete from database",
-			"Remove from group \""+ selectedGroup +"\"",
-			"Cancel"};
+		Object[] options = {Localization.lang("Delete_from_database"),
+			Localization.lang("Remove_from_group")+ " \"" + selectedGroup +"\"",
+			Localization.lang("Cancel")};
 		int n = JOptionPane.showOptionDialog(frame,
-			"The entry is the member of groups: " + entries.get(0).getField("groups"),
-			"Delete/remove entry",
-			JOptionPane.YES_NO_CANCEL_OPTION,
-			JOptionPane.QUESTION_MESSAGE,
-			null,
-			options,
-			options[2]);
+				Localization.lang("The_entry_is_the_member_of_groups: ") + entries.get(0).getField("groups"),
+				Localization.lang("Delete_remove_entry"),
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				options,
+				options[2]);
 
 		if (n == 0) { // Delete
 			bDelete = true;
@@ -818,17 +814,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
 		// removes from the first selected group
 		if (bRemoveFromGroup){
+			if(Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() < 1) {
+				return;
+			}
+			
 			GroupTreeNode node = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0);
 			changesRemove = node.removeEntriesFromGroup(entries);
-			
+
 			// Remember undo information
-	        if (!changesRemove.isEmpty()) {
-	            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
-	            undoManager.addEdit(undoRemove);
-	        }
-	        
-	        markBaseChanged();
-	        mainTable.requestFocus();
+			if (!changesRemove.isEmpty()) {
+				AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(new GroupTreeNodeViewModel(node), changesRemove);
+				undoManager.addEdit(undoRemove);
+			}
+
+			markBaseChanged();
+			mainTable.requestFocus();
 			return;
 		}
 
