@@ -29,7 +29,7 @@ public class BracketedExpressionExpander {
 
     public String expandBrackets(String pattern) {
         StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(pattern,"[]",true);
+        StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
         String separator = "'";
         while(st.hasMoreTokens()) {
