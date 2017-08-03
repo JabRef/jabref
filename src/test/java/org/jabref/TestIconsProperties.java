@@ -42,14 +42,15 @@ public class TestIconsProperties {
 
         // check that each image in the folder is referenced by a key
         List<String> imagesReferencedFromProperties = new ArrayList<>();
-        for(Map.Entry<Object, Object> entry : properties.entrySet()) {
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             imagesReferencedFromProperties.add(entry.getValue().toString());
         }
 
-        List<String> fileNamesInFolder = Files.list(Paths.get(folder)).map(p -> p.getFileName().toString()).collect(Collectors.toList());
+        List<String> fileNamesInFolder = Files.list(Paths.get(folder)).map(p -> p.getFileName().toString()).sorted().collect(Collectors.toList());
         fileNamesInFolder.removeAll(imagesReferencedFromProperties);
 
-        assertEquals("Images are in the folder that are unused", "[red.png]", fileNamesInFolder.toString());
+        // JabRef-icon-256.png currently used in snapcraft only
+        assertEquals("Images are in the folder that are unused", "[JabRef-icon-256.png, red.png]", fileNamesInFolder.toString());
     }
 
 }

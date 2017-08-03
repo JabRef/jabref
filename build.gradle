@@ -153,6 +153,8 @@ sourceSets {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
+
     filesMatching("build.properties") {
         expand(version: project.version,
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
@@ -161,7 +163,6 @@ processResources {
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'))
         filteringCharset = 'UTF-8'
     }
-    filteringCharset = 'UTF-8'
 
     filesMatching("resource/**/meta.xml") {
         expand version: project.version
@@ -368,17 +369,20 @@ task release(dependsOn: ["media", "releaseJar"]) {
 task releaseJar(dependsOn: "shadowJar") {
     group = 'JabRef - Release'
     description "Creates a Jar release."
-
     doLast {
         copy {
             from("$buildDir/libs/JabRef-${project.version}-fat.jar")
             into("$buildDir/releases")
-
             rename { String fileName ->
                 fileName.replace('-fat', '')
             }
         }
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, true);
     }
+}
+
+task snapJar(dependsOn: "releaseJar", type: Delete) {
+    delete fileTree(dir: "$buildDir/releases/", exclude: "JabRef-${project.version}.jar")
 }
 
 jmh {

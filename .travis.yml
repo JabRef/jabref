@@ -9,16 +9,19 @@ sudo: required
 services:
   - postgresql
   - mysql
+  - docker
 
 env:
   global:
     - GRADLE_OPTS=-Dorg.gradle.daemon=false
+    - TERM=dumb
   matrix:
     - TEST_SUITE=check OPTIONS=modernizer
     - TEST_SUITE=fetcherTest
     - TEST_SUITE=databaseTest
     - TEST_SUITE=guiTest
     - TEST_SUITE=checkstyle
+    - TEST_SUITE=snapcraft
 
 matrix:
     fast_finish: true
@@ -40,14 +43,14 @@ before_script:
 script:
   # --scan enables the Gradle build scan, which can be used to investiage the time each action consumes
   # For more information see https://gradle.com/scans/get-started
-  - if [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "checkstyle" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
+  - if [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "guiTest" ] && [ "$TEST_SUITE" != "snapcraft" ]; then ./gradlew $TEST_SUITE $OPTIONS --scan; fi
   - if [ "$TEST_SUITE" == "checkstyle" ]; then ./gradlew checkstyleMain checkstyleTest checkstyleJmh; fi
   - if [ "$TEST_SUITE" == "guiTest" ]; then ./buildres/gui-tests.sh; fi
 
 after_success:
   # enable codecov report
-  - ./gradlew jacocoTestReport
-  - bash <(curl -s https://codecov.io/bash)
+  - if [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "snapcraft" ]; then ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash); fi
+  - if [ "$TRAVIS_BRANCH" == "snapcraft" ] && [ "$TEST_SUITE" == "snapcraft" ]; then openssl aes-256-cbc -K $encrypted_5f91cda8b19d_key -iv $encrypted_5f91cda8b19d_iv -in .snapcraft/travis_snapcraft.cfg -out .snapcraft/snapcraft.cfg -d && sh ./scripts/run-snapcraft.sh; fi
 
 after_failure:
   # show test results if build fails
