@@ -101,7 +101,7 @@ dependencies {
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
-    compile 'org.controlsfx:controlsfx:8.40.12'
+    compile 'org.controlsfx:controlsfx:8.40.13'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
 
     compile 'org.fxmisc.flowless:flowless:0.5.2'
@@ -117,8 +117,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
     compile 'org.apache.logging.log4j:log4j-api:2.8.2'
     compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-    compile 'org.xmlunit:xmlunit-core:2.3.0'
-    compile 'org.xmlunit:xmlunit-matchers:2.3.0'
+    compile 'org.xmlunit:xmlunit-core:2.4.0'
+    compile 'org.xmlunit:xmlunit-matchers:2.4.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -132,7 +132,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'
-    testCompile 'com.github.tomakehurst:wiremock:2.6.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.7.0'
     testCompile 'org.assertj:assertj-swing-junit:3.7.0'
     testCompile 'org.reflections:reflections:0.9.11'
 
