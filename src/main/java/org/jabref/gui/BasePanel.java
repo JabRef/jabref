@@ -797,7 +797,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
 			Localization.lang("Cancel")};
 		int n = JOptionPane.showOptionDialog(frame,
-				Localization.lang("The_entry_is_the_member_of_groups: ") + entries.get(0).getField("groups"),
+				Localization.lang("The_entry_is_the_member_of_groups") + entries.get(0).getField("groups"),
 				Localization.lang("Delete_remove_entry"),
 				JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.QUESTION_MESSAGE,
