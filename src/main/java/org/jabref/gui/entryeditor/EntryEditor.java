@@ -69,6 +69,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
@@ -276,8 +277,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // Special tabs
         tabs.add(new MathSciNetTab(entry));
-        tabs.add(new FileAnnotationTab(entry, this, panel.getAnnotationCache()));
-        tabs.add(new FxFileAnnotationTab(frame, panel, this, panel.getAnnotationCache()));
+        FileAnnotationCache annotationCache = panel.getAnnotationCache();
+        tabs.add(new FileAnnotationTab(entry, this, annotationCache));
+        tabs.add(new FxFileAnnotationTab(frame, panel, this, annotationCache));
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab

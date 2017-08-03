@@ -1,5 +1,10 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.List;
+import java.util.Map;
+
+import javafx.collections.FXCollections;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
@@ -14,6 +19,7 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.pdf.FileAnnotation;
 
 public class FxFileAnnotationTab extends EntryEditorTab {
     private final Region panel;
@@ -28,9 +34,9 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
+        this.cache = cache;
 
         this.panel = setupPanel(frame, basePanel);
-        this.cache = cache;
         setText(Localization.lang("File annotations")); // TODO: rename in "File annotations"
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
         setGraphic(IconTheme.JabRefIcon.REQUIRED.getGraphicNode());
@@ -71,9 +77,20 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
     private GridPane setupLeftSide() {
         GridPane leftSide = new GridPane();
-        leftSide.addRow(0, new Label("filename"));
+
+        leftSide.addColumn(0, new Label("Filename"));
+        leftSide.addRow(0, createFileNameComboBox());
+
         leftSide.addRow(1, new Label("AnnotationsList"));
         return leftSide;
+    }
+
+    private ComboBox<String> createFileNameComboBox() {
+        final Map<String, List<FileAnnotation>> fileAnnotations = cache.getFromCache(parent.getEntry());
+
+        ComboBox<String> comboBox = new ComboBox<>(FXCollections.observableArrayList(fileAnnotations.keySet()));
+        comboBox.getSelectionModel().selectFirst();
+        return comboBox;
     }
 
     @Override
