@@ -264,7 +264,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.markBaseChanged();
+        SwingUtilities.invokeLater(() -> this.markBaseChanged());
+
     }
 
     /**
@@ -2143,7 +2144,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     // Check if it is the preamble:
-                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
+
+                    FieldEditor fieldEditor = (FieldEditor) focused;
+                    if ((preambleEditor != null) && (fieldEditor.equals(preambleEditor.getFieldEditor()))) {
                         preambleEditor.storeCurrentEdit();
                     }
                 }
