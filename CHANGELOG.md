@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 If fetched article is already in database the ImportInspectionDialog is started
+We changed confirmation dialog for delete entities, so now it is offered possibility to remove article from selected group
 
 ### Fixed
 We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
