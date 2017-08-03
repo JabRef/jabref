@@ -33,11 +33,16 @@ import org.jabref.model.entry.BibEntry;
 
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
+import org.jabref.preferences.JabRefPreferences;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final LinkedFilesEditorViewModel viewModel;
-    @FXML private ListView<LinkedFileViewModel> listView;
+    private static final String FONT_STYLE = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+
+    @FXML
+    private final LinkedFilesEditorViewModel viewModel;
+    @FXML
+    private ListView<LinkedFileViewModel> listView;
 
     public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider) {
         this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor);
@@ -57,6 +62,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
         Text text = new Text(linkedFile.getLink());
+        text.setStyle(FONT_STYLE);
         ProgressBar progressIndicator = new ProgressBar();
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
@@ -78,15 +84,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 switch (keyBinding.get()) {
-                case DELETE_ENTRY:
-                    LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
-                    if (selectedItem != null) {
-                        viewModel.deleteFile(selectedItem);
-                    }
-                    event.consume();
-                    break;
-                default:
-                    // Pass other keys to children
+                    case DELETE_ENTRY:
+                        LinkedFileViewModel selectedItem = listView.getSelectionModel().getSelectedItem();
+                        if (selectedItem != null) {
+                            viewModel.deleteFile(selectedItem);
+                        }
+                        event.consume();
+                        break;
+                    default:
+                        // Pass other keys to children
                 }
             }
         });
@@ -126,28 +132,35 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         MenuItem edit = new MenuItem(Localization.lang("Edit"));
         edit.setOnAction(event -> linkedFile.edit());
+        edit.setStyle(FONT_STYLE);
 
         MenuItem openFile = new MenuItem(Localization.lang("Open"));
         openFile.setOnAction(event -> linkedFile.open());
+        openFile.setStyle(FONT_STYLE);
 
         MenuItem openFolder = new MenuItem(Localization.lang("Open folder"));
         openFolder.setOnAction(event -> linkedFile.openFolder());
+        openFolder.setStyle(FONT_STYLE);
 
         MenuItem renameFile = new MenuItem(Localization.lang("Rename file"));
         renameFile.setOnAction(event -> linkedFile.rename());
         renameFile.setDisable(linkedFile.getFile().isOnlineLink());
+        renameFile.setStyle(FONT_STYLE);
 
         MenuItem moveFile = new MenuItem(Localization.lang("Move file to file directory"));
         moveFile.setOnAction(event -> linkedFile.moveToDefaultDirectory());
         moveFile.setDisable(linkedFile.getFile().isOnlineLink());
+        moveFile.setStyle(FONT_STYLE);
 
         MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
         deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
         deleteFile.setDisable(linkedFile.getFile().isOnlineLink());
+        deleteFile.setStyle(FONT_STYLE);
 
         MenuItem deleteLink = new MenuItem(Localization.lang("Remove link"));
         deleteLink.setOnAction(event -> viewModel.removeFileLink(linkedFile));
         deleteLink.setDisable(linkedFile.getFile().isOnlineLink());
+        deleteLink.setStyle(FONT_STYLE);
 
         menu.getItems().add(edit);
         menu.getItems().add(new SeparatorMenuItem());
