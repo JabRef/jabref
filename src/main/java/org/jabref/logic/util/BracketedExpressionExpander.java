@@ -7,8 +7,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
-import java.lang.StringBuilder;
 import java.util.StringTokenizer;
+
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
@@ -54,8 +54,8 @@ public class BracketedExpressionExpander {
         char keywordDelimiter = ';';
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if(token.equals("\\")) {
-                if(st.hasMoreTokens()) {
+            if (token.equals("\\")) {
+                if (st.hasMoreTokens()) {
                     sb.append(st.nextToken());
                 }
                 // FIXME: else -> raise exception or log? (S.G.)
