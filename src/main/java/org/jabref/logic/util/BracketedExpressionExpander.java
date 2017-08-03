@@ -52,7 +52,7 @@ public class BracketedExpressionExpander {
         // FIXME: keywordDelimiter should be later fetched from a
         // database configuration, or passed as a parameter (S.G.):
         char keywordDelimiter = ';';
-        while(st.hasMoreTokens()) {
+        while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if(token.equals("\\")) {
                 if(st.hasMoreTokens()) {
@@ -60,13 +60,13 @@ public class BracketedExpressionExpander {
                 }
                 // FIXME: else -> raise exception or log? (S.G.)
             } else {
-                if(token.equals("[")) {
+                if (token.equals("[")) {
                     // Fetch the next token after the '[':
                     token = st.nextToken();
                     List<String> fieldParts = parseFieldMarker(token);
                     // check whether there is a modifier on the end such as
                     // ":lower":
-                    if(fieldParts.size() <= 1) {
+                    if (fieldParts.size() <= 1) {
                         sb.append(getFieldValue(bibentry,token,keywordDelimiter));
                     } else {
                         // apply modifiers:
@@ -76,7 +76,7 @@ public class BracketedExpressionExpander {
                     // Fetch and discard the closing ']'
                     token = st.nextToken();
                     // if( st.nextToken().equals("]")) {
-                    //     FIXME: raise esception or log? S.G.
+                    //     FIXME: raise exception or log? S.G.
                     // }
                 } else {
                     sb.append(token);
