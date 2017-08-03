@@ -41,6 +41,7 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import javafx.application.Platform;
+
 import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.collab.ChangeScanner;
@@ -781,7 +782,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     	
     	String selectedGroup = "";
-    	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size()>0) {
+    	if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() > 0) {
     		selectedGroup = Globals.stateManager.getSelectedGroup(bibDatabaseContext).get(0).getName();
     	}
 
@@ -793,7 +794,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
 		Object[] options = {Localization.lang("Delete_from_database"),
-			Localization.lang("Remove_from_group")+ " \"" + selectedGroup +"\"",
+			Localization.lang("Remove_from_group") + " \"" + selectedGroup + "\"",
 			Localization.lang("Cancel")};
 		int n = JOptionPane.showOptionDialog(frame,
 				Localization.lang("The_entry_is_the_member_of_groups: ") + entries.get(0).getField("groups"),
@@ -813,8 +814,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 		}
 
 		// removes from the first selected group
-		if (bRemoveFromGroup){
-			if(Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() < 1) {
+		if (bRemoveFromGroup) {
+			if (Globals.stateManager.getSelectedGroup(bibDatabaseContext).size() < 1) {
 				return;
 			}
 			
