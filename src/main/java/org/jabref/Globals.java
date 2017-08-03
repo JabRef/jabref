@@ -16,10 +16,10 @@ import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.base.StandardSystemProperty;
 import com.microsoft.applicationinsights.TelemetryClient;
 import com.microsoft.applicationinsights.TelemetryConfiguration;
 import com.microsoft.applicationinsights.telemetry.SessionState;
-import org.apache.commons.lang3.SystemUtils;
 
 public class Globals {
 
@@ -58,7 +58,7 @@ public class Globals {
     }
 
     // Key binding preferences
-    public static KeyBindingRepository getKeyPrefs() {
+    public static synchronized KeyBindingRepository getKeyPrefs() {
         if (keyBindingRepository == null) {
             keyBindingRepository = prefs.getKeyBindingRepository();
         }
@@ -87,11 +87,11 @@ public class Globals {
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.getVersion().toString());
-        telemetryClient.getContext().getProperties().put("Java version", SystemUtils.JAVA_RUNTIME_VERSION);
+        telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());
         telemetryClient.getContext().getUser().setId(Globals.prefs.getOrCreateUserId());
         telemetryClient.getContext().getSession().setId(UUID.randomUUID().toString());
-        telemetryClient.getContext().getDevice().setOperatingSystem(SystemUtils.OS_NAME);
-        telemetryClient.getContext().getDevice().setOperatingSystemVersion(SystemUtils.OS_VERSION);
+        telemetryClient.getContext().getDevice().setOperatingSystem(StandardSystemProperty.OS_NAME.value());
+        telemetryClient.getContext().getDevice().setOperatingSystemVersion(StandardSystemProperty.OS_VERSION.value());
         telemetryClient.getContext().getDevice().setScreenResolution(
                 Toolkit.getDefaultToolkit().getScreenSize().toString());
 

@@ -1,6 +1,7 @@
 package org.jabref.shared.security;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -41,7 +42,7 @@ public class Password {
      */
     public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
-        return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), "UTF-8");
+        return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), StandardCharsets.UTF_8);
     }
 
     /**
@@ -51,7 +52,7 @@ public class Password {
      */
     public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
         cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)), "UTF-8");
+        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)), StandardCharsets.UTF_8);
     }
 
     /**

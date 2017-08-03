@@ -73,10 +73,10 @@ public class ContentSelectorDialog extends JabRefDialog {
     private final JTextField wordEditField = new JTextField("", 20);
     private final JScrollPane fPane = new JScrollPane(fieldList);
     private final Map<String, DefaultListModel<String>> wordListModels = new HashMap<>();
-    private DefaultListModel<String> wordListModel = new DefaultListModel<>();
-    private final JList<String> wordList = new JList<>(wordListModel);
-    private final JScrollPane wPane = new JScrollPane(wordList);
     private final List<String> removedFields = new ArrayList<>();
+    private DefaultListModel<String> wordListModel = new DefaultListModel<>();
+    private JList<String> wordList = new JList<>(wordListModel);
+    private JScrollPane wPane = new JScrollPane(wordList);
     private String currentField;
 
 
@@ -262,7 +262,6 @@ public class ContentSelectorDialog extends JabRefDialog {
     }
 
     private void applyChanges() {
-        boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
         boolean anythingChanged = false; // Watch if we should mark as there is data changed
 
         // First remove the mappings for fields that have been deleted.
@@ -270,7 +269,6 @@ public class ContentSelectorDialog extends JabRefDialog {
         // cause any harm to remove them here.
         for (String fieldName : removedFields) {
             metaData.clearContentSelectors(fieldName);
-            changedFieldSet = true;
             anythingChanged = true;
         }
 
@@ -302,27 +300,19 @@ public class ContentSelectorDialog extends JabRefDialog {
 
             // Check if there are words to be added and previously there were no content selector for the field
             if (!data.isEmpty() && metaData.getContentSelectorValuesForField(entry.getKey()).isEmpty()) {
-                changedFieldSet = true;
+                anythingChanged = true;
             }
 
             metaData.addContentSelector(new ContentSelector(entry.getKey(), new ArrayList<>(data)));
         }
 
-        // Update all selectors in the current BasePanel.
-        if (changedFieldSet) {
-            // TODO: We have added or removed content selectors, update the entry editor
-        } else if (anythingChanged) {
-            // Enough to update the content selectors, if anything changed
-            panel.updateAllContentSelectors();
-        }
-
         if (anythingChanged) {
+            // Update all selectors in the current BasePanel.
+            panel.setupMainPanel();
+
             // Mark the database updated so changes are not lost
             panel.markNonUndoableBaseChanged();
         }
-
-        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.getBibDatabaseContext().getMetaData());
-
     }
 
     /**

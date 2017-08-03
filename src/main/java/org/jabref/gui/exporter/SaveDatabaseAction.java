@@ -334,8 +334,20 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (!success) {
             return;
         }
-        // Register so we get notifications about outside changes to the file.
 
+        Optional<Path> databasePath = context.getDatabasePath();
+        if (databasePath.isPresent()) {
+            final Path oldFile = databasePath.get();
+            context.setDatabaseFile(oldFile.toFile());
+            //closing AutosaveManager and BackupManager for original library
+            AutosaveManager.shutdown(context);
+            BackupManager.shutdown(context);
+        } else {
+            LOGGER.info("Old file not found, just creating a new file");
+        }
+        context.setDatabaseFile(file);
+
+        // Register so we get notifications about outside changes to the file.
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
                     context.getDatabaseFile().orElse(null)));

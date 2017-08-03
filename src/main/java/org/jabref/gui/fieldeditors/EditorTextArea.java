@@ -7,6 +7,8 @@ import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
@@ -24,6 +26,26 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
+
+        // Should behave as a normal text field with respect to TAB behaviour
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.TAB) {
+                TextAreaSkin skin = (TextAreaSkin) getSkin();
+                if (event.isShiftDown()) {
+                    // Shift + Tab > previous text area
+                    skin.getBehavior().traversePrevious();
+                } else {
+                    if (event.isControlDown()) {
+                        // Ctrl + Tab > insert tab
+                        skin.getBehavior().callAction("InsertTab");
+                    } else {
+                        // Tab > next text area
+                        skin.getBehavior().traverseNext();
+                    }
+                }
+                event.consume();
+            }
+        });
     }
 
     /**

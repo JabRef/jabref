@@ -22,6 +22,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -35,13 +36,11 @@ import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor) {
-        this.fieldName = fieldName;
-        this.viewModel = new LinkedFilesEditorViewModel(dialogService, databaseContext, taskExecutor);
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider) {
+        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -99,7 +98,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

@@ -36,11 +36,12 @@ import javax.swing.UIManager;
 
 import org.jabref.JabRefException;
 import org.jabref.JabRefMain;
+import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
+import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preftabs.ImportSettingsTab;
-import org.jabref.logic.autocompleter.AutoCompletePreferences;
 import org.jabref.logic.bibtex.FieldContentParserPreferences;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
@@ -180,7 +181,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String PREFS_EXPORT_PATH = "prefsExportPath";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
-    public static final String AUTO_COMPLETE = "autoComplete";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CF = "editorEMACSkeyBindingsRebindCF";
@@ -361,16 +361,18 @@ public class JabRefPreferences implements PreferencesService {
     // Prefs node for customized entry types
     public static final String CUSTOMIZED_BIBTEX_TYPES = "customizedBibtexTypes";
     public static final String CUSTOMIZED_BIBLATEX_TYPES = "customizedBiblatexTypes";
-
     // Version
     public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+    //KeyBindings - keys - public because needed for pref migration
+    public static final String BINDINGS = "bindings";
+
+    private static final String BIND_NAMES = "bindNames";
     // User
     private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String PERSONAL_JOURNAL_LIST = "personalJournalList";
     private static final String USE_IEEE_ABRV = "useIEEEAbrv";
-    private static final String BINDINGS = "bindings";
-    private static final String BIND_NAMES = "bindNames";
+
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
@@ -390,6 +392,13 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String PREVIEW_ENABLED = "previewEnabled";
+    // Auto completion
+    private static final String AUTO_COMPLETE = "autoComplete";
+    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
+    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
+    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
+    private static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
+
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
     // solves the issue java.lang.RuntimeException: Internal graphics not initialized yet
@@ -445,7 +454,6 @@ public class JabRefPreferences implements PreferencesService {
             defaults.put(WIN_LOOK_AND_FEEL, UIManager.getSystemLookAndFeelClassName());
             defaults.put(EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(FONT_FAMILY, "Arial");
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
         } else {
@@ -528,7 +536,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);
         // Remembers working directory of last import
         defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);
-        defaults.put(PREFS_EXPORT_PATH, WORKING_DIRECTORY);
+        defaults.put(PREFS_EXPORT_PATH, USER_HOME);
         defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
@@ -564,8 +572,11 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(EDITOR_EMACS_KEYBINDINGS, Boolean.FALSE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CA, Boolean.TRUE);
         defaults.put(EDITOR_EMACS_KEYBINDINGS_REBIND_CF, Boolean.TRUE);
-        defaults.put(AUTO_COMPLETE, Boolean.FALSE);
-        AutoCompletePreferences.putDefaults(defaults);
+        defaults.put(AUTO_COMPLETE, Boolean.TRUE);
+        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
+        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
+        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords");
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
@@ -750,7 +761,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
-
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
@@ -1220,7 +1230,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     private void clearAllCustomEntryTypes() throws BackingStoreException {
-        for (BibDatabaseMode mode :BibDatabaseMode.values()) {
+        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
             clearCustomEntryTypes(mode);
         }
     }
@@ -1597,7 +1607,24 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY),
                 get(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
                 getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY),
-                getKeywordDelimiter()
-        );
+                getKeywordDelimiter());
+    }
+
+    public AutoCompletePreferences getAutoCompletePreferences() {
+        return new AutoCompletePreferences(
+                getBoolean(AUTO_COMPLETE),
+                AutoCompleteFirstNameMode.parse(get(AUTOCOMPLETER_FIRSTNAME_MODE)),
+                getBoolean(AUTOCOMPLETER_LAST_FIRST),
+                getBoolean(AUTOCOMPLETER_FIRST_LAST),
+                getStringList(AUTOCOMPLETER_COMPLETE_FIELDS),
+                getJournalAbbreviationPreferences());
+    }
+
+    public void storeAutoCompletePreferences(AutoCompletePreferences autoCompletePreferences) {
+        putBoolean(AUTO_COMPLETE, autoCompletePreferences.shouldAutoComplete());
+        put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
+        putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
+        putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteNames());
     }
 }

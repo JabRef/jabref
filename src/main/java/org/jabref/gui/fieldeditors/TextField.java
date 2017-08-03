@@ -15,7 +15,6 @@ import javax.swing.undo.UndoManager;
 import org.jabref.Globals;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.actions.Actions;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.util.component.JTextFieldWithPlaceholder;
 
 import org.apache.commons.logging.Log;
@@ -31,8 +30,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
 
     private final String fieldName;
     private UndoManager undo;
-    private AutoCompleteListener autoCompleteListener;
-
 
     public TextField(String fieldName, String content, boolean changeColorOnFocus) {
         this(fieldName, content, changeColorOnFocus, "");
@@ -133,18 +130,6 @@ public class TextField extends JTextFieldWithPlaceholder implements FieldEditor 
     @Override
     public void redo() {
         // Nothing
-    }
-
-    @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-        autoCompleteListener = listener;
-    }
-
-    @Override
-    public void clearAutoCompleteSuggestion() {
-        if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
-        }
     }
 
     private void setupPasteListener() {

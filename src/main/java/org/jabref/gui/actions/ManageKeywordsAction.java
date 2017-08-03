@@ -25,19 +25,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
-import org.jabref.JabRefGUI;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.autocompleter.AutoCompleter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
@@ -53,18 +49,12 @@ import com.jgoodies.forms.layout.FormLayout;
 public class ManageKeywordsAction extends MnemonicAwareAction {
 
     private final JabRefFrame frame;
-
+    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
     private JDialog diag;
-
-
     private DefaultListModel<Keyword> keywordListModel;
-
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
-
     private boolean canceled;
-
-    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
@@ -167,31 +157,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             public void keyPressed(KeyEvent arg0) {
                 if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
                     removeActionListenter.actionPerformed(null);
-                }
-            }
-        });
-
-        AutoCompleter<String> autoComp = JabRefGUI.getMainFrame().getCurrentBasePanel().getAutoCompleters()
-                .get(FieldName.KEYWORDS);
-        AutoCompleteListener acl = new AutoCompleteListener(autoComp);
-        keyword.addKeyListener(acl);
-        keyword.addFocusListener(acl);
-        keyword.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                // Do nothing
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // Do nothing
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    addActionListener.actionPerformed(null);
                 }
             }
         });

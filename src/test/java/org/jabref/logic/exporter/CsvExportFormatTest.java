@@ -2,6 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.google.common.base.Charsets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,7 +41,7 @@ public class CsvExportFormatTest {
         exportFormat = ExportFormats.getExportFormat("oocsv");
 
         databaseContext = new BibDatabaseContext();
-        charset = Charsets.UTF_8;
+        charset = StandardCharsets.UTF_8;
     }
 
     @After

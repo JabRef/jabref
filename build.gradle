@@ -1,25 +1,15 @@
 import org.gradle.internal.os.OperatingSystem
 
-// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
-
-buildscript {
-    repositories {
-        maven {
-            url 'http://maven.ej-technologies.com/repository'
-        }
-    }
-    dependencies {
-        classpath 'com.github.edwgiz:maven-shade-plugin.log4j2-cachefile-transformer:2.1'
-    }
-}
+// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 4.0
 
 plugins {
     id 'com.gradle.build-scan' version '1.8'
-    id "com.install4j.gradle" version "6.1.5"
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
-    id "com.simonharrer.modernizer" version "1.4.0-1"
-    id 'me.champeau.gradle.jmh' version '0.3.1'
-    id "net.ltgt.errorprone" version "0.0.10"
+    id 'com.install4j.gradle' version '6.1.5'
+    id 'com.github.johnrengelman.shadow' version '2.0.1'
+    id "de.sebastianboegl.shadow.transformer.log4j" version "2.1.1"
+    id "com.simonharrer.modernizer" version '1.5.0-1'
+    id 'me.champeau.gradle.jmh' version '0.4.3'
+    id 'net.ltgt.errorprone' version '0.0.11'
 }
 
 // use the gradle build scan feature: https://scans.gradle.com/get-started
@@ -28,13 +18,12 @@ buildScan {
     licenseAgree = 'yes'
 }
 
-apply plugin: "java"
-apply plugin: "application"
-apply plugin: "project-report"
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'project-report'
 apply plugin: 'jacoco'
 apply plugin: 'install4j'
 apply plugin: 'me.champeau.gradle.jmh'
-
 apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
@@ -42,8 +31,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.0.0-dev"
-project.ext.threeDotVersion = "4.0.0.1"
+version = "4.0-dev"
+project.ext.threeDotVersion = "4.0.1.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -52,7 +41,6 @@ mainClassName = "org.jabref.JabRefMain"
 install4j {
     installDir = file(project.ext.install4jDir)
 }
-
 
 repositories {
     mavenLocal()
@@ -68,12 +56,14 @@ configurations {
 }
 
 dependencies {
+    compile fileTree(dir: 'lib', includes: ['*.jar'])
+
     compile 'com.jgoodies:jgoodies-common:1.8.1'
     compile 'com.jgoodies:jgoodies-forms:1.9.0'
     compile 'com.jgoodies:jgoodies-looks:2.7.0'
 
     // Later versions cannot be used. Tested until 1.6.5-1.
-    // See https://github.com/JabRef/jabref/issues/271 for details
+    // See https://github.com/JabRef/jabref/issues/271 for details.
     compile 'org.swinglabs.swingx:swingx-core:1.6.4'
 
     // update to 2.0.x is not possible - see https://github.com/JabRef/jabref/pull/1096#issuecomment-208857517
@@ -105,24 +95,20 @@ dependencies {
     compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.7.1'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
-    compile fileTree(dir: 'lib', includes: ['*.jar'])
 
     compile 'com.google.guava:guava:22.0'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
-    compile 'org.controlsfx:controlsfx:8.40.12'
+    compile 'org.controlsfx:controlsfx:8.40.13'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'net.corda:jfx:0.12.1'
+
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
 
-
     compile 'commons-logging:commons-logging:1.2'
-
-    compile 'org.apache.commons:commons-lang3:3.6'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
@@ -131,8 +117,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
     compile 'org.apache.logging.log4j:log4j-api:2.8.2'
     compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-    compile 'org.xmlunit:xmlunit-core:2.3.0'
-    compile 'org.xmlunit:xmlunit-matchers:2.3.0'
+    compile 'org.xmlunit:xmlunit-core:2.4.0'
+    compile 'org.xmlunit:xmlunit-matchers:2.4.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -146,9 +132,12 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'
-    testCompile 'com.github.tomakehurst:wiremock:2.6.0'
-    testCompile 'org.assertj:assertj-swing-junit:3.6.0'
+    testCompile 'com.github.tomakehurst:wiremock:2.7.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.7.0'
     testCompile 'org.reflections:reflections:0.9.11'
+
+    testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
+    testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }
 
 sourceSets {
@@ -285,6 +274,7 @@ processTestResources.dependsOn copyTestResources
 
 tasks.withType(Test) {
     reports.html.destination = file("${reporting.baseDir}/${name}")
+
     jacoco {
         append = true
     }
@@ -306,33 +296,6 @@ jacocoTestReport {
 
 shadowJar {
     classifier 'fat'
-
-    transform(new com.github.jengelman.gradle.plugins.shadow.transformers.Transformer() {
-
-        // this is an adapter required for generating a fat jar with correct log4j2 output
-
-        com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer target = new com.github.edwgiz.mavenShadePlugin.log4j2CacheTransformer.PluginsCacheFileTransformer()
-
-        @Override
-        boolean canTransformResource(FileTreeElement element) {
-            return target.canTransformResource(element.getPath())
-        }
-
-        @Override
-        void transform(String path, InputStream is, List<com.github.jengelman.gradle.plugins.shadow.relocation.Relocator> relocators) {
-            target.processResource(path, is, relocators)
-        }
-
-        @Override
-        boolean hasTransformedResource() {
-            return target.hasTransformedResource()
-        }
-
-        @Override
-        void modifyOutputStream(org.apache.tools.zip.ZipOutputStream jos) {
-            target.modifyOutputStream(jos)
-        }
-    })
 }
 
 /*
@@ -391,8 +354,11 @@ task media(type: com.install4j.gradle.Install4jTask, dependsOn: "releaseJar") {
 checkstyle {
     // do not use other packages for checkstyle, excluding gen(erated) sources
     checkstyleMain.source = "src/main/java"
-    toolVersion = '7.6.1'
+    toolVersion = '8.0'
 }
+
+checkstyleMain.shouldRunAfter test
+checkstyleTest.shouldRunAfter test
 
 task release(dependsOn: ["media", "releaseJar"]) {
     group = 'JabRef - Release'

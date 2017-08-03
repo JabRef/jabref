@@ -1,7 +1,9 @@
 package org.jabref.migrations;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -33,7 +35,7 @@ public class PreferencesMigrations {
                 // skip further processing as prefs already have been migrated
                 LOGGER.debug("New prefs node already exists with content - skipping migration");
             } else {
-                if ( mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
+                if (mainPrefsNode.parent().parent().nodeExists("net/sf/jabref")) {
                     LOGGER.info("Migrating old preferences.");
                     Preferences oldNode = mainPrefsNode.parent().parent().node("net/sf/jabref");
                     copyPrefsRecursively(oldNode, mainPrefsNode);
@@ -138,7 +140,7 @@ public class PreferencesMigrations {
 
         try {
             if (mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBTEX_TYPES) ||
-                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES) ) {
+                    mainPrefsNode.nodeExists(JabRefPreferences.CUSTOMIZED_BIBLATEX_TYPES)) {
                 // skip further processing as prefs already have been migrated
             } else {
                 LOGGER.info("Migrating old custom entry types.");
@@ -188,13 +190,29 @@ public class PreferencesMigrations {
         }
     }
 
+    public static void upgradeKeyBindingsToJavaFX() {
+        UnaryOperator<String> replaceKeys = (str) -> {
+            String result = str.replace("ctrl ", "ctrl+");
+            result = result.replace("shift ", "shift+");
+            result = result.replace("alt ", "alt+");
+            result = result.replace("meta ", "meta+");
+
+            return result;
+        };
+
+        JabRefPreferences prefs = Globals.prefs;
+        List<String> keys = prefs.getStringList(JabRefPreferences.BINDINGS);
+        keys.replaceAll(replaceKeys);
+        prefs.putStringList(JabRefPreferences.BINDINGS, keys);
+
+    }
+
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
 
         GlobalBibtexKeyPattern keyPattern = GlobalBibtexKeyPattern.fromPattern(
-                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)
-        );
+                prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN));
         for (String key : oldPatternPrefs.keys()) {
             keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
         }

@@ -11,38 +11,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- We moved the `adsurl` field to `url` field when fetching with the ADS fetcher.
-- We continued to improve the new groups interface:
-  - You can now again select multiple groups (and a few related settings were added to the preferences) [#2786](https://github.com/JabRef/jabref/issues/2786).
-  - We further improved performance of group operations, especially of the new filter feature [#2852](https://github.com/JabRef/jabref/issues/2852).
-  - It is now possible to resort groups using drag & drop [#2785](https://github.com/JabRef/jabref/issues/2785).
-- The entry editor got a fresh coat of paint:
-  - Homogenize the size of text fields.
-  - The buttons were changed to icons.
-  - Completely new interface to add or modify linked files.
-  - Removed the hidden feature that a double click in the editor inserted the current date.
-- All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
-- Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
-- We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)
-- The integrity check for person names now also tests that the names are specified in one of the standard BibTeX formats.
-- Links in the Recommended Articles tab (Mr.DLib), when clicked, are now opened in the system's default browser. [2931](https://github.com/JabRef/jabref/issues/2931)
-- We improved the duplicate checker such that different editions of the same publication are not marked as duplicates. [2960](https://github.com/JabRef/jabref/issues/2960)
+If fetched article is already in database the ImportInspectionDialog is started
 
 ### Fixed
-- We fixed the function "Edit - Copy BibTeX key and link" to pass a hyperlink rather than an HTML statement.
-- We fixed the adding of a new entry from DOI which led to a connection error. The DOI resolution now uses HTTPS to protect the user's privacy.[#2879](https://github.com/JabRef/jabref/issues/2897)
-- We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
-- We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
-- We fixed an issue that prevented new entries to be automatically assigned to the currently selected group [#2783](https://github.com/JabRef/jabref/issues/2783).
-- We fixed a bug that only allowed parsing positive timezones from a FileAnnotation [#2839](https://github.com/JabRef/jabref/issues/2839)
-- We fixed a bug that did not allow the correct re-export of the MS-Office XML field `msbib-accessed` with a different date format [#2859](https://github.com/JabRef/jabref/issues/2859).
-- We fixed some bugs that prevented the display of FileAnnotations that were created using the Foxit Reader. [#2839, comment](https://github.com/JabRef/jabref/issues/2839#issuecomment-302058227).
-- We fixed an error that prevented the FileAnnotation tab to load when the entry had no bibtexkey [#2903](https://github.com/JabRef/jabref/issues/2903).
-- We fixed a bug which which could result in an exception when opening/saving files from/to a nonexistent directory [#2917](https://github.com/JabRef/jabref/issues/2917).
-- We fixed a bug where recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
-- We fixed a bug where new groups information was not stored on save [#2932](https://github.com/JabRef/jabref/issues/2932)
-- We fixed a bug where the language files for Brazilian Portugese could not be loaded and the GUI localization remained in English [#1128](https://github.com/JabRef/jabref/issues/1182)
-
+We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
+We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
+We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
 ### Removed
 
 
@@ -85,6 +59,56 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 
 
+
+
+
+
+
+
+
+
+
+
+## [4.0-beta2] – 2017-07-18
+
+### Changed
+- We moved the `adsurl` field to `url` field when fetching with the ADS fetcher.
+- We continued to improve the new groups interface:
+  - You can now again select multiple groups (and a few related settings were added to the preferences) [#2786](https://github.com/JabRef/jabref/issues/2786).
+  - We further improved performance of group operations, especially of the new filter feature [#2852](https://github.com/JabRef/jabref/issues/2852).
+  - It is now possible to resort groups using drag & drop [#2785](https://github.com/JabRef/jabref/issues/2785).
+- The entry editor got a fresh coat of paint:
+  - Homogenize the size of text fields.
+  - The buttons were changed to icons.
+  - Completely new interface to add or modify linked files.
+  - Removed the hidden feature that a double click in the editor inserted the current date.
+  - Complete new implementation of the the auto complete feature.
+- All authors and editors are separated using semicolons when exporting to csv. [#2762](https://github.com/JabRef/jabref/issues/2762)
+- Improved wording of "Show recommendations: into "Show 'Related Articles' tab" in the preferences
+- We added integration of the Library of Congress catalog as a fetcher based on the [LCCN identifier](https://en.wikipedia.org/wiki/Library_of_Congress_Control_Number). [Feature request 636 in the forum](http://discourse.jabref.org/t/loc-marc-mods-connection/636)
+- The integrity check for person names now also tests that the names are specified in one of the standard BibTeX formats.
+- Links in the Recommended Articles tab (Mr.DLib), when clicked, are now opened in the system's default browser. [2931](https://github.com/JabRef/jabref/issues/2931)
+- We improved the duplicate checker such that different editions of the same publication are not marked as duplicates. [2960](https://github.com/JabRef/jabref/issues/2960)
+
+### Fixed
+- We fixed a bug that leaves .sav file after SaveAs [#2947](https://github.com/JabRef/jabref/issues/2947)
+- We fixed the function "Edit - Copy BibTeX key and link" to pass a hyperlink rather than an HTML statement.
+- We fixed the adding of a new entry from DOI which led to a connection error. The DOI resolution now uses HTTPS to protect the user's privacy.[#2879](https://github.com/JabRef/jabref/issues/2897)
+- We fixed the IEEE Xplore web search functionality [#2789](https://github.com/JabRef/jabref/issues/2789)
+- We fixed an error in the CrossRef fetcher that occurred if one of the fetched entries had no title
+- We fixed an issue that prevented new entries to be automatically assigned to the currently selected group [#2783](https://github.com/JabRef/jabref/issues/2783).
+- We fixed a bug that only allowed parsing positive timezones from a FileAnnotation [#2839](https://github.com/JabRef/jabref/issues/2839)
+- We fixed a bug that did not allow the correct re-export of the MS-Office XML field `msbib-accessed` with a different date format [#2859](https://github.com/JabRef/jabref/issues/2859).
+- We fixed some bugs that prevented the display of FileAnnotations that were created using the Foxit Reader. [#2839, comment](https://github.com/JabRef/jabref/issues/2839#issuecomment-302058227).
+- We fixed an error that prevented the FileAnnotation tab to load when the entry had no bibtexkey [#2903](https://github.com/JabRef/jabref/issues/2903).
+- We fixed a bug which which could result in an exception when opening/saving files from/to a nonexistent directory [#2917](https://github.com/JabRef/jabref/issues/2917).
+- We fixed a bug where recursive RegExpBased search found a file in a subdirectory multiple times and non-recursive RegExpBased search erroneously found files in subdirectories.
+- We fixed a bug where new groups information was not stored on save [#2932](https://github.com/JabRef/jabref/issues/2932)
+- We fixed a bug where the language files for Brazilian Portugese could not be loaded and the GUI localization remained in English [#1128](https://github.com/JabRef/jabref/issues/1182)
+- We fixed a bug where the database was not marked as dirty when entries or groups were changed [#2787](https://github.com/JabRef/jabref/issues/2787)
+- We fixed a bug where editors in the DocBook export were not exported [#3020](https://github.com/JabRef/jabref/issues/3020)
+- We fixed a bug where the source tab was not updated when one the fields was changed [#2888](https://github.com/JabRef/jabref/issues/2888)
+- We restored the original functionality that when browsing through the MainTable, the Entry Editor remembers which tab was opened before [#2896](https://github.com/JabRef/jabref/issues/2896)
 
 ## [4.0-beta] – 2017-04-17
 
@@ -875,7 +899,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta2...HEAD
+[4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
 [3.8.1]: https://github.com/JabRef/jabref/compare/v3.8...v3.8.1

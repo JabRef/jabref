@@ -33,9 +33,9 @@ import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.base.Enums;
 import com.google.common.eventbus.Subscribe;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import org.apache.commons.lang3.EnumUtils;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -187,7 +187,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<MaterialDesignIcon> parseIcon(String iconCode) {
-        return Optional.ofNullable(EnumUtils.getEnum(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH)));
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH)).toJavaUtil();
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {

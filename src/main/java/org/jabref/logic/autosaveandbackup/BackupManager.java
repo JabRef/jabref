@@ -22,6 +22,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -42,11 +43,12 @@ public class BackupManager {
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
+    private String lastFieldChanged;
+
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
-
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -129,7 +131,18 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        startBackupTask();
+        if (!(event instanceof FieldChangedEvent)) {
+            startBackupTask();
+        } else {
+            // only do a backup if the field changes are more than one character or a new field is edited
+            FieldChangedEvent fieldChange = (FieldChangedEvent) event;
+            boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getFieldName());
+
+            if (fieldChange.getDelta() > 1 || isEditOnNewField) {
+                lastFieldChanged = fieldChange.getFieldName();
+                startBackupTask();
+            }
+        }
     }
 
     private void startBackupTask() {
