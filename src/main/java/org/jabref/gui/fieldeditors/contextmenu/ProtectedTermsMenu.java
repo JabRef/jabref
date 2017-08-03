@@ -24,7 +24,6 @@ class ProtectedTermsMenu extends Menu {
     public ProtectedTermsMenu(TextArea opener) {
         super(Localization.lang("Protect terms"));
         this.opener = opener;
-        this.setStyle(fontStyle);
 
         MenuItem protectItem = new MenuItem(Localization.lang("Add {} around selected text"));
         protectItem.setStyle(fontStyle);

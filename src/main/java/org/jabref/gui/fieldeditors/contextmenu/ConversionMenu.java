@@ -19,7 +19,6 @@ class ConversionMenu extends Menu {
 
     public ConversionMenu(StringProperty text) {
         super(Localization.lang("Convert"));
-        this.setStyle(fontStyle);
 
         // create menu items, one for each converter
         for (Formatter converter : Formatters.CONVERTERS) {

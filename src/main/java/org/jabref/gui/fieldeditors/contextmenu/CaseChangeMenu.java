@@ -19,7 +19,6 @@ class CaseChangeMenu extends Menu {
     public CaseChangeMenu(final StringProperty text) {
         super(Localization.lang("Change case"));
 
-        this.setStyle(fontStyle);
         Objects.requireNonNull(text);
 
         // create menu items, one for each case changer

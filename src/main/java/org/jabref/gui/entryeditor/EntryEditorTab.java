@@ -1,6 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import javafx.scene.control.Tab;
+
 import org.jabref.Globals;
 import org.jabref.preferences.JabRefPreferences;
 

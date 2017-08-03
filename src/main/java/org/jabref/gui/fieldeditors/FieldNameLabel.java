@@ -2,8 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-
 import javafx.scene.text.Font;
+
 import org.jabref.Globals;
 import org.jabref.model.entry.FieldName;
 import org.jabref.preferences.JabRefPreferences;

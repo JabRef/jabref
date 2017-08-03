@@ -9,11 +9,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
-import com.sun.javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.text.Font;
+
 import org.jabref.Globals;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
@@ -63,7 +64,6 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
             @Override
             public void populateContextMenu(ContextMenu contextMenu) {
                 super.populateContextMenu(contextMenu);
-                contextMenu.setStyle(FONT_STYLE);
                 contextMenu.getItems().addAll(0, items);
                 contextMenu.getItems().stream().forEach(item -> item.setStyle(FONT_STYLE));
             }

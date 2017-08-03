@@ -33,6 +33,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -179,7 +180,8 @@ class FieldsEditorTab extends EntryEditorTab {
             gridPane.setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
                             + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
+                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
+            + "text-area-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;");
         }
         gridPane.getStylesheets().add("org/jabref/gui/entryeditor/EntryEditor.css");
 
