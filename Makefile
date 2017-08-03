@@ -231,4 +231,4 @@ clean:
 	rm -f ${DIFF_FILES}
 
 distclean cleanAll: clean
-	rm -f ${CLSFILES}
+	rm -f ${CLASS_FILES}
