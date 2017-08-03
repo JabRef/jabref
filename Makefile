@@ -126,6 +126,8 @@ test tests: ${DIFF_FILES}
 
 out outputs: ${OUTP_FILES}
 
+${DIFF_FILES}: ${MAIN_CLASSES}
+
 #------------------------------------------------------------------------------
 # Rules to run script-specific tests:
 
