@@ -60,6 +60,9 @@ public class BracketedExpressionExpander {
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
+        // FIXME: keywordDelimiter should be later fetched from a
+        // database configuration, or passed as a parameter (S.G.):
+        char keywordDelimiter = ';';
         while(st.hasMoreTokens()) {
             String token = st.nextToken();
             if(token.equals("\\")) {
@@ -71,7 +74,16 @@ public class BracketedExpressionExpander {
                 if(token.equals("[")) {
                     // Fetch the next token after the '[':
                     token = st.nextToken();
-                    sb.append(getFieldValue(bibentry,token,';'));
+                    List<String> fieldParts = parseFieldMarker(token);
+                    // check whether there is a modifier on the end such as
+                    // ":lower":
+                    if(fieldParts.size() <= 1) {
+                        sb.append(getFieldValue(bibentry,token,keywordDelimiter));
+                    } else {
+                        // apply modifiers:
+                        String fieldValue = getFieldValue(bibentry,fieldParts.get(0),keywordDelimiter);
+                        sb.append(applyModifiers(fieldValue, fieldParts, 1));
+                    }
                     // Fetch and discard the closing ']'
                     token = st.nextToken();
                     // if( st.nextToken().equals("]")) {
