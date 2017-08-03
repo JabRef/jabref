@@ -149,7 +149,6 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.math3.exception.NoDataException;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
 
