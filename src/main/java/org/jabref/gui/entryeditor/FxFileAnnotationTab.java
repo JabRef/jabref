@@ -1,11 +1,16 @@
 package org.jabref.gui.entryeditor;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
@@ -21,6 +26,8 @@ import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.FileAnnotation;
 
+import static org.jabref.model.pdf.FileAnnotationType.NONE;
+
 public class FxFileAnnotationTab extends EntryEditorTab {
     private final Region panel;
 
@@ -29,12 +36,15 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private final BasePanel basePanel;
     private final FileAnnotationCache cache;
     private FieldEditorFX activeField;
+    private Map<String, List<FileAnnotation>> fileAnnotations;
+    private ObservableList<FileAnnotation> fileAnnotationsList = FXCollections.observableArrayList();
 
     public FxFileAnnotationTab(JabRefFrame frame, BasePanel basePanel, EntryEditor parent, FileAnnotationCache cache) {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
         this.cache = cache;
+        fileAnnotations = cache.getFromCache(parent.getEntry());
 
         this.panel = setupPanel(frame, basePanel);
         setText(Localization.lang("File annotations")); // TODO: rename in "File annotations"
@@ -79,14 +89,42 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         GridPane leftSide = new GridPane();
 
         leftSide.addColumn(0, new Label("Filename"));
-        leftSide.addRow(0, createFileNameComboBox());
+        ComboBox<String> fileNameComboBox = createFileNameComboBox();
+        leftSide.addRow(0, fileNameComboBox);
 
-        leftSide.addRow(1, new Label("AnnotationsList"));
+        leftSide.addRow(1, createFileAnnotationsList());
+        updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectionModel().getSelectedItem()));
+
         return leftSide;
     }
 
+    private ListView<FileAnnotation> createFileAnnotationsList() {
+        ListView<FileAnnotation> listView = new ListView<>();
+        listView.setItems(fileAnnotationsList);
+
+        listView.setCellFactory(new FileAnnotationListCellRenderer());
+        return listView;
+    }
+
+    /**
+     * Updates the list model to show the given notes without those with no content
+     *
+     * @param annotations value is the annotation name and the value is a pdfAnnotation object to add to the list model
+     */
+    private void updateShownAnnotations(List<FileAnnotation> annotations) {
+        fileAnnotationsList.clear();
+        if (annotations == null || annotations.isEmpty()) {
+            fileAnnotationsList.add(new FileAnnotation("", LocalDateTime.now(), 0, Localization.lang("File has no attached annotations"), NONE, Optional.empty()));
+        } else {
+            Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
+            annotations.stream()
+                    .filter(annotation -> (null != annotation.getContent()))
+                    .sorted(byPage)
+                    .forEach(annotation -> fileAnnotationsList.add(new FileAnnotationViewModel(annotation)));
+        }
+    }
+
     private ComboBox<String> createFileNameComboBox() {
-        final Map<String, List<FileAnnotation>> fileAnnotations = cache.getFromCache(parent.getEntry());
 
         ComboBox<String> comboBox = new ComboBox<>(FXCollections.observableArrayList(fileAnnotations.keySet()));
         comboBox.getSelectionModel().selectFirst();
