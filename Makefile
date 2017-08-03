@@ -13,15 +13,6 @@
 #     make
 
 #------------------------------------------------------------------------------
-# Include local configuration files from this directory:
-
-MAKECONF_FILES = ${filter-out %~, ${wildcard Makeconf*}}
-
-ifneq ("${MAKECONF_FILES}","")
-include ${MAKECONF_FILES}
-endif
-
-#------------------------------------------------------------------------------
 # ARGS holds arguments to be passed to the run main Java class; empty
 # by default but can be provided on the comamnd line:
 
@@ -63,6 +54,15 @@ CLASSDIR = bin
 export CLASSPATH
 
 #------------------------------------------------------------------------------
+# Include local configuration files from this directory:
+
+MAKECONF_FILES = ${filter-out %~, ${wildcard Makeconf*}}
+
+ifneq ("${MAKECONF_FILES}","")
+include ${MAKECONF_FILES}
+endif
+
+#------------------------------------------------------------------------------
 # File and directory settings for test cases:
 
 BIN_DIR  = tools
@@ -93,8 +93,7 @@ OUTP_FILES = $(sort ${INP_OUTS} ${OPT_OUTS} ${SH_OUTS})
 all: ${CLASS_FILES}
 
 display:
-	@echo ${CLASSPATH}
-	@echo ${CLASS_FILES}
+	@echo ${ARGS}
 
 #------------------------------------------------------------------------------
 # Include Makefiles with additional rules for this directory:
