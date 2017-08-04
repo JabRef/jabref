@@ -11,13 +11,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+
 If fetched article is already in database the ImportInspectionDialog is started
 
 ### Fixed
-We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
-We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
-We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
-We fixed an issue where <kbd>DEL</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> in the search field triggered corresponding actions in the main table [#3067](https://github.com/JabRef/jabref/issues/3067)
+
+- We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
+- We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
+- We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
+- We fixed an issue where <kbd>DEL</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> in the search field triggered corresponding actions in the main table [#3067](https://github.com/JabRef/jabref/issues/3067)
 ### Removed
 
 
