@@ -26,7 +26,6 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.GUIGlobals;
@@ -117,6 +116,35 @@ public class GlobalSearchBar extends JPanel {
                 focus();
             }
         };
+        //TODO: These have to be somehow converted
+        /*
+        String endSearch = "endSearch";
+        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
+        searchField.getActionMap().put(endSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (autoCompleteSupport.isVisible()) {
+                    autoCompleteSupport.setVisible(false);
+                } else {
+                    endSearch();
+                }
+            }
+        });
+        */
+
+        /*
+        String acceptSearch = "acceptSearch";
+        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
+        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                autoCompleteSupport.setVisible(false);
+                BasePanel currentBasePanel = frame.getCurrentBasePanel();
+                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+                currentBasePanel.getMainTable().requestFocus();
+            }
+        });
+        */
 
         String searchGlobalByKey = "searchGlobalByKey";
         globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
@@ -353,6 +381,7 @@ public class GlobalSearchBar extends JPanel {
                 searchCompleter,
                 new PersonNameStringConverter(true, true, AutoCompleteFirstNameMode.BOTH),
                 new AppendPersonNamesStrategy());
+
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -379,7 +408,7 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        searchField.setTooltip(new Tooltip(description));
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(new Tooltip(description)));
         openCurrentResultsInDialog.setEnabled(true);
     }
 
