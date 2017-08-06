@@ -127,6 +127,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -1396,7 +1397,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
             suggestionProviders.indexDatabase(getDatabase());
             // Ensure that the suggestion providers are in sync with entries
-            this.getDatabase().registerListener(new AutoCompleteUpdater(suggestionProviders));
+            CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+            changeFilter.registerListener(new AutoCompleteUpdater(suggestionProviders));
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
