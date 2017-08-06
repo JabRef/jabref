@@ -84,6 +84,9 @@ public class FileListEntryEditor {
     //Do not make this variable final, as then the lambda action listener will fail on compiöe
     private BibDatabaseContext databaseContext;
     private final ActionListener browsePressed = e -> {
+
+
+
         String fileText = link.getText().trim();
         Optional<Path> file = FileHelper.expandFilename(this.databaseContext, fileText,
                 Globals.prefs.getFileDirectoryPreferences());

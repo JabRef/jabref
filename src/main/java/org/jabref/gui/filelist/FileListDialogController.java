@@ -44,11 +44,21 @@ public class FileListDialogController extends AbstractController<FileListDialogV
     @FXML
     private void initialize() {
         viewModel = new FileListDialogViewModel();
+        setBindings();
+    }
+
+    private void setBindings() {
+
+        cmbFileType.itemsProperty().bindBidirectional(viewModel.externalFileTypeProperty());
+        tfDescription.textProperty().bindBidirectional(viewModel.descriptionProperty());
+        tfLink.textProperty().bindBidirectional(viewModel.linkProperty());
     }
 
     @FXML
     void browseFileDialog(ActionEvent event) {
-        String fileText = tfLink.getText().trim();
+
+        String fileText = viewModel.linkProperty().get();
+
         Optional<Path> file = FileHelper.expandFilename(stateManager.getActiveDatabase().get(), fileText,
                 Globals.prefs.getFileDirectoryPreferences());
 
@@ -73,7 +83,7 @@ public class FileListDialogController extends AbstractController<FileListDialogV
                     .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
             newFile = FileUtil.shortenFileName(newFile, fileDirectories);
 
-            tfLink.setText(newFile.toString());
+            viewModel.linkProperty().set(newFile.toString());
             tfLink.requestFocus();
         });
     }
