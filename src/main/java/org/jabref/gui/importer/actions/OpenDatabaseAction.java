@@ -150,8 +150,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabaseFile().isPresent())
-                        && basePanel.getBibDatabaseContext().getDatabaseFile().get().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
+                        && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps

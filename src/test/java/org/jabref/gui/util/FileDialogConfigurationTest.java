@@ -61,6 +61,15 @@ public class FileDialogConfigurationTest {
     }
 
     @Test
+    public void testWithNonExistingDirectoryAndParentNull() {
+        String tempFolder = "workingDirectory";
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(tempFolder).build();
+
+        assertEquals(Optional.ofNullable(null), fileDialogConfiguration.getInitialDirectory());
+    }
+
+    @Test
     public void testSingleExtension() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .withDefaultExtension(FileExtensions.BIBTEX_DB).build();
