@@ -72,6 +72,7 @@ public class GlobalSearchBar extends JPanel {
     private final JLabel currentResults = new JLabel("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
     private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+    private final JFXPanel container;
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
@@ -185,7 +186,7 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        JFXPanel container = new JFXPanel();
+        container = new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
             container.addKeyListener(new KeyAdapter() {
@@ -315,6 +316,7 @@ public class GlobalSearchBar extends JPanel {
      */
     public void focus() {
         if (!searchField.isFocused()) {
+            container.requestFocus();
             searchField.requestFocus();
         }
         searchField.selectAll();
