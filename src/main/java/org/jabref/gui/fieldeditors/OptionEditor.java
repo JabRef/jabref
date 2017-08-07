@@ -4,10 +4,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
 
+import org.jabref.Globals;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 /**
  * Field editor that provides various pre-defined options as a drop-down combobox.
@@ -26,6 +29,7 @@ public class OptionEditor<T> extends HBox implements FieldEditorFX {
         comboBox.setCellFactory(new ViewModelListCellFactory<T>().withText(viewModel::convertToDisplayText));
         comboBox.getItems().setAll(viewModel.getItems());
         comboBox.getEditor().textProperty().bindBidirectional(viewModel.textProperty());
+        comboBox.getEditor().setFont(Font.font("Verdana", Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
     }
 
     public OptionEditorViewModel<T> getViewModel() {

@@ -28,6 +28,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -79,7 +80,7 @@ public class SourceTab extends EntryEditorTab {
     private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        //codeArea.(Font.font("Monospaced", Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        codeArea.setStyle("-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;");
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
                 storeSource();
@@ -90,8 +91,6 @@ public class SourceTab extends EntryEditorTab {
             String srcString = getSourceString(entry, mode);
             codeArea.appendText(srcString);
         } catch (IOException ex) {
-            codeArea.appendText(ex.getMessage() + "\n\n" +
-                    Localization.lang("Correct the entry, and reopen editor to display/edit source."));
             codeArea.setEditable(false);
             LOGGER.debug("Incorrect entry", ex);
         }

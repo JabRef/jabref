@@ -12,6 +12,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
+import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
@@ -20,8 +21,11 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
+
+    private static final String FONT_STYLE = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
 
     @FXML private IdentifierEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
@@ -38,8 +42,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
         fetchInformationByIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(fieldName))));
+        fetchInformationByIdentifierButton.setStyle(FONT_STYLE);
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", FieldName.getDisplayName(fieldName))));
+        lookupIdentifierButton.setStyle(FONT_STYLE);
 
         List<MenuItem> menuItems = new ArrayList<>();
         if (fieldName.equalsIgnoreCase(FieldName.DOI)) {

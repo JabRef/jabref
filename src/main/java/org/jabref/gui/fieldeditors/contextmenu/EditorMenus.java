@@ -29,6 +29,7 @@ public class EditorMenus {
 
     public static List<MenuItem> getNameMenu(TextArea textArea) {
         MenuItem normalizeNames = new MenuItem(Localization.lang("Normalize to BibTeX name format"));
+
         //normalizeNames.setTooltip(Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"))
         normalizeNames.setOnAction(event -> textArea.setText(new NormalizeNamesFormatter().format(textArea.getText())));
 
@@ -38,6 +39,7 @@ public class EditorMenus {
     public static List<MenuItem> getDOIMenu(TextArea textArea) {
         AbstractAction copyDoiUrlAction = new CopyDoiUrlAction(textArea);
         MenuItem copyDoiUrlMenuItem = new MenuItem((String) copyDoiUrlAction.getValue(Action.NAME));
+
         copyDoiUrlMenuItem.setOnAction(event -> copyDoiUrlAction.actionPerformed(null));
 
         List<MenuItem> menuItems = new ArrayList<>();

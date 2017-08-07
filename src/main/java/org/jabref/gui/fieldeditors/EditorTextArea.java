@@ -9,10 +9,16 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Font;
+
+import org.jabref.Globals;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
+
+    private static final String FONT_STYLE = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
 
     public EditorTextArea() {
         this("");
@@ -23,6 +29,8 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
 
         setMinHeight(1);
         setMinWidth(200);
+
+        this.setFont(Font.font("Verdana", Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
 
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
@@ -57,6 +65,7 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
             public void populateContextMenu(ContextMenu contextMenu) {
                 super.populateContextMenu(contextMenu);
                 contextMenu.getItems().addAll(0, items);
+                contextMenu.getItems().stream().forEach(item -> item.setStyle(FONT_STYLE));
             }
         };
         setSkin(customContextSkin);

@@ -11,17 +11,22 @@ import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
+import org.jabref.preferences.JabRefPreferences;
 
 class ProtectedTermsMenu extends Menu {
 
     private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private final String fontStyle = "-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;";
+
     private final Menu externalFiles;
     private final TextArea opener;
 
     public ProtectedTermsMenu(TextArea opener) {
         super(Localization.lang("Protect terms"));
         this.opener = opener;
+
         MenuItem protectItem = new MenuItem(Localization.lang("Add {} around selected text"));
+        protectItem.setStyle(fontStyle);
         protectItem.setOnAction(event -> {
             String selectedText = opener.getSelectedText();
             if ((selectedText != null) && !selectedText.isEmpty()) {
@@ -30,9 +35,11 @@ class ProtectedTermsMenu extends Menu {
         });
 
         MenuItem formatItem = new MenuItem(Localization.lang("Format field"));
+        formatItem.setStyle("-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;");
         formatItem.setOnAction(event -> opener.setText(FORMATTER.format(opener.getText())));
 
         externalFiles = new Menu(Localization.lang("Add selected text to list"));
+        externalFiles.setStyle(fontStyle);
         updateFiles();
 
         this.getItems().add(protectItem);
@@ -57,6 +64,7 @@ class ProtectedTermsMenu extends Menu {
         }
         externalFiles.getItems().add(new SeparatorMenuItem());
         MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
+        addToNewFileItem.setStyle("-fx-font-size: " + Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt;");
         addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
                     Globals.protectedTermsLoader);
