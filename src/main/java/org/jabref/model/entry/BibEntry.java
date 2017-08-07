@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -808,7 +809,7 @@ public class BibEntry implements Cloneable {
         //Extract the path
         Optional<String> oldValue = getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
-            return Collections.emptyList();
+            return new ArrayList<>(); //Return new ArrayList because emptyList is immutable
         }
 
         return FileFieldParser.parse(oldValue.get());
