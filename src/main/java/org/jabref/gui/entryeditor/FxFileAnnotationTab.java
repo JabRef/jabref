@@ -47,7 +47,6 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private Map<String, List<FileAnnotation>> fileAnnotations;
     private ObservableList<FileAnnotation> fileAnnotationsList = FXCollections.observableArrayList();
 
-
     private StringProperty currentAuthor = new SimpleStringProperty();
     private StringProperty currentPage = new SimpleStringProperty();
     private StringProperty currentDate = new SimpleStringProperty();
@@ -61,13 +60,13 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         this.cache = cache;
         fileAnnotations = cache.getFromCache(parent.getEntry());
 
-        this.panel = setupPanel(frame, basePanel);
-        setText(Localization.lang("File annotations")); // TODO: rename in "File annotations"
+        this.panel = setupPanel();
+        setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
         setGraphic(IconTheme.JabRefIcon.REQUIRED.getGraphicNode());
     }
 
-    private Region setupPanel(JabRefFrame frame, BasePanel basePanel) {
+    private Region setupPanel() {
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("editorPane");
         ColumnConstraints leftSideConstraint = new ColumnConstraints();
@@ -89,7 +88,6 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
     private GridPane setupRightSide() {
         GridPane rightSide = new GridPane();
-
 
         rightSide.addRow(0, new Label("Author"));
 

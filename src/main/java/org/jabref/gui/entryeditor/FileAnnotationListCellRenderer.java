@@ -8,10 +8,8 @@ import org.jabref.model.pdf.FileAnnotation;
 
 public class FileAnnotationListCellRenderer implements Callback<ListView<FileAnnotation>, ListCell<FileAnnotation>> {
 
-
     @Override
     public ListCell<FileAnnotation> call(ListView<FileAnnotation> param) {
-
         return new ListCell<FileAnnotation>() {
             @Override
             protected void updateItem(FileAnnotation t, boolean bln) {
