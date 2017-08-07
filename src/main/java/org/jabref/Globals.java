@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.awt.Toolkit;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.collab.FileUpdateMonitor;
@@ -80,8 +81,8 @@ public class Globals {
 
     private static void stopTelemetryClient() {
         if (Globals.prefs.shouldCollectTelemetry()) {
-            telemetryClient.trackSessionState(SessionState.End);
-            telemetryClient.flush();
+            getTelemetryClient().ifPresent(client -> client.trackSessionState(SessionState.End));
+            getTelemetryClient().ifPresent(client -> client.flush());
         }
     }
 
@@ -119,7 +120,7 @@ public class Globals {
         stopTelemetryClient();
     }
 
-    public static TelemetryClient getTelemetryClient() {
-        return telemetryClient;
+    public static Optional<TelemetryClient> getTelemetryClient() {
+        return Optional.ofNullable(telemetryClient);
     }
 }

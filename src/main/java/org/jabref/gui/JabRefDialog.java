@@ -54,8 +54,6 @@ public class JabRefDialog extends JDialog {
     }
 
     private <T extends JabRefDialog> void trackDialogOpening(Class<T> clazz) {
-        if (Globals.getTelemetryClient()!=null) {
-            Globals.getTelemetryClient().trackPageView(clazz.getName());
-        }
+        Globals.getTelemetryClient().ifPresent(client -> client.trackPageView(clazz.getName()));
     }
 }
