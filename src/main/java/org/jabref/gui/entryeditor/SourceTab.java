@@ -52,6 +52,15 @@ public class SourceTab extends EntryEditorTab {
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
     }
 
+    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+        StringWriter stringWriter = new StringWriter(200);
+        LatexFieldFormatter formatter = LatexFieldFormatter
+                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
+        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
+
+        return stringWriter.getBuffer().toString();
+    }
+
     @Subscribe
     public void listen(EntryChangedEvent event) {
         if (codeArea != null && this.entry.equals(event.getBibEntry())) {
@@ -67,19 +76,11 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
-
-        return stringWriter.getBuffer().toString();
-    }
-
     private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        //codeArea.(Font.font("Monospaced", Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        codeArea.lookup(".styled-text-area").setStyle(
+                "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
                 storeSource();

@@ -913,6 +913,11 @@ public class JabRefPreferences implements PreferencesService {
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
+    public int getFontSizeFX() {
+        // Decrease font size by 3 since JavaFX has default font size of 9, while Swing uses 12
+        return getInt(MENU_FONT_SIZE) - 3;
+    }
+
     public String getUser() {
         try {
             return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
