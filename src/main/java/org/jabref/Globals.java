@@ -73,12 +73,16 @@ public class Globals {
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        startTelemetryClient();
+        if (Globals.prefs.shouldCollectTelemetry()) {
+            startTelemetryClient();
+        }
     }
 
     private static void stopTelemetryClient() {
-        telemetryClient.trackSessionState(SessionState.End);
-        telemetryClient.flush();
+        if (Globals.prefs.shouldCollectTelemetry()) {
+            telemetryClient.trackSessionState(SessionState.End);
+            telemetryClient.flush();
+        }
     }
 
     private static void startTelemetryClient() {
