@@ -1,7 +1,5 @@
 package org.jabref.logic.citationstyle;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.model.database.BibDatabaseContext;
@@ -9,6 +7,9 @@ import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryChangedEvent;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
 
 
@@ -18,8 +19,9 @@ import com.google.common.eventbus.Subscribe;
  */
 public class CitationStyleCache {
 
-    private CitationStyle citationStyle = CitationStyle.getDefault();
-    private Map<BibEntry, String> citationStylesCache = new HashMap<>();
+    private static final int CACHE_SIZE = 10;
+    private CitationStyle citationStyle;
+    private LoadingCache<BibEntry, String> citationStyleCache;
 
 
     public CitationStyleCache(BibDatabaseContext bibDatabaseContext) {
@@ -27,7 +29,13 @@ public class CitationStyleCache {
     }
 
     public CitationStyleCache(BibDatabaseContext bibDatabaseContext, CitationStyle citationStyle) {
-        this.setCitationStyle(citationStyle);
+        this.citationStyle = citationStyle;
+        citationStyleCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, String>() {
+            @Override
+            public String load(BibEntry entry) throws Exception {
+                return CitationStyleGenerator.generateCitation(entry, getCitationStyle().getSource(), CitationStyleOutputFormat.HTML);
+            }
+        });
         bibDatabaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }
 
@@ -35,24 +43,19 @@ public class CitationStyleCache {
      * returns the citation for the given BibEntry and the set CitationStyle
      */
     public String getCitationFor(BibEntry entry) {
-        String citation = citationStylesCache.get(entry);
-        if (citation == null) {
-            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle.getSource(), CitationStyleOutputFormat.HTML);
-            citationStylesCache.put(entry, citation);
-        }
-        return citation;
+        return citationStyleCache.getUnchecked(entry);
     }
 
     public void setCitationStyle(CitationStyle citationStyle) {
         Objects.requireNonNull(citationStyle);
         if (!this.citationStyle.equals(citationStyle)) {
             this.citationStyle = citationStyle;
-            this.citationStylesCache.clear();
+            this.citationStyleCache.invalidateAll();
         }
     }
 
     public CitationStyle getCitationStyle() {
-        return citationStyle;
+        return this.citationStyle;
     }
 
     private class BibDatabaseEntryListener {
@@ -61,7 +64,7 @@ public class CitationStyleCache {
          */
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            citationStylesCache.remove(entryChangedEvent.getBibEntry());
+            citationStyleCache.invalidate(entryChangedEvent.getBibEntry());
         }
 
         /**
@@ -69,8 +72,7 @@ public class CitationStyleCache {
          */
         @Subscribe
         public void listen(EntryRemovedEvent entryRemovedEvent) {
-            citationStylesCache.remove(entryRemovedEvent.getBibEntry());
+            citationStyleCache.invalidate(entryRemovedEvent.getBibEntry());
         }
     }
-
 }

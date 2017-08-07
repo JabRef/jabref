@@ -7,7 +7,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -80,6 +82,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         JButton cancel = new JButton(Localization.lang("Cancel"));
         JButton add = new JButton(Localization.lang("Add"));
         JButton remove = new JButton(Localization.lang("Remove"));
+        JButton replace = new JButton(Localization.lang("Replace"));
+        JButton join = new JButton(Localization.lang("Join"));
+
+        join.setToolTipText(Localization.lang("Joins selected keywords and deletes selected keywords."));
 
         keywordList.setVisibleRowCount(10);
 
@@ -93,16 +99,18 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         mergeKeywords.addActionListener(stateChanged);
         intersectKeywords.setSelected(true);
 
-        FormBuilder builder = FormBuilder.create().layout(new FormLayout("fill:200dlu:grow, 4dlu, fill:pref",
+        FormBuilder builder = FormBuilder.create().layout(new FormLayout("fill:200dlu:grow, pref, fill:pref",
                 "pref, 2dlu, pref, 1dlu, pref, 2dlu, fill:100dlu:grow, 4dlu, pref, 4dlu, pref, "));
 
         builder.addSeparator(Localization.lang("Keywords of selected entries")).xyw(1, 1, 3);
         builder.add(intersectKeywords).xyw(1, 3, 3);
         builder.add(mergeKeywords).xyw(1, 5, 3);
         builder.add(kPane).xywh(1, 7, 1, 3);
-        builder.add(remove).xy(3, 9);
+        builder.add(join).xy(2,9);
+        builder.add(replace).xy(3, 9);
         builder.add(keyword).xy(1, 11);
-        builder.add(add).xy(3, 11);
+        builder.add(add).xy(2, 11);
+        builder.add(remove).xy(3, 11);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
@@ -130,7 +138,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         add.addActionListener(addActionListener);
 
-        final ActionListener removeActionListenter = arg0 -> {
+        final ActionListener removeActionListener = arg0 -> {
             // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
             List<Keyword> values = keywordList.getSelectedValuesList();
 
@@ -139,7 +147,30 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         };
 
-        remove.addActionListener(removeActionListenter);
+        remove.addActionListener(removeActionListener);
+
+        final ActionListener joinActionListener = arg0 -> {
+            List<Keyword> values = keywordList.getSelectedValuesList();
+            String joinedKeyword = values.stream().map(currentKeyword -> currentKeyword.get()).collect(Collectors.joining(" "));
+            this.addKeywordToKeywordListModel(joinedKeyword);
+
+            for (Keyword val : values) {
+                this.keywordListModel.removeElement(val);
+            }
+        };
+
+        join.addActionListener(joinActionListener);
+
+        final ActionListener replaceActionListener = arg0 -> {
+            List<Keyword> values = keywordList.getSelectedValuesList();
+
+            for (Keyword val : values) {
+                keywordListModel.removeElement(val);
+            }
+            addButtonActionListener(keyword);
+        };
+
+        replace.addActionListener(replaceActionListener);
 
         keywordList.addKeyListener(new KeyListener() {
 
@@ -156,7 +187,27 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             @Override
             public void keyPressed(KeyEvent arg0) {
                 if (arg0.getKeyCode() == KeyEvent.VK_DELETE) {
-                    removeActionListenter.actionPerformed(null);
+                    removeActionListener.actionPerformed(null);
+                }
+            }
+        });
+
+        keyword.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                // Do nothing
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // Do nothing
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    addActionListener.actionPerformed(null);
                 }
             }
         });
@@ -175,8 +226,18 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         if (StringUtil.isBlank(keywordTextField.getText())) {
             return; // nothing to add
         }
+        addKeywordToKeywordListModel(keywordTextField.getText());
+        keywordTextField.setText(null);
+        keywordTextField.requestFocusInWindow();
 
-        Keyword newKeyword = new Keyword(keywordTextField.getText().trim());
+    }
+
+    /**
+     * Adds given keyword to the keyword list model
+     */
+    private void addKeywordToKeywordListModel(String keyword) {
+        keyword = Objects.requireNonNull(keyword).trim();
+        Keyword newKeyword = new Keyword(keyword);
         if (keywordListModel.isEmpty()) {
             keywordListModel.addElement(newKeyword);
         } else {
@@ -194,9 +255,6 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 keywordListModel.add(idx, newKeyword);
             }
         }
-        keywordTextField.setText(null);
-            keywordTextField.requestFocusInWindow();
-
     }
 
     @Override
@@ -257,7 +315,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     }
 
     private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
-            KeywordList keywordsToRemove) {
+                                         KeywordList keywordsToRemove) {
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
             KeywordList keywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
