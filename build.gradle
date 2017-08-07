@@ -96,7 +96,7 @@ dependencies {
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
 
-    compile 'com.google.guava:guava:22.0'
+    compile 'com.google.guava:guava:23.0'
 
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
