@@ -6,17 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
@@ -39,6 +46,13 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private FieldEditorFX activeField;
     private Map<String, List<FileAnnotation>> fileAnnotations;
     private ObservableList<FileAnnotation> fileAnnotationsList = FXCollections.observableArrayList();
+
+
+    private StringProperty currentAuthor = new SimpleStringProperty();
+    private StringProperty currentPage = new SimpleStringProperty();
+    private StringProperty currentDate = new SimpleStringProperty();
+    private StringProperty currentContent = new SimpleStringProperty();
+    private StringProperty currentMarking = new SimpleStringProperty();
 
     public FxFileAnnotationTab(JabRefFrame frame, BasePanel basePanel, EntryEditor parent, FileAnnotationCache cache) {
         this.parent = parent;
@@ -76,16 +90,47 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private GridPane setupRightSide() {
         GridPane rightSide = new GridPane();
 
+
         rightSide.addRow(0, new Label("Author"));
 
+        Text annotationAuthor = new Text();
+        annotationAuthor.textProperty().bind(currentAuthor);
+        rightSide.addColumn(1, annotationAuthor);
 
-        rightSide.addRow(1, new Label("date"));
+        rightSide.addRow(1, new Label("Page"));
+        Text annotationPage = new Text();
+        annotationPage.textProperty().bind(currentPage);
 
-        rightSide.addRow(2, new Label("page"));
-        rightSide.addRow(3, new Label("content"));
+        rightSide.addColumn(1, annotationPage);
 
-        rightSide.addRow(4, new Label("highlight"));
+        rightSide.addRow(2, new Label("Date"));
+        Text annotationDate = new Text();
+        annotationDate.textProperty().bind(currentDate);
+
+        rightSide.addColumn(1, annotationDate);
+
+        rightSide.addRow(3, new Label("Content"));
+        TextArea annotationContent = new TextArea();
+
+        annotationContent.textProperty().bind(currentContent);
+        annotationContent.setEditable(false);
+        annotationContent.setWrapText(true);
+        rightSide.addColumn(1, annotationContent);
+
+        rightSide.addRow(4, new Label("Marking"));
+        TextArea markingArea = new TextArea();
+        markingArea.textProperty().bind(currentMarking);
+        markingArea.setEditable(false);
+        markingArea.setWrapText(true);
+        rightSide.addColumn(1, markingArea);
         return rightSide;
+    }
+
+    private String getMarking(FileAnnotation annotation) {
+        if (annotation.hasLinkedAnnotation()) {
+            return getContentOrNA(annotation.getLinkedFileAnnotation().getContent());
+        }
+        return "N/A";
     }
 
     private GridPane setupLeftSide() {
@@ -97,20 +142,42 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
         leftSide.addRow(0, fileNameComboBox);
 
-        leftSide.add(createFileAnnotationsList(), 0, 1, 2, 1);
-        updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectionModel().getSelectedItem()));
+        ListView<FileAnnotation> listView = createFileAnnotationsList(fileNameComboBox);
+        leftSide.add(listView, 0, 1, 2, 1);
 
         return leftSide;
     }
 
-    private ListView<FileAnnotation> createFileAnnotationsList() {
+    private ListView<FileAnnotation> createFileAnnotationsList(ComboBox fileNameComboBox) {
         ListView<FileAnnotation> listView = new ListView<>();
         listView.setItems(fileAnnotationsList);
+        listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        listView.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<FileAnnotation>() {
+                    @Override
+                    public void changed(ObservableValue<? extends FileAnnotation> ov, FileAnnotation t, FileAnnotation newFA) {
+                        currentAuthor.setValue(listView.getSelectionModel().getSelectedItem().getAuthor());
+                        currentPage.setValue(Integer.toString(listView.getSelectionModel().getSelectedItem().getPage()));
+                        currentDate.setValue(listView.getSelectionModel().getSelectedItem().getTimeModified().toString());
+                        currentContent.setValue(getContentOrNA(listView.getSelectionModel().getSelectedItem().getContent()));
+                        currentMarking.setValue(getMarking(listView.getSelectionModel().getSelectedItem()));
+                    }
+                }
+        );
         GridPane.setHgrow(listView, Priority.ALWAYS);
 
         listView.setCellFactory(new FileAnnotationListCellRenderer());
+        updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectionModel().getSelectedItem()));
         return listView;
     }
+
+    private String getContentOrNA(String content) {
+        if (content.isEmpty()) {
+            return "N/A";
+        }
+        return content;
+    }
+
 
     /**
      * Updates the list model to show the given notes without those with no content
