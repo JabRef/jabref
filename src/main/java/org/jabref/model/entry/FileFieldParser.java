@@ -1,59 +1,58 @@
 package org.jabref.model.entry;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FileFieldParser {
+
     public static List<LinkedFile> parse(String value) {
-        if ((value == null) || value.trim().isEmpty()) {
-            return Collections.emptyList();
-        }
-
         List<LinkedFile> files = new ArrayList<>();
-        List<String> entry = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        boolean inXmlChar = false;
-        boolean escaped = false;
 
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!escaped && (c == '\\')) {
-                escaped = true;
-                continue;
-            }
-            // Check if we are entering an XML special character construct such
-            // as "&#44;", because we need to know in order to ignore the semicolon.
-            else if (!escaped && (c == '&') && !inXmlChar) {
-                sb.append(c);
-                if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
-                    inXmlChar = true;
+        if ((value != null) && !value.trim().isEmpty()) {
+
+            List<String> entry = new ArrayList<>();
+            StringBuilder sb = new StringBuilder();
+            boolean inXmlChar = false;
+            boolean escaped = false;
+
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (!escaped && (c == '\\')) {
+                    escaped = true;
+                    continue;
                 }
-            } else if (!escaped && inXmlChar && (c == ';')) {
-                // Check if we are exiting an XML special character construct:
-                sb.append(c);
-                inXmlChar = false;
-            } else if (!escaped && (c == ':')) {
-                entry.add(sb.toString());
-                sb = new StringBuilder();
-            } else if (!escaped && (c == ';') && !inXmlChar) {
-                entry.add(sb.toString());
-                sb = new StringBuilder();
+                // Check if we are entering an XML special character construct such
+                // as "&#44;", because we need to know in order to ignore the semicolon.
+                else if (!escaped && (c == '&') && !inXmlChar) {
+                    sb.append(c);
+                    if ((value.length() > (i + 1)) && (value.charAt(i + 1) == '#')) {
+                        inXmlChar = true;
+                    }
+                } else if (!escaped && inXmlChar && (c == ';')) {
+                    // Check if we are exiting an XML special character construct:
+                    sb.append(c);
+                    inXmlChar = false;
+                } else if (!escaped && (c == ':')) {
+                    entry.add(sb.toString());
+                    sb = new StringBuilder();
+                } else if (!escaped && (c == ';') && !inXmlChar) {
+                    entry.add(sb.toString());
+                    sb = new StringBuilder();
 
-                files.add(convert(entry));
-            } else {
-                sb.append(c);
+                    files.add(convert(entry));
+                } else {
+                    sb.append(c);
+                }
+                escaped = false;
             }
-            escaped = false;
-        }
-        if (sb.length() > 0) {
-            entry.add(sb.toString());
-        }
+            if (sb.length() > 0) {
+                entry.add(sb.toString());
+            }
 
-        if (!entry.isEmpty()) {
-            files.add(convert(entry));
+            if (!entry.isEmpty()) {
+                files.add(convert(entry));
+            }
         }
-
         return files;
     }
 
