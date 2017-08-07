@@ -15,6 +15,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
 import org.jabref.gui.BasePanel;
@@ -76,6 +77,8 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         GridPane rightSide = new GridPane();
 
         rightSide.addRow(0, new Label("Author"));
+
+
         rightSide.addRow(1, new Label("date"));
 
         rightSide.addRow(2, new Label("page"));
@@ -90,9 +93,11 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
         leftSide.addColumn(0, new Label("Filename"));
         ComboBox<String> fileNameComboBox = createFileNameComboBox();
+        GridPane.setHgrow(fileNameComboBox, Priority.ALWAYS);
+
         leftSide.addRow(0, fileNameComboBox);
 
-        leftSide.addRow(1, createFileAnnotationsList());
+        leftSide.add(createFileAnnotationsList(), 0, 1, 2, 1);
         updateShownAnnotations(fileAnnotations.get(fileNameComboBox.getSelectionModel().getSelectedItem()));
 
         return leftSide;
@@ -101,6 +106,7 @@ public class FxFileAnnotationTab extends EntryEditorTab {
     private ListView<FileAnnotation> createFileAnnotationsList() {
         ListView<FileAnnotation> listView = new ListView<>();
         listView.setItems(fileAnnotationsList);
+        GridPane.setHgrow(listView, Priority.ALWAYS);
 
         listView.setCellFactory(new FileAnnotationListCellRenderer());
         return listView;
