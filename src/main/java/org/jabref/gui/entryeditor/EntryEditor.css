@@ -31,3 +31,7 @@
     -fx-text-fill: text-area-foreground;
     -fx-text-origin: baseline;
 }
+
+.tooltip {
+    -fx-font-size: Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + "pt";
+}
