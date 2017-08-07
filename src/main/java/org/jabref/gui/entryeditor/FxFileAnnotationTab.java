@@ -1,30 +1,17 @@
 package org.jabref.gui.entryeditor;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
-
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -33,6 +20,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.FileAnnotation;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.jabref.model.pdf.FileAnnotationType.NONE;
 
@@ -76,7 +69,6 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         gridPane.addColumn(0, setupLeftSide());
         gridPane.addColumn(1, setupRightSide());
 
-        // Warp everything in a scroll-pane
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -88,7 +80,7 @@ public class FxFileAnnotationTab extends EntryEditorTab {
 
     private GridPane setupRightSide() {
         GridPane rightSide = new GridPane();
-
+        // TODO: add localization
         rightSide.addRow(0, new Label("Author"));
 
         Text annotationAuthor = new Text();
@@ -121,6 +113,9 @@ public class FxFileAnnotationTab extends EntryEditorTab {
         markingArea.setEditable(false);
         markingArea.setWrapText(true);
         rightSide.addColumn(1, markingArea);
+
+        rightSide.addRow(5, new Button("Reload Annotations")); // Todo: add functionality
+        rightSide.addColumn(1, new Button("Copy to Clipboard")); // Todo: add functionality
         return rightSide;
     }
 
