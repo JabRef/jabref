@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.SwingUtilities;
+
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
@@ -262,6 +264,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void edit() {
         FileListEntryEditor editor = new FileListEntryEditor(linkedFile, false, true, databaseContext);
-        editor.setVisible(true, false);
+        SwingUtilities.invokeLater(() -> editor.setVisible(true, false));
+
     }
 }

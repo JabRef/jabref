@@ -22,7 +22,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -43,8 +43,6 @@ public class BackupManager {
 
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
-    private String lastFieldChanged;
-
     private final BibDatabaseContext bibDatabaseContext;
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
@@ -56,9 +54,8 @@ public class BackupManager {
         BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
 
-        // Listen for change events
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
+        CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter.registerListener(this);
     }
 
     static Path getBackupPath(Path originalPath) {
@@ -131,18 +128,7 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!(event instanceof FieldChangedEvent)) {
-            startBackupTask();
-        } else {
-            // only do a backup if the field changes are more than one character or a new field is edited
-            FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-            boolean isEditOnNewField = lastFieldChanged == null || !lastFieldChanged.equals(fieldChange.getFieldName());
-
-            if (fieldChange.getDelta() > 1 || isEditOnNewField) {
-                lastFieldChanged = fieldChange.getFieldName();
-                startBackupTask();
-            }
-        }
+        startBackupTask();
     }
 
     private void startBackupTask() {

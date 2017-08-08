@@ -11,12 +11,20 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-If fetched article is already in database the ImportInspectionDialog is started
+
+- If fetched article is already in database, then the entry merge dialog is shown.
+- An error message is now displayed if you try to create a group containing the keyword separator or if there is already a group with the same name. [#3075](https://github.com/JabRef/jabref/issues/3075) and [#1495](https://github.com/JabRef/jabref/issues/1495)
 
 ### Fixed
-We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
-We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
-We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
+
+- We fixed an issue where the fetcher for the Astrophysics Data System (ADS) added some non-bibtex data to the entry returned from the search [#3035](https://github.com/JabRef/jabref/issues/3035)
+- We improved the auto completion so that minor changes are not added as suggestions. [#2998](https://github.com/JabRef/jabref/issues/2998)
+- We readded the undo mechanism for changes in the entry editor [#2973](https://github.com/JabRef/jabref/issues/2973)
+- We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
+- We fixed the shortcut <kbd>Ctrl</kbd>+<kbd>F</kbd> for the search field.
+- We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
+- We fixed an issue where <kbd>DEL</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> in the search field triggered corresponding actions in the main table [#3067](https://github.com/JabRef/jabref/issues/3067)
+- We fixed an issue where JabRef freezed when editing an assigned file in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-311050976)
 ### Removed
 
 

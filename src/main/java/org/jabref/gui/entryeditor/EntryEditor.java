@@ -8,7 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
@@ -158,18 +158,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         JFXPanel container = new JFXPanel();
 
-        container.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(java.awt.event.KeyEvent e) {
-                //empty
-            }
-
-            @Override
-            public void keyReleased(java.awt.event.KeyEvent e) {
-                // empty
-
-            }
+        container.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {

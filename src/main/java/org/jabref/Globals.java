@@ -1,6 +1,7 @@
 package org.jabref;
 
 import java.awt.Toolkit;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jabref.collab.FileUpdateMonitor;
@@ -73,12 +74,16 @@ public class Globals {
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        startTelemetryClient();
+        if (Globals.prefs.shouldCollectTelemetry()) {
+            startTelemetryClient();
+        }
     }
 
     private static void stopTelemetryClient() {
-        telemetryClient.trackSessionState(SessionState.End);
-        telemetryClient.flush();
+        if (Globals.prefs.shouldCollectTelemetry()) {
+            getTelemetryClient().ifPresent(client -> client.trackSessionState(SessionState.End));
+            getTelemetryClient().ifPresent(client -> client.flush());
+        }
     }
 
     private static void startTelemetryClient() {
@@ -115,7 +120,7 @@ public class Globals {
         stopTelemetryClient();
     }
 
-    public static TelemetryClient getTelemetryClient() {
-        return telemetryClient;
+    public static Optional<TelemetryClient> getTelemetryClient() {
+        return Optional.ofNullable(telemetryClient);
     }
 }
