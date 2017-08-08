@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
 
@@ -29,16 +26,19 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<String> files = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
+    private final FileAnnotationCache cache;
+    private final BibEntry entry;
     private Map<String, List<FileAnnotation>> fileAnnotations;
-    private StringProperty currentAuthor = new SimpleStringProperty();
-    private StringProperty currentPage = new SimpleStringProperty();
-    private StringProperty currentDate = new SimpleStringProperty();
-    private StringProperty currentContent = new SimpleStringProperty();
-    private StringProperty currentMarking = new SimpleStringProperty();
 
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry) {
+        this.cache = cache;
+        this.entry = entry;
+        initialize();
+    }
+
+    private void initialize() {
         fileAnnotations = cache.getFromCache(entry);
-        files.addAll(fileAnnotations.keySet());
+        files.setAll(fileAnnotations.keySet());
     }
 
     public ObjectProperty<FileAnnotationViewModel> currentAnnotationProperty() {
@@ -55,49 +55,6 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     public void notifyNewSelectedAnnotation(FileAnnotationViewModel newAnnotation) {
         currentAnnotation.set(newAnnotation);
-        /*
-        currentAuthor.setValue(newValue.getAuthor());
-        currentPage.setValue(newValue.getPage());
-        currentDate.setValue(newValue.getTimeModified().toString());
-        currentContent.setValue(getContentOrNA(newValue.getContent()));
-        currentMarking.setValue(getMarking(newValue));
-        */
-    }
-
-    private GridPane setupRightSide() {
-        GridPane rightSide = new GridPane();
-
-        rightSide.addRow(0, new Label(Localization.lang("Author")));
-        Text annotationAuthor = new Text();
-        annotationAuthor.textProperty().bind(currentAuthor);
-        rightSide.addColumn(1, annotationAuthor);
-
-        rightSide.addRow(1, new Label(Localization.lang("Page")));
-        Text annotationPage = new Text();
-        annotationPage.textProperty().bind(currentPage);
-
-        rightSide.addColumn(1, annotationPage);
-
-        rightSide.addRow(2, new Label(Localization.lang("Date")));
-        Text annotationDate = new Text();
-        annotationDate.textProperty().bind(currentDate);
-        rightSide.addColumn(1, annotationDate);
-
-        rightSide.addRow(3, new Label(Localization.lang("Content")));
-        TextArea annotationContent = new TextArea();
-
-        annotationContent.textProperty().bind(currentContent);
-        annotationContent.setEditable(false);
-        annotationContent.setWrapText(true);
-        rightSide.addColumn(1, annotationContent);
-
-        rightSide.addRow(4, new Label(Localization.lang("Marking")));
-        TextArea markingArea = new TextArea();
-        markingArea.textProperty().bind(currentMarking);
-        markingArea.setEditable(false);
-        markingArea.setWrapText(true);
-        rightSide.addColumn(1, markingArea);
-        return rightSide;
     }
 
     public void notifyNewSelectedFile(String newFile) {
@@ -110,5 +67,28 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
                 .map(FileAnnotationViewModel::new)
                 .collect(Collectors.toList());
         annotations.setAll(newAnnotations);
+    }
+
+    public void reloadAnnotations() {
+        cache.remove(entry);
+        initialize();
+    }
+
+    /**
+     * Copies the meta and content information of the pdf annotation to the clipboard
+     */
+    public void copyCurrentAnnotation() {
+        StringJoiner sj = new StringJoiner(OS.NEWLINE);
+        sj.add(Localization.lang("Author") + ": " + getCurrentAnnotation().getAuthor());
+        sj.add(Localization.lang("Date") + ": " + getCurrentAnnotation().getDate());
+        sj.add(Localization.lang("Page") + ": " + getCurrentAnnotation().getPage());
+        sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
+        sj.add(Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get());
+
+        new ClipBoardManager().setClipboardContents(sj.toString());
+    }
+
+    private FileAnnotationViewModel getCurrentAnnotation() {
+        return currentAnnotation.get();
     }
 }

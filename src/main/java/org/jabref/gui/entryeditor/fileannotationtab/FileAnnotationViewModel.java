@@ -1,7 +1,5 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
-import java.util.Optional;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -9,14 +7,68 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
-public class FileAnnotationViewModel extends FileAnnotation {
+public class FileAnnotationViewModel {
 
+    private final FileAnnotation annotation;
     private StringProperty author = new SimpleStringProperty();
+    private StringProperty page = new SimpleStringProperty();
+    private StringProperty date = new SimpleStringProperty();
+    private StringProperty content = new SimpleStringProperty();
+    private StringProperty marking = new SimpleStringProperty();
 
     public FileAnnotationViewModel(FileAnnotation annotation) {
-        super(annotation.getAuthor(), annotation.getTimeModified(), annotation.getPage(), annotation.getContent(),
-                annotation.getAnnotationType(), annotation.hasLinkedAnnotation() ? Optional.of(annotation.getLinkedFileAnnotation()) : Optional.empty());
-        author.set(annotation.getContent()); // Use content just for test, since some annotations don't have an author
+        this.annotation = annotation;
+        author.set(annotation.getAuthor());
+        page.set(Integer.toString(annotation.getPage()));
+        date.set(annotation.getTimeModified().toString());
+        content.set(getContentOrNA(annotation.getContent()));
+        marking.set(getMarking(annotation));
+    }
+
+    private static String getMarking(FileAnnotation annotation) {
+        if (annotation.hasLinkedAnnotation()) {
+            return getContentOrNA(annotation.getLinkedFileAnnotation().getContent());
+        }
+        return "N/A";
+    }
+
+    private static String getContentOrNA(String content) {
+        if (content.isEmpty()) {
+            return "N/A";
+        }
+        return content;
+    }
+
+    public String getAuthor() {
+        return author.get();
+    }
+
+    public String getPage() {
+        return page.get();
+    }
+
+    public String getDate() {
+        return date.get();
+    }
+
+    public String getContent() {
+        return content.get();
+    }
+
+    public StringProperty pageProperty() {
+        return page;
+    }
+
+    public StringProperty dateProperty() {
+        return date;
+    }
+
+    public StringProperty contentProperty() {
+        return content;
+    }
+
+    public StringProperty markingProperty() {
+        return marking;
     }
 
     public StringProperty authorProperty() {
@@ -25,20 +77,20 @@ public class FileAnnotationViewModel extends FileAnnotation {
 
     @Override
     public String toString() {
-        if (this.hasLinkedAnnotation() && this.getContent().isEmpty()) {
-            if (FileAnnotationType.UNDERLINE.equals(this.getAnnotationType())) {
+        if (annotation.hasLinkedAnnotation() && this.getContent().isEmpty()) {
+            if (FileAnnotationType.UNDERLINE.equals(annotation.getAnnotationType())) {
                 return Localization.lang("Empty Underline");
             }
-            if (FileAnnotationType.HIGHLIGHT.equals(this.getAnnotationType())) {
+            if (FileAnnotationType.HIGHLIGHT.equals(annotation.getAnnotationType())) {
                 return Localization.lang("Empty Highlight");
             }
             return Localization.lang("Empty Marking");
         }
 
-        if (FileAnnotationType.UNDERLINE.equals(this.getAnnotationType())) {
+        if (FileAnnotationType.UNDERLINE.equals(annotation.getAnnotationType())) {
             return Localization.lang("Underline") + ": " + this.getContent();
         }
-        if (FileAnnotationType.HIGHLIGHT.equals(this.getAnnotationType())) {
+        if (FileAnnotationType.HIGHLIGHT.equals(annotation.getAnnotationType())) {
             return Localization.lang("Highlight") + ": " + this.getContent();
         }
 
@@ -46,20 +98,6 @@ public class FileAnnotationViewModel extends FileAnnotation {
     }
 
     public String getDescription() {
-        return null;
-    }
-
-    private String getMarking(FileAnnotation annotation) {
-        if (annotation.hasLinkedAnnotation()) {
-            return getContentOrNA(annotation.getLinkedFileAnnotation().getContent());
-        }
-        return "N/A";
-    }
-
-    private String getContentOrNA(String content) {
-        if (content.isEmpty()) {
-            return "N/A";
-        }
-        return content;
+        return marking.get();
     }
 }

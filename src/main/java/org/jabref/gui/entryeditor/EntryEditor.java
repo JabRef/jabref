@@ -48,7 +48,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
-import org.jabref.gui.entryeditor.fileannotationtab.FxFileAnnotationTab;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextField;
@@ -269,8 +268,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // Special tabs
         tabs.add(new MathSciNetTab(entry));
         FileAnnotationCache annotationCache = panel.getAnnotationCache();
-        tabs.add(new FileAnnotationTab(entry, this, annotationCache));
-        tabs.add(new FxFileAnnotationTab(this, annotationCache));
+        tabs.add(new FileAnnotationTab(annotationCache, entry));
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
