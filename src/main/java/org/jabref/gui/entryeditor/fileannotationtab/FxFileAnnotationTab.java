@@ -1,7 +1,9 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.gui.entryeditor.fileannotationtab;
 
 import javafx.scene.control.Tooltip;
 
+import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;

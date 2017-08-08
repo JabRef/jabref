@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.FileAnnotation;
@@ -34,6 +35,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private StringProperty currentDate = new SimpleStringProperty();
     private StringProperty currentContent = new SimpleStringProperty();
     private StringProperty currentMarking = new SimpleStringProperty();
+
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry) {
         fileAnnotations = cache.getFromCache(entry);
         files.addAll(fileAnnotations.keySet());
@@ -65,26 +67,23 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     private GridPane setupRightSide() {
         GridPane rightSide = new GridPane();
 
-
-        rightSide.addRow(0, new Label("Author"));
-
+        rightSide.addRow(0, new Label(Localization.lang("Author")));
         Text annotationAuthor = new Text();
         annotationAuthor.textProperty().bind(currentAuthor);
         rightSide.addColumn(1, annotationAuthor);
 
-        rightSide.addRow(1, new Label("Page"));
+        rightSide.addRow(1, new Label(Localization.lang("Page")));
         Text annotationPage = new Text();
         annotationPage.textProperty().bind(currentPage);
 
         rightSide.addColumn(1, annotationPage);
 
-        rightSide.addRow(2, new Label("Date"));
+        rightSide.addRow(2, new Label(Localization.lang("Date")));
         Text annotationDate = new Text();
         annotationDate.textProperty().bind(currentDate);
-
         rightSide.addColumn(1, annotationDate);
 
-        rightSide.addRow(3, new Label("Content"));
+        rightSide.addRow(3, new Label(Localization.lang("Content")));
         TextArea annotationContent = new TextArea();
 
         annotationContent.textProperty().bind(currentContent);
@@ -92,7 +91,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         annotationContent.setWrapText(true);
         rightSide.addColumn(1, annotationContent);
 
-        rightSide.addRow(4, new Label("Marking"));
+        rightSide.addRow(4, new Label(Localization.lang("Marking")));
         TextArea markingArea = new TextArea();
         markingArea.textProperty().bind(currentMarking);
         markingArea.setEditable(false);

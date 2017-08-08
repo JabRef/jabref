@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.util.HashMap;
 import java.util.Map;

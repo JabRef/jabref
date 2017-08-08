@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor;
+package org.jabref.gui.entryeditor.fileannotationtab;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -32,6 +32,8 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.entryeditor.EntryEditor;
+import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +45,7 @@ import com.jgoodies.forms.factories.Paddings;
 
 import static org.jabref.model.pdf.FileAnnotationType.NONE;
 
-class FileAnnotationTab extends EntryEditorTab {
+public class FileAnnotationTab extends EntryEditorTab {
 
     private final JList<FileAnnotation> annotationList = new JList<>();
     private final JScrollPane annotationScrollPane = new JScrollPane();
@@ -73,7 +75,7 @@ class FileAnnotationTab extends EntryEditorTab {
     private final EntryEditor parent;
     private DefaultListModel<FileAnnotation> listModel;
 
-    FileAnnotationTab(BibEntry entry, EntryEditor parent, FileAnnotationCache cache) {
+    public FileAnnotationTab(BibEntry entry, EntryEditor parent, FileAnnotationCache cache) {
         this.entry = entry;
         this.fileAnnotationCache = cache;
         this.parent = parent;
@@ -213,7 +215,7 @@ class FileAnnotationTab extends EntryEditorTab {
         markedTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
-        
+
         swingNode.setContent(FormBuilder.create()
                 .columns("0:grow, $lcgap, 0:grow")
                 .rows("fill:pref:grow")

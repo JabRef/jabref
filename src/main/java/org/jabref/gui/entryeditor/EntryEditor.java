@@ -47,6 +47,8 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
+import org.jabref.gui.entryeditor.fileannotationtab.FxFileAnnotationTab;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
 import org.jabref.gui.fieldeditors.TextField;
