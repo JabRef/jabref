@@ -377,7 +377,8 @@ task releaseJar(dependsOn: "shadowJar") {
                 fileName.replace('-fat', '')
             }
         }
-        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, true);
+        // set executable with read permissions (first true) and for all (false)
+        file("$buildDir/releases/JabRef-${project.version}.jar").setExecutable(true, false);
     }
 }
 
