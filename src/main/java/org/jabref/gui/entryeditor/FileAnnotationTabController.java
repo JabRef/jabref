@@ -19,10 +19,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
 
+import org.fxmisc.easybind.EasyBind;
+
 public class FileAnnotationTabController extends AbstractController<FileAnnotationTabViewModel> {
 
     @FXML ComboBox<String> files;
     @FXML ListView<FileAnnotationViewModel> annotationList;
+    @FXML Label author;
 
     @Inject private FileAnnotationCache fileAnnotationCache;
     @Inject private BibEntry entry;
@@ -63,5 +66,9 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         annotationList.setCellFactory(cellFactory);
         annotationList.setPlaceholder(new Label(Localization.lang("File has no attached annotations")));
         Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
+
+        // Set-up details pane
+        author.textProperty().bind(
+                EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::authorProperty));
     }
 }

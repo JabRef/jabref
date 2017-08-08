@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -25,16 +27,20 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
     private final ListProperty<FileAnnotationViewModel> annotations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<String> files = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<FileAnnotationViewModel> currentAnnotation = new SimpleObjectProperty<>();
     private Map<String, List<FileAnnotation>> fileAnnotations;
     private StringProperty currentAuthor = new SimpleStringProperty();
     private StringProperty currentPage = new SimpleStringProperty();
     private StringProperty currentDate = new SimpleStringProperty();
     private StringProperty currentContent = new SimpleStringProperty();
     private StringProperty currentMarking = new SimpleStringProperty();
-
     public FileAnnotationTabViewModel(FileAnnotationCache cache, BibEntry entry) {
         fileAnnotations = cache.getFromCache(entry);
         files.addAll(fileAnnotations.keySet());
+    }
+
+    public ObjectProperty<FileAnnotationViewModel> currentAnnotationProperty() {
+        return currentAnnotation;
     }
 
     public ListProperty<FileAnnotationViewModel> annotationsProperty() {
@@ -46,6 +52,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     }
 
     public void notifyNewSelectedAnnotation(FileAnnotationViewModel newAnnotation) {
+        currentAnnotation.set(newAnnotation);
         /*
         currentAuthor.setValue(newValue.getAuthor());
         currentPage.setValue(newValue.getPage());

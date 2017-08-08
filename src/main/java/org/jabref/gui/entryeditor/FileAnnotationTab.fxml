@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.MasterDetailPane?>
 <ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
             styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
@@ -25,7 +26,10 @@
             </BorderPane>
         </masterNode>
         <detailNode>
-
+            <VBox>
+                <Label text="%Author"/>
+                <Label fx:id="author"/>
+            </VBox>
         </detailNode>
     </MasterDetailPane>
 </ScrollPane>
