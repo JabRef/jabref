@@ -34,4 +34,22 @@ public class FileAnnotationViewModel extends FileAnnotation {
 
         return super.toString();
     }
+
+    public String getDescription() {
+        return null;
+    }
+
+    private String getMarking(FileAnnotation annotation) {
+        if (annotation.hasLinkedAnnotation()) {
+            return getContentOrNA(annotation.getLinkedFileAnnotation().getContent());
+        }
+        return "N/A";
+    }
+
+    private String getContentOrNA(String content) {
+        if (content.isEmpty()) {
+            return "N/A";
+        }
+        return content;
+    }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import org.controlsfx.control.MasterDetailPane?>
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
+            styleClass="fileAnnotationTab" xmlns="http://javafx.com/javafx/8.0.112"
+            fx:controller="org.jabref.gui.entryeditor.FileAnnotationTabController">
+    <MasterDetailPane prefHeight="581.0" prefWidth="488.0">
+        <masterNode>
+            <BorderPane>
+                <top>
+                    <HBox>
+                        <Label text="%Filename"/>
+                        <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </top>
+                <center>
+                    <ListView fx:id="annotationList"/>
+                </center>
+            </BorderPane>
+        </masterNode>
+        <detailNode>
+
+        </detailNode>
+    </MasterDetailPane>
+</ScrollPane>
