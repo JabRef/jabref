@@ -2,15 +2,25 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Optional;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.pdf.FileAnnotation;
 import org.jabref.model.pdf.FileAnnotationType;
 
 public class FileAnnotationViewModel extends FileAnnotation {
 
+    private StringProperty author = new SimpleStringProperty();
+
     public FileAnnotationViewModel(FileAnnotation annotation) {
         super(annotation.getAuthor(), annotation.getTimeModified(), annotation.getPage(), annotation.getContent(),
                 annotation.getAnnotationType(), annotation.hasLinkedAnnotation() ? Optional.of(annotation.getLinkedFileAnnotation()) : Optional.empty());
+        author.set(annotation.getContent()); // Use content just for test, since some annotations don't have an author
+    }
+
+    public StringProperty authorProperty() {
+        return author;
     }
 
     @Override
