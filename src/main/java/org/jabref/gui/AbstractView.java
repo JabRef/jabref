@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.scene.Parent;
 import javafx.stage.Stage;
@@ -11,7 +12,11 @@ import com.airhacks.afterburner.views.FXMLView;
 
 public class AbstractView extends FXMLView {
     public AbstractView() {
-        super();
+        this(f -> null);
+    }
+
+    public AbstractView(Function<String, Object> injectionContext) {
+        super(injectionContext);
 
         // Set resource bundle to internal localizations
         bundle = Localization.getMessages();

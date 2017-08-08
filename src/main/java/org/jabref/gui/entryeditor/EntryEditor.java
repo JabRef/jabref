@@ -279,7 +279,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new MathSciNetTab(entry));
         FileAnnotationCache annotationCache = panel.getAnnotationCache();
         tabs.add(new FileAnnotationTab(entry, this, annotationCache));
-        tabs.add(new FxFileAnnotationTab(frame, panel, this, annotationCache));
+        tabs.add(new FxFileAnnotationTab(this, annotationCache));
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
