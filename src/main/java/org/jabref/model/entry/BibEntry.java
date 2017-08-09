@@ -803,7 +803,8 @@ public class BibEntry implements Cloneable {
     /**
      * Gets a list of linked files.
      *
-     * @return the list of linked files, is never null but can be empty
+     * @return the list of linked files, is never null but can be empty.
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
      */
     public List<LinkedFile> getFiles() {
         //Extract the path
