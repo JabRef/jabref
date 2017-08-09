@@ -186,6 +186,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             addTabs(lastTabName);
+
+            tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+
             container.setScene(new Scene(tabbed));
         });
         add(container, BorderLayout.CENTER);

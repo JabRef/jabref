@@ -11,7 +11,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-
+- We made the font size in the entry editor and group panel customizable by "Menu and label font size". [#3034](https://github.com/JabRef/jabref/issues/3034)
 - If fetched article is already in database, then the entry merge dialog is shown.
 - An error message is now displayed if you try to create a group containing the keyword separator or if there is already a group with the same name. [#3075](https://github.com/JabRef/jabref/issues/3075) and [#1495](https://github.com/JabRef/jabref/issues/1495)
 
