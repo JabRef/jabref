@@ -39,6 +39,7 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
+import org.jabref.gui.filelist.ConfirmCloseFileListEntryEditor;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -123,14 +124,12 @@ public class FileListEntryEditor {
 
     private boolean dontOpenBrowseUntilDisposed;
 
-    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton,
-                               BibDatabaseContext databaseContext, boolean showSaveDialog) {
+    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton, BibDatabaseContext databaseContext, boolean showSaveDialog) {
         this(entry, showProgressBar, showOpenButton, databaseContext);
         this.showSaveDialog = showSaveDialog;
     }
 
-    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton,
-                               BibDatabaseContext databaseContext) {
+    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton, BibDatabaseContext databaseContext) {
         this.entry = entry;
         this.databaseContext = databaseContext;
 
