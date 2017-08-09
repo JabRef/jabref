@@ -11,6 +11,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.FXMLView;
 
 public class AbstractView extends FXMLView {
+
     public AbstractView() {
         this(f -> null);
     }
@@ -31,9 +32,12 @@ public class AbstractView extends FXMLView {
 
         // Notify controller about the stage, where it is displayed
         view.sceneProperty().addListener((observable, oldValue, newValue) -> {
-            Stage stage = (Stage) newValue.getWindow();
-            if (stage != null) {
-                getController().ifPresent(controller -> controller.setStage(stage));
+
+            if (newValue.getWindow() instanceof Stage) {
+                Stage stage = (Stage) newValue.getWindow();
+                if (stage != null) {
+                    getController().ifPresent(controller -> controller.setStage(stage));
+                }
             }
         });
         return view;
@@ -41,6 +45,6 @@ public class AbstractView extends FXMLView {
 
     private Optional<AbstractController> getController() {
         return Optional.ofNullable(presenterProperty.get()).map(
-                presenter -> (AbstractController)presenter);
+                presenter -> (AbstractController) presenter);
     }
 }
