@@ -224,6 +224,11 @@ Project: javafxsvg
 URL:     https://github.com/codecentric/javafxsvg
 License: BSD 3-Clause
 
+Id:      de.saxsys:mvvmfx
+Project: mvvm(fx)
+URL:     https://github.com/sialcasa/mvvmFX
+License: Apache-2.0
+
 Id:      com.github.tomtung
 Project: latex2unicode
 URL:     https://github.com/tomtung/latex2unicode

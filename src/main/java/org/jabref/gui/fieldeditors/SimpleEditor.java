@@ -9,14 +9,17 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
     @FXML private final SimpleEditorViewModel viewModel;
 
-    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider);
+    public SimpleEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new SimpleEditorViewModel(fieldName, suggestionProvider, fieldCheckers);
 
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
@@ -29,6 +32,9 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
             // If content selector values are present, then we want to show the auto complete suggestions immediately on focus
             autoCompleter.setShowOnFocus(true);
         }
+
+        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     @Override
