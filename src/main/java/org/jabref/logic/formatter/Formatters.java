@@ -76,7 +76,6 @@ public class Formatters {
             String regex = modifier.substring(5);
             RegexFormatter.setRegex(regex);
             formatter = ALL.stream().filter(f -> f.getKey().equals("regex")).findAny();
-
         } else {
             formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();
         }
