@@ -255,6 +255,8 @@ When accessing a preference value, the method Globals.prefs.getTYPE(key) has to 
 
 Defaults should go into the model package. See [here](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484) for the comment.
 
+See https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java (via https://github.com/JabRef/jabref/pull/3092) for the current way how to deal with preferences.
+
 ## Test Cases
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
 - *Placing:* all tests should be placed in a class named `classTest`, e.g. `BracesFormatterTest`. 
