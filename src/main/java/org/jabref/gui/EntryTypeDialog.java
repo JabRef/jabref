@@ -28,7 +28,6 @@ import javax.swing.SwingWorker;
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;

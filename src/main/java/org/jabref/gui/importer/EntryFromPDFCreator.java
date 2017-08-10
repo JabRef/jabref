@@ -15,7 +15,6 @@ import org.jabref.JabRefGUI;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
