@@ -7,6 +7,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
@@ -16,8 +17,8 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     private final BibDatabaseContext databaseContext;
     private final ListProperty<ParsedEntryLink> linkedEntries;
 
-    public LinkedEntriesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext) {
-        super(fieldName, suggestionProvider);
+    public LinkedEntriesEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, BibDatabaseContext databaseContext, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
 
         this.databaseContext = databaseContext;
         linkedEntries = new SimpleListProperty<>(FXCollections.observableArrayList());
