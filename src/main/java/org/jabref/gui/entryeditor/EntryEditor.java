@@ -58,7 +58,7 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.undo.UndoableRemoveEntry;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.Timestamps;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.gui.util.component.CheckBoxMessage;
 import org.jabref.gui.util.component.VerticalLabelUI;
 import org.jabref.logic.TypedBibEntry;
@@ -714,10 +714,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         private void updateTimestamp(UndoableEdit undoableEdit) {
-            if (Timestamps.includeTimestamps()) {
+            if (Globals.prefs.getTimestampPreferences().includeTimestamps()) {
                 NamedCompound compound = new NamedCompound(undoableEdit.getPresentationName());
                 compound.addEdit(undoableEdit);
-                UpdateField.updateField(entry, Timestamps.getFieldName(), Timestamps.now()).ifPresent(fieldChange -> compound.addEdit(new UndoableFieldChange(fieldChange)));
+                UpdateField.updateField(entry, Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now()).ifPresent(fieldChange -> compound.addEdit(new UndoableFieldChange(fieldChange)));
                 compound.end();
                 panel.getUndoManager().addEdit(compound);
             } else {

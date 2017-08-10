@@ -28,7 +28,7 @@ import javax.swing.SwingWorker;
 import org.jabref.Globals;
 import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.util.Timestamps;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
@@ -322,8 +322,8 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 		// Regenerate CiteKey of imported BibEntry
                         BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
                         // Update Timestamps
-                        if (Timestamps.includeCreatedTimestamp()) {
-                            bibEntry.setField(Timestamps.getFieldName(), Timestamps.now());
+                        if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                            bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
                         }
                         frame.getCurrentBasePanel().insertEntry(bibEntry);
                     }
