@@ -27,6 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where <kbd>DEL</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> in the search field triggered corresponding actions in the main table [#3067](https://github.com/JabRef/jabref/issues/3067)
 - We fixed an issue where JabRef freezed when editing an assigned file in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-311050976)
 - We fixed an issue where a file could not be assigned to an existing entry via the entry context menu action `Attach file` [#3080](https://github.com/JabRef/jabref/issues/3080)
+- We fixed an issue where entry editor was not focused after opening up. [#3052](https://github.com/JabRef/jabref/issues/3052) 
 
 ### Removed
 

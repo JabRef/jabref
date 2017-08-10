@@ -134,6 +134,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
     private final List<SearchQueryHighlightListener> searchListeners = new ArrayList<>();
+    private final JFXPanel container;
 
     /**
      * Indicates that we are about to go to the next or previous entry
@@ -153,7 +154,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setLayout(borderLayout);
         setupToolBar();
 
-        JFXPanel container = new JFXPanel();
+        container = new JFXPanel();
 
         container.addKeyListener(new KeyAdapter() {
 
@@ -412,10 +413,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     @Override
     public void requestFocus() {
-        EntryEditorTab activeTab = (EntryEditorTab) tabbed.getSelectionModel().getSelectedItem();
-        if (activeTab != null) {
-            activeTab.requestFocus();
-        }
+        container.requestFocus();
     }
 
     /**
