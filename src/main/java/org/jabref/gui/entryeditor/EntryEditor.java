@@ -11,8 +11,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +30,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.undo.UndoableEdit;
 
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
@@ -72,7 +71,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
-import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
@@ -482,21 +480,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 + Localization.lang("Grouping may not work for this entry."));
     }
 
-    private boolean updateTimeStampIsSet() {
-        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
-                && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
-    }
-
-    /**
-     * Updates the timestamp of the given entry and returns the FieldChange
-     */
-    private Optional<FieldChange> doUpdateTimeStamp() {
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String timeStampFormat = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
-        String timestamp = DateTimeFormatter.ofPattern(timeStampFormat).format(LocalDateTime.now());
-        return UpdateField.updateField(entry, timeStampField, timestamp);
-    }
-
     private class TypeButton extends JButton {
 
         private TypeButton() {
@@ -639,15 +622,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(entry, oldValue, newValue);
-                if (updateTimeStampIsSet()) {
-                    NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
-                    ce.addEdit(undoableKeyChange);
-                    doUpdateTimeStamp().ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-                    ce.end();
-                    panel.getUndoManager().addEdit(ce);
-                } else {
-                    panel.getUndoManager().addEdit(undoableKeyChange);
-                }
+                updateTimestamp(undoableKeyChange);
 
                 textField.setValidBackgroundColor();
 
@@ -709,18 +684,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry,
                                 fieldEditor.getFieldName(), oldValue, toSet);
-                        if (updateTimeStampIsSet()) {
-                            NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
-                            ce.addEdit(undoableFieldChange);
-
-                            doUpdateTimeStamp()
-                                    .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-                            ce.end();
-
-                            panel.getUndoManager().addEdit(ce);
-                        } else {
-                            panel.getUndoManager().addEdit(undoableFieldChange);
-                        }
+                        updateTimestamp(undoableFieldChange);
 
                         panel.markBaseChanged();
                     } catch (InvalidFieldValueException ex) {
@@ -745,6 +709,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 SwingUtilities.invokeLater(() -> {
                     panel.getMainTable().ensureVisible(entry);
                 });
+            }
+        }
+
+        private void updateTimestamp(UndoableEdit undoableEdit) {
+            if (Globals.prefs.getTimestampPreferences().includeTimestamps()) {
+                NamedCompound compound = new NamedCompound(undoableEdit.getPresentationName());
+                compound.addEdit(undoableEdit);
+                UpdateField.updateField(entry, Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now()).ifPresent(fieldChange -> compound.addEdit(new UndoableFieldChange(fieldChange)));
+                compound.end();
+                panel.getUndoManager().addEdit(compound);
+            } else {
+                panel.getUndoManager().addEdit(undoableEdit);
             }
         }
     }
