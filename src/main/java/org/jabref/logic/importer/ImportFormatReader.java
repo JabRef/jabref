@@ -45,7 +45,6 @@ public class ImportFormatReader {
 
     private ImportFormatPreferences importFormatPreferences;
 
-
     public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XMPPreferences xmpPreferences) {
         this.importFormatPreferences = newImportFormatPreferences;
 
@@ -150,7 +149,6 @@ public class ImportFormatReader {
 
         public final String format;
         public final ParserResult parserResult;
-
 
         public UnknownFormatImport(String format, ParserResult parserResult) {
             this.format = format;

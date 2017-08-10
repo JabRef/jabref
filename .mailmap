@@ -4,6 +4,9 @@
 # duplicates that aren't also email duplicates): scan the output of:
 #   git log --format='%aE - %aN' | sort --unique --ignore-case
 #
+# One can find out the real name by using the GitHub API.
+# E.g., https://api.github.com/users/sauliusg/events/public
+#
 # For explanation on this file format: man git-shortlog
 Ruy Minoru Ito Takata <ruy.takata@gmail.com>
 Ruy Minoru Ito Takata <ruy.takata@gmail.com> <21537850814@serpro-1557637.(none)>
@@ -109,3 +112,12 @@ Arno Blouin <blouin.arno@gmail.com>
 Jeff Miller <miller@psy.otago.ac.nz>
 Alain Vaucher <avaucher@users.noreply.github.com>
 Daniel Mair <mairdl.dev@gmail.com> <mairdl.dev@googlemail.com>
+Sven Jäger <svenjaeger@gmx.de>
+Tim van Rossum <trvanrossum@gmail.com>
+Saulius Gražulis <grazulis@ibt.lt>
+Rolf Starre <rolf.starre@gmail.com> <RolfStarre@users.noreply.github.com>
+Owen Huang <ohuang12@users.noreply.github.com>
+Anita Armbruster <armbruan@gmail.com>
+Fabian Bauer <125m125@users.noreply.github.com>
+Jong-Ho Shinn <jhshinn@kaist.edu>
+Nadeem Mahmood <mahmoodn@purdue.edu>

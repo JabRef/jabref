@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +10,6 @@ import org.jabref.model.strings.StringUtil;
 
 /**
  * String constants for BibTeX entry field names
- *
  */
 public class FieldName {
     // Character separating field names that are to be used in sequence as
@@ -153,7 +151,7 @@ public class FieldName {
     public static final String MARKED_INTERNAL = "__markedentry";
 
     // Map to hold alternative display names
-    private static final Map<String, String> displayNames = new HashMap<>();
+    private static final Map<String, String> DISPLAY_NAMES = new HashMap<>();
 
     private FieldName() {
     }
@@ -167,15 +165,15 @@ public class FieldName {
     }
 
     static {
-        displayNames.put(FieldName.DOI, "DOI");
-        displayNames.put(FieldName.ISBN, "ISBN");
-        displayNames.put(FieldName.ISRN, "ISRN");
-        displayNames.put(FieldName.ISSN, "ISSN");
-        displayNames.put(FieldName.PMID, "PMID");
-        displayNames.put(FieldName.PS, "PS");
-        displayNames.put(FieldName.PDF, "PDF");
-        displayNames.put(FieldName.URI, "URI");
-        displayNames.put(FieldName.URL, "URL");
+        DISPLAY_NAMES.put(FieldName.DOI, "DOI");
+        DISPLAY_NAMES.put(FieldName.ISBN, "ISBN");
+        DISPLAY_NAMES.put(FieldName.ISRN, "ISRN");
+        DISPLAY_NAMES.put(FieldName.ISSN, "ISSN");
+        DISPLAY_NAMES.put(FieldName.PMID, "PMID");
+        DISPLAY_NAMES.put(FieldName.PS, "PS");
+        DISPLAY_NAMES.put(FieldName.PDF, "PDF");
+        DISPLAY_NAMES.put(FieldName.URI, "URI");
+        DISPLAY_NAMES.put(FieldName.URL, "URL");
     }
 
     /**
@@ -185,16 +183,17 @@ public class FieldName {
     public static String getDisplayName(String field) {
         String lowercaseField = field.toLowerCase(Locale.ROOT);
 
-        if (displayNames.containsKey(lowercaseField)) {
-            return displayNames.get(lowercaseField);
+        if (DISPLAY_NAMES.containsKey(lowercaseField)) {
+            return DISPLAY_NAMES.get(lowercaseField);
         }
         return StringUtil.capitalizeFirst(field);
     }
 
-    public static ArrayList getNotTextFieldNames() {
-        ArrayList<String> notTextFieldNames = new ArrayList<>();
-        notTextFieldNames.addAll(Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR));
-    return notTextFieldNames;
+    public static List<String> getNotTextFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.FILE, FieldName.URL, FieldName.URI, FieldName.ISBN, FieldName.ISSN, FieldName.MONTH, FieldName.DATE, FieldName.YEAR);
     }
 
+    public static List<String> getIdentifierFieldNames() {
+        return Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.PMID);
+    }
 }

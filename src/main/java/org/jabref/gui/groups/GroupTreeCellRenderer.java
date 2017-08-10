@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.border.Border;
@@ -87,10 +86,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         label.setToolTipText(viewModel.getDescription());
 
-        Icon icon = viewModel.getIcon();
-        if (label.getIcon() != icon) {
-            label.setIcon(icon);
-        }
         return c;
     }
 
@@ -109,31 +104,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
             return false;
         }
         return matchingGroups.contains(viewModel.getNode());
-    }
-
-    /**
-     * For use when dragging: The specified cell is always rendered as selected.
-     *
-     * @param cell The cell over which the user is currently dragging.
-     */
-    public void setHighlight1Cell(Object cell) {
-        this.highlight1Cell = cell;
-    }
-
-    /**
-     * Highlights the specified groups in red.
-     */
-    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.overlappingGroups = nodes;
-    }
-
-    /**
-     * Highlights the specified groups by underlining.
-     */
-    public void setMatchingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.matchingGroups = nodes;
     }
 
     /**

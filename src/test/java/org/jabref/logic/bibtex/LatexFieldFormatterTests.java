@@ -1,12 +1,15 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Collections;
+
 import org.jabref.logic.util.OS;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class LatexFieldFormatterTests {
 
@@ -14,7 +17,7 @@ public class LatexFieldFormatterTests {
 
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences());
+        this.formatter = new LatexFieldFormatter(mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
@@ -109,4 +112,20 @@ public class LatexFieldFormatterTests {
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
     }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = new LatexFieldFormatterPreferences(
+                false, Collections.emptyList(), new FieldContentParserPreferences());
+        LatexFieldFormatter formatter = new LatexFieldFormatter(latexFieldFormatterPreferences);
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
 }

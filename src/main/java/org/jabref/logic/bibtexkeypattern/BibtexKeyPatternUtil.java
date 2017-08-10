@@ -489,7 +489,7 @@ public class BibtexKeyPatternUtil {
                     Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
                     if (formatter.isPresent()) {
                         resultingLabel = formatter.get().format(label);
-                    } else if (!modifier.isEmpty() && (modifier.length()>= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                    } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                         // Alternate text modifier in parentheses. Should be inserted if
                         // the label is empty:
                         if (label.isEmpty() && (modifier.length() > 2)) {
@@ -524,8 +524,13 @@ public class BibtexKeyPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getField(FieldName.AUTHOR)
-                        .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                String authString;
+                if (database != null) {
+                    authString = entry.getField(FieldName.AUTHOR)
+                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                } else {
+                    authString = entry.getField(FieldName.AUTHOR).orElse("");
+                }
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
@@ -534,8 +539,12 @@ public class BibtexKeyPatternUtil {
                 }
 
                 if (authString.isEmpty()) {
-                    authString = entry.getField(FieldName.EDITOR)
+                    if (database != null) {
+                        authString = entry.getField(FieldName.EDITOR)
                             .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                    } else {
+                        authString = entry.getField(FieldName.EDITOR).orElse("");
+                    }
                 }
 
                 // Gather all author-related checks, so we don't
@@ -635,6 +644,8 @@ public class BibtexKeyPatternUtil {
                 }
             } else if ("firstpage".equals(val)) {
                 return firstPage(entry.getField(FieldName.PAGES).orElse(""));
+            } else if ("pageprefix".equals(val)) {
+                return pagePrefix(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("title".equals(val)) {
@@ -671,7 +682,7 @@ public class BibtexKeyPatternUtil {
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return separatedKeywords.get(num-1).toString();
+                    return separatedKeywords.get(num - 1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -824,7 +835,6 @@ public class BibtexKeyPatternUtil {
 
         return stringJoiner.toString();
     }
-
 
     public static String removeSmallWords(String title) {
         StringJoiner stringJoiner = new StringJoiner(" ");
@@ -1293,6 +1303,26 @@ public class BibtexKeyPatternUtil {
             return "";
         } else {
             return String.valueOf(result);
+        }
+    }
+
+    /**
+     * Return the non-digit prefix of pages
+     *
+     * @param pages
+     *            a pages string such as L42--111 or L7,41,73--97 or L43+
+     *
+     * @return the non-digit prefix of pages (like "L" of L7)
+     *         or "" if no non-digit prefix is found in the string
+     *
+     * @throws NullPointerException
+     *             if pages is null.
+     */
+    public static String pagePrefix(String pages) {
+        if (pages.matches("^\\D+.*$")) {
+            return (pages.split("\\d+"))[0];
+        } else {
+            return "";
         }
     }
 

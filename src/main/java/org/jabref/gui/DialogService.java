@@ -1,11 +1,13 @@
 package org.jabref.gui;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.stage.FileChooser;
 
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -15,6 +17,8 @@ import org.jabref.logic.l10n.Localization;
  * This interface provides methods to create dialogs and show them to the user.
  */
 public interface DialogService {
+
+    Optional<String> showInputDialogAndWait(String title, String content);
 
     /**
      * This will create and display a new information dialog.
@@ -64,7 +68,7 @@ public interface DialogService {
     /**
      * This will create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
-     * a OK and Cancel Button. To create a confirmation dialog with custom
+     * a OK and Cancel button. To create a confirmation dialog with custom
      * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
      *
      * @return true if the use clicked "OK" otherwise false
@@ -74,12 +78,22 @@ public interface DialogService {
     /**
      * Create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
-     * a OK (with given label) and Cancel Button. To create a confirmation dialog with custom
+     * a OK (with given label) and Cancel button. To create a confirmation dialog with custom
      * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
      *
      * @return true if the use clicked "OK" otherwise false
      */
     boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel);
+
+    /**
+     * Create and display a new confirmation dialog.
+     * It will include a blue question icon on the left and
+     * a OK (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+     *
+     * @return true if the use clicked "OK" otherwise false
+     */
+    boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel);
 
     /**
      * This will create and display a new dialog of the specified
@@ -133,6 +147,16 @@ public interface DialogService {
     Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration);
 
     /**
+     * Shows a new file open dialog. The method doesn't return until the
+     * displayed open dialog is dismissed. The return value specifies
+     * the files chosen by the user or an empty {@link List} if no selection has been
+     * made.
+     *
+     * @return the selected files or an empty {@link List} if no file has been selected
+     */
+    List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration);
+
+    /**
      * Shows a new directory selection dialog. The method doesn't return until the
      * displayed open dialog is dismissed. The return value specifies
      * the file chosen by the user or an empty {@link Optional} if no selection has been
@@ -141,4 +165,12 @@ public interface DialogService {
      * @return the selected directory or an empty {@link Optional} if no directory has been selected
      */
     Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration);
+
+    /**
+     * Gets the configured {@link FileChooser}, should only be necessary in rare use cases.
+     * For normal usage use the show-Methods which directly return the selected file(s)
+     * @param fileDialogConfiguration
+     * @return A configured instance of the {@link FileChooser}
+     */
+    FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration);
 }

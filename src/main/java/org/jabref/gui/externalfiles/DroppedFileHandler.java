@@ -40,6 +40,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.IdGenerator;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -145,8 +146,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : Paths.get(fileName).toString();
@@ -197,8 +198,8 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
@@ -282,8 +283,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName),
-                    panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences()))
+            destFilename = FileUtil.shortenFileName(Paths.get(fileName),
+                    panel.getBibDatabaseContext().getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
             if (renameCheckBox.isSelected() || (single == null)) {
@@ -416,15 +417,15 @@ public class DroppedFileHandler {
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+            List<Path> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
             } else {
-                Optional<File> file = FileUtil.expandFilename(filename, dirs);
+                Optional<Path> file = FileHelper.expandFilenameAsPath(filename, dirs);
                 if (file.isPresent()) {
-                    absFilename = file.get().getAbsolutePath();
+                    absFilename = file.get().toAbsolutePath().toString();
                 } else {
                     absFilename = ""; // This shouldn't happen based on the old code, so maybe one should set it something else?
                 }
@@ -435,17 +436,12 @@ public class DroppedFileHandler {
             for (int i = 0; i < tm.getRowCount(); i++) {
                 FileListEntry flEntry = tm.getEntry(i);
                 // Find the absolute filename for this existing link:
-                String absName;
-                if (new File(flEntry.getLink()).isAbsolute() || dirs.isEmpty()) {
-                    absName = flEntry.getLink();
-                } else {
-                    Optional<File> file = FileUtil.expandFilename(flEntry.getLink(), dirs);
-                    if (file.isPresent()) {
-                        absName = file.get().getAbsolutePath();
-                    } else {
-                        absName = null;
-                    }
-                }
+                String absName = flEntry.toParsedFileField()
+                        .findIn(dirs)
+                        .map(Path::toAbsolutePath)
+                        .map(Path::toString)
+                        .orElse(null);
+
                 LOGGER.debug("absName: " + absName);
                 // If the filenames are equal, we don't need to link, so we simply return:
                 if (absFilename.equals(absName)) {

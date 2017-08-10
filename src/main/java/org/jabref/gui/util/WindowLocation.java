@@ -53,7 +53,7 @@ public class WindowLocation {
         WindowPosition storedPosition = getStoredLocation();
 
         // preference values are wrong/not in multi-monitor setup anymore
-        if(!isDisplayable(storedPosition)) {
+        if (!isDisplayable(storedPosition)) {
             // adapt position to be inside available boundaries
             storedPosition = adaptPosition(storedPosition);
         }

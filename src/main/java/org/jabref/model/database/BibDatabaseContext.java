@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
@@ -143,6 +145,20 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
+    public List<Path> getFileDirectoriesAsPaths(FileDirectoryPreferences preferences) {
+        // Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
+        return getFileDirectories(preferences).stream()
+                .filter(s -> !s.isEmpty())
+                .map(Paths::get)
+                .map(Path::toAbsolutePath)
+                .map(Path::normalize)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @deprecated use {@link #getFileDirectoriesAsPaths(FileDirectoryPreferences)} instead
+     */
+    @Deprecated
     public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
         return getFileDirectories(FieldName.FILE, preferences);
     }
@@ -153,9 +169,7 @@ public class BibDatabaseContext {
      * @return Optional of Path
      */
     public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
-        return getFileDirectories(preferences).stream().filter(s -> !s.isEmpty()).map(p -> Paths.get(p))
-                .filter(Files::exists).findFirst();
-        //Filter for empty string, as this would be expanded to the jar-directory with Paths.get()
+        return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
     }
 
     /**
@@ -191,13 +205,17 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFileDirectory(fieldName).ifPresent(path ->
-            fileDirs.add(path.toAbsolutePath().toString())
-        );
+        preferences.getFileDirectory(fieldName).ifPresent(path -> fileDirs.add(path.toAbsolutePath().toString()));
 
         // 4. BIB file directory
         getDatabasePath().ifPresent(dbPath -> {
-            String parentDir = dbPath.getParent().toAbsolutePath().toString();
+            Objects.requireNonNull(dbPath, "dbPath is null");
+            Path parentPath = dbPath.getParent();
+            if (parentPath == null) {
+                parentPath = Paths.get(System.getProperty("user.dir"));
+            }
+            Objects.requireNonNull(parentPath, "BibTex database parent path is null");
+            String parentDir = parentPath.toAbsolutePath().toString();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
@@ -266,5 +284,9 @@ public class BibDatabaseContext {
         }
 
         this.location = DatabaseLocation.LOCAL;
+    }
+
+    public List<BibEntry> getEntries() {
+        return database.getEntries();
     }
 }

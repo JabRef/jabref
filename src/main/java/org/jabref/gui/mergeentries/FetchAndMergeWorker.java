@@ -18,7 +18,6 @@ import org.jabref.model.entry.FieldName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class FetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(FetchAndMergeWorker.class);

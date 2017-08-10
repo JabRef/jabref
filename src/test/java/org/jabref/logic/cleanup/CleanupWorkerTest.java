@@ -15,7 +15,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.Defaults;
@@ -25,11 +25,10 @@ import org.jabref.model.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,12 +60,10 @@ public class CleanupWorkerTest {
         FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
         when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Biblocation as Primary overwrites all other dirs
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-
         worker = new CleanupWorker(context,
-                new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                new CleanupPreferences("\\bibtexkey",
                         "", //empty fileDirPattern for backwards compatibility
-                        prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                        mock(LayoutFormatterPreferences.class),
                         fileDirPrefs));
 
     }
@@ -98,8 +95,8 @@ public class CleanupWorkerTest {
         entry.setField("title", "<b>hallo</b> units 1 A case AlGaAs and latex $\\alpha$$\\beta$");
         entry.setField("abstract", "Réflexions");
         File tempFile = bibFolder.newFile();
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         List<FieldChange> changes = worker.cleanup(emptyPreset, entry);
         Assert.assertEquals(Collections.emptyList(), changes);
@@ -225,12 +222,12 @@ public class CleanupWorkerTest {
         File tempFile = new File(subfolder, "test.pdf");
         tempFile.createNewFile();
         BibEntry entry = new BibEntry();
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
-        ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", tempFile.getName(), "");
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -239,12 +236,12 @@ public class CleanupWorkerTest {
 
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
-        ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", tempFile.getName(), "");
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -254,12 +251,12 @@ public class CleanupWorkerTest {
         File tempFile = bibFolder.newFile();
         BibEntry entry = new BibEntry();
         entry.setCiteKey("Toot");
-        ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(fileField));
+        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
+        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
         worker.cleanup(preset, entry);
-        ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
+        Assert.assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test

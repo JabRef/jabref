@@ -14,23 +14,24 @@ public class Languages {
         LANGUAGES = new TreeMap<>();
 
         // LANGUAGES contains mappings for supported languages.
+        LANGUAGES.put("Bahasa Indonesia", "in");
+        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
         LANGUAGES.put("Dansk", "da");
         LANGUAGES.put("Deutsch", "de");
         LANGUAGES.put("English", "en");
         LANGUAGES.put("Español", "es");
-        LANGUAGES.put("Persian (فارسی)", "fa");
         LANGUAGES.put("Français", "fr");
-        LANGUAGES.put("Bahasa Indonesia", "in");
         LANGUAGES.put("Italiano", "it");
         LANGUAGES.put("Japanese", "ja");
         LANGUAGES.put("Nederlands", "nl");
         LANGUAGES.put("Norsk", "no");
-        LANGUAGES.put("Brazilian Portuguese", "pt_BR");
+        LANGUAGES.put("Persian (فارسی)", "fa");
         LANGUAGES.put("Russian", "ru");
+        LANGUAGES.put("Simplified Chinese", "zh");
         LANGUAGES.put("Svenska", "sv");
         LANGUAGES.put("Turkish", "tr");
         LANGUAGES.put("Vietnamese", "vi");
-        LANGUAGES.put("Simplified Chinese", "zh");
+        LANGUAGES.put("ελληνικά", "el");
     }
 
     private Languages() {
@@ -40,17 +41,22 @@ public class Languages {
         Objects.requireNonNull(language);
 
         if (!LANGUAGES.values().contains(language)) {
-            if (!language.contains("_")) {
-                return Optional.empty();
-            }
-
-            String lang = language.split("_")[0];
-            if (!LANGUAGES.values().contains(lang)) {
-                return Optional.empty();
-            }
-            return Optional.of(new Locale(lang));
+            return Optional.empty();
+        }
+        //Very important to split languages like pt_BR into two parts, because otherwise the country would be threated lowercase
+        //and create problems in loading
+        String[] languageParts = language.split("_");
+        Locale locale;
+        if (languageParts.length == 1) {
+            locale = new Locale(languageParts[0]);
+        } else if (languageParts.length == 2) {
+            locale = new Locale(languageParts[0], languageParts[1]);
+        } else {
+            locale = Locale.ENGLISH;
         }
 
-        return Optional.of(new Locale(language));
+        return Optional.of(locale);
+
     }
+
 }

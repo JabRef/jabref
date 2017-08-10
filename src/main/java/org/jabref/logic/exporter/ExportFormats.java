@@ -10,10 +10,10 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 
 public class ExportFormats {
 
-    private static final Map<String, IExportFormat> EXPORT_FORMATS = new TreeMap<>();
-
     // Global variable that is used for counting output entries when exporting:
     public static int entryNumber;
+
+    private static final Map<String, IExportFormat> EXPORT_FORMATS = new TreeMap<>();
 
     private ExportFormats() {
     }

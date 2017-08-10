@@ -65,7 +65,7 @@ public interface Formatter {
      * @return true if the object is a formatter with the same key
      */
     default boolean defaultEquals(Object obj) {
-        if(obj instanceof Formatter) {
+        if (obj instanceof Formatter) {
             return getKey().equals(((Formatter)obj).getKey());
         } else {
             return false;

@@ -81,11 +81,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class SearchResultFrame {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
-
-    private final JabRefFrame frame;
-
-    private JFrame searchResultFrame;
     private static final String[] FIELDS = new String[] {
             FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
     };
@@ -93,6 +88,11 @@ public class SearchResultFrame {
     private static final int FILE_COL = 1;
     private static final int URL_COL = 2;
     private static final int PAD = 3;
+
+    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
+
+    private final JabRefFrame frame;
+    private JFrame searchResultFrame;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -390,27 +390,27 @@ public class SearchResultFrame {
         entries.add(entry);
         entryHome.put(entry, panel);
 
-        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()){
+        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()) {
             preview.setEntry(entry);
             preview.setBasePanel(panel);
             preview.setDatabaseContext(panel.getBibDatabaseContext());
         }
     }
 
-    private void selectEntryInBasePanel(BibEntry entry){
+    private void selectEntryInBasePanel(BibEntry entry) {
         BasePanel basePanel = entryHome.get(entry);
         frame.showBasePanel(basePanel);
         basePanel.requestFocus();
         basePanel.highlightEntry(entry);
     }
 
-    public void dispose(){
+    public void dispose() {
         frame.getGlobalSearchBar().setSearchResultFrame(null);
         searchResultFrame.dispose();
         frame.getGlobalSearchBar().focus();
     }
 
-    public void focus(){
+    public void focus() {
         entryTable.requestFocus();
     }
 
@@ -567,7 +567,7 @@ public class SearchResultFrame {
         public String getColumnName(int column) {
             if (column >= PAD) {
                 return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
-            } else if (column == DATABASE_COL){
+            } else if (column == DATABASE_COL) {
                 return Localization.lang("Library");
             } else {
                 return "";

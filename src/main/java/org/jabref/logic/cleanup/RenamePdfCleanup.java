@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,15 +12,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +36,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final LayoutFormatterPreferences layoutPrefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
-    private ParsedFileField singleFieldCleanup;
+    private LinkedFile singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             LayoutFormatterPreferences layoutPrefs,
@@ -50,7 +50,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             LayoutFormatterPreferences layoutPrefs,
-            FileDirectoryPreferences fileDirectoryPreferences, ParsedFileField singleField) {
+            FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
 
         this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPrefs,
                 fileDirectoryPreferences);
@@ -60,23 +60,26 @@ public class RenamePdfCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
-        List<ParsedFileField> newFileList;
-        List<ParsedFileField> fileList;
+        List<LinkedFile> newFileList;
+        List<LinkedFile> fileList;
         if (singleFieldCleanup != null) {
             fileList = Arrays.asList(singleFieldCleanup);
 
-            newFileList = typedEntry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
+            newFileList = entry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
-            fileList = typedEntry.getFiles();
+            fileList = entry.getFiles();
         }
 
         boolean changed = false;
 
-        for (ParsedFileField flEntry : fileList) {
+        for (LinkedFile flEntry : fileList) {
             String realOldFilename = flEntry.getLink();
+
+            if (StringUtil.isBlank(realOldFilename)) {
+                continue; //Skip empty filenames
+            }
 
             if (onlyRelativePaths && Paths.get(realOldFilename).isAbsolute()) {
                 newFileList.add(flEntry);
@@ -84,8 +87,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             //old path and old filename
-            Optional<Path> expandedOldFile = FileUtil.expandFilename(realOldFilename,
-                    databaseContext.getFileDirectories(fileDirectoryPreferences)).map(File::toPath);
+            Optional<Path> expandedOldFile = flEntry.findIn(databaseContext, fileDirectoryPreferences);
 
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
@@ -137,7 +139,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     } else {
                         newFileEntryFileName = parent.relativize(newPath).toString();
                     }
-                    newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
+                    newFileList.add(new LinkedFile(description, newFileEntryFileName, type));
                 }
             } else {
                 unsuccessfulRenames++;
@@ -157,14 +159,14 @@ public class RenamePdfCleanup implements CleanupJob {
         return Collections.emptyList();
     }
 
-    public String getTargetFileName(ParsedFileField flEntry, BibEntry entry) {
+    public String getTargetFileName(LinkedFile flEntry, BibEntry entry) {
         String realOldFilename = flEntry.getLink();
 
         StringBuilder targetFileName = new StringBuilder(FileUtil
                 .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
                 .trim());
         //Add extension to newFilename
-        targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+        targetFileName.append('.').append(FileHelper.getFileExtension(realOldFilename).orElse("pdf"));
         return targetFileName.toString();
     }
 

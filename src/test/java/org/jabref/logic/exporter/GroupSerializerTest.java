@@ -50,7 +50,7 @@ public class GroupSerializerTest {
     @Test
     public void serializeSingleExplicitGroupWithIconAndDescription() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        group.setIconCode("test icon");
+        group.setIconName("test icon");
         group.setExpanded(true);
         group.setColor(Color.ALICEBLUE);
         group.setDescription("test description");
@@ -96,9 +96,9 @@ public class GroupSerializerTest {
 
     @Test
     public void serializeSingleAutomaticKeywordGroup() {
-        AutomaticGroup group = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "keywords", ',');
+        AutomaticGroup group = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, "keywords", ',', '>');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
-        assertEquals(Collections.singletonList("0 AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;1;;;;"), serialization);
+        assertEquals(Collections.singletonList("0 AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;>;1;;;;"), serialization);
     }
 
     @Test

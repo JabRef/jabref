@@ -17,6 +17,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtex.comparator.EntryComparator;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -29,7 +30,6 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.Defaults;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.EntrySorter;
@@ -47,16 +47,16 @@ public class ChangeScanner implements Runnable {
 
     private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
+    private static final double MATCH_THRESHOLD = 0.4;
     private final File file;
     private final BibDatabase databaseInMemory;
     private final MetaData metadataInMemory;
-    private final BasePanel panel;
 
+    private final BasePanel panel;
     private final JabRefFrame frame;
     private BibDatabase databaseInTemp;
-    private MetaData metadataInTemp;
 
-    private static final double MATCH_THRESHOLD = 0.4;
+    private MetaData metadataInTemp;
 
     /**
      * We create an ArrayList to hold the changes we find. These will be added in the form
@@ -463,7 +463,6 @@ public class ChangeScanner implements Runnable {
             changes.add(new GroupChange(groupsDisk.get(), groupsTmp.get()));
         }
     }
-
 
     @FunctionalInterface
     public interface DisplayResultCallback {

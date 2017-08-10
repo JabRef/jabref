@@ -2,7 +2,11 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +21,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import org.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -61,7 +67,7 @@ import org.apache.commons.logging.LogFactory;
  * More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
  * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
  */
-public class ModsImporter extends Importer {
+public class ModsImporter extends Importer implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
@@ -69,7 +75,6 @@ public class ModsImporter extends Importer {
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
     private JAXBContext context;
-
 
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
@@ -477,4 +482,13 @@ public class ModsImporter extends Importer {
         return "Importer for the MODS format";
     }
 
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+        try {
+            return importDatabase(new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+        } catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage(), e);
+        }
+        return Collections.emptyList();
+    }
 }

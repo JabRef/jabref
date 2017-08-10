@@ -7,10 +7,11 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 
 public class NoteChecker implements ValueChecker {
 
-    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
+    private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[^a-z]").asPredicate();
 
     private final BibDatabaseContext bibDatabaseContextEdition;
 
@@ -27,6 +28,10 @@ public class NoteChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         //BibTeX
         if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.trim())) {
             return Optional.of(Localization.lang("should have the first letter capitalized"));

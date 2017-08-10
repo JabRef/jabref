@@ -24,17 +24,12 @@ public class KeyBindingViewModel {
 
     private KeyBinding keyBinding = null;
     private String realBinding = "";
+    private final ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
+    private final KeyBindingRepository keyBindingRepository;
     private final SimpleStringProperty displayName = new SimpleStringProperty();
     private final SimpleStringProperty shownBinding = new SimpleStringProperty();
+
     private final KeyBindingCategory category;
-
-    public ObservableList<KeyBindingViewModel> getChildren() {
-        return children;
-    }
-
-    private ObservableList<KeyBindingViewModel> children = FXCollections.observableArrayList();
-    private KeyBindingRepository keyBindingRepository;
-
 
     public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBinding keyBinding, String binding) {
         this(keyBindingRepository, keyBinding.getCategory());
@@ -47,6 +42,10 @@ public class KeyBindingViewModel {
         this.keyBindingRepository = keyBindingRepository;
         this.category = category;
         setDisplayName();
+    }
+
+    public ObservableList<KeyBindingViewModel> getChildren() {
+        return children;
     }
 
     public KeyBinding getKeyBinding() {
@@ -92,6 +91,7 @@ public class KeyBindingViewModel {
      */
     public boolean setNewBinding(KeyEvent evt) {
         // validate the shortcut is no modifier key
+
         KeyCode code = evt.getCode();
         if (code.isModifierKey() || (code == KeyCode.BACK_SPACE) || (code == KeyCode.SPACE) || (code == KeyCode.TAB)
                 || (code == KeyCode.ENTER) || (code == KeyCode.UNDEFINED)) {
@@ -101,13 +101,13 @@ public class KeyBindingViewModel {
         // gather the pressed modifier keys
         String modifiers = "";
         if (evt.isControlDown()) {
-            modifiers = "ctrl ";
+            modifiers = "ctrl+";
         }
         if (evt.isShiftDown()) {
-            modifiers += "shift ";
+            modifiers += "shift+";
         }
         if (evt.isAltDown()) {
-            modifiers += "alt ";
+            modifiers += "alt+";
         }
 
         // if no modifier keys are pressed, only special keys can be shortcuts
@@ -128,7 +128,7 @@ public class KeyBindingViewModel {
      */
     public void resetToDefault() {
         if (!isCategory()) {
-            String key = getKeyBinding().getKey();
+            String key = getKeyBinding().getConstant();
             keyBindingRepository.resetToDefault(key);
             setBinding(keyBindingRepository.get(key));
         }

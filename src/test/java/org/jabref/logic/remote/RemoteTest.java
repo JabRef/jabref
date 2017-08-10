@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import org.jabref.logic.remote.client.RemoteListenerClient;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
@@ -91,7 +92,7 @@ public class RemoteTest {
                 @Override
                 public void run() {
                     try (Socket socket2 = socket.accept(); OutputStream os = socket2.getOutputStream()) {
-                        os.write("whatever".getBytes("UTF8"));
+                        os.write("whatever".getBytes(StandardCharsets.UTF_8));
                     } catch (IOException e) {
                         // Ignored
                     }

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.swing.BorderFactory;
@@ -19,8 +20,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.JabRefPreferences;
@@ -58,7 +62,13 @@ public class ExternalFileTypeEntryEditor {
             appDir = Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new FileDialog(fParent, appDir).showDialogAndGetSelectedFile();
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .withInitialDirectory(Paths.get(appDir)).build();
+        DialogService ds = new FXDialogService();
+
+        Optional<Path> path = DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+
         path.ifPresent(applicationDir -> {
             if (applicationDir.getParent() != null) {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, applicationDir.getParent().toString());
@@ -243,7 +253,5 @@ public class ExternalFileTypeEntryEditor {
     public boolean okPressed() {
         return okPressed;
     }
-
-
 
 }

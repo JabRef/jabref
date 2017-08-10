@@ -1,25 +1,15 @@
 ## Understanding the basics
 We welcome contributions to JabRef and encourage to create a fork, clone, **create a new branch** (such as `fix-for-issue-121`), **work on the new branch — not master**, and create a pull request.
 Be sure to create a **separate branch** for each improvement you implement.
-Take a look at GitHub's excellent [help documentation] for a detailed explanation.
+Take a look at GitHub's excellent [help documentation] for a detailed explanation and the explanation of [Feature Branch Workflow](https://de.atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) and [guidelines for setting up a local workspace](https://github.com/JabRef/jabref/wiki/Guidelines-for-setting-up-a-local-workspace).
-
-For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
-It contains steps to get started with JabRef development.
 
 In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
 
 
 ## Formal requirements for a pull request
 The main goal of the formal requirements is to provide credit to you and to be able to understand the patch.
-Nevertheless we aim to keep the code consistently formatted, therefore we additionally have a requirement regarding the source formatter.
-
-
-### Ensure consistent formatting
-Ensure your code is formatted according the JabRef formatting guidelines.
-When you use Eclipse, the required configuration is generated automatically by `gradlew cleanEclipse eclipse`.
-
 
 ### Add your change to CHANGELOG.md
 You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory of the JabRef source.
@@ -49,7 +39,7 @@ Please make sure there are no duplicates or alternate spellings of your name lis
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
 More information on this can be found via `man git-shortlog`.
 
-Please, **do not add yourself at `@authors`**.
+Please, **do not add yourself at JavaDoc's `@authors`**.
 The contribution information is tracked via the version control system.
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).

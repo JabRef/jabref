@@ -23,7 +23,6 @@ public class IfPlural extends AbstractParamLayoutFormatter {
     private String pluralText;
     private String singularText;
 
-
     @Override
     public void setArgument(String arg) {
         List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);

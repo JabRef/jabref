@@ -127,8 +127,9 @@ public class GroupsParser {
         String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         String field = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
-        Character separator = tok.nextToken().charAt(0);
-        AutomaticKeywordGroup newGroup = new AutomaticKeywordGroup(name, context, field, separator);
+        Character delimiter = tok.nextToken().charAt(0);
+        Character hierarchicalDelimiter = tok.nextToken().charAt(0);
+        AutomaticKeywordGroup newGroup = new AutomaticKeywordGroup(name, context, field, delimiter, hierarchicalDelimiter);
         addGroupDetails(tok, newGroup);
         return newGroup;
     }
@@ -247,7 +248,7 @@ public class GroupsParser {
         if (tokenizer.hasMoreTokens()) {
             group.setExpanded(Integer.parseInt(tokenizer.nextToken()) == 1);
             group.setColor(tokenizer.nextToken());
-            group.setIconCode(tokenizer.nextToken());
+            group.setIconName(tokenizer.nextToken());
             group.setDescription(tokenizer.nextToken());
         }
     }

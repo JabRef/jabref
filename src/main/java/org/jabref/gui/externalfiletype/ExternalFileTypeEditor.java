@@ -31,6 +31,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jabref.Globals;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.actions.MnemonicAwareAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -42,7 +43,7 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
 /**
  * Editor for external file types.
  */
-public class ExternalFileTypeEditor extends JDialog {
+public class ExternalFileTypeEditor extends JabRefDialog {
 
     private JFrame frame;
     private JDialog dialog;
@@ -60,13 +61,13 @@ public class ExternalFileTypeEditor extends JDialog {
 
 
     private ExternalFileTypeEditor(JFrame frame) {
-        super(frame, Localization.lang("Manage external file types"), true);
+        super(frame, Localization.lang("Manage external file types"), true, ExternalFileTypeEditor.class);
         this.frame = frame;
         init();
     }
 
     private ExternalFileTypeEditor(JDialog dialog) {
-        super(dialog, Localization.lang("Manage external file types"), true);
+        super(dialog, Localization.lang("Manage external file types"), true, ExternalFileTypeEditor.class);
         this.dialog = dialog;
         init();
     }
@@ -234,7 +235,6 @@ public class ExternalFileTypeEditor extends JDialog {
         return new EditExternalFileTypesAction(dialog);
     }
 
-
     class EditListener implements ActionListener {
 
         @Override
@@ -253,7 +253,6 @@ public class ExternalFileTypeEditor extends JDialog {
     static class IconRenderer implements TableCellRenderer {
 
         private final JLabel lab = new JLabel();
-
 
         @Override
         public Component getTableCellRendererComponent(JTable tab, Object value, boolean isSelected, boolean hasFocus,

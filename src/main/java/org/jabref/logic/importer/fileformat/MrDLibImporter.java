@@ -256,6 +256,8 @@ public class MrDLibImporter extends Importer {
 
         }
 
-    };
+    }
+
+    ;
 
 }

@@ -40,15 +40,15 @@ public class ACS implements FulltextFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // DOI search
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             String source = String.format(SOURCE, doi.get().getDOI());
             // Retrieve PDF link
             Document html = Jsoup.connect(source).ignoreHttpErrors(true).get();
             Element link = html.select(".pdf-high-res a").first();
 
-            if(link != null) {
+            if (link != null) {
                 LOGGER.info("Fulltext PDF found @ ACS.");
                 pdfLink = Optional.of(new URL(source.replaceFirst("/abs/", "/pdf/")));
             }

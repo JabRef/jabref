@@ -1,35 +1,17 @@
 package org.jabref.logic.util.io;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import org.jabref.preferences.JabRefPreferences;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class FileHistoryTest {
 
-    private JabRefPreferences prefs;
-    private List<String> oldFileNames;
-
-    @Before
-    public void setUp() {
-        prefs = JabRefPreferences.getInstance();
-        oldFileNames = prefs.getStringList(JabRefPreferences.RECENT_DATABASES);
-    }
-
-    @After
-    public void restore() {
-        prefs.putStringList(JabRefPreferences.RECENT_DATABASES, oldFileNames);
-    }
-
     @Test
     public void testFileHistory() {
-        FileHistory fh = prefs.getFileHistory();
+        FileHistory fh = new FileHistory(new ArrayList<>());
 
         fh.newFile("aa");
         assertEquals("aa", fh.getFileName(0));
@@ -63,9 +45,8 @@ public class FileHistoryTest {
         fh.removeItem("cc");
         fh.removeItem("cc");
         fh.removeItem("aa");
-        prefs.storeFileHistory(fh);
-        assertArrayEquals(new String[] {"ii", "hh", "gg"},
-                prefs.getStringList(JabRefPreferences.RECENT_DATABASES).toArray(new String[0]));
+
+        assertEquals(Arrays.asList("ii", "hh", "gg"), fh.getHistory());
     }
 
 }

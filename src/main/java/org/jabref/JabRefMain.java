@@ -64,8 +64,8 @@ public class JabRefMain extends Application {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
 
-        Globals.startBackgroundTasks();
         Globals.prefs = preferences;
+        Globals.startBackgroundTasks();
         Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
 
@@ -76,12 +76,13 @@ public class JabRefMain extends Application {
         PreferencesMigrations.upgradeFaultyEncodingStrings();
         PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
         PreferencesMigrations.upgradeStoredCustomEntryTypes();
+        PreferencesMigrations.upgradeKeyBindingsToJavaFX();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
                 .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS));
         // Update name of the time stamp field based on preferences
-        InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
+        InternalBibtexFields.updateTimeStampField(Globals.prefs.getTimestampPreferences().getTimestampField());
         // Update which fields should be treated as numeric, based on preferences:
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
@@ -115,7 +116,9 @@ public class JabRefMain extends Application {
                     // We have successfully sent our command line options through the socket to another JabRef instance.
                     // So we assume it's all taken care of, and quit.
                     LOGGER.info(Localization.lang("Arguments passed on to running JabRef instance. Shutting down."));
-                    JabRefExecutorService.INSTANCE.shutdownEverything();
+                    Globals.shutdownThreadPools();
+                    // needed to tell JavaFx to stop
+                    Platform.exit();
                     return;
                 }
             }
@@ -132,7 +135,7 @@ public class JabRefMain extends Application {
 
         // See if we should shut down now
         if (argumentProcessor.shouldShutDown()) {
-            JabRefExecutorService.INSTANCE.shutdownEverything();
+            Globals.shutdownThreadPools();
             return;
         }
 

@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,14 @@ public class FileDialogConfiguration {
     private final FileChooser.ExtensionFilter defaultExtension;
     private final String initialFileName;
 
+    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
+            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
+        this.initialDirectory = initialDirectory;
+        this.extensionFilters = Objects.requireNonNull(extensionFilters);
+        this.defaultExtension = defaultExtension;
+        this.initialFileName = initialFileName;
+    }
+
     public Optional<Path> getInitialDirectory() {
         return Optional.ofNullable(initialDirectory);
     }
@@ -32,21 +41,13 @@ public class FileDialogConfiguration {
         return initialFileName;
     }
 
-    private FileDialogConfiguration(Path initialDirectory, List<FileChooser.ExtensionFilter> extensionFilters,
-            FileChooser.ExtensionFilter defaultExtension, String initialFileName) {
-        this.initialDirectory = initialDirectory;
-        this.extensionFilters = Objects.requireNonNull(extensionFilters);
-        this.defaultExtension = defaultExtension;
-        this.initialFileName = initialFileName;
-    }
-
     public List<FileChooser.ExtensionFilter> getExtensionFilters() {
         return extensionFilters;
     }
 
     public static class Builder {
 
-        List<FileChooser.ExtensionFilter> extensionFilter = new ArrayList<>();
+        private final List<FileChooser.ExtensionFilter> extensionFilter = new ArrayList<>();
         private Path initialDirectory;
         private FileChooser.ExtensionFilter defaultExtension;
         private String initialFileName;
@@ -71,17 +72,29 @@ public class FileDialogConfiguration {
         }
 
         public Builder withInitialDirectory(Path directory) {
+            if (directory == null) { //It could be that somehow the path is null, for example if it got deleted in the meantime
+                initialDirectory = null;
+            } else { //Dir must be a folder, not a file
+                if (!Files.isDirectory(directory)) {
+                    directory = directory.getParent();
+                }
+                //The lines above work also if the dir does not exist at all!
+                //NULL is accepted by the filechooser as no inital path
+                //Explicit null check, if somehow the parent is null, as Files.exists throws an NPE otherwise
+                if ((directory != null) && !Files.exists(directory)) {
+                    directory = null;
+                }
+                initialDirectory = directory;
+            }
+            return this;
+        }
 
-            //Dir must be a folder, not a file
-            if (!Files.isDirectory(directory)) {
-                directory = directory.getParent();
+        public Builder withInitialDirectory(String directory) {
+            if (directory != null) {
+                withInitialDirectory(Paths.get(directory));
+            } else {
+                initialDirectory = null;
             }
-            //The lines above work also if the dir does not exist at all!
-            //NULL is accepted by the filechooser as no inital path
-            if (!Files.exists(directory)) {
-                directory = null;
-            }
-            initialDirectory = directory;
             return this;
         }
 
@@ -95,5 +108,6 @@ public class FileDialogConfiguration {
             return this;
 
         }
+
     }
 }

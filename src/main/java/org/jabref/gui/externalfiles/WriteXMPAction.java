@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -15,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,16 +27,13 @@ import javax.swing.SwingUtilities;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.filelist.FileListEntry;
-import org.jabref.gui.filelist.FileListTableModel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -117,29 +115,12 @@ public class WriteXMPAction extends AbstractWorker {
         for (BibEntry entry : entries) {
 
             // Make a list of all PDFs linked from this entry:
-            List<File> files = new ArrayList<>();
-
-            // First check the (legacy) "pdf" field:
-            entry.getField(FieldName.PDF)
-                    .ifPresent(
-                            pdf -> FileUtil
-                                    .expandFilename(pdf,
-                                            panel.getBibDatabaseContext().getFileDirectories(FieldName.PDF,
-                                                    Globals.prefs.getFileDirectoryPreferences()))
-                            .ifPresent(files::add));
-            // Then check the "file" field:
-            List<String> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-            if (entry.hasField(FieldName.FILE)) {
-                FileListTableModel tm = new FileListTableModel();
-                entry.getField(FieldName.FILE).ifPresent(tm::setContent);
-                for (int j = 0; j < tm.getRowCount(); j++) {
-                    FileListEntry flEntry = tm.getEntry(j);
-                    if ((flEntry.getType().isPresent()) && "pdf".equalsIgnoreCase(flEntry.getType().get().getName())) {
-                        FileUtil.expandFilename(flEntry.getLink(), dirs).ifPresent(files::add);
-                    }
-                }
-            }
+            List<Path> files = entry.getFiles().stream()
+                    .filter(file -> file.getFileType().equalsIgnoreCase("pdf"))
+                    .map(file -> file.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences()))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
 
             SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
                     .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
@@ -149,17 +130,17 @@ public class WriteXMPAction extends AbstractWorker {
                 SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
                         .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
-                for (File file : files) {
-                    if (file.exists()) {
+                for (Path file : files) {
+                    if (Files.exists(file)) {
                         try {
-                            XMPUtil.writeXMP(file, entry, database, Globals.prefs.getXMPPreferences());
+                            XMPUtil.writeXMP(file.toFile(), entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
                                     () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
                             SwingUtilities.invokeLater(() -> {
                                 optDiag.getProgressArea().append("  " + Localization.lang("Error while writing") + " '"
-                                        + file.getPath() + "':\n");
+                                        + file.toString() + "':\n");
                                 optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
                             });
                             errors++;
@@ -169,7 +150,7 @@ public class WriteXMPAction extends AbstractWorker {
                         SwingUtilities.invokeLater(() -> {
                             optDiag.getProgressArea()
                                     .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                            optDiag.getProgressArea().append("    " + file.getPath() + "\n");
+                            optDiag.getProgressArea().append("    " + file.toString() + "\n");
                         });
                     }
                 }
@@ -200,8 +181,7 @@ public class WriteXMPAction extends AbstractWorker {
                 String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
     }
 
-
-    class OptionsDialog extends JDialog {
+    class OptionsDialog extends JabRefDialog {
 
         private final JButton okButton = new JButton(Localization.lang("OK"));
         private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -212,7 +192,7 @@ public class WriteXMPAction extends AbstractWorker {
 
 
         public OptionsDialog(JFrame parent) {
-            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false);
+            super(parent, Localization.lang("Writing XMP-metadata for selected entries..."), false, OptionsDialog.class);
             okButton.setEnabled(false);
 
             okButton.addActionListener(e -> dispose());

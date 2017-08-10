@@ -7,8 +7,8 @@ import org.jabref.gui.BasePanel;
 import org.jabref.gui.PreviewPanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableRemoveEntry;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -17,11 +17,11 @@ import org.apache.commons.logging.LogFactory;
 
 class EntryDeleteChange extends Change {
 
+    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
     private final BibEntry memEntry;
     private final BibEntry tmpEntry;
-    private final JScrollPane sp;
 
-    private static final Log LOGGER = LogFactory.getLog(EntryDeleteChange.class);
+    private final JScrollPane sp;
 
 
     public EntryDeleteChange(BibEntry memEntry, BibEntry tmpEntry) {

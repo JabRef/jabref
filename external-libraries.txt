@@ -1,6 +1,9 @@
 This document lists the fonts, icons, and libraries used by JabRef.
 This file is manually kept in sync with build.gradle and the binary jars contained in the lib/ directory.
 
+One can list all depdencies by using Gradle task `depdencyReport`.
+It generated the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
+
 # Legend
 
 ## License
@@ -131,9 +134,24 @@ URL:     http://fxexperience.com/controlsfx/
 License: BSD-3-Clause
 
 Id:      org.fx.misc.easybin:easybind
-Projekt: EasyBind
+Project: EasyBind
 URL:     https://github.com/TomasMikula/EasyBind
 License: BSD-2-Clause
+
+Id:      org.fxmisc.flowless:flowless
+Project: Flowless
+URL:     https://github.com/TomasMikula/Flowless
+License: BSD-2-Clause
+
+Id:      org.fxmisc.richtext:richtextfx
+Project: RichTextFX
+URL:     https://github.com/TomasMikula/RichTextFX
+License: BSD-2-Clause
+
+Id:      de.jensd:fontawesomefx-materialdesignfont
+Project: FontAwesomeFX
+URL:     https://bitbucket.org/Jerady/fontawesomefx
+License: Apache-2.0
 
 Id:      org.jsoup:jsoup
 Project: jsoup
@@ -160,15 +178,20 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
+Id:      org.xmlunit:xmlunit-core
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
+Id:      org.xmlunit:xmlunit-matchers
+Project: XMLUnit
+URL:     http://www.xmlunit.org/
+License: Apache 2.0
+
 Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL-3.0
-
-Id:      com.github.lgooddatepicker:LGoodDatePicker
-Project: LGoodDatePicker
-URL:     https://github.com/LGoodDatePicker/LGoodDatePicker
-License: MIT
 
 Id:      spin
 Path:    lib/spin.jar
@@ -200,6 +223,11 @@ Id:      de.codecentric.centerdevice
 Project: javafxsvg
 URL:     https://github.com/codecentric/javafxsvg
 License: BSD 3-Clause
+
+Id:      de.saxsys:mvvmfx
+Project: mvvm(fx)
+URL:     https://github.com/sialcasa/mvvmFX
+License: Apache-2.0
 
 Id:      com.github.tomtung
 Project: latex2unicode

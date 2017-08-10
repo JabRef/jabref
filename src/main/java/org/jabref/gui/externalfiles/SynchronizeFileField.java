@@ -2,13 +2,13 @@ package org.jabref.gui.externalfiles;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -21,7 +21,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +31,7 @@ import org.jabref.Globals;
 import org.jabref.JabRefExecutorService;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -44,10 +44,10 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -61,15 +61,12 @@ import com.jgoodies.forms.layout.FormLayout;
 public class SynchronizeFileField extends AbstractWorker {
 
     private final BasePanel panel;
-    private List<BibEntry> sel;
-    private SynchronizeFileField.OptionsDialog optDiag;
-
-    private int entriesChangedCount;
-
     private final Object[] brokenLinkOptions = {Localization.lang("Ignore"), Localization.lang("Assign new file"),
             Localization.lang("Remove link"), Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
-
+    private List<BibEntry> sel;
+    private SynchronizeFileField.OptionsDialog optDiag;
+    private int entriesChangedCount;
     private boolean goOn = true;
     private boolean autoSet = true;
     private boolean checkExisting = true;
@@ -139,19 +136,12 @@ public class SynchronizeFileField extends AbstractWorker {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old.get());
 
-                    // We need to specify which directories to search in for Util.expandFilename:
-                    List<String> dirsS = panel.getBibDatabaseContext()
-                            .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-                    List<File> dirs = new ArrayList<>();
-                    for (String dirs1 : dirsS) {
-                        dirs.add(new File(dirs1));
-                    }
-
                     for (int j = 0; j < tableModel.getRowCount(); j++) {
                         FileListEntry flEntry = tableModel.getEntry(j);
+                        LinkedFile field = flEntry.toParsedFileField();
+
                         // See if the link looks like an URL:
-                        boolean httpLink = flEntry.getLink().toLowerCase(Locale.ENGLISH).startsWith("http");
-                        if (httpLink) {
+                        if (field.isOnlineLink()) {
                             continue; // Don't check the remote file.
                             // TODO: should there be an option to check remote links?
                         }
@@ -160,8 +150,8 @@ public class SynchronizeFileField extends AbstractWorker {
                         boolean deleted = false;
 
                         // Get an absolute path representation:
-                        Optional<File> file = FileUtil.expandFilename(flEntry.getLink(), dirsS);
-                        if ((!file.isPresent()) || !file.get().exists()) {
+                        Optional<Path> file = field.findIn(panel.getBibDatabaseContext(), Globals.prefs.getFileDirectoryPreferences());
+                        if ((!file.isPresent()) || !Files.exists(file.get())) {
                             int answer;
                             if (removeAllBroken) {
                                 answer = 2; // We should delete this link.
@@ -178,8 +168,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             switch (answer) {
                             case 1:
                                 // Assign new file.
-                                FileListEntryEditor flEditor = new FileListEntryEditor
-                                (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
+                                FileListEntryEditor flEditor = new FileListEntryEditor(flEntry.toParsedFileField(), false, true, panel.getBibDatabaseContext());
                                 flEditor.setVisible(true, true);
                                 break;
                             case 2:
@@ -235,7 +224,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User wants to change the type of this link.
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
-                                        (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
+                                        (flEntry.toParsedFileField(), false, true, panel.getBibDatabaseContext());
                                 editor.setVisible(true, false);
                             }
                         }
@@ -281,13 +270,10 @@ public class SynchronizeFileField extends AbstractWorker {
         }
     }
 
-
-    static class OptionsDialog extends JDialog {
-
+    static class OptionsDialog extends JabRefDialog {
 
         private final JButton ok = new JButton(Localization.lang("OK"));
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
-        private boolean canceled = true;
         private final BibDatabaseContext databaseContext;
         private final JRadioButton autoSetUnset = new JRadioButton(Localization.lang("Automatically set file links")
                 + ". " + Localization.lang("Do not overwrite existing links."), true);
@@ -295,10 +281,11 @@ public class SynchronizeFileField extends AbstractWorker {
                 + ". " + Localization.lang("Allow overwriting existing links."), false);
         private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not automatically set"), false);
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
+        private boolean canceled = true;
 
 
         public OptionsDialog(JFrame parent, BibDatabaseContext databaseContext) {
-            super(parent, Localization.lang("Synchronize file links"), true);
+            super(parent, Localization.lang("Synchronize file links"), true, OptionsDialog.class);
             this.databaseContext = databaseContext;
             ok.addActionListener(e -> {
                 canceled = false;

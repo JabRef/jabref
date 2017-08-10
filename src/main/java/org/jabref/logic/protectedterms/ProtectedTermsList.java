@@ -41,11 +41,9 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         return description;
     }
 
-
     public List<String> getTermList() {
         return termsList;
     }
-
 
     public String getLocation() {
         return location;

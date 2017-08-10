@@ -126,7 +126,6 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 
-
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
@@ -148,7 +147,6 @@ public class MainTableFormat implements TableFormat<BibEntry> {
                 tableColumns.add(builder.buildReadStatusColumn());
             }
         }
-
 
     }
 

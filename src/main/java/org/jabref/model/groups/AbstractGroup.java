@@ -26,7 +26,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected Optional<Color> color = Optional.empty();
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
-    protected Optional<String> iconCode = Optional.empty();
+    protected Optional<String> iconName = Optional.empty();
 
     protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name = name;
@@ -41,12 +41,34 @@ public abstract class AbstractGroup implements SearchMatcher {
                 ", color=" + color +
                 ", isExpanded=" + isExpanded +
                 ", description=" + description +
-                ", iconCode=" + iconCode +
+                ", iconName=" + iconName +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+        AbstractGroup that = (AbstractGroup) other;
+        return Objects.equals(this.name, that.name) && Objects.equals(this.description, that.description)
+                && Objects.equals(this.context, that.context);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, description, context);
     }
 
     public Optional<Color> getColor() {
         return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = Optional.of(color);
     }
 
     public void setColor(String colorString) {
@@ -55,10 +77,6 @@ public abstract class AbstractGroup implements SearchMatcher {
         } else {
             setColor(Color.valueOf(colorString));
         }
-    }
-
-    public void setColor(Color color) {
-        this.color = Optional.of(color);
     }
 
     public boolean isExpanded() {
@@ -77,12 +95,16 @@ public abstract class AbstractGroup implements SearchMatcher {
         this.description = Optional.of(description);
     }
 
-    public Optional<String> getIconCode() {
-        return iconCode;
+    public Optional<String> getIconName() {
+        return iconName;
     }
 
-    public void setIconCode(String iconCode) {
-        this.iconCode = Optional.of(iconCode);
+    public void setIconName(String iconName) {
+        if (StringUtil.isBlank(iconName)) {
+            this.iconName = Optional.empty();
+        } else {
+            this.iconName = Optional.of(iconName);
+        }
     }
 
     /**

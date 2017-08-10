@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,11 +27,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.mockito.Answers;
 import org.xmlunit.builder.Input;
 import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
+
+import static org.mockito.Mockito.mock;
 
 @RunWith(Parameterized.class)
 public class BibTeXMLExporterTestFiles {
@@ -64,7 +67,7 @@ public class BibTeXMLExporterTestFiles {
         charset = StandardCharsets.UTF_8;
         bibtexmlExportFormat = new BibTeXMLExportFormat();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

@@ -14,7 +14,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -23,6 +22,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -44,7 +44,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
  * @version 1.0
  */
 
-public class ExportCustomizationDialog extends JDialog {
+public class ExportCustomizationDialog extends JabRefDialog {
 
     // Column widths for export customization dialog table:
     private static final int COL_0_WIDTH = 50;
@@ -53,7 +53,7 @@ public class ExportCustomizationDialog extends JDialog {
 
     public ExportCustomizationDialog(final JabRefFrame frame) {
 
-        super(frame, Localization.lang("Manage custom exports"), false);
+        super(frame, Localization.lang("Manage custom exports"), false, ExportCustomizationDialog.class);
         DefaultEventTableModel<List<String>> tableModel = new DefaultEventTableModel<>(
                 Globals.prefs.customExports.getSortedList(), new ExportTableFormat());
         JTable table = new JTable(tableModel);
@@ -159,7 +159,6 @@ public class ExportCustomizationDialog extends JDialog {
         setLocationRelativeTo(frame);
         table.requestFocus();
     }
-
 
     private static class ExportTableFormat implements TableFormat<List<String>> {
 

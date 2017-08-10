@@ -111,7 +111,7 @@ public class NormalizeNamesFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(formatter.format(formatter.getExampleInput()), "Einstein, Albert and Turing, Alan");
+        assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
     }
 
     @Test
@@ -157,8 +157,13 @@ public class NormalizeNamesFormatterTest {
     }
 
     @Test
+    public void testOneCommaUntouched() {
+        assertEquals("Canon der Barbar, Alexander der Große", formatter.format("Canon der Barbar, Alexander der Große"));
+    }
+
+    @Test
     public void testAvoidNameAffixes() {
-        assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar, Alexander der Große"));
+        assertEquals("der Barbar, Canon and der Große, Alexander and der Alexander, Peter", formatter.format("Canon der Barbar, Alexander der Große, Peter der Alexander"));
     }
 
     @Test

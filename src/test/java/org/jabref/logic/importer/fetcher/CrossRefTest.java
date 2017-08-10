@@ -88,6 +88,14 @@ public class CrossRefTest {
     }
 
     @Test
+    public void findWithSubtitle() throws Exception {
+        BibEntry entry = new BibEntry();
+        // CrossRef entry will only include { "title": "A break in the clouds", "subtitle": "towards a cloud definition" }
+        entry.setField("title", "A break in the clouds: towards a cloud definition");
+        assertEquals("10.1145/1496091.1496100", fetcher.findIdentifier(entry).get().getDOI().toLowerCase(Locale.ENGLISH));
+    }
+
+    @Test
     public void findByDOI() throws Exception {
         assertEquals(Optional.of(barrosEntry), fetcher.performSearchById("10.1007/11538394_20"));
     }
@@ -104,5 +112,18 @@ public class CrossRefTest {
         entry.setField("author", "Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede");
         entry.setField("year", "2005");
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
+    }
+
+    @Test
+    public void performSearchByIdFindsPaperWithoutTitle() throws Exception {
+        BibEntry entry = new BibEntry("article");
+        entry.setField("author", "Dominik Wujastyk");
+        entry.setField("doi", "10.1023/a:1003473214310");
+        entry.setField("issn", "0019-7246");
+        entry.setField("pages", "172-176");
+        entry.setField("volume", "42");
+        entry.setField("year", "1999");
+
+        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
     }
 }

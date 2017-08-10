@@ -69,9 +69,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
             uriBuilder.addParameter("as_occt", "title");
 
-            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(
-                    "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
-                    .get();
+            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(URLDownload.USER_AGENT).get();
             // Check results for PDF link
             // TODO: link always on first result or none?
             for (int i = 0; i < NUM_RESULTS; i++) {
@@ -119,14 +117,14 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
             addHitsFromQuery(foundEntries, uriBuilder.toString());
 
-            if(foundEntries.size()==10) {
+            if (foundEntries.size() == 10) {
                 uriBuilder.addParameter("start", "10");
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
 
             return foundEntries;
         } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from "+getName(), e);
+            throw new FetcherException("Error while fetching from " + getName(), e);
         } catch (IOException e) {
             // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
@@ -135,7 +133,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
-                throw new FetcherException("Error while fetching from "+getName(), e);
+                throw new FetcherException("Error while fetching from " + getName(), e);
             }
         }
     }

@@ -3,11 +3,11 @@ package org.jabref.gui.mergeentries;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntry;
 import org.jabref.gui.undo.UndoableRemoveEntry;
@@ -27,16 +27,16 @@ import com.jgoodies.forms.layout.RowSpec;
  *
  *         Dialog for merging two Bibtex entries
  */
-public class MergeEntriesDialog extends JDialog {
-
-    private final BasePanel panel;
-    private final CellConstraints cc = new CellConstraints();
+public class MergeEntriesDialog extends JabRefDialog {
 
     private static final String MERGE_ENTRIES = Localization.lang("Merge entries");
     private static final String MARGIN = "5px";
+    private final BasePanel panel;
+
+    private final CellConstraints cc = new CellConstraints();
 
     public MergeEntriesDialog(BasePanel panel) {
-        super(panel.frame(), MERGE_ENTRIES, true);
+        super(panel.frame(), MERGE_ENTRIES, true, MergeEntriesDialog.class);
 
         this.panel = panel;
 
@@ -111,7 +111,6 @@ public class MergeEntriesDialog extends JDialog {
         layout.appendColumn(ColumnSpec.decode(MARGIN));
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
-
 
         WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
