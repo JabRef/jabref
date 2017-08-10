@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.strings.StringUtil;
 
 public class FileChecker implements ValueChecker {
 
@@ -25,6 +26,10 @@ public class FileChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         List<LinkedFile> linkedFiles = FileFieldParser.parse(value).stream()
                 .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());

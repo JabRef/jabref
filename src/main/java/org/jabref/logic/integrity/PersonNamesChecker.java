@@ -5,11 +5,16 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.strings.StringUtil;
 
 public class PersonNamesChecker implements ValueChecker {
 
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         String valueTrimmedAndLowerCase = value.trim().toLowerCase(Locale.ROOT);
         if (valueTrimmedAndLowerCase.startsWith("and ") || valueTrimmedAndLowerCase.startsWith(",")) {
             return Optional.of(Localization.lang("should start with a name"));
