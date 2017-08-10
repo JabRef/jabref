@@ -20,7 +20,6 @@ import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
