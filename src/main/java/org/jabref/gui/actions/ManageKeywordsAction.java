@@ -218,8 +218,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
      * Adds given keyword to the keyword list model
      */
     private void addKeywordToKeywordListModel(String keyword) {
-        keyword = Objects.requireNonNull(keyword).trim();
-        Keyword newKeyword = new Keyword(keyword);
+        String keywordToAdd = Objects.requireNonNull(keyword).trim();
+        Keyword newKeyword = new Keyword(keywordToAdd);
         if (keywordListModel.isEmpty()) {
             keywordListModel.addElement(newKeyword);
         } else {
