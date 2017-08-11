@@ -20,6 +20,7 @@ import com.google.common.eventbus.Subscribe;
 public class CitationStyleCache {
 
     private static final int CACHE_SIZE = 1024;
+
     private CitationStyle citationStyle;
     private LoadingCache<BibEntry, String> citationStyleCache;
 
