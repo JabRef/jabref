@@ -159,8 +159,6 @@ public class SourceTab extends EntryEditorTab {
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
-            boolean entryChanged = false;
-            boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
             if (newKey != null) {
                 entry.setCiteKey(newKey);
@@ -177,7 +175,6 @@ public class SourceTab extends EntryEditorTab {
                     compound.addEdit(
                             new UndoableFieldChange(entry, fieldName, fieldValue, null));
                     entry.clearField(fieldName);
-                    entryChanged = true;
                 }
             }
 
@@ -193,7 +190,6 @@ public class SourceTab extends EntryEditorTab {
 
                     compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
                     entry.setField(fieldName, newValue);
-                    entryChanged = true;
                 }
             }
 
@@ -201,20 +197,9 @@ public class SourceTab extends EntryEditorTab {
             if (!Objects.equals(newEntry.getType(), entry.getType())) {
                 compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
                 entry.setType(newEntry.getType());
-                entryChanged = true;
             }
             compound.end();
 
-            // TODO: Warn about duplicate/empty bibtext key
-            /*
-            if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
-                warnDuplicateBibtexkey();
-            } else if (emptyWarning) {
-                warnEmptyBibtexkey();
-            } else {
-                panel.output(Localization.lang("Stored entry") + '.');
-            }
-            */
         } catch (InvalidFieldValueException | IOException ex) {
             // The source couldn't be parsed, so the user is given an
             // error message, and the choice to keep or revert the contents
