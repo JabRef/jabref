@@ -221,6 +221,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void rebuildOtherFieldsTab() {
         int index = -1;
         boolean isOtherFieldsTabSelected = false;
+
+        // find tab index and selection status
         for (Tab tab: tabbed.getTabs()) {
             if (tab instanceof OtherFieldsTab) {
                 index = tabbed.getTabs().indexOf(tab);
@@ -228,6 +230,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 break;
             }
         }
+
+        // rebuild tab at index and with prior selection status
         if (index != -1) {
             tabbed.getTabs().remove(index);
             OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
