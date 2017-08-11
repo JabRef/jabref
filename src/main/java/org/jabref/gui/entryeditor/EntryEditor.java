@@ -295,8 +295,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (changed) {
                 int index = -1;
                 boolean isOtherFieldsTabSelected = false;
-                for(Tab tab: tabbed.getTabs()) {
-                    if(tab instanceof OtherFieldsTab) {
+                for (Tab tab: tabbed.getTabs()) {
+                    if (tab instanceof OtherFieldsTab) {
                         index = tabbed.getTabs().indexOf(tab);
                         isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
                         break;
@@ -307,7 +307,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     OtherFieldsTab tab = new OtherFieldsTab(frame, panel, type, this, entry);
                     tabbed.getTabs().add(index, tab);
                     // select the new tab if it was selected before
-                    if(isOtherFieldsTabSelected) {
+                    if (isOtherFieldsTabSelected) {
                         tabbed.getSelectionModel().select(tab);
                     }
                 }
