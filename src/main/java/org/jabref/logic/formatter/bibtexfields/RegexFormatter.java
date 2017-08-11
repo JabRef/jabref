@@ -86,8 +86,9 @@ public class RegexFormatter implements Formatter {
 
     public static void setRegex(String rex) {
         // formatting is like ("exp1","exp2"), we want to remove (" and ")
-        rex = rex.substring(2, rex.length() - 2);
-        String[] parts = rex.split("\",\"");
+        String rexToSet = rex;
+        rexToSet = rexToSet.substring(2, rexToSet.length() - 2);
+        String[] parts = rexToSet.split("\",\"");
         regex = parts;
     }
 
