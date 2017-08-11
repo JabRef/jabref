@@ -1584,7 +1584,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Map<String, Double> measurements = new HashMap<>();
         measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
 
-        Globals.getTelemetryClient().trackEvent("OpenNewDatabase", properties, measurements);
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {

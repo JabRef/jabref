@@ -7,20 +7,26 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences);
+    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+
+        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {

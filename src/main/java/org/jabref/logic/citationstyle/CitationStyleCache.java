@@ -15,11 +15,12 @@ import com.google.common.eventbus.Subscribe;
 
 /**
  * Caches the generated Citations for quicker access
- * {@link CitationStyleGenerator} generates the citaiton with JavaScript which may take some time
+ * {@link CitationStyleGenerator} generates the citation with JavaScript which may take some time
  */
 public class CitationStyleCache {
 
-    private static final int CACHE_SIZE = 10;
+    private static final int CACHE_SIZE = 1024;
+
     private CitationStyle citationStyle;
     private LoadingCache<BibEntry, String> citationStyleCache;
 
