@@ -294,15 +294,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
         EasyBind.subscribe(sourceTab.getFieldsChangedProperty(), changed -> {
             if (changed) {
                 int index = -1;
+                boolean isOtherFieldsTabSelected = false;
                 for(Tab tab: tabbed.getTabs()) {
                     if(tab instanceof OtherFieldsTab) {
                         index = tabbed.getTabs().indexOf(tab);
+                        isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
                         break;
                     }
                 }
                 if (index != -1) {
                     tabbed.getTabs().remove(index);
-                    tabbed.getTabs().add(index,new OtherFieldsTab(frame, panel, type, this, entry));
+                    OtherFieldsTab tab = new OtherFieldsTab(frame, panel, type, this, entry);
+                    tabbed.getTabs().add(index, tab);
+                    // select the new tab if it was selected before
+                    if(isOtherFieldsTabSelected) {
+                        tabbed.getSelectionModel().select(tab);
+                    }
                 }
             }
         });
