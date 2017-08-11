@@ -273,7 +273,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
-        SourceTab sourceTab = new SourceTab(panel.getBibDatabaseContext(), entry, movingToDifferentEntry);
+        SourceTab sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
         tabs.add(sourceTab);
 
         tabbed.getTabs().clear();

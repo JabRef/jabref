@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
@@ -43,14 +44,16 @@ public class SourceTab extends EntryEditorTab {
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
     private final BibEntry entry;
+    private final BasePanel panel;
     private CodeArea codeArea;
     private BooleanProperty movingToDifferentEntry;
 
-    public SourceTab(BibDatabaseContext context, BibEntry entry, BooleanProperty movingToDifferentEntry) {
-        this.mode = context.getMode();
+    public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
+        this.mode = panel.getBibDatabaseContext().getMode();
         this.entry = entry;
+        this.panel = panel;
         this.movingToDifferentEntry = movingToDifferentEntry;
-        context.getDatabase().registerListener(this);
+        panel.getBibDatabaseContext().getDatabase().registerListener(this);
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
@@ -110,6 +113,13 @@ public class SourceTab extends EntryEditorTab {
             codeArea.setEditable(false);
             LOGGER.debug("Incorrect entry", ex);
         }
+
+        // set the database to dirty when something is changed in the source tab
+        EasyBind.subscribe(codeArea.beingUpdatedProperty(), updated -> {
+            if (updated) {
+                panel.markBaseChanged();
+            }
+        });
 
         return new VirtualizedScrollPane<>(codeArea);
     }
