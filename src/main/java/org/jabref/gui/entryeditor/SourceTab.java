@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -16,6 +17,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -42,10 +44,12 @@ public class SourceTab extends EntryEditorTab {
     private final BibDatabaseMode mode;
     private final BibEntry entry;
     private CodeArea codeArea;
+    private BooleanProperty movingToDifferentEntry;
 
-    public SourceTab(BibDatabaseContext context, BibEntry entry) {
+    public SourceTab(BibDatabaseContext context, BibEntry entry, BooleanProperty movingToDifferentEntry) {
         this.mode = context.getMode();
         this.entry = entry;
+        this.movingToDifferentEntry = movingToDifferentEntry;
         context.getDatabase().registerListener(this);
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
@@ -76,14 +80,24 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
+    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode, BooleanProperty movingToDifferentEntry) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.lookup(".styled-text-area").setStyle(
                 "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+        // store source if new tab is selected (if this one is not focused anymore)
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
                 storeSource();
+            }
+        });
+
+        // store source if new entry is selected in the maintable and the source tab is focused
+        EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
+            if (newEntrySelected && codeArea.focusedProperty().get()) {
+                DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    storeSource();
+                });
             }
         });
 
@@ -107,7 +121,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void initialize() {
-        this.setContent(createSourceEditor(entry, mode));
+        this.setContent(createSourceEditor(entry, mode, movingToDifferentEntry));
     }
 
     private void storeSource() {

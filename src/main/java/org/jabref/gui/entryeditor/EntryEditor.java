@@ -32,6 +32,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -139,7 +141,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Indicates that we are about to go to the next or previous entry
      */
-    private boolean movingToDifferentEntry;
+    private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
@@ -271,7 +273,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
-        SourceTab sourceTab = new SourceTab(panel.getBibDatabaseContext(), entry);
+        SourceTab sourceTab = new SourceTab(panel.getBibDatabaseContext(), entry, movingToDifferentEntry);
         tabs.add(sourceTab);
 
         tabbed.getTabs().clear();
@@ -455,7 +457,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void setMovingToDifferentEntry() {
-        movingToDifferentEntry = true;
+        movingToDifferentEntry.set(true);
         unregisterListeners();
     }
 
@@ -573,8 +575,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            boolean movingAway = movingToDifferentEntry;
-            movingToDifferentEntry = false;
+            boolean movingAway = movingToDifferentEntry.get();
+            movingToDifferentEntry.set(false);
 
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
