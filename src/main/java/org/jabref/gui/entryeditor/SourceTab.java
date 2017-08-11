@@ -80,7 +80,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode, BooleanProperty movingToDifferentEntry) {
+    private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
         codeArea.lookup(".styled-text-area").setStyle(
@@ -121,7 +121,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void initialize() {
-        this.setContent(createSourceEditor(entry, mode, movingToDifferentEntry));
+        this.setContent(createSourceEditor(entry, mode));
     }
 
     private void storeSource() {
