@@ -32,7 +32,6 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
-import com.google.common.eventbus.Subscribe;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.JFXPanel;
@@ -77,10 +76,10 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.event.FieldAddedEvent;
-import org.jabref.model.entry.event.FieldRemovedEvent;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -212,15 +211,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     @Subscribe
-    public synchronized void listen(FieldAddedEvent event) {
-        // new other field -> update other fields tab
-        if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
-            rebuildOtherFieldsTab();
-        }
-    }
-
-    @Subscribe
-    public synchronized void listen(FieldRemovedEvent event) {
+    public synchronized void listen(FieldAddedOrRemovedEvent event) {
         // other field deleted -> update other fields tab
         if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
             rebuildOtherFieldsTab();
