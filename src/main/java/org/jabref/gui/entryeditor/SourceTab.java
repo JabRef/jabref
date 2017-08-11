@@ -205,9 +205,6 @@ public class SourceTab extends EntryEditorTab {
             }
             compound.end();
 
-            // TODO: Add undo
-            //panel.getUndoManager().addEdit(compound);
-
             // TODO: Warn about duplicate/empty bibtext key
             /*
             if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
