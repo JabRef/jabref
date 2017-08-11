@@ -79,7 +79,10 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
      * Copies the meta and content information of the pdf annotation to the clipboard
      */
     public void copyCurrentAnnotation() {
-        StringJoiner sj = new StringJoiner(OS.NEWLINE);
+        if (null == getCurrentAnnotation()){
+            return;
+        }
+        StringJoiner sj = new StringJoiner("," + OS.NEWLINE);
         sj.add(Localization.lang("Author") + ": " + getCurrentAnnotation().getAuthor());
         sj.add(Localization.lang("Date") + ": " + getCurrentAnnotation().getDate());
         sj.add(Localization.lang("Page") + ": " + getCurrentAnnotation().getPage());
