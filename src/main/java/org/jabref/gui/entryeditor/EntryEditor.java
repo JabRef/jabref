@@ -289,6 +289,23 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else {
             selectLastUsedTab(lastTabName);
         }
+
+        // rebuild the other tab if the fields in the source tab change
+        EasyBind.subscribe(sourceTab.getFieldsChangedProperty(), changed -> {
+            if (changed) {
+                int index = -1;
+                for(Tab tab: tabbed.getTabs()) {
+                    if(tab instanceof OtherFieldsTab) {
+                        index = tabbed.getTabs().indexOf(tab);
+                        break;
+                    }
+                }
+                if (index != -1) {
+                    tabbed.getTabs().remove(index);
+                    tabbed.getTabs().add(index,new OtherFieldsTab(frame, panel, type, this, entry));
+                }
+            }
+        });
     }
 
     public String getDisplayedBibEntryType() {
