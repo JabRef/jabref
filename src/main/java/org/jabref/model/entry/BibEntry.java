@@ -25,7 +25,9 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.FieldAddedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.event.FieldRemovedEvent;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
@@ -407,6 +409,7 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(fieldName).orElse(null);
+        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
@@ -421,7 +424,11 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        if (isNewField) {
+            eventBus.post(new FieldAddedEvent(change, eventSource));
+        } else {
+            eventBus.post(new FieldChangedEvent(change, eventSource));
+        }
         return Optional.of(change);
     }
 
@@ -477,7 +484,7 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldRemovedEvent(change, eventSource));
         return Optional.of(change);
     }
 

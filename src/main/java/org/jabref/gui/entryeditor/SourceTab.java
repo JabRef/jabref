@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
@@ -47,7 +46,6 @@ public class SourceTab extends EntryEditorTab {
     private final BasePanel panel;
     private CodeArea codeArea;
     private BooleanProperty movingToDifferentEntry;
-    private BooleanProperty fieldsChanged = new SimpleBooleanProperty();
 
     public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
         this.mode = panel.getBibDatabaseContext().getMode();
@@ -67,10 +65,6 @@ public class SourceTab extends EntryEditorTab {
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
-    }
-
-    public BooleanProperty getFieldsChangedProperty() {
-        return fieldsChanged;
     }
 
     @Subscribe
@@ -172,8 +166,6 @@ public class SourceTab extends EntryEditorTab {
                 entry.clearCiteKey();
             }
 
-            boolean fieldsHaveChanged = !entry.getFieldNames().containsAll(newEntry.getFieldNames()) || !newEntry.getFieldNames().containsAll(entry.getFieldNames());
-
             // First, remove fields that the user has removed.
             for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
@@ -208,11 +200,6 @@ public class SourceTab extends EntryEditorTab {
             }
             compound.end();
 
-            // notify about field changes
-            if (fieldsHaveChanged) {
-                fieldsChanged.setValue(true);
-            }
-
         } catch (InvalidFieldValueException | IOException ex) {
             // The source couldn't be parsed, so the user is given an
             // error message, and the choice to keep or revert the contents
@@ -236,6 +223,5 @@ public class SourceTab extends EntryEditorTab {
                 }
             }
         }
-        fieldsChanged.set(false);
     }
 }

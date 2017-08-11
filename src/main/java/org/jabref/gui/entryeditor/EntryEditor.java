@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
+import com.google.common.eventbus.Subscribe;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.JFXPanel;
@@ -76,6 +77,8 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.event.FieldAddedEvent;
+import org.jabref.model.entry.event.FieldRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -142,11 +145,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Indicates that we are about to go to the next or previous entry
      */
     private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
+    private EntryType entryType;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
         this.panel = panel;
         this.entry = Objects.requireNonNull(entry);
+        entry.registerListener(this);
+        entryType = EntryTypes.getTypeOrDefault(entry.getType(),
+                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         displayedBibEntryType = entry.getType();
 
@@ -204,6 +211,43 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setupKeyBindings();
     }
 
+    @Subscribe
+    public synchronized void listen(FieldAddedEvent event) {
+        // new other field -> update other fields tab
+        if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
+            rebuildOtherFieldsTab();
+        }
+    }
+
+    @Subscribe
+    public synchronized void listen(FieldRemovedEvent event) {
+        // other field deleted -> update other fields tab
+        if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
+            rebuildOtherFieldsTab();
+        }
+    }
+
+    private void rebuildOtherFieldsTab() {
+        int index = -1;
+        boolean isOtherFieldsTabSelected = false;
+        for (Tab tab: tabbed.getTabs()) {
+            if (tab instanceof OtherFieldsTab) {
+                index = tabbed.getTabs().indexOf(tab);
+                isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
+                break;
+            }
+        }
+        if (index != -1) {
+            tabbed.getTabs().remove(index);
+            OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+            tabbed.getTabs().add(index, tab);
+            // select the new tab if it was selected before
+            if (isOtherFieldsTabSelected) {
+                tabbed.getSelectionModel().select(tab);
+            }
+        }
+    }
+
     private void selectLastUsedTab(String lastTabName) {
         tabbed.getTabs().stream().filter(tab -> lastTabName.equals(tab.getText())).findFirst().ifPresent(tab -> tabbed.getSelectionModel().select(tab));
     }
@@ -242,21 +286,19 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addTabs(String lastTabName) {
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
-                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         List<EntryEditorTab> tabs = new ArrayList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new RequiredFieldsTab(frame, panel, entryType, this, entry));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(frame, panel, type, this, entry));
-        tabs.add(new OptionalFields2Tab(frame, panel, type, this, entry));
-        tabs.add(new DeprecatedFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new OptionalFieldsTab(frame, panel, entryType, this, entry));
+        tabs.add(new OptionalFields2Tab(frame, panel, entryType, this, entry));
+        tabs.add(new DeprecatedFieldsTab(frame, panel, entryType, this, entry));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new OtherFieldsTab(frame, panel, entryType, this, entry));
 
         // General fields from preferences
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
@@ -290,29 +332,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             selectLastUsedTab(lastTabName);
         }
 
-        // rebuild the other tab if the fields in the source tab change
-        EasyBind.subscribe(sourceTab.getFieldsChangedProperty(), changed -> {
-            if (changed) {
-                int index = -1;
-                boolean isOtherFieldsTabSelected = false;
-                for (Tab tab: tabbed.getTabs()) {
-                    if (tab instanceof OtherFieldsTab) {
-                        index = tabbed.getTabs().indexOf(tab);
-                        isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
-                        break;
-                    }
-                }
-                if (index != -1) {
-                    tabbed.getTabs().remove(index);
-                    OtherFieldsTab tab = new OtherFieldsTab(frame, panel, type, this, entry);
-                    tabbed.getTabs().add(index, tab);
-                    // select the new tab if it was selected before
-                    if (isOtherFieldsTabSelected) {
-                        tabbed.getSelectionModel().select(tab);
-                    }
-                }
-            }
-        });
     }
 
     public String getDisplayedBibEntryType() {
