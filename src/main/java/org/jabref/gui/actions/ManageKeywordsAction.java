@@ -3,8 +3,8 @@ package org.jabref.gui.actions;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -172,17 +172,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         replace.addActionListener(replaceActionListener);
 
-        keywordList.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent arg0) {
-                // Do nothing
-            }
-
-            @Override
-            public void keyReleased(KeyEvent arg0) {
-                // Do nothing
-            }
+        //enable a user to press Delete to delete a keyword
+        keywordList.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent arg0) {
@@ -192,17 +183,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
         });
 
-        keyword.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                // Do nothing
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                // Do nothing
-            }
+        //enable a user to press Enter to add a keyword
+        keyword.addKeyListener(new KeyAdapter() {
 
             @Override
             public void keyPressed(KeyEvent e) {
