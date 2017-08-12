@@ -233,13 +233,32 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         // rebuild tab at index and with prior selection status
         if (index != -1) {
-            tabbed.getTabs().remove(index);
-            OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+            readdOtherFieldsTab(index, isOtherFieldsTabSelected);
+        } else {
+            // maybe the tab wasn't there but needs to be now
+            addNewOtherFieldsTabIfNeeded();
+        }
+    }
+
+    private void readdOtherFieldsTab(int index, boolean isOtherFieldsTabSelected) {
+        tabbed.getTabs().remove(index);
+        OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+        // if there are no other fields left, no need to readd the tab
+        if (!(tab.getFields().size() == 0)) {
             tabbed.getTabs().add(index, tab);
-            // select the new tab if it was selected before
-            if (isOtherFieldsTabSelected) {
-                tabbed.getSelectionModel().select(tab);
-            }
+        }
+        // select the new tab if it was selected before
+        if (isOtherFieldsTabSelected) {
+            tabbed.getSelectionModel().select(tab);
+        }
+    }
+
+    private void addNewOtherFieldsTabIfNeeded() {
+        OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+        if (tab.getFields().size() > 0) {
+            // add it at default index, but that is just a guess
+            int defaultIndex = 4;
+            tabbed.getTabs().add(defaultIndex, tab);
         }
     }
 
