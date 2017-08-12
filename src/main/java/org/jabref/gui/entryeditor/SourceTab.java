@@ -96,7 +96,6 @@ public class SourceTab extends EntryEditorTab {
             codeArea.setEditable(false);
             LOGGER.debug("Incorrect entry", ex);
         }
-
         return new VirtualizedScrollPane<>(codeArea);
     }
 
@@ -206,8 +205,7 @@ public class SourceTab extends EntryEditorTab {
                     Localization.lang("Problem with parsing entry"),
                     Localization.lang("Error") + ": " + ex.getMessage(),
                     Localization.lang("Edit"),
-                    Localization.lang("Revert to original source")
-            );
+                    Localization.lang("Revert to original source"));
 
             if (!keepEditing) {
                 // Revert

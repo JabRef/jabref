@@ -377,7 +377,7 @@ public class JabRefPreferences implements PreferencesService {
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
-    private static final Class PREFS_BASE_CLASS = JabRefMain.class;
+    private static final Class<JabRefMain> PREFS_BASE_CLASS = JabRefMain.class;
     private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
     private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
     private static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
@@ -1388,6 +1388,7 @@ public class JabRefPreferences implements PreferencesService {
                 && getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
+    @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                 getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),

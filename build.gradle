@@ -111,6 +111,7 @@ dependencies {
     compile 'commons-logging:commons-logging:1.2'
 
     compile 'org.jsoup:jsoup:1.10.3'
+
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.24'
 
@@ -129,6 +130,12 @@ dependencies {
 
     compile group: 'com.microsoft.azure', name: 'applicationinsights-core', version: '1.0.+'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
+
+    compile "org.glassfish.tyrus.bundles:tyrus-standalone-client:1.13.1"
+    compile "org.glassfish.tyrus.ext:tyrus-extension-deflate:1.13.1"
+
+    compile "com.google.code.gson:gson:2.8.0"
+    compile "org.bitbucket.cowwoc:diff-match-patch:1.1"
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'

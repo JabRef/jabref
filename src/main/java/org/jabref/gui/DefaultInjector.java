@@ -6,6 +6,7 @@ import org.jabref.Globals;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.sharelatex.ShareLatexManager;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -35,6 +36,8 @@ public class DefaultInjector implements PresenterFactory {
             return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
+        } else if (clazz == ShareLatexManager.class) {
+            return Globals.shareLatexManager;
         } else {
             try {
                 return clazz.newInstance();

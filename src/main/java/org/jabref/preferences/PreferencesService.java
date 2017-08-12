@@ -1,9 +1,11 @@
 package org.jabref.preferences;
 
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 
 public interface PreferencesService {
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -11,4 +13,6 @@ public interface PreferencesService {
     KeyBindingRepository getKeyBindingRepository();
 
     void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences);
+
+    ImportFormatPreferences getImportFormatPreferences();
 }
