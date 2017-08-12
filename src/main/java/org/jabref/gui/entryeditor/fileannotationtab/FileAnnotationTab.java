@@ -31,6 +31,11 @@ public class FileAnnotationTab extends EntryEditorTab {
     }
 
     @Override
+    public void notifyAboutFocus() {
+        initialize();
+    }
+
+    @Override
     protected void initialize() {
         setContent(new FileAnnotationTabView(entry, fileAnnotationCache).getView());
     }
