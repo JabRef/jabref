@@ -21,18 +21,22 @@ public class FileAnnotationViewModel {
         author.set(annotation.getAuthor());
         page.set(Integer.toString(annotation.getPage()));
         date.set(annotation.getTimeModified().toString());
-        content.set(getContentOrNA(annotation.getContent()));
-        marking.set(getMarking(annotation));
+        setupContentProperties(annotation);
     }
 
-    private static String getMarking(FileAnnotation annotation) {
+    private void setupContentProperties(FileAnnotation annotation) {
         if (annotation.hasLinkedAnnotation()) {
-            return getContentOrNA(annotation.getLinkedFileAnnotation().getContent());
+            this.content.set(toNAifEmpty(annotation.getLinkedFileAnnotation().getContent()));
+            String annotationContent = annotation.getContent();
+            String illegibleTextMessage = Localization.lang("The marked area does not contain any legible text!");
+            this.marking.set(annotationContent.isEmpty() ? illegibleTextMessage : annotationContent);
+        } else {
+            this.content.set(toNAifEmpty(annotation.getContent()));
+            this.marking.set("N/A");
         }
-        return "N/A";
     }
 
-    private static String getContentOrNA(String content) {
+    private static String toNAifEmpty(String content) {
         if (content.isEmpty()) {
             return "N/A";
         }
