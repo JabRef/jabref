@@ -99,6 +99,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     /**
+     * The default index number of the other fields tab
+     */
+    private static final int OTHER_FIELDS_DEFAULTPOSITION = 4;
+
+    /**
      * A reference to the entry this object works on.
      */
     private final BibEntry entry;
@@ -257,8 +262,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
         if (tab.getFields().size() > 0) {
             // add it at default index, but that is just a guess
-            int defaultIndex = 4;
-            tabbed.getTabs().add(defaultIndex, tab);
+            tabbed.getTabs().add(OTHER_FIELDS_DEFAULTPOSITION, tab);
         }
     }
 
