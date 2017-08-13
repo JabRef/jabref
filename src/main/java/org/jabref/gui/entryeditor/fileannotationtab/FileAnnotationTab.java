@@ -27,10 +27,6 @@ public class FileAnnotationTab extends EntryEditorTab {
     }
 
     @Override
-    public void requestFocus() {
-    }
-
-    @Override
     public void notifyAboutFocus() {
         initialize();
     }

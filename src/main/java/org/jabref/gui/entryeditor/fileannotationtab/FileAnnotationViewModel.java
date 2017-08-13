@@ -20,7 +20,7 @@ public class FileAnnotationViewModel {
         this.annotation = annotation;
         author.set(annotation.getAuthor());
         page.set(Integer.toString(annotation.getPage()));
-        date.set(annotation.getTimeModified().toString());
+        date.set(annotation.getTimeModified().toString().replace('T', ' '));
         setupContentProperties(annotation);
     }
 

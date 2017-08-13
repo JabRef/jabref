@@ -25,16 +25,25 @@ import org.fxmisc.easybind.EasyBind;
 
 public class FileAnnotationTabController extends AbstractController<FileAnnotationTabViewModel> {
 
-    @FXML ComboBox<String> files;
-    @FXML ListView<FileAnnotationViewModel> annotationList;
-    @FXML Label author;
-    @FXML Label page;
-    @FXML Label date;
-    @FXML TextArea content;
-    @FXML TextArea marking;
+    @FXML
+    public ComboBox<String> files;
+    @FXML
+    public ListView<FileAnnotationViewModel> annotationList;
+    @FXML
+    public Label author;
+    @FXML
+    public Label page;
+    @FXML
+    public Label date;
+    @FXML
+    public TextArea content;
+    @FXML
+    public TextArea marking;
 
-    @Inject private FileAnnotationCache fileAnnotationCache;
-    @Inject private BibEntry entry;
+    @Inject
+    private FileAnnotationCache fileAnnotationCache;
+    @Inject
+    private BibEntry entry;
 
     @FXML
     public void initialize() {
@@ -70,6 +79,7 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         annotationList.setCellFactory(cellFactory);
         annotationList.setPlaceholder(new Label(Localization.lang("File has no attached annotations")));
         Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
+        annotationList.getSelectionModel().selectFirst();
 
         // Set-up details pane
         author.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::authorProperty));
