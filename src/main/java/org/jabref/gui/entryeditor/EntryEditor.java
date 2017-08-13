@@ -32,6 +32,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.undo.UndoableEdit;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -74,8 +76,10 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -93,6 +97,11 @@ import org.fxmisc.easybind.EasyBind;
 public class EntryEditor extends JPanel implements EntryContainer {
 
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
+
+    /**
+     * The default index number of the other fields tab
+     */
+    private static final int OTHER_FIELDS_DEFAULTPOSITION = 4;
 
     /**
      * A reference to the entry this object works on.
@@ -139,12 +148,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Indicates that we are about to go to the next or previous entry
      */
-    private boolean movingToDifferentEntry;
+    private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
+    private EntryType entryType;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
         this.panel = panel;
         this.entry = Objects.requireNonNull(entry);
+        entry.registerListener(this);
+        entryType = EntryTypes.getTypeOrDefault(entry.getType(),
+                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         displayedBibEntryType = entry.getType();
 
@@ -202,6 +215,57 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setupKeyBindings();
     }
 
+    @Subscribe
+    public synchronized void listen(FieldAddedOrRemovedEvent event) {
+        // other field deleted -> update other fields tab
+        if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
+            rebuildOtherFieldsTab();
+        }
+    }
+
+    private void rebuildOtherFieldsTab() {
+        int index = -1;
+        boolean isOtherFieldsTabSelected = false;
+
+        // find tab index and selection status
+        for (Tab tab: tabbed.getTabs()) {
+            if (tab instanceof OtherFieldsTab) {
+                index = tabbed.getTabs().indexOf(tab);
+                isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
+                break;
+            }
+        }
+
+        // rebuild tab at index and with prior selection status
+        if (index != -1) {
+            readdOtherFieldsTab(index, isOtherFieldsTabSelected);
+        } else {
+            // maybe the tab wasn't there but needs to be now
+            addNewOtherFieldsTabIfNeeded();
+        }
+    }
+
+    private void readdOtherFieldsTab(int index, boolean isOtherFieldsTabSelected) {
+        tabbed.getTabs().remove(index);
+        OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+        // if there are no other fields left, no need to readd the tab
+        if (!(tab.getFields().size() == 0)) {
+            tabbed.getTabs().add(index, tab);
+        }
+        // select the new tab if it was selected before
+        if (isOtherFieldsTabSelected) {
+            tabbed.getSelectionModel().select(tab);
+        }
+    }
+
+    private void addNewOtherFieldsTabIfNeeded() {
+        OtherFieldsTab tab = new OtherFieldsTab(frame, panel, entryType, this, entry);
+        if (tab.getFields().size() > 0) {
+            // add it at default index, but that is just a guess
+            tabbed.getTabs().add(OTHER_FIELDS_DEFAULTPOSITION, tab);
+        }
+    }
+
     private void selectLastUsedTab(String lastTabName) {
         tabbed.getTabs().stream().filter(tab -> lastTabName.equals(tab.getText())).findFirst().ifPresent(tab -> tabbed.getSelectionModel().select(tab));
     }
@@ -240,21 +304,19 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addTabs(String lastTabName) {
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
-                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         List<EntryEditorTab> tabs = new ArrayList<>();
 
         // Required fields
-        tabs.add(new RequiredFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new RequiredFieldsTab(frame, panel, entryType, this, entry));
 
         // Optional fields
-        tabs.add(new OptionalFieldsTab(frame, panel, type, this, entry));
-        tabs.add(new OptionalFields2Tab(frame, panel, type, this, entry));
-        tabs.add(new DeprecatedFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new OptionalFieldsTab(frame, panel, entryType, this, entry));
+        tabs.add(new OptionalFields2Tab(frame, panel, entryType, this, entry));
+        tabs.add(new DeprecatedFieldsTab(frame, panel, entryType, this, entry));
 
         // Other fields
-        tabs.add(new OtherFieldsTab(frame, panel, type, this, entry));
+        tabs.add(new OtherFieldsTab(frame, panel, entryType, this, entry));
 
         // General fields from preferences
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
@@ -271,7 +333,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
-        SourceTab sourceTab = new SourceTab(panel.getBibDatabaseContext(), entry);
+        SourceTab sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
         tabs.add(sourceTab);
 
         tabbed.getTabs().clear();
@@ -287,6 +349,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else {
             selectLastUsedTab(lastTabName);
         }
+
     }
 
     public String getDisplayedBibEntryType() {
@@ -455,7 +518,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void setMovingToDifferentEntry() {
-        movingToDifferentEntry = true;
+        movingToDifferentEntry.set(true);
         unregisterListeners();
     }
 
@@ -573,8 +636,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent event) {
-            boolean movingAway = movingToDifferentEntry;
-            movingToDifferentEntry = false;
+            boolean movingAway = movingToDifferentEntry.get();
+            movingToDifferentEntry.set(false);
 
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
