@@ -70,9 +70,7 @@ public class SourceTab extends EntryEditorTab {
     @Subscribe
     public void listen(EntryChangedEvent event) {
         if (codeArea != null && this.entry.equals(event.getBibEntry())) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                updateSourcePane();
-            });
+            DefaultTaskExecutor.runInJavaFXThread(() -> updateSourcePane());
         }
     }
 
@@ -103,9 +101,7 @@ public class SourceTab extends EntryEditorTab {
         // store source if new entry is selected in the maintable and the source tab is focused
         EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
             if (newEntrySelected && codeArea.focusedProperty().get()) {
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    storeSource();
-                });
+                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
             }
         });
 
