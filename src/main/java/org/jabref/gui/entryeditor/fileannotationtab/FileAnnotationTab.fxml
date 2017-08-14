@@ -61,7 +61,8 @@
                     <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
                     <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="ALWAYS"/>
                 </rowConstraints>
-                <Label text="%Author" GridPane.columnIndex="0" GridPane.rowIndex="1" alignment="TOP_LEFT"/>
+                <Label text="%Author" minHeight="35.0" prefHeight="30.0" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                       alignment="TOP_LEFT"/>
                 <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <Label fx:id="author"/>
                     <Pane HBox.hgrow="ALWAYS"/>
