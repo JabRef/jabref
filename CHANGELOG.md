@@ -30,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where entry editor was not focused after opening up. [#3052](https://github.com/JabRef/jabref/issues/3052)
 - We fixed an issue where changes in the source tab were not stored when selecting a new entry. [#3086](https://github.com/JabRef/jabref/issues/3086)
 - We fixed an issue where the other tab was not updated when fields where changed in the source tab. [#3063](https://github.com/JabRef/jabref/issues/3063)
+- We fixed an issue where the source tab was not updated after fetching data by DOI. [#3103](https://github.com/JabRef/jabref/issues/3103)
 ### Removed
 
 

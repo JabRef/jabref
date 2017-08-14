@@ -219,7 +219,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public synchronized void listen(FieldAddedOrRemovedEvent event) {
         // other field deleted -> update other fields tab
         if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
-            rebuildOtherFieldsTab();
+            DefaultTaskExecutor.runInJavaFXThread(() -> rebuildOtherFieldsTab());
         }
     }
 
