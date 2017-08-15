@@ -10,6 +10,7 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,46 +31,48 @@ public class FieldEditors {
 
         AutoCompleteSuggestionProvider<?> suggestionProvider = getSuggestionProvider(fieldName, suggestionProviders, databaseContext.getMetaData());
 
-        if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
+        FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences());
+
+        if (Globals.prefs.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
             } else {
-                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT)), suggestionProvider);
+                return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
             }
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(fieldName, dialogService, suggestionProvider);
+            return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider);
+            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider);
+            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
-            return new OwnerEditor(fieldName, preferences, suggestionProvider);
+            return new OwnerEditor(fieldName, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider);
+            return new LinkedFilesEditor(fieldName, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
-            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new YesNoEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.MONTH)) {
-            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode()));
+            return new OptionEditor<>(fieldName, new MonthEditorViewModel(fieldName, suggestionProvider, databaseContext.getMode(), fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.GENDER)) {
-            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new GenderEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
-            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new EditorTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
-            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider));
+            return new OptionEditor<>(fieldName, new PaginationEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             if ("patent".equalsIgnoreCase(entryType)) {
-                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider));
+                return new OptionEditor<>(fieldName, new PatentTypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             } else {
-                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider));
+                return new OptionEditor<>(fieldName, new TypeEditorViewModel(fieldName, suggestionProvider, fieldCheckers));
             }
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-            return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider);
+            return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences());
+            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider);
+        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers);
     }
 
     @SuppressWarnings("unchecked")

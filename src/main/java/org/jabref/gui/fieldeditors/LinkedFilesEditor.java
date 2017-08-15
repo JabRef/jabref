@@ -27,6 +27,7 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -39,8 +40,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @FXML private final LinkedFilesEditorViewModel viewModel;
     @FXML private ListView<LinkedFileViewModel> listView;
 
-    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor);
+    public LinkedFilesEditor(String fieldName, DialogService dialogService, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new LinkedFilesEditorViewModel(fieldName, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -123,6 +124,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
+        menu.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
 
         MenuItem edit = new MenuItem(Localization.lang("Edit"));
         edit.setOnAction(event -> linkedFile.edit());

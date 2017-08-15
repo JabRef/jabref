@@ -9,14 +9,17 @@ import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
     @FXML private final PersonsEditorViewModel viewModel;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences) {
-        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, autoCompletePreferences);
+    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences, FieldCheckers fieldCheckers) {
+        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, autoCompletePreferences, fieldCheckers);
 
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
@@ -25,6 +28,9 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         this.getChildren().add(textArea);
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
+
+        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     @Override
