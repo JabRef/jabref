@@ -93,7 +93,6 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
     }
 
     private FileAnnotationViewModel getCurrentAnnotation() {
-        //TODO: It has to be initialized! NPE
         return currentAnnotation.get();
     }
 }
