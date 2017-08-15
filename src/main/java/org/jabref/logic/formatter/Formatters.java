@@ -65,6 +65,8 @@ public class Formatters {
 
     public static final List<Formatter> ALL = new ArrayList<>();
 
+    private static final int LENGTH_OF_REGEX_PREFIX = 5;
+
     private Formatters() {
     }
 
@@ -73,7 +75,7 @@ public class Formatters {
         Optional<Formatter> formatter;
 
         if (modifier.matches("regex.*")) {
-            String regex = modifier.substring(5);
+            String regex = modifier.substring(LENGTH_OF_REGEX_PREFIX);
             RegexFormatter.setRegex(regex);
             formatter = ALL.stream().filter(f -> f.getKey().equals("regex")).findAny();
         } else {

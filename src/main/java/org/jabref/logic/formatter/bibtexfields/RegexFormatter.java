@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,12 +27,13 @@ public class RegexFormatter implements Formatter {
 
     private static final String PLACEHOLDER_FOR_CLOSING_CURLY_BRACE = Character.toString('\u0A16');
 
+    private static final int REMOVE_OUTER_QUOTES = 2;
     // stores the regex set by setRegex
     private static String[] regex;
 
     @Override
     public String getName() {
-        return Localization.lang("Regex");
+        return Localization.lang("regular_expression");
     }
 
     @Override
@@ -57,6 +59,7 @@ public class RegexFormatter implements Formatter {
 
     @Override
     public String format(final String input) {
+        Objects.requireNonNull(input);
         if (regex == null) {
             return input;
         }
@@ -87,7 +90,7 @@ public class RegexFormatter implements Formatter {
     public static void setRegex(String rex) {
         // formatting is like ("exp1","exp2"), we want to remove (" and ")
         String rexToSet = rex;
-        rexToSet = rexToSet.substring(2, rexToSet.length() - 2);
+        rexToSet = rexToSet.substring(REMOVE_OUTER_QUOTES, rexToSet.length() - REMOVE_OUTER_QUOTES);
         String[] parts = rexToSet.split("\",\"");
         regex = parts;
     }
