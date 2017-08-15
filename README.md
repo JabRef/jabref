@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/JabRef/jabref.svg?branch=master)](https://travis-ci.org/JabRef/jabref)
 [![Dependency Status](https://www.versioneye.com/user/projects/557f2723386664002000009c/badge.svg?style=flat)](https://www.versioneye.com/user/projects/557f2723386664002000009c)
 [![codecov.io](https://codecov.io/github/JabRef/jabref/coverage.svg?branch=master)](https://codecov.io/github/JabRef/jabref?branch=master)
-[![Donation](https://img.shields.io/badge/donate-to%20jabref-orange.svg)](https://donations.jabref.org)
+[![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
 
 This version is a development version. Features may not work as expected.
 
@@ -24,9 +24,9 @@ JabRef also lets you easily link to PDF or web sources for your reference entrie
 JabRef can import from and export to several formats, and you can customize export filters.
 JabRef can be run as a command line application to convert from any import format to any export format.
 
-* Homepage: https://www.jabref.org
-* Development page: https://github.com/JabRef/jabref
-* Open HUB page: https://www.openhub.net/p/jabref
+* Homepage: <https://www.jabref.org>
+* Development page: <https://github.com/JabRef/jabref>
+* Open HUB page: <https://www.openhub.net/p/jabref>
 
 ### Bug Reports, Suggestions, Other Feedback
 
@@ -47,6 +47,11 @@ For details see [CONTRIBUTING](CONTRIBUTING.md).
 ### Requirements
 
 JabRef runs on any system equipped with the Java Virtual Machine (1.8 or newer), which can be downloaded at no cost from [Oracle](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
+From JabRef 4.0 onwards, [JavaFX] support has to be available.
+
+### Installing and Running, Linux:
+
+Please see our [Installation Guide](http://help.jabref.org/en/Installation).
 
 ### Installing and Running, Mac OS X:
 
@@ -109,4 +114,5 @@ See [external libraries](external-libraries.txt) for details.
   [BibTeX]: https://www.ctan.org/pkg/bibtex
   [Biblatex]: https://www.ctan.org/pkg/biblatex
   [install4j]: https://www.ej-technologies.com/products/install4j/overview.html
-  [JabRef]: http://www.jabref.org
+  [JabRef]: https://www.jabref.org
+  [JavaFX]: https://en.wikipedia.org/wiki/JavaFX

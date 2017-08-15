@@ -1,8 +1,11 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -70,4 +73,34 @@ public interface EntryType extends Comparable<EntryType> {
      * TODO: move inside GUI
      */
     List<String> getSecondaryOptionalFields();
+
+    default List<String> getDeprecatedFields() {
+        Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+        deprecatedFields.add(FieldName.YEAR);
+        deprecatedFields.add(FieldName.MONTH);
+
+        deprecatedFields.retainAll(getOptionalFieldsAndAliases());
+
+        return new ArrayList<>(deprecatedFields);
+    }
+
+    default List<String> getSecondaryOptionalNotDeprecatedFields() {
+        List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(getSecondaryOptionalFields());
+        optionalFieldsNotPrimaryOrDeprecated.removeAll(getDeprecatedFields());
+        return optionalFieldsNotPrimaryOrDeprecated;
+    }
+
+    /**
+     * Get list of all optional fields of this entry and their aliases.
+     */
+    default Set<String> getOptionalFieldsAndAliases() {
+        Set<String> optionalFieldsAndAliases = new HashSet<>();
+        for (String field : getOptionalFields()) {
+            optionalFieldsAndAliases.add(field);
+            if (EntryConverter.FIELD_ALIASES_LTX_TO_TEX.containsKey(field)) {
+                optionalFieldsAndAliases.add(EntryConverter.FIELD_ALIASES_LTX_TO_TEX.get(field));
+            }
+        }
+        return optionalFieldsAndAliases;
+    }
 }

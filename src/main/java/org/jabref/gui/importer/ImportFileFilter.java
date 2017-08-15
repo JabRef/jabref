@@ -3,6 +3,7 @@ package org.jabref.gui.importer;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.stage.FileChooser;
@@ -25,6 +26,13 @@ class ImportFileFilter {
         List<String> flatExtensions = extensions.stream().flatMap(extList -> Arrays.stream(extList.getExtensions()))
                 .collect(Collectors.toList());
         return new FileChooser.ExtensionFilter(description, flatExtensions.toArray(new String[flatExtensions.size()]));
+    }
+
+    public static Optional<Importer> convert(FileChooser.ExtensionFilter extensionFilter,
+            Collection<Importer> formats) {
+        return formats.stream().filter(format -> format.getDescription().equals(extensionFilter.getDescription()))
+                .findFirst();
+
     }
 
 }

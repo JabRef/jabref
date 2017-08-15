@@ -13,11 +13,11 @@ import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
@@ -31,7 +31,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
-    private static final int warningLimit = 5; // The minimum number of selected entries to ask the user for confirmation
+    private static final int WARNING_LIMIT = 5; // The minimum number of selected entries to ask the user for confirmation
 
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
@@ -51,7 +51,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (basePanel.getSelectedEntries().size() >= warningLimit) {
+        if (basePanel.getSelectedEntries().size() >= WARNING_LIMIT) {
             String[] options = new String[] {Localization.lang("Look up full text documents"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(basePanel.frame(),
@@ -94,16 +94,13 @@ public class FindFullTextAction extends AbstractWorker {
                         basePanel.getBibDatabaseContext(), entry);
                 try {
                     def.download(result.get(), file -> {
-                        FileListTableModel fileLinkModel = new FileListTableModel();
-                        entry.getField(FieldName.FILE).ifPresent(fileLinkModel::setContent);
-                        // add full text file link at first position
-                        fileLinkModel.addEntry(0, file);
-                        String newValue = fileLinkModel.getStringRepresentation();
-                        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                                entry.getField(FieldName.FILE).orElse(null), newValue);
-                        entry.setField(FieldName.FILE, newValue);
-                        basePanel.getUndoManager().addEdit(edit);
-                        basePanel.markBaseChanged();
+                        Optional<FieldChange> fieldChange = entry.addFile(file);
+                        if (fieldChange.isPresent()) {
+                            UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                                    entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
+                            basePanel.getUndoManager().addEdit(edit);
+                            basePanel.markBaseChanged();
+                        }
                     });
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);

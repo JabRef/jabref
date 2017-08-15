@@ -29,10 +29,10 @@ import org.w3c.dom.Text;
  */
 class OpenDocumentRepresentation {
 
-    private final List<BibEntry> entries;
-    private final BibDatabase database;
-
     private static final Log LOGGER = LogFactory.getLog(OpenDocumentRepresentation.class);
+    private final List<BibEntry> entries;
+
+    private final BibDatabase database;
 
 
     public OpenDocumentRepresentation(BibDatabase database, List<BibEntry> entries) {

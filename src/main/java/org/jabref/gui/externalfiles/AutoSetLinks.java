@@ -3,8 +3,8 @@ package org.jabref.gui.externalfiles;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +30,13 @@ import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileFinder;
+import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.util.io.RegExpFileSearch;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.FileHelper;
 
 public class AutoSetLinks {
 
@@ -99,30 +100,18 @@ public class AutoSetLinks {
             @Override
             public void run() {
                 // determine directories to search in
-                List<File> dirs = new ArrayList<>();
-                List<String> dirsS = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
-                dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
+                final List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
                 // determine extensions
-                List<String> extensions = new ArrayList<>();
-                for (final ExternalFileType type : types) {
-                    extensions.add(type.getExtension());
-                }
+                final List<String> extensions = types.stream().map(ExternalFileType::getExtension).collect(Collectors.toList());
 
                 // Run the search operation:
-                Map<BibEntry, List<File>> result;
-                if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
-                    String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
-                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp,
-                            Globals.prefs.getKeywordDelimiter());
-                } else {
-                    boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-                    result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
-                }
+                FileFinder fileFinder = FileFinders.constructFromConfiguration(Globals.prefs.getAutoLinkPreferences());
+                Map<BibEntry, List<Path>> result = fileFinder.findAssociatedFiles(entries, dirs, extensions);
 
                 boolean foundAny = false;
                 // Iterate over the entries:
-                for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
+                for (Entry<BibEntry, List<Path>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
                     Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
                     if (singleTableModel == null) {
@@ -132,15 +121,15 @@ public class AutoSetLinks {
                         assert entries.size() == 1;
                         tableModel = singleTableModel;
                     }
-                    List<File> files = entryFilePair.getValue();
-                    for (File f : files) {
-                        f = FileUtil.shortenFileName(f, dirsS);
+                    List<Path> files = entryFilePair.getValue();
+                    for (Path f : files) {
+                        f = FileUtil.shortenFileName(f, dirs);
                         boolean alreadyHas = false;
                         //System.out.println("File: "+f.getPath());
                         for (int j = 0; j < tableModel.getRowCount(); j++) {
                             FileListEntry existingEntry = tableModel.getEntry(j);
                             //System.out.println("Comp: "+existingEntry.getLink());
-                            if (new File(existingEntry.getLink()).equals(f)) {
+                            if (Paths.get(existingEntry.getLink()).equals(f)) {
                                 alreadyHas = true;
                                 foundAny = true;
                                 break;
@@ -149,13 +138,13 @@ public class AutoSetLinks {
                         if (!alreadyHas) {
                             foundAny = true;
                             Optional<ExternalFileType> type;
-                            Optional<String> extension = FileUtil.getFileExtension(f);
+                            Optional<String> extension = FileHelper.getFileExtension(f);
                             if (extension.isPresent()) {
                                 type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(extension.get());
                             } else {
                                 type = Optional.of(new UnknownExternalFileType(""));
                             }
-                            FileListEntry flEntry = new FileListEntry(f.getName(), f.getPath(), type);
+                            FileListEntry flEntry = new FileListEntry(f.getFileName().toString(), f.toString(), type);
                             tableModel.addEntry(tableModel.getRowCount(), flEntry);
 
                             String newVal = tableModel.getStringRepresentation();

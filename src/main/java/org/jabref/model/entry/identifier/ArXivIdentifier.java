@@ -1,5 +1,7 @@
 package org.jabref.model.entry.identifier;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -41,5 +43,14 @@ public class ArXivIdentifier implements Identifier {
     @Override
     public String getNormalized() {
         return identifier;
+    }
+
+    @Override
+    public Optional<URI> getExternalURI() {
+        try {
+            return Optional.of(new URI("https://arxiv.org/abs/" + identifier));
+        } catch (URISyntaxException e) {
+            return Optional.empty();
+        }
     }
 }

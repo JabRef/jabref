@@ -10,9 +10,12 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.architecture.ApacheCommonsLang3Allowed;
+
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
+@ApacheCommonsLang3Allowed("There is no equivalent in Google's Guava")
 public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
@@ -167,7 +170,6 @@ public class StringUtil {
         if (orgName == null) {
             return "";
         }
-
 
         if (orgName.toLowerCase(Locale.ROOT).endsWith("." + defaultExtension.toLowerCase(Locale.ROOT))) {
             return orgName;
@@ -625,7 +627,11 @@ public class StringUtil {
         return !isNotBlank(string);
     }
 
+    /**
+     * Checks if a CharSequence is not empty (""), not null and not whitespace only.
+     */
     public static boolean isNotBlank(String string) {
+        // No Guava equivalent existing
         return StringUtils.isNotBlank(string);
     }
 
@@ -678,6 +684,8 @@ public class StringUtil {
         }
         return result.toString();
     }
+
+    @ApacheCommonsLang3Allowed("No Guava equivalent existing - see https://stackoverflow.com/q/3322152/873282 for a list of other implementations")
     public static String stripAccents(String searchQuery) {
         return StringUtils.stripAccents(searchQuery);
     }
@@ -707,6 +715,7 @@ public class StringUtil {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
 
+    @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
     }

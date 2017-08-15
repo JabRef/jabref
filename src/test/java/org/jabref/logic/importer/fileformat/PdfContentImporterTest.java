@@ -7,14 +7,15 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class PdfContentImporterTest {
 
@@ -23,7 +24,7 @@ public class PdfContentImporterTest {
 
     @Before
     public void setUp() {
-        importer = new PdfContentImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
     }
 
     @Test

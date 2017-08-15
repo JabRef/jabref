@@ -9,13 +9,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.Globals;
 import org.jabref.logic.importer.ImportDataTest;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITests;
 
 import org.junit.Assert;
@@ -24,13 +23,15 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
+import static org.mockito.Mockito.mock;
+
 @Category(GUITests.class)
 public class EntryFromFileCreatorManagerTest {
 
     // Needed to initialize ExternalFileTypes
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+
     }
 
     @Test
@@ -49,7 +50,7 @@ public class EntryFromFileCreatorManagerTest {
     public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(reader);
+            ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class)).parse(reader);
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();

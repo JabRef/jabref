@@ -13,15 +13,14 @@ import com.google.common.cache.LoadingCache;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 public class FileAnnotationCache {
 
+    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
     //cache size in entries
     private final static int CACHE_SIZE = 10;
+
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
-
-    private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
 
     public FileAnnotationCache(BibDatabaseContext context) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
@@ -39,12 +38,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
-        LOGGER.debug(String.format("Loading Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
+        LOGGER.debug(String.format("Loading Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
         return annotationCache.getUnchecked(entry);
     }
 
     public void remove(BibEntry entry) {
-        LOGGER.debug(String.format("Deleted Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
+        LOGGER.debug(String.format("Deleted Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
         annotationCache.invalidate(entry);
     }
 }

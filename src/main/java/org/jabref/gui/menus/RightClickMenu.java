@@ -213,14 +213,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         frame.createDisabledIconsForMenuEntries(this);
     }
 
-    private boolean areMultipleEntriesSelected() {
-        return panel.getMainTable().getSelectedRowCount() > 1;
-    }
-
-    private boolean areExactlyTwoEntriesSelected() {
-        return panel.getMainTable().getSelectedRowCount() == 2;
-    }
-
     /**
      * Remove all types from the menu.
      * Then cycle through all available values, and add them.
@@ -234,19 +226,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         }
     }
 
+    private boolean areMultipleEntriesSelected() {
+        return panel.getMainTable().getSelectedRowCount() > 1;
+    }
+
+    private boolean areExactlyTwoEntriesSelected() {
+        return panel.getMainTable().getSelectedRowCount() == 2;
+    }
+
     /**
      * Set the dynamic contents of "Add to group ..." submenu.
      */
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-        panel.storeCurrentEdit();
-
         boolean groupsPresent = panel.getBibDatabaseContext().getMetaData().getGroups().isPresent();
         groupAdd.setEnabled(groupsPresent);
         groupRemove.setEnabled(groupsPresent);
         groupMoveTo.setEnabled(groupsPresent);
     }
-
 
     @Override
     public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
@@ -273,7 +270,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            if(entry.hasField(FieldName.FILE)) {
+            if (entry.hasField(FieldName.FILE)) {
                 JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();

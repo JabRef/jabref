@@ -4,16 +4,17 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 /**
  * This class represents a file link for a Bibtex entry.
  */
+
 public class FileListEntry {
 
     private String description;
 
     private String link;
-    
+
     private Optional<ExternalFileType> type;
 
     public FileListEntry(String description, String link) {
@@ -45,8 +46,8 @@ public class FileListEntry {
         return getDescription() + " : " + getLink() + " : " + getType().orElse(null);
     }
 
-    public ParsedFileField toParsedFileField() {
-        return new ParsedFileField(getDescription(), getLink(), getType().isPresent() ? getType().get().getName() : "");
+    public LinkedFile toParsedFileField() {
+        return new LinkedFile(getDescription(), getLink(), getType().isPresent() ? getType().get().getName() : "");
     }
 
     public String getDescription() {

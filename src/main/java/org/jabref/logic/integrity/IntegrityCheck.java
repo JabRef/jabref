@@ -46,7 +46,8 @@ public class IntegrityCheck {
             return result;
         }
 
-        for (FieldChecker checker : FieldCheckers.getAll(bibDatabaseContext, fileDirectoryPreferences)) {
+        FieldCheckers fieldCheckers = new FieldCheckers(bibDatabaseContext, fileDirectoryPreferences);
+        for (FieldChecker checker : fieldCheckers.getAll()) {
             result.addAll(checker.check(entry));
         }
 
@@ -69,7 +70,6 @@ public class IntegrityCheck {
 
         return result;
     }
-
 
     @FunctionalInterface
     public interface Checker {

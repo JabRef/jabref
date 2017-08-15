@@ -21,7 +21,7 @@ public class DOI implements Identifier {
     private static final Log LOGGER = LogFactory.getLog(DOI.class);
 
     // DOI resolver
-    private static final URI RESOLVER = URI.create("http://doi.org");
+    private static final URI RESOLVER = URI.create("https://doi.org");
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
     private static final String DOI_EXP = ""
@@ -64,12 +64,12 @@ public class DOI implements Identifier {
         String trimmedDoi = doi.trim();
 
         // HTTP URL decoding
-        if(doi.matches(HTTP_EXP)) {
+        if (doi.matches(HTTP_EXP)) {
             try {
                 // decodes path segment
                 URI url = new URI(trimmedDoi);
                 trimmedDoi = url.getScheme() + "://" + url.getHost() + url.getPath();
-            } catch(URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 throw new IllegalArgumentException(doi + " is not a valid HTTP DOI.");
             }
         }
@@ -93,7 +93,7 @@ public class DOI implements Identifier {
      * @param doi the DOI string
      * @return an Optional containing the DOI or an empty Optional
      */
-    public static Optional<DOI> build(String doi) {
+    public static Optional<DOI> parse(String doi) {
         try {
             return Optional.ofNullable(new DOI(doi));
         } catch (IllegalArgumentException | NullPointerException e) {
@@ -107,8 +107,8 @@ public class DOI implements Identifier {
      * @param doi the DOI string
      * @return true if DOI is valid, false otherwise
      */
-    public static boolean isValid(String doi){
-        return build(doi).isPresent();
+    public static boolean isValid(String doi) {
+        return parse(doi).isPresent();
     }
 
     /**
@@ -149,11 +149,12 @@ public class DOI implements Identifier {
      *
      * @return an encoded URI representation of the DOI
      */
-    public Optional<URI> getURI() {
+    @Override
+    public Optional<URI> getExternalURI() {
         try {
             URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
             return Optional.of(uri);
-        } catch(URISyntaxException e) {
+        } catch (URISyntaxException e) {
             // should never happen
             LOGGER.error(doi + " could not be encoded as URI.", e);
             return Optional.empty();
@@ -166,7 +167,7 @@ public class DOI implements Identifier {
      * @return an encoded URL representation of the DOI
      */
     public String getURIAsASCIIString() {
-        return getURI().map(URI::toASCIIString).orElse("");
+        return getExternalURI().map(URI::toASCIIString).orElse("");
     }
 
     @Override

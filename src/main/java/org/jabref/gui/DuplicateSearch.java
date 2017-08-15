@@ -143,7 +143,6 @@ public class DuplicateSearch implements Runnable {
 
     }
 
-
     class SearcherRunnable implements Runnable {
 
         private volatile boolean finished;

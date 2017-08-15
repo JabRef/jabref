@@ -7,13 +7,14 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 
 public class BibtexKeyPatternUtilTest {
 
@@ -43,7 +44,7 @@ public class BibtexKeyPatternUtilTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -592,6 +593,28 @@ public class BibtexKeyPatternUtilTest {
     @Test(expected = NullPointerException.class)
     public void testFirstPageNull() {
         BibtexKeyPatternUtil.firstPage(null);
+    }
+
+    public void testPagePrefix() {
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7--27"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L--27"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L42--111"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7,L41,L73--97"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L41,L7,L73--97"));
+        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L43+"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7--27"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("--27"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix(""));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("42--111"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("7,41,73--97"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("41,7,73--97"));
+        assertEquals("", BibtexKeyPatternUtil.pagePrefix("43+"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testPagePrefixNull() {
+        BibtexKeyPatternUtil.pagePrefix(null);
     }
 
     @Test

@@ -32,7 +32,7 @@ public class RemoveBracesFormatter implements Formatter {
             // It could be that the removed braces were not matching
             // For example, "{A} test {B}" results in "A} test {B"
             // In this case, trimmed has a closing } without an opening { before that
-            if(hasNegativeBraceCount(trimmed)) {
+            if (hasNegativeBraceCount(trimmed)) {
                 return formatted;
             } else {
                 formatted = trimmed;

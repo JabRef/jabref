@@ -43,20 +43,20 @@ import org.jabref.preferences.JabRefPreferences;
  */
 class FieldSetComponent extends JPanel {
 
-    private final Set<ActionListener> additionListeners = new HashSet<>();
     protected final JList<String> list;
-    private final JScrollPane sp;
     protected DefaultListModel<String> listModel;
-    private JComboBox<String> sel;
-    private JTextField input;
-    private final JButton add;
     protected final JButton remove;
-    private JButton up;
-    private JButton down;
     protected final GridBagLayout gbl = new GridBagLayout();
     protected final GridBagConstraints con = new GridBagConstraints();
     protected final boolean forceLowerCase;
     protected boolean changesMade;
+    private final Set<ActionListener> additionListeners = new HashSet<>();
+    private final JScrollPane sp;
+    private JComboBox<String> sel;
+    private JTextField input;
+    private final JButton add;
+    private JButton up;
+    private JButton down;
     private final Set<ListDataListener> modelListeners = new HashSet<>();
 
 
@@ -351,6 +351,5 @@ class FieldSetComponent extends JPanel {
             //focus should remain at the same position so nothing to do here
         }
     }
-
 
 }

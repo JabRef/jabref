@@ -3,9 +3,10 @@ package org.jabref.gui;
 import java.util.function.Function;
 
 import org.jabref.Globals;
-import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.injection.PresenterFactory;
@@ -25,11 +26,13 @@ public class DefaultInjector implements PresenterFactory {
         if (clazz == DialogService.class) {
             return new FXDialogService();
         } else if (clazz == TaskExecutor.class) {
-            return Globals.taskExecutor;
-        } else if (clazz == JabRefPreferences.class) {
+            return Globals.TASK_EXECUTOR;
+        } else if (clazz == PreferencesService.class) {
             return Globals.prefs;
-        } else if (clazz == KeyBindingPreferences.class) {
+        } else if (clazz == KeyBindingRepository.class) {
             return Globals.getKeyPrefs();
+        } else if (clazz == JournalAbbreviationLoader.class) {
+            return Globals.journalAbbreviationLoader;
         } else if (clazz == StateManager.class) {
             return Globals.stateManager;
         } else {

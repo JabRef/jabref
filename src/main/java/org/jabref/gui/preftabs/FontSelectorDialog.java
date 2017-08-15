@@ -113,30 +113,30 @@ import org.jabref.logic.l10n.Localization;
 
 public class FontSelectorDialog extends JabRefDialog {
 
-    private static final String PLAIN = "plain";
-    private static final String BOLD = "bold";
-    private static final String BOLD_ITALIC = "bold-italic";
-    private static final String ITALIC = "italic";
-
-    private static final String[] styles = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
-
-    private static final String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
-
-    // private members
-    private boolean isOK;
-    private final JTextField familyField = new JTextField();
-    private final JList<String> familyList;
-    private final JTextField sizeField = new JTextField();
-    private final JList<String> sizeList = new JList<>(sizes);
-    private final JTextField styleField = new JTextField();
-    private final JList<String> styleList = new JList<>(styles);
-    private final JLabel preview;
-
     /**
      * For some reason the default Java fonts show up in the
      * list with .bold, .bolditalic, and .italic extensions.
      */
     private static final String[] HIDEFONTS = {".bold", ".italic"};
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+
+    private static final String ITALIC = "italic";
+
+    private static final String[] STYLES = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
+
+    private static final String[] SIZES = {"9", "10", "12", "14", "16", "18", "24"};
+    // private members
+    private boolean isOK;
+    private final JTextField familyField = new JTextField();
+    private final JList<String> familyList;
+    private final JTextField sizeField = new JTextField();
+    private final JList<String> sizeList = new JList<>(SIZES);
+    private final JTextField styleField = new JTextField();
+    private final JList<String> styleList = new JList<>(STYLES);
+
+    private final JLabel preview;
 
 
     public FontSelectorDialog(Component comp, Font font) {
@@ -260,8 +260,6 @@ public class FontSelectorDialog extends JabRefDialog {
 
         return Optional.of(new Font(familyField.getText(), styleList.getSelectedIndex(), size));
     }
-
-
 
     private static String[] getFontList() {
         try {

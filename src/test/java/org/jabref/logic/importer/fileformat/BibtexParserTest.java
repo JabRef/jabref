@@ -35,15 +35,17 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Test the BibtexParser
@@ -56,7 +58,8 @@ public class BibtexParserTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         parser = new BibtexParser(importFormatPreferences);
     }
 
@@ -343,7 +346,8 @@ public class BibtexParserTest {
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry("article").withField(BibEntry.KEY_FIELD, "test")
+        BibEntry expected = new BibEntry("article")
+                .withField(BibEntry.KEY_FIELD, "test")
                 .withField("author", "Ed von T@st");
         expected.setCommentsBeforeEntry(comment);
 
@@ -1159,9 +1163,11 @@ public class BibtexParserTest {
      * @author Andrei Haralevich
      */
     @Test
-    public void parsePreservesMultipleSpacesInFileField() throws IOException {
+    public void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
+        when(importFormatPreferences.getFieldContentParserPreferences().getNonWrappableFields())
+                .thenReturn(Collections.singletonList("file"));
         ParserResult result = parser
-                .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
+                .parse(new StringReader("@article{canh05,file = {ups  sala}}"), importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
@@ -1413,7 +1419,7 @@ public class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences);
 
-        GlobalBibtexKeyPattern pattern = JabRefPreferences.getInstance().getKeyPattern();
+        GlobalBibtexKeyPattern pattern = mock(GlobalBibtexKeyPattern.class);
         AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
 
         AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);

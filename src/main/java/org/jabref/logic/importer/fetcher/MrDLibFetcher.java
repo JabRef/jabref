@@ -118,10 +118,10 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         URI uri = null;
         try {
             uri = builder.build();
+            return uri.toString();
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
         }
-        System.out.println("Query: " + uri.toString());
-        return uri.toString();
+        return "";
     }
 }

@@ -31,10 +31,10 @@ import org.xml.sax.SAXException;
  */
 public class MSBibDatabase {
 
-    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
-
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
+
+    private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     private Set<MSBibEntry> entries;
 

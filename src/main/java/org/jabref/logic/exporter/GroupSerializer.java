@@ -82,7 +82,7 @@ public class GroupSerializer {
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getColor().map(Color::toString).orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        builder.append(group.getIconCode().orElse(""));
+        builder.append(group.getIconName().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getDescription().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -104,7 +104,7 @@ public class GroupSerializer {
         representation.add(String.valueOf(node.getLevel()) + ' ' + serializeGroup(node.getGroup()));
 
         // Append children
-        for(GroupTreeNode child : node.getChildren()) {
+        for (GroupTreeNode child : node.getChildren()) {
             representation.addAll(serializeTree(child));
         }
 

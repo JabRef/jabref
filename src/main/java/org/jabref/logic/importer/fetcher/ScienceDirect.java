@@ -39,9 +39,9 @@ public class ScienceDirect implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             // Available in catalog?
             try {
                 String sciLink = getUrlByDoi(doi.get().getDOI());
@@ -70,7 +70,7 @@ public class ScienceDirect implements FulltextFetcher {
                         return pdfLink;
                     }
                 }
-            } catch(UnirestException e) {
+            } catch (UnirestException e) {
                 LOGGER.warn("ScienceDirect API request failed", e);
             }
         }
@@ -89,14 +89,14 @@ public class ScienceDirect implements FulltextFetcher {
             JSONObject json = jsonResponse.getBody().getObject();
             JSONArray links = json.getJSONObject("full-text-retrieval-response").getJSONObject("coredata").getJSONArray("link");
 
-            for (int i=0; i < links.length(); i++) {
+            for (int i = 0; i < links.length(); i++) {
                 JSONObject link = links.getJSONObject(i);
                 if (link.getString("@rel").equals("scidir")) {
                     sciLink = link.getString("@href");
                 }
             }
             return sciLink;
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             LOGGER.debug("No ScienceDirect link found in API request", e);
             return sciLink;
         }

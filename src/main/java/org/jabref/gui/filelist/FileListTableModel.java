@@ -12,18 +12,40 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.externalfiletype.UnknownExternalFileType;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldParser;
+import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.model.entry.LinkedFile;
 
 /**
  * Data structure to contain a list of file links, parseable from a coded string.
  * Doubles as a table model for the file list editor.
+ *
+ * @deprecated use {@link org.jabref.model.entry.LinkedFile} instead
  */
+@Deprecated
 public class FileListTableModel extends AbstractTableModel {
 
     private final List<FileListEntry> list = new ArrayList<>();
+
+    /**
+     * Convenience method for finding a label corresponding to the type of the
+     * first file link in the given field content. The difference between using
+     * this method and using setContent() on an instance of FileListTableModel
+     * is a slight optimization: with this method, parsing is discontinued after
+     * the first entry has been found.
+     *
+     * @param content The file field content, as fed to this class' setContent() method.
+     * @return A JLabel set up with no text and the icon of the first entry's file type, or null if no entry was found
+     * or the entry had no icon.
+     */
+    public static JLabel getFirstLabel(String content) {
+        FileListTableModel tm = new FileListTableModel();
+        FileListEntry entry = tm.setContent(content, true, true);
+        if ((entry == null) || (!entry.getType().isPresent())) {
+            return null;
+        }
+        return entry.getType().get().getIconLabel();
+    }
 
     @Override
     public int getRowCount() {
@@ -119,10 +141,11 @@ public class FileListTableModel extends AbstractTableModel {
             value = "";
         }
 
-        List<ParsedFileField> fields = FileField.parse(value);
+        List<LinkedFile> fields = FileFieldParser.parse(value);
         List<FileListEntry> files = new ArrayList<>();
 
-        for(ParsedFileField entry : fields) {
+        for (LinkedFile entry : fields) {
+
             if (entry.isEmpty()) {
                 continue;
             }
@@ -142,45 +165,8 @@ public class FileListTableModel extends AbstractTableModel {
         return null;
     }
 
-    /**
-     * Convenience method for finding a label corresponding to the type of the
-     * first file link in the given field content. The difference between using
-     * this method and using setContent() on an instance of FileListTableModel
-     * is a slight optimization: with this method, parsing is discontinued after
-     * the first entry has been found.
-     * @param content The file field content, as fed to this class' setContent() method.
-     * @return A JLabel set up with no text and the icon of the first entry's file type,
-     *  or null if no entry was found or the entry had no icon.
-     */
-    public static JLabel getFirstLabel(String content) {
-        FileListTableModel tm = new FileListTableModel();
-        FileListEntry entry = tm.setContent(content, true, true);
-        if ((entry == null) || (!entry.getType().isPresent())) {
-            return null;
-        }
-        return entry.getType().get().getIconLabel();
-    }
-
-    private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByName(entry.getFileType());
-
-        if (deduceUnknownType && (type.get() instanceof UnknownExternalFileType)) {
-            // No file type was recognized. Try to find a usable file type based
-            // on mime type:
-            type = ExternalFileTypes.getInstance().getExternalFileTypeByMimeType(entry.getFileType());
-            if (!type.isPresent()) {
-                // No type could be found from mime type on the extension:
-                Optional<String> extension = FileUtil.getFileExtension(entry.getLink());
-                if (extension.isPresent()) {
-                    Optional<ExternalFileType> typeGuess = ExternalFileTypes.getInstance()
-                            .getExternalFileTypeByExt(extension.get());
-
-                    if (typeGuess.isPresent()) {
-                        type = typeGuess;
-                    }
-                }
-            }
-        }
+    private FileListEntry decodeEntry(LinkedFile entry, boolean deduceUnknownType) {
+        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().fromLinkedFile(entry, deduceUnknownType);
 
         return new FileListEntry(entry.getDescription(), entry.getLink(), type);
     }
@@ -198,7 +184,7 @@ public class FileListTableModel extends AbstractTableModel {
                 array[i] = entry.getStringArrayRepresentation();
                 i++;
             }
-            return FileField.encodeStringArray(array);
+            return FileFieldWriter.encodeStringArray(array);
         }
     }
 

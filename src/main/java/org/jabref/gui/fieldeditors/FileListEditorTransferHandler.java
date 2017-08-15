@@ -5,9 +5,9 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,21 +20,21 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiles.DroppedFileHandler;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.groups.EntryTableTransferHandler;
-import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class FileListEditorTransferHandler extends TransferHandler {
 
+    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
-    private DroppedFileHandler droppedFileHandler;
 
-    private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
+    private DroppedFileHandler droppedFileHandler;
 
 
     /**
@@ -79,11 +79,11 @@ class FileListEditorTransferHandler extends TransferHandler {
 
         try {
 
-            List<File> files = new ArrayList<>();
+            List<Path> files = new ArrayList<>();
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 @SuppressWarnings("unchecked")
-                List<File> transferedFiles = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                List<Path> transferedFiles = (List<Path>) t.getTransferData(DataFlavor.javaFileListFlavor);
                 files.addAll(transferedFiles);
             }
 
@@ -100,10 +100,10 @@ class FileListEditorTransferHandler extends TransferHandler {
             }
 
             SwingUtilities.invokeLater(() -> {
-                for (File file : files) {
+                for (Path file : files) {
                     // Find the file's extension, if any:
-                    String name = file.getAbsolutePath();
-                    FileUtil.getFileExtension(name).ifPresent(extension -> ExternalFileTypes.getInstance()
+                    String name = file.toAbsolutePath().toString();
+                    FileHelper.getFileExtension(name).ifPresent(extension -> ExternalFileTypes.getInstance()
                             .getExternalFileTypeByExt(extension).ifPresent(fileType -> {
                                 if (droppedFileHandler == null) {
                                     droppedFileHandler = new DroppedFileHandler(frame, frame.getCurrentBasePanel());

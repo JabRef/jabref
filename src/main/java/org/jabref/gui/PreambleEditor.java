@@ -77,10 +77,11 @@ class PreambleEditor extends JabRefDialog {
 
         editor = new TextArea(Localization.lang("Preamble"), database.getPreamble().orElse(""));
 
-        setupJTextComponent((TextArea) editor);
+        // TODO: Reenable this
+        //setupJTextComponent((TextArea) editor);
 
-        gbl.setConstraints(editor.getLabel(), con);
-        pan.add(editor.getLabel());
+        //gbl.setConstraints(editor.getLabel(), con);
+        //pan.add(editor.getLabel());
 
         con.weightx = 1;
 
@@ -115,6 +116,13 @@ class PreambleEditor extends JabRefDialog {
         editor.setText(database.getPreamble().orElse(""));
     }
 
+    public FieldEditor getFieldEditor() {
+        return editor;
+    }
+
+    public void storeCurrentEdit() {
+        storeFieldAction.actionPerformed(null);
+    }
 
     private class FieldListener extends FocusAdapter {
 
@@ -130,8 +138,6 @@ class PreambleEditor extends JabRefDialog {
         }
 
     }
-
-
 
     class StoreFieldAction extends AbstractAction {
 
@@ -150,13 +156,13 @@ class PreambleEditor extends JabRefDialog {
                 panel.getUndoManager().addEdit(
                         new UndoablePreambleChange(database, panel, database.getPreamble().orElse(null), toSet));
                 database.setPreamble(toSet);
-                if ((toSet == null) || toSet.isEmpty()) {
-                    editor.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
-                } else {
-                    editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-                }
+                //if ((toSet == null) || toSet.isEmpty()) {
+                //    editor.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
+                //} else {
+                //    editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+                //}
                 editor.setValidBackgroundColor();
-                if (editor.getTextComponent().hasFocus()) {
+                if (editor.hasFocus()) {
                     editor.setActiveBackgroundColor();
                 }
                 panel.markBaseChanged();
@@ -164,8 +170,6 @@ class PreambleEditor extends JabRefDialog {
 
         }
     }
-
-
 
     class UndoAction extends AbstractAction {
 
@@ -180,8 +184,6 @@ class PreambleEditor extends JabRefDialog {
         }
     }
 
-
-
     class RedoAction extends AbstractAction {
 
         public RedoAction() {
@@ -195,8 +197,6 @@ class PreambleEditor extends JabRefDialog {
         }
     }
 
-
-
     class CloseAction extends AbstractAction {
 
         public CloseAction() {
@@ -209,15 +209,6 @@ class PreambleEditor extends JabRefDialog {
             panel.preambleEditorClosing();
             dispose();
         }
-    }
-
-
-    public FieldEditor getFieldEditor() {
-        return editor;
-    }
-
-    public void storeCurrentEdit() {
-        storeFieldAction.actionPerformed(null);
     }
 
 }

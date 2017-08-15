@@ -14,14 +14,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 class StringRemoveChange extends Change {
+    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
     private final BibtexString string;
-    private final BibtexString inMem;
 
+    private final BibtexString inMem;
     private final InfoPane tp = new InfoPane();
     private final JScrollPane sp = new JScrollPane(tp);
-    private final BibtexString tmpString;
 
-    private static final Log LOGGER = LogFactory.getLog(StringRemoveChange.class);
+    private final BibtexString tmpString;
 
 
     public StringRemoveChange(BibtexString string, BibtexString tmpString, BibtexString inMem) {

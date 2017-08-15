@@ -6,7 +6,6 @@ import java.awt.GridBagLayout;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -24,14 +22,19 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import javafx.embed.swing.SwingNode;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.GUIGlobals;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.pdf.FileAnnotation;
 
@@ -40,8 +43,7 @@ import com.jgoodies.forms.factories.Paddings;
 
 import static org.jabref.model.pdf.FileAnnotationType.NONE;
 
-
-class FileAnnotationTab extends JPanel {
+class FileAnnotationTab extends EntryEditorTab {
 
     private final JList<FileAnnotation> annotationList = new JList<>();
     private final JScrollPane annotationScrollPane = new JScrollPane();
@@ -65,32 +67,21 @@ class FileAnnotationTab extends JPanel {
     private final JScrollPane markedTextScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton reloadAnnotationsButton = new JButton();
+    private final BibEntry entry;
     private final FileAnnotationCache fileAnnotationCache;
+    private final SwingNode swingNode = new SwingNode();
+    private final EntryEditor parent;
     private DefaultListModel<FileAnnotation> listModel;
 
-    private final EntryEditor parent;
-
-    private boolean isInitialized;
-
-
-    FileAnnotationTab(EntryEditor parent, FileAnnotationCache cache) {
+    FileAnnotationTab(BibEntry entry, EntryEditor parent, FileAnnotationCache cache) {
+        this.entry = entry;
         this.fileAnnotationCache = cache;
         this.parent = parent;
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel = new DefaultListModel<>();
-        this.isInitialized = false;
-    }
 
-    public FileAnnotationTab initializeTab(FileAnnotationTab tab) {
-        if (tab.isInitialized) {
-            return tab;
-        }
-
-        tab.addAnnotations();
-        tab.setUpGui();
-        tab.isInitialized = true;
-        tab.parent.repaint();
-        return tab;
+        this.setText(Localization.lang("File annotations"));
+        this.setTooltip(new Tooltip(Localization.lang("Show file annotations")));
+        this.setContent(swingNode);
     }
 
     /**
@@ -127,7 +118,7 @@ class FileAnnotationTab extends JPanel {
      */
     private void updateShownAnnotations(List<FileAnnotation> annotations) {
         listModel.clear();
-        if (annotations.isEmpty()) {
+        if (annotations == null || annotations.isEmpty()) {
             listModel.addElement(new FileAnnotation("", LocalDateTime.now(), 0, Localization.lang("File has no attached annotations"), NONE, Optional.empty()));
         } else {
             Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
@@ -222,8 +213,8 @@ class FileAnnotationTab extends JPanel {
         markedTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
-
-        this.add(FormBuilder.create()
+        
+        swingNode.setContent(FormBuilder.create()
                 .columns("0:grow, $lcgap, 0:grow")
                 .rows("fill:pref:grow")
                 .add(annotationPanel).xy(1, 1)
@@ -268,11 +259,8 @@ class FileAnnotationTab extends JPanel {
     }
 
     private void reloadAnnotations() {
-        isInitialized = false;
-        Arrays.stream(this.getComponents()).forEach(this::remove);
         fileAnnotationCache.remove(parent.getEntry());
-        initializeTab(this);
-        this.repaint();
+        initialize();
     }
 
 
@@ -333,15 +321,25 @@ class FileAnnotationTab extends JPanel {
         }
     }
 
+    @Override
+    public boolean shouldShow() {
+        return entry.getField(FieldName.FILE).isPresent();
+    }
+
+    @Override
+    protected void initialize() {
+        addAnnotations();
+        SwingUtilities.invokeLater(this::setUpGui);
+        this.parent.repaint();
+    }
 
     private class AnnotationListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
 
-            int index;
             int annotationListSelectedIndex = 0;
             if (annotationList.getSelectedIndex() >= 0) {
-                index = annotationList.getSelectedIndex();
+                int index = annotationList.getSelectedIndex();
                 updateTextFields(listModel.get(index));
                 annotationListSelectedIndex = index;
             }
@@ -388,9 +386,5 @@ class FileAnnotationTab extends JPanel {
 
             return label;
         }
-    }
-
-    public boolean isInitialized() {
-        return isInitialized;
     }
 }

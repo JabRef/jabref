@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -24,7 +25,7 @@ import org.jabref.logic.importer.util.OAI2Handler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.MonthUtil;
+import org.jabref.model.entry.Month;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -188,10 +189,8 @@ public class OAI2Fetcher implements EntryFetcher {
                 entry.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
                 int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
-                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
-                if (month.isValid()) {
-                    entry.setField(FieldName.MONTH, month.bibtexFormat);
-                }
+                Optional<Month> month = Month.getMonthByNumber(monthNumber);
+                month.ifPresent(entry::setMonth);
             }
         }
         return entry;
@@ -253,7 +252,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 } catch (SAXException e) {
                     String url = constructUrl(OAI2Fetcher.fixKey(key));
                     LOGGER.error("Error while fetching from " + getTitle(), e);
-                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) + "\n" +
                                     Localization.lang("A SAX exception occurred while parsing '%0':", url),
                             Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
                 }

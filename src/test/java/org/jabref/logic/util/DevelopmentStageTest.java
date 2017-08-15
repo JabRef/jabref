@@ -13,25 +13,25 @@ public class DevelopmentStageTest {
         assertTrue(Version.DevelopmentStage.BETA.isMoreStableThan(Version.DevelopmentStage.ALPHA));
         assertTrue(Version.DevelopmentStage.STABLE.isMoreStableThan(Version.DevelopmentStage.BETA));
 
-        assertEquals("It seems that the development stages have been changed, please adjust the test",
-                Version.DevelopmentStage.values().length, 4);
+        assertEquals("It seems that the development stages have been changed, please adjust the test", 4,
+                Version.DevelopmentStage.values().length);
     }
 
     @Test
     public void parseStages() {
-        assertEquals(Version.DevelopmentStage.parse("-alpha"), Version.DevelopmentStage.ALPHA);
-        assertEquals(Version.DevelopmentStage.parse("-beta"), Version.DevelopmentStage.BETA);
-        assertEquals(Version.DevelopmentStage.parse(""), Version.DevelopmentStage.STABLE);
+        assertEquals(Version.DevelopmentStage.ALPHA, Version.DevelopmentStage.parse("-alpha"));
+        assertEquals(Version.DevelopmentStage.BETA, Version.DevelopmentStage.parse("-beta"));
+        assertEquals(Version.DevelopmentStage.STABLE, Version.DevelopmentStage.parse(""));
     }
 
     @Test
     public void parseNull() {
-        assertEquals(Version.DevelopmentStage.parse(null), Version.DevelopmentStage.UNKNOWN);
+        assertEquals(Version.DevelopmentStage.UNKNOWN, Version.DevelopmentStage.parse(null));
     }
 
     @Test
     public void parseUnknownString() {
-        assertEquals(Version.DevelopmentStage.parse("asdf"), Version.DevelopmentStage.UNKNOWN);
+        assertEquals(Version.DevelopmentStage.UNKNOWN, Version.DevelopmentStage.parse("asdf"));
     }
 
 }

@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
+import org.jabref.model.entry.Date;
 import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
@@ -28,7 +29,6 @@ class MSBibEntry {
 
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
-
     public List<MsBibAuthor> authors;
     public List<MsBibAuthor> bookAuthors;
     public List<MsBibAuthor> editors;
@@ -43,10 +43,10 @@ class MSBibEntry {
     public List<MsBibAuthor> interviewers;
     public List<MsBibAuthor> interviewees;
     public List<MsBibAuthor> inventors;
+
     public List<MsBibAuthor> counsels;
 
     public PageNumbers pages;
-
     public String standardNumber;
     public String address;
     public String conferenceName;
@@ -61,6 +61,7 @@ class MSBibEntry {
     public String day;
     public String number;
     public String patentNumber;
+
     public String journalName;
 
     private String bibtexEntryType;
@@ -73,14 +74,6 @@ class MSBibEntry {
      *  tested using http://www.regexpal.com/
      */
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
-
-    /**
-     * Allows 20.3-2007|||20/3-  2007 etc.
-     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
-     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-     */
-    private static final Pattern DATE_PATTERN = Pattern
-            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
     public MSBibEntry() {
         //empty
@@ -165,22 +158,11 @@ class MSBibEntry {
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        StringBuilder sbDateAccesed = new StringBuilder();
-        if (monthAccessed != null) {
-            sbDateAccesed.append(monthAccessed);
-            sbDateAccesed.append(' ');
-        }
-        if (dayAccessed != null) {
-            sbDateAccesed.append(dayAccessed);
-            sbDateAccesed.append(", ");
-        }
-        if (yearAccessed != null) {
-            sbDateAccesed.append(yearAccessed);
-        }
-        dateAccessed = sbDateAccesed.toString().trim();
-        if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
-            dateAccessed = null;
-        }
+        Optional<Date> parsedDateAcessed = Date.parse(Optional.ofNullable(yearAccessed),
+                Optional.ofNullable(monthAccessed),
+                Optional.ofNullable(dayAccessed));
+
+        parsedDateAcessed.map(Date::getNormalized).ifPresent(date -> dateAccessed = date);
 
         NodeList nodeLst = entry.getElementsByTagNameNS("*", "Author");
         if (nodeLst.getLength() > 0) {
@@ -262,15 +244,7 @@ class MSBibEntry {
             addField(document, rootNode, entry.getKey(), entry.getValue());
         }
 
-        // based on bibtex content
-        if (dateAccessed != null) {
-            Matcher matcher = DATE_PATTERN.matcher(dateAccessed);
-            if (matcher.matches() && (matcher.groupCount() >= 3)) {
-                addField(document, rootNode, "Month" + "Accessed", matcher.group(1));
-                addField(document, rootNode, "Day" + "Accessed", matcher.group(2));
-                addField(document, rootNode, "Year" + "Accessed", matcher.group(3));
-            }
-        }
+        Optional.ofNullable(dateAccessed).ifPresent(field -> addDateAcessedFields(document, rootNode));
 
         Element allAuthors = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Author");
 
@@ -358,6 +332,23 @@ class MSBibEntry {
             authorTop.appendChild(nameList);
         }
         allAuthors.appendChild(authorTop);
+
+    }
+
+    private void addDateAcessedFields(Document document, Element rootNode) {
+        Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
+        parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString()).ifPresent(yearAccessed -> {
+            addField(document, rootNode, "Year" + "Accessed", yearAccessed);
+        });
+
+        parsedDateAcesseField.flatMap(Date::getMonth)
+                .map(accMonth -> accMonth.getTwoDigitNumber()).ifPresent(monthAcessed -> {
+                    addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+
+                });
+        parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).ifPresent(dayAccessed -> {
+            addField(document, rootNode, "Day" + "Accessed", dayAccessed);
+        });
 
     }
 

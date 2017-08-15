@@ -15,21 +15,24 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.text.Text;
 
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.preferences.JabRefPreferences;
 
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,11 +43,11 @@ public class IconTheme {
      */
     public static final Color DEFAULT_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_ENABLED_COLOR);
     public static final Color DEFAULT_DISABLED_COLOR = JabRefPreferences.getInstance().getColor(JabRefPreferences.ICON_DISABLED_COLOR);
+    public static Font FONT;
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Log LOGGER = LogFactory.getLog(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(
             IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-    public static Font FONT;
 
     // Christmas edition
     //public static final Color DEFAULT_COLOR = new Color(0x155115);
@@ -163,142 +166,150 @@ public class IconTheme {
 
         return jabrefLogos;
     }
-
+	
     public enum JabRefIcon {
 
-        ADD("\uf416") /*css: mdi-plus-box*/,
-        ADD_NOBOX("\uf415") /*css: plus */,
-        ADD_ENTRY("\uf527") /*css: tooltip-outline-plus */,
-        EDIT_ENTRY("\uf524") /*css: tooltip-edit */,
-        EDIT_STRINGS("\uf528") /*css: tooltip-text */,
-        FOLDER("\uf24b"), /*css: folder */
-        REMOVE("\uf375"), /*css: minus-box */
-        REMOVE_NOBOX("\uf374") /*css: minus */,
-        FILE("\uf214"), /* css: file*/
-        PDF_FILE("\uf225"), /* css: file-pdf*/
-        DOI("\uF072") /*css: barcode-scan*/,
-        DUPLICATE("\uf191") /*css: content-duplicate */,
-        EDIT("\uf3eb") /*css: pencil */,
-        NEW("\uf224") /* css: file-outline */,
-        SAVE("\uf193") /*css: content-save*/,
-        SAVE_ALL("\uf194") /*css: content-save-all*/,
-        CLOSE("\uf156") /* css: close */,
-        PASTE("\uf192") /*css: content-paste*/,
-        CUT("\uf190") /*css: content-cut*/,
-        COPY("\uf18f") /*css: content-copy */,
-        COMMENT("\uF188") /*css: comment*/,
-        REDO("\uf44e") /*css: redo*/,
-        UNDO("\uf54c") /*css: undo*/,
-        MARK_ENTRIES("\uf0c0") /*css: bookmark */,
-        MARKER("\uF524") /*css: marker */,
-        UNMARK_ENTRIES("\uf0c3") /*css: bookmark-outline */,
-        REFRESH("\uf450") /*css: refresh */,
-        DELETE_ENTRY("\uf1c0") /*css: delete */,
-        SEARCH("\uf349") /*css: magnify */,
-        PREFERENCES("\uf493") /*css: settings */,
-        HELP("\uf2d7") /*css: help-circle*/,
-        UP("\uf143") /*css: chevron-up */,
-        DOWN("\uf140") /*css: chevron-down */,
-        LEFT("\uf04e") /* css; arrow-left-bold */,
-        RIGHT("\uf055") /*css: arrow-right-bold */,
-        SOURCE("\uf169") /*css: code-braces*/,
-        MAKE_KEY("\uf30b") /*css: key-variant */,
-        CLEANUP_ENTRIES("\uf0e2") /*css: broom */,
-        PRIORITY("\uf23b") /*css: flag */,
-        PRIORITY_HIGH("\uF23B", Color.RED) /*css: flag */,
-        PRIORITY_MEDIUM("\uF23B", Color.ORANGE) /*css: flag */,
-        PRIORITY_LOW("\uF23B", new Color(111, 204, 117)) /*css: flag */,
-        PRINTED("\uf42a") /*css: printer */,
-        RANKING("\uf4ce") /*css: star + star-outline: f4d2*/,
-        RANK1("\uF4CE\uF4D2\uF4D2\uF4D2\uf4d2"),
-        RANK2("\uF4CE\uF4CE\uF4D2\uF4D2\uF4D2"),
-        RANK3("\uF4CE\uF4CE\uF4CE\uF4D2\uF4D2"),
-        RANK4("\uF4CE\uF4CE\uF4CE\uF4CE\uF4D2"),
-        RANK5("\uF4CE\uF4CE\uF4CE\uF4CE\uF4CE"),
-        WWW("\uf59f") /*css: web*/,
-        GROUP_INCLUDING("\uf233") /*css: filter-outline*/,
-        GROUP_REFINING("\uf232") /*css: filter*/,
-        AUTO_GROUP("\uf068"), /*css: auto-fix*/
-        EMAIL("\uf1ee") /*css: email*/,
-        EXPORT_TO_CLIPBOARD("\uf14b") /*css: clipboard-arrow-left */,
-        ATTACH_FILE("\uf3e2") /*css: paperclip*/,
-        AUTO_FILE_LINK("\uf21e") /*css: file-find */,
-        QUALITY_ASSURED("\uf124"), /*css: certificate */
-        QUALITY("\uF124"),/*css: certificate */
-        OPEN("\uf24b") /*css: folder */,
-        ADD_ROW("\uf490") /* css: server-plus*/,
-        REMOVE_ROW("\uf48c") /*css: server-minus */,
-        PICTURE("\uf21f") /*css: file-image */,
-        READ_STATUS_READ("\uf208", new Color(111, 204, 117)), /*css: eye */
-        READ_STATUS_SKIMMED("\uF208", Color.ORANGE), /*css: eye */
-        READ_STATUS("\uF208"),/*css: eye */
-        RELEVANCE("\uf4cf"),/*css: star-circle */
-        MERGE_ENTRIES("\uf18a"), /* css: compare */
-        CONNECT_OPEN_OFFICE("\uf3cb") /*css: open-in-app */,
-        PLAIN_TEXT_IMPORT_TODO("\uf130") /* css: checkbox-blank-circle-outline*/,
-        PLAIN_TEXT_IMPORT_DONE("\uf134") /* checkbox-marked-circle-outline */,
-        DONATE("\uf2a1"), /* css: gift */
-        MOVE_TAB_ARROW("\uf05e"), /*css:  arrow-up-bold */
-        OPTIONAL("\uf316"), /*css: label-outline */
-        REQUIRED("\uf315"), /*css: label */
-        INTEGRITY_FAIL("\uf159", Color.RED), /*css: close-circle */
-        INTEGRITY_INFO("\uf2fc"), /*css: information */
-        INTEGRITY_WARN("\uf028"), /*css alert-circle */
-        INTEGRITY_SUCCESS("\uF134") /*css: checkbox-marked-circle-outline */,
-        GITHUB("\uf2a4"), /*css: github-circle*/
-        TOGGLE_ENTRY_PREVIEW("\uf332"), /*css: library-books */
-        TOGGLE_GROUPS("\uf572"), /*css: view-list */
-        WRITE_XMP("\uf2fa"), /* css: import */
-        FILE_WORD("\uf22c"), /*css: file-word */
-        FILE_EXCEL("\uf21b"), /*css: file-excel */
-        FILE_POWERPOINT("\uf227"), /*css: file-powerpoint */
-        FILE_TEXT("\uf219"), /*css: file-document */
-        FILE_MULTIPLE("\uf222"), /*css: file-multiple */
-        KEY_BINDINGS("\uf30c"), /*css: keyboard */
-        FIND_DUPLICATES("\uf16b"), /*css: code-equal */
-        PULL("\uf4c2"), /*source-pull*/
-        OPEN_IN_NEW_WINDOW("\uf3cc"), /*css: open-in-new */
-        CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
-        REG_EX("\uf451"), /*css: mdi-regex */
-        CONSOLE("\uf18d"), /*css: console */
-        FORUM("\uf28c"), /* css: forum */
-        FACEBOOK("\uf20c"), /* css: facebook */
-        BLOG("\uf46b"), /* css: rss */
-        GLOBAL_SEARCH("\uF1E7"), /* css: earth */
-        DATE_PICKER("\uF0ED;"), /* css: calendar */
-        DEFAULT_GROUP_ICON("\uF316"), /* css: label-outline */
+        ADD(MaterialDesignIcon.PLUS_BOX),
+        ADD_NOBOX(MaterialDesignIcon.PLUS),
+        ADD_ENTRY(MaterialDesignIcon.TOOLTIP_OUTLINE_PLUS),
+        EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
+        EDIT_STRINGS(MaterialDesignIcon.TOOLTIP_TEXT),
+        FOLDER(MaterialDesignIcon.FOOD_FORK_DRINK),
+        REMOVE(MaterialDesignIcon.MINUS_BOX),
+        REMOVE_NOBOX(MaterialDesignIcon.MINUS),
+        FILE(MaterialDesignIcon.FILE),
+        PDF_FILE(MaterialDesignIcon.FILE_PDF),
+        DOI(MaterialDesignIcon.BARCODE_SCAN),
+        DUPLICATE(MaterialDesignIcon.CONTENT_DUPLICATE),
+        EDIT(MaterialDesignIcon.PENCIL),
+        NEW(MaterialDesignIcon.FILE_OUTLINE),
+        SAVE(MaterialDesignIcon.CONTENT_SAVE),
+        SAVE_ALL(MaterialDesignIcon.CONTENT_SAVE_ALL),
+        CLOSE(MaterialDesignIcon.CLOSE),
+        PASTE(MaterialDesignIcon.CONTENT_PASTE),
+        CUT(MaterialDesignIcon.CONTENT_CUT),
+        COPY(MaterialDesignIcon.CONTENT_COPY),
+        COMMENT(MaterialDesignIcon.COMMENT),
+        REDO(MaterialDesignIcon.REDO),
+        UNDO(MaterialDesignIcon.UNDO),
+        MARK_ENTRIES(MaterialDesignIcon.BOOKMARK),
+        MARKER(MaterialDesignIcon.MARKER),
+        UNMARK_ENTRIES(MaterialDesignIcon.BOOKMARK_OUTLINE),
+        REFRESH(MaterialDesignIcon.REFRESH),
+        DELETE_ENTRY(MaterialDesignIcon.DELETE),
+        SEARCH(MaterialDesignIcon.MAGNIFY),
+        PREFERENCES(MaterialDesignIcon.SETTINGS),
+        HELP(MaterialDesignIcon.HELP_CIRCLE),
+        UP(MaterialDesignIcon.CHEVRON_UP),
+        DOWN(MaterialDesignIcon.CHEVRON_DOWN),
+        LEFT(MaterialDesignIcon.ARROW_LEFT_BOLD),
+        RIGHT(MaterialDesignIcon.ARROW_RIGHT_BOLD),
+        SOURCE(MaterialDesignIcon.CODE_BRACES),
+        MAKE_KEY(MaterialDesignIcon.KEY_VARIANT),
+        CLEANUP_ENTRIES(MaterialDesignIcon.BROOM),
+        PRIORITY(MaterialDesignIcon.FLAG),
+        PRIORITY_HIGH(Color.RED, MaterialDesignIcon.FLAG),
+        PRIORITY_MEDIUM(Color.ORANGE, MaterialDesignIcon.FLAG),
+        PRIORITY_LOW(new Color(111, 204, 117), MaterialDesignIcon.FLAG),
+        PRINTED(MaterialDesignIcon.PRINTER),
+        RANKING(MaterialDesignIcon.STAR),
+        RANK1(MaterialDesignIcon.STAR, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE),
+        RANK2(MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE),
+        RANK3(MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR_OUTLINE, MaterialDesignIcon.STAR_OUTLINE),
+        RANK4(MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR_OUTLINE),
+        RANK5(MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR, MaterialDesignIcon.STAR),
+        WWW(MaterialDesignIcon.WEB) /*css: web*/,
+        GROUP_INCLUDING(MaterialDesignIcon.FILTER_OUTLINE) /*css: filter-outline*/,
+        GROUP_REFINING(MaterialDesignIcon.FILTER) /*css: filter*/,
+        AUTO_GROUP(MaterialDesignIcon.AUTO_FIX), /*css: auto-fix*/
+        EMAIL(MaterialDesignIcon.EMAIL) /*css: email*/,
+        EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT) /*css: clipboard-arrow-left */,
+        ATTACH_FILE(MaterialDesignIcon.PAPERCLIP) /*css: paperclip*/,
+        AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND) /*css: file-find */,
+        QUALITY_ASSURED(MaterialDesignIcon.CERTIFICATE), /*css: certificate */
+        QUALITY(MaterialDesignIcon.CERTIFICATE),/*css: certificate */
+        OPEN(MaterialDesignIcon.FOLDER) /*css: folder */,
+        ADD_ROW(MaterialDesignIcon.SERVER_PLUS) /* css: server-plus*/,
+        REMOVE_ROW(MaterialDesignIcon.SERVER_MINUS) /*css: server-minus */,
+        PICTURE(MaterialDesignIcon.FILE_IMAGE) /*css: file-image */,
+        READ_STATUS_READ(new Color(111, 204, 117), MaterialDesignIcon.EYE), /*css: eye */
+        READ_STATUS_SKIMMED(Color.ORANGE, MaterialDesignIcon.EYE), /*css: eye */
+        READ_STATUS(MaterialDesignIcon.EYE),/*css: eye */
+        RELEVANCE(MaterialDesignIcon.STAR_CIRCLE),/*css: star-circle */
+        MERGE_ENTRIES(MaterialDesignIcon.COMPARE), /* css: compare */
+        CONNECT_OPEN_OFFICE(MaterialDesignIcon.OPEN_IN_APP) /*css: open-in-app */,
+        PLAIN_TEXT_IMPORT_TODO(MaterialDesignIcon.CHECKBOX_BLANK_CIRCLE_OUTLINE) /* css: checkbox-blank-circle-outline*/,
+        PLAIN_TEXT_IMPORT_DONE(MaterialDesignIcon.CHECKBOX_MARKED_CIRCLE_OUTLINE) /* checkbox-marked-circle-outline */,
+        DONATE(MaterialDesignIcon.GIFT), /* css: gift */
+        MOVE_TAB_ARROW(MaterialDesignIcon.ARROW_UP_BOLD), /*css:  arrow-up-bold */
+        OPTIONAL(MaterialDesignIcon.LABEL_OUTLINE), /*css: label-outline */
+        REQUIRED(MaterialDesignIcon.LABEL), /*css: label */
+        INTEGRITY_FAIL(Color.RED, MaterialDesignIcon.CLOSE_CIRCLE), /*css: close-circle */
+        INTEGRITY_INFO(MaterialDesignIcon.INFORMATION), /*css: information */
+        INTEGRITY_WARN(MaterialDesignIcon.ALERT_CIRCLE), /*css alert-circle */
+        INTEGRITY_SUCCESS(MaterialDesignIcon.CHECKBOX_MARKED_CIRCLE_OUTLINE) /*css: checkbox-marked-circle-outline */,
+        GITHUB(MaterialDesignIcon.GITHUB_CIRCLE), /*css: github-circle*/
+        TOGGLE_ENTRY_PREVIEW(MaterialDesignIcon.LIBRARY_BOOKS), /*css: library-books */
+        TOGGLE_GROUPS(MaterialDesignIcon.VIEW_LIST), /*css: view-list */
+        WRITE_XMP(MaterialDesignIcon.IMPORT), /* css: import */
+        FILE_WORD(MaterialDesignIcon.FILE_WORD), /*css: file-word */
+        FILE_EXCEL(MaterialDesignIcon.FILE_EXCEL), /*css: file-excel */
+        FILE_POWERPOINT(MaterialDesignIcon.FILE_POWERPOINT), /*css: file-powerpoint */
+        FILE_TEXT(MaterialDesignIcon.FILE_DOCUMENT), /*css: file-document */
+        FILE_MULTIPLE(MaterialDesignIcon.FILE_MULTIPLE), /*css: file-multiple */
+        KEY_BINDINGS(MaterialDesignIcon.KEYBOARD), /*css: keyboard */
+        FIND_DUPLICATES(MaterialDesignIcon.CODE_EQUAL), /*css: code-equal */
+        PULL(MaterialDesignIcon.SOURCE_PULL), /*source-pull*/
+        OPEN_IN_NEW_WINDOW(MaterialDesignIcon.OPEN_IN_NEW), /*css: open-in-new */
+        CASE_SENSITIVE(MaterialDesignIcon.ALPHABETICAL), /* css: mdi-alphabetical */
+        REG_EX(MaterialDesignIcon.REGEX), /*css: mdi-regex */
+        CONSOLE(MaterialDesignIcon.CONSOLE), /*css: console */
+        FORUM(MaterialDesignIcon.FORUM), /* css: forum */
+        FACEBOOK(MaterialDesignIcon.FACEBOOK), /* css: facebook */
+        BLOG(MaterialDesignIcon.RSS), /* css: rss */
+        GLOBAL_SEARCH(MaterialDesignIcon.EARTH), /* css: earth */
+        DATE_PICKER(MaterialDesignIcon.CALENDAR), /* css: calendar */
+        DEFAULT_GROUP_ICON(MaterialDesignIcon.LABEL_OUTLINE), /* css: label-outline */
         ALL_ENTRIES_GROUP_ICON(DefaultGroupsFactory.ALL_ENTRIES_GROUP_DEFAULT_ICON),
         // STILL MISSING:
-        GROUP_REGULAR("\uF4E6", Color.RED);
+        GROUP_REGULAR(Color.RED, MaterialDesignIcon.SYNC);
 
-        private final String code;
+        private final List<MaterialDesignIcon> icons;
         private final Color color;
+        private final String unicode;
 
-        JabRefIcon(String code) {
-            this(code, IconTheme.DEFAULT_COLOR);
+        JabRefIcon(MaterialDesignIcon... icons) {
+            this(IconTheme.DEFAULT_COLOR, icons);
         }
 
-        JabRefIcon(String code, Color color) {
-            this.code = code;
+        JabRefIcon(Color color, MaterialDesignIcon... icons) {
+            this.icons = Arrays.asList(icons);
             this.color = color;
+            this.unicode = Arrays.stream(icons).map(MaterialDesignIcon::unicode).collect(Collectors.joining());
         }
 
         public FontBasedIcon getIcon() {
-            return new FontBasedIcon(this.code, this.color);
+            return new FontBasedIcon(this.unicode, this.color);
+        }
+
+        public List<MaterialDesignIcon> getUnderlyingIcons() {
+            return icons;
+        }
+
+        public MaterialDesignIcon getUnderlyingIcon() {
+            return icons.get(0);
         }
 
         public FontBasedIcon getSmallIcon() {
-            return new FontBasedIcon(this.code, this.color, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
+            return new FontBasedIcon(this.unicode, this.color, JabRefPreferences.getInstance().getInt(JabRefPreferences.ICON_SIZE_SMALL));
         }
 
         public Node getGraphicNode() {
-            Text graphic = new Text(this.code);
-            graphic.getStyleClass().add("icon");
-            return graphic;
+            return new MaterialDesignIconView(this.icons.get(0));
         }
 
         public String getCode() {
-            return this.code;
+            return this.unicode;
         }
     }
 

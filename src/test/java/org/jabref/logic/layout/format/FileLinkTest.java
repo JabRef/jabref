@@ -1,12 +1,12 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 
 public class FileLinkTest {
@@ -14,7 +14,7 @@ public class FileLinkTest {
     private FileLinkPreferences prefs;
     @Before
     public void setUp() throws Exception {
-        prefs = JabRefPreferences.getInstance().getFileLinkPreferences();
+        prefs = mock(FileLinkPreferences.class);
     }
 
     @Test

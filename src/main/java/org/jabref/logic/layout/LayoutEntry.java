@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.AuthorAbbreviator;
+import org.jabref.logic.layout.format.AuthorAndToSemicolonReplacer;
 import org.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import org.jabref.logic.layout.format.AuthorAndsReplacer;
 import org.jabref.logic.layout.format.AuthorFirstAbbrLastCommas;
@@ -34,6 +35,7 @@ import org.jabref.logic.layout.format.Authors;
 import org.jabref.logic.layout.format.CompositeFormat;
 import org.jabref.logic.layout.format.CreateBibORDFAuthors;
 import org.jabref.logic.layout.format.CreateDocBookAuthors;
+import org.jabref.logic.layout.format.CreateDocBookEditors;
 import org.jabref.logic.layout.format.CurrentDate;
 import org.jabref.logic.layout.format.DOICheck;
 import org.jabref.logic.layout.format.DOIStrip;
@@ -403,6 +405,8 @@ class LayoutEntry {
             return new OOPreFormatter();
         case "AuthorAbbreviator":
             return new AuthorAbbreviator();
+        case "AuthorAndToSemicolonReplacer":
+            return new AuthorAndToSemicolonReplacer();
         case "AuthorAndsCommaReplacer":
             return new AuthorAndsCommaReplacer();
         case "AuthorAndsReplacer":
@@ -445,6 +449,8 @@ class LayoutEntry {
             return new CreateBibORDFAuthors();
         case "CreateDocBookAuthors":
             return new CreateDocBookAuthors();
+        case "CreateDocBookEditors":
+            return new CreateDocBookEditors();
         case "CurrentDate":
             return new CurrentDate();
         case "DateFormatter":

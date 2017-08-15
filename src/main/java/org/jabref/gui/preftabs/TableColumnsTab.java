@@ -450,7 +450,6 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
     }
 
-
     class DeleteRowAction extends AbstractAction {
 
         public DeleteRowAction() {
