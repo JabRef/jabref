@@ -21,7 +21,7 @@ parts:
   jabref:
     plugin: gradle
     source: .
-    stage-packages: [default-jre, openjfx, libglib2.0-bin, x11-utils]
+    stage-packages: [default-jre, openjfx, x11-utils]
     gradle-options: [snapJar]
     gradle-output-dir: 'build/releases'
     after: [desktop-gtk3]
