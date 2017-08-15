@@ -32,7 +32,6 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-
 public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
@@ -188,7 +187,7 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     private void recuriveRemoveFromNode(GroupTreeNodeViewModel node, List<BibEntry> entries) {
         node.removeEntriesFromGroup(entries);
-        for(GroupTreeNodeViewModel child: node.getChildren()) {
+        for (GroupTreeNodeViewModel child: node.getChildren()) {
             recuriveRemoveFromNode(child, entries);
         }
     }
