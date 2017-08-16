@@ -74,6 +74,10 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
+    public void deregisterListeners() {
+        this.entry.unregisterListener(this);
+    }
+
     private void updateSourcePane() {
         try {
             codeArea.clear();
