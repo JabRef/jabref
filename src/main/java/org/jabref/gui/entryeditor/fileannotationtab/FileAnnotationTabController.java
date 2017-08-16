@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor.fileannotationtab;
 import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -80,6 +81,8 @@ public class FileAnnotationTabController extends AbstractController<FileAnnotati
         annotationList.setPlaceholder(new Label(Localization.lang("File has no attached annotations")));
         Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());
         annotationList.getSelectionModel().selectFirst();
+        annotationList.itemsProperty().get().addListener(
+                (ListChangeListener<? super FileAnnotationViewModel>) c -> annotationList.getSelectionModel().selectFirst());
 
         // Set-up details pane
         author.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::authorProperty));
