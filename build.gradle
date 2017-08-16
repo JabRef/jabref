@@ -31,8 +31,8 @@ apply from: 'localization.gradle'
 apply from: 'xjc.gradle'
 
 group = "org.jabref"
-version = "4.0-beta3"
-project.ext.threeDotVersion = "4.0.2.0"
+version = "4.0-dev"
+project.ext.threeDotVersion = "4.0.2.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
