@@ -50,7 +50,7 @@ script:
 after_success:
   # enable codecov report
   - if [ "$TEST_SUITE" != "checkstyle" ] && [ "$TEST_SUITE" != "snapcraft" ]; then ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash); fi
-  - if [ "$TRAVIS_BRANCH" == "snapcraft" ] && [ "$TEST_SUITE" == "snapcraft" ]; then openssl aes-256-cbc -K $encrypted_5f91cda8b19d_key -iv $encrypted_5f91cda8b19d_iv -in .snapcraft/travis_snapcraft.cfg -out .snapcraft/snapcraft.cfg -d && sh ./scripts/run-snapcraft.sh; fi
+  - if [ "$TRAVIS_BRANCH" == "snapcraft-travis" ] && [ "$TEST_SUITE" == "snapcraft" ]; then openssl aes-256-cbc -K $encrypted_5f91cda8b19d_key -iv $encrypted_5f91cda8b19d_iv -in .snapcraft/travis_snapcraft.cfg -out .snapcraft/snapcraft.cfg -d && sh ./scripts/run-snapcraft.sh; fi
 
 after_failure:
   # show test results if build fails
