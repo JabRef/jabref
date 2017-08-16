@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We made the font size in the entry editor and group panel customizable by "Menu and label font size". [#3034](https://github.com/JabRef/jabref/issues/3034)
 - If fetched article is already in database, then the entry merge dialog is shown.
 - An error message is now displayed if you try to create a group containing the keyword separator or if there is already a group with the same name. [#3075](https://github.com/JabRef/jabref/issues/3075) and [#1495](https://github.com/JabRef/jabref/issues/1495)
+- The FileAnnotationsTab was re-implemented in JavaFx. [#3082](https://github.com/JabRef/jabref/pull/3082)
 - Integrity warnings are now directly displayed in the entry editor.
 
 ### Fixed
@@ -31,6 +32,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where changes in the source tab were not stored when selecting a new entry. [#3086](https://github.com/JabRef/jabref/issues/3086)
 - We fixed an issue where the other tab was not updated when fields where changed in the source tab. [#3063](https://github.com/JabRef/jabref/issues/3063)
 - We fixed an issue where the source tab was not updated after fetching data by DOI. [#3103](https://github.com/JabRef/jabref/issues/3103)
+
 ### Removed
 
 
