@@ -27,7 +27,14 @@ public class RegexFormatter implements Formatter {
 
     private static final String PLACEHOLDER_FOR_CLOSING_CURLY_BRACE = Character.toString('\u0A16');
 
-    private static final int REMOVE_OUTER_QUOTES = 2;
+    private static final String QUOTE_AND_OPENING_BRACE = "\"(";
+
+    private static final int LENGTH_OF_QUOTE_AND_OPENING_BRACE = QUOTE_AND_OPENING_BRACE.length();
+
+    private static final String CLOSING_BRACE_AND_QUOTE = ")\"";
+
+    private static final int LENGTH_OF_CLOSING_BRACE_AND_QUOTE = CLOSING_BRACE_AND_QUOTE.length();
+
     // stores the regex set by setRegex
     private static String[] regex;
 
@@ -90,7 +97,7 @@ public class RegexFormatter implements Formatter {
     public static void setRegex(String rex) {
         // formatting is like ("exp1","exp2"), we want to remove (" and ")
         String rexToSet = rex;
-        rexToSet = rexToSet.substring(REMOVE_OUTER_QUOTES, rexToSet.length() - REMOVE_OUTER_QUOTES);
+        rexToSet = rexToSet.substring(LENGTH_OF_QUOTE_AND_OPENING_BRACE, rexToSet.length() - LENGTH_OF_CLOSING_BRACE_AND_QUOTE);
         String[] parts = rexToSet.split("\",\"");
         regex = parts;
     }

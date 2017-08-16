@@ -65,7 +65,9 @@ public class Formatters {
 
     public static final List<Formatter> ALL = new ArrayList<>();
 
-    private static final int LENGTH_OF_REGEX_PREFIX = 5;
+    private static final String REGEX = "regex";
+
+    private static final int LENGTH_OF_REGEX_PREFIX = REGEX.length();
 
     private Formatters() {
     }
