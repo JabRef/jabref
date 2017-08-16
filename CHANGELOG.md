@@ -35,6 +35,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the other tab was not updated when fields where changed in the source tab. [#3063](https://github.com/JabRef/jabref/issues/3063)
 - We fixed an issue where the source tab was not updated after fetching data by DOI. [#3103](https://github.com/JabRef/jabref/issues/3103)
 - We fixed an issue where the move to group operation did not remove the entry from other groups [#3101](https://github.com/JabRef/jabref/issues/3101)
+- We fixed an issue where the main table was not updated when grouping changes [#1903](https://github.com/JabRef/jabref/issues/1903)
 
 ### Removed
 
