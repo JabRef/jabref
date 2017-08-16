@@ -8,13 +8,15 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased]
+## [4.0-beta3] – 2017-08-16
 
 ### Changed
 - We made the font size in the entry editor and group panel customizable by "Menu and label font size". [#3034](https://github.com/JabRef/jabref/issues/3034)
 - If fetched article is already in database, then the entry merge dialog is shown.
 - An error message is now displayed if you try to create a group containing the keyword separator or if there is already a group with the same name. [#3075](https://github.com/JabRef/jabref/issues/3075) and [#1495](https://github.com/JabRef/jabref/issues/1495)
+- The FileAnnotationsTab was re-implemented in JavaFx. [#3082](https://github.com/JabRef/jabref/pull/3082)
 - Integrity warnings are now directly displayed in the entry editor.
+- We added the functionality to have `regex` as modifier. [#457](https://github.com/JabRef/jabref/issues/457)
 
 ### Fixed
 
@@ -23,6 +25,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We readded the undo mechanism for changes in the entry editor [#2973](https://github.com/JabRef/jabref/issues/2973)
 - We fixed an issue where assigning an entry via drag and drop to a group caused JabRef to stop/freeze completely [#3036](https://github.com/JabRef/jabref/issues/3036)
 - We fixed the shortcut <kbd>Ctrl</kbd>+<kbd>F</kbd> for the search field.
+- We fixed an issue where `title_case` and `capitalize` modifiers did not work with shorttitle.
 - We fixed an issue where the preferences could not be imported without a restart of JabRef [#3064](https://github.com/JabRef/jabref/issues/3064)
 - We fixed an issue where <kbd>DEL</kbd>, <kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd> and <kbd>Ctrl</kbd>+<kbd>A</kbd> in the search field triggered corresponding actions in the main table [#3067](https://github.com/JabRef/jabref/issues/3067)
 - We fixed an issue where JabRef freezed when editing an assigned file in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-311050976)
@@ -31,57 +34,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where changes in the source tab were not stored when selecting a new entry. [#3086](https://github.com/JabRef/jabref/issues/3086)
 - We fixed an issue where the other tab was not updated when fields where changed in the source tab. [#3063](https://github.com/JabRef/jabref/issues/3063)
 - We fixed an issue where the source tab was not updated after fetching data by DOI. [#3103](https://github.com/JabRef/jabref/issues/3103)
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- We fixed an issue where the move to group operation did not remove the entry from other groups [#3101](https://github.com/JabRef/jabref/issues/3101)
+- We fixed an issue where the main table was not updated when grouping changes [#1903](https://github.com/JabRef/jabref/issues/1903)
 
 ## [4.0-beta2] – 2017-07-18
 
@@ -913,7 +867,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta2...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta3...HEAD
+[4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
 [4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2

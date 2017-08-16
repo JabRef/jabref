@@ -1409,7 +1409,7 @@ return console.askYesNo(message, true);
     </styles>
   </installerGui>
   <mediaSets>
-    <windows name="Windows 32bit JRE" id="73" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_141" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-x86-1.8.0_141.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+    <windows name="Windows 32bit JRE" id="73" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-x86-1.8.0_144" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-x86-1.8.0_144.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers />
@@ -1422,7 +1422,7 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <windows name="Windows 64bit JRE" id="74" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_141" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-amd64-1.8.0_141.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
+    <windows name="Windows 64bit JRE" id="74" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="64" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="windows-amd64-1.8.0_144" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/windows-amd64-1.8.0_144.tar.gz" jreShared="true" directDownload="false" installOnlyIfNecessary="true" customInstallBaseDir="" contentFilesType="1" verifyIntegrity="true">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedLaunchers />
@@ -1435,7 +1435,7 @@ return console.askYesNo(message, true);
         <customAttributes />
       </autoUpdate>
     </windows>
-    <macos name="Mac OS X Single Bundle JRE" id="77" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_141_unpacked" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/macosx-amd64-1.8.0_141_unpacked.tar.gz" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="23">
+    <macos name="Mac OS X Single Bundle JRE" id="77" customizedId="" mediaFileName="${compiler:sys.shortName}_${compiler:sys.platform}_${compiler:version}" installDir="${compiler:sys.fullName}" overridePrincipalLanguage="false" jreBitType="all" runPostProcessor="false" postProcessor="" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" downloadURL="" includeAllDownloadableComponents="false" includedJRE="macosx-amd64-1.8.0_144_unpacked" manualJREEntry="false" bundleType="2" jreURL="https://files.jabref.org/jres/macosx-amd64-1.8.0_144_unpacked.tar.gz" jreShared="false" directDownload="false" installOnlyIfNecessary="false" requiredVmIdPrefix="" customInstallBaseDir="" contentFilesType="1" installerName="${i18n:InstallerName(${compiler:sys.fullName})}" volumeName="${compiler:sys.shortName}" compressDmg="false" launcherId="23">
       <excludedComponents />
       <includedDownloadableComponents />
       <excludedBeans />
