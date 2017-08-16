@@ -103,6 +103,7 @@ dependencies {
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
     compile 'org.controlsfx:controlsfx:8.40.13'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
+    compile 'de.saxsys:mvvmfx-validation:1.6.0'
 
     compile 'org.fxmisc.flowless:flowless:0.5.2'
     compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
@@ -133,7 +134,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.8.47'
     testCompile 'com.github.tomakehurst:wiremock:2.7.1'
-    testCompile 'org.assertj:assertj-swing-junit:3.7.0'
+    testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
 
     testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
