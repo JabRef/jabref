@@ -43,11 +43,15 @@ public class GroupSidePane extends SidePaneComponent {
 
         Globals.stateManager.activeGroupProperty()
                 .addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
-        // register the panel to all the database contexts
+
+        // register the panel the current active context
         Globals.stateManager.activeDatabaseProperty()
-                .addListener((observable, oldValue, newValue)
-                        -> newValue.ifPresent(databaseContext
-                        -> databaseContext.getDatabase().registerListener(this)));
+                .addListener((observable, oldValue, newValue) -> {
+            newValue.ifPresent(databaseContext ->
+                    databaseContext.getDatabase().registerListener(this));
+            oldValue.ifPresent(databaseContext ->
+                    databaseContext.getDatabase().unregisterListener(this));
+        });
 
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
