@@ -8,7 +8,7 @@ Here, the categories "Changed" for added and changed functionality,
 
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
-## [Unreleased]
+## [4.0-beta3] – 2017-08-16
 
 ### Changed
 - We made the font size in the entry editor and group panel customizable by "Menu and label font size". [#3034](https://github.com/JabRef/jabref/issues/3034)
@@ -36,58 +36,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the source tab was not updated after fetching data by DOI. [#3103](https://github.com/JabRef/jabref/issues/3103)
 - We fixed an issue where the move to group operation did not remove the entry from other groups [#3101](https://github.com/JabRef/jabref/issues/3101)
 - We fixed an issue where the main table was not updated when grouping changes [#1903](https://github.com/JabRef/jabref/issues/1903)
-
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ## [4.0-beta2] – 2017-07-18
 
@@ -919,7 +867,8 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
-[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta2...HEAD
+[unreleased]: https://github.com/JabRef/jabref/compare/v4.0-beta3...HEAD
+[4.0-beta3]: https://github.com/JabRef/jabref/compare/v4.0-beta2...v4.0-beta3
 [4.0-beta2]: https://github.com/JabRef/jabref/compare/v4.0-beta...v4.0-beta2
 [4.0-beta]: https://github.com/JabRef/jabref/compare/v3.8.2...v4.0-beta
 [3.8.2]: https://github.com/JabRef/jabref/compare/v3.8.1...v3.8.2
