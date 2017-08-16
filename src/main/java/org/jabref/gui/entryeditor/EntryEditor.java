@@ -151,6 +151,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
     private EntryType entryType;
+    private SourceTab sourceTab;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
         this.frame = frame;
@@ -334,7 +335,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(new RelatedArticlesTab(entry));
 
         // Source tab
-        SourceTab sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
+        sourceTab = new SourceTab(panel, entry, movingToDifferentEntry);
         tabs.add(sourceTab);
 
         tabbed.getTabs().clear();
@@ -525,7 +526,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void unregisterListeners() {
         this.entry.unregisterListener(this);
+        if (sourceTab != null) {
+            this.sourceTab.deregisterListeners();
+        }
         removeSearchListeners();
+
     }
 
     private void showChangeEntryTypePopupMenu() {
