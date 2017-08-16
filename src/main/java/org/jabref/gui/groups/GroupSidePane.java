@@ -16,10 +16,14 @@ import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The groups side pane.
@@ -39,6 +43,11 @@ public class GroupSidePane extends SidePaneComponent {
 
         Globals.stateManager.activeGroupProperty()
                 .addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
+        // register the panel to all the database contexts
+        Globals.stateManager.activeDatabaseProperty()
+                .addListener((observable, oldValue, newValue)
+                        -> newValue.ifPresent(databaseContext
+                        -> databaseContext.getDatabase().registerListener(this)));
 
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
@@ -58,6 +67,13 @@ public class GroupSidePane extends SidePaneComponent {
             Scene scene = new Scene(root);
             groupsPane.setScene(scene);
         });
+    }
+
+    @Subscribe
+    public synchronized void listen(FieldChangedEvent event) {
+        if (FieldName.GROUPS.equals(event.getFieldName())) {
+            updateShownEntriesAccordingToSelectedGroups(Globals.stateManager.activeGroupProperty());
+        }
     }
 
     private void updateShownEntriesAccordingToSelectedGroups(List<GroupTreeNode> selectedGroups) {
