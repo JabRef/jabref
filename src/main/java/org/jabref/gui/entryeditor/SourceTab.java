@@ -29,9 +29,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.event.EntryChangedEvent;
 
-import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -52,7 +50,6 @@ public class SourceTab extends EntryEditorTab {
         this.entry = entry;
         this.panel = panel;
         this.movingToDifferentEntry = movingToDifferentEntry;
-        panel.getBibDatabaseContext().getDatabase().registerListener(this);
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
@@ -67,26 +64,17 @@ public class SourceTab extends EntryEditorTab {
         return stringWriter.getBuffer().toString();
     }
 
-    @Subscribe
-    public void listen(EntryChangedEvent event) {
-        if (codeArea != null && this.entry.equals(event.getBibEntry())) {
-            DefaultTaskExecutor.runInJavaFXThread(() -> updateSourcePane());
-        }
-    }
-
-    public void deregisterListeners() {
-        this.entry.unregisterListener(this);
-    }
-
-    private void updateSourcePane() {
-        try {
-            codeArea.clear();
-            codeArea.appendText(getSourceString(entry, mode));
-        } catch (IOException ex) {
-            codeArea.appendText(ex.getMessage() + "\n\n" +
-                    Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-            codeArea.setEditable(false);
-            LOGGER.debug("Incorrect entry", ex);
+    public void updateSourcePane() {
+        if (codeArea != null) {
+            try {
+                codeArea.clear();
+                codeArea.appendText(getSourceString(entry, mode));
+            } catch (IOException ex) {
+                codeArea.appendText(ex.getMessage() + "\n\n" +
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                codeArea.setEditable(false);
+                LOGGER.debug("Incorrect entry", ex);
+            }
         }
     }
 

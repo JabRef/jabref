@@ -77,6 +77,7 @@ import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
+import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -223,6 +224,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (OtherFieldsTab.isOtherField(entryType, event.getFieldName())) {
             DefaultTaskExecutor.runInJavaFXThread(() -> rebuildOtherFieldsTab());
         }
+    }
+
+    @Subscribe
+    public synchronized void listen(EntryChangedEvent event) {
+        sourceTab.updateSourcePane();
     }
 
     private void rebuildOtherFieldsTab() {
@@ -526,9 +532,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void unregisterListeners() {
         this.entry.unregisterListener(this);
-        if (sourceTab != null) {
-            this.sourceTab.deregisterListeners();
-        }
         removeSearchListeners();
 
     }
