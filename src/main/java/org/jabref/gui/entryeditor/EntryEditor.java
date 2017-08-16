@@ -524,6 +524,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void unregisterListeners() {
+        this.entry.unregisterListener(this);
         removeSearchListeners();
     }
 
