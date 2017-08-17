@@ -17,7 +17,7 @@ grade: devel
 
 # see https://snapcraft.io/docs/reference/confinement
 # strict | devmode
-confinement: devmode
+confinement: strict
 
 apps:
    jabref:
