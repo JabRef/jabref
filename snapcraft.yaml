@@ -23,7 +23,7 @@ apps:
    jabref:
      command: desktop-launch java -jar $SNAP/jar/JabRef-4.0-dev.jar
      plugs: [home, network-bind, x11]
-     desktop: buildres/snapcraft/jabref.desktop
+     desktop: ../buildres/snapcraft/jabref.desktop
 
 parts:
   jabref:
