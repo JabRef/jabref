@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+ - We integrated the built-in journal abbrevations lists from text files into source code
 
 ### Fixed
 

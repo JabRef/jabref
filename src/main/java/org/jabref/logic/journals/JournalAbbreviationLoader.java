@@ -14,22 +14,18 @@ public class JournalAbbreviationLoader {
 
     private static final Log LOGGER = LogFactory.getLog(JournalAbbreviationLoader.class);
 
-    // journal initialization
-    private static final String JOURNALS_FILE_BUILTIN = "/journals/journalList.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE = "/journals/IEEEJournalListCode.txt";
-    private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     private JournalAbbreviationRepository journalAbbrev;
 
     public static List<Abbreviation> getOfficialIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
+        return IeeeAbbreviationLists.getOfficialAbbreviations();
     }
 
     public static List<Abbreviation> getStandardIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
+        return IeeeAbbreviationLists.getStandardAbbreviations();
     }
 
     public static List<Abbreviation> getBuiltInAbbreviations() {
-        return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+        return BuiltInJournalsList.getAbbreviations();
     }
 
     public static List<Abbreviation> readJournalListFromResource(String resource) {
@@ -60,7 +56,7 @@ public class JournalAbbreviationLoader {
         // for instance, in the personal list one can overwrite abbreviations in the built in list
 
         // Read builtin list
-        journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
+        journalAbbrev.addEntries(BuiltInJournalsList.getAbbreviations());
 
         // read IEEE list
         if (journalAbbreviationPreferences.useIEEEAbbreviations()) {
