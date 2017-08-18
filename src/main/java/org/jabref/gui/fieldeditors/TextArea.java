@@ -10,7 +10,9 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.util.OS;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +38,7 @@ public class TextArea implements FieldEditor {
         textArea = new EditorTextArea(content);
         textArea.setPromptText(title);
 
-        swingPanel = new JFXPanel();
+        swingPanel = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
         DefaultTaskExecutor.runInJavaFXThread(
                 () -> {

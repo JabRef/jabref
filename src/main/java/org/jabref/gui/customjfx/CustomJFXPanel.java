@@ -1,4 +1,4 @@
-package test;
+package org.jabref.gui.customjfx;
 
 import java.awt.event.InputMethodEvent;
 import java.lang.reflect.Field;
@@ -9,6 +9,11 @@ import com.sun.javafx.embed.EmbeddedSceneInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/***
+ * WARNING: THIS IS A CUSTOM HACK TO PREVENT A BUG WITH ACCENTED CHARACTERS PRODUCING AN NPE IN LINUX </br>
+ * So far the bug has only been resolved in openjfx10: <a href="https://bugs.openjdk.java.net/browse/JDK-8185792">https://bugs.openjdk.java.net/browse/JDK-8185792</a>
+ *
+ */
 public class CustomJFXPanel extends JFXPanel {
 
     private EmbeddedSceneInterface myScencePeer;
@@ -21,7 +26,6 @@ public class CustomJFXPanel extends JFXPanel {
             scenePeerField = this.getClass().getSuperclass().getDeclaredField("scenePeer");
             scenePeerField.setAccessible(true);
         } catch (NoSuchFieldException | SecurityException e) {
-            // TODO Auto-generated catch block
             LOGGER.error("Could not access scenePeer Field", e);
 
         }
@@ -44,10 +48,10 @@ public class CustomJFXPanel extends JFXPanel {
         }
 
         try {
+            //the variable must be named different to the original, otherwise reflection does not find the right ones
             this.myScencePeer = (EmbeddedSceneInterface) scenePeerField.get(this);
-        } catch (IllegalArgumentException | IllegalAccessException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
+            LOGGER.error("Could not access scenePeer Field", ex);
         }
 
         myScencePeer.inputMethodEvent(

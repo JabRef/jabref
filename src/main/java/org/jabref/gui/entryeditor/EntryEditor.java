@@ -48,6 +48,7 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.OSXCompatibleToolbar;
 import org.jabref.gui.actions.Actions;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import org.jabref.gui.fieldeditors.FieldEditor;
@@ -72,6 +73,7 @@ import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
+import org.jabref.logic.util.OS;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabase;
@@ -149,8 +151,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * Indicates that we are about to go to the next or previous entry
      */
-    private BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
-    private EntryType entryType;
+    private final BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
+    private final EntryType entryType;
     private SourceTab sourceTab;
 
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
@@ -169,7 +171,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setLayout(borderLayout);
         setupToolBar();
 
-        container = new JFXPanel();
+        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
 
         container.addKeyListener(new KeyAdapter() {
 

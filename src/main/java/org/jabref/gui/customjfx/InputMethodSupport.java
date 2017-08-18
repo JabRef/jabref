@@ -23,7 +23,7 @@
  * questions.
  */
 
-package test;
+package org.jabref.gui.customjfx;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import com.sun.javafx.scene.input.ExtendedInputMethodRequests;
