@@ -22,6 +22,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import javafx.css.PseudoClass;
+import javafx.embed.swing.CustomJFXPanel;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -186,7 +187,7 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        container = new JFXPanel();
+        container = new CustomJFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
             container.addKeyListener(new KeyAdapter() {
