@@ -9,8 +9,15 @@ summary: Bibliography manager
 icon: buildres/snapcraft/JabRef-icon-256.png
 description: JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
 
-grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+# only with the following set to stable + strict, we can do a full release
+
+# see https://snapcraft.io/docs/reference/channels
+# stable | devel
+grade: devel
+
+# see https://snapcraft.io/docs/reference/confinement
+# strict | devmode
+confinement: strict
 
 apps:
    jabref:
