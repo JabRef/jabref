@@ -33,7 +33,6 @@ public class CustomJFXPanel extends JFXPanel {
             sendInputMethodEventToFX(e);
         }
 
-        super.processInputMethodEvent(e);
     }
 
     private void sendInputMethodEventToFX(InputMethodEvent e) {
