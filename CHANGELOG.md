@@ -11,9 +11,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ## [Unreleased]
 
-##2017-08-17
+## 2017-08-17
+
 ### Changed
--Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.  
+
+- Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.  
 
 ### Fixed
 
