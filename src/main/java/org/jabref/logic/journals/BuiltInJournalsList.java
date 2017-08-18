@@ -5,7 +5,7 @@ import java.util.List;
 
 class BuiltInJournalsList {
 
-    private static final List<Abbreviation> builtInList = new ArrayList<>(942);
+    private static final List<Abbreviation> builtInList = new ArrayList<>(15195);
 
     static {
         builtInList.add(new Abbreviation("Canadian Young Scientist Journal", "Can. Young Sci. J."));
