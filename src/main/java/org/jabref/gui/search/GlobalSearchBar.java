@@ -22,7 +22,6 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
 import javafx.css.PseudoClass;
-import javafx.embed.swing.CustomJFXPanel;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -53,6 +52,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
 
 import org.fxmisc.easybind.EasyBind;
+import test.CustomJFXPanel;
 
 public class GlobalSearchBar extends JPanel {
 

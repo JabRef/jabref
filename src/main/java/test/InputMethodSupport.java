@@ -23,7 +23,7 @@
  * questions.
  */
 
-package javafx.embed.swing;
+package test;
 
 import com.sun.javafx.collections.ObservableListWrapper;
 import com.sun.javafx.scene.input.ExtendedInputMethodRequests;

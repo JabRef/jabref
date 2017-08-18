@@ -1,7 +1,9 @@
-package javafx.embed.swing;
+package test;
 
 import java.awt.event.InputMethodEvent;
 import java.lang.reflect.Field;
+
+import javafx.embed.swing.JFXPanel;
 
 import com.sun.javafx.embed.EmbeddedSceneInterface;
 import org.apache.commons.logging.Log;
