@@ -17,7 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
  - We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
-
+ - We fixed a [java bug](https://bugs.openjdk.java.net/browse/JDK-8185792) where linux users could not enter accented characters in the entry editor and the search bar [#3028](https://github.com/JabRef/jabref/issues/3028)  
 ### Removed
 
 
