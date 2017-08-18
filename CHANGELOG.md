@@ -16,6 +16,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.  
 
 ### Fixed
+ - We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
 
 ### Removed
 
