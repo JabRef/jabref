@@ -124,12 +124,11 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 });
                 menu.add(menuItem);
             }
+
             JButton menuButton = new JButton(Localization.lang("Filter"));
             menuButton.addActionListener(entry -> menu.show(menuButton, 0, menuButton.getHeight()));
             FormBuilder builder = FormBuilder.create()
                     .layout(new FormLayout("fill:pref:grow", "fill:pref:grow, 2dlu, pref"));
-
-
 
             JButton filterNoneButton = new JButton(Localization.lang("Filter None"));
             filterNoneButton.addActionListener(event -> {
