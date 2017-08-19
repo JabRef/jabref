@@ -24,7 +24,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textArea.addToContextMenu(EditorMenus.getNameMenu(textArea));
         this.getChildren().add(textArea);
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());

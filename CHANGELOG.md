@@ -13,9 +13,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 
-- Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.  
+- Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
 
 ### Fixed
+ - We re-added the "Normalize to BibTeX name format" context menu item [#3136](https://github.com/JabRef/jabref/issues/3136)
  - We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
 
 ### Removed
