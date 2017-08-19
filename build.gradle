@@ -82,6 +82,7 @@ dependencies {
     compile 'org.openoffice:unoil:4.1.2'
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
+    compile 'info.debatty:java-string-similarity:0.24'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
@@ -101,25 +102,20 @@ dependencies {
     // JavaFX stuff
     compile 'com.airhacks:afterburner.fx:1.7.0'
     compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
+    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
+    compile 'de.saxsys:mvvmfx-validation:1.6.0'
     compile 'org.controlsfx:controlsfx:8.40.13'
     compile 'org.fxmisc.easybind:easybind:1.0.3'
-    compile 'de.saxsys:mvvmfx-validation:1.6.0'
-
     compile 'org.fxmisc.flowless:flowless:0.5.2'
-    compile 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-4'
     compile 'org.fxmisc.richtext:richtextfx:0.7-M5'
-
-    compile 'commons-logging:commons-logging:1.2'
 
     compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.24'
 
+    compile 'commons-logging:commons-logging:1.2'
     compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
     compile 'org.apache.logging.log4j:log4j-api:2.8.2'
     compile 'org.apache.logging.log4j:log4j-core:2.8.2'
-    compile 'org.xmlunit:xmlunit-core:2.4.0'
-    compile 'org.xmlunit:xmlunit-matchers:2.4.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -136,7 +132,8 @@ dependencies {
     testCompile 'com.github.tomakehurst:wiremock:2.7.1'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
-
+    testCompile 'org.xmlunit:xmlunit-core:2.4.0'
+    testCompile 'org.xmlunit:xmlunit-matchers:2.4.0'
     testCompile 'com.tngtech.archunit:archunit-junit:0.4.0'
     testCompile 'org.slf4j:slf4j-jcl:1.7.25' // required by ArchUnit to enable logging over jcl
 }
