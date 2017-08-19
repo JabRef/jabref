@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomJFXPanel extends JFXPanel {
 
+    private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
     private EmbeddedSceneInterface myScencePeer;
     private Field scenePeerField = null;
-    private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
 
     public CustomJFXPanel() {
         super();
