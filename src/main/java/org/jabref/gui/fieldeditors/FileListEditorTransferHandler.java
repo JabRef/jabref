@@ -82,9 +82,11 @@ class FileListEditorTransferHandler extends TransferHandler {
             List<Path> files = new ArrayList<>();
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                // javaFileListFlavor returns a list of java.io.File (as the string *File* in File indicates) and not a list of java.nio.file
+                // There is no DataFlavor.javaPathListFlavor, so we have to deal with java.io.File
                 @SuppressWarnings("unchecked")
                 List<File> transferedFiles = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                files.addAll(transferedFiles.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+                files.addAll(transferedFiles.stream().map(File::toPath).collect(Collectors.toList()));
             } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
                 LOGGER.warn("Dropped URL, which is currently not implemented " + dropLink);
