@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 
 import javafx.embed.swing.JFXPanel;
 
+import org.jabref.gui.customjfx.support.InputMethodSupport;
+
 import com.sun.javafx.embed.EmbeddedSceneInterface;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
