@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+ - We integrated the built-in journal abbrevations lists from text files into source code
 
 - Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.  
 
