@@ -5,11 +5,13 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
@@ -38,13 +40,11 @@ class FileListEditorTransferHandler extends TransferHandler {
 
 
     /**
-     *
-     * @param frame
-     * @param entryContainer
-     * @param textTransferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class is not visible. Therefore, we have to "cheat"
+     * @param textTransferHandler is an instance of javax.swing.plaf.basic.BasicTextUI.TextTransferHandler. That class
+     *                            is not visible. Therefore, we have to "cheat"
      */
     public FileListEditorTransferHandler(JabRefFrame frame, EntryContainer entryContainer,
-            TransferHandler textTransferHandler) {
+                                         TransferHandler textTransferHandler) {
         this.frame = frame;
         this.entryContainer = entryContainer;
         this.textTransferHandler = textTransferHandler;
@@ -57,8 +57,8 @@ class FileListEditorTransferHandler extends TransferHandler {
     }
 
     /**
-     * Overridden to indicate which types of drags are supported (only LINK + COPY).
-     * COPY is supported as no support disables CTRL+C (copy of text)
+     * Overridden to indicate which types of drags are supported (only LINK + COPY). COPY is supported as no support
+     * disables CTRL+C (copy of text)
      */
     @Override
     public int getSourceActions(JComponent c) {
@@ -83,20 +83,18 @@ class FileListEditorTransferHandler extends TransferHandler {
             // This flavor is used for dragged file links in Windows:
             if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 @SuppressWarnings("unchecked")
-                List<Path> transferedFiles = (List<Path>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                files.addAll(transferedFiles);
-            }
-
-            if (t.isDataFlavorSupported(urlFlavor)) {
+                List<File> transferedFiles = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                files.addAll(transferedFiles.stream().map(file -> file.toPath()).collect(Collectors.toList()));
+            } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
-                LOGGER.debug("URL: " + dropLink);
-            }
-
-            // This is used when one or more files are pasted from the file manager
-            // under Gnome. The data consists of the file paths, one file per line:
-            if (t.isDataFlavorSupported(stringFlavor)) {
+                LOGGER.warn("Dropped URL, which is currently not implemented " + dropLink);
+            } else if (t.isDataFlavorSupported(stringFlavor)) {
+                // This is used when one or more files are pasted from the file manager
+                // under Gnome. The data consists of the file paths, one file per line:
                 String dropStr = (String) t.getTransferData(stringFlavor);
                 files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
+            } else {
+                LOGGER.warn("Dropped something, which we currently cannot handle");
             }
 
             SwingUtilities.invokeLater(() -> {
@@ -151,5 +149,4 @@ class FileListEditorTransferHandler extends TransferHandler {
         // nope, never heard of this type
         return false;
     }
-
 }
