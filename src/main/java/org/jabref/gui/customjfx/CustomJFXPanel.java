@@ -19,7 +19,6 @@ import org.apache.commons.logging.LogFactory;
 public class CustomJFXPanel extends JFXPanel {
 
     private static final Log LOGGER = LogFactory.getLog(CustomJFXPanel.class);
-    private EmbeddedSceneInterface myScencePeer;
     private Field scenePeerField = null;
 
     public CustomJFXPanel() {
@@ -49,9 +48,10 @@ public class CustomJFXPanel extends JFXPanel {
             insertionIndex = e.getCaret().getInsertionIndex();
         }
 
+        EmbeddedSceneInterface myScencePeer = null;
         try {
             //the variable must be named different to the original, otherwise reflection does not find the right ones
-            this.myScencePeer = (EmbeddedSceneInterface) scenePeerField.get(this);
+            myScencePeer = (EmbeddedSceneInterface) scenePeerField.get(this);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             LOGGER.error("Could not access scenePeer Field", ex);
         }
