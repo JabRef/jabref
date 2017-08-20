@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
  - We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
+ - We fixed a regression introduced in v4.0-beta2: A file can be dropped to the entry preview to attach it to the entry [koppor#245](https://github.com/koppor/jabref/issues/245)
 
 ### Removed
 
