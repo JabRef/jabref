@@ -1,6 +1,7 @@
 .text-area {
     -fx-text-fill: text-area-foreground;
     -fx-control-inner-background: text-area-background;
+    -fx-min-height: 70;
 }
 
 .text-area *.text {
