@@ -31,8 +31,8 @@ import org.apache.commons.logging.LogFactory;
 class FileListEditorTransferHandler extends TransferHandler {
 
     private static final Log LOGGER = LogFactory.getLog(FileListEditorTransferHandler.class);
-    private DataFlavor urlFlavor;
-    private final DataFlavor stringFlavor;
+
+    private final DataFlavor URL_FLAVOR;
     private final JabRefFrame frame;
     private final EntryContainer entryContainer;
     private final TransferHandler textTransferHandler;
@@ -49,12 +49,18 @@ class FileListEditorTransferHandler extends TransferHandler {
         this.frame = frame;
         this.entryContainer = entryContainer;
         this.textTransferHandler = textTransferHandler;
-        stringFlavor = DataFlavor.stringFlavor;
+        URL_FLAVOR = getUrlFlavor();
+    }
+
+    private DataFlavor getUrlFlavor() {
+        DataFlavor urlFlavor;
         try {
             urlFlavor = new DataFlavor("application/x-java-url; class=java.net.URL");
         } catch (ClassNotFoundException e) {
             LOGGER.info("Unable to configure drag and drop for file link table", e);
+            urlFlavor = null;
         }
+        return urlFlavor;
     }
 
     /**
@@ -87,13 +93,13 @@ class FileListEditorTransferHandler extends TransferHandler {
                 @SuppressWarnings("unchecked")
                 List<File> transferedFiles = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                 files.addAll(transferedFiles.stream().map(File::toPath).collect(Collectors.toList()));
-            } else if (transferable.isDataFlavorSupported(urlFlavor)) {
-                URL dropLink = (URL) transferable.getTransferData(urlFlavor);
+            } else if (transferable.isDataFlavorSupported(URL_FLAVOR)) {
+                URL dropLink = (URL) transferable.getTransferData(URL_FLAVOR);
                 LOGGER.warn("Dropped URL, which is currently not implemented " + dropLink);
-            } else if (transferable.isDataFlavorSupported(stringFlavor)) {
+            } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 // This is used when one or more files are pasted from the file manager
                 // under Gnome. The data consists of the file paths, one file per line:
-                String dropStr = (String) transferable.getTransferData(stringFlavor);
+                String dropStr = (String) transferable.getTransferData(DataFlavor.stringFlavor);
                 files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
             } else {
                 LOGGER.warn("Dropped something, which we currently cannot handle");
@@ -123,29 +129,33 @@ class FileListEditorTransferHandler extends TransferHandler {
         }
 
         // all supported flavors failed
-        // log the flavours to support debugging
-        LOGGER.warn(Arrays.stream(transferable.getTransferDataFlavors())
-                .map(dataFlavor -> dataFlavor.toString())
-                .collect(Collectors.joining(" ", "Cannot transfer input: ", "")));
+        // log the flavors to support debugging
+        LOGGER.warn("Cannot transfer input: " + dataFlavorsToString(transferable.getTransferDataFlavors()));
         return false;
+    }
+
+    private String dataFlavorsToString(DataFlavor[] transferFlavors) {
+        return Arrays.stream(transferFlavors)
+                .map(dataFlavor -> dataFlavor.toString())
+                .collect(Collectors.joining(" "));
     }
 
     /**
      * This method is called to query whether the transfer can be imported.
      *
-     * Will return true for urls, strings, javaFileLists
+     *  @return <code>true</code> for urls, strings, javaFileLists, <code>false</code> otherwise
      */
     @Override
     public boolean canImport(JComponent comp, DataFlavor[] transferFlavors) {
-
         // accept this if any input flavor matches any of our supported flavors
         for (DataFlavor inflav : transferFlavors) {
-            if (inflav.match(urlFlavor) || inflav.match(stringFlavor) || inflav.match(DataFlavor.javaFileListFlavor)) {
+            if (inflav.match(URL_FLAVOR) || inflav.match(DataFlavor.stringFlavor) || inflav.match(DataFlavor.javaFileListFlavor)) {
                 return true;
             }
         }
 
         // nope, never heard of this type
+        LOGGER.debug("Unknown data transfer flavor: " + dataFlavorsToString(transferFlavors));
         return false;
     }
 }
