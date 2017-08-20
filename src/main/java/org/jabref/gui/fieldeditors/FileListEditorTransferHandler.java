@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,27 +74,26 @@ class FileListEditorTransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(JComponent comp, Transferable t) {
+    public boolean importData(JComponent comp, Transferable transferable) {
         // If the drop target is the main table, we want to record which
         // row the item was dropped on, to identify the entry if needed:
 
         try {
-
             List<Path> files = new ArrayList<>();
             // This flavor is used for dragged file links in Windows:
-            if (t.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+            if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 // javaFileListFlavor returns a list of java.io.File (as the string *File* in File indicates) and not a list of java.nio.file
                 // There is no DataFlavor.javaPathListFlavor, so we have to deal with java.io.File
                 @SuppressWarnings("unchecked")
-                List<File> transferedFiles = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
+                List<File> transferedFiles = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                 files.addAll(transferedFiles.stream().map(File::toPath).collect(Collectors.toList()));
-            } else if (t.isDataFlavorSupported(urlFlavor)) {
-                URL dropLink = (URL) t.getTransferData(urlFlavor);
+            } else if (transferable.isDataFlavorSupported(urlFlavor)) {
+                URL dropLink = (URL) transferable.getTransferData(urlFlavor);
                 LOGGER.warn("Dropped URL, which is currently not implemented " + dropLink);
-            } else if (t.isDataFlavorSupported(stringFlavor)) {
+            } else if (transferable.isDataFlavorSupported(stringFlavor)) {
                 // This is used when one or more files are pasted from the file manager
                 // under Gnome. The data consists of the file paths, one file per line:
-                String dropStr = (String) t.getTransferData(stringFlavor);
+                String dropStr = (String) transferable.getTransferData(stringFlavor);
                 files.addAll(EntryTableTransferHandler.getFilesFromDraggedFilesString(dropStr));
             } else {
                 LOGGER.warn("Dropped something, which we currently cannot handle");
@@ -123,13 +123,10 @@ class FileListEditorTransferHandler extends TransferHandler {
         }
 
         // all supported flavors failed
-        StringBuilder logMessage = new StringBuilder("Cannot transfer input:");
-        DataFlavor[] inflavs = t.getTransferDataFlavors();
-        for (DataFlavor inflav : inflavs) {
-            logMessage.append(' ').append(inflav);
-        }
-        LOGGER.warn(logMessage.toString());
-
+        // log the flavours to support debugging
+        LOGGER.warn(Arrays.stream(transferable.getTransferDataFlavors())
+                .map(dataFlavor -> dataFlavor.toString())
+                .collect(Collectors.joining(" ", "Cannot transfer input: ", "")));
         return false;
     }
 
