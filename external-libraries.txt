@@ -28,40 +28,27 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 
 # Libraries
 
+(Sorted alphabetically by Id)
+
+Id:      com.airhacks:afterburner.fx
+Project: afterburner.fx
+URL:     https://github.com/AdamBien/afterburner.fx
+License: Apache 2.0
+
 Id:      com.apple:AppleJavaExtensions
 Project: AppleJavaExtensions
 URL:     https://developer.apple.com/legacy/library/samplecode/AppleJavaExtensions/Introduction/Intro.html
 License: Apple License
 
-Id:      org.antlr:antlr
-Project: ANTLR 3
-URL:     http://www.antlr.org/
-License: BSD
-
-Id:      org.antlr:antlr4
-Project: ANTLR 4
-URL:     http://www.antlr.org/
-License: BSD
-
-Id:      commons-cli:commons-cli
-Project: Apache Commons CLI
-URL:     http://commons.apache.org/cli/
-License: Apache-2.0
-
-Id:      commons-logging:commons-logging
-Project: Apache Commons Logging
-URL:     http://commons.apache.org/logging/
-License: Apache-2.0
-
-Id:      org.apache.commons:commons-lang3
-Project: Apache Commons Lang
-URL:     https://commons.apache.org/proper/commons-lang/
-License: Apache-2.0
-
 Id:      com.github.bkromhout:java-diff-utils
 Project: java-diff-utils
 URL:     https://github.com/bkromhout/java-diff-utils
 License: Apache-2.0
+
+Id:      com.github.tomtung
+Project: latex2unicode
+URL:     https://github.com/tomtung/latex2unicode
+License: Apache 2.0
 
 Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
 Project: pgjdbc-ng
@@ -88,6 +75,46 @@ Project: Unirest for Java
 URL:     https://github.com/Mashape/unirest-java
 License: MIT
 
+Id:      com.microsoft.azure:applicationinsights-core
+Project: Application Insights SDK for Java
+URL:     https://github.com/Microsoft/ApplicationInsights-Java
+License: MIT
+
+Id:      com.microsoft.azure:applicationinsights-logging-log4j2
+Project: Application Insights SDK for Java
+URL:     https://github.com/Microsoft/ApplicationInsights-Java
+License: MIT
+
+Id:      commons-cli:commons-cli
+Project: Apache Commons CLI
+URL:     http://commons.apache.org/cli/
+License: Apache-2.0
+
+Id:      commons-logging:commons-logging
+Project: Apache Commons Logging
+URL:     http://commons.apache.org/logging/
+License: Apache-2.0
+
+Id:      de.codecentric.centerdevice
+Project: javafxsvg
+URL:     https://github.com/codecentric/javafxsvg
+License: BSD 3-Clause
+
+Id:      de.jensd:fontawesomefx-materialdesignfont
+Project: FontAwesomeFX
+URL:     https://bitbucket.org/Jerady/fontawesomefx
+License: Apache-2.0
+
+Id:      de.saxsys:mvvmfx-validation
+Project: mvvm(fx)
+URL:     https://github.com/sialcasa/mvvmFX
+License: Apache-2.0
+
+Id:      de.undercouch.citeproc-java
+Project: Citeproc-Java
+URL:     http://michel-kraemer.github.io/citeproc-java/
+Licence: Apache-2.0
+
 Id:      info.debatty:java-string-similarity
 Project: Java String Similarity
 URL:     https://github.com/tdebatty/java-string-similarity
@@ -102,6 +129,21 @@ Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LGPL-2.1 (not explicitly, but no comments in the source header) and MPL-2.0
+
+Id:      org.antlr:antlr
+Project: ANTLR 3
+URL:     http://www.antlr.org/
+License: BSD
+
+Id:      org.antlr:antlr4
+Project: ANTLR 4
+URL:     http://www.antlr.org/
+License: BSD
+
+Id:      org.apache.commons:commons-lang3
+Project: Apache Commons Lang
+URL:     https://commons.apache.org/proper/commons-lang/
+License: Apache-2.0
 
 Id:      org.apache.logging.log4j
 Project: Apache Log2j 2
@@ -128,12 +170,22 @@ Project: The Legion of the Bouncy Castle
 URL:     https://www.bouncycastle.org/
 License: MIT
 
+Id:      org.citationstyles.styles
+Project: CSL Styles
+URL:     https://github.com/citation-style-language/styles
+Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
+
+Id:      org.citationstyles.locales
+Project: CSL Locales
+URL:     https://github.com/citation-style-language/locales
+Licence: CC-BY-SA-3.0
+
 Id:      org.controlsfx:controlsfx
 Project: ControlsFX
 URL:     http://fxexperience.com/controlsfx/
 License: BSD-3-Clause
 
-Id:      org.fx.misc.easybin:easybind
+Id:      org.fx.misc.easybind:easybind
 Project: EasyBind
 URL:     https://github.com/TomasMikula/EasyBind
 License: BSD-2-Clause
@@ -147,11 +199,6 @@ Id:      org.fxmisc.richtext:richtextfx
 Project: RichTextFX
 URL:     https://github.com/TomasMikula/RichTextFX
 License: BSD-2-Clause
-
-Id:      de.jensd:fontawesomefx-materialdesignfont
-Project: FontAwesomeFX
-URL:     https://bitbucket.org/Jerady/fontawesomefx
-License: Apache-2.0
 
 Id:      org.jsoup:jsoup
 Project: jsoup
@@ -178,6 +225,11 @@ Project: OpenOffice.org
 URL:     http://www.openoffice.org/api/SDK
 License: Apache-2.0
 
+Id:      org.swinglabs.swingx:swingx-core
+Project: SwingX
+URL:     https://swingx.java.net/
+License: LGPL-3.0
+
 Id:      org.xmlunit:xmlunit-core
 Project: XMLUnit
 URL:     http://www.xmlunit.org/
@@ -188,50 +240,10 @@ Project: XMLUnit
 URL:     http://www.xmlunit.org/
 License: Apache 2.0
 
-Id:      org.swinglabs.swingx:swingx-core
-Project: SwingX
-URL:     https://swingx.java.net/
-License: LGPL-3.0
-
 Id:      spin
 Path:    lib/spin.jar
 Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL-2.1+
-
-Id:      org.citationstyles.styles
-Project: CSL Styles
-URL:     https://github.com/citation-style-language/styles
-Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
-
-Id:      org.citationstyles.locales
-Project: CSL Locales
-URL:     https://github.com/citation-style-language/locales
-Licence: CC-BY-SA-3.0
-
-Id:      de.undercouch.citeproc-java
-Project: Citeproc-Java
-URL:     http://michel-kraemer.github.io/citeproc-java/
-Licence: Apache-2.0
-
-Id:      com.airhacks:afterburner.fx
-Project: afterburner.fx
-URL:     https://github.com/AdamBien/afterburner.fx
-License: Apache 2.0
-
-Id:      de.codecentric.centerdevice
-Project: javafxsvg
-URL:     https://github.com/codecentric/javafxsvg
-License: BSD 3-Clause
-
-Id:      de.saxsys:mvvmfx
-Project: mvvm(fx)
-URL:     https://github.com/sialcasa/mvvmFX
-License: Apache-2.0
-
-Id:      com.github.tomtung
-Project: latex2unicode
-URL:     https://github.com/tomtung/latex2unicode
-License: Apache 2.0
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.
