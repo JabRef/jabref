@@ -84,7 +84,6 @@ public class Localization {
         return new LocalizationKeyParams(translation, params).replacePlaceholders();
     }
 
-
     public static String lang(String key, String... params) {
         if (messages == null) {
             setLanguage("en");

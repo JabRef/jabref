@@ -34,6 +34,9 @@ import org.controlsfx.dialog.ProgressDialog;
 
 public class ExportLinkedFilesAction extends AbstractAction {
 
+    private final BiFunction<Path, Path, Path> resolvePathFilename = (p, f) -> {
+        return p.resolve(f.getFileName());
+    };
     private final DialogService ds = new FXDialogService();
 
     public ExportLinkedFilesAction() {
@@ -114,9 +117,4 @@ public class ExportLinkedFilesAction extends AbstractAction {
             dlg.showAndWait();
         });
     }
-
-    BiFunction<Path, Path, Path> resolvePathFilename = (p, f) -> {
-        return p.resolve(f.getFileName());
-    };
-
 }
