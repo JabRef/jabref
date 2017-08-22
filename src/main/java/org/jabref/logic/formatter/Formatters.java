@@ -16,6 +16,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+import org.jabref.logic.formatter.bibtexfields.RegexFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -56,6 +57,7 @@ public class Formatters {
             new NormalizeNamesFormatter(),
             new NormalizePagesFormatter(),
             new OrdinalsToSuperscriptFormatter(),
+            new RegexFormatter(),
             new RemoveBracesFormatter(),
             new UnitsToLatexFormatter(),
             new EscapeUnderscoresFormatter()
@@ -63,12 +65,24 @@ public class Formatters {
 
     public static final List<Formatter> ALL = new ArrayList<>();
 
+    private static final String REGEX = "regex";
+
+    private static final int LENGTH_OF_REGEX_PREFIX = REGEX.length();
+
     private Formatters() {
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {
         Objects.requireNonNull(modifier);
-        Optional<Formatter> formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();
+        Optional<Formatter> formatter;
+
+        if (modifier.matches("regex.*")) {
+            String regex = modifier.substring(LENGTH_OF_REGEX_PREFIX);
+            RegexFormatter.setRegex(regex);
+            formatter = ALL.stream().filter(f -> f.getKey().equals("regex")).findAny();
+        } else {
+            formatter = ALL.stream().filter(f -> f.getKey().equals(modifier)).findAny();
+        }
         if (formatter.isPresent()) {
             return formatter;
         }

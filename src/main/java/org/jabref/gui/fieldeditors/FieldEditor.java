@@ -3,9 +3,6 @@ package org.jabref.gui.fieldeditors;
 import java.awt.Color;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
-
-import org.jabref.gui.autocompleter.AutoCompleteListener;
 
 /**
  * FieldEditors is a common interface between the TextField and TextArea.
@@ -32,15 +29,11 @@ public interface FieldEditor {
         return false;
     }
 
-    JLabel getLabel();
-
     void setActiveBackgroundColor();
 
     void setValidBackgroundColor();
 
     void setInvalidBackgroundColor();
-
-    void setLabelColor(Color color);
 
     void setBackground(Color color);
 
@@ -76,8 +69,4 @@ public interface FieldEditor {
     void undo();
 
     void redo();
-
-    void setAutoCompleteListener(AutoCompleteListener listener);
-
-    void clearAutoCompleteSuggestion();
 }

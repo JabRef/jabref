@@ -43,8 +43,8 @@ public class BibDatabaseTest {
     public void insertEntryAddsEntryToEntriesList() {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
-        assertEquals(database.getEntries().size(), 1);
-        assertEquals(database.getEntryCount(), 1);
+        assertEquals(1, database.getEntries().size());
+        assertEquals(1, database.getEntryCount());
         assertEquals(entry, database.getEntries().get(0));
     }
 
@@ -100,8 +100,8 @@ public class BibDatabaseTest {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
-        assertEquals(database.getStringKeySet().size(), 1);
-        assertEquals(database.getStringCount(), 1);
+        assertEquals(1, database.getStringKeySet().size());
+        assertEquals(1, database.getStringCount());
         assertTrue(database.getStringValues().contains(string));
         assertTrue(database.getStringKeySet().contains(string.getId()));
         assertEquals(string, database.getString(string.getId()));
@@ -113,8 +113,8 @@ public class BibDatabaseTest {
         database.addString(string);
         database.removeString(string.getId());
         assertTrue(database.hasNoStrings());
-        assertEquals(database.getStringKeySet().size(), 0);
-        assertEquals(database.getStringCount(), 0);
+        assertEquals(0, database.getStringKeySet().size());
+        assertEquals(0, database.getStringCount());
         assertFalse(database.getStringValues().contains(string));
         assertFalse(database.getStringKeySet().contains(string.getId()));
         assertNull(database.getString(string.getId()));
@@ -186,7 +186,7 @@ public class BibDatabaseTest {
         BibEntry entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -197,7 +197,7 @@ public class BibDatabaseTest {
         entry = new BibEntry();
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 2);
+        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -209,7 +209,7 @@ public class BibDatabaseTest {
         entry.setCiteKey("AAA");
         database.insertEntry(entry);
         database.removeEntry(entry);
-        assertEquals(database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"), 1);
+        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
     }
 
     @Test
@@ -218,8 +218,8 @@ public class BibDatabaseTest {
         database.addString(string);
         string = new BibtexString("BBB", "#AAA#");
         database.addString(string);
-        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
-        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
+        assertEquals("AAA", database.resolveForStrings("#AAA#"));
+        assertEquals("BBB", database.resolveForStrings("#BBB#"));
     }
 
     @Test
@@ -232,29 +232,29 @@ public class BibDatabaseTest {
         database.addString(string);
         string = new BibtexString( "DDD", "#AAA#");
         database.addString(string);
-        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
-        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
-        assertEquals(database.resolveForStrings("#CCC#"), "CCC");
-        assertEquals(database.resolveForStrings("#DDD#"), "DDD");
+        assertEquals("AAA", database.resolveForStrings("#AAA#"));
+        assertEquals("BBB", database.resolveForStrings("#BBB#"));
+        assertEquals("CCC", database.resolveForStrings("#CCC#"));
+        assertEquals("DDD", database.resolveForStrings("#DDD#"));
     }
 
     @Test
     public void resolveForStringsMonth() {
-        assertEquals(database.resolveForStrings("#jan#"), "January");
+        assertEquals("January", database.resolveForStrings("#jan#"));
     }
 
     @Test
     public void resolveForStringsSurroundingContent() {
         BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
-        assertEquals(database.resolveForStrings("aa#AAA#AAA"), "aaaaaAAA");
+        assertEquals("aaaaaAAA", database.resolveForStrings("aa#AAA#AAA"));
     }
 
     @Test
     public void resolveForStringsOddHashMarkAtTheEnd() {
         BibtexString string = new BibtexString("AAA", "aaa");
         database.addString(string);
-        assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
+        assertEquals("AAAaaaAAA#", database.resolveForStrings("AAA#AAA#AAA#"));
     }
 
     @Test

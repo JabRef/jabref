@@ -51,6 +51,8 @@ public class DiVATest {
         entry.setField("title", "Lower bounds for constant multiplication problems");
         entry.setField("volume", "54");
         entry.setField("year", "2007");
+        entry.setField("abstract", "Lower bounds for problems related to realizing multiplication by constants with shifts, adders, and subtracters are presented. These lower bounds are straightforwardly calculated and have applications in proving the optimality of solutions obtained by heuristics. ");
+        entry.setField("doi", "10.1109/TCSII.2007.903212");
 
         assertEquals(Optional.of(entry), fetcher.performSearchById("diva2:260746"));
     }

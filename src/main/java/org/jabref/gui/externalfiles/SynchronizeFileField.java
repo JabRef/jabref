@@ -168,8 +168,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             switch (answer) {
                             case 1:
                                 // Assign new file.
-                                FileListEntryEditor flEditor = new FileListEntryEditor
-                                (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
+                                FileListEntryEditor flEditor = new FileListEntryEditor(flEntry.toParsedFileField(), false, true, panel.getBibDatabaseContext());
                                 flEditor.setVisible(true, true);
                                 break;
                             case 2:
@@ -225,7 +224,7 @@ public class SynchronizeFileField extends AbstractWorker {
                                 // User wants to change the type of this link.
                                 // First get a model of all file links for this entry:
                                 FileListEntryEditor editor = new FileListEntryEditor
-                                        (panel.frame(), flEntry, false, true, panel.getBibDatabaseContext());
+                                        (flEntry.toParsedFileField(), false, true, panel.getBibDatabaseContext());
                                 editor.setVisible(true, false);
                             }
                         }
@@ -272,7 +271,6 @@ public class SynchronizeFileField extends AbstractWorker {
     }
 
     static class OptionsDialog extends JabRefDialog {
-
         private final JButton ok = new JButton(Localization.lang("OK"));
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private final BibDatabaseContext databaseContext;

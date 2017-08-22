@@ -2,6 +2,7 @@ package org.jabref;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -10,6 +11,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Responsible for managing of all threads (except Swing threads) in JabRef
@@ -23,6 +25,7 @@ public class JabRefExecutorService implements Executor {
         thread.setName("JabRef CachedThreadPool");
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
+
     });
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
@@ -60,6 +63,26 @@ public class JabRefExecutorService implements Executor {
                 // Ignored
             } catch (ExecutionException e) {
                 LOGGER.error("Problem executing command", e);
+            }
+        }
+    }
+
+    public boolean executeAndWait(Callable command) {
+        if (command == null) {
+            LOGGER.debug("Received null as command for execution");
+            return false;
+        }
+
+        Future<?> future = executorService.submit(command);
+        while (true) {
+            try {
+                future.get();
+                return true;
+            } catch (InterruptedException ignored) {
+                // Ignored
+            } catch (ExecutionException e) {
+                LOGGER.error("Problem executing command", e);
+                return false;
             }
         }
     }

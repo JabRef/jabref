@@ -248,7 +248,7 @@ public class GroupsParser {
         if (tokenizer.hasMoreTokens()) {
             group.setExpanded(Integer.parseInt(tokenizer.nextToken()) == 1);
             group.setColor(tokenizer.nextToken());
-            group.setIconCode(tokenizer.nextToken());
+            group.setIconName(tokenizer.nextToken());
             group.setDescription(tokenizer.nextToken());
         }
     }

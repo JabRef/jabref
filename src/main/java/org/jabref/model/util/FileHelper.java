@@ -1,6 +1,5 @@
 package org.jabref.model.util;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,14 +13,15 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 public class FileHelper {
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
      * @param file
      * @return The extension, trimmed and in lowercase.
      */
-    public static Optional<String> getFileExtension(File file) {
-        return getFileExtension(file.getName());
+    public static Optional<String> getFileExtension(Path file) {
+        return getFileExtension(file.toString());
     }
 
     /**
@@ -53,7 +53,7 @@ public class FileHelper {
      * @param name     The filename, may also be a relative path to the file
      */
     public static Optional<Path> expandFilename(final BibDatabaseContext databaseContext, String name,
-                                                        FileDirectoryPreferences fileDirectoryPreferences) {
+            FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
         List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
@@ -81,14 +81,26 @@ public class FileHelper {
      * <p>
      * Will look in each of the given dirs starting from the beginning and
      * returning the first found file to match if any.
+     *
+     * @deprecated use {@link #expandFilenameAsPath(String, List)} instead
      */
+    @Deprecated
     public static Optional<Path> expandFilename(String name, List<String> directories) {
         for (String dir : directories) {
-            if (dir != null) {
-                Optional<Path> result = expandFilename(name, dir);
-                if (result.isPresent()) {
-                    return result;
-                }
+            Optional<Path> result = expandFilename(name, Paths.get(dir));
+            if (result.isPresent()) {
+                return result;
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public static Optional<Path> expandFilenameAsPath(String name, List<Path> directories) {
+        for (Path directory : directories) {
+            Optional<Path> result = expandFilename(name, directory);
+            if (result.isPresent()) {
+                return result;
             }
         }
 
@@ -99,16 +111,17 @@ public class FileHelper {
      * Converts a relative filename to an absolute one, if necessary. Returns
      * an empty optional if the file does not exist.
      */
-    private static Optional<Path> expandFilename(String filename, String directoryName) {
+    private static Optional<Path> expandFilename(String filename, Path directory) {
         Objects.requireNonNull(filename);
-        Objects.requireNonNull(directoryName);
+        Objects.requireNonNull(directory);
 
         Path file = Paths.get(filename);
-        if (Files.exists(file)) {
-            return Optional.of(file);
+        //Explicitly check for an empty String, as File.exists returns true on that empty path, because it maps to the default jar location
+        // if we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here
+        if (filename.isEmpty()) {
+            return Optional.of(directory);
         }
 
-        Path directory = Paths.get(directoryName);
         Path resolvedFile = directory.resolve(file);
         if (Files.exists(resolvedFile)) {
             return Optional.of(resolvedFile);

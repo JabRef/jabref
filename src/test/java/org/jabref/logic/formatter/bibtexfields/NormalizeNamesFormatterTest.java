@@ -111,7 +111,7 @@ public class NormalizeNamesFormatterTest {
 
     @Test
     public void formatExample() {
-        assertEquals(formatter.format(formatter.getExampleInput()), "Einstein, Albert and Turing, Alan");
+        assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
     }
 
     @Test

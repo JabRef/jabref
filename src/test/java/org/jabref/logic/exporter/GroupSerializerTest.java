@@ -50,7 +50,7 @@ public class GroupSerializerTest {
     @Test
     public void serializeSingleExplicitGroupWithIconAndDescription() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
-        group.setIconCode("test icon");
+        group.setIconName("test icon");
         group.setExpanded(true);
         group.setColor(Color.ALICEBLUE);
         group.setDescription("test description");

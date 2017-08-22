@@ -10,13 +10,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -25,7 +21,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -34,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
-    public static final boolean isPosixCompilant = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
@@ -56,7 +51,7 @@ public class FileUtil {
      * Adds an extension to the given file name. The original extension is not replaced. That means,
      * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
      *
-     * @param path the path to add the extension to
+     * @param path      the path to add the extension to
      * @param extension the extension to add
      * @return the with the modified file name
      */
@@ -113,7 +108,6 @@ public class FileUtil {
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
-     * @throws IOException
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
@@ -147,11 +141,10 @@ public class FileUtil {
     /**
      * Renames a given file
      *
-     * @param fromFile The source filename to rename
-     * @param toFile   The target fileName
+     * @param fromFile        The source filename to rename
+     * @param toFile          The target fileName
      * @param replaceExisting Wether to replace existing files or not
      * @return True if the rename was successful, false if an exception occurred
-     *
      */
     public static boolean renameFile(Path fromFile, Path toFile, boolean replaceExisting) {
         try {
@@ -168,110 +161,36 @@ public class FileUtil {
     }
 
     /**
-     * Converts an absolute filename to a relative one, if necessary.
-     * Returns the parameter fileName itself if no shortening is possible
+     * Converts an absolute file to a relative one, if possible.
+     * Returns the parameter file itself if no shortening is possible
      * <p>
      * This method works correctly only if dirs are sorted decent in their length
      * i.e. /home/user/literature/important before /home/user/literature
      *
-     * @param fileName the filename to be shortened
-     * @param dirs     directories to check.
+     * @param file the file to be shortened
+     * @param dirs directories to check
      */
-    public static File shortenFileName(File fileName, List<String> dirs) {
-        if ((fileName == null) || !fileName.isAbsolute() || (dirs == null)) {
-            return fileName;
+    public static Path shortenFileName(Path file, List<Path> dirs) {
+        if (!file.isAbsolute()) {
+            return file;
         }
 
-        for (String dir : dirs) {
-            if (dir != null) {
-                File result = shortenFileName(fileName, dir);
-                if ((result != null) && !result.equals(fileName)) {
-                    return result;
-                }
+        for (Path dir : dirs) {
+            if (file.startsWith(dir)) {
+                return dir.relativize(file);
             }
         }
-        return fileName;
-    }
-
-    private static File shortenFileName(File fileName, String directory) {
-        if ((fileName == null) || !fileName.isAbsolute() || (directory == null)) {
-            return fileName;
-        }
-
-        String dir = directory;
-        String longName;
-        if (OS.WINDOWS) {
-            // case-insensitive matching on Windows
-            longName = fileName.toString().toLowerCase(Locale.ROOT);
-            dir = dir.toLowerCase(Locale.ROOT);
-        } else {
-            longName = fileName.toString();
-        }
-
-        if (!dir.endsWith(OS.FILE_SEPARATOR)) {
-            dir = dir.concat(OS.FILE_SEPARATOR);
-        }
-
-        if (longName.startsWith(dir)) {
-            // result is based on original name, not on lower-cased name
-            String newName = fileName.toString().substring(dir.length());
-            return new File(newName);
-        } else {
-            return fileName;
-        }
-    }
-
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
-            List<File> directories, boolean autolinkExactKeyOnly) {
-        Map<BibEntry, List<File>> result = new HashMap<>();
-
-        // First scan directories
-        Set<Path> filesWithExtension = FileFinder.findFiles(extensions, directories);
-
-        // Initialize Result-Set
-        for (BibEntry entry : entries) {
-            result.put(entry, new ArrayList<>());
-        }
-
-        // Now look for keys
-        nextFile: for (Path file : filesWithExtension) {
-
-            String name = file.getFileName().toString();
-            int dot = name.lastIndexOf('.');
-            // First, look for exact matches:
-            for (BibEntry entry : entries) {
-                Optional<String> citeKey = entry.getCiteKeyOptional();
-                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
-                        && name.substring(0, dot).equals(citeKey.get())) {
-                    result.get(entry).add(file.toFile());
-                    continue nextFile;
-                }
-            }
-            // If we get here, we did not find any exact matches. If non-exact
-            // matches are allowed, try to find one:
-            if (!autolinkExactKeyOnly) {
-                for (BibEntry entry : entries) {
-                    Optional<String> citeKey = entry.getCiteKeyOptional();
-                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
-                        result.get(entry).add(file.toFile());
-                        continue nextFile;
-                    }
-                }
-            }
-        }
-
-        return result;
+        return file;
     }
 
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes list of BibTeX entries
+     * @param bes      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
-     *
      * @return list of files. May be empty
      */
-    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<String> fileDirs) {
+    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
         Objects.requireNonNull(bes);
         Objects.requireNonNull(fileDirs);
 
@@ -291,7 +210,7 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
-            LayoutFormatterPreferences prefs) {
+                                                   LayoutFormatterPreferences prefs) {
         String targetName = null;
 
         StringReader sr = new StringReader(fileNamePattern);
@@ -317,7 +236,7 @@ public class FileUtil {
      * Finds a file inside a directory structure.
      * Will also look for the file inside nested directories.
      *
-     * @param filename the name of the file that should be found
+     * @param filename      the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
      * @return the path to the first file that matches the defined conditions
      */
@@ -337,7 +256,7 @@ public class FileUtil {
      * Finds a file inside a list of directory structures.
      * Will also look for the file inside nested directories.
      *
-     * @param filename the name of the file that should be found
+     * @param filename    the name of the file that should be found
      * @param directories the directories that will be searched
      * @return a list including all found paths to files that match the defined conditions
      */

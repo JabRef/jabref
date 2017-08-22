@@ -10,17 +10,17 @@ dependencies:
     # openssl aes-256-cbc -e -in ./buildres/jabref-cert-2016.p12 -out jabref-cert-2016.p12.enc -k {PASSWORD}
     - openssl aes-256-cbc -d -in ./buildres/jabref-cert-2016.p12.enc -out ./buildres/jabref-cert-2016.p12 -k $CERTIFICATE
     - scripts/prepare-install4j.sh
-    - install4j6/bin/install4jc --verbose --license=$INSTALL4J_KEY --win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
+    - install4j7/bin/install4jc --verbose --license=$INSTALL4J_KEY --win-keystore-password $CERTIFICATE_PW --mac-keystore-password $CERTIFICATE_PW
   override:
     # We do this to decrease build time by using CircleCI's cache. See https://discuss.circleci.com/t/effective-caching-for-gradle/540 for a longer motivation.
     - ./gradlew compileJava
   cache_directories:
-    - "~/.install4j6"
+    - "~/.install4j7"
     - "~/downloads"
 
 test:
   override:
-    - ./gradlew -Pdev=true -Pinstall4jDir="install4j6" release --stacktrace
+    - ./gradlew -Pdev=true -Pinstall4jDir="install4j7" release --stacktrace
   post:
     # save test reports as build artifacts
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
@@ -32,7 +32,7 @@ deployment:
    tag: /v[0-9]+(\.[0-9]+)*(-.+)?/
    commands:
       # we have to do a clean build as changing gradle's "project.version" does not lead to a rebuild of resources (mirroring project.version)
-      - ./gradlew -Pinstall4jDir="install4j6" clean release --stacktrace
+      - ./gradlew -Pinstall4jDir="install4j7" clean release --stacktrace
       # upload at all circumstances
       - scripts/upload-to-builds.jabref.org.sh
   development:

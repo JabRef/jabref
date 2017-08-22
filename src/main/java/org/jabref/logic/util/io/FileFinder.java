@@ -1,51 +1,26 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Map;
 
-import org.jabref.model.util.FileHelper;
+import org.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+public interface FileFinder {
 
-public class FileFinder {
+    /**
+     * Finds all files in the given directories that are probably associated with the given entries and have one of the
+     * passed extensions.
+     *
+     * @param entries     The entries to search for.
+     * @param directories The root directories to search.
+     * @param extensions  The extensions that are acceptable.
+     */
+    Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions);
 
-    private static final Log LOGGER = LogFactory.getLog(FileFinder.class);
-
-    private FileFinder() {
-    }
-
-    public static Set<Path> findFiles(List<String> extensions, List<File> directories) {
-
-        Objects.requireNonNull(directories, "Directories must not be null!");
-        Objects.requireNonNull(extensions, "Extensions must not be null!");
-
-        BiPredicate<Path, BasicFileAttributes> isDirectoryAndContainsExtension = (path,
-                attr) -> !Files.isDirectory(path)
-                        && extensions.contains(FileHelper.getFileExtension(path.toFile()).orElse(""));
-
-        Set<Path> result = new HashSet<>();
-        for (File directory : directories) {
-
-            try (Stream<Path> files = Files.find(directory.toPath(), Integer.MAX_VALUE,
-                    isDirectoryAndContainsExtension)) {
-                result.addAll(files.collect(Collectors.toSet()));
-
-            } catch (IOException e) {
-                LOGGER.error("Problem in finding files", e);
-            }
-        }
-        return result;
-
+    default List<Path> findAssociatedFiles(BibEntry entry, List<Path> directories, List<String> extensions) {
+        Map<BibEntry, List<Path>> associatedFiles = findAssociatedFiles(Collections.singletonList(entry), directories, extensions);
+        return associatedFiles.getOrDefault(entry, Collections.emptyList());
     }
 }

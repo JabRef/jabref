@@ -91,7 +91,7 @@ import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import org.jabref.gui.groups.EntryTableTransferHandler;
-import org.jabref.gui.groups.GroupSelector;
+import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.ImportCustomizationDialog;
@@ -407,7 +407,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             IconTheme.JabRefIcon.MERGE_ENTRIES.getIcon());
     private final AbstractAction downloadFullText = new GeneralAction(Actions.DOWNLOAD_FULL_TEXT,
             Localization.menuTitle("Look up full text documents"),
-            Localization.lang("Look up full text documents"));
+            Globals.getKeyPrefs().getKey(KeyBinding.DOWNLOAD_FULL_TEXT));
     private final AbstractAction increaseFontSize = new IncreaseTableFontSizeAction();
     private final AbstractAction defaultFontSize = new DefaultTableFontSizeAction();
     private final AbstractAction decreseFontSize = new DecreaseTableFontSizeAction();
@@ -461,7 +461,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private PushToApplications pushApplications;
     private GeneralFetcher generalFetcher;
     private OpenOfficePanel openOfficePanel;
-    private GroupSelector groupSelector;
+    private GroupSidePane groupSidePane;
     private int previousTabCount = -1;
     private JMenu newSpec;
 
@@ -626,12 +626,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (currentSearchQuery.isPresent()) {
                     content = currentSearchQuery.get().getQuery();
                 }
-                globalSearchBar.setSearchTerm(content, true);
+                globalSearchBar.setSearchTerm(content);
             }
 
             currentBasePanel.getPreviewPanel().updateLayout();
 
-            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
+            groupSidePane.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSidePane.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
             openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficeSidePanel.class));
@@ -719,11 +719,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initSidePane() {
         sidePaneManager = new SidePaneManager(this);
 
-        groupSelector = new GroupSelector(this, sidePaneManager);
+        groupSidePane = new GroupSidePane(this, sidePaneManager);
         openOfficePanel = new OpenOfficePanel(this, sidePaneManager);
         generalFetcher = new GeneralFetcher(this, sidePaneManager);
 
-        sidePaneManager.register(groupSelector);
+        sidePaneManager.register(groupSidePane);
     }
 
     /**
@@ -1152,10 +1152,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         mb.add(search);
 
-        groups.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
+        groups.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
-            sidePaneManager.register(groupSelector);
-            sidePaneManager.show(GroupSelector.class);
+            sidePaneManager.register(groupSidePane);
+            sidePaneManager.show(GroupSidePane.class);
         }
 
         groups.addSeparator();
@@ -1177,7 +1177,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
-        view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
+        view.add(new JCheckBoxMenuItem(groupSidePane.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(showPdvViewer);
         view.add(getNextPreviewStyleAction());
@@ -1377,7 +1377,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
 
-        tlb.addJToggleButton(new JToggleButton(groupSelector.getToggleAction()));
+        tlb.addJToggleButton(new JToggleButton(groupSidePane.getToggleAction()));
 
         tlb.addSeparator();
 
@@ -1404,7 +1404,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, copyPreview,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
-                groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                groupSidePane.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, lookupIdentifiers, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
@@ -1588,7 +1588,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         Map<String, Double> measurements = new HashMap<>();
         measurements.put("NumberOfEntries", (double)basePanel.getDatabaseContext().getDatabase().getEntryCount());
 
-        Globals.getTelemetryClient().trackEvent("OpenNewDatabase", properties, measurements);
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -1916,10 +1916,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public SidePaneManager getSidePaneManager() {
         return sidePaneManager;
-    }
-
-    public GroupSelector getGroupSelector() {
-        return groupSelector;
     }
 
     public void setPreviewToggle(boolean enabled) {

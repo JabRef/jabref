@@ -11,6 +11,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -36,7 +38,16 @@ public class FXDialogService implements DialogService {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         return alert;
+    }
+
+    @Override
+    public Optional<String> showInputDialogAndWait(String title, String content) {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.setHeaderText(title);
+        inputDialog.setContentText(content);
+        return inputDialog.showAndWait();
     }
 
     @Override

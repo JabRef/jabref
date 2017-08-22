@@ -1,5 +1,7 @@
 package org.jabref.gui.groups;
 
+import java.util.Arrays;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -87,7 +89,71 @@ public class GroupNodeViewModelTest {
         assertEquals(expected, groupViewModel.getChildren());
     }
 
+    @Test
+    public void draggedOnTopOfGroupAddsBeforeIt() throws Exception {
+        GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true));
+        WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true);
+        WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, "keywords", "A > B", true, ',', true);
+        WordKeywordGroup groupC = new WordKeywordGroup("C", GroupHierarchyType.INCLUDING, "keywords", "A > B > B1", true, ',', true);
+        GroupNodeViewModel groupAViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupA));
+        GroupNodeViewModel groupBViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupB));
+        GroupNodeViewModel groupCViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupC));
+
+        groupCViewModel.draggedOn(groupBViewModel, DroppingMouseLocation.TOP);
+
+        assertEquals(Arrays.asList(groupAViewModel, groupCViewModel, groupBViewModel), rootViewModel.getChildren());
+    }
+
+    @Test
+    public void draggedOnBottomOfGroupAddsAfterIt() throws Exception {
+        GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true));
+        WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true);
+        WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, "keywords", "A > B", true, ',', true);
+        WordKeywordGroup groupC = new WordKeywordGroup("C", GroupHierarchyType.INCLUDING, "keywords", "A > B > B1", true, ',', true);
+        GroupNodeViewModel groupAViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupA));
+        GroupNodeViewModel groupBViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupB));
+        GroupNodeViewModel groupCViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupC));
+
+        groupCViewModel.draggedOn(groupAViewModel, DroppingMouseLocation.BOTTOM);
+
+        assertEquals(Arrays.asList(groupAViewModel, groupCViewModel, groupBViewModel), rootViewModel.getChildren());
+    }
+
+    @Test
+    public void draggedOnBottomOfGroupAddsAfterItWhenSourceGroupWasBefore() throws Exception {
+        GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true));
+        WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true);
+        WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, "keywords", "A > B", true, ',', true);
+        WordKeywordGroup groupC = new WordKeywordGroup("C", GroupHierarchyType.INCLUDING, "keywords", "A > B > B1", true, ',', true);
+        GroupNodeViewModel groupAViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupA));
+        GroupNodeViewModel groupBViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupB));
+        GroupNodeViewModel groupCViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupC));
+
+        groupAViewModel.draggedOn(groupBViewModel, DroppingMouseLocation.BOTTOM);
+
+        assertEquals(Arrays.asList(groupBViewModel, groupAViewModel, groupCViewModel), rootViewModel.getChildren());
+    }
+
+    @Test
+    public void draggedOnTopOfGroupAddsBeforeItWhenSourceGroupWasBefore() throws Exception {
+        GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true));
+        WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, "keywords", "A", true, ',', true);
+        WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, "keywords", "A > B", true, ',', true);
+        WordKeywordGroup groupC = new WordKeywordGroup("C", GroupHierarchyType.INCLUDING, "keywords", "A > B > B1", true, ',', true);
+        GroupNodeViewModel groupAViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupA));
+        GroupNodeViewModel groupBViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupB));
+        GroupNodeViewModel groupCViewModel = getViewModelForGroup(rootViewModel.addSubgroup(groupC));
+
+        groupAViewModel.draggedOn(groupCViewModel, DroppingMouseLocation.TOP);
+
+        assertEquals(Arrays.asList(groupBViewModel, groupAViewModel, groupCViewModel), rootViewModel.getChildren());
+    }
+
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
+    }
+
+    private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
         return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
     }
 }

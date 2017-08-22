@@ -16,7 +16,6 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -24,6 +23,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -57,6 +57,60 @@ public class DownloadExternalFile {
         this.frame = frame;
         this.databaseContext = databaseContext;
         this.entry = entry;
+    }
+
+    /**
+     * Look for the last '.' in the link, and return the following characters.
+     * This gives the extension for most reasonably named links.
+     *
+     * @param link The link
+     * @return The suffix, excluding the dot (e.g. "pdf")
+     */
+    public static String getSuffix(final String link) {
+        String strippedLink = link;
+        try {
+            // Try to strip the query string, if any, to get the correct suffix:
+            URL url = new URL(link);
+            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
+                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
+            }
+        } catch (MalformedURLException e) {
+            // Don't report this error, since this getting the suffix is a non-critical
+            // operation, and this error will be triggered and reported elsewhere.
+        }
+        // First see if the stripped link gives a reasonable suffix:
+        String suffix;
+        int strippedLinkIndex = strippedLink.lastIndexOf('.');
+        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
+            suffix = null;
+        } else {
+            suffix = strippedLink.substring(strippedLinkIndex + 1);
+        }
+        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
+            // If the suffix doesn't seem to give any reasonable file type, try
+            // with the non-stripped link:
+            int index = link.lastIndexOf('.');
+            if ((index <= 0) || (index == (link.length() - 1))) {
+                // No occurrence, or at the end
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
+                    return "";
+                } else {
+                    return suffix; // return the first one we found, anyway.
+                }
+            } else {
+                // Check if there are path separators in the suffix - if so, it is definitely
+                // not a proper suffix, so we should give up:
+                if (link.substring(index + 1).indexOf('/') >= 1) {
+                    return "";
+                } else {
+                    return link.substring(index + 1);
+                }
+            }
+        } else {
+            return suffix;
+        }
     }
 
     /**
@@ -159,8 +213,8 @@ public class DownloadExternalFile {
         }
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
-        FileListEntry fileListEntry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
-        editor = new FileListEntryEditor(frame, fileListEntry, true, false, databaseContext, true);
+        LinkedFile fileListEntry = new LinkedFile("", file.getCanonicalPath(), suggestedType.map(ExternalFileType::getName).orElse(""));
+        editor = new FileListEntryEditor(fileListEntry, true, false, databaseContext, true);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {
@@ -208,8 +262,8 @@ public class DownloadExternalFile {
             // path to relative:
             if ((dirPrefix != null) && fileListEntry.getLink().startsWith(directory)
                     && (fileListEntry.getLink().length() > dirPrefix.length())) {
-                fileListEntry = new FileListEntry(fileListEntry.getDescription(),
-                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getType());
+                fileListEntry = new LinkedFile(fileListEntry.getDescription(),
+                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getFileType());
             }
             callback.downloadComplete(fileListEntry);
 
@@ -281,61 +335,6 @@ public class DownloadExternalFile {
         return plannedName;
     }
 
-    /**
-     * Look for the last '.' in the link, and return the following characters.
-     * This gives the extension for most reasonably named links.
-     *
-     * @param link The link
-     * @return The suffix, excluding the dot (e.g. "pdf")
-     */
-    private String getSuffix(final String link) {
-        String strippedLink = link;
-        try {
-            // Try to strip the query string, if any, to get the correct suffix:
-            URL url = new URL(link);
-            if ((url.getQuery() != null) && (url.getQuery().length() < (link.length() - 1))) {
-                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);
-            }
-        } catch (MalformedURLException e) {
-            // Don't report this error, since this getting the suffix is a non-critical
-            // operation, and this error will be triggered and reported elsewhere.
-        }
-        // First see if the stripped link gives a reasonable suffix:
-        String suffix;
-        int strippedLinkIndex = strippedLink.lastIndexOf('.');
-        if ((strippedLinkIndex <= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {
-            suffix = null;
-        } else {
-            suffix = strippedLink.substring(strippedLinkIndex + 1);
-        }
-        if (!ExternalFileTypes.getInstance().isExternalFileTypeByExt(suffix)) {
-            // If the suffix doesn't seem to give any reasonable file type, try
-            // with the non-stripped link:
-            int index = link.lastIndexOf('.');
-            if ((index <= 0) || (index == (link.length() - 1))) {
-                // No occurrence, or at the end
-                // Check if there are path separators in the suffix - if so, it is definitely
-                // not a proper suffix, so we should give up:
-                if (strippedLink.substring(strippedLinkIndex + 1).indexOf('/') >= 1) {
-                    return "";
-                } else {
-                    return suffix; // return the first one we found, anyway.
-                }
-            } else {
-                // Check if there are path separators in the suffix - if so, it is definitely
-                // not a proper suffix, so we should give up:
-                if (link.substring(index + 1).indexOf('/') >= 1) {
-                    return "";
-                } else {
-                    return link.substring(index + 1);
-                }
-            }
-        } else {
-            return suffix;
-        }
-
-    }
-
 
     /**
      * Callback interface that users of this class must implement in order to receive
@@ -343,6 +342,6 @@ public class DownloadExternalFile {
      */
     @FunctionalInterface
     public interface DownloadCallback {
-        void downloadComplete(FileListEntry file);
+        void downloadComplete(LinkedFile file);
     }
 }

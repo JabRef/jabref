@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
@@ -214,15 +216,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -406,6 +408,7 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(fieldName).orElse(null);
+        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
@@ -420,7 +423,11 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        if (isNewField) {
+            eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
+        } else {
+            eventBus.post(new FieldChangedEvent(change, eventSource));
+        }
         return Optional.of(change);
     }
 
@@ -476,7 +483,7 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
         return Optional.of(change);
     }
 
@@ -605,7 +612,8 @@ public class BibEntry implements Cloneable {
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
-        this.commentsBeforeEntry = parsedComments;
+        // delete trailing whitespaces (between entry and text)
+        this.commentsBeforeEntry = REMOVE_TRAILING_WHITESPACE.matcher(parsedComments).replaceFirst("");
     }
 
     public boolean hasChanged() {
@@ -700,7 +708,9 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type, entry.type) && Objects.equals(fields, entry.fields);
+        return Objects.equals(type, entry.type)
+                && Objects.equals(fields, entry.fields)
+                && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
@@ -730,8 +740,7 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-        // delete trailing whitespaces (between entry and text) from stored serialization
-        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+        return commentsBeforeEntry;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
@@ -800,13 +809,14 @@ public class BibEntry implements Cloneable {
     /**
      * Gets a list of linked files.
      *
-     * @return the list of linked files, is never null but can be empty
+     * @return the list of linked files, is never null but can be empty.
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
      */
     public List<LinkedFile> getFiles() {
         //Extract the path
         Optional<String> oldValue = getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
-            return Collections.emptyList();
+            return new ArrayList<>(); //Return new ArrayList because emptyList is immutable
         }
 
         return FileFieldParser.parse(oldValue.get());
@@ -824,6 +834,12 @@ public class BibEntry implements Cloneable {
 
     public ObjectBinding<String> getFieldBinding(String fieldName) {
         return Bindings.valueAt(fields, fieldName);
+    }
+
+    public Optional<FieldChange> addFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(file);
+        return setFiles(linkedFiles);
     }
 
     private interface GetFieldInterface {

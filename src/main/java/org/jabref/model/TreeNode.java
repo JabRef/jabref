@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -604,5 +605,22 @@ import javafx.collections.ObservableList;
         if (!isRoot()) {
             parent.notifyAboutDescendantChange(source);
         }
+    }
+
+    /**
+     * Returns the group and any of its children in the tree satisfying the given condition.
+     */
+    public List<T> findChildrenSatisfying(Predicate<T> matcher) {
+        List<T> hits = new ArrayList<>();
+
+        if (matcher.test((T) this)) {
+            hits.add((T) this);
+        }
+
+        for (T child : getChildren()) {
+            hits.addAll(child.findChildrenSatisfying(matcher));
+        }
+
+        return hits;
     }
 }

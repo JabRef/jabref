@@ -1,12 +1,16 @@
 package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.fxml.Initializable;
-import javafx.scene.text.Font;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.GUIGlobals;
+import com.sun.javafx.scene.control.skin.TextAreaSkin;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable {
 
@@ -23,21 +27,39 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
         // Hide horizontal scrollbar and always wrap text
         setWrapText(true);
 
-        if (GUIGlobals.currentFont != null) {
-            setFont(Font.font(GUIGlobals.currentFont.getFontName(), GUIGlobals.currentFont.getSize()));
-
-            setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";"
-            );
-        }
-
-        getStylesheets().add("org/jabref/gui/fieldeditors/EditorTextArea.css");
+        // Should behave as a normal text field with respect to TAB behaviour
+        addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.TAB) {
+                TextAreaSkin skin = (TextAreaSkin) getSkin();
+                if (event.isShiftDown()) {
+                    // Shift + Tab > previous text area
+                    skin.getBehavior().traversePrevious();
+                } else {
+                    if (event.isControlDown()) {
+                        // Ctrl + Tab > insert tab
+                        skin.getBehavior().callAction("InsertTab");
+                    } else {
+                        // Tab > next text area
+                        skin.getBehavior().traverseNext();
+                    }
+                }
+                event.consume();
+            }
+        });
     }
 
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    /**
+     * Adds the given list of menu items to the context menu.
+     */
+    public void addToContextMenu(List<MenuItem> items) {
+        TextAreaSkin customContextSkin = new TextAreaSkin(this) {
+            @Override
+            public void populateContextMenu(ContextMenu contextMenu) {
+                super.populateContextMenu(contextMenu);
+                contextMenu.getItems().addAll(0, items);
+            }
+        };
+        setSkin(customContextSkin);
     }
 
     @Override

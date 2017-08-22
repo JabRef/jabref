@@ -48,6 +48,6 @@ public class ApplicationInsightsAppender extends AbstractAppender {
         }
         telemetry.getContext().getProperties().putAll(event.getCustomParameters());
 
-        Globals.getTelemetryClient().track(telemetry);
+        Globals.getTelemetryClient().ifPresent(client -> client.track(telemetry));
     }
 }

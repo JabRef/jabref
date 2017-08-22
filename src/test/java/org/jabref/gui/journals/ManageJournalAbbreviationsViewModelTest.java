@@ -76,8 +76,8 @@ public class ManageJournalAbbreviationsViewModelTest {
 
     @Test
     public void testInitialHasNoFilesAndNoAbbreviations() {
-        Assert.assertEquals(viewModel.journalFilesProperty().size(), 0);
-        Assert.assertEquals(viewModel.abbreviationsProperty().size(), 0);
+        Assert.assertEquals(0, viewModel.journalFilesProperty().size());
+        Assert.assertEquals(0, viewModel.abbreviationsProperty().size());
     }
 
     @Test
@@ -430,7 +430,7 @@ public class ManageJournalAbbreviationsViewModelTest {
 
         Assert.assertEquals(expected, actual);
 
-        expected = "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE
+        expected = "EntryEntry = EE" + NEWLINE + "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE
                 + "SomeOtherEntry = SOE" + NEWLINE + "";
         actual = Files.contentOf(testFile5EntriesWithDuplicate.toFile(), StandardCharsets.UTF_8);
 
