@@ -1,8 +1,10 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
@@ -18,8 +20,9 @@ class ConversionMenu extends Menu {
 
         // create menu items, one for each converter
         for (Formatter converter : Formatters.CONVERTERS) {
-            MenuItem menuItem = new MenuItem(converter.getName());
-            //menuItem.setToolTipText(converter.getDescription());
+            CustomMenuItem menuItem = new CustomMenuItem(new Label(converter.getName()));
+            Tooltip toolTip = new Tooltip(converter.getDescription());
+            Tooltip.install(menuItem.getContent(), toolTip);
             menuItem.setOnAction(event -> text.set(converter.format(text.get())));
             this.getItems().add(menuItem);
         }
