@@ -163,31 +163,19 @@ class FieldsEditorTab extends EntryEditorTab {
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
         }
 
-        if(! (fields.contains(FieldName.KEYWORDS) || fields.contains(FieldName.FILE))) {
+        List<RowConstraints> constraints = new ArrayList<>(rows);
+        for (String field : fields) {
             RowConstraints rowExpand = new RowConstraints();
             rowExpand.setVgrow(Priority.ALWAYS);
             rowExpand.setValignment(VPos.TOP);
             if (rows == 0) {
                 rowExpand.setPercentHeight(100);
             } else {
-                rowExpand.setPercentHeight(100 / rows);
+                rowExpand.setPercentHeight(100 / rows * editors.get(field).getWeight());
             }
-            for (int i = 0; i < rows; i++) {
-                gridPane.getRowConstraints().add(rowExpand);
-            }
-        } else {
-            List<RowConstraints> constraints = new ArrayList<>(rows);
-            for (String field: fields) {
-                RowConstraints row = new RowConstraints();
-                if (FieldName.KEYWORDS.equals(field) || FieldName.FILE.equals(field)) {
-                    row.setPercentHeight(100 / rows * 2);
-                } else {
-                    row.setPercentHeight(100 / rows);
-                }
-                constraints.add(row);
-            }
-            gridPane.getRowConstraints().addAll(constraints);
+            constraints.add(rowExpand);
         }
+        gridPane.getRowConstraints().addAll(constraints);
 
         if (GUIGlobals.currentFont != null) {
             gridPane.setStyle(
@@ -219,12 +207,12 @@ class FieldsEditorTab extends EntryEditorTab {
         }
 
         switch (field) {
-        case FieldName.YEAR:
-            return "YYYY";
-        case FieldName.MONTH:
-            return "MM or #mmm#";
-        case FieldName.URL:
-            return "https://";
+            case FieldName.YEAR:
+                return "YYYY";
+            case FieldName.MONTH:
+                return "MM or #mmm#";
+            case FieldName.URL:
+                return "https://";
         }
 
         return "";
