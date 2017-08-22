@@ -10,7 +10,7 @@ public class KeywordsEditor extends SimpleEditor implements FieldEditorFX {
     }
 
     @Override
-    public int getWeight() {
+    public double getWeight() {
         return 2;
     }
 }

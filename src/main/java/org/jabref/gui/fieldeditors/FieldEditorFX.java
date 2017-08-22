@@ -22,5 +22,5 @@ public interface FieldEditorFX {
      *
      * @return the relative weight of the editor in terms of display space
      */
-    default int getWeight() { return 1; }
+    default double getWeight() { return 1; }
 }
