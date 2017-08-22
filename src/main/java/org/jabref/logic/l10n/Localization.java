@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class Localization {
+
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
     public static final String BIBTEX = "BibTeX";
@@ -83,6 +84,7 @@ public class Localization {
         return new LocalizationKeyParams(translation, params).replacePlaceholders();
     }
 
+
     public static String lang(String key, String... params) {
         if (messages == null) {
             setLanguage("en");
@@ -98,4 +100,3 @@ public class Localization {
     }
 
 }
-
