@@ -154,6 +154,8 @@ class FieldsEditorTab extends EntryEditorTab {
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand, new ColumnConstraints(10),
                     columnDoNotContract, columnExpand);
+
+            setCompressedRowLayout(gridPane, rows);
         } else {
             rows = fields.size();
 
@@ -161,21 +163,10 @@ class FieldsEditorTab extends EntryEditorTab {
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
+
+            setRegularRowLayout(gridPane, rows);
         }
 
-        List<RowConstraints> constraints = new ArrayList<>(rows);
-        for (String field : fields) {
-            RowConstraints rowExpand = new RowConstraints();
-            rowExpand.setVgrow(Priority.ALWAYS);
-            rowExpand.setValignment(VPos.TOP);
-            if (rows == 0) {
-                rowExpand.setPercentHeight(100);
-            } else {
-                rowExpand.setPercentHeight(100 / rows * editors.get(field).getWeight());
-            }
-            constraints.add(rowExpand);
-        }
-        gridPane.getRowConstraints().addAll(constraints);
 
         if (GUIGlobals.currentFont != null) {
             gridPane.setStyle(
@@ -193,6 +184,36 @@ class FieldsEditorTab extends EntryEditorTab {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
         return scrollPane;
+    }
+
+    private void setRegularRowLayout(GridPane gridPane, int rows) {
+        List<RowConstraints> constraints = new ArrayList<>(rows);
+        for (String field : fields) {
+            RowConstraints rowExpand = new RowConstraints();
+            rowExpand.setVgrow(Priority.ALWAYS);
+            rowExpand.setValignment(VPos.TOP);
+            if (rows == 0) {
+                rowExpand.setPercentHeight(100);
+            } else {
+                rowExpand.setPercentHeight(100 / rows * editors.get(field).getWeight());
+            }
+            constraints.add(rowExpand);
+        }
+        gridPane.getRowConstraints().addAll(constraints);
+    }
+
+    private void setCompressedRowLayout(GridPane gridPane, int rows) {
+        RowConstraints rowExpand = new RowConstraints();
+        rowExpand.setVgrow(Priority.ALWAYS);
+        rowExpand.setValignment(VPos.TOP);
+        if (rows == 0) {
+            rowExpand.setPercentHeight(100);
+        } else {
+            rowExpand.setPercentHeight(100 / rows);
+        }
+        for (int i = 0; i < rows; i++) {
+            gridPane.getRowConstraints().add(rowExpand);
+        }
     }
 
     private String getPrompt(String field) {
