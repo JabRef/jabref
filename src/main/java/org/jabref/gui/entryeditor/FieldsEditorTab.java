@@ -163,16 +163,30 @@ class FieldsEditorTab extends EntryEditorTab {
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
         }
 
-        RowConstraints rowExpand = new RowConstraints();
-        rowExpand.setVgrow(Priority.ALWAYS);
-        rowExpand.setValignment(VPos.TOP);
-        if (rows == 0) {
-            rowExpand.setPercentHeight(100);
+        if(! (fields.contains(FieldName.KEYWORDS) || fields.contains(FieldName.FILE))) {
+            RowConstraints rowExpand = new RowConstraints();
+            rowExpand.setVgrow(Priority.ALWAYS);
+            rowExpand.setValignment(VPos.TOP);
+            if (rows == 0) {
+                rowExpand.setPercentHeight(100);
+            } else {
+                rowExpand.setPercentHeight(100 / rows);
+            }
+            for (int i = 0; i < rows; i++) {
+                gridPane.getRowConstraints().add(rowExpand);
+            }
         } else {
-            rowExpand.setPercentHeight(100 / rows);
-        }
-        for (int i = 0; i < rows; i++) {
-            gridPane.getRowConstraints().add(rowExpand);
+            List<RowConstraints> constraints = new ArrayList<>(rows);
+            for (String field: fields) {
+                RowConstraints row = new RowConstraints();
+                if (FieldName.KEYWORDS.equals(field) || FieldName.FILE.equals(field)) {
+                    row.setPercentHeight(100 / rows * 2);
+                } else {
+                    row.setPercentHeight(100 / rows);
+                }
+                constraints.add(row);
+            }
+            gridPane.getRowConstraints().addAll(constraints);
         }
 
         if (GUIGlobals.currentFont != null) {
