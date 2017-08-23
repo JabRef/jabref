@@ -136,7 +136,7 @@ public class AuthorListTest {
         String a = AuthorList.fixAuthorLastNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter",
                 true, false);
         String b = AuthorList.fixAuthorLastNameFirstCommas(
-                "John von Neumann" + (0 == 1 ? "" : " and ") + "John Smith and Black Brown, Peter", true, false);
+                "John von Neumann" + (false ? "" : " and ") + "John Smith and Black Brown, Peter", true, false);
 
         // Check caching
         Assert.assertEquals(a, b);
@@ -171,7 +171,7 @@ public class AuthorListTest {
         String a = AuthorList.fixAuthorLastNameFirstCommas(
                 "John von Neumann and John Smith and Black Brown, Peter", true, true);
         String b = AuthorList.fixAuthorLastNameFirstCommas("John von Neumann"
-                + (0 == 1 ? "" : " and ") + "John Smith and Black Brown, Peter", true, true);
+                + (false ? "" : " and ") + "John Smith and Black Brown, Peter", true, true);
 
         // Check caching
         Assert.assertEquals(a, b);
