@@ -238,7 +238,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         boolean isOtherFieldsTabSelected = false;
 
         // find tab index and selection status
-        for (Tab tab: tabbed.getTabs()) {
+        for (Tab tab : tabbed.getTabs()) {
             if (tab instanceof OtherFieldsTab) {
                 index = tabbed.getTabs().indexOf(tab);
                 isOtherFieldsTabSelected = tabbed.getSelectionModel().isSelected(index);
@@ -311,6 +311,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
         });
+    }
+
+    public void close() {
+        closeAction.actionPerformed(null);
     }
 
     private void addTabs(String lastTabName) {
@@ -866,7 +870,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeAndSetLabel(panel.getBibDatabaseContext().getMetaData()
-                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
