@@ -2105,6 +2105,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // if the entry that is displayed in the current entry editor is removed, close the entry editor
             if (isShowingEditor() && currentEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
                 currentEditor.close();
+            }
+
+            if (selectionListener.getPreview().getEntry().equals(entryRemovedEvent.getBibEntry())) {
                 selectionListener.setPreviewActive(false);
             }
         }
