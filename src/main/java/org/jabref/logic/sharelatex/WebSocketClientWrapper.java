@@ -203,6 +203,7 @@ public class WebSocketClientWrapper {
     private void parseContents(String message) {
         try {
 
+            System.out.println("Got message: " + message);
             if (message.contains(":::1")) {
 
                 Thread.currentThread().sleep(300);
