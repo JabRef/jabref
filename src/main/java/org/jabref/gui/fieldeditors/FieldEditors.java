@@ -14,6 +14,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.metadata.MetaData;
@@ -69,6 +70,8 @@ public class FieldEditors {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
             return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
+        } else if (FieldName.KEYWORDS.equals(fieldName)) {
+            return new KeywordsEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
         }
 
         // default
