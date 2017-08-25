@@ -1,9 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.jabref.Globals;
 import org.jabref.preferences.JabRefPreferences;
+
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class EditorValidator {
 
