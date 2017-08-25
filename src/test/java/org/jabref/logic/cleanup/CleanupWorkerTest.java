@@ -58,11 +58,13 @@ public class CleanupWorkerTest {
         context.setDatabaseFile(bibFolder.newFile("test.bib"));
 
         FileDirectoryPreferences fileDirPrefs = mock(FileDirectoryPreferences.class);
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Biblocation as Primary overwrites all other dirs
+        //Biblocation as Primary overwrites all other dirs
+        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
 
         worker = new CleanupWorker(context,
+                //empty fileDirPattern for backwards compatibility
                 new CleanupPreferences("\\bibtexkey",
-                        "", //empty fileDirPattern for backwards compatibility
+                        "",
                         mock(LayoutFormatterPreferences.class),
                         fileDirPrefs));
 
