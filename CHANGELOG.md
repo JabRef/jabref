@@ -14,13 +14,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 - Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
+- We increased the size of the keywords and file text areas in the entry editor
+
 ### Fixed
  - We re-added the "Normalize to BibTeX name format" context menu item [#3136](https://github.com/JabRef/jabref/issues/3136)
  - We fixed a memory leak in the source tab of the entry editor [#3113](https://github.com/JabRef/jabref/issues/3113)
- - We fixed a [java bug](https://bugs.openjdk.java.net/browse/JDK-8185792) where linux users could not enter accented characters in the entry editor and the search bar [#3028](https://github.com/JabRef/jabref/issues/3028)  
+ - We fixed a [java bug](https://bugs.openjdk.java.net/browse/JDK-8185792) where linux users could not enter accented characters in the entry editor and the search bar [#3028](https://github.com/JabRef/jabref/issues/3028)
  - We fixed a regression introduced in v4.0-beta2: A file can be dropped to the entry preview to attach it to the entry [koppor#245](https://github.com/koppor/jabref/issues/245)
  - We fixed an issue in the "Replace String" dialog (<kbd>Ctrl</kbd>+<kbd>R</kbd> where search and replace did not work for the `bibtexkey` field. [#3132](https://github.com/JabRef/jabref/issues/3132)
-### Removed
+
 
 
 
