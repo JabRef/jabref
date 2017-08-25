@@ -166,8 +166,7 @@ class FieldsEditorTab extends EntryEditorTab {
 
             setRegularRowLayout(gridPane, rows);
         }
-
-
+        
         if (GUIGlobals.currentFont != null) {
             gridPane.setStyle(
                     "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
