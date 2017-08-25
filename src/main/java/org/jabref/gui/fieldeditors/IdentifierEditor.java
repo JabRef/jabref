@@ -22,8 +22,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML private IdentifierEditorViewModel viewModel;
@@ -51,8 +49,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         menuItems.addAll(EditorMenus.getDefaultMenu(textArea));
         textArea.addToContextMenu(menuItems);
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public IdentifierEditorViewModel getViewModel() {

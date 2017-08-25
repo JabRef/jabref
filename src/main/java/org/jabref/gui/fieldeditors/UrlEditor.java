@@ -11,8 +11,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
 public class UrlEditor extends HBox implements FieldEditorFX {
 
     @FXML private UrlEditorViewModel viewModel;
@@ -25,8 +23,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public UrlEditorViewModel getViewModel() {

@@ -12,8 +12,6 @@ import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
     @FXML private final SimpleEditorViewModel viewModel;
@@ -33,8 +31,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
             autoCompleter.setShowOnFocus(true);
         }
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     @Override

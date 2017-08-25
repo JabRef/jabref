@@ -16,8 +16,6 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
@@ -34,8 +32,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public JournalEditorViewModel getViewModel() {

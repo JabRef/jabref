@@ -11,8 +11,6 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
-import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @FXML private OwnerEditorViewModel viewModel;
@@ -25,8 +23,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
-        ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
-        validationVisualizer.initVisualization(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {
