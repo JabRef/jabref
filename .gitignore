@@ -1,9 +1,6 @@
 # no generated files in version control
 src/main/gen/
 
-# do not distribute Oracle's JDBC driver
-lib/ojdbc.jar
-
 # private data
 /buildres/jabref-cert-2016.p12
 
@@ -344,3 +341,10 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # End of https://www.gitignore.io/api/gradle,java,jabref,intellij,eclipse,netbeans,windows,linux,macos,node,snapcraft
+
+
+# we really version .jar files - needs to be go after the www.gitignore.io-generated ones, because they ignore *.jar files
+!/lib/*.jar
+
+# do not distribute Oracle's JDBC driver
+lib/ojdbc.jar
