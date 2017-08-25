@@ -23,7 +23,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
 
-        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {

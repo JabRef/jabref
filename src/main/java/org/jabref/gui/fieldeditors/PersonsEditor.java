@@ -5,19 +5,19 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
     @FXML private final PersonsEditorViewModel viewModel;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, AutoCompletePreferences autoCompletePreferences, FieldCheckers fieldCheckers) {
-        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, autoCompletePreferences, fieldCheckers);
+    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JabRefPreferences preferences, FieldCheckers fieldCheckers) {
+        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
         EditorTextArea textArea = new EditorTextArea();
         HBox.setHgrow(textArea, Priority.ALWAYS);
@@ -27,7 +27,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
 
-        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     @Override

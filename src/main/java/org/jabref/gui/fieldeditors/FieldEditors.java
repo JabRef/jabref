@@ -33,18 +33,18 @@ public class FieldEditors {
 
         FieldCheckers fieldCheckers = new FieldCheckers(databaseContext, preferences.getFileDirectoryPreferences());
 
-        if (Globals.prefs.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
+        if (preferences.getTimestampPreferences().getTimestampField().equals(fieldName) || fieldExtras.contains(FieldProperty.DATE)) {
             if (fieldExtras.contains(FieldProperty.ISO_DATE)) {
                 return new DateEditor(fieldName, DateTimeFormatter.ofPattern("[uuuu][-MM][-dd]"), suggestionProvider, fieldCheckers);
             } else {
                 return new DateEditor(fieldName, DateTimeFormatter.ofPattern(Globals.prefs.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);
             }
         } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
-            return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers);
+            return new UrlEditor(fieldName, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
-            return new JournalEditor(fieldName, journalAbbreviationLoader, journalAbbreviationPreferences, suggestionProvider, fieldCheckers);
+            return new JournalEditor(fieldName, journalAbbreviationLoader, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.DOI) || fieldExtras.contains(FieldProperty.EPRINT) || fieldExtras.contains(FieldProperty.ISBN)) {
-            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers);
+            return new IdentifierEditor(fieldName, taskExecutor, dialogService, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return new OwnerEditor(fieldName, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.FILE_EDITOR)) {
@@ -68,11 +68,11 @@ public class FieldEditors {
         } else if (fieldExtras.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldExtras.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
             return new LinkedEntriesEditor(fieldName, databaseContext, suggestionProvider, fieldCheckers);
         } else if (fieldExtras.contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonsEditor(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
+            return new PersonsEditor(fieldName, suggestionProvider, preferences, fieldCheckers);
         }
 
         // default
-        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers);
+        return new SimpleEditor(fieldName, suggestionProvider, fieldCheckers, preferences);
     }
 
     @SuppressWarnings("unchecked")

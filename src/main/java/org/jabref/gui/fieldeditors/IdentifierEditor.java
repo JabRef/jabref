@@ -21,6 +21,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.preferences.JabRefPreferences;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
@@ -30,7 +31,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public IdentifierEditor(String fieldName, TaskExecutor taskExecutor, DialogService dialogService, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
         this.viewModel = new IdentifierEditorViewModel(fieldName, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
@@ -49,7 +50,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         menuItems.addAll(EditorMenus.getDefaultMenu(textArea));
         textArea.addToContextMenu(menuItems);
 
-        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public IdentifierEditorViewModel getViewModel() {

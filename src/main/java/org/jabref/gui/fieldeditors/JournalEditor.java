@@ -13,8 +13,8 @@ import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.JabRefPreferences;
 
 public class JournalEditor extends HBox implements FieldEditorFX {
 
@@ -22,8 +22,8 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     @FXML private EditorTextArea textArea;
     private Optional<BibEntry> entry;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JournalAbbreviationPreferences journalAbbreviationPreferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, journalAbbreviationPreferences, fieldCheckers);
+    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, preferences.getJournalAbbreviationPreferences(), fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -32,7 +32,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
         AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
 
-        EditorValidator.configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public JournalEditorViewModel getViewModel() {
