@@ -166,4 +166,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             linkedFile.edit();
         }
     }
+
+    @Override
+    public double getWeight() {
+        return 2;
+    }
 }
