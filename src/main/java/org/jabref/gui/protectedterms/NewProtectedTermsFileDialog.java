@@ -67,7 +67,7 @@ public class NewProtectedTermsFileDialog extends JabRefDialog {
 
         browse.addActionListener(e -> {
             Optional<Path> file = DefaultTaskExecutor
-                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
+                    .runInJavaFXThread(() -> ds.showFileSaveDialog(fileDialogConfiguration));
             file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
         });
 

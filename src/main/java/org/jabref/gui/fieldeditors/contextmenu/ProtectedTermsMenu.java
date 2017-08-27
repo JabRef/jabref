@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import javax.swing.SwingUtilities;
+
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -60,7 +62,9 @@ class ProtectedTermsMenu extends Menu {
         addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
                     Globals.protectedTermsLoader);
-            dialog.setVisible(true);
+
+            SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+
             if (dialog.isOKPressed()) {
                 // Update preferences with new list
                 Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
