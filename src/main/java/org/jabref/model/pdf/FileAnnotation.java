@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
-
 public class FileAnnotation {
 
     private static final Log LOGGER = LogFactory.getLog(FileAnnotation.class);
