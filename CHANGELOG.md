@@ -26,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
  - We fixed an issue in the "Replace String" dialog (<kbd>Ctrl</kbd>+<kbd>R</kbd> where search and replace did not work for the `bibtexkey` field. [#3132](https://github.com/JabRef/jabref/issues/3132)
 -  We fixed an issue in the entry editor where adding a term to a new protected terms list freezed JabRef completely. [#3157](https://github.com/JabRef/jabref/issues/3157)
 -  We fixed an issue in the "Manage protected terms" dialog where an 'Open file' dialog instead of a 'Save file' dialog was shown when creating a new list. [#3157](https://github.com/JabRef/jabref/issues/3157)
+-  We fixed an issue where a new protected terms list was not available immediately after its addition. [#3161](https://github.com/JabRef/jabref/issues/3161)
 ### Removed
 
 

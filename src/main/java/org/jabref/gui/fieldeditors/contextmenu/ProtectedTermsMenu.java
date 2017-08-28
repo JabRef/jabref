@@ -63,12 +63,15 @@ class ProtectedTermsMenu extends Menu {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
                     Globals.protectedTermsLoader);
 
-            SwingUtilities.invokeLater(() -> dialog.setVisible(true));
+            SwingUtilities.invokeLater(() -> {
+                dialog.setVisible(true);
 
-            if (dialog.isOKPressed()) {
-                // Update preferences with new list
-                Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
-            }
+                if (dialog.isOKPressed()) {
+                    // Update preferences with new list
+                    Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
+                    this.updateFiles();
+                }
+            });
         });
         externalFiles.getItems().add(addToNewFileItem);
     }
