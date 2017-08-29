@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.BiMap;
@@ -9,7 +11,9 @@ public class TypeEditorViewModel extends MapBasedEditorViewModel<String> {
 
     private BiMap<String, String> itemMap = HashBiMap.create(8);
 
-    public TypeEditorViewModel() {
+    public TypeEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        super(fieldName, suggestionProvider, fieldCheckers);
+
         itemMap.put("mathesis", Localization.lang("Master's thesis"));
         itemMap.put("phdthesis", Localization.lang("PhD thesis"));
         itemMap.put("candthesis", Localization.lang("Candidate thesis"));

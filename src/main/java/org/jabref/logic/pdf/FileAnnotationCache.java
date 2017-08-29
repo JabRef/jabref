@@ -22,6 +22,14 @@ public class FileAnnotationCache {
     //the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<String, List<FileAnnotation>>> annotationCache;
 
+    /**
+     * Creates an empty fil annotation cache. Required to allow the annotation cache to be injected into views without
+     * hitting the bug https://github.com/AdamBien/afterburner.fx/issues/71.
+     */
+    public FileAnnotationCache() {
+
+    }
+
     public FileAnnotationCache(BibDatabaseContext context) {
         annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader<BibEntry, Map<String, List<FileAnnotation>>>() {
             @Override
@@ -38,12 +46,12 @@ public class FileAnnotationCache {
      * @return Map containing a list of annotations in a list for each file
      */
     public Map<String, List<FileAnnotation>> getFromCache(BibEntry entry) {
-        LOGGER.debug(String.format("Loading Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
+        LOGGER.debug(String.format("Loading Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
         return annotationCache.getUnchecked(entry);
     }
 
     public void remove(BibEntry entry) {
-        LOGGER.debug(String.format("Deleted Bibentry '%s' from cache.", entry.getField(BibEntry.KEY_FIELD).get()));
+        LOGGER.debug(String.format("Deleted Bibentry '%s' from cache.", entry.getCiteKeyOptional().orElse(entry.getId())));
         annotationCache.invalidate(entry);
     }
 }

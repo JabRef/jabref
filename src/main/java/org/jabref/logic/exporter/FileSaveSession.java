@@ -91,7 +91,7 @@ public class FileSaveSession extends SaveSession {
                     PosixFilePermission.GROUP_READ,
                     PosixFilePermission.GROUP_WRITE,
                     PosixFilePermission.OTHERS_READ);
-            if (FileUtil.isPosixCompilant && Files.exists(file)) {
+            if (FileUtil.IS_POSIX_COMPILANT && Files.exists(file)) {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
@@ -102,7 +102,7 @@ public class FileSaveSession extends SaveSession {
             FileUtil.copyFile(temporaryFile, file, true);
 
             // Restore file permissions
-            if (FileUtil.isPosixCompilant) {
+            if (FileUtil.IS_POSIX_COMPILANT) {
                 try {
                     Files.setPosixFilePermissions(file, oldFilePermissions);
                 } catch (IOException exception) {

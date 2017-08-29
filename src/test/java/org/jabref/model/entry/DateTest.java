@@ -14,4 +14,9 @@ public class DateTest {
         Date expected = new Date(LocalDate.of(2014, 6, 19));
         assertEquals(Optional.of(expected), Date.parse("19-06-2014"));
     }
+
+    @Test(expected = NullPointerException.class)
+    public void parseDateNull() {
+        assertEquals(Optional.empty(), Date.parse(null));
+    }
 }

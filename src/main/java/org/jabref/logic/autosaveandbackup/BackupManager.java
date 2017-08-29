@@ -22,6 +22,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -47,16 +48,14 @@ public class BackupManager {
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
 
-
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.preferences = JabRefPreferences.getInstance();
         BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
 
-        // Listen for change events
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
+        CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter.registerListener(this);
     }
 
     static Path getBackupPath(Path originalPath) {

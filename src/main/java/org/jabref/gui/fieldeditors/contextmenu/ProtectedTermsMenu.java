@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import javax.swing.SwingUtilities;
+
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -14,7 +16,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final Menu externalFiles;
     private final TextArea opener;
 
@@ -30,7 +32,7 @@ class ProtectedTermsMenu extends Menu {
         });
 
         MenuItem formatItem = new MenuItem(Localization.lang("Format field"));
-        formatItem.setOnAction(event -> opener.setText(formatter.format(opener.getText())));
+        formatItem.setOnAction(event -> opener.setText(FORMATTER.format(opener.getText())));
 
         externalFiles = new Menu(Localization.lang("Add selected text to list"));
         updateFiles();
@@ -60,14 +62,17 @@ class ProtectedTermsMenu extends Menu {
         addToNewFileItem.setOnAction(event -> {
             NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
                     Globals.protectedTermsLoader);
-            dialog.setVisible(true);
-            if (dialog.isOKPressed()) {
-                // Update preferences with new list
-                Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
-            }
+
+            SwingUtilities.invokeLater(() -> {
+                dialog.setVisible(true);
+
+                if (dialog.isOKPressed()) {
+                    // Update preferences with new list
+                    Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
+                    this.updateFiles();
+                }
+            });
         });
         externalFiles.getItems().add(addToNewFileItem);
-
     }
-
 }

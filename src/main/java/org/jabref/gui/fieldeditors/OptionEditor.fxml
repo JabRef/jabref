@@ -3,5 +3,6 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.HBox?>
 <fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
-    <ComboBox fx:id="comboBox" editable="true" prefHeight="0" HBox.hgrow="ALWAYS"/>
+    <ComboBox fx:id="comboBox" editable="true" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="Infinity"
+              maxWidth="Infinity"/>
 </fx:root>

@@ -1,30 +1,29 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.JabRefPreferences;
 
 public class OwnerEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private OwnerEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
-    private Optional<BibEntry> entry;
 
-    public OwnerEditor(String fieldName, JabRefPreferences preferences) {
-        this.fieldName = fieldName;
-        this.viewModel = new OwnerEditorViewModel(preferences);
+    public OwnerEditor(String fieldName, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new OwnerEditorViewModel(fieldName, suggestionProvider, preferences, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
 
     public OwnerEditorViewModel getViewModel() {
@@ -33,8 +32,7 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        this.entry = Optional.of(entry);
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

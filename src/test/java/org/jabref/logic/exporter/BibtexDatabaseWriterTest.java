@@ -80,7 +80,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
@@ -98,7 +98,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writePreambleAndEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
         database.setPreamble("Test preamble");
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
@@ -123,7 +123,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeEncodingAndEntry() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
         database.insertEntry(entry);
@@ -148,7 +148,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeEpilogueAndEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
         database.setEpilog("Test epilog");
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
@@ -171,7 +171,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeMetadataAndEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(mock(GlobalBibtexKeyPattern.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
@@ -202,7 +202,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeGroupsAndEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
 
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
@@ -232,7 +232,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeStringAndEncoding() throws Exception {
-        SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
+        SavePreferences preferences = new SavePreferences().withEncoding(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);

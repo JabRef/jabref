@@ -12,26 +12,28 @@ import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
  */
 
 public enum FileAnnotationType {
-    TEXT("Text"),
-    HIGHLIGHT("Highlight"),
-    UNDERLINE("Underline"),
-    POLYGON("Polygon"),
-    POPUP("Popup"),
-    LINE("Line"),
-    CIRCLE("Circle"),
-    FREETEXT("FreeText"),
-    STRIKEOUT("Strikeout"),
-    LINK("Link"),
-    INK("Ink"),
-    UNKNOWN("Unknown"),
-    NONE("None");
+    TEXT("Text", false),
+    HIGHLIGHT("Highlight", true),
+    SQUIGGLY("Squiggly", true),
+    UNDERLINE("Underline", true),
+    STRIKEOUT("StrikeOut", true),
+    POLYGON("Polygon", false),
+    POPUP("Popup", false),
+    LINE("Line", false),
+    CIRCLE("Circle", false),
+    FREETEXT("FreeText", false),
+    INK("Ink", false),
+    UNKNOWN("Unknown", false),
+    NONE("None", false);
 
     private static final Log LOGGER = LogFactory.getLog(FileAnnotationType.class);
 
     private final String name;
+    private final boolean linkedFileAnnotationType;
 
-    FileAnnotationType(String name) {
+    FileAnnotationType(String name, boolean linkedFileAnnotationType) {
         this.name = name;
+        this.linkedFileAnnotationType = linkedFileAnnotationType;
     }
 
     /**
@@ -48,6 +50,24 @@ public enum FileAnnotationType {
             LOGGER.info(String.format("FileAnnotationType %s is not supported and was converted into 'Unknown'!", annotation.getSubtype()));
             return UNKNOWN;
         }
+    }
+
+    /**
+     * Determines if a String is a supported marked FileAnnotation type.
+     *
+     * @param annotationType a type descriptor
+     * @return true if annotationType is a supported marked FileAnnotation type
+     */
+    public static boolean isMarkedFileAnnotationType(String annotationType) {
+        try {
+            return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean isLinkedFileAnnotationType() {
+        return linkedFileAnnotationType;
     }
 
     public String toString() {

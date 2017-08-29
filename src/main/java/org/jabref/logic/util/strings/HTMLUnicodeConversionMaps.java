@@ -471,7 +471,7 @@ public class HTMLUnicodeConversionMaps {
             /* Manually added */
             {"35", "", "\\#"}, // Hash
             {"36", "dollar", "\\$"}, // Dollar
-            {"37", "percnt", "\\%"}, // Percent
+            {"37", "#37", "\\%"}, // Percent (&percnt; is not displayed correctly in the entry preview)
             {"39", "apos", "'"}, // Apostrophe
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket

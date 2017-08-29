@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -154,8 +155,11 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
 
-        // Remove url to ADS page
+        // Remove ADS note
         new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
-        new FieldFormatterCleanup("adsurl", new ClearFormatter()).cleanup(entry);
+        // Move adsurl to url field
+        new MoveFieldCleanup("adsurl", FieldName.URL).cleanup(entry);
+        // The fetcher adds some garbage (number of found entries etc before)
+        entry.setCommentsBeforeEntry("");
     }
 }

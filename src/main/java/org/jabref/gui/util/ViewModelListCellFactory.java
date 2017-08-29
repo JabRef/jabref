@@ -1,7 +1,9 @@
 package org.jabref.gui.util;
 
-import javafx.event.EventHandler;
+import java.util.function.BiConsumer;
+
 import javafx.scene.Node;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
@@ -25,8 +27,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
     private Callback<T, String> toText;
     private Callback<T, Node> toGraphic;
     private Callback<T, String> toTooltip;
-    private Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent;
     private Callback<T, String> toStyleClass;
+    private Callback<T, ContextMenu> toContextMenu;
 
     public ViewModelListCellFactory<T> withText(Callback<T, String> toText) {
         this.toText = toText;
@@ -57,13 +60,18 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
         return this;
     }
 
+    public ViewModelListCellFactory<T> withContextMenu(Callback<T, ContextMenu> toContextMenu) {
+        this.toContextMenu = toContextMenu;
+        return this;
+    }
+
     public ViewModelListCellFactory<T> withStyleClass(Callback<T, String> toStyleClass) {
         this.toStyleClass = toStyleClass;
         return this;
     }
 
     public ViewModelListCellFactory<T> withOnMouseClickedEvent(
-            Callback<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
+            BiConsumer<T, ? super MouseEvent> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
         return this;
     }
@@ -91,7 +99,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         setGraphic(toGraphic.call(viewModel));
                     }
                     if (toOnMouseClickedEvent != null) {
-                        setOnMouseClicked(toOnMouseClickedEvent.call(viewModel));
+                        setOnMouseClicked(event -> toOnMouseClickedEvent.accept(viewModel, event));
                     }
                     if (toStyleClass != null) {
                         getStyleClass().setAll(toStyleClass.call(viewModel));
@@ -101,6 +109,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         if (StringUtil.isNotBlank(tooltipText)) {
                             setTooltip(new Tooltip(tooltipText));
                         }
+                    }
+                    if (toContextMenu != null) {
+                        setContextMenu(toContextMenu.call(viewModel));
                     }
                 }
                 getListView().refresh();

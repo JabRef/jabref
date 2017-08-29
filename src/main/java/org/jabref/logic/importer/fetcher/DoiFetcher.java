@@ -23,7 +23,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
-    public static final String name = "DOI";
+    public static final String NAME = "DOI";
 
     private final ImportFormatPreferences preferences;
 
@@ -33,7 +33,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public String getName() {
-        return DoiFetcher.name;
+        return DoiFetcher.NAME;
     }
 
     @Override
@@ -80,5 +80,4 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         bibEntry.ifPresent(list::add);
         return list;
     }
-
 }

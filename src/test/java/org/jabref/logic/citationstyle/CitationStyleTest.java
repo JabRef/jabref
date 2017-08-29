@@ -24,7 +24,7 @@ public class CitationStyleTest {
                 "<i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>\n" +
                 "  </div>\n";
 
-        Assert.assertEquals(citation, expected);
+        Assert.assertEquals(expected, citation);
     }
 
 }

@@ -20,13 +20,13 @@ public class OAI2Handler extends DefaultHandler {
 
     private final BibEntry entry;
 
-    private StringBuffer authors;
+    private StringBuilder authors;
 
     private String keyname;
 
     private String forenames;
 
-    private StringBuffer characters;
+    private StringBuilder characters;
 
 
     public OAI2Handler(BibEntry be) {
@@ -35,7 +35,7 @@ public class OAI2Handler extends DefaultHandler {
 
     @Override
     public void startDocument() throws SAXException {
-        authors = new StringBuffer();
+        authors = new StringBuilder();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OAI2Handler extends DefaultHandler {
     public void startElement(String uri, String localName, String qualifiedName,
             Attributes attributes) throws SAXException {
 
-        characters = new StringBuffer();
+        characters = new StringBuilder();
     }
 
     @Override

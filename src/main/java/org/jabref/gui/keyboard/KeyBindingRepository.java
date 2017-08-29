@@ -44,7 +44,7 @@ public class KeyBindingRepository {
         if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {
             // Use default key bindings
             for (KeyBinding keyBinding : KeyBinding.values()) {
-                put(keyBinding, keyBinding.getDefaultBinding());
+                put(keyBinding, keyBinding.getDefaultKeyBinding());
             }
         } else {
             for (int i = 0; i < bindNames.size(); i++) {
@@ -53,8 +53,24 @@ public class KeyBindingRepository {
         }
     }
 
+    /**
+     * Check if the given keyCombination equals the given keyEvent
+     *
+     * @param combination as KeyCombination
+     * @param keyEvent    as KeEvent
+     * @return true if matching, else false
+     */
+    public static boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
+        KeyCode code = keyEvent.getCode();
+        if (code == KeyCode.UNDEFINED) {
+            return false;
+        }
+
+        return combination.match(keyEvent);
+    }
+
     public Optional<String> get(KeyBinding key) {
-        return getKeyBinding(key).flatMap(k -> Optional.ofNullable(bindings.get(k)));
+        return Optional.ofNullable(bindings.get(key));
     }
 
     public String get(String key) {
@@ -64,7 +80,7 @@ public class KeyBindingRepository {
         if (result.isPresent()) {
             return result.get();
         } else if (keyBinding.isPresent()) {
-            return keyBinding.get().getDefaultBinding();
+            return keyBinding.get().getDefaultKeyBinding();
         } else {
             return "Not associated";
         }
@@ -78,31 +94,48 @@ public class KeyBindingRepository {
     }
 
     public void put(KeyBinding key, String value) {
-        getKeyBinding(key).ifPresent(binding -> bindings.put(binding, value));
+        bindings.put(key, value);
     }
 
     public void put(String key, String value) {
-        getKeyBinding(key).ifPresent(binding -> bindings.put(binding, value));
+        getKeyBinding(key).ifPresent(binding -> put(binding, value));
     }
 
     private Optional<KeyBinding> getKeyBinding(String key) {
-        return Arrays.stream(KeyBinding.values()).filter(b -> b.getKey().equals(key)).findFirst();
-    }
-
-    private Optional<KeyBinding> getKeyBinding(KeyBinding key) {
-        return Arrays.stream(KeyBinding.values()).filter(b -> b.equals(key)).findFirst();
+        return Arrays.stream(KeyBinding.values()).filter(b -> b.getConstant().equals(key)).findFirst();
     }
 
     public void resetToDefault(String key) {
-        getKeyBinding(key).ifPresent(b -> bindings.put(b, b.getDefaultBinding()));
+        getKeyBinding(key).ifPresent(b -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public void resetToDefault() {
-        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultBinding()));
+        bindings.forEach((b, s) -> bindings.put(b, b.getDefaultKeyBinding()));
     }
 
     public int size() {
         return this.bindings.size();
+    }
+
+    public Optional<KeyBinding> mapToKeyBinding(KeyEvent keyEvent) {
+        for (KeyBinding binding : KeyBinding.values()) {
+            if (checkKeyCombinationEquality(binding, keyEvent)) {
+                return Optional.of(binding);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Optional<KeyBinding> mapToKeyBinding(java.awt.event.KeyEvent keyEvent) {
+        Optional<KeyCode> keyCode = Arrays.stream(KeyCode.values()).filter(k -> k.impl_getCode() == keyEvent.getKeyCode()).findFirst();
+        if (keyCode.isPresent()) {
+            KeyEvent event = new KeyEvent(keyEvent.getSource(), null, KeyEvent.KEY_PRESSED, "", "", keyCode.get(), keyEvent.isShiftDown(), keyEvent.isControlDown(), keyEvent.isAltDown(), keyEvent.isMetaDown());
+            return mapToKeyBinding(event);
+
+        }
+
+        return Optional.empty();
+
     }
 
     /**
@@ -110,7 +143,8 @@ public class KeyBindingRepository {
      */
     public KeyStroke getKey(KeyBinding bindName) {
 
-        String s = get(bindName.getKey());
+        String s = get(bindName.getConstant());
+        s = s.replace("+", " "); //swing needs the keys without pluses but whitespace between the modifiers
 
         if (OS.OS_X) {
             return getKeyForMac(KeyStroke.getKeyStroke(s));
@@ -120,37 +154,12 @@ public class KeyBindingRepository {
     }
 
     private KeyCombination getKeyCombination(KeyBinding bindName) {
-        String binding = get(bindName.getKey());
-        return KeyCombination.valueOf(binding);
-    }
+        String binding = get(bindName.getConstant());
+        if (OS.OS_X) {
+            binding = binding.replace("ctrl", "meta");
+        }
 
-    /**
-     * Check if the given keyCombination equals the given keyEvent
-     *
-     * @param combination as KeyCombination
-     * @param keyEvent as KeEvent
-     * @return true if matching, else false
-     */
-    public boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
-        KeyCode code = keyEvent.getCode();
-        if (code == KeyCode.UNDEFINED) {
-            return false;
-        }
-        // gather the pressed modifier keys
-        String modifiers = "";
-        if (keyEvent.isControlDown()) {
-            modifiers = "ctrl";
-        }
-        if (keyEvent.isShiftDown()) {
-            modifiers += " shift";
-        }
-        if (keyEvent.isAltDown()) {
-            modifiers += " alt";
-        }
-        modifiers = modifiers.trim();
-        String newShortcut = (modifiers.isEmpty()) ? code.toString() : modifiers + " " + code;
-        KeyCombination pressedCombination = KeyCombination.valueOf(newShortcut);
-        return combination.equals(pressedCombination);
+        return KeyCombination.valueOf(binding);
     }
 
     /**
@@ -199,7 +208,7 @@ public class KeyBindingRepository {
     }
 
     public List<String> getBindNames() {
-        return bindings.keySet().stream().map(KeyBinding::getKey).collect(Collectors.toList());
+        return bindings.keySet().stream().map(KeyBinding::getConstant).collect(Collectors.toList());
     }
 
     public List<String> getBindings() {

@@ -16,7 +16,6 @@ import org.jabref.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.filelist.FileListEntry;
 import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
@@ -24,6 +23,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -213,8 +213,8 @@ public class DownloadExternalFile {
         }
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
-        FileListEntry fileListEntry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
-        editor = new FileListEntryEditor(frame, fileListEntry, true, false, databaseContext, true);
+        LinkedFile fileListEntry = new LinkedFile("", file.getCanonicalPath(), suggestedType.map(ExternalFileType::getName).orElse(""));
+        editor = new FileListEntryEditor(fileListEntry, true, false, databaseContext, true);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {
@@ -262,8 +262,8 @@ public class DownloadExternalFile {
             // path to relative:
             if ((dirPrefix != null) && fileListEntry.getLink().startsWith(directory)
                     && (fileListEntry.getLink().length() > dirPrefix.length())) {
-                fileListEntry = new FileListEntry(fileListEntry.getDescription(),
-                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getType());
+                fileListEntry = new LinkedFile(fileListEntry.getDescription(),
+                        fileListEntry.getLink().substring(dirPrefix.length()), fileListEntry.getFileType());
             }
             callback.downloadComplete(fileListEntry);
 
@@ -342,6 +342,6 @@ public class DownloadExternalFile {
      */
     @FunctionalInterface
     public interface DownloadCallback {
-        void downloadComplete(FileListEntry file);
+        void downloadComplete(LinkedFile file);
     }
 }

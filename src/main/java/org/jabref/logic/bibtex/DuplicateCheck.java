@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
  * This class contains utility method for duplicate checking of entries.
  */
 public class DuplicateCheck {
-    public static double duplicateThreshold = 0.75; // The overall threshold to signal a duplicate pair
+    private static final double DUPLICATE_THRESHOLD = 0.75; // The overall threshold to signal a duplicate pair
 
     private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
     /*
@@ -54,7 +54,8 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
-    private DuplicateCheck() { }
+    private DuplicateCheck() {
+    }
 
     /**
      * Checks if the two entries represent the same publication.
@@ -64,13 +65,16 @@ public class DuplicateCheck {
      * @return boolean
      */
     public static boolean isDuplicate(BibEntry one, BibEntry two, BibDatabaseMode bibDatabaseMode) {
-        // same identifier
-        if (hasSameIdentifier(one, two)) {
+        if (haveSameIdentifier(one, two)) {
             return true;
         }
 
         // same entry type
         if (!one.getType().equals(two.getType())) {
+            return false;
+        }
+
+        if (haveDifferentEditions(one, two)) {
             return false;
         }
 
@@ -84,21 +88,30 @@ public class DuplicateCheck {
             req = DuplicateCheck.compareFieldSet(var, one, two);
         }
 
-        if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
+        if (Math.abs(req[0] - DuplicateCheck.DUPLICATE_THRESHOLD) > DuplicateCheck.DOUBT_RANGE) {
             // Far from the threshold value, so we base our decision on the req. fields only
-            return req[0] >= DuplicateCheck.duplicateThreshold;
+            return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
         List<String> optionalFields = type.getOptionalFields();
         if (optionalFields != null) {
             double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
-            return totValue >= DuplicateCheck.duplicateThreshold;
+            return totValue >= DuplicateCheck.DUPLICATE_THRESHOLD;
         }
-        return req[0] >= DuplicateCheck.duplicateThreshold;
+        return req[0] >= DuplicateCheck.DUPLICATE_THRESHOLD;
     }
 
-    private static boolean hasSameIdentifier(BibEntry one, BibEntry two) {
+    private static boolean haveDifferentEditions(BibEntry one, BibEntry two) {
+        if (one.getField(FieldName.EDITION).isPresent() && two.getField(FieldName.EDITION).isPresent()) {
+            if (!one.getField(FieldName.EDITION).get().equals(two.getField(FieldName.EDITION).get())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean haveSameIdentifier(BibEntry one, BibEntry two) {
         for (String name : FieldName.getIdentifierFieldNames()) {
             if (one.getField(name).isPresent() && one.getField(name).equals(two.getField(name))) {
                 return true;
@@ -112,11 +125,7 @@ public class DuplicateCheck {
         double totWeights = 0.;
         for (String field : fields) {
             double weight;
-            if (DuplicateCheck.FIELD_WEIGHTS.containsKey(field)) {
-                weight = DuplicateCheck.FIELD_WEIGHTS.get(field);
-            } else {
-                weight = 1.0;
-            }
+            weight = DuplicateCheck.FIELD_WEIGHTS.getOrDefault(field, 1.0);
             totWeights += weight;
             int result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == EQUAL) {
@@ -128,7 +137,7 @@ public class DuplicateCheck {
         if (totWeights > 0) {
             return new double[]{res / totWeights, totWeights};
         }
-        return new double[] {0.5, 0.0};
+        return new double[]{0.5, 0.0};
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
@@ -218,7 +227,7 @@ public class DuplicateCheck {
      *
      * @param database The database to search.
      * @param entry    The entry of which we are looking for duplicates.
-     * @return The first duplicate entry found. null if no duplicates are found.
+     * @return The first duplicate entry found. Empty Optional if no duplicates are found.
      */
     public static Optional<BibEntry> containsDuplicate(BibDatabase database, BibEntry entry, BibDatabaseMode bibDatabaseMode) {
         for (BibEntry other : database.getEntries()) {
@@ -232,8 +241,8 @@ public class DuplicateCheck {
     /**
      * Compare two strings on the basis of word-by-word correlation analysis.
      *
-     * @param s1       The first string
-     * @param s2       The second string
+     * @param s1 The first string
+     * @param s2 The second string
      * @return a value in the interval [0, 1] indicating the degree of match.
      */
     public static double correlateByWords(String s1, String s2) {
@@ -252,17 +261,17 @@ public class DuplicateCheck {
     }
 
 
-    /**
+    /*
      * Calculates the similarity (a number within 0 and 1) between two strings.
      * http://stackoverflow.com/questions/955110/similarity-string-comparison-in-java
      */
-    private static double similarity(String s1, String s2) {
-        String longer = s1;
-        String shorter = s2;
+    private static double similarity(String first, String second) {
+        String longer = first;
+        String shorter = second;
 
-        if (s1.length() < s2.length()) {
-            longer = s2;
-            shorter = s1;
+        if (first.length() < second.length()) {
+            longer = second;
+            shorter = first;
         }
 
         int longerLength = longer.length();

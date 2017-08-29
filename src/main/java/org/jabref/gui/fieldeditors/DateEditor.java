@@ -6,19 +6,19 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
+import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.component.TemporalAccessorPicker;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 
 public class DateEditor extends HBox implements FieldEditorFX {
 
-    private final String fieldName;
     @FXML private DateEditorViewModel viewModel;
     @FXML private TemporalAccessorPicker datePicker;
 
-    public DateEditor(String fieldName, DateTimeFormatter dateFormatter) {
-        this.fieldName = fieldName;
-        this.viewModel = new DateEditorViewModel(dateFormatter);
+    public DateEditor(String fieldName, DateTimeFormatter dateFormatter, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new DateEditorViewModel(fieldName, suggestionProvider, dateFormatter, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
@@ -32,7 +32,7 @@ public class DateEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(fieldName, entry);
+        viewModel.bindToEntry(entry);
     }
 
     @Override

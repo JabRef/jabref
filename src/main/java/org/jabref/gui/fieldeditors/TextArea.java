@@ -10,8 +10,9 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.Scene;
 
 import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.autocompleter.AutoCompleteListener;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.util.OS;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,8 +30,6 @@ public class TextArea implements FieldEditor {
     private final EditorTextArea textArea;
     private String fieldName;
 
-    private AutoCompleteListener autoCompleteListener;
-
     public TextArea(String fieldName, String content) {
         this(fieldName, content, "");
     }
@@ -39,7 +38,7 @@ public class TextArea implements FieldEditor {
         textArea = new EditorTextArea(content);
         textArea.setPromptText(title);
 
-        swingPanel = new JFXPanel();
+        swingPanel = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         swingPanel.setBackground(GUIGlobals.activeBackgroundColor);
         DefaultTaskExecutor.runInJavaFXThread(
                 () -> {
@@ -161,20 +160,6 @@ public class TextArea implements FieldEditor {
     @Override
     public void redo() {
         // Nothing
-    }
-
-    @Override
-    public void setAutoCompleteListener(AutoCompleteListener listener) {
-        autoCompleteListener = listener;
-    }
-
-    @Override
-    public void clearAutoCompleteSuggestion() {
-        /*
-        if (autoCompleteListener != null) {
-            autoCompleteListener.clearCurrentSuggestion(this);
-        }
-        */
     }
 
     @Override
