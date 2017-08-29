@@ -2,13 +2,15 @@ package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,14 +57,17 @@ public final class DocumentReader {
      *
      * @return A List of Documents with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
      */
-    public List<Document> readLinkedPdfs() {
+    public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
         List<Document> documents = new LinkedList<>();
         for (LinkedFile pdf : this.entry.getFiles()) {
-            try {
-                documents.add(readPdfContents(Paths.get(pdf.getLink())));
-            } catch (IOException ioe) {
-                LOGGER.info("Could not read pdf file: " + pdf.getLink() + "!", ioe);
-            }
+            Optional<Path> pdfPath = pdf.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences());
+            pdfPath.ifPresent(file -> {
+                try {
+                    documents.add(readPdfContents(pdfPath.get()));
+                } catch (IOException e) {
+                    LOGGER.info("Could not read pdf file: " + pdf.getLink() + "!", e);
+                }
+            });
         }
         return documents;
     }
@@ -83,7 +88,6 @@ public final class DocumentReader {
         addStringField(newDocument, TITLE, info.getTitle());
         addStringField(newDocument, SUBJECT, info.getSubject());
         addTextField(newDocument, KEYWORDS, info.getKeywords());
-
     }
 
     private void addTextField(Document newDocument, String field, String value) {

@@ -1,10 +1,12 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -12,8 +14,11 @@ import org.jabref.model.pdf.search.PdfSearchResults;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PdfSearcherTest {
 
@@ -26,22 +31,23 @@ public class PdfSearcherTest {
         // given
         PdfIndexer indexer = new PdfIndexer();
         BibDatabase database = new BibDatabase();
-
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(context.getFileDirectoriesAsPaths(Mockito.any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs")));
         BibEntry examplePdf = new BibEntry("article");
-        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "src/test/resources/pdfs/example.pdf", "pdf")));
+        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", "pdf")));
         database.insertEntry(examplePdf);
 
         BibEntry metaDataEntry = new BibEntry("article");
-        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "src/test/resources/pdfs/metaData.pdf", "pdf")));
+        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", "pdf")));
         metaDataEntry.setCiteKey("MetaData2017");
         database.insertEntry(metaDataEntry);
 
         BibEntry exampleThesis = new BibEntry("PHDThesis");
-        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
         exampleThesis.setCiteKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 
-        indexer.createIndex(database);
+        indexer.createIndex(database, context);
     }
 
 

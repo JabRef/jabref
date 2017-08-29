@@ -28,6 +28,7 @@ import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.Version;
 import org.jabref.preferences.JabRefPreferences;
@@ -49,12 +50,14 @@ public class JabRefGUI {
     private final boolean isBlank;
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
+    private final PdfIndexer indexer;
 
     private String focusedFile;
 
-    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
+    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank, PdfIndexer indexer) {
         this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
+        this.indexer = indexer;
 
         // passed file (we take the first one) should be focused
         focusedFile = argsDatabases.stream().findFirst().flatMap(ParserResult::getFile).map(File::getAbsolutePath)
@@ -102,7 +105,7 @@ public class JabRefGUI {
         // Add all bibDatabases databases to the frame:
         boolean first = false;
         if (!bibDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
+            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext(); ) {
                 ParserResult pr = parserResultIterator.next();
                 // Define focused tab
                 if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
@@ -214,6 +217,7 @@ public class JabRefGUI {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
                 bibDatabases.add(parsedDatabase);
+                this.indexer.createIndex(parsedDatabase);
             }
         }
     }
@@ -300,5 +304,4 @@ public class JabRefGUI {
     public static void setMainFrame(JabRefFrame mainFrame) {
         JabRefGUI.mainFrame = mainFrame;
     }
-
 }

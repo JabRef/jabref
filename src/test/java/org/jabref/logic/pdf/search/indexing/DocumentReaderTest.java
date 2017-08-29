@@ -1,29 +1,43 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DocumentReaderTest {
+
+    private BibDatabaseContext databaseContext;
+
+    @Before
+    public void setup() {
+        this.databaseContext = mock(BibDatabaseContext.class);
+        when(databaseContext.getFileDirectoriesAsPaths(Mockito.any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs")));
+    }
 
     @Test
     public void unknownFileTestShouldReturnEmptyList() throws IOException {
         // given
         BibEntry entry = new BibEntry();
-        entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "src/test/resources/pdfs/NOT_PRESENT.pdf", "Type")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Wrong path", "NOT_PRESENT.pdf", "Type")));
 
         // when
-        final List<Document> emptyDocumentList = new DocumentReader(entry).readLinkedPdfs();
+        final List<Document> emptyDocumentList = new DocumentReader(entry).readLinkedPdfs(databaseContext);
 
         // then
         assertEquals(Collections.emptyList(), emptyDocumentList);
@@ -44,10 +58,9 @@ public class DocumentReaderTest {
         // given
         BibEntry entry = new BibEntry("article");
         entry.setCiteKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example", "src/test/resources/pdfs/example.pdf", "pdf")));
-
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example", "example.pdf", "pdf")));
         // when
-        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs(databaseContext);
 
         // then
         assertEquals(1, documents.size());
@@ -62,10 +75,10 @@ public class DocumentReaderTest {
         // given
         BibEntry entry = new BibEntry("PHDThesis");
         entry.setCiteKey("ThesisExample2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "src/test/resources/pdfs/thesis-example.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "thesis-example.pdf", "pdf")));
 
         // when
-        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs(databaseContext);
 
         //then
         assertEquals(1, documents.size());
@@ -80,10 +93,10 @@ public class DocumentReaderTest {
         // given
         BibEntry entry = new BibEntry("article");
         entry.setCiteKey("Minimal2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "src/test/resources/pdfs/minimal.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "minimal.pdf", "pdf")));
 
         // when
-        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs(databaseContext);
 
         // then
         assertEquals(1, documents.size());
@@ -98,10 +111,10 @@ public class DocumentReaderTest {
         // given
         BibEntry entry = new BibEntry();
         entry.setCiteKey("MetaData2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Minimal", "src/test/resources/pdfs/metaData.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Minimal", "metaData.pdf", "pdf")));
 
         // when
-        List<Document> documents = new DocumentReader(entry).readLinkedPdfs();
+        List<Document> documents = new DocumentReader(entry).readLinkedPdfs(databaseContext);
 
         // then
         assertEquals(1, documents.size());

@@ -1,6 +1,8 @@
 package org.jabref;
 
+import java.io.IOException;
 import java.net.Authenticator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.SwingUtilities;
@@ -15,12 +17,14 @@ import org.jabref.logic.exporter.ExportFormat;
 import org.jabref.logic.exporter.ExportFormats;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteListenerClient;
@@ -139,9 +143,22 @@ public class JabRefMain extends Application {
             return;
         }
 
-        // If not, start GUI
-        SwingUtilities
-                .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
-                        argumentProcessor.isBlank()));
+        List<ParserResult> bibDatabases = argumentProcessor.getParserResults();
+        // Initialize Indexer
+        try {
+            PdfIndexer indexer = new PdfIndexer();
+            for (ParserResult parsedDatabase : bibDatabases) {
+                // TODO: Parallelize
+                indexer.createIndex(parsedDatabase);
+            }
+
+            // If not, start GUI
+            SwingUtilities
+                    .invokeLater(() -> {
+                        new JabRefGUI(bibDatabases, argumentProcessor.isBlank(), indexer);
+                    });
+        } catch (IOException e) {
+            LOGGER.error("Could not initialize the Lucene PdfIndexer.");
+        }
     }
 }

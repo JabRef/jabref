@@ -5,7 +5,9 @@ import java.nio.file.Paths;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -23,6 +25,8 @@ public class PdfIndexer {
     private static final Log LOGGER = LogFactory.getLog(PdfIndexer.class);
 
     private final Directory directoryToIndex;
+    private BibDatabaseContext databaseContext;
+    private BibDatabase database;
 
     public PdfIndexer() throws IOException {
         this.directoryToIndex = new SimpleFSDirectory(Paths.get("src/main/resources/luceneIndex"));
@@ -36,12 +40,34 @@ public class PdfIndexer {
      * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
      * Lucene search index will be deleted!
      *
-     * @param database a bibtex database to link the pdf files to
+     * @param perserResult a bibtex database to link the pdf files to
      */
-    public void createIndex(BibDatabase database) {
+    public void createIndex(ParserResult perserResult) {
+        this.databaseContext = perserResult.getDatabaseContext();
+        this.database = perserResult.getDatabase();
         try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                 new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
-            final ObservableList<BibEntry> entries = database.getEntries();
+            final ObservableList<BibEntry> entries = this.database.getEntries();
+
+            entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> writeToIndex(entry, indexWriter));
+        } catch (IOException e) {
+            LOGGER.warn("Could not initialize the IndexWriter!", e);
+        }
+    }
+
+    /**
+     * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
+     * Lucene search index will be deleted!
+     *
+     * @param database a bibtex database to link the pdf files to
+     */
+    public void createIndex(BibDatabase database, BibDatabaseContext context) {
+        this.databaseContext = context;
+        this.database = database;
+        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
+                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
+            final ObservableList<BibEntry> entries = this.database.getEntries();
+
             entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> writeToIndex(entry, indexWriter));
         } catch (IOException e) {
             LOGGER.warn("Could not initialize the IndexWriter!", e);
@@ -83,7 +109,7 @@ public class PdfIndexer {
 
     private void writeToIndex(BibEntry entry, IndexWriter indexWriter) {
         try {
-            indexWriter.addDocuments(new DocumentReader(entry).readLinkedPdfs());
+            indexWriter.addDocuments(new DocumentReader(entry).readLinkedPdfs(this.databaseContext));
         } catch (IOException e) {
             LOGGER.warn("Could not add the documents to the index!", e);
         }
