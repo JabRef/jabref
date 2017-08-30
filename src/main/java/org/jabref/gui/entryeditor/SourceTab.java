@@ -6,6 +6,8 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -35,8 +37,6 @@ import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
-
-import javax.swing.undo.UndoManager;
 
 public class SourceTab extends EntryEditorTab {
 
