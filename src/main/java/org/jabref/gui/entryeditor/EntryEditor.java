@@ -895,7 +895,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.runCommand(Actions.UNDO);
+            DefaultTaskExecutor.runInJavaFXThread(() -> panel.runCommand(Actions.UNDO));
         }
     }
 

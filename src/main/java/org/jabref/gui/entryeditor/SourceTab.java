@@ -36,6 +36,8 @@ import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 
+import javax.swing.undo.UndoManager;
+
 public class SourceTab extends EntryEditorTab {
 
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
@@ -44,6 +46,7 @@ public class SourceTab extends EntryEditorTab {
     private final BasePanel panel;
     private CodeArea codeArea;
     private BooleanProperty movingToDifferentEntry;
+    private UndoManager undoManager;
 
     public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
         this.mode = panel.getBibDatabaseContext().getMode();
@@ -53,6 +56,7 @@ public class SourceTab extends EntryEditorTab {
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
+        this.undoManager = panel.getUndoManager();
     }
 
     private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
@@ -193,6 +197,7 @@ public class SourceTab extends EntryEditorTab {
                 entry.setType(newEntry.getType());
             }
             compound.end();
+            undoManager.addEdit(compound);
 
         } catch (InvalidFieldValueException | IOException ex) {
             // The source couldn't be parsed, so the user is given an
