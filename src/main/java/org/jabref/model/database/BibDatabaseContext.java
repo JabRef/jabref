@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.Defaults;
 import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.metadata.FileDirectoryPreferences;
@@ -31,6 +32,7 @@ public class BibDatabaseContext {
     /** The file where this database was last saved to. */
     private File file;
     private DBMSSynchronizer dbmsSynchronizer;
+    private CoarseChangeFilter dbmsListener;
     private DatabaseLocation location;
 
     public BibDatabaseContext() {
@@ -263,8 +265,8 @@ public class BibDatabaseContext {
 
     public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
-        this.database.registerListener(dbmsSynchronizer);
-        this.metaData.registerListener(dbmsSynchronizer);
+        this.dbmsListener = new CoarseChangeFilter(this);
+        dbmsListener.registerListener(dbmsSynchronizer);
 
         this.location = DatabaseLocation.SHARED;
     }
@@ -278,9 +280,9 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-        if (Objects.nonNull(dbmsSynchronizer) && (location == DatabaseLocation.SHARED)) {
-            this.database.unregisterListener(dbmsSynchronizer);
-            this.metaData.unregisterListener(dbmsSynchronizer);
+        if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
+            this.database.unregisterListener(dbmsListener);
+            this.metaData.unregisterListener(dbmsListener);
         }
 
         this.location = DatabaseLocation.LOCAL;
