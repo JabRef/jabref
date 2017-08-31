@@ -282,8 +282,8 @@ public class BibDatabaseContext {
 
     public void convertToLocalDatabase() {
         if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
-            this.database.unregisterListener(dbmsListener);
-            this.metaData.unregisterListener(dbmsListener);
+            dbmsListener.unregisterListener(dbmsSynchronizer);
+            dbmsListener.shutdown();
         }
 
         this.location = DatabaseLocation.LOCAL;

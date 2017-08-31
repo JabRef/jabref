@@ -47,6 +47,7 @@ public class BackupManager {
     private final JabRefPreferences preferences;
     private final ExecutorService executor;
     private final Runnable backupTask = () -> determineBackupPath().ifPresent(this::performBackup);
+    private final CoarseChangeFilter changeFilter;
 
     private BackupManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
@@ -54,7 +55,7 @@ public class BackupManager {
         BlockingQueue<Runnable> workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
 
-        CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+        changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);
     }
 
@@ -144,8 +145,8 @@ public class BackupManager {
      * This method should only be used when closing a database/JabRef legally.
      */
     private void shutdown() {
-        bibDatabaseContext.getDatabase().unregisterListener(this);
-        bibDatabaseContext.getMetaData().unregisterListener(this);
+        changeFilter.unregisterListener(this);
+        changeFilter.shutdown();
         executor.shutdown();
         determineBackupPath().ifPresent(this::deleteBackupFile);
     }
