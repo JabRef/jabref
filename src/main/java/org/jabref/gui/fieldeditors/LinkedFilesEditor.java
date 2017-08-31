@@ -149,7 +149,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         MenuItem deleteLink = new MenuItem(Localization.lang("Remove link"));
         deleteLink.setOnAction(event -> viewModel.removeFileLink(linkedFile));
-        deleteLink.setDisable(linkedFile.getFile().isOnlineLink());
 
         menu.getItems().add(edit);
         menu.getItems().add(new SeparatorMenuItem());

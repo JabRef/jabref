@@ -299,9 +299,13 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void deleteFile(LinkedFileViewModel file) {
-        boolean deleteSuccessful = file.delete();
-        if (deleteSuccessful) {
-            files.remove(file);
+        if (file.getFile().isOnlineLink()) {
+            removeFileLink(file);
+        } else {
+            boolean deleteSuccessful = file.delete();
+            if (deleteSuccessful) {
+                files.remove(file);
+            }
         }
     }
 

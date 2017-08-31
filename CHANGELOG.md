@@ -29,6 +29,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue in the "Manage protected terms" dialog where an 'Open file' dialog instead of a 'Save file' dialog was shown when creating a new list. [#3157](https://github.com/JabRef/jabref/issues/3157)
 - We fixed an issue where unparseable dates of the FileAnnotations caused the FileAnnotationsTab to crash.
 - We fixed an issue where a new protected terms list was not available immediately after its addition. [#3161](https://github.com/JabRef/jabref/issues/3161)
+- We fixed an issue where an online file link could not be removed from an entry [#3165](https://github.com/JabRef/jabref/issues/3165)
+- We fixed an issue where an online file link did not open the browser and created an error [#3165](https://github.com/JabRef/jabref/issues/3165)
 
 ### Removed
 
