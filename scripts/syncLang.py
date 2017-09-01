@@ -11,7 +11,7 @@ import logger
 
 RES_DIR = "src/main/resources/l10n"
 STATUS_FILE = "status.md"
-URL_BASE = "https://github.com/JabRef/jabref/tree/master/"
+URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
 def get_current_branch():
