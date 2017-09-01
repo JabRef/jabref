@@ -18,7 +18,6 @@ import org.jabref.model.entry.specialfields.SpecialFieldValue;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 
-
 public class SpecialFieldDropDown {
 
     private SpecialFieldDropDown() {
@@ -45,7 +44,6 @@ public class SpecialFieldDropDown {
         button.addActionListener(new MenuButtonActionListener(field, frame, button, buttonDim));
         return button;
     }
-
 
     private static class MenuButtonActionListener implements ActionListener {
 
@@ -79,7 +77,6 @@ public class SpecialFieldDropDown {
             }
             popup.show(button, 0, dim.height);
         }
-
 
         private class PopupitemActionListener implements ActionListener {
 

@@ -153,11 +153,11 @@ public class OOPreFormatter implements LayoutFormatter {
                         }
                         sb.append(' ');
                     }
-                }/* else if (c == '}') {
+                } /* else if (c == '}') {
                     System.out.printf("com term by }: '%s'\n", currentCommand.toString());
 
                     argument = "";
-                 }*/else {
+                 }*/ else {
                     /*
                      * TODO: this point is reached, apparently, if a command is
                      * terminated in a strange way, such as with "$\omega$".

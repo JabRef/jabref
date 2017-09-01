@@ -1,6 +1,5 @@
 package org.jabref.pdfimport;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -43,12 +42,12 @@ import org.apache.commons.logging.LogFactory;
 
 public class PdfImporter {
 
+    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final MainTable entryTable;
-    private final int dropRow;
 
-    private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
+    private final int dropRow;
 
     /**
      * Creates the PdfImporter
@@ -63,25 +62,6 @@ public class PdfImporter {
         this.panel = panel;
         this.entryTable = entryTable;
         this.dropRow = dropRow;
-    }
-
-    public class ImportPdfFilesResult {
-
-        private final List<String> noPdfFiles;
-        private final List<BibEntry> entries;
-
-        public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
-            this.noPdfFiles = noPdfFiles;
-            this.entries = entries;
-        }
-
-        public List<String> getNoPdfFiles() {
-            return noPdfFiles;
-        }
-
-        public List<BibEntry> getEntries() {
-            return entries;
-        }
     }
 
     /**
@@ -191,12 +171,12 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         FileListTableModel tm = new FileListTableModel();
-        File toLink = new File(fileName);
+        Path toLink = Paths.get(fileName);
         // Get a list of file directories:
-        List<String> dirsS = panel.getBibDatabaseContext()
-                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+        List<Path> dirsS = panel.getBibDatabaseContext()
+                .getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
 
-        tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
+        tm.addEntry(0, new FileListEntry(toLink.getFileName().toString(), FileUtil.shortenFileName(toLink, dirsS).toString(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
         entry.setField(FieldName.FILE, tm.getStringRepresentation());
         res.add(entry);
@@ -292,5 +272,24 @@ public class PdfImporter {
             }
         }
         return Optional.empty();
+    }
+
+    public class ImportPdfFilesResult {
+
+        private final List<String> noPdfFiles;
+        private final List<BibEntry> entries;
+
+        public ImportPdfFilesResult(List<String> noPdfFiles, List<BibEntry> entries) {
+            this.noPdfFiles = noPdfFiles;
+            this.entries = entries;
+        }
+
+        public List<String> getNoPdfFiles() {
+            return noPdfFiles;
+        }
+
+        public List<BibEntry> getEntries() {
+            return entries;
+        }
     }
 }

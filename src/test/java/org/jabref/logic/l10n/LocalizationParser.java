@@ -61,7 +61,7 @@ public class LocalizationParser {
         }
         englishKeys.removeAll(keysInFiles);
 
-        return englishKeys.stream().collect(Collectors.toCollection(TreeSet::new));
+        return new TreeSet<>(englishKeys);
     }
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundleForTest type) throws IOException {
@@ -195,9 +195,14 @@ public class LocalizationParser {
             }
         };
 
+        PlatformImpl.startup(() -> {
+        });
         try {
-            PlatformImpl.startup(() -> {});
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
+            // We don't want to initialize controller
+            loader.setControllerFactory(controllerType -> null);
+            // Don't check if root is null (needed for custom controls, where the root value is normally set in the FXMLLoader)
+            loader.impl_setStaticLoad(true);
             loader.load();
         } catch (IOException ignore) {
             ignore.printStackTrace();

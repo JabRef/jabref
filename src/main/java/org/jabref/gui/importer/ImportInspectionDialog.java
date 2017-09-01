@@ -94,6 +94,7 @@ import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.FieldProperty;
 import org.jabref.model.entry.IdGenerator;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
@@ -236,7 +237,7 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
 
         popup.add(deleteListener);
         popup.addSeparator();
-        if (!newDatabase && (bibDatabaseContext != null)) {
+        if (!newDatabase && (bibDatabaseContext != null) && bibDatabaseContext.getMetaData().getGroups().isPresent()) {
             GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups().get();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
@@ -1252,14 +1253,11 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         }
 
         @Override
-        public void downloadComplete(FileListEntry file) {
+        public void downloadComplete(LinkedFile file) {
             ImportInspectionDialog.this.toFront(); // Hack
-            FileListTableModel localModel = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
-            localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
-                entry.setField(FieldName.FILE, localModel.getStringRepresentation());
+                entry.addFile(file);
             } finally {
                 entries.getReadWriteLock().writeLock().unlock();
             }
@@ -1328,16 +1326,13 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            FileListEntry flEntry = new FileListEntry("", "");
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, bibDatabaseContext, true);
+            LinkedFile flEntry = new LinkedFile("", "", "");
+            FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true, bibDatabaseContext, true);
             editor.setVisible(true, true);
             if (editor.okPressed()) {
-                FileListTableModel localModel = new FileListTableModel();
-                entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
-                localModel.addEntry(localModel.getRowCount(), flEntry);
                 entries.getReadWriteLock().writeLock().lock();
                 try {
-                    entry.setField(FieldName.FILE, localModel.getStringRepresentation());
+                    entry.addFile(flEntry);
                 } finally {
                     entries.getReadWriteLock().writeLock().unlock();
                 }
@@ -1346,14 +1341,11 @@ public class ImportInspectionDialog extends JabRefDialog implements ImportInspec
         }
 
         @Override
-        public void downloadComplete(FileListEntry file) {
+        public void downloadComplete(LinkedFile file) {
             ImportInspectionDialog.this.toFront(); // Hack
-            FileListTableModel localModel = new FileListTableModel();
-            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
-            localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
-                entry.setField(FieldName.FILE, localModel.getStringRepresentation());
+                entry.addFile(file);
             } finally {
                 entries.getReadWriteLock().writeLock().unlock();
             }

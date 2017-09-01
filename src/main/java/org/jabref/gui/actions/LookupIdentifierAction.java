@@ -19,6 +19,14 @@ public class LookupIdentifierAction extends MnemonicAwareAction {
     private final JabRefFrame frame;
     private final IdFetcher fetcher;
 
+    public LookupIdentifierAction(JabRefFrame frame, IdFetcher fetcher) {
+        super();
+        this.frame = frame;
+        this.fetcher = fetcher;
+
+        putValue(Action.NAME, fetcher.getIdentifierName());
+    }
+
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         try {
@@ -26,13 +34,5 @@ public class LookupIdentifierAction extends MnemonicAwareAction {
         } catch (Exception e) {
             LOGGER.error(e);
         }
-    }
-
-    public LookupIdentifierAction(JabRefFrame frame, IdFetcher fetcher) {
-        super();
-        this.frame = frame;
-        this.fetcher = fetcher;
-
-        putValue(Action.NAME, fetcher.getIdentifierName());
     }
 }

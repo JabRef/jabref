@@ -167,11 +167,11 @@ public class SidePaneManager {
                 Class<? extends SidePaneComponent> componentClass = (Class<? extends SidePaneComponent>) Class.forName(componentName);
                 preferredPositions.put(componentClass, Integer.parseInt(componentPositions.get(i)));
             } catch (ClassNotFoundException e) {
-                LOGGER.error("Following side pane could not be found: " + componentName, e);
+                LOGGER.debug("Following side pane could not be found: " + componentName, e);
             } catch (ClassCastException e) {
-                LOGGER.error("Following Class is no side pane: '" + componentName, e);
+                LOGGER.debug("Following Class is no side pane: '" + componentName, e);
             } catch (NumberFormatException e) {
-                LOGGER.info("Invalid number format for side pane component '" + componentName + "'.", e);
+                LOGGER.debug("Invalid number format for side pane component '" + componentName + "'.", e);
             }
         }
 
@@ -220,7 +220,6 @@ public class SidePaneManager {
             return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
-
 
     public synchronized void moveUp(SidePaneComponent comp) {
         if (visible.contains(comp)) {

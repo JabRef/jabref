@@ -13,10 +13,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -33,7 +35,7 @@ import org.jabref.gui.importer.ImportMenuItem;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.util.FileHelper;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
@@ -42,13 +44,13 @@ import org.apache.commons.logging.LogFactory;
 
 public class EntryTableTransferHandler extends TransferHandler {
 
+    private static final boolean DROP_ALLOWED = true;
+    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private final MainTable entryTable;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private DataFlavor urlFlavor;
     private final DataFlavor stringFlavor;
-    private static final boolean DROP_ALLOWED = true;
-    private static final Log LOGGER = LogFactory.getLog(EntryTableTransferHandler.class);
     private boolean draggingFile;
 
     /**
@@ -117,8 +119,9 @@ public class EntryTableTransferHandler extends TransferHandler {
                 // JOptionPane.showMessageDialog(null, "Received
                 // javaFileListFlavor");
                 @SuppressWarnings("unchecked")
-                List<File> l = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
-                return handleDraggedFiles(l, dropRow);
+                List<Path> files = ((List<File>) t.getTransferData(DataFlavor.javaFileListFlavor)).stream()
+                        .map(File::toPath).collect(Collectors.toList());
+                return handleDraggedFiles(files, dropRow);
             } else if (t.isDataFlavorSupported(urlFlavor)) {
                 URL dropLink = (URL) t.getTransferData(urlFlavor);
                 return handleDropTransfer(dropLink);
@@ -230,10 +233,10 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @return a List<File> containing the individual file objects.
      *
      */
-    public static List<File> getFilesFromDraggedFilesString(String s) {
+    public static List<Path> getFilesFromDraggedFilesString(String s) {
         // Split into lines:
         String[] lines = s.replace("\r", "").split("\n");
-        List<File> files = new ArrayList<>();
+        List<Path> files = new ArrayList<>();
         for (String line1 : lines) {
             String line = line1;
 
@@ -263,7 +266,7 @@ public class EntryTableTransferHandler extends TransferHandler {
 
             File f = new File(line);
             if (f.exists()) {
-                files.add(f);
+                files.add(f.toPath());
             }
         }
         return files;
@@ -290,10 +293,10 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @param dropRow @param dropRow The row in the table where the files were dragged.
      * @return success status for the operation
      */
-    private boolean handleDraggedFiles(List<File> files, final int dropRow) {
+    private boolean handleDraggedFiles(List<Path> files, final int dropRow) {
         final List<String> fileNames = new ArrayList<>();
-        for (File file : files) {
-            fileNames.add(file.getAbsolutePath());
+        for (Path file : files) {
+            fileNames.add(file.toAbsolutePath().toString());
         }
         // Try to load BIB files normally, and import the rest into the current
         // database.
@@ -323,7 +326,7 @@ public class EntryTableTransferHandler extends TransferHandler {
         List<String> bibFiles = new ArrayList<>();
         for (String fileName : fileNames) {
             // Find the file's extension, if any:
-            Optional<String> extension = FileUtil.getFileExtension(fileName);
+            Optional<String> extension = FileHelper.getFileExtension(fileName);
             Optional<ExternalFileType> fileType;
 
             if (extension.isPresent() && "bib".equals(extension.get())) {

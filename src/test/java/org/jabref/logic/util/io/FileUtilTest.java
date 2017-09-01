@@ -11,15 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.util.FileHelper;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -28,19 +28,20 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
+    private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
     public TemporaryFolder otherTemporaryFolder = new TemporaryFolder();
-
-    private final Path nonExistingTestPath = Paths.get("nonExistingTestPath");
     private Path existingTestFile;
     private Path otherExistingTestFile;
+    private LayoutFormatterPreferences layoutFormatterPreferences;
 
     @Before
     public void setUpViewModel() throws IOException {
         existingTestFile = createTemporaryTestFile("existingTestFile.txt");
         otherExistingTestFile = createTemporaryTestFile("otherExistingTestFile.txt");
         otherTemporaryFolder.create();
+        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -64,8 +65,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, JabRefPreferences.getInstance()
-                        .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, layoutFormatterPreferences));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class FileUtilTest {
 
         assertEquals("1234",
                 FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                        mock(LayoutFormatterPreferences.class)));
+                        layoutFormatterPreferences));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                mock(LayoutFormatterPreferences.class)));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                mock(LayoutFormatterPreferences.class)));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
 
         assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                layoutFormatterPreferences));
     }
 
     @Test
@@ -120,57 +120,57 @@ public class FileUtilTest {
         BibEntry entry = new BibEntry();
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+                layoutFormatterPreferences));
     }
 
     @Test
     public void testGetFileExtensionSimpleFile() {
-        assertEquals("pdf", FileUtil.getFileExtension(new File("test.pdf")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.pdf")).get());
     }
 
     @Test
     public void testGetFileExtensionLowerCaseAndTrimmingFile() {
-        assertEquals("pdf", FileUtil.getFileExtension(new File("test.PdF  ")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.PdF  ")).get());
     }
 
     @Test
     public void testGetFileExtensionMultipleDotsFile() {
-        assertEquals("pdf", FileUtil.getFileExtension(new File("te.st.PdF  ")).get());
+        assertEquals("pdf", FileHelper.getFileExtension(Paths.get("te.st.PdF  ")).get());
     }
 
     @Test
     public void testGetFileExtensionNoExtensionFile() {
-        assertFalse(FileUtil.getFileExtension(new File("JustTextNotASingleDot")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Paths.get("JustTextNotASingleDot")).isPresent());
     }
 
     @Test
     public void testGetFileExtensionNoExtension2File() {
-        assertFalse(FileUtil.getFileExtension(new File(".StartsWithADotIsNotAnExtension")).isPresent());
+        assertFalse(FileHelper.getFileExtension(Paths.get(".StartsWithADotIsNotAnExtension")).isPresent());
     }
 
     @Test
     public void getFileExtensionWithSimpleString() {
-        assertEquals("pdf", FileUtil.getFileExtension("test.pdf").get());
+        assertEquals("pdf", FileHelper.getFileExtension("test.pdf").get());
     }
 
     @Test
     public void getFileExtensionTrimsAndReturnsInLowercase() {
-        assertEquals("pdf", FileUtil.getFileExtension("test.PdF  ").get());
+        assertEquals("pdf", FileHelper.getFileExtension("test.PdF  ").get());
     }
 
     @Test
     public void getFileExtensionWithMultipleDotsString() {
-        assertEquals("pdf", FileUtil.getFileExtension("te.st.PdF  ").get());
+        assertEquals("pdf", FileHelper.getFileExtension("te.st.PdF  ").get());
     }
 
     @Test
     public void getFileExtensionWithNoDotReturnsEmptyExtension() {
-        assertEquals(Optional.empty(), FileUtil.getFileExtension("JustTextNotASingleDot"));
+        assertEquals(Optional.empty(), FileHelper.getFileExtension("JustTextNotASingleDot"));
     }
 
     @Test
     public void getFileExtensionWithDotAtStartReturnsEmptyExtension() {
-        assertEquals(Optional.empty(), FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension"));
+        assertEquals(Optional.empty(), FileHelper.getFileExtension(".StartsWithADotIsNotAnExtension"));
     }
 
     @Test

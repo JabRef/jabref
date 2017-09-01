@@ -14,6 +14,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
+import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
@@ -54,6 +55,14 @@ public class WebFetchers {
         }
     }
 
+    public static Optional<IdFetcher<? extends Identifier>> getIdFetcherForField(String fieldName) {
+        switch (fieldName) {
+            case FieldName.DOI:
+                return Optional.of(new CrossRef());
+        }
+        return Optional.empty();
+    }
+
     public static List<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
         ArrayList<SearchBasedFetcher> list = new ArrayList<>();
         list.add(new ArXiv(importFormatPreferences));
@@ -80,6 +89,7 @@ public class WebFetchers {
         list.add(new TitleFetcher(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new CrossRef());
+        list.add(new LibraryOfCongress());
         list.sort(Comparator.comparing(WebFetcher::getName));
         return list;
     }

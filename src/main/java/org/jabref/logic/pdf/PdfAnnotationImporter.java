@@ -1,6 +1,5 @@
 package org.jabref.logic.pdf;
 
-import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,14 +17,10 @@ import org.jabref.model.pdf.FileAnnotationType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSArray;
-import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
-import org.apache.pdfbox.util.PDFTextStripperByArea;
-
 
 public class PdfAnnotationImporter implements AnnotationImporter {
 
@@ -54,8 +49,8 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                     if (!isSupportedAnnotationType(annotation)) {
                         continue;
                     }
-                    if (FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype()) ||
-                            FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype())) {
+
+                    if (FileAnnotationType.isMarkedFileAnnotationType(annotation.getSubtype())) {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
@@ -72,6 +67,13 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     }
 
     private boolean isSupportedAnnotationType(PDAnnotation annotation) {
+        if (annotation.getSubtype() == null) {
+            return false;
+        }
+        if ("Link".equals(annotation.getSubtype()) || "Widget".equals(annotation.getSubtype())) {
+            LOGGER.debug(annotation.getSubtype() + " is excluded from the supported file annotations");
+            return false;
+        }
         try {
             if (!Arrays.asList(FileAnnotationType.values()).contains(FileAnnotationType.valueOf(annotation.getSubtype()))) {
                 return false;
@@ -87,76 +89,34 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
                 pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
-        try {
-            if (FileAnnotationType.HIGHLIGHT.toString().equals(annotation.getSubtype()) || FileAnnotationType.UNDERLINE.toString().equals(annotation.getSubtype())) {
-                annotation.setContents(extractMarkedText(page, annotation));
+        if (annotationBelongingToMarking.getAnnotationType().isLinkedFileAnnotationType()) {
+            try {
+                COSArray boundingBoxes = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
+                annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
+            } catch (IOException e) {
+                annotation.setContents("JabRef: Could not extract any marked text!");
             }
-        } catch (IOException e) {
-            annotation.setContents("JabRef: Could not extract any marked text!");
         }
 
         //Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
-
-    private String extractMarkedText(PDPage page, PDAnnotation annotation) throws IOException {
-        //highlighted or underlined text has to be extracted by the rectangle calculated from the marking
-        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
-        String markedText = "";
-        for (int j = 1,
-             k = 0;
-             j <= (quadsArray.size() / 8);
-             j++) {
-
-            COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
-            COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
-            COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
-            COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
-            COSFloat lowerLeftX = (COSFloat) quadsArray.get(4 + k);
-            COSFloat lowerLeftY = (COSFloat) quadsArray.get(5 + k);
-
-            k += 8;
-
-            float ulx = upperLeftX.floatValue() - 1;
-            float uly = upperLeftY.floatValue();
-            float width = upperRightX.floatValue() - lowerLeftX.floatValue();
-            float height = upperRightY.floatValue() - lowerLeftY.floatValue();
-
-            PDRectangle pageSize = page.getMediaBox();
-            uly = pageSize.getHeight() - uly;
-
-            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-            stripperByArea.addRegion("markedRegion", rectangle);
-            stripperByArea.extractRegions(page);
-            String markedTextInLine = stripperByArea.getTextForRegion("markedRegion");
-
-            if (j > 1) {
-                markedText = markedText.concat(markedTextInLine);
-            } else {
-                markedText = markedTextInLine;
-            }
-        }
-
-        return markedText.trim();
-    }
-
     private boolean validatePath(Path path) {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn(String.format("File %s does not end with .pdf!", path));
+            LOGGER.warn(String.format("File '%s' does not end with .pdf!", path));
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn(String.format("File %s does not exist!", path));
+            LOGGER.warn(String.format("File '%s' does not exist!", path));
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn(String.format("File %s is not readable!", path));
+            LOGGER.warn(String.format("File '%s' is not readable!", path));
             return false;
         }
 

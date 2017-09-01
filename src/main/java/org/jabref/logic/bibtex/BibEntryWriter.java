@@ -58,7 +58,7 @@ public class BibEntryWriter {
     private void writeUserComments(BibEntry entry, Writer out) throws IOException {
         String userComments = entry.getUserComments();
 
-        if(!userComments.isEmpty()) {
+        if (!userComments.isEmpty()) {
             out.write(userComments + OS.NEWLINE);
         }
     }

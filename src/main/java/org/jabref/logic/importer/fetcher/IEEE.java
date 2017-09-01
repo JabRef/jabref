@@ -30,7 +30,6 @@ public class IEEE implements FulltextFetcher {
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "http://ieeexplore.ieee.org";
 
-
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
@@ -49,10 +48,10 @@ public class IEEE implements FulltextFetcher {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
-            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
+            Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
+            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
-                String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL()).asString();
+                String resolvedDOIPage = new URLDownload(doi.get().getExternalURI().get().toURL()).asString();
                 // Try to find the link
                 Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
                 if (matcher.find()) {

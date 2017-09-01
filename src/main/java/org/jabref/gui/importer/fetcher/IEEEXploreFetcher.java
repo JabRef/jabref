@@ -29,6 +29,7 @@ import org.jabref.logic.importer.OutputPrinter;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
@@ -67,9 +68,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
-
-    private boolean shouldContinue;
     private final JournalAbbreviationLoader abbreviationLoader;
+    private boolean shouldContinue;
 
 
     public IEEEXploreFetcher(JournalAbbreviationLoader abbreviationLoader) {
@@ -105,6 +105,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             //add request header
             dl.addHeader("Accept", "application/json");
             dl.addHeader("Content-Type", "application/json");
+            dl.addHeader("Referer", "http://ieeexplore.ieee.org/search/searchresult.jsp");
 
             // set post data
             dl.setPostData(postData);
@@ -166,7 +167,6 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         return false;
     }
-
 
     @Override
     public String getTitle() {
@@ -331,7 +331,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         entry.getField(FieldName.PAGES).ifPresent(pages -> {
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
-                if (pageNumbers[0].equals(pageNumbers[1])) {// single page
+                if (pageNumbers[0].equals(pageNumbers[1])) { // single page
                     entry.setField(FieldName.PAGES, pageNumbers[0]);
                 } else {
                     entry.setField(FieldName.PAGES, pages.replace("-", "--"));
@@ -406,9 +406,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.replace(" - ", "-"); //IEE Proceedings-
 
                 fullName = fullName.trim();
-                if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+                JournalAbbreviationPreferences journalAbbreviationPreferences = Globals.prefs.getJournalAbbreviationPreferences();
+                if (journalAbbreviationPreferences.useIEEEAbbreviations()) {
                     fullName = abbreviationLoader
-                            .getRepository(Globals.prefs.getJournalAbbreviationPreferences())
+                            .getRepository(journalAbbreviationPreferences)
                             .getMedlineAbbreviation(fullName)
                             .orElse(fullName);
                 }
@@ -483,6 +484,5 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }
-
 
 }

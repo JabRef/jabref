@@ -10,7 +10,6 @@ import javafx.application.Platform;
 import org.jabref.gui.IconTheme;
 import org.jabref.logic.l10n.Localization;
 
-
 public class KeyBindingAction extends AbstractAction {
 
 

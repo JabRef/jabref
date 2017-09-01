@@ -10,7 +10,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.ISSN;
 
-
 public class ISSNCleanup implements CleanupJob {
 
     @Override

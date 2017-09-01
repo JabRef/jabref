@@ -53,10 +53,59 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
-    public static final String UNDEFINED_CITATION_MARKER = "??";
-    private String name = "";
-    private final SortedSet<String> journals = new TreeSet<>();
+    public static final String ITALIC_ET_AL = "ItalicEtAl";
+    public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
+    public static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
+    public static final String ET_AL_STRING = "EtAlString";
+    public static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
+    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
+    public static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
 
+    public static final String TITLE = "Title";
+    public static final String UNDEFINED_CITATION_MARKER = "??";
+    private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
+    private static final String LAYOUT_MRK = "LAYOUT";
+    private static final String PROPERTIES_MARK = "PROPERTIES";
+    private static final String CITATION_MARK = "CITATION";
+    private static final String NAME_MARK = "NAME";
+    private static final String JOURNALS_MARK = "JOURNALS";
+    private static final String DEFAULT_MARK = "default";
+    private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
+    private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
+    private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
+    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
+    private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
+    private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
+    private static final String BOLD_CITATIONS = "BoldCitations";
+    private static final String ITALIC_CITATIONS = "ItalicCitations";
+    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
+    private static final String FORMAT_CITATIONS = "FormatCitations";
+    private static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
+    private static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
+    private static final String CITATION_SEPARATOR = "CitationSeparator";
+    private static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
+    private static final String MAX_AUTHORS = "MaxAuthors";
+    private static final String YEAR_FIELD = "YearField";
+    private static final String AUTHOR_FIELD = "AuthorField";
+    private static final String BRACKET_AFTER = "BracketAfter";
+    private static final String BRACKET_BEFORE = "BracketBefore";
+    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
+    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
+    private static final String SORT_ALGORITHM = "SortAlgorithm";
+    private static final String OXFORD_COMMA = "OxfordComma";
+    private static final String YEAR_SEPARATOR = "YearSeparator";
+    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
+    private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
+
+    private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
+
+    private static final Pattern QUOTED = Pattern.compile("\".*\"");
+
+    private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
+
+    private String name = "";
+
+    private final SortedSet<String> journals = new TreeSet<>();
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
 
@@ -66,16 +115,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private final Map<String, Layout> bibLayout = new HashMap<>();
 
     private final Map<String, Object> properties = new HashMap<>();
+
     private final Map<String, Object> citProperties = new HashMap<>();
 
-    private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
-
     private boolean valid;
-
     private final boolean fromResource;
-
     private final String path;
-
 
     enum BibStyleMode {
         NONE,
@@ -84,58 +129,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         CITATION,
         NAME,
         JOURNALS
-    }
-    private static final String LAYOUT_MRK = "LAYOUT";
-    private static final String PROPERTIES_MARK = "PROPERTIES";
-    private static final String CITATION_MARK = "CITATION";
-    private static final String NAME_MARK = "NAME";
-    private static final String JOURNALS_MARK = "JOURNALS";
-    private static final String DEFAULT_MARK = "default";
+        }
+
     private File styleFile;
     private final Charset encoding;
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
-
-    private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
-    private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
-    private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
-    public static final String ITALIC_ET_AL = "ItalicEtAl";
-    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
-    public static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
-    private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
-    private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
-    private static final String BOLD_CITATIONS = "BoldCitations";
-    private static final String ITALIC_CITATIONS = "ItalicCitations";
-    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
-    private static final String FORMAT_CITATIONS = "FormatCitations";
-    public static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
-    private static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
-    private static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
-    private static final String CITATION_SEPARATOR = "CitationSeparator";
-    private static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
-    public static final String ET_AL_STRING = "EtAlString";
-    public static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
-    private static final String MAX_AUTHORS = "MaxAuthors";
-    private static final String YEAR_FIELD = "YearField";
-    private static final String AUTHOR_FIELD = "AuthorField";
-    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
-    public static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
-    private static final String BRACKET_AFTER = "BracketAfter";
-    private static final String BRACKET_BEFORE = "BracketBefore";
-    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
-    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
-    private static final String SORT_ALGORITHM = "SortAlgorithm";
-    private static final String OXFORD_COMMA = "OxfordComma";
-    public static final String TITLE = "Title";
-    private static final String YEAR_SEPARATOR = "YearSeparator";
-    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
-    private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
-    private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
-
     private final LayoutFormatterPreferences prefs;
-    private static final Pattern QUOTED = Pattern.compile("\".*\"");
-
-    private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
 
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
@@ -537,7 +537,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                         // See if this entry can go into a group with the previous one:
                         String thisMarker = getAuthorYearParenthesisMarker(Collections.singletonList(currentEntry),
                                 database, null, unlimAuthors);
-
 
                         String authorField = getStringCitProperty(AUTHOR_FIELD);
                         int maxAuthors = getIntCitProperty(MAX_AUTHORS);

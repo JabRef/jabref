@@ -14,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
+import org.jabref.preferences.PreferencesService;
 
 import org.fxmisc.easybind.EasyBind;
 
@@ -24,12 +25,13 @@ public class KeyBindingsDialogController extends AbstractController<KeyBindingsD
     @FXML private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
     @FXML private TreeTableColumn<KeyBindingViewModel, String> resetColumn;
 
-    @Inject private KeyBindingPreferences keyBindingPreferences;
+    @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferences;
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsDialogViewModel(keyBindingPreferences, dialogService);
+        viewModel = new KeyBindingsDialogViewModel(keyBindingRepository, dialogService, preferences);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(

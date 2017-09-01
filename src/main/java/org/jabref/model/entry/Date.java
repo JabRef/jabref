@@ -31,25 +31,28 @@ public class Date {
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     public static Optional<Date> parse(String dateString) {
-        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
+        Objects.requireNonNull(dateString);
+        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "d-M-uuuu", "M/uu", "M/uuuu", "MMMM d, uuuu",
+                "MMMM, uuuu",
                 "d.M.uuuu", "uuuu.M.d", "uuuu");
-        for (String formatString : formatStrings) {
-            try {
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                return Optional.of(new Date(parsedDate));
-            } catch (DateTimeParseException ignored) {
-                // Ignored
+
+            for (String formatString : formatStrings) {
+                try {
+                    TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
+                    return Optional.of(new Date(parsedDate));
+                } catch (DateTimeParseException ignored) {
+                    // Ignored
+                }
             }
-        }
 
         return Optional.empty();
     }
 
-    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue, Optional<String> dayValue) {
+    public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
+            Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);
-
 
         if (year.isPresent()) {
             TemporalAccessor date;
@@ -102,10 +105,18 @@ public class Date {
         return get(ChronoField.DAY_OF_MONTH);
     }
 
+    public TemporalAccessor toTemporalAccessor() {
+        return date;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
         Date date1 = (Date) o;
         return Objects.equals(getYear(), date1.getYear()) &&
                 Objects.equals(getMonth(), date1.getMonth()) &&

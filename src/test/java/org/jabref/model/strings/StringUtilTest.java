@@ -2,8 +2,6 @@ package org.jabref.model.strings;
 
 import java.util.Optional;
 
-import org.jabref.model.entry.FileField;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -43,15 +41,6 @@ public class StringUtilTest {
     public void testQuoteMoreComplicated() {
         assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
-
-    private static final String[][] STRING_ARRAY_1 = {{"a", "b"}, {"c", "d"}};
-    private static final String ENCODED_STRING_ARRAY_1 = "a:b;c:d";
-    private static final String[][] STRING_ARRAY_2_WITH_NULL = {{"a", null}, {"c", "d"}};
-    private static final String ENCODED_STRING_ARRAY_2_WITH_NULL = "a:" + null + ";c:d";
-    private static final String[][] STRING_ARRAY_2 = {{"a", ""}, {"c", "d"}};
-    private static final String ENCODED_STRING_ARRAY_2 = "a:;c:d";
-    private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
-    private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
 
 
     @Test
@@ -168,20 +157,12 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testEncodeStringArray() {
-        assertEquals(ENCODED_STRING_ARRAY_1, FileField.encodeStringArray(STRING_ARRAY_1));
-        assertEquals(ENCODED_STRING_ARRAY_2, FileField.encodeStringArray(STRING_ARRAY_2));
-        assertEquals(ENCODED_STRING_ARRAY_2_WITH_NULL, FileField.encodeStringArray(STRING_ARRAY_2_WITH_NULL));
-        assertEquals(ENCODED_STRING_ARRAY_3, FileField.encodeStringArray(STRING_ARRAY_3));
-    }
-
-    @Test
     public void testDecodeStringDoubleArray() {
-        assertArrayEquals(STRING_ARRAY_1, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_1));
-        assertArrayEquals(STRING_ARRAY_2, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_2));
+        assertArrayEquals(new String[][]{{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
+        assertArrayEquals(new String[][]{{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(STRING_ARRAY_3, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_3));
+        assertArrayEquals(new String[][]{{"a", ":b"}, {"c;", "d"}}, StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
     }
 
     @Test

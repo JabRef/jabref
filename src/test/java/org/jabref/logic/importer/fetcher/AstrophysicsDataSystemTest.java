@@ -47,6 +47,7 @@ public class AstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField("keywords", "Mathematical Physics, Mathematics - Differential Geometry, Mathematics - Symplectic Geometry, 58B99, 58Z05, 58B25, 22E65, 58D19, 53D20, 53D42");
         diezSliceTheoremEntry.setField("month", "#may#");
         diezSliceTheoremEntry.setField("primaryclass", "math-ph");
+        diezSliceTheoremEntry.setField("url", "http://adsabs.harvard.edu/abs/2014arXiv1405.2249D");
         diezSliceTheoremEntry.setField("abstract",
                 "A general slice theorem for the action of a Fr$\\backslash$'echet Lie group on a" + NEWLINE
                         + "Fr$\\backslash$'echet manifolds is established. The Nash-Moser theorem provides the" + NEWLINE
@@ -72,13 +73,14 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("journal", "Living Reviews in Relativity");
         famaeyMcGaughEntry.setField("year", "2012");
         famaeyMcGaughEntry.setField("volume", "15");
-        famaeyMcGaughEntry.setField("month", "#dec#");
+        famaeyMcGaughEntry.setField("month", "#sep#");
         famaeyMcGaughEntry.setField("archiveprefix", "arXiv");
         famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
         famaeyMcGaughEntry.setField("eid", "10");
         famaeyMcGaughEntry.setField("eprint", "1112.3960");
         famaeyMcGaughEntry.setField("pages", "10");
         famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
+        famaeyMcGaughEntry.setField("url", "http://adsabs.harvard.edu/abs/2012LRR....15...10F");
 
         sunWelchEntry = new BibEntry();
         sunWelchEntry.setType(BiblatexEntryTypes.ARTICLE);
@@ -91,6 +93,7 @@ public class AstrophysicsDataSystemTest {
         sunWelchEntry.setField("title", "Solution-processed small-molecule solar cells with 6.7\\% efficiency");
         sunWelchEntry.setField("volume", "11");
         sunWelchEntry.setField("year", "2012");
+        sunWelchEntry.setField("url", "http://adsabs.harvard.edu/abs/2012NatMa..11...44S");
 
         xiongSunEntry = new BibEntry();
         xiongSunEntry.setType(BiblatexEntryTypes.ARTICLE);
@@ -103,6 +106,7 @@ public class AstrophysicsDataSystemTest {
         xiongSunEntry.setField("title", "Multiyear On-Orbit Calibration and Performance of Terra MODIS Reflective Solar Bands");
         xiongSunEntry.setField("volume", "45");
         xiongSunEntry.setField("year", "2007");
+        xiongSunEntry.setField("url", "http://adsabs.harvard.edu/abs/2007ITGRS..45..879X");
 
         ingersollPollardEntry = new BibEntry();
         ingersollPollardEntry.setType(BiblatexEntryTypes.ARTICLE);
@@ -116,6 +120,7 @@ public class AstrophysicsDataSystemTest {
         ingersollPollardEntry.setField("title", "Motion in the interiors and atmospheres of Jupiter and Saturn - Scale analysis, anelastic equations, barotropic stability criterion");
         ingersollPollardEntry.setField("volume", "52");
         ingersollPollardEntry.setField("year", "1982");
+        ingersollPollardEntry.setField("url", "http://adsabs.harvard.edu/abs/1982Icar...52...62I");
 
         luceyPaulEntry = new BibEntry();
         luceyPaulEntry.setType(BiblatexEntryTypes.ARTICLE);
@@ -128,6 +133,7 @@ public class AstrophysicsDataSystemTest {
         luceyPaulEntry.setField("title", "Lunar iron and titanium abundance algorithms based on final processing of Clementine ultraviolet-visible images");
         luceyPaulEntry.setField("volume", "105");
         luceyPaulEntry.setField("year", "2000");
+        luceyPaulEntry.setField("url", "http://adsabs.harvard.edu/abs/2000JGR...10520297L");
     }
 
     @Test
@@ -142,7 +148,7 @@ public class AstrophysicsDataSystemTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
         assertEquals(Collections.singletonList(diezSliceTheoremEntry), fetchedEntries);
     }
 

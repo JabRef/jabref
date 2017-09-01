@@ -6,14 +6,15 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class FreeCiteImporterTest {
 
@@ -22,7 +23,7 @@ public class FreeCiteImporterTest {
 
     @Before
     public void setUp() {
-        importer = new FreeCiteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        importer = new FreeCiteImporter(mock(ImportFormatPreferences.class));
     }
 
     @Test

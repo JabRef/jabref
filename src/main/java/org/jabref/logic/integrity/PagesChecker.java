@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.strings.StringUtil;
 
 public class PagesChecker implements ValueChecker {
 
@@ -52,6 +53,10 @@ public class PagesChecker implements ValueChecker {
      */
     @Override
     public Optional<String> checkValue(String value) {
+        if (StringUtil.isBlank(value)) {
+            return Optional.empty();
+        }
+
         if (!isValidPageNumber.test(value.trim())) {
             return Optional.of(Localization.lang("should contain a valid page number range"));
         }

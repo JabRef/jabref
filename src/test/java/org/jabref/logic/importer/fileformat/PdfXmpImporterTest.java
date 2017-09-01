@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileExtensions;
+import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +21,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class PdfXmpImporterTest {
 
@@ -29,7 +30,7 @@ public class PdfXmpImporterTest {
 
     @Before
     public void setUp() {
-        importer = new PdfXmpImporter(JabRefPreferences.getInstance().getXMPPreferences());
+        importer = new PdfXmpImporter(mock(XMPPreferences.class));
     }
 
     @Test

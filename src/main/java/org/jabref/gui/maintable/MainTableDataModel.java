@@ -171,7 +171,7 @@ public class MainTableDataModel {
     }
 
     public void updateGroupFilter() {
-        if(getGroupingState() == DisplayOption.FILTER) {
+        if (getGroupingState() == DisplayOption.FILTER) {
             filterGroupToggle.start();
         } else {
             filterGroupToggle.stop();

@@ -131,11 +131,11 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
          * 3. order specified in preferences
          */
 
-        if(preferences.isSaveInOriginalOrder()) {
+        if (preferences.isSaveInOriginalOrder()) {
             return Optional.empty();
         }
 
-        if(preferences.getTakeMetadataSaveOrderInAccount()) {
+        if (preferences.getTakeMetadataSaveOrderInAccount()) {
             return metaData.getSaveOrderConfig();
         }
 
@@ -234,7 +234,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
                 globalCiteKeyPattern);
 
-        for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
+        for (Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);
         }
     }

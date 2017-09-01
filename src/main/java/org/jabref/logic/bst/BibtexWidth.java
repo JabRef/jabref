@@ -160,7 +160,6 @@ public class BibtexWidth {
 
     public static int getCharWidth(char c) {
 
-
         if ((c >= 0) && (c < 128)) {
             return BibtexWidth.widths[c];
         } else {

@@ -53,7 +53,7 @@ public class CleanupWorker {
         if (preset.isConvertToBiblatex()) {
             jobs.add(new BiblatexCleanup());
         }
-        if(preset.getFormatterCleanups().isEnabled()) {
+        if (preset.getFormatterCleanups().isEnabled()) {
             jobs.addAll(preset.getFormatterCleanups().getConfiguredActions());
         }
         if (preset.isCleanUpUpgradeExternalLinks()) {

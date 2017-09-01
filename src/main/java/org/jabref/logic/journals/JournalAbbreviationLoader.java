@@ -20,6 +20,37 @@ public class JournalAbbreviationLoader {
     private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     private JournalAbbreviationRepository journalAbbrev;
 
+    public static List<Abbreviation> getOfficialIEEEAbbreviations() {
+        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
+    }
+
+    public static List<Abbreviation> getStandardIEEEAbbreviations() {
+        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
+    }
+
+    public static List<Abbreviation> getBuiltInAbbreviations() {
+        return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
+    }
+
+    public static List<Abbreviation> readJournalListFromResource(String resource) {
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromResource(Objects.requireNonNull(resource));
+        return parser.getAbbreviations();
+    }
+
+    public static List<Abbreviation> readJournalListFromFile(File file) throws FileNotFoundException {
+        LOGGER.debug("Reading journal list from file " + file);
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromFile(Objects.requireNonNull(file));
+        return parser.getAbbreviations();
+    }
+
+    public static List<Abbreviation> readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
+        LOGGER.debug("Reading journal list from file " + file);
+        AbbreviationParser parser = new AbbreviationParser();
+        parser.readJournalListFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
+        return parser.getAbbreviations();
+    }
 
     public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
@@ -32,7 +63,7 @@ public class JournalAbbreviationLoader {
         journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
 
         // read IEEE list
-        if (journalAbbreviationPreferences.isUseIEEEAbbreviations()) {
+        if (journalAbbreviationPreferences.useIEEEAbbreviations()) {
             journalAbbrev.addEntries(getOfficialIEEEAbbreviations());
         } else {
             journalAbbrev.addEntries(getStandardIEEEAbbreviations());
@@ -66,42 +97,10 @@ public class JournalAbbreviationLoader {
 
     }
 
-    public static List<Abbreviation> getOfficialIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_CODE);
-    }
-
-    public static List<Abbreviation> getStandardIEEEAbbreviations() {
-        return readJournalListFromResource(JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT);
-    }
-
-    public static List<Abbreviation> getBuiltInAbbreviations() {
-        return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
-    }
-
     public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         if (journalAbbrev == null) {
             update(journalAbbreviationPreferences);
         }
         return journalAbbrev;
-    }
-
-    public static List<Abbreviation> readJournalListFromResource(String resource) {
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromResource(Objects.requireNonNull(resource));
-        return parser.getAbbreviations();
-    }
-
-    public static List<Abbreviation> readJournalListFromFile(File file) throws FileNotFoundException {
-        LOGGER.debug("Reading journal list from file " + file);
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(Objects.requireNonNull(file));
-        return parser.getAbbreviations();
-    }
-
-    public static List<Abbreviation> readJournalListFromFile(File file, Charset encoding) throws FileNotFoundException {
-        LOGGER.debug("Reading journal list from file " + file);
-        AbbreviationParser parser = new AbbreviationParser();
-        parser.readJournalListFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
-        return parser.getAbbreviations();
     }
 }

@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,11 +15,17 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
+
 import org.jabref.model.EntryTypes;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.event.EntryEventSource;
+import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
@@ -50,7 +57,7 @@ public class BibEntry implements Cloneable {
     private final EventBus eventBus = new EventBus();
     private String id;
     private String type;
-    private Map<String, String> fields = new ConcurrentHashMap<>();
+    private ObservableMap<String, String> fields = FXCollections.observableMap(new ConcurrentHashMap<>());
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
     private boolean groupHit;
@@ -209,15 +216,15 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
-        setType(type, EntryEventSource.LOCAL);
+    public void setType(EntryType type) {
+        this.setType(type.getName());
     }
 
     /**
      * Sets this entry's type.
      */
-    public void setType(EntryType type) {
-        this.setType(type.getName());
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -330,7 +337,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<DOI> getDOI() {
-        return getField(FieldName.DOI).flatMap(DOI::build);
+        return getField(FieldName.DOI).flatMap(DOI::parse);
     }
 
     /**
@@ -401,6 +408,7 @@ public class BibEntry implements Cloneable {
         }
 
         String oldValue = getField(fieldName).orElse(null);
+        boolean isNewField = oldValue == null;
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
@@ -415,7 +423,11 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        if (isNewField) {
+            eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
+        } else {
+            eventBus.post(new FieldChangedEvent(change, eventSource));
+        }
         return Optional.of(change);
     }
 
@@ -471,7 +483,7 @@ public class BibEntry implements Cloneable {
         invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
         return Optional.of(change);
     }
 
@@ -524,7 +536,7 @@ public class BibEntry implements Cloneable {
     @Override
     public Object clone() {
         BibEntry clone = new BibEntry(type);
-        clone.fields = new HashMap<>(fields);
+        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
         return clone;
     }
 
@@ -600,7 +612,8 @@ public class BibEntry implements Cloneable {
     }
 
     public void setCommentsBeforeEntry(String parsedComments) {
-        this.commentsBeforeEntry = parsedComments;
+        // delete trailing whitespaces (between entry and text)
+        this.commentsBeforeEntry = REMOVE_TRAILING_WHITESPACE.matcher(parsedComments).replaceFirst("");
     }
 
     public boolean hasChanged() {
@@ -695,7 +708,9 @@ public class BibEntry implements Cloneable {
             return false;
         }
         BibEntry entry = (BibEntry) o;
-        return Objects.equals(type, entry.type) && Objects.equals(fields, entry.fields);
+        return Objects.equals(type, entry.type)
+                && Objects.equals(fields, entry.fields)
+                && Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);
     }
 
     @Override
@@ -725,8 +740,7 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-        // delete trailing whitespaces (between entry and text) from stored serialization
-        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+        return commentsBeforeEntry;
     }
 
     public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
@@ -781,15 +795,31 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
+    public Optional<FieldChange> setFiles(List<LinkedFile> files) {
         Optional<String> oldValue = this.getField(FieldName.FILE);
-        String newValue = FileField.getStringRepresentation(files);
+        String newValue = FileFieldWriter.getStringRepresentation(files);
 
         if (oldValue.isPresent() && oldValue.get().equals(newValue)) {
             return Optional.empty();
         }
 
         return this.setField(FieldName.FILE, newValue);
+    }
+
+    /**
+     * Gets a list of linked files.
+     *
+     * @return the list of linked files, is never null but can be empty.
+     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}
+     */
+    public List<LinkedFile> getFiles() {
+        //Extract the path
+        Optional<String> oldValue = getField(FieldName.FILE);
+        if (!oldValue.isPresent()) {
+            return new ArrayList<>(); //Return new ArrayList because emptyList is immutable
+        }
+
+        return FileFieldParser.parse(oldValue.get());
     }
 
     public void setDate(Date date) {
@@ -802,9 +832,18 @@ public class BibEntry implements Cloneable {
         return getFieldOrAlias(FieldName.MONTH).flatMap(Month::parse);
     }
 
+    public ObjectBinding<String> getFieldBinding(String fieldName) {
+        return Bindings.valueAt(fields, fieldName);
+    }
+
+    public Optional<FieldChange> addFile(LinkedFile file) {
+        List<LinkedFile> linkedFiles = getFiles();
+        linkedFiles.add(file);
+        return setFiles(linkedFiles);
+    }
+
     private interface GetFieldInterface {
 
         Optional<String> getValueForField(String fieldName);
     }
-
 }

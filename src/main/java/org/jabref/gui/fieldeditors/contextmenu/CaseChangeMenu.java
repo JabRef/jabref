@@ -2,26 +2,30 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.util.Objects;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.text.JTextComponent;
+import javafx.beans.property.StringProperty;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
 
-public class CaseChangeMenu extends JMenu {
+class CaseChangeMenu extends Menu {
 
-    public CaseChangeMenu(final JTextComponent parent) {
+    public CaseChangeMenu(final StringProperty text) {
         super(Localization.lang("Change case"));
-        Objects.requireNonNull(parent);
+        Objects.requireNonNull(text);
 
         // create menu items, one for each case changer
         for (final Formatter caseChanger : Formatters.CASE_CHANGERS) {
-            JMenuItem menuItem = new JMenuItem(caseChanger.getName());
-            menuItem.setToolTipText(caseChanger.getDescription());
-            menuItem.addActionListener(e -> parent.setText(caseChanger.format(parent.getText())));
-            this.add(menuItem);
+            CustomMenuItem menuItem = new CustomMenuItem(new Label(caseChanger.getName()));
+            Tooltip toolTip = new Tooltip(caseChanger.getDescription());
+            Tooltip.install(menuItem.getContent(), toolTip);
+            menuItem.setOnAction(event -> text.set(caseChanger.format(text.get())));
+
+            this.getItems().add(menuItem);
         }
     }
 }

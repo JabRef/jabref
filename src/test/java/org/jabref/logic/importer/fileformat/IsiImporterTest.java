@@ -39,12 +39,12 @@ public class IsiImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals(importer.getName(), "ISI");
+        assertEquals("ISI", importer.getName());
     }
 
     @Test
     public void testGetCLIId() {
-        assertEquals(importer.getId(), "isi");
+        assertEquals("isi", importer.getId());
     }
 
     @Test

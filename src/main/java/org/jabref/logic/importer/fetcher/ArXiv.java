@@ -29,7 +29,7 @@ import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.strings.StringUtil;
@@ -124,7 +124,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         // 2. DOI and other fields
         String query;
 
-        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::build).map(DOI::getNormalized);
+        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
         if (doi.isPresent()) {
             // Search for an entry in the ArXiv which is linked to the doi
             query = "doi:" + doi.get();
@@ -398,7 +398,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
             getPdfUrl().ifPresent(url -> bibEntry
-                    .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
+                    .setFiles(Collections.singletonList(new LinkedFile("online", url, "PDF"))));
             return bibEntry;
         }
     }

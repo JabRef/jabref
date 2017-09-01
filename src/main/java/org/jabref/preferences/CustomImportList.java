@@ -18,9 +18,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomImportList extends TreeSet<CustomImporter> {
 
-    private final JabRefPreferences prefs;
-
     private static final Log LOGGER = LogFactory.getLog(CustomImportList.class);
+
+    private final JabRefPreferences prefs;
 
 
     public CustomImportList(JabRefPreferences prefs) {

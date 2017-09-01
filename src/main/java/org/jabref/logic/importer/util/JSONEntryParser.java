@@ -30,8 +30,6 @@ public class JSONEntryParser {
         // Fields that are accessible in the journal part of the BibJson object
         String[] journalSingleFieldStrings = {FieldName.PUBLISHER, FieldName.NUMBER, FieldName.VOLUME};
 
-
-
         BibEntry entry = new BibEntry();
         entry.setType("article");
 
