@@ -195,6 +195,18 @@ public class GlobalSearchBar extends JPanel {
 
                 @Override
                 public void keyPressed(java.awt.event.KeyEvent e) {
+                    switch (e.getKeyCode()) {
+                        //This "hack" prevents that the focus moves out of the field
+                        case java.awt.event.KeyEvent.VK_RIGHT:
+                        case java.awt.event.KeyEvent.VK_LEFT:
+                        case java.awt.event.KeyEvent.VK_UP:
+                        case java.awt.event.KeyEvent.VK_DOWN:
+                            e.consume();
+                            break;
+                        default:
+                            //do nothing
+                    }
+
                     //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
                     Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
                     if (keyBinding.isPresent()) {
