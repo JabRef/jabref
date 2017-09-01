@@ -6,32 +6,34 @@ import logging
 import os
 import subprocess
 import sys
-import webbrowser
+from io import TextIOWrapper
+
+logging.basicConfig(level=logging.INFO)
 
 RES_DIR = "src/main/resources/l10n"
-STATUS_FILE = "status.md"
 URL_BASE = "https://github.com/JabRef/jabref/tree/master/src/main/resources/l10n/"
 
 
-def get_current_branch():
+def get_current_branch() -> str:
     """
-    :return: string: the current git branch
+    :return: the current git branch
     """
-    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).rstrip()
+    return call_command('git rev-parse --abbrev-ref HEAD')
 
 
-def get_current_hash_short():
+def get_current_hash_short() -> str:
     """
-    :return: string: the current git hash (short)
+    :return: the current git hash (short)
     """
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).rstrip()
+    return call_command('git rev-parse --short HEAD')
 
 
-def open_file(filename):
+def call_command(command: str) -> str:
     """
-    :param filename: string: opens the file with its associated application
+    :param command: a shell command
+    :return: the output of the shell command
     """
-    webbrowser.open(filename)
+    return subprocess.check_output(command.split(" ")).decode("utf-8").rstrip()
 
 
 def get_filename(filepath):
@@ -70,7 +72,7 @@ def get_main_jabref_preferences():
     return os.path.join(RES_DIR, "JabRef_en.properties")
 
 
-def get_other_jabref_properties():
+def get_other_jabref_properties() -> list:
     """
     :return: list of strings: all the JabRef_*.preferences files without the english one
     """
@@ -82,7 +84,7 @@ def get_all_jabref_properties():
     """
     :return: list of strings: all the JabRef_*.preferences files with the english at the beginning
     """
-    jabref_property_files = get_other_jabref_properties()
+    jabref_property_files = sorted(get_other_jabref_properties())
     jabref_property_files.insert(0, os.path.join(RES_DIR, "JabRef_en.properties"))
     return jabref_property_files
 
@@ -102,11 +104,11 @@ def get_other_menu_properties():
     return [os.path.join(RES_DIR, file) for file in menu_property_files]
 
 
-def get_all_menu_properties():
+def get_all_menu_properties() -> list:
     """
     :return: list of strings: all the Menu_*.preferences files with the english at the beginning
     """
-    menu_property_files = get_other_menu_properties()
+    menu_property_files = sorted(get_other_menu_properties())
     menu_property_files.insert(0, os.path.join(RES_DIR, "Menu_en.properties"))
     return menu_property_files
 
@@ -257,6 +259,7 @@ def status(extended):
 
     :param extended: boolean: if the keys with problems should be printed
     """
+
     def check_properties(main_property_file, property_files):
         main_lines = read_file(filename=main_property_file)
         main_keys = get_keys_from_lines(lines=main_lines)
@@ -314,6 +317,7 @@ def update(extended):
 
     :param extended: boolean: if the keys with problems should be printed
     """
+
     def update_properties(main_property_file, other_property_files):
         main_lines = read_file(filename=main_property_file)
         # saved the stripped lines
@@ -396,41 +400,46 @@ def update(extended):
     update_properties(main_property_file=get_main_menu_properties(), other_property_files=get_other_menu_properties())
 
 
-def status_create_markdown():
+def status_create_markdown(markdown_output: str):
     """
-    creates a markdown file of the current status and opens it
+    Creates a markdown file of the current status.
+    :param markdown_output: file to where to write the output
     """
-    def write_properties(property_files):
-        markdown.append("\n| Property file | Keys | Keys translated | Keys not translated | % translated |\n")
-        markdown.append("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
+
+    def _write_properties(output_file: TextIOWrapper, property_files: list):
+        output_file.write("\n| Property file | Keys | Keys translated | Keys not translated | % translated |\n")
+        output_file.write("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
 
         for file in property_files:
             lines = read_file(file)
-            keys = get_translations_as_dict(lines=lines)
-            keys_missing_value = get_empty_keys(lines=lines)
-
-            num_keys = len(keys)
-            num_keys_missing_value = len(keys_missing_value)
+            num_keys = len(get_translations_as_dict(lines=lines))
+            num_keys_missing_value = len(get_empty_keys(lines=lines))
             num_keys_translated = num_keys - num_keys_missing_value
-            percent_translated = int((num_keys_translated / float(num_keys)) * 100) if num_keys != 0 else 0
 
-            markdown.append("| [{file}]({url_base}{file}) | {num_keys} | {num_keys_translated} | {num_keys_missing} | {percent_translated} |\n"
-         .format(url_base=URL_BASE, file=os.path.basename(file), num_keys=num_keys, num_keys_translated=num_keys_translated, num_keys_missing=num_keys_missing_value, percent_translated=percent_translated))
+            output_file.write(f"| [{os.path.basename(file)}]({URL_BASE}{os.path.basename(file)}) | "
+                              f"{num_keys} | "
+                              f"{num_keys_translated} | "
+                              f"{num_keys_missing_value} | "
+                              f"{_percentage(num_keys, num_keys_translated)} |\n")
 
-    markdown = []
-    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
-    markdown.append("Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n")
+    def _percentage(whole: int, part: int) -> int:
+        if whole == 0:
+            return 0
+        return int(part / whole * 100.0)
 
-    write_properties(property_files=get_all_jabref_properties())
-    write_properties(property_files=get_all_menu_properties())
-    write_file(STATUS_FILE, markdown)
-    logging.info("Current status written to {}".format(STATUS_FILE))
-    open_file(STATUS_FILE)
+    with open(markdown_output, "w", encoding='utf-8') as status_file:
+        status_file.write(f'### Localization files status ({datetime.datetime.now().strftime("%Y-%m-%d %H:%M")} - '
+                          f'Branch `{get_current_branch()}` `{get_current_hash_short()}`)\n\n')
+        status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
+
+        _write_properties(status_file, get_all_jabref_properties())
+        _write_properties(status_file, get_all_menu_properties())
+
+    logging.info(f'Current status written to {markdown_output}')
 
 
 if len(sys.argv) == 2 and sys.argv[1] == "markdown":
-    status_create_markdown()
+    status_create_markdown('status.md')
 
 elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "update":
     update(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended"))
