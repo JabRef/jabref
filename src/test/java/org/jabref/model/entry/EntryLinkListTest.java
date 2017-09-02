@@ -16,10 +16,11 @@ import static org.junit.Assert.assertEquals;
 
 public class EntryLinkListTest {
 
+    String fieldValue = "test";
+    BibDatabase bibDatabase = new BibDatabase();
+
     @Test
     public void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
-        String fieldValue = "test";
-        BibDatabase bibDatabase = new BibDatabase();
         List<ParsedEntryLink> links = EntryLinkList.parse(fieldValue, bibDatabase);
         ParsedEntryLink link = links.get(0);
 
@@ -30,9 +31,7 @@ public class EntryLinkListTest {
 
     @Test
     public void givenNullFieldValueAndDatabaseWhenParsingThenExpectLinksSizeZero() {
-        String fieldValue = null;
-        BibDatabase bibDatabase = new BibDatabase();
-        List<ParsedEntryLink> links = EntryLinkList.parse(fieldValue, bibDatabase);
+        List<ParsedEntryLink> links = EntryLinkList.parse(null, bibDatabase);
 
         assertEquals(0, links.size());
     }
