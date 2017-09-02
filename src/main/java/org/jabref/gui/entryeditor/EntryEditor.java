@@ -110,11 +110,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     /**
      * A reference to the entry this object works on.
      */
-    private final BibEntry entry;
+    private BibEntry entry;
     /**
      * The currently displayed type
      */
-    private final String displayedBibEntryType;
+    private String displayedBibEntryType;
 
     /**
      * The action concerned with closing the window.
@@ -153,12 +153,39 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Indicates that we are about to go to the next or previous entry
      */
     private final BooleanProperty movingToDifferentEntry = new SimpleBooleanProperty();
-    private final EntryType entryType;
+    private EntryType entryType;
     private SourceTab sourceTab;
+    private final BorderLayout layout;
 
-    public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry, String lastTabName) {
-        this.frame = frame;
+    public EntryEditor(BasePanel panel, BibEntry entry) {
+        this.frame = panel.frame();
         this.panel = panel;
+
+        writeXmp = new WriteXMPEntryEditorAction(panel, this);
+
+        layout = new BorderLayout();
+        setLayout(layout);
+
+        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+
+        setEntry(entry);
+        setupToolBar();
+        container.setScene(new Scene(tabbed));
+        add(container, BorderLayout.CENTER);
+
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
+                        EntryEditorTab activeTab = (EntryEditorTab) tab;
+                        if (activeTab != null) {
+                            activeTab.notifyAboutFocus();
+                        }
+                    });
+                });
+
+        setupKeyBindings();
+    }
+
+    public void setEntry(BibEntry entry) {
         this.entry = Objects.requireNonNull(entry);
         entry.registerListener(this);
         entryType = EntryTypes.getTypeOrDefault(entry.getType(),
@@ -166,58 +193,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         displayedBibEntryType = entry.getType();
 
-        writeXmp = new WriteXMPEntryEditorAction(panel, this);
-
-        BorderLayout borderLayout = new BorderLayout();
-        setLayout(borderLayout);
-        setupToolBar();
-
-        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-
-        container.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent e) {
-
-                //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-                if (keyBinding.isPresent()) {
-                    switch (keyBinding.get()) {
-                        case CUT:
-                        case COPY:
-                        case PASTE:
-                        case CLOSE_ENTRY_EDITOR:
-                        case DELETE_ENTRY:
-                        case SELECT_ALL:
-                        case ENTRY_EDITOR_NEXT_PANEL:
-                        case ENTRY_EDITOR_NEXT_PANEL_2:
-                        case ENTRY_EDITOR_PREVIOUS_PANEL:
-                        case ENTRY_EDITOR_PREVIOUS_PANEL_2:
-                            e.consume();
-                            break;
-                        default:
-                            //do nothing
-                    }
-                }
-            }
-        });
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            addTabs(lastTabName);
+            addTabs(this.getVisibleTabName());
 
             tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
 
-            container.setScene(new Scene(tabbed));
         });
-        add(container, BorderLayout.CENTER);
-
-        EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
-            EntryEditorTab activeTab = (EntryEditorTab) tab;
-            if (activeTab != null) {
-                activeTab.notifyAboutFocus();
-            }
-        });
-
-        setupKeyBindings();
     }
 
     @Subscribe
@@ -284,6 +265,34 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Set-up key bindings specific for the entry editor.
      */
     private void setupKeyBindings() {
+        container.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent e) {
+
+                //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+                Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+                if (keyBinding.isPresent()) {
+                    switch (keyBinding.get()) {
+                        case CUT:
+                        case COPY:
+                        case PASTE:
+                        case CLOSE_ENTRY_EDITOR:
+                        case DELETE_ENTRY:
+                        case SELECT_ALL:
+                        case ENTRY_EDITOR_NEXT_PANEL:
+                        case ENTRY_EDITOR_NEXT_PANEL_2:
+                        case ENTRY_EDITOR_PREVIOUS_PANEL:
+                        case ENTRY_EDITOR_PREVIOUS_PANEL_2:
+                            e.consume();
+                            break;
+                        default:
+                            //do nothing
+                    }
+                }
+            }
+        });
+
         tabbed.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
@@ -383,6 +392,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void setupToolBar() {
+
         JPanel leftPan = new JPanel();
         leftPan.setLayout(new BorderLayout());
         JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
