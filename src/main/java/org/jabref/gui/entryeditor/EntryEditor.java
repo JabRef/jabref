@@ -156,6 +156,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private EntryType entryType;
     private SourceTab sourceTab;
     private final BorderLayout layout;
+    private TypeLabel typeLabel;
 
     public EntryEditor(BasePanel panel, BibEntry entry) {
         this.frame = panel.frame();
@@ -167,7 +168,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setLayout(layout);
 
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
-
+        // Create type-label
+        typeLabel = new TypeLabel("");
         setEntry(entry);
         setupToolBar();
         container.setScene(new Scene(tabbed));
@@ -199,6 +201,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
             tabbed.setStyle("-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
 
         });
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
+        typeLabel.setText(typedEntry.getTypeForDisplay());
     }
 
     @Subscribe
@@ -432,9 +436,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         closeBut.setMargin(new Insets(8, 0, 8, 0));
         leftPan.add(closeBut, BorderLayout.NORTH);
 
-        // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
-        leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
+        leftPan.add(typeLabel, BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
         toolBar.add(typeButton);
