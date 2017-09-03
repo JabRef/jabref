@@ -407,7 +407,8 @@ public class GlobalSearchBar extends JPanel {
         }
 
         setDontSelectSearchBar();
-        searchField.setText(searchTerm);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+
     }
 
     public void setDontSelectSearchBar() {
