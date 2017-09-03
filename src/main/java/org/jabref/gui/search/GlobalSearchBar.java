@@ -191,27 +191,7 @@ public class GlobalSearchBar extends JPanel {
         container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
-            container.addKeyListener(new KeyAdapter() {
-
-                @Override
-                public void keyPressed(java.awt.event.KeyEvent e) {
-                    //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-                    Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-                    if (keyBinding.isPresent()) {
-                        switch (keyBinding.get()) {
-                            case CUT:
-                            case COPY:
-                            case PASTE:
-                            case DELETE_ENTRY:
-                            case SELECT_ALL:
-                                e.consume();
-                                break;
-                            default:
-                                //do nothing
-                        }
-                    }
-                }
-            });
+            container.addKeyListener(new SearchKeyAdapter());
 
         });
 
@@ -427,7 +407,8 @@ public class GlobalSearchBar extends JPanel {
         }
 
         setDontSelectSearchBar();
-        searchField.setText(searchTerm);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+
     }
 
     public void setDontSelectSearchBar() {
@@ -442,4 +423,37 @@ public class GlobalSearchBar extends JPanel {
         }
     }
 
+    private class SearchKeyAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(java.awt.event.KeyEvent e) {
+            switch (e.getKeyCode()) {
+                //This "hack" prevents that the focus moves out of the field
+                case java.awt.event.KeyEvent.VK_RIGHT:
+                case java.awt.event.KeyEvent.VK_LEFT:
+                case java.awt.event.KeyEvent.VK_UP:
+                case java.awt.event.KeyEvent.VK_DOWN:
+                    e.consume();
+                    break;
+                default:
+                    //do nothing
+            }
+
+            //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case CUT:
+                    case COPY:
+                    case PASTE:
+                    case DELETE_ENTRY:
+                    case SELECT_ALL:
+                        e.consume();
+                        break;
+                    default:
+                        //do nothing
+                }
+            }
+        }
+    }
 }
