@@ -432,8 +432,8 @@ def status_create_markdown(markdown_output: str):
                           f'Branch `{get_current_branch()}` `{get_current_hash_short()}`)\n\n')
         status_file.write('Note: To get the current status from your local repository, run `python ./scripts/syncLang.py markdown`\n')
 
-        _write_properties(status_file, get_all_jabref_properties())
         _write_properties(status_file, get_all_menu_properties())
+        _write_properties(status_file, get_all_jabref_properties())
 
     logging.info(f'Current status written to {markdown_output}')
 
