@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,7 +15,8 @@ import org.jabref.model.util.FileHelper;
 /**
  * Represents the link to an external file (e.g. associated PDF file).
  */
-public class LinkedFile {
+//Serialiable is required for drag and drop
+public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
     private String description;

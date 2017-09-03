@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
 - We increased the size of the keywords and file text areas in the entry editor
 - When the entry that is currently shown in the entry editor is deleted externally, the editor is now closed automatically [#2946](https://github.com/JabRef/jabref/issues/2946)
+- We added reordering of file and link entries in the `General`-Tab [3165, comment](https://github.com/JabRef/jabref/issues/3165#issuecomment-326269715)
 
 ### Fixed
 

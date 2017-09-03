@@ -8,5 +8,6 @@ import javafx.scene.input.DataFormat;
 public class DragAndDropDataFormats {
 
     public static final DataFormat GROUP = new DataFormat("dnd/org.jabref.model.groups.GroupTreeNode");
+    public static final DataFormat LINKED_FILE = new DataFormat("dnd/org.jabref.model.entry.LinkedFile");
     public static final DataFormat ENTRIES = new DataFormat("application/x-java-jvm-local-objectref");
 }
