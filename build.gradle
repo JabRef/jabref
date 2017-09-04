@@ -113,9 +113,9 @@ dependencies {
     compile 'com.mashape.unirest:unirest-java:1.4.9'
 
     compile 'commons-logging:commons-logging:1.2'
-    compile 'org.apache.logging.log4j:log4j-jcl:2.8.2'
-    compile 'org.apache.logging.log4j:log4j-api:2.8.2'
-    compile 'org.apache.logging.log4j:log4j-core:2.8.2'
+    compile 'org.apache.logging.log4j:log4j-jcl:2.9.0'
+    compile 'org.apache.logging.log4j:log4j-api:2.9.0'
+    compile 'org.apache.logging.log4j:log4j-core:2.9.0'
 
     // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
     compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
@@ -129,7 +129,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.9.0'
-    testCompile 'com.github.tomakehurst:wiremock:2.7.1'
+    testCompile 'com.github.tomakehurst:wiremock:2.8.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
     testCompile 'org.xmlunit:xmlunit-core:2.4.0'
