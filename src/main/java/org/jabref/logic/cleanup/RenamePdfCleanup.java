@@ -117,7 +117,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     Files.createDirectories(newPath);
                 }
             } catch (IOException e) {
-                LOGGER.error("Could not create necessary target directoires for renaming", e);
+                LOGGER.error("Could not create necessary target directories for renaming", e);
             }
 
             boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
