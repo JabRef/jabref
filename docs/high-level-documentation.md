@@ -1,5 +1,3 @@
-# High Level Documentation
-
 Describes relevant information about the code structure of JabRef in a very precise and succinct way.
 Closer-to-code documentation is available at [Code HowTos](../Code HowTos).
 
