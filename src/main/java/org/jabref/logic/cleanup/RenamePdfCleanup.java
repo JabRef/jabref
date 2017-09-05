@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,26 +32,26 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final String fileNamePattern;
-    private final LayoutFormatterPreferences layoutPrefs;
+    private final LayoutFormatterPreferences layoutPreferences;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
     private LinkedFile singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-                            LayoutFormatterPreferences layoutPrefs,
+                            LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
-        this.layoutPrefs = Objects.requireNonNull(layoutPrefs);
+        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-                            LayoutFormatterPreferences layoutPrefs,
+                            LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
 
-        this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPrefs,
+        this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPreferences,
                 fileDirectoryPreferences);
         this.singleFieldCleanup = singleField;
     }
@@ -60,40 +59,40 @@ public class RenamePdfCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         List<LinkedFile> newFileList;
-        List<LinkedFile> fileList;
+        List<LinkedFile> oldFileList;
         if (singleFieldCleanup != null) {
-            fileList = Arrays.asList(singleFieldCleanup);
+            oldFileList = Collections.singletonList(singleFieldCleanup);
 
             newFileList = entry.getFiles().stream().filter(x -> !x.equals(singleFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
-            fileList = entry.getFiles();
+            oldFileList = entry.getFiles();
         }
 
         boolean changed = false;
 
-        for (LinkedFile flEntry : fileList) {
-            String realOldFilename = flEntry.getLink();
+        for (LinkedFile oldLinkedFile : oldFileList) {
+            String realOldFilename = oldLinkedFile.getLink();
 
             if (StringUtil.isBlank(realOldFilename)) {
                 continue; //Skip empty filenames
             }
 
             if (onlyRelativePaths && Paths.get(realOldFilename).isAbsolute()) {
-                newFileList.add(flEntry);
+                newFileList.add(oldLinkedFile);
                 continue;
             }
 
             //old path and old filename
-            Optional<Path> expandedOldFile = flEntry.findIn(databaseContext, fileDirectoryPreferences);
+            Optional<Path> expandedOldFile = oldLinkedFile.findIn(databaseContext, fileDirectoryPreferences);
 
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
-                newFileList.add(flEntry);
+                newFileList.add(oldLinkedFile);
                 continue;
             }
-            String targetFileName = getTargetFileName(flEntry, entry);
+            String targetFileName = getTargetFileName(oldLinkedFile, entry);
             Path newPath = expandedOldFile.get().getParent().resolve(targetFileName);
 
             String expandedOldFilePath = expandedOldFile.get().toString();
@@ -105,9 +104,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
                 // nonetheless rename files to a new name which just differs by case.
                 // TODO: we could check here if the newPath file is linked with the current entry. And if not, we could add a link
-                LOGGER.debug("There already exists a file with that name " + newPath.getFileName()
-                        + " so I won't rename it");
-                newFileList.add(flEntry);
+                LOGGER.debug("There already exists a file with that name " + newPath.getFileName() + " so I won't rename it");
+                newFileList.add(oldLinkedFile);
                 continue;
             }
 
@@ -124,22 +122,12 @@ public class RenamePdfCleanup implements CleanupJob {
                 changed = true;
 
                 //Change the path for this entry
-                String description = flEntry.getDescription();
-                String type = flEntry.getFileType();
+                String description = oldLinkedFile.getDescription();
+                String type = oldLinkedFile.getFileType();
 
                 //We use the file directory (if none is set - then bib file) to create relative file links
                 Optional<Path> settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences);
-                if (settingsDir.isPresent()) {
-
-                    Path parent = settingsDir.get();
-                    String newFileEntryFileName;
-                    if (parent == null) {
-                        newFileEntryFileName = targetFileName;
-                    } else {
-                        newFileEntryFileName = parent.relativize(newPath).toString();
-                    }
-                    newFileList.add(new LinkedFile(description, newFileEntryFileName, type));
-                }
+                settingsDir.ifPresent(path -> newFileList.add(new LinkedFile(description, path.relativize(newPath).toString(), type)));
             } else {
                 unsuccessfulRenames++;
             }
@@ -149,11 +137,7 @@ public class RenamePdfCleanup implements CleanupJob {
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            if (change.isPresent()) {
-                return Collections.singletonList(change.get());
-            } else {
-                return Collections.emptyList();
-            }
+            return change.map(Collections::singletonList).orElseGet(Collections::emptyList);
         }
         return Collections.emptyList();
     }
@@ -162,7 +146,7 @@ public class RenamePdfCleanup implements CleanupJob {
         String realOldFilename = flEntry.getLink();
 
         String targetFileName = FileUtil.createFileNameFromPattern(
-                databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs).trim()
+                databaseContext.getDatabase(), entry, fileNamePattern, layoutPreferences).trim()
                 + '.'
                 + FileHelper.getFileExtension(realOldFilename).orElse("pdf");
 

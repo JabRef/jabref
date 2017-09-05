@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class FileUtil {
     public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
+    public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
     private FileUtil() {
@@ -39,7 +40,6 @@ public class FileUtil {
     /**
      * Returns the extension of a file name or Optional.empty() if the file does not have one (no "." in name).
      *
-     * @param fileName
      * @return The extension (without leading dot), trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(String fileName) {
@@ -54,7 +54,6 @@ public class FileUtil {
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
-     * @param file
      * @return The extension, trimmed and in lowercase.
      */
     public static Optional<String> getFileExtension(File file) {
@@ -76,28 +75,24 @@ public class FileUtil {
     /**
      * Returns a valid filename for most operating systems.
      *
-     * Currently, only the length is restricted to 255 chars.
+     * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
      */
     public static String getValidFileName(String fileName) {
         String nameWithoutExtension = getFileName(fileName);
 
-        if (nameWithoutExtension.length() > 255) {
+        if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
-            String shortName = nameWithoutExtension.substring(0, 255);
-
-            if (extension.isPresent()) {
-                return shortName + "." + extension.get();
-            } else {
-                return shortName;
-            }
+            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH);
+            LOGGER.info(String.format("Truncated the too long filename '%s' (%d characters) to '%s'.", fileName, fileName.length(), shortName));
+            return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
         return fileName;
     }
 
     /**
-     * Adds an extension to the given file name. The original extension is not replaced. That means,
-     * "demo.bib", ".sav" gets "demo.bib.sav" and not "demo.sav"
+     * Adds an extension to the given file name. The original extension is not replaced. That means, "demo.bib", ".sav"
+     * gets "demo.bib.sav" and not "demo.sav"
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
@@ -209,11 +204,10 @@ public class FileUtil {
     }
 
     /**
-     * Converts an absolute file to a relative one, if possible.
-     * Returns the parameter file itself if no shortening is possible
+     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+     * possible.
      * <p>
-     * This method works correctly only if dirs are sorted decent in their length
-     * i.e. /home/user/literature/important before /home/user/literature
+     * This method works correctly only if dirs are sorted decent in their length i.e. /home/user/literature/important before /home/user/literature.
      *
      * @param file the file to be shortened
      * @param dirs directories to check
@@ -281,8 +275,7 @@ public class FileUtil {
     }
 
     /**
-     * Finds a file inside a directory structure.
-     * Will also look for the file inside nested directories.
+     * Finds a file inside a directory structure. Will also look for the file inside nested directories.
      *
      * @param filename      the name of the file that should be found
      * @param rootDirectory the rootDirectory that will be searched
@@ -301,8 +294,7 @@ public class FileUtil {
     }
 
     /**
-     * Finds a file inside a list of directory structures.
-     * Will also look for the file inside nested directories.
+     * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
      *
      * @param filename    the name of the file that should be found
      * @param directories the directories that will be searched

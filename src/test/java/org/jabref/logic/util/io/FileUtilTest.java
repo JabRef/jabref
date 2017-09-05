@@ -315,14 +315,14 @@ public class FileUtilTest {
 
     @Test
     public void validFilenameShouldBeMaximum255Chars() {
-        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(255).collect(Collectors.joining()) + ".pdf";
+        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(FileUtil.MAXIMUM_FILE_NAME_LENGTH).collect(Collectors.joining()) + ".pdf";
         String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining()) + ".pdf";
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
 
     @Test
     public void invalidFilenameWithoutExtension() {
-        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(255).collect(Collectors.joining());
+        String longestValidFilename = Stream.generate(() -> String.valueOf('1')).limit(FileUtil.MAXIMUM_FILE_NAME_LENGTH).collect(Collectors.joining());
         String longerFilename = Stream.generate(() -> String.valueOf('1')).limit(260).collect(Collectors.joining());
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
