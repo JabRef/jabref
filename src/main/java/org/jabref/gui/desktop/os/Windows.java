@@ -2,6 +2,7 @@ package org.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class Windows implements NativeDesktop {
             openFileWithApplication(filePath, type.get().getOpenWithApplication());
         } else {
             // quote String so explorer handles URL query strings correctly
-            String quotePath = "\"" + filePath +"\"";
+            String quotePath = "\"" + filePath + "\"";
             new ProcessBuilder("explorer.exe", quotePath).start();
         }
     }
@@ -43,13 +44,23 @@ public class Windows implements NativeDesktop {
     }
 
     @Override
+    public Path getApplicationDirectory() {
+        String programDir = System.getenv("ProgramFiles");
+
+        if (programDir != null) {
+            return Paths.get(programDir);
+        }
+        return getUserDirectory();
+    }
+
+    @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
         new ProcessBuilder(Paths.get(application).toString(), Paths.get(filePath).toString()).start();
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
-        new ProcessBuilder("explorer.exe", "/select,", filePath).start();
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
+        new ProcessBuilder("explorer.exe", "/select,", filePath.toString()).start();
     }
 
     @Override

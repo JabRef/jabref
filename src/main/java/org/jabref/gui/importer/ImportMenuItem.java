@@ -8,16 +8,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryMarker;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.worker.AbstractWorker;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -69,16 +73,15 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         // replace the work of the init step:
         MyWorker worker = new MyWorker();
         worker.fileOk = true;
-        worker.filenames = filenames;
+        worker.filenames = filenames.stream().map(Paths::get).collect(Collectors.toList());
 
         worker.getWorker().run();
         worker.getCallBack().update();
     }
 
-
     class MyWorker extends AbstractWorker {
 
-        private List<String> filenames;
+        private List<Path> filenames;
         private ParserResult bibtexResult; // Contains the merged import results
         private boolean fileOk;
 
@@ -86,14 +89,20 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         public void init() {
             importError = null;
 
-            filenames = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+
+            DialogService ds = new FXDialogService();
+
+            filenames = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration));
 
             if (!filenames.isEmpty()) {
                 frame.block();
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, Paths.get(filenames.get(0)).getParent().toString());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames.get(0).getParent().toString());
             }
         }
 
@@ -105,18 +114,18 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
             // We import all files and collect their results:
             List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
-            for (String filename : filenames) {
-                Path file = Paths.get(filename);
+            for (Path filename : filenames) {
+
                 try {
                     if (importer == null) {
                         // Unknown format:
                         frame.output(Localization.lang("Importing in unknown format") + "...");
                         // This import method never throws an IOException:
-                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(file));
+                        imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:
-                        ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
+                        ParserResult pr = importer.importDatabase(filename, Globals.prefs.getDefaultEncoding());
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer.getName(), pr));
                     }
                 } catch (ImportException | IOException e) {
@@ -183,7 +192,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             frame.unblock();
         }
     }
-
 
     private ParserResult mergeImportResults(List<ImportFormatReader.UnknownFormatImport> imports) {
         BibDatabase database = new BibDatabase();

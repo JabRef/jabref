@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.border.Border;
@@ -27,7 +26,6 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     private List<GroupTreeNode> overlappingGroups = new ArrayList<>();
     private List<GroupTreeNode> matchingGroups = new ArrayList<>();
     private Object highlightBorderCell;
-
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf,
@@ -88,15 +86,11 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         }
         label.setToolTipText(viewModel.getDescription());
 
-        Icon icon = viewModel.getIcon();
-        if (label.getIcon() != icon) {
-            label.setIcon(icon);
-        }
         return c;
     }
 
     private boolean printInRed(GroupTreeNodeViewModel viewModel) {
-        if(viewModel.isAllEntriesGroup()) {
+        if (viewModel.isAllEntriesGroup()) {
             // Do not print all entries group in red
             return false;
         }
@@ -105,36 +99,11 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     private boolean printUnderlined(GroupTreeNodeViewModel viewModel) {
-        if(viewModel.isAllEntriesGroup()) {
+        if (viewModel.isAllEntriesGroup()) {
             // Do not underline all entries group
             return false;
         }
         return matchingGroups.contains(viewModel.getNode());
-    }
-
-    /**
-     * For use when dragging: The specified cell is always rendered as selected.
-     *
-     * @param cell The cell over which the user is currently dragging.
-     */
-    public void setHighlight1Cell(Object cell) {
-        this.highlight1Cell = cell;
-    }
-
-    /**
-     * Highlights the specified groups in red.
-     */
-    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.overlappingGroups = nodes;
-    }
-
-    /**
-     * Highlights the specified groups by underlining.
-     */
-    public void setMatchingGroups(List<GroupTreeNode> nodes) {
-        Objects.requireNonNull(nodes);
-        this.matchingGroups = nodes;
     }
 
     /**

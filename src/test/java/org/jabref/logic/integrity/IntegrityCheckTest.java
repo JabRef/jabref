@@ -18,8 +18,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.metadata.FileDirectoryPreferences;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 
 public class IntegrityCheckTest {
 
@@ -94,6 +95,7 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("note", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("note", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
 
@@ -102,6 +104,7 @@ public class IntegrityCheckTest {
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
         assertWrong(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "\\url{someurl}"), BibDatabaseMode.BIBTEX));
         assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
         assertCorrect(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
     }
@@ -160,8 +163,8 @@ public class IntegrityCheckTest {
             // if run without mode, the NoBibtexFieldChecker will complain that "afterword" is a biblatex only field
             assertCorrect(withMode(createContext(field, ""), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Knuth"), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
-            assertCorrect(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "   Knuth, Donald E. "), BibDatabaseMode.BIBLATEX));
+            assertWrong(withMode(createContext(field, "Knuth, Donald E. and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertCorrect(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, ", and Kurt Cobain and A. Einstein"), BibDatabaseMode.BIBLATEX));
             assertWrong(withMode(createContext(field, "Donald E. Knuth and Kurt Cobain and ,"), BibDatabaseMode.BIBLATEX));
@@ -205,7 +208,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testFileChecks() {
-        MetaData metaData = Mockito.mock(MetaData.class);
+        MetaData metaData = mock(MetaData.class);
         Mockito.when(metaData.getDefaultFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
@@ -335,7 +338,7 @@ public class IntegrityCheckTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase, new Defaults());
 
         new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
@@ -373,7 +376,7 @@ public class IntegrityCheckTest {
 
     private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW")))
                 .checkBibtexDatabase();
@@ -382,7 +385,7 @@ public class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                JabRefPreferences.getInstance().getFileDirectoryPreferences(),
+                mock(FileDirectoryPreferences.class),
                 createBibtexKeyPatternPreferences(),
                 new JournalAbbreviationRepository(new Abbreviation("IEEE Software", "IEEE SW"))
                 ).checkBibtexDatabase();

@@ -1,36 +1,41 @@
 package org.jabref.gui.groups;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.input.Dragboard;
 import javafx.scene.paint.Color;
 
+import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntryEvent;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
+import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.strings.StringUtil;
 
+import com.google.common.base.Enums;
 import com.google.common.eventbus.Subscribe;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import org.fxmisc.easybind.EasyBind;
 
 public class GroupNodeViewModel {
@@ -39,14 +44,19 @@ public class GroupNodeViewModel {
     private final boolean isRoot;
     private final ObservableList<GroupNodeViewModel> children;
     private final BibDatabaseContext databaseContext;
+    private final StateManager stateManager;
     private final GroupTreeNode groupNode;
     private final SimpleIntegerProperty hits;
     private final SimpleBooleanProperty hasChildren;
     private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();
     private final BooleanBinding anySelectedEntriesMatched;
     private final BooleanBinding allSelectedEntriesMatched;
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, GroupTreeNode groupNode) {
+    private final TaskExecutor taskExecutor;
+
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.stateManager = Objects.requireNonNull(stateManager);
         this.groupNode = Objects.requireNonNull(groupNode);
 
         LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
@@ -55,16 +65,12 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof AutomaticGroup) {
             AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
 
-            // TODO: Update on changes to entry list (however: there is no flatMap and filter as observable TransformationLists)
-            children = databaseContext.getDatabase()
-                    .getEntries().stream()
-                    .flatMap(stream -> createSubgroups(databaseContext, stateManager, automaticGroup, stream))
-                    .filter(distinctByKey(group -> group.getGroupNode().getName()))
+            children = automaticGroup.createSubgroups(databaseContext.getDatabase().getEntries()).stream()
+                    .map(this::toViewModel)
                     .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
                     .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
-            children = EasyBind.map(groupNode.getChildren(),
-                    child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+            children = BindingsHelper.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
@@ -81,22 +87,30 @@ public class GroupNodeViewModel {
         allSelectedEntriesMatched = BindingsHelper.all(selectedEntriesMatchStatus, matched -> matched);
     }
 
-    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, AbstractGroup group) {
-        this(databaseContext, stateManager, new GroupTreeNode(group));
+    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group) {
+        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group));
     }
 
-    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor) {
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup());
     }
 
-    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager) {
-        return new GroupNodeViewModel(newDatabase, stateManager, DefaultGroupsFactory.getAllEntriesGroup());
+    private GroupNodeViewModel toViewModel(GroupTreeNode child) {
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child);
     }
 
-    private Stream<GroupNodeViewModel> createSubgroups(BibDatabaseContext databaseContext, StateManager stateManager, AutomaticGroup automaticGroup, BibEntry entry) {
-        return automaticGroup.createSubgroups(entry).stream()
-                .map(child -> new GroupNodeViewModel(databaseContext, stateManager, child));
+    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+        //if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+        //{
+        //    return; // user aborted operation
+        //}
+
+        return groupNode.addEntriesToGroup(entries);
+
+        // TODO: Store undo
+        // if (!undo.isEmpty()) {
+        // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
     }
 
     public SimpleBooleanProperty expandedProperty() {
@@ -133,12 +147,18 @@ public class GroupNodeViewModel {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
 
         GroupNodeViewModel that = (GroupNodeViewModel) o;
 
-        if (!groupNode.equals(that.groupNode)) return false;
+        if (!groupNode.equals(that.groupNode)) {
+            return false;
+        }
         return true;
     }
 
@@ -147,7 +167,7 @@ public class GroupNodeViewModel {
         return "GroupNodeViewModel{" +
                 "displayName='" + displayName + '\'' +
                 ", isRoot=" + isRoot +
-                ", iconCode='" + getIconCode() + '\'' +
+                ", icon='" + getIcon() + '\'' +
                 ", children=" + children +
                 ", databaseContext=" + databaseContext +
                 ", groupNode=" + groupNode +
@@ -160,8 +180,14 @@ public class GroupNodeViewModel {
         return groupNode.hashCode();
     }
 
-    public String getIconCode() {
-        return groupNode.getGroup().getIconCode().orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getCode());
+    public MaterialDesignIcon getIcon() {
+        Optional<String> iconName = groupNode.getGroup().getIconName();
+        return iconName.flatMap(this::parseIcon)
+                .orElse(IconTheme.JabRefIcon.DEFAULT_GROUP_ICON.getUnderlyingIcon());
+    }
+
+    private Optional<MaterialDesignIcon> parseIcon(String iconCode) {
+        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH)).toJavaUtil();
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {
@@ -173,8 +199,8 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Gets invoked if an entry in the current database changes.
-     */
+    * Gets invoked if an entry in the current database changes.
+    */
     @Subscribe
     public void listen(@SuppressWarnings("unused") EntryEvent entryEvent) {
         calculateNumberOfMatches();
@@ -184,10 +210,10 @@ public class GroupNodeViewModel {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
         // for example, a previously matched entry gets removed -> hits = hits - 1
-        new Thread(()-> {
-            int newHits = groupNode.calculateNumberOfMatches(databaseContext.getDatabase());
-            Platform.runLater(() -> hits.setValue(newHits));
-        }).start();
+        BackgroundTask
+                .wrap(() -> groupNode.calculateNumberOfMatches(databaseContext.getDatabase()))
+                .onSuccess(hits::setValue)
+                .executeWith(taskExecutor);
     }
 
     public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
@@ -199,10 +225,89 @@ public class GroupNodeViewModel {
     }
 
     boolean isMatchedBy(String searchString) {
-        return StringUtil.isBlank(searchString) || getDisplayName().contains(searchString);
+        return StringUtil.isBlank(searchString) || StringUtil.containsIgnoreCase(getDisplayName(), searchString);
     }
 
     public Color getColor() {
         return groupNode.getGroup().getColor().orElse(IconTheme.getDefaultColor());
+    }
+
+    public String getPath() {
+        return groupNode.getPath();
+    }
+
+    public Optional<GroupNodeViewModel> getChildByPath(String pathToSource) {
+        return groupNode.getChildByPath(pathToSource).map(this::toViewModel);
+    }
+
+    /**
+     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row.
+     * Currently, the following sources are allowed:
+     *  - another group (will be added as subgroup on drop)
+     *  - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+     */
+    public boolean acceptableDrop(Dragboard dragboard) {
+        // TODO: we should also check isNodeDescendant
+        boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);
+        boolean canDropEntries = dragboard.hasContent(DragAndDropDataFormats.ENTRIES)
+                && (groupNode.getGroup() instanceof GroupEntryChanger);
+        return canDropOtherGroup || canDropEntries;
+    }
+
+    public void moveTo(GroupNodeViewModel target) {
+        // TODO: Add undo and display message
+        //MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+        //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
+
+        getGroupNode().moveTo(target.getGroupNode());
+        //panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+        //panel.markBaseChanged();
+        //frame.output(Localization.lang("Moved group \"%0\".", node.getNode().getGroup().getName()));
+    }
+
+    public void moveTo(GroupTreeNode target, int targetIndex) {
+        getGroupNode().moveTo(target, targetIndex);
+    }
+
+    public Optional<GroupTreeNode> getParent() {
+        return groupNode.getParent();
+    }
+
+    public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+        Optional<GroupTreeNode> targetParent = target.getParent();
+        if (targetParent.isPresent()) {
+            int targetIndex = target.getPositionInParent();
+
+            // In case we want to move an item in the same parent
+            // and the item is moved down, we need to adjust the target index
+            if (targetParent.equals(getParent())) {
+                int sourceIndex = this.getPositionInParent();
+                if (sourceIndex < targetIndex) {
+                    targetIndex--;
+                }
+            }
+
+            // Different actions depending on where the user releases the drop in the target row
+            // Bottom + top -> insert source row before / after this row
+            // Center -> add as child
+            switch (mouseLocation) {
+            case BOTTOM:
+                this.moveTo(targetParent.get(), targetIndex + 1);
+                break;
+            case CENTER:
+                this.moveTo(target);
+                break;
+            case TOP:
+                this.moveTo(targetParent.get(), targetIndex);
+                break;
+            }
+        } else {
+            // No parent = root -> just add
+            this.moveTo(target);
+        }
+    }
+
+    private int getPositionInParent() {
+        return groupNode.getPositionInParent();
     }
 }

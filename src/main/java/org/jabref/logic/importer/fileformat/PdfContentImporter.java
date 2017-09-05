@@ -19,7 +19,6 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import org.jabref.logic.xmp.XMPUtil;
@@ -27,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.EntryType;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -474,7 +474,7 @@ public class PdfContentImporter extends Importer {
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             return ParserResult.fromError(exception);
         } catch (FetcherException e) {
             return ParserResult.fromErrorMessage(e.getMessage());

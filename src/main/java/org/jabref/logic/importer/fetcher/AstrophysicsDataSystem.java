@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -128,8 +130,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         try {
             URLConnection connection = getURLForQuery(query).openConnection();
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
-            try(InputStream stream = connection.getInputStream()) {
+            connection.setRequestProperty("User-Agent", URLDownload.USER_AGENT);
+            try (InputStream stream = connection.getInputStream()) {
                 List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
                 // Post-cleanup
@@ -153,8 +155,11 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
         new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
 
-        // Remove url to ADS page
+        // Remove ADS note
         new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
-        new FieldFormatterCleanup("adsurl", new ClearFormatter()).cleanup(entry);
+        // Move adsurl to url field
+        new MoveFieldCleanup("adsurl", FieldName.URL).cleanup(entry);
+        // The fetcher adds some garbage (number of found entries etc before)
+        entry.setCommentsBeforeEntry("");
     }
 }

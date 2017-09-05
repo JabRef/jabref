@@ -35,14 +35,18 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.WindowLocation;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
@@ -86,7 +90,6 @@ public class ProtectedTermsDialog {
     private boolean okPressed;
     private final ProtectedTermsLoader loader;
 
-
     public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
 
         this.frame = Objects.requireNonNull(frame);
@@ -115,7 +118,6 @@ public class ProtectedTermsDialog {
             tableModel.fireTableDataChanged();
         });
         newButton.setToolTipText(Localization.lang("New protected terms file"));
-
 
         setupTable();
 
@@ -281,7 +283,6 @@ public class ProtectedTermsDialog {
         diag.setVisible(visible);
     }
 
-
     /**
      * Get the currently selected term list.
      * @return the selected term list, or empty if no term list is selected.
@@ -293,8 +294,8 @@ public class ProtectedTermsDialog {
         return Optional.empty();
     }
 
-
     class TermTableModel extends DefaultTableModel {
+
         @Override
         public int getColumnCount() {
             return 3;
@@ -395,7 +396,6 @@ public class ProtectedTermsDialog {
         dd.setVisible(true);
     }
 
-
     /**
      * The listener for the table monitoring the current selection.
      */
@@ -421,20 +421,24 @@ public class ProtectedTermsDialog {
         }
     }
 
-    private class AddFileDialog extends JDialog {
+    private class AddFileDialog extends JabRefDialog {
 
         private final JTextField newFile = new JTextField();
         private boolean addOKPressed;
 
-
         public AddFileDialog() {
-            super(diag, Localization.lang("Add protected terms file"), true);
+            super(diag, Localization.lang("Add protected terms file"), true, AddFileDialog.class);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TERMS);
-            dialog.setDefaultExtension(FileExtensions.TERMS);
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileExtensions.TERMS)
+                    .withDefaultExtension(FileExtensions.TERMS)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
             browse.addActionListener(e -> {
-                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                Optional<Path> file = DefaultTaskExecutor
+                        .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
                 file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
             });
 
@@ -488,7 +492,6 @@ public class ProtectedTermsDialog {
         }
 
     }
-
 
     private void storePreferences() {
         Globals.prefs.setProtectedTermsPreferences(loader);

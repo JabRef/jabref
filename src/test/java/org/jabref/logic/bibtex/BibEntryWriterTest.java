@@ -12,25 +12,25 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class BibEntryWriterTest {
 
-    private BibEntryWriter writer;
     private static ImportFormatPreferences importFormatPreferences;
-
+    private BibEntryWriter writer;
 
     @Before
     public void setUpWriter() {
-        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
-        writer = new BibEntryWriter(
-                new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences()), true);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        writer = new BibEntryWriter(new LatexFieldFormatter(latexFieldFormatterPreferences), true);
     }
 
     @Test
@@ -414,6 +414,16 @@ public class BibEntryWriterTest {
                 "}" + OS.NEWLINE;
 
         assertEquals(expected, actual);
+    }
+
+    @Test(expected = IOException.class)
+    public void writeThrowsErrorIfFieldContainsUnbalancedBraces() throws IOException {
+        StringWriter stringWriter = new StringWriter();
+
+        BibEntry entry = new BibEntry("article");
+        entry.setField("note", "some text with unbalanced { braces");
+
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
     }
 
     @Test

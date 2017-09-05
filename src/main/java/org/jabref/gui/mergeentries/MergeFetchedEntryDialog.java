@@ -8,10 +8,10 @@ import java.util.TreeSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JSeparator;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
@@ -30,8 +30,9 @@ import com.jgoodies.forms.layout.RowSpec;
 /**
  * Dialog for merging Bibtex entry with fetched data
  */
-public class MergeFetchedEntryDialog extends JDialog {
+public class MergeFetchedEntryDialog extends JabRefDialog {
 
+    private static final String MARGIN = "5px";
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
     private final BibEntry originalEntry;
@@ -39,11 +40,10 @@ public class MergeFetchedEntryDialog extends JDialog {
     private NamedCompound ce;
     private MergeEntries mergeEntries;
     private final String type;
-    private static final String MARGIN = "5px";
 
 
     public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
-        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true);
+        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true, MergeFetchedEntryDialog.class);
 
         this.panel = panel;
         this.originalEntry = originalEntry;
@@ -94,7 +94,7 @@ public class MergeFetchedEntryDialog extends JDialog {
     }
 
     private class CancelAction extends AbstractAction {
-        CancelAction(){
+        CancelAction() {
             putValue(Action.NAME, Localization.lang("Cancel"));
         }
 
@@ -106,7 +106,7 @@ public class MergeFetchedEntryDialog extends JDialog {
     }
 
     private class ReplaceAction extends AbstractAction {
-        ReplaceAction(){
+        ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Replace original entry"));
         }
 
@@ -123,7 +123,7 @@ public class MergeFetchedEntryDialog extends JDialog {
             String oldType = originalEntry.getType();
             String newType = mergedEntry.getType();
 
-            if(!oldType.equalsIgnoreCase(newType)) {
+            if (!oldType.equalsIgnoreCase(newType)) {
                 originalEntry.setType(newType);
                 ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
                 edited = true;

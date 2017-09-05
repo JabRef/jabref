@@ -16,18 +16,21 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.SaveOrderConfigDisplay;
 import org.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Encodings;
@@ -35,12 +38,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class DatabasePropertiesDialog extends JDialog {
+public class DatabasePropertiesDialog extends JabRefDialog {
 
     private MetaData metaData;
     private BasePanel panel;
@@ -65,14 +69,13 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private FieldFormatterCleanupsPanel fieldFormatterCleanupsPanel;
 
-
     public DatabasePropertiesDialog(JFrame parent) {
-        super(parent, Localization.lang("Library properties"), true);
+        super(parent, Localization.lang("Library properties"), true, DatabasePropertiesDialog.class);
         encoding = new JComboBox<>();
         encoding.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
         ok = new JButton(Localization.lang("OK"));
         cancel = new JButton(Localization.lang("Cancel"));
-        init(parent);
+        init();
     }
 
     public void setPanel(BasePanel panel) {
@@ -90,19 +93,21 @@ public class DatabasePropertiesDialog extends JDialog {
         protect.setEnabled(!isShared);
     }
 
-    private void init(JFrame parent) {
+    private void init() {
+
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
 
-        browseFile.addActionListener(e ->
-                new FileDialog(parent).showDialogAndGetSelectedDirectory()
-                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
-        );
-        browseFileIndv.addActionListener(e ->
-                new FileDialog(parent).showDialogAndGetSelectedDirectory()
-                        .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString()))
-        );
+        browseFile.addActionListener(e -> DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration))
+                .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString())));
+        browseFileIndv.addActionListener(e -> DefaultTaskExecutor
+                .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration))
+                .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString())));
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
@@ -150,6 +155,7 @@ public class DatabasePropertiesDialog extends JDialog {
         pack();
 
         AbstractAction closeAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();

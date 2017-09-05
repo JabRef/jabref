@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsights xmlns="http://schemas.microsoft.com/ApplicationInsights/2013/Settings" schemaVersion="2014-05-30">
+
+    <PerformanceCounters>
+        <!-- Disable collection of the standard set of performance counters -->
+        <UseBuiltIn>False</UseBuiltIn>
+    </PerformanceCounters>
+
+    <!--
+        This turns on diagnostic level logging.
+        Information like loaded performance counters and "Sent Telemetry" events are written to the console.
+    -->
+    <!--<SDKLogger />-->
+
+    <QuickPulse enabled="false"/>
+
+    <Channel>
+        <!--
+            Setting DeveloperMode to true will enable immediate transmission of the telemetry events,
+            which can be helpful during the development process.
+            Make sure to turn this off on production servers due to performance considerations.
+        -->
+        <!-- <DeveloperMode>true</DeveloperMode> -->
+    </Channel>
+</ApplicationInsights>

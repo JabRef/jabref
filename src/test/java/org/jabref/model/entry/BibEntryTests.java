@@ -169,13 +169,13 @@ public class BibEntryTests {
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMM() {
         emptyEntry.setField("date", "2003-03");
-        assertEquals(Optional.of("3"), emptyEntry.getFieldOrAlias("month"));
+        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias("month"));
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMMDD() {
         emptyEntry.setField("date", "2003-03-30");
-        assertEquals(Optional.of("3"), emptyEntry.getFieldOrAlias("month"));
+        assertEquals(Optional.of("#mar#"), emptyEntry.getFieldOrAlias("month"));
     }
 
     @Test
@@ -206,12 +206,6 @@ public class BibEntryTests {
     public void getFieldOrAliasLatexFreeComplexConversionInAlias() {
         emptyEntry.setField("journal", "A 32~{mA} {$\\Sigma\\Delta$}-modulator");
         assertEquals(Optional.of("A 32 mA ΣΔ-modulator"), emptyEntry.getFieldOrAliasLatexFree("journaltitle"));
-    }
-
-    @Test
-    public void getFieldOrAliasLatexFreeDoesNotChangeDateSemantics() {
-        emptyEntry.setField("date", "2003-03-30");
-        assertEquals(Optional.of("3"), emptyEntry.getFieldOrAliasLatexFree("month"));
     }
 
     @Test(expected = NullPointerException.class)

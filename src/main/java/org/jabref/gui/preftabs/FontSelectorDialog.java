@@ -52,7 +52,6 @@ import java.util.Optional;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -62,6 +61,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.l10n.Localization;
 
 /**
@@ -111,37 +111,37 @@ import org.jabref.logic.l10n.Localization;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-public class FontSelectorDialog extends JDialog {
-
-    private static final String PLAIN = "plain";
-    private static final String BOLD = "bold";
-    private static final String BOLD_ITALIC = "bold-italic";
-    private static final String ITALIC = "italic";
-
-    private static final String[] styles = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
-
-    private static final String[] sizes = {"9", "10", "12", "14", "16", "18", "24"};
-
-    // private members
-    private boolean isOK;
-    private final JTextField familyField = new JTextField();
-    private final JList<String> familyList;
-    private final JTextField sizeField = new JTextField();
-    private final JList<String> sizeList = new JList<>(sizes);
-    private final JTextField styleField = new JTextField();
-    private final JList<String> styleList = new JList<>(styles);
-    private final JLabel preview;
+public class FontSelectorDialog extends JabRefDialog {
 
     /**
      * For some reason the default Java fonts show up in the
      * list with .bold, .bolditalic, and .italic extensions.
      */
     private static final String[] HIDEFONTS = {".bold", ".italic"};
+    private static final String PLAIN = "plain";
+    private static final String BOLD = "bold";
+    private static final String BOLD_ITALIC = "bold-italic";
+
+    private static final String ITALIC = "italic";
+
+    private static final String[] STYLES = {PLAIN, BOLD, ITALIC, BOLD_ITALIC};
+
+    private static final String[] SIZES = {"9", "10", "12", "14", "16", "18", "24"};
+    // private members
+    private boolean isOK;
+    private final JTextField familyField = new JTextField();
+    private final JList<String> familyList;
+    private final JTextField sizeField = new JTextField();
+    private final JList<String> sizeList = new JList<>(SIZES);
+    private final JTextField styleField = new JTextField();
+    private final JList<String> styleList = new JList<>(STYLES);
+
+    private final JLabel preview;
 
 
     public FontSelectorDialog(Component comp, Font font) {
 
-        super(JOptionPane.getFrameForComponent(comp), Localization.lang("Font selection"), true); //
+        super(JOptionPane.getFrameForComponent(comp), Localization.lang("Font selection"), true, FontSelectorDialog.class); //
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(new EmptyBorder(12, 12, 12, 12));
         setContentPane(content);
@@ -260,8 +260,6 @@ public class FontSelectorDialog extends JDialog {
 
         return Optional.of(new Font(familyField.getText(), styleList.getSelectedIndex(), size));
     }
-
-
 
     private static String[] getFontList() {
         try {

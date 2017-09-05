@@ -1,14 +1,10 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAccessor;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.entry.Date;
 
 /**
  * This class transforms date to the format yyyy-mm-dd or yyyy-mm..
@@ -34,13 +30,8 @@ public class NormalizeDateFormatter implements Formatter {
      */
     @Override
     public String format(String value) {
-        Optional<TemporalAccessor> parsedDate = tryParseDate(value);
-        if (!parsedDate.isPresent()) {
-            return value;
-        }
-
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM[-dd]");
-        return dateFormatter.format(parsedDate.get());
+        Optional<Date> parsedDate = Date.parse(value);
+        return parsedDate.map(Date::getNormalized).orElse(value);
     }
 
     @Override
@@ -51,29 +42,6 @@ public class NormalizeDateFormatter implements Formatter {
     @Override
     public String getExampleInput() {
         return "29.11.2003";
-    }
-
-    /*
-     * Try to parse the following formats
-     *  "M/y" (covers 9/15, 9/2015, and 09/2015)
-     *  "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     *  "yyyy-MM-dd" (covers 2009-1-15)
-     *  "d.M.uuuu" (covers 15.1.2015)
-     *  "uuuu.M.d" (covers 2015.1.15)
-     * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
-     */
-    private Optional<TemporalAccessor> tryParseDate(String dateString) {
-        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
-                "d.M.uuuu", "uuuu.M.d");
-        for (String formatString : formatStrings) {
-            try {
-                return Optional.of(DateTimeFormatter.ofPattern(formatString).parse(dateString));
-            } catch (DateTimeParseException ignored) {
-                // Ignored
-            }
-        }
-
-        return Optional.empty();
     }
 
     @Override

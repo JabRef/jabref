@@ -1,19 +1,18 @@
 package org.jabref.logic.util.io;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.metadata.FileDirectoryPreferences;
 
 /**
@@ -21,23 +20,19 @@ import org.jabref.model.metadata.FileDirectoryPreferences;
  * <br>
  * This class provides some functionality to search in a {@link BibDatabase} for
  * files. <br>
-
- * @author Nosh&Dan
  */
 public class DatabaseFileLookup {
 
-    private final Set<File> fileCache = new HashSet<>();
+    private final Set<Path> fileCache = new HashSet<>();
 
-    private final List<String> possibleFilePaths;
+    private final List<Path> possibleFilePaths;
 
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
-     *
-     * @param database A {@link BibDatabase}.
      */
     public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(fileDirectoryPreferences))
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences))
                 .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
@@ -60,26 +55,18 @@ public class DatabaseFileLookup {
      *         entry in the database, otherwise <code>false</code>.
      */
     public boolean lookupDatabase(File file) {
-        return fileCache.contains(file);
+        return fileCache.contains(file.toPath());
     }
 
-    private List<File> parseFileField(BibEntry entry) {
+    private List<Path> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        List<ParsedFileField> entries = FileField.parse(entry.getField(FieldName.FILE).orElse(null));
+        return entry.getFiles().stream()
+                .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
+                .map(file -> file.findIn(possibleFilePaths))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
-        List<File> fileLinks = new ArrayList<>();
-        for (ParsedFileField field : entries) {
-            String link = field.getLink();
-
-            // Do not query external file links (huge performance leak)
-            if(link.contains("//")) {
-                continue;
-            }
-
-            FileUtil.expandFilename(link, possibleFilePaths).ifPresent(fileLinks::add);
-        }
-
-        return fileLinks;
     }
 }

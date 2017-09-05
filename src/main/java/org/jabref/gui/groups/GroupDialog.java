@@ -18,7 +18,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -33,17 +32,20 @@ import javafx.scene.paint.Color;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.Dialog;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.fieldeditors.TextField;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.Keyword;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.WordKeywordGroup;
@@ -59,7 +61,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * Dialog for creating or modifying groups. Operates directly on the Vector
  * containing group information.
  */
-class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
+class GroupDialog extends JabRefDialog implements Dialog<AbstractGroup> {
 
     private static final int INDEX_EXPLICIT_GROUP = 0;
     private static final int INDEX_KEYWORD_GROUP = 1;
@@ -100,6 +102,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JTextField autoGroupKeywordsField = new JTextField(60);
     private final JTextField autoGroupKeywordsDeliminator = new JTextField(60);
+    private final JTextField autoGroupKeywordsHierarchicalDeliminator = new JTextField(60);
     private final JRadioButton autoGroupPersonsOption = new JRadioButton(
             Localization.lang("Generate groups for author last names"));
     private final JTextField autoGroupPersonsField = new JTextField(60);
@@ -130,7 +133,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
      *                    created.
      */
     public GroupDialog(JabRefFrame jabrefFrame, AbstractGroup editedGroup) {
-        super(jabrefFrame, Localization.lang("Edit group"), true);
+        super(jabrefFrame, Localization.lang("Edit group"), true, GroupDialog.class);
 
         // set default values (overwritten if editedGroup != null)
         keywordGroupSearchField.setText(jabrefFrame.prefs().get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
@@ -183,7 +186,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         bg.add(autoGroupPersonsOption);
 
         FormLayout layoutAutoGroup = new FormLayout("left:20dlu, 4dlu, left:pref, 4dlu, fill:60dlu",
-                "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p");
+                "p, 2dlu, p, 2dlu, p, p, 2dlu, p, 2dlu, p");
         FormBuilder builderAutoGroup = FormBuilder.create();
         builderAutoGroup.layout(layoutAutoGroup);
         builderAutoGroup.add(autoGroupKeywordsOption).xyw(1, 1, 5);
@@ -191,14 +194,16 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         builderAutoGroup.add(autoGroupKeywordsField).xy(5, 3);
         builderAutoGroup.add(Localization.lang("Use the following delimiter character(s):")).xy(3, 5);
         builderAutoGroup.add(autoGroupKeywordsDeliminator).xy(5, 5);
-        builderAutoGroup.add(autoGroupPersonsOption).xyw(1, 7, 5);
-        builderAutoGroup.add(Localization.lang("Field to group by") + ":").xy(3, 9);
-        builderAutoGroup.add(autoGroupPersonsField).xy(5, 9);
+        builderAutoGroup.add(autoGroupKeywordsHierarchicalDeliminator).xy(5, 6);
+        builderAutoGroup.add(autoGroupPersonsOption).xyw(1, 8, 5);
+        builderAutoGroup.add(Localization.lang("Field to group by") + ":").xy(3, 10);
+        builderAutoGroup.add(autoGroupPersonsField).xy(5, 10);
         optionsPanel.add(builderAutoGroup.build(), String.valueOf(GroupDialog.INDEX_AUTO_GROUP));
 
         autoGroupKeywordsOption.setSelected(true);
         autoGroupKeywordsField.setText(Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
         autoGroupKeywordsDeliminator.setText(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        autoGroupKeywordsHierarchicalDeliminator.setText(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString());
         autoGroupPersonsField.setText(FieldName.AUTHOR);
 
         // ... for buttons panel
@@ -322,18 +327,45 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
         okButton.addActionListener(e -> {
                 isOkPressed = true;
             try {
+                String groupName = nameField.getText().trim();
                 if (explicitRadioButton.isSelected()) {
-                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
-                            Globals.prefs.getKeywordDelimiter());
+                    Character keywordDelimiter = Globals.prefs.getKeywordDelimiter();
+                    if (groupName.contains(Character.toString(keywordDelimiter))) {
+                        jabrefFrame.showMessage(
+                                Localization.lang("The group name contains the keyword separator \"%0\" and thus probably does not work as expected.", Character.toString(keywordDelimiter)));
+                    }
+
+                    Optional<GroupTreeNode> rootGroup = jabrefFrame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getGroups();
+                    if (rootGroup.isPresent()) {
+                        int groupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(groupName)).size();
+                        boolean warnAboutSameName = false;
+                        if (editedGroup == null && groupsWithSameName > 0) {
+                            // New group but there is already one group with the same name
+                            warnAboutSameName = true;
+                        }
+                        if (editedGroup != null && !editedGroup.getName().equals(groupName) && groupsWithSameName > 0) {
+                            // Edit group, changed name to something that is already present
+                            warnAboutSameName = true;
+                        }
+
+                        if (warnAboutSameName) {
+                            jabrefFrame.showMessage(
+                                    Localization.lang("There exists already a group with the same name.", Character.toString(keywordDelimiter)));
+                            return;
+                        }
+                    }
+
+                    resultingGroup = new ExplicitGroup(groupName, getContext(),
+                            keywordDelimiter);
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     if (keywordGroupRegExp.isSelected()) {
-                        resultingGroup = new RegexKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new RegexKeywordGroup(groupName, getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected());
                     } else {
-                        resultingGroup = new WordKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new WordKeywordGroup(groupName, getContext(),
                                 keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                                 keywordGroupCaseSensitive.isSelected(), Globals.prefs.getKeywordDelimiter(), false);
                     }
@@ -342,18 +374,20 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
                         // regex is correct, otherwise OK would have been
                         // disabled
                         // therefore I don't catch anything here
-                        resultingGroup = new SearchGroup(nameField.getText().trim(), getContext(), searchGroupSearchExpression.getText().trim(),
+                        resultingGroup = new SearchGroup(groupName, getContext(), searchGroupSearchExpression.getText().trim(),
                                 isCaseSensitive(), isRegex());
                     } catch (Exception e1) {
                         // should never happen
                     }
                 } else if (autoRadioButton.isSelected()) {
                     if (autoGroupKeywordsOption.isSelected()) {
-                        resultingGroup = new AutomaticKeywordGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new AutomaticKeywordGroup(
+                                groupName, getContext(),
                                 autoGroupKeywordsField.getText().trim(),
-                                autoGroupKeywordsDeliminator.getText().charAt(0));
+                                autoGroupKeywordsDeliminator.getText().charAt(0),
+                                autoGroupKeywordsHierarchicalDeliminator.getText().charAt(0));
                     } else {
-                        resultingGroup = new AutomaticPersonsGroup(nameField.getText().trim(), getContext(),
+                        resultingGroup = new AutomaticPersonsGroup(groupName, getContext(),
                                 autoGroupPersonsField.getText().trim());
                     }
                 }
@@ -363,7 +397,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
                     // Ignore invalid color (we should probably notify the user instead...)
                 }
                 resultingGroup.setDescription(descriptionField.getText());
-                resultingGroup.setIconCode(iconField.getText());
+                resultingGroup.setIconName(iconField.getText());
 
                 dispose();
             } catch (IllegalArgumentException exception) {
@@ -395,7 +429,7 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
             nameField.setText(editedGroup.getName());
             colorField.setText(editedGroup.getColor().map(Color::toString).orElse(""));
             descriptionField.setText(editedGroup.getDescription().orElse(""));
-            iconField.setText(editedGroup.getIconCode().orElse(""));
+            iconField.setText(editedGroup.getIconName().orElse(""));
 
             if (editedGroup.getClass() == WordKeywordGroup.class) {
                 WordKeywordGroup group = (WordKeywordGroup) editedGroup;
@@ -429,7 +463,8 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
 
                 if (editedGroup.getClass() == AutomaticKeywordGroup.class) {
                     AutomaticKeywordGroup group = (AutomaticKeywordGroup) editedGroup;
-                    autoGroupKeywordsDeliminator.setText(group.getKeywordSeperator().toString());
+                    autoGroupKeywordsDeliminator.setText(group.getKeywordDelimiter().toString());
+                    autoGroupKeywordsHierarchicalDeliminator.setText(group.getKeywordHierarchicalDelimiter().toString());
                     autoGroupKeywordsField.setText(group.getField());
                 } else if (editedGroup.getClass() == AutomaticPersonsGroup.class) {
                     AutomaticPersonsGroup group = (AutomaticPersonsGroup) editedGroup;
@@ -441,6 +476,10 @@ class GroupDialog extends JDialog implements Dialog<AbstractGroup> {
 
     public GroupDialog() {
         this(JabRefGUI.getMainFrame(), null);
+    }
+
+    public GroupDialog(AbstractGroup editedGroup) {
+        this(JabRefGUI.getMainFrame(), editedGroup);
     }
 
     private static String formatRegExException(String regExp, Exception e) {

@@ -1,7 +1,7 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.util.DOI;
+import org.jabref.model.entry.identifier.DOI;
 
 /**
  * Will strip any prefixes from the Doi field, in order to output only the Doi number
@@ -13,6 +13,6 @@ public class DOIStrip implements LayoutFormatter {
             return null;
         }
 
-        return DOI.build(fieldText).map(DOI::getDOI).orElse(fieldText);
+        return DOI.parse(fieldText).map(DOI::getDOI).orElse(fieldText);
     }
 }

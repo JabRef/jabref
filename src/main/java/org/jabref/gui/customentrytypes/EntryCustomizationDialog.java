@@ -24,7 +24,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,6 +36,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
@@ -50,11 +50,13 @@ import org.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-public class EntryCustomizationDialog extends JDialog implements ListSelectionListener {
+public class EntryCustomizationDialog extends JabRefDialog implements ListSelectionListener {
 
-    private final JabRefFrame frame;
     protected GridBagLayout gbl = new GridBagLayout();
     protected GridBagConstraints con = new GridBagConstraints();
+    protected JButton helpButton;
+    protected JButton delete;
+    private final JabRefFrame frame;
     private FieldSetComponent reqComp;
     private FieldSetComponent optComp;
     private FieldSetComponent optComp2;
@@ -62,8 +64,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     private JButton ok;
     private JButton cancel;
     private JButton apply;
-    protected JButton helpButton;
-    protected JButton delete;
     private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
     private final Map<String, List<String>> reqLists = new HashMap<>();
@@ -79,7 +79,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
      * Creates a new instance of EntryCustomizationDialog
      */
     public EntryCustomizationDialog(JabRefFrame frame) {
-        super(frame, Localization.lang("Customize entry types"), false);
+        super(frame, Localization.lang("Customize entry types"), false, EntryCustomizationDialog.class);
 
         this.frame = frame;
         initGui();
@@ -303,7 +303,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
 
         // update all affected entries if something has been changed
-        if(!actuallyChangedTypes.isEmpty()) {
+        if (!actuallyChangedTypes.isEmpty()) {
             updateEntriesForChangedTypes(actuallyChangedTypes);
         }
 

@@ -13,8 +13,8 @@ import javax.swing.JScrollPane;
 import org.jabref.gui.BasePanel;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.DuplicateCheck;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
@@ -96,7 +96,6 @@ class EntryChange extends Change {
     public JComponent description() {
         return new JLabel(name);
     }
-
 
     static class FieldChange extends Change {
 

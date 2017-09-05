@@ -38,7 +38,6 @@ public class FileSaveSession extends SaveSession {
     private static final String TEMP_SUFFIX = "save.bib";
     private final Path temporaryFile;
 
-
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
         this(encoding, backup, createTemporaryFile());
     }
@@ -86,9 +85,13 @@ public class FileSaveSession extends SaveSession {
                 LOGGER.error("Error when creating lock file.", ex);
             }
 
-            // Try to save file permissions to restore them later (by default: allow everything)
-            Set<PosixFilePermission> oldFilePermissions = EnumSet.allOf(PosixFilePermission.class);
-            if (FileUtil.isPosixCompliant && Files.exists(file)) {
+            // Try to save file permissions to restore them later (by default: 664)
+            Set<PosixFilePermission> oldFilePermissions = EnumSet.of(PosixFilePermission.OWNER_READ,
+                    PosixFilePermission.OWNER_WRITE,
+                    PosixFilePermission.GROUP_READ,
+                    PosixFilePermission.GROUP_WRITE,
+                    PosixFilePermission.OTHERS_READ);
+            if (FileUtil.IS_POSIX_COMPILANT && Files.exists(file)) {
                 try {
                     oldFilePermissions = Files.getPosixFilePermissions(file);
                 } catch (IOException exception) {
@@ -99,7 +102,7 @@ public class FileSaveSession extends SaveSession {
             FileUtil.copyFile(temporaryFile, file, true);
 
             // Restore file permissions
-            if (FileUtil.isPosixCompliant) {
+            if (FileUtil.IS_POSIX_COMPILANT) {
                 try {
                     Files.setPosixFilePermissions(file, oldFilePermissions);
                 } catch (IOException exception) {

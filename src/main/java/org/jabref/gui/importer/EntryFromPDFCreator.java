@@ -19,7 +19,6 @@ import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.pdfimport.PdfImporter;
 import org.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -99,7 +98,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
                         String date = LocalDate.of(Calendar.YEAR, Calendar.MONTH + 1, Calendar.DAY_OF_MONTH)
                                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
-                        appendToField(entry, Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), date);
+                        appendToField(entry, Globals.prefs.getTimestampPreferences().getTimestampField(), date);
                     }
 
                     if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null) {

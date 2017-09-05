@@ -22,7 +22,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -30,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import org.jabref.gui.BasePanel;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinder;
@@ -44,20 +44,20 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ContentSelectorDialog extends JDialog {
+public class ContentSelectorDialog extends JabRefDialog {
 
+    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
+    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
+    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
     private final GridBagLayout gbl = new GridBagLayout();
     private final GridBagConstraints con = new GridBagConstraints();
     private final JPanel fieldPan = new JPanel();
     private final JPanel wordPan = new JPanel();
     private final JPanel buttonPan = new JPanel();
+
     private final JPanel fieldNamePan = new JPanel();
     private final JPanel wordEditPan = new JPanel();
-
-    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
-    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
-    private String currentField;
     private final JabRefFrame frame;
     private final BasePanel panel;
     private final JButton newField = new JButton(Localization.lang("New"));
@@ -68,18 +68,16 @@ public class ContentSelectorDialog extends JDialog {
     private final JButton cancel = new JButton();
     private final JButton apply = new JButton(Localization.lang("Apply"));
     private final DefaultListModel<String> fieldListModel = new DefaultListModel<>();
-    private DefaultListModel<String> wordListModel = new DefaultListModel<>();
     private final JList<String> fieldList = new JList<>(fieldListModel);
-    private final JList<String> wordList = new JList<>(wordListModel);
     private final JTextField fieldNameField = new JTextField("", 20);
     private final JTextField wordEditField = new JTextField("", 20);
     private final JScrollPane fPane = new JScrollPane(fieldList);
-    private final JScrollPane wPane = new JScrollPane(wordList);
-
     private final Map<String, DefaultListModel<String>> wordListModels = new HashMap<>();
     private final List<String> removedFields = new ArrayList<>();
-
-    private static final Log LOGGER = LogFactory.getLog(ContentSelectorDialog.class);
+    private DefaultListModel<String> wordListModel = new DefaultListModel<>();
+    private JList<String> wordList = new JList<>(wordListModel);
+    private JScrollPane wPane = new JScrollPane(wordList);
+    private String currentField;
 
 
     /**
@@ -91,7 +89,7 @@ public class ContentSelectorDialog extends JDialog {
      * @param fieldName the field this selector is initialized for. May be null.
      */
     public ContentSelectorDialog(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, String fieldName) {
-        super(owner, Localization.lang("Manage content selectors"));
+        super(owner, Localization.lang("Manage content selectors"), ContentSelectorDialog.class);
         this.setModal(modal);
         this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;
@@ -118,6 +116,16 @@ public class ContentSelectorDialog extends JDialog {
         KeyBinder.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
 
         pack();
+    }
+
+    private static int findPos(DefaultListModel<String> lm, String item) {
+        for (int i = 0; i < lm.size(); i++) {
+            String s = lm.get(i);
+            if (item.compareToIgnoreCase(s) < 0) { // item precedes s
+                return i;
+            }
+        }
+        return lm.size();
     }
 
     private void setupActions() {
@@ -254,7 +262,6 @@ public class ContentSelectorDialog extends JDialog {
     }
 
     private void applyChanges() {
-        boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
         boolean anythingChanged = false; // Watch if we should mark as there is data changed
 
         // First remove the mappings for fields that have been deleted.
@@ -262,7 +269,6 @@ public class ContentSelectorDialog extends JDialog {
         // cause any harm to remove them here.
         for (String fieldName : removedFields) {
             metaData.clearContentSelectors(fieldName);
-            changedFieldSet = true;
             anythingChanged = true;
         }
 
@@ -294,28 +300,19 @@ public class ContentSelectorDialog extends JDialog {
 
             // Check if there are words to be added and previously there were no content selector for the field
             if (!data.isEmpty() && metaData.getContentSelectorValuesForField(entry.getKey()).isEmpty()) {
-                changedFieldSet = true;
+                anythingChanged = true;
             }
 
             metaData.addContentSelector(new ContentSelector(entry.getKey(), new ArrayList<>(data)));
         }
 
-        // Update all selectors in the current BasePanel.
-        if (changedFieldSet) {
-            // We have added or removed content selectors, update the entry editor
-            panel.rebuildAllEntryEditors();
-        } else if (anythingChanged) {
-            // Enough to update the content selectors, if anything changed
-            panel.updateAllContentSelectors();
-        }
-
         if (anythingChanged) {
+            // Update all selectors in the current BasePanel.
+            panel.setupMainPanel();
+
             // Mark the database updated so changes are not lost
             panel.markNonUndoableBaseChanged();
         }
-
-        panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.getBibDatabaseContext().getMetaData());
-
     }
 
     /**
@@ -373,16 +370,6 @@ public class ContentSelectorDialog extends JDialog {
         } else {
             wordList.setModel(wordListModel);
         }
-    }
-
-    private static int findPos(DefaultListModel<String> lm, String item) {
-        for (int i = 0; i < lm.size(); i++) {
-            String s = lm.get(i);
-            if (item.compareToIgnoreCase(s) < 0) { // item precedes s
-                return i;
-            }
-        }
-        return lm.size();
     }
 
     private void initLayout() {
@@ -475,7 +462,6 @@ public class ContentSelectorDialog extends JDialog {
         getContentPane().add(buttonPan);
 
     }
-
 
     private class FieldNameFocusAdapter extends FocusAdapter {
 

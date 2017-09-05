@@ -14,14 +14,14 @@ public class LogMessages {
 
     private static LogMessages instance = new LogMessages();
 
+    private final ObservableList<LogEvent> messages = FXCollections.observableArrayList();
+
     private LogMessages() {
     }
 
     public static LogMessages getInstance() {
         return instance;
     }
-
-    private final ObservableList<LogEvent> messages = FXCollections.observableArrayList();
 
     public ObservableList<LogEvent> getMessages() {
         return FXCollections.unmodifiableObservableList(messages);
@@ -32,6 +32,10 @@ public class LogMessages {
         MutableLogEvent copy = new MutableLogEvent();
         copy.initFrom(event);
         messages.add(copy);
+    }
+
+    public void clear() {
+        messages.clear();
     }
 
 }

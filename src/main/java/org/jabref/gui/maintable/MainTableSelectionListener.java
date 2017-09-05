@@ -62,16 +62,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     private final BasePanel panel;
 
     private final EventList<BibEntry> tableRows;
-    private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
-
-    private boolean workingOnPreview;
-
-    private boolean enabled = true;
     // Register the last character pressed to quick jump in the table. Together
     // with storing the last row number jumped to, this is used to let multiple
     // key strokes cycle between all entries starting with the same letter:
     private final int[] lastPressed = new int[20];
+    private PreviewPanel preview;
+    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
+    private boolean workingOnPreview;
+    private boolean enabled = true;
     private int lastPressedCount;
 
     private long lastPressedTime;
@@ -81,7 +79,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
         PreviewPanel previewPanel = panel.getPreviewPanel();
-        if (previewPanel != null){
+        if (previewPanel != null) {
             preview = previewPanel;
         } else {
             preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
@@ -100,7 +98,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         EventList<BibEntry> selected = e.getSourceList();
-        if (selected.isEmpty()){
+        if (selected.isEmpty()) {
             return;
         }
 
@@ -118,7 +116,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 EntryEditor oldEditor = panel.getCurrentEditor();
                 String visName = null;
                 if (oldEditor != null) {
-                    visName = oldEditor.getVisiblePanelName();
+                    visName = oldEditor.getVisibleTabName();
                 }
                 // Get a new editor for the entry to edit:
                 EntryEditor newEditor = panel.getEntryEditor(newSelected);
@@ -127,7 +125,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (!Objects.equals(newEditor, oldEditor) || (mode != BasePanelMode.SHOWING_EDITOR)) {
 
                     if (visName != null) {
-                        newEditor.setVisiblePanel(visName);
+                        newEditor.setVisibleTab(visName);
                     }
                     panel.showEntryEditor(newEditor);
                     SwingUtilities.invokeLater(() -> table.ensureVisible(table.getSelectedRow()));
@@ -370,8 +368,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         // See if this is a simple file link field, or if it is a file-list
         // field that can specify a list of links:
-        if(!column.getBibtexFields().isEmpty()) {
-            for(String field : column.getBibtexFields()) {
+        if (!column.getBibtexFields().isEmpty()) {
+            for (String field : column.getBibtexFields()) {
                 if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
@@ -455,11 +453,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
     }
 
-    public void nextPreviewStyle(){
+    public void nextPreviewStyle() {
         cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
     }
 
-    public void previousPreviewStyle(){
+    public void previousPreviewStyle() {
         cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
     }
 

@@ -17,13 +17,13 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.DOI;
 import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
-    public static final String name = "DOI";
+    public static final String NAME = "DOI";
 
     private final ImportFormatPreferences preferences;
 
@@ -33,7 +33,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public String getName() {
-        return DoiFetcher.name;
+        return DoiFetcher.NAME;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<DOI> doi = DOI.build(identifier);
+        Optional<DOI> doi = DOI.parse(identifier);
 
         try {
             if (doi.isPresent()) {
@@ -62,7 +62,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
         } catch (IOException e) {
-            throw new FetcherException(Localization.lang("Invalid URL"), e);
+            throw new FetcherException(Localization.lang("Connection error"), e);
         } catch (ParseException e) {
             throw new FetcherException("Could not parse BibTeX entry", e);
         }
@@ -80,5 +80,4 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         bibEntry.ifPresent(list::add);
         return list;
     }
-
 }

@@ -22,12 +22,13 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.logic.util.BuildInfo;
 
 public class ErrorConsoleController extends AbstractController<ErrorConsoleViewModel> {
 
     @FXML private Button copyLogButton;
+    @FXML private Button clearLogButton;
     @FXML private Button createIssueButton;
     @FXML private ListView<LogEventViewModel> messagesListView;
     @FXML private Label descriptionLabel;
@@ -35,7 +36,7 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
     @Inject private DialogService dialogService;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
-    @Inject private KeyBindingPreferences keyBindingPreferences;
+    @Inject private KeyBindingRepository keyBindingRepository;
 
     @FXML
     private void initialize() {
@@ -93,7 +94,7 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
 
     @FXML
     private void copySelectedLogEntries(KeyEvent event) {
-        if (keyBindingPreferences.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
+        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, event)) {
             ObservableList<LogEventViewModel> selectedEntries = messagesListView.getSelectionModel().getSelectedItems();
             viewModel.copyLog(selectedEntries);
         }
@@ -102,6 +103,11 @@ public class ErrorConsoleController extends AbstractController<ErrorConsoleViewM
     @FXML
     private void copyLog() {
         viewModel.copyLog();
+    }
+
+    @FXML
+    private void clearLog() {
+        viewModel.clearLog();
     }
 
     @FXML

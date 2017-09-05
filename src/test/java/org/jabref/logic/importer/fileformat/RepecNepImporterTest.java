@@ -10,13 +10,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RepecNepImporterTest {
 
@@ -25,7 +28,9 @@ public class RepecNepImporterTest {
 
     @Before
     public void setUp() {
-        testImporter = new RepecNepImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        testImporter = new RepecNepImporter(importFormatPreferences);
     }
 
     @Test
@@ -52,8 +57,7 @@ public class RepecNepImporterTest {
     public final void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Paths.get(RepecNepImporter.class.getResource("RepecNepImporterTest1.txt").toURI());
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest1.bib")) {
-            List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
-                    .getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }

@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  * <li> every comma separates tokens, while sequences of other separators are
  * equivalent to a single separator; for example: "a - b" consists of 2 tokens
  * ("a" and "b"), while "a,-,b" consists of 3 tokens ("a", "", and "b")
- * <li> anything enclosed in braces belonges to a single token; for example:
+ * <li> anything enclosed in braces belongs to a single token; for example:
  * "abc x{a,b,-~ c}x" consists of 2 tokens, while "abc xa,b,-~ cx" consists of 4
  * tokens ("abc", "xa","b", and "cx");
  * <li> a token followed immediately by a dash is "dash-terminated" token, and
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  * tokens "a" and "b" are dash-terminated and "c" and "d" are space-terminated;
  * <li> for the purposes of splitting of 'author name' into parts and
  * construction of abbreviation of first name, one needs definitions of first
- * latter of a token, case of a token, and abbreviation of a token:
+ * letter of a token, case of a token, and abbreviation of a token:
  * <ul>
  * <li> 'first letter' of a token is the first letter character (<CODE>Character.isLetter(c)==true</CODE>)
  * that does not belong to a sequence of letters that immediately follows "\"
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
  * "{\noopsort{\"o}}xyz" 'first letter' is "o", in "{\AE}x" 'first letter' is
  * "A", in "\aex\ijk\Oe\j" 'first letter' is "j"; if there is no letter
  * satisfying the above rule, 'first letter' is undefined;
- * <li> token is "lower-case" token, if its first letter id defined and is
+ * <li> token is "lower-case" token if its first letter is defined and is
  * lower-case (<CODE>Character.isLowerCase(c)==true</CODE>), and token is
  * "upper-case" token otherwise;
  * <li> 'abbreviation' of a token is the shortest prefix of the token that (a)
@@ -62,7 +63,7 @@ import java.util.stream.Collectors;
  * as "{\noopsort{A}}.", while BiBTeX produces "j."; fixing this problem,
  * however, requires processing of the preabmle;
  * </ul>
- * <li> 'author name's in 'author field' are subsequences of tokens separated by
+ * <li> 'author names' in 'author field' are subsequences of tokens separated by
  * token "and" ("and" is case-insensitive); if 'author name' is an empty
  * sequence of tokens, it is ignored; for examle, both "John Smith and Peter
  * Black" and "and and John Smith and and Peter Black" consists of 2 'author
@@ -70,11 +71,11 @@ import java.util.stream.Collectors;
  * different from BiBTeX behavior);
  * <li> 'author name' consists of 'first-part', 'von-part', 'last-part', and
  * 'junior-part', each of which is a sequence of tokens; how a sequence of
- * tokens has to be splitted into these parts, depends the number of commas:
+ * tokens has to be split into these parts, depends the number of commas:
  * <ul>
  * <li> no commas, all tokens are upper-case: 'junior-part' and 'von-part' are
  * empty, 'last-part' consist of the last token, 'first-part' consists of all
- * other tokens ('first-part' is empty, if 'author name' consists of a single
+ * other tokens ('first-part' is empty if 'author name' consists of a single
  * token); for example, in "John James Smith", 'last-part'="Smith" and
  * 'first-part'="John James";
  * <li> no commas, there exists lower-case token: 'junior-part' is empty,
@@ -99,7 +100,7 @@ import java.util.stream.Collectors;
  * <li> two or more commas (any comma after the second one is ignored; it merely
  * separates tokens): 'junior-part' consists of all tokens between first and
  * second commas, 'first-part' consists of all tokens after the second comma,
- * tokens before the first comma are splitted into 'von-part' and 'last-part'
+ * tokens before the first comma are split into 'von-part' and 'last-part'
  * similarly to the case of one comma; for example: in "de la Vall{\'e}e
  * Poussin, Jr., Charles Louis Xavier Joseph", 'first-part'="Charles Louis
  * Xavier Joseph", 'von-part'="de la", 'last-part'="Vall{\'e}e la Poussin", and
@@ -119,23 +120,19 @@ import java.util.stream.Collectors;
  */
 public class AuthorList {
 
+    private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
+    // Avoid partition where these values are contained
+    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
-
-    // Variables for storing computed strings, so they only need to be created once:
-    private String authorsNatbib;
-    private String authorsFirstFirstAnds;
-    private String authorsAlph;
-
     private final String[] authorsFirstFirst = new String[4];
     private final String[] authorsLastOnly = new String[2];
     private final String[] authorLastFirstAnds = new String[2];
     private final String[] authorsLastFirst = new String[4];
     private final String[] authorsLastFirstFirstLast = new String[2];
-
-    private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
-
-    // Avoid partition where these values are contained
-    private final static Collection<String> avoidTermsInLowerCase = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+    // Variables for storing computed strings, so they only need to be created once:
+    private String authorsNatbib;
+    private String authorsFirstFirstAnds;
+    private String authorsAlph;
 
     /**
      * Creates a new list of authors.
@@ -153,6 +150,10 @@ public class AuthorList {
         this(Collections.singletonList(author));
     }
 
+    public AuthorList() {
+        this(new ArrayList<Author>());
+    }
+
     /**
      * Retrieve an AuthorList for the given string of authors or editors.
      * <p>
@@ -166,7 +167,11 @@ public class AuthorList {
 
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        if (!authors.toUpperCase(Locale.ENGLISH).contains(" AND ") && !authors.contains("{") && !authors.contains(";")) {
+        final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
+        final boolean authorsContainOpeningBrace = authors.contains("{");
+        final boolean authorsContainSemicolon = authors.contains(";");
+        final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
+        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
             List<String> arrayNameList = Arrays.asList(authors.split(","));
 
             // Delete spaces for correct case identification
@@ -191,7 +196,7 @@ public class AuthorList {
                 Collection<Integer> avoidIndex = new HashSet<>();
 
                 for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
+                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
                         avoidIndex.add(i);
                         valuePartsCount--;
                     }
@@ -286,6 +291,37 @@ public class AuthorList {
     }
 
     /**
+     * Builds a new array of strings with stringbuilder.
+     * Regarding to the name affixes.
+     *
+     * @return New string with correct seperation
+     */
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+        int avoidedTimes = 0;
+        for (int i = 0; i < nameList.size(); i++) {
+            if (indexArray.contains(i)) {
+                // We hit a name affix
+                stringBuilder.append(nameList.get(i));
+                stringBuilder.append(',');
+                avoidedTimes++;
+            } else {
+                stringBuilder.append(nameList.get(i));
+                if (((i + avoidedTimes) % 2) == 0) {
+                    // Hit separation between last name and firstname --> comma has to be kept
+                    stringBuilder.append(',');
+                } else {
+                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
+                    // Will be treated correctly by AuthorList.parse(authors);
+                    stringBuilder.append(';');
+                }
+            }
+        }
+        return stringBuilder;
+    }
+
+    /**
      * Returns the number of author names in this object.
      *
      * @return the number of author names in this object.
@@ -369,7 +405,8 @@ public class AuthorList {
      *
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
         int abbrInt = oxfordComma ? 0 : 1;
@@ -419,7 +456,8 @@ public class AuthorList {
      * @param abbreviate  whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         int abbrInt = abbreviate ? 0 : 1;
@@ -477,7 +515,6 @@ public class AuthorList {
             return authorLastFirstAnds[abbrInt];
         }
 
-
         authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
                 .collect(Collectors.joining(" and "));
         return authorLastFirstAnds[abbrInt];
@@ -521,7 +558,8 @@ public class AuthorList {
      * @param abbr        whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
-     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the Oxford comma.</a>
+     * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
+     * Oxford comma.</a>
      */
     public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
 
@@ -554,7 +592,6 @@ public class AuthorList {
         return authorsFirstFirst[abbrInt];
     }
 
-
     /**
      * Compare this object with the given one.
      * <p>
@@ -574,7 +611,6 @@ public class AuthorList {
     public int hashCode() {
         return Objects.hash(authors);
     }
-
 
     /**
      * Returns the list of authors separated by "and"s with first names before
@@ -624,34 +660,7 @@ public class AuthorList {
         return authorsAlph;
     }
 
-    /**
-     * Builds a new array of strings with stringbuilder.
-     * Regarding to the name affixes.
-     * @return New string with correct seperation
-     */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
-        int avoidedTimes = 0;
-        for (int i = 0; i < nameList.size(); i++) {
-            if (indexArray.contains(i)) {
-                // We hit a name affix
-                stringBuilder.append(nameList.get(i));
-                stringBuilder.append(',');
-                avoidedTimes++;
-            } else {
-                stringBuilder.append(nameList.get(i));
-                if (((i + avoidedTimes) % 2) == 0) {
-                    // Hit separation between last name and firstname --> comma has to be kept
-                    stringBuilder.append(',');
-                } else {
-                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
-                    // Will be treated correctly by AuthorList.parse(authors);
-                    stringBuilder.append(';');
-                }
-            }
-        }
-        return stringBuilder;
+    public void addAuthor(String first, String firstabbr, String von, String last, String jr) {
+        authors.add(new Author(first, firstabbr, von, last, jr));
     }
-
 }

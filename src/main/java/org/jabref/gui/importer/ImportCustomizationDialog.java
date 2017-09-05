@@ -17,7 +17,6 @@ import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,14 +27,19 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.jabref.Globals;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -44,7 +48,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Dialog to manage custom importers.
  */
-public class ImportCustomizationDialog extends JDialog {
+public class ImportCustomizationDialog extends JabRefDialog {
+
     private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
@@ -57,7 +62,7 @@ public class ImportCustomizationDialog extends JDialog {
     private final JTable customImporterTable;
 
     public ImportCustomizationDialog(final JabRefFrame frame) {
-        super(frame, Localization.lang("Manage custom imports"), false);
+        super(frame, Localization.lang("Manage custom imports"), false, ImportCustomizationDialog.class);
 
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
@@ -77,9 +82,14 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
 
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.CLASS);
-            dialog.setDefaultExtension(FileExtensions.CLASS);
-            Optional<Path> selectedFile = dialog.showDialogAndGetSelectedFile();
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilter(FileExtensions.CLASS)
+                    .withDefaultExtension(FileExtensions.JAR)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
+            Optional<Path> selectedFile = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 String chosenFileStr = selectedFile.get().toString();
@@ -107,9 +117,14 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame).withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR));
-            dialog.setDefaultExtension(FileExtensions.JAR);
-            Optional<Path> jarZipFile = dialog.showDialogAndGetSelectedFile();
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .addExtensionFilters(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR))
+                    .withDefaultExtension(FileExtensions.JAR)
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
+            Optional<Path> jarZipFile = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
@@ -250,7 +265,6 @@ public class ImportCustomizationDialog extends JDialog {
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 
-
     /**
      * Table model for the custom importer table.
      */
@@ -259,7 +273,6 @@ public class ImportCustomizationDialog extends JDialog {
         private final String[] columnNames = new String[] {Localization.lang("Import name"),
                 Localization.lang("Command line id"), Localization.lang("Importer class"),
                 Localization.lang("Contained in")};
-
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {

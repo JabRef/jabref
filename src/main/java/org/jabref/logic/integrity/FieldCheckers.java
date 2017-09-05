@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,11 +13,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 public class FieldCheckers {
-    static List<FieldChecker> getAll(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
-        return getAllMap(databaseContext, fileDirectoryPreferences)
-                .entries().stream()
-                .map(pair -> new FieldChecker(pair.getKey(), pair.getValue()))
-                .collect(Collectors.toList());
+
+    private Multimap<String, ValueChecker> fieldChecker;
+
+    public FieldCheckers(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
+        fieldChecker = getAllMap(databaseContext, fileDirectoryPreferences);
     }
 
     private static Multimap<String, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
@@ -47,5 +48,18 @@ public class FieldCheckers {
         fieldCheckers.put(FieldName.YEAR, new YearChecker());
 
         return fieldCheckers;
+    }
+
+    public List<FieldChecker> getAll() {
+        return fieldChecker
+                .entries()
+                .stream()
+                .map(pair -> new FieldChecker(pair.getKey(), pair.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<ValueChecker> getForField(String field) {
+        return fieldChecker
+                .get(field);
     }
 }

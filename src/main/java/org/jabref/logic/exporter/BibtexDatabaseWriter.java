@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
 import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import org.jabref.logic.util.OS;
@@ -19,11 +20,10 @@ import org.jabref.model.strings.StringUtil;
 
 public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWriter<E> {
 
+    public static final String DATABASE_ID_PREFIX = "DBID:";
     private static final String STRING_PREFIX = "@String";
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
-
-    public static final String DATABASE_ID_PREFIX = "DBID:";
 
     public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory) {
         super(saveSessionFactory);
@@ -84,7 +84,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
             // Write user comments
             String userComments = bibtexString.getUserComments();
-            if(!userComments.isEmpty()) {
+            if (!userComments.isEmpty()) {
                 getWriter().write(userComments + OS.NEWLINE);
             }
 
@@ -102,9 +102,8 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                                     .format(bibtexString.getContent(),
                             LatexFieldFormatter.BIBTEX_STRING);
                     getWriter().write(formatted);
-                } catch (IllegalArgumentException ex) {
-                    throw new IllegalArgumentException(
-                            "The # character is not allowed in BibTeX strings unless escaped as in '\\#'.\n" + "Before saving, please edit any strings containing the # character.");
+                } catch (InvalidFieldValueException ex) {
+                    throw new SaveException(ex);
                 }
             }
 
@@ -129,7 +128,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws SaveException {
-        if(encoding == null) {
+        if (encoding == null) {
             return;
         }
 

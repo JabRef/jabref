@@ -2,15 +2,22 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Region;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import org.jabref.JabRefGUI;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 
@@ -31,7 +38,16 @@ public class FXDialogService implements DialogService {
         FXDialog alert = new FXDialog(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         return alert;
+    }
+
+    @Override
+    public Optional<String> showInputDialogAndWait(String title, String content) {
+        TextInputDialog inputDialog = new TextInputDialog();
+        inputDialog.setHeaderText(title);
+        inputDialog.setContentText(content);
+        return inputDialog.showAndWait();
     }
 
     @Override
@@ -80,6 +96,16 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
+    public boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel,
+            String cancelButtonLabel) {
+        FXDialog alert = createDialog(AlertType.CONFIRMATION, title, content);
+        ButtonType okButtonType = new ButtonType(okButtonLabel, ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType(cancelButtonLabel, ButtonBar.ButtonData.NO);
+        alert.getButtonTypes().setAll(okButtonType, cancelButtonType);
+        return alert.showAndWait().filter(buttonType -> buttonType == okButtonType).isPresent();
+    }
+
+    @Override
     public Optional<ButtonType> showCustomButtonDialogAndWait(AlertType type, String title, String content,
             ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);
@@ -107,24 +133,47 @@ public class FXDialogService implements DialogService {
     }
 
     @Override
-    public Optional<Path> showSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
+    public Optional<Path> showFileSaveDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showSaveDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
     @Override
-    public Optional<Path> showOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
+    public Optional<Path> showFileOpenDialog(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         File file = chooser.showOpenDialog(null);
         return Optional.ofNullable(file).map(File::toPath);
     }
 
-    private FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {
+    @Override
+    public Optional<Path> showDirectorySelectionDialog(DirectoryDialogConfiguration directoryDialogConfiguration) {
+        DirectoryChooser chooser = getConfiguredDirectoryChooser(directoryDialogConfiguration);
+        File file = chooser.showDialog(null);
+        return Optional.ofNullable(file).map(File::toPath);
+    }
+
+    @Override
+    public List<Path> showFileOpenDialogAndGetMultipleFiles(FileDialogConfiguration fileDialogConfiguration) {
+        FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
+        List<File> files = chooser.showOpenMultipleDialog(null);
+        return files != null ? files.stream().map(File::toPath).collect(Collectors.toList()) : Collections.emptyList();
+    }
+
+    private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {
+        DirectoryChooser chooser = new DirectoryChooser();
+        directoryDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
+        return chooser;
+    }
+
+    @Override
+    public FileChooser getConfiguredFileChooser(FileDialogConfiguration fileDialogConfiguration) {
         FileChooser chooser = new FileChooser();
         chooser.getExtensionFilters().addAll(fileDialogConfiguration.getExtensionFilters());
         chooser.setSelectedExtensionFilter(fileDialogConfiguration.getDefaultExtension());
+        chooser.setInitialFileName(fileDialogConfiguration.getInitialFileName());
         fileDialogConfiguration.getInitialDirectory().map(Path::toFile).ifPresent(chooser::setInitialDirectory);
         return chooser;
     }
+
 }

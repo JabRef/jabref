@@ -1,7 +1,5 @@
 package org.jabref.logic;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -11,9 +9,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -45,7 +40,7 @@ public class TypedBibEntry {
      */
     public boolean hasAllRequiredFields() {
         Optional<EntryType> type = EntryTypes.getType(entry.getType(), this.mode);
-        if(type.isPresent()) {
+        if (type.isPresent()) {
             return entry.allFieldsPresent(type.get().getRequiredFields(), database.orElse(null));
         } else {
             return true;
@@ -63,20 +58,4 @@ public class TypedBibEntry {
             return StringUtil.capitalizeFirst(entry.getType());
         }
     }
-
-    /**
-     * Gets a list of linked files.
-     *
-     * @return the list of linked files, is never null but can be empty
-     */
-    public List<ParsedFileField> getFiles() {
-        //Extract the path
-        Optional<String> oldValue = entry.getField(FieldName.FILE);
-        if (!oldValue.isPresent()) {
-            return new ArrayList<>();
-        }
-
-        return FileField.parse(oldValue.get());
-    }
-
 }

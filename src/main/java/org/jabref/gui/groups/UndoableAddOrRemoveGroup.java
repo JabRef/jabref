@@ -8,6 +8,12 @@ import org.jabref.model.groups.GroupTreeNode;
 
 class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
 
+    /** Adding of a single node (group). */
+    public static final int ADD_NODE = 0;
+    /** Removal of a single node. Children, if any, are kept. */
+    public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
+    /** Removal of a node and all of its children. */
+    public static final int REMOVE_NODE_AND_CHILDREN = 2;
     /** The root of the global groups tree */
     private final GroupTreeNodeViewModel m_groupsRootHandle;
     /** The subtree that was added or removed */
@@ -24,13 +30,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
      * REMOVE_NODE_AND_CHILDREN)
      */
     private final int m_editType;
-    /** Adding of a single node (group). */
-    public static final int ADD_NODE = 0;
-    /** Removal of a single node. Children, if any, are kept. */
-    public static final int REMOVE_NODE_KEEP_CHILDREN = 1;
-    /** Removal of a node and all of its children. */
-    public static final int REMOVE_NODE_AND_CHILDREN = 2;
-
 
     /**
      * Creates an object that can undo/redo an edit event.
@@ -62,7 +61,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
         m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();
     }
 
-
     @Override
     public String getPresentationName() {
         switch (m_editType) {
@@ -77,7 +75,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
         }
         return "? (" + Localization.lang("unknown edit") + ")";
     }
-
 
     @Override
     public void undo() {

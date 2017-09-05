@@ -93,7 +93,6 @@ public class UnitsToLatexFormatter implements Formatter {
         Collections.sort(prefixUnitCombinations, new StringLengthComparator()); // Sort based on string length
     }
 
-
     @Override
     public String format(String text) {
         Objects.requireNonNull(text);

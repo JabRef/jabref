@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.util.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -36,9 +36,9 @@ public class SpringerLink implements FulltextFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse);
 
-        if(doi.isPresent()) {
+        if (doi.isPresent()) {
             // Available in catalog?
             try {
                 HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
@@ -53,7 +53,7 @@ public class SpringerLink implements FulltextFetcher {
                     LOGGER.info("Fulltext PDF found @ Springer.");
                     pdfLink = Optional.of(new URL("http", CONTENT_HOST, String.format("/content/pdf/%s.pdf", doi.get().getDOI())));
                 }
-            } catch(UnirestException e) {
+            } catch (UnirestException e) {
                 LOGGER.warn("SpringerLink API request failed", e);
             }
         }

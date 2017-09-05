@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,29 +12,29 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.TypedBibEntry;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
 import org.jabref.model.cleanup.CleanupJob;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MoveFilesCleanup implements CleanupJob {
 
+    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
+
     private final LayoutFormatterPreferences layoutPrefs;
-
     private final String fileDirPattern;
-    private static final Log LOGGER = LogFactory.getLog(MoveFilesCleanup.class);
 
-    private ParsedFileField singleFileFieldCleanup;
+    private LinkedFile singleFileFieldCleanup;
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
@@ -47,7 +46,7 @@ public class MoveFilesCleanup implements CleanupJob {
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences prefs,
-            ParsedFileField field) {
+            LinkedFile field) {
 
         this(databaseContext, fileDirPattern, fileDirectoryPreferences, prefs);
         this.singleFileFieldCleanup = field;
@@ -61,34 +60,33 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<String> paths = databaseContext.getFileDirectories(fileDirectoryPreferences);
+        List<Path> paths = databaseContext.getFileDirectoriesAsPaths(fileDirectoryPreferences);
         String defaultFileDirectory = firstExistingFileDir.get().toString();
-        Optional<Path> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths).map(File::toPath);
+        Optional<Path> targetDirectory = FileHelper.expandFilenameAsPath(defaultFileDirectory, paths);
 
         if (!targetDirectory.isPresent()) {
             return Collections.emptyList();
         }
 
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, databaseContext);
-        List<ParsedFileField> fileList;
-        List<ParsedFileField> newFileList;
+        List<LinkedFile> fileList;
+        List<LinkedFile> newFileList;
 
         if (singleFileFieldCleanup != null) {
             fileList = Arrays.asList(singleFileFieldCleanup);
             //Add all other except the current selected file
-            newFileList = typedEntry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
+            newFileList = entry.getFiles().stream().filter(name -> !name.equals(singleFileFieldCleanup))
                     .collect(Collectors.toList());
         } else {
             newFileList = new ArrayList<>();
-            fileList = typedEntry.getFiles();
+            fileList = entry.getFiles();
         }
 
         boolean changed = false;
-        for (ParsedFileField fileEntry : fileList) {
+        for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
 
-            Optional<File> oldFile = FileUtil.expandFilename(oldFileName, paths);
-            if (!oldFile.isPresent() || !oldFile.get().exists()) {
+            Optional<Path> oldFile = fileEntry.findIn(paths);
+            if (!oldFile.isPresent() || !Files.exists(oldFile.get())) {
                 newFileList.add(fileEntry);
                 continue;
             }
@@ -98,7 +96,7 @@ public class MoveFilesCleanup implements CleanupJob {
                         layoutPrefs);
             }
 
-            Path newTargetFile = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getName());
+            Path newTargetFile = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getFileName());
             if (Files.exists(newTargetFile)) {
                 // We do not overwrite already existing files
                 newFileList.add(fileEntry);
@@ -113,13 +111,13 @@ public class MoveFilesCleanup implements CleanupJob {
                 LOGGER.error("Could no create necessary target directoires for renaming", e);
             }
 
-            if (FileUtil.renameFile(oldFile.get().toPath(), newTargetFile, true)) {
+            if (FileUtil.renameFile(oldFile.get(), newTargetFile, true)) {
                 changed = true;
 
                 String newEntryFilePath = Paths.get(defaultFileDirectory).relativize(newTargetFile).toString();
-                ParsedFileField newFileEntry = fileEntry;
+                LinkedFile newFileEntry = fileEntry;
                 if (!oldFileName.equals(newTargetFile.toString())) {
-                    newFileEntry = new ParsedFileField(fileEntry.getDescription(), newEntryFilePath,
+                    newFileEntry = new LinkedFile(fileEntry.getDescription(), newEntryFilePath,
                             fileEntry.getFileType());
                     changed = true;
                 }

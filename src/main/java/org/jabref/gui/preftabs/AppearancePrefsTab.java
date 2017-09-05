@@ -54,7 +54,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox customLAF;
 
     static class LookAndFeel {
-        private static final List<String> looks = Arrays.asList(
+        private static final List<String> LOOKS = Arrays.asList(
                 UIManager.getSystemLookAndFeelClassName(),
                 UIManager.getCrossPlatformLookAndFeelClassName(),
                 "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
@@ -63,12 +63,12 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         public static List<String> getAvailableLookAndFeels() {
             List<String> lookAndFeels = new ArrayList<>();
 
-            for (String l : looks) {
+            for (String l : LOOKS) {
                 try {
                     // Try to find L&F
                     Class.forName(l);
                     lookAndFeels.add(l);
-                } catch (ClassNotFoundException|IllegalAccessError ignored) {
+                } catch (ClassNotFoundException | IllegalAccessError ignored) {
                     // LookAndFeel class does not exist or we don't have rights to access it
                     // Ignore it
                 }
@@ -158,16 +158,16 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         FormBuilder generalBuilder = FormBuilder.create();
         JPanel generalPanel = generalBuilder.columns("left:pref, left:pref, 3dlu, pref, 7dlu, right:pref, 3dlu, pref")
                 .rows("pref, 3dlu, pref, 3dlu, pref")
-                .columnGroup(2,6)
-                .columnGroup(4,8)
-                .add(overrideFonts).xyw(1,1,5)
-                .add(new JLabel("    ")).xy(1,3)
-                .add(new JLabel(Localization.lang("Menu and label font size") + ":")).xy(2,3)
-                .add(fontSize).xy(4,3)
-                .add(new JLabel(Localization.lang("Size of large icons")+":")).xy(2, 5)
-                .add(largeIconsTextField).xy(4,5)
-                .add(new JLabel(Localization.lang("Size of small icons")+":")).xy(6, 5)
-                .add(smallIconsTextField).xy(8,5)
+                .columnGroup(2, 6)
+                .columnGroup(4, 8)
+                .add(overrideFonts).xyw(1, 1, 5)
+                .add(new JLabel("    ")).xy(1, 3)
+                .add(new JLabel(Localization.lang("Menu and label font size") + ":")).xy(2, 3)
+                .add(fontSize).xy(4, 3)
+                .add(new JLabel(Localization.lang("Size of large icons") + ":")).xy(2, 5)
+                .add(largeIconsTextField).xy(4, 5)
+                .add(new JLabel(Localization.lang("Size of small icons") + ":")).xy(6, 5)
+                .add(smallIconsTextField).xy(8, 5)
                 .build();
 
         builder.append(generalPanel);
@@ -289,7 +289,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
                                     .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
                             Localization.lang("Changed font settings"), JOptionPane.WARNING_MESSAGE);
                 }
-            } else if (overrideFonts.isSelected() != oldOverrideFontSize){
+            } else if (overrideFonts.isSelected() != oldOverrideFontSize) {
                 prefs.remove(JabRefPreferences.ICON_SIZE_SMALL);
                 prefs.remove(JabRefPreferences.ICON_SIZE_LARGE);
                 prefs.remove(JabRefPreferences.MENU_FONT_SIZE);

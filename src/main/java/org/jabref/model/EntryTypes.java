@@ -105,6 +105,9 @@ public class EntryTypes {
     public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BiblatexEntryTypes.MISC,
             Arrays.asList(BiblatexEntryTypes.ALL));
 
+    private EntryTypes() {
+    }
+
     /**
      * This method returns the BibtexEntryType for the name of a type,
      * or null if it does not exist.
@@ -131,7 +134,7 @@ public class EntryTypes {
     }
 
     public static void addOrModifyCustomEntryType(CustomEntryType customEntryType, BibDatabaseMode mode) {
-        if(BibDatabaseMode.BIBLATEX == mode) {
+        if (BibDatabaseMode.BIBLATEX == mode) {
             BIBLATEX.addOrModifyEntryType(customEntryType);
         } else if (BibDatabaseMode.BIBTEX == mode) {
             BIBTEX.addOrModifyEntryType(customEntryType);
@@ -156,7 +159,7 @@ public class EntryTypes {
      */
     public static List<EntryType> getAllCustomTypes(BibDatabaseMode mode) {
         Collection<EntryType> allTypes = getAllValues(mode);
-        if(mode == BibDatabaseMode.BIBTEX) {
+        if (mode == BibDatabaseMode.BIBTEX) {
             return allTypes.stream().filter(entryType -> !BibtexEntryTypes.getType(entryType.getName()).isPresent())
                     .filter(entryType -> !IEEETranEntryTypes.getType(entryType.getName()).isPresent())
                     .collect(Collectors.toList());
@@ -195,8 +198,8 @@ public class EntryTypes {
     }
 
     public static void removeAllCustomEntryTypes() {
-        for(BibDatabaseMode type : BibDatabaseMode.values()) {
-            for(String typeName : new HashSet<>(getAllTypes(type))) {
+        for (BibDatabaseMode type : BibDatabaseMode.values()) {
+            for (String typeName : new HashSet<>(getAllTypes(type))) {
                 getType(typeName, type).ifPresent(entryType -> {
                     if (entryType instanceof CustomEntryType) {
                         removeType(typeName, type);
@@ -228,15 +231,16 @@ public class EntryTypes {
      * @return returns true if the two compared entry types have the same name and equal required and optional fields
      */
     public static boolean isEqualNameAndFieldBased(EntryType type1, EntryType type2) {
-        if (type1 == null && type2 == null) {
+        if ((type1 == null) && (type2 == null)) {
             return true;
-        } else if (type1 == null || type2 == null) {
+        } else if ((type1 == null) || (type2 == null)) {
             return false;
-        } else
+        } else {
             return type1.getName().equals(type2.getName())
                     && type1.getRequiredFields().equals(type2.getRequiredFields())
                     && type1.getOptionalFields().equals(type2.getOptionalFields())
                     && type1.getSecondaryOptionalFields().equals(type2.getSecondaryOptionalFields());
+        }
     }
 
     public static boolean isExclusiveBiblatex(String type) {

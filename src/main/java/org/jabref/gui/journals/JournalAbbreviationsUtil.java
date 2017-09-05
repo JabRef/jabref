@@ -10,6 +10,9 @@ import org.jabref.logic.l10n.Localization;
 
 public class JournalAbbreviationsUtil {
 
+    private JournalAbbreviationsUtil() {
+    }
+
     public static TableModel getTableModel(Collection<Abbreviation> abbreviations) {
         Object[][] cells = new Object[abbreviations.size()][2];
         int row = 0;

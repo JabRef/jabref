@@ -12,7 +12,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -23,14 +22,19 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileExtensions;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -39,7 +43,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * A wizard dialog for generating a new sub database from existing TeX AUX file
  */
-public class FromAuxDialog extends JDialog {
+public class FromAuxDialog extends JabRefDialog {
 
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
@@ -62,9 +66,8 @@ public class FromAuxDialog extends JDialog {
 
     private final JabRefFrame parentFrame;
 
-
     public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
-        super(frame, title, modal);
+        super(frame, title, modal, FromAuxDialog.class);
 
         parentTabbedPane = viewedDBs;
         parentFrame = frame;
@@ -155,10 +158,15 @@ public class FromAuxDialog extends JDialog {
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
 
-        FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
-        dialog.setDefaultExtension(FileExtensions.AUX);
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(FileExtensions.AUX)
+                .withDefaultExtension(FileExtensions.AUX)
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
+
         browseAuxFileButton.addActionListener(e -> {
-            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            Optional<Path> file = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration));
             file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
         });
 
@@ -168,7 +176,8 @@ public class FromAuxDialog extends JDialog {
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference library") + ":");
         b.append(dbChooser, 3);

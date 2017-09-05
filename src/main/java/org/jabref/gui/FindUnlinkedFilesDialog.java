@@ -42,7 +42,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -73,6 +72,8 @@ import org.jabref.gui.importer.EntryFromFileCreator;
 import org.jabref.gui.importer.EntryFromFileCreatorManager;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
 import org.jabref.gui.importer.UnlinkedPDFFileFilter;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
 import org.jabref.model.database.BibDatabaseContext;
@@ -87,13 +88,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * GUI Dialog for the feature "Find unlinked files".
- *
- * @author Nosh&Dan
- * @version 25.11.2008 | 23:13:29
- *
  */
-public class FindUnlinkedFilesDialog extends JDialog {
-    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
+public class FindUnlinkedFilesDialog extends JabRefDialog {
 
     /**
      * Keys to be used for referencing this Action.
@@ -103,14 +99,16 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     public static final String ACTION_SHORT_DESCRIPTION = Localization
             .lang("Searches for unlinked PDF files on the file system");
+
+    private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
     private static final String GLOBAL_PREFS_WORKING_DIRECTORY_KEY = "findUnlinkedFilesWD";
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
-    private JabRefFrame frame;
-    private BibDatabaseContext databaseContext;
-    private EntryFromFileCreatorManager creatorManager;
+    private final JabRefFrame frame;
+    private final BibDatabaseContext databaseContext;
+    private final EntryFromFileCreatorManager creatorManager;
 
-    private UnlinkedFilesCrawler crawler;
+    private final UnlinkedFilesCrawler crawler;
     private Path lastSelectedDirectory;
 
     private TreeModel treeModel;
@@ -130,7 +128,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JButton buttonClose;
     /* Options for the TreeView */
     private JButton buttonOptionSelectAll;
-    private JButton buttonOptionUnselectAll;
+    private JButton buttonOptionDeselectAll;
     private JButton buttonOptionExpandAll;
     private JButton buttonOptionCollapseAll;
 
@@ -163,18 +161,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private boolean checkBoxWhyIsThereNoGetSelectedStupidSwing;
 
-    /**
-     * For Unit-testing only. <i>Don't remove!</i> <br>
-     * Used via reflection in {@link org.jabref.logic.importer.DatabaseFileLookupTest} to construct this
-     * class.
-     */
-    @SuppressWarnings("unused")
-    private FindUnlinkedFilesDialog() {
-        //intended
-    }
-
     public FindUnlinkedFilesDialog(Frame owner, JabRefFrame frame, BasePanel panel) {
-        super(owner, Localization.lang("Find unlinked files"), true);
+        super(owner, Localization.lang("Find unlinked files"), true, FindUnlinkedFilesDialog.class);
         this.frame = frame;
 
         restoreSizeOfDialog();
@@ -461,7 +449,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
                         int counter;
 
-
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             counter++;
@@ -598,11 +585,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
      */
     private void setupActions() {
 
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+        DialogService ds = new FXDialogService();
         /**
          * Stores the selected directory.
          */
         buttonBrowse.addActionListener(e -> {
-            Optional<Path> selectedDirectory = new FileDialog(frame).showDialogAndGetSelectedDirectory();
+            Optional<Path> selectedDirectory = DefaultTaskExecutor
+                    .runInJavaFXThread(() -> ds.showDirectorySelectionDialog(directoryDialogConfiguration));
             selectedDirectory.ifPresent(d -> {
                 textfieldDirectoryPath.setText(d.toAbsolutePath().toString());
                 storeLastSelectedDirectory(d);
@@ -711,9 +702,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
         buttonOptionSelectAll = new JButton();
         buttonOptionSelectAll.setMnemonic('A');
         buttonOptionSelectAll.setAction(actionSelectAll);
-        buttonOptionUnselectAll = new JButton();
-        buttonOptionUnselectAll.setMnemonic('U');
-        buttonOptionUnselectAll.setAction(actionUnselectAll);
+        buttonOptionDeselectAll = new JButton();
+        buttonOptionDeselectAll.setMnemonic('U');
+        buttonOptionDeselectAll.setAction(actionUnselectAll);
         buttonOptionExpandAll = new JButton();
         buttonOptionExpandAll.setMnemonic('E');
         buttonOptionExpandAll.setAction(actionExpandTree);
@@ -809,7 +800,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 GridBagConstraints.NORTHEAST, basicInsets, 1, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionSelectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 0, 1, 1, 1, 0, 0, 0);
-        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionUnselectAll, GridBagConstraints.HORIZONTAL,
+        FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionDeselectAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, noInsets, 0, 1, 1, 1, 0, 0, 0, 0);
         FindUnlinkedFilesDialog.addComponent(gbl, panelOptions, buttonOptionExpandAll, GridBagConstraints.HORIZONTAL,
                 GridBagConstraints.NORTH, new Insets(6, 0, 0, 0), 0, 2, 1, 1, 0, 0, 0, 0);
@@ -1097,7 +1088,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private static class CheckboxTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private final FileSystemView fsv = FileSystemView.getFileSystemView();
-
 
         @Override
         public Component getTreeCellRendererComponent(final JTree tree, Object value, boolean sel, boolean expanded,

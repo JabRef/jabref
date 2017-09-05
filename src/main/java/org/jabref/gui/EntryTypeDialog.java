@@ -18,7 +18,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,10 +26,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
-import org.jabref.gui.importer.fetcher.EntryFetchers;
+import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.EntryTypes;
@@ -50,43 +52,21 @@ import org.jdesktop.swingx.VerticalLayout;
  * Dialog that prompts the user to choose a type for an entry.
  * Returns null if canceled.
  */
-public class EntryTypeDialog extends JDialog implements ActionListener {
+public class EntryTypeDialog extends JabRefDialog implements ActionListener {
 
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
-
+    private static final int COLUMN = 3;
+    private final JabRefFrame frame;
+    private final CancelAction cancelAction = new CancelAction();
     private EntryType type;
     private SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new FetcherWorker();
     private JButton generateButton;
     private JTextField idTextField;
     private JComboBox<String> comboBox;
-    private final JabRefFrame frame;
-    private static final int COLUMN = 3;
-
-    private final CancelAction cancelAction = new CancelAction();
-
-    static class TypeButton extends JButton implements Comparable<TypeButton> {
-
-        private final EntryType type;
-
-
-        TypeButton(String label, EntryType type) {
-            super(label);
-            this.type = type;
-        }
-
-        @Override
-        public int compareTo(TypeButton o) {
-            return type.getName().compareTo(o.type.getName());
-        }
-
-        public EntryType getType() {
-            return type;
-        }
-    }
 
     public EntryTypeDialog(JabRefFrame frame) {
         // modal dialog
-        super(frame, true);
+        super(frame, true, EntryTypeDialog.class);
 
         this.frame = frame;
 
@@ -118,7 +98,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             if (!customTypes.isEmpty()) {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), customTypes));
             }
-
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
@@ -186,9 +165,9 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         idTextField = new JTextField("");
         comboBox = new JComboBox<>();
 
-        EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
+        WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).forEach(fetcher -> comboBox.addItem(fetcher.getName()));
         // set DOI as default
-        comboBox.setSelectedItem(DoiFetcher.name);
+        comboBox.setSelectedItem(DoiFetcher.NAME);
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -204,7 +183,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel jPanel = new JPanel();
 
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(4,4,4,4);
+        constraints.insets = new Insets(4, 4, 4, 4);
 
         GridBagLayout layout = new GridBagLayout();
         jPanel.setLayout(layout);
@@ -263,6 +242,25 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return type;
     }
 
+    static class TypeButton extends JButton implements Comparable<TypeButton> {
+
+        private final EntryType type;
+
+
+        TypeButton(String label, EntryType type) {
+            super(label);
+            this.type = type;
+        }
+
+        @Override
+        public int compareTo(TypeButton o) {
+            return type.getName().compareTo(o.type.getName());
+        }
+
+        public EntryType getType() {
+            return type;
+        }
+    }
 
     class CancelAction extends AbstractAction {
         public CancelAction() {
@@ -290,7 +288,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 generateButton.setText(Localization.lang("Searching..."));
             });
             searchID = idTextField.getText().trim();
-            fetcher = EntryFetchers.getIdFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
+            fetcher = WebFetchers.getIdBasedFetchers(Globals.prefs.getImportFormatPreferences()).get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);
@@ -308,15 +306,35 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             try {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
-                    frame.getCurrentBasePanel().insertEntry(result.get());
+                    final BibEntry bibEntry = result.get();
+                    if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
+                		//If there are duplicates starts ImportInspectionDialog
+                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
+
+                        ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
+                        diag.addEntry(bibEntry);
+                        diag.entryListComplete();
+                        diag.setLocationRelativeTo(frame);
+                        diag.setVisible(true);
+                        diag.toFront();
+                    } else {
+                		// Regenerate CiteKey of imported BibEntry
+                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        // Update Timestamps
+                        if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                            bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
+                        }
+                        frame.getCurrentBasePanel().insertEntry(bibEntry);
+                    }
+
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 } else if (!fetcherException) {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID) + "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) +"." + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "." + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 fetcherWorker = new FetcherWorker();
@@ -331,5 +349,4 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             }
         }
     }
-
 }

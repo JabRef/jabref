@@ -1,12 +1,15 @@
 package org.jabref.logic.bibtex;
 
+import java.util.Collections;
+
 import org.jabref.logic.util.OS;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class LatexFieldFormatterTests {
 
@@ -14,11 +17,11 @@ public class LatexFieldFormatterTests {
 
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences());
+        this.formatter = new LatexFieldFormatter(mock(LatexFieldFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test
-    public void normalizeNewlineInAbstractField() {
+    public void normalizeNewlineInAbstractField() throws Exception {
         String fieldName = "abstract";
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
 
@@ -34,7 +37,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveNewlineInAbstractField() {
+    public void preserveNewlineInAbstractField() throws Exception {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
@@ -46,7 +49,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveMultipleNewlinesInAbstractField() {
+    public void preserveMultipleNewlinesInAbstractField() throws Exception {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum"
@@ -59,7 +62,7 @@ public class LatexFieldFormatterTests {
     }
 
     @Test
-    public void preserveNewlineInReviewField() {
+    public void preserveNewlineInReviewField() throws Exception {
         String fieldName = "review";
         // The newlines are normalized according to the globally configured newline setting in the formatter
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum" + OS.NEWLINE;
@@ -82,31 +85,47 @@ public class LatexFieldFormatterTests {
         assertEquals(expected, any);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void reportUnbalancedBracing() {
+    @Test(expected = InvalidFieldValueException.class)
+    public void reportUnbalancedBracing() throws Exception {
         String unbalanced = "{";
 
         formatter.format(unbalanced, "anyfield");
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void reportUnbalancedBracingWithEscapedBraces() {
+    @Test(expected = InvalidFieldValueException.class)
+    public void reportUnbalancedBracingWithEscapedBraces() throws Exception {
         String unbalanced = "{\\}";
 
         formatter.format(unbalanced, "anyfield");
     }
 
     @Test
-    public void tolerateBalancedBrace() {
+    public void tolerateBalancedBrace() throws Exception {
         String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
     }
 
     @Test
-    public void tolerateEscapeCharacters() {
+    public void tolerateEscapeCharacters() throws Exception {
         String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", formatter.format(text, "anyfield"));
     }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
+    @Test
+    public void hashEnclosedWordsGetRealStringsInMonthFieldBecauseMonthIsStandardField() throws Exception {
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = new LatexFieldFormatterPreferences(
+                false, Collections.emptyList(), new FieldContentParserPreferences());
+        LatexFieldFormatter formatter = new LatexFieldFormatter(latexFieldFormatterPreferences);
+        String text = "#jan# - #feb#";
+        assertEquals("jan #{ - } # feb", formatter.format(text, "month"));
+    }
+
 }

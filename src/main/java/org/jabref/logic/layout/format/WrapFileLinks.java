@@ -1,17 +1,16 @@
 package org.jabref.logic.layout.format;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.entry.FileField;
-import org.jabref.model.entry.ParsedFileField;
+import org.jabref.model.entry.FileFieldParser;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.util.FileHelper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,13 +80,6 @@ import org.apache.commons.logging.LogFactory;
 public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     private static final Log LOGGER = LogFactory.getLog(WrapFileLinks.class);
-
-    private String fileType;
-    private List<FormatEntry> format;
-    private final Map<String, String> replacements = new HashMap<>();
-
-
-    // Define codes for the various escape sequences that can be inserted:
     private static final int STRING = 0;
     private static final int ITERATION_COUNT = 1;
     private static final int FILE_PATH = 2;
@@ -95,11 +87,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     private static final int FILE_EXTENSION = 4;
     private static final int FILE_DESCRIPTION = 5;
     private static final int RELATIVE_FILE_PATH = 6;
-
     // Define which escape sequences give what results:
     private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
-
-    private final FileLinkPreferences prefs;
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -110,122 +99,15 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         WrapFileLinks.ESCAPE_SEQ.put('d', WrapFileLinks.FILE_DESCRIPTION);
     }
 
+    private final Map<String, String> replacements = new HashMap<>();
+    private final FileLinkPreferences prefs;
+    private String fileType;
+    private List<FormatEntry> format;
+
 
     public WrapFileLinks(FileLinkPreferences fileLinkPreferences) {
         this.prefs = fileLinkPreferences;
     }
-
-    @Override
-    public void setArgument(String arg) {
-        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
-        format = parseFormatString(parts.get(0));
-        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
-            fileType = parts.get(1);
-        }
-        if (parts.size() > 2) {
-            for (int i = 2; i < (parts.size() - 1); i += 2) {
-                replacements.put(parts.get(i), parts.get(i + 1));
-            }
-        }
-    }
-
-    @Override
-    public String format(String field) {
-
-        if (field == null) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        // Build the list containing the links:
-        List<ParsedFileField> fileList = FileField.parse(field);
-
-        int piv = 1; // counter for relevant iterations
-        for (ParsedFileField flEntry : fileList) {
-            // Use this entry if we don't discriminate on types, or if the type fits:
-            if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {
-
-                for (FormatEntry entry : format) {
-                    switch (entry.getType()) {
-                    case STRING:
-                        sb.append(entry.getString());
-                        break;
-                    case ITERATION_COUNT:
-                        sb.append(piv);
-                        break;
-                    case FILE_PATH:
-                        List<String> dirs;
-                        // We need to resolve the file directory from the database's metadata,
-                        // but that is not available from a formatter. Therefore, as an
-                        // ugly hack, the export routine has set a global variable before
-                        // starting the export, which contains the database's file directory:
-                        if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
-                            dirs = prefs.getGeneratedDirForDatabase();
-                        } else {
-                            dirs = prefs.getFileDirForDatabase();
-                        }
-
-                        Optional<File> f = FileUtil.expandFilename(flEntry.getLink(), dirs);
-
-                        /*
-                         * Stumbled over this while investigating
-                         *
-                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                         */
-                        if (f.isPresent()) {
-                            try {
-                                sb.append(replaceStrings(f.get().getCanonicalPath()));
-                            } catch (IOException ex) {
-                                LOGGER.warn("Problem getting path", ex);
-                                sb.append(replaceStrings(f.get().getPath()));
-                            }
-                        } else {
-                            sb.append(replaceStrings(flEntry.getLink()));
-                        }
-
-                        break;
-                    case RELATIVE_FILE_PATH:
-
-                        /*
-                         * Stumbled over this while investigating
-                         *
-                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
-                         */
-                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
-
-                        break;
-                    case FILE_EXTENSION:
-                        FileUtil.getFileExtension(flEntry.getLink())
-                                .ifPresent(extension -> sb.append(replaceStrings(extension)));
-                        break;
-                    case FILE_TYPE:
-                        sb.append(replaceStrings(flEntry.getFileType()));
-                        break;
-                    case FILE_DESCRIPTION:
-                        sb.append(replaceStrings(flEntry.getDescription()));
-                        break;
-                    default:
-                        break;
-                    }
-                }
-
-                piv++; // update counter
-            }
-        }
-
-        return sb.toString();
-    }
-
-    private String replaceStrings(String text) {
-        String result = text;
-        for (Map.Entry<String, String> stringStringEntry : replacements.entrySet()) {
-            String to = stringStringEntry.getValue();
-            result = result.replaceAll(stringStringEntry.getKey(), to);
-        }
-        return result;
-
-    }
-
 
     /**
      * Parse a format string and return a list of FormatEntry objects. The format
@@ -279,6 +161,103 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         return l;
     }
 
+    @Override
+    public void setArgument(String arg) {
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        format = parseFormatString(parts.get(0));
+        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
+            fileType = parts.get(1);
+        }
+        if (parts.size() > 2) {
+            for (int i = 2; i < (parts.size() - 1); i += 2) {
+                replacements.put(parts.get(i), parts.get(i + 1));
+            }
+        }
+    }
+
+    @Override
+    public String format(String field) {
+
+        if (field == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        // Build the list containing the links:
+        List<LinkedFile> fileList = FileFieldParser.parse(field);
+
+        int piv = 1; // counter for relevant iterations
+        for (LinkedFile flEntry : fileList) {
+            // Use this entry if we don't discriminate on types, or if the type fits:
+            if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {
+
+                for (FormatEntry entry : format) {
+                    switch (entry.getType()) {
+                    case STRING:
+                        sb.append(entry.getString());
+                        break;
+                    case ITERATION_COUNT:
+                        sb.append(piv);
+                        break;
+                    case FILE_PATH:
+                        List<String> dirs;
+                        // We need to resolve the file directory from the database's metadata,
+                        // but that is not available from a formatter. Therefore, as an
+                        // ugly hack, the export routine has set a global variable before
+                        // starting the export, which contains the database's file directory:
+                        if ((prefs.getFileDirForDatabase() == null) || prefs.getFileDirForDatabase().isEmpty()) {
+                            dirs = prefs.getGeneratedDirForDatabase();
+                        } else {
+                            dirs = prefs.getFileDirForDatabase();
+                        }
+
+                        String pathString = flEntry.findIn(dirs.stream().map(Paths::get).collect(Collectors.toList()))
+                                .map(path -> path.toAbsolutePath().toString())
+                                .orElse(flEntry.getLink());
+
+                        sb.append(replaceStrings(pathString));
+                        break;
+                    case RELATIVE_FILE_PATH:
+
+                        /*
+                         * Stumbled over this while investigating
+                         *
+                         * https://sourceforge.net/tracker/index.php?func=detail&aid=1469903&group_id=92314&atid=600306
+                         */
+                        sb.append(replaceStrings(flEntry.getLink()));//f.toURI().toString();
+
+                        break;
+                    case FILE_EXTENSION:
+                        FileHelper.getFileExtension(flEntry.getLink())
+                                .ifPresent(extension -> sb.append(replaceStrings(extension)));
+                        break;
+                    case FILE_TYPE:
+                        sb.append(replaceStrings(flEntry.getFileType()));
+                        break;
+                    case FILE_DESCRIPTION:
+                        sb.append(replaceStrings(flEntry.getDescription()));
+                        break;
+                    default:
+                        break;
+                    }
+                }
+
+                piv++; // update counter
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String replaceStrings(String text) {
+        String result = text;
+        for (Map.Entry<String, String> stringStringEntry : replacements.entrySet()) {
+            String to = stringStringEntry.getValue();
+            result = result.replaceAll(stringStringEntry.getKey(), to);
+        }
+        return result;
+
+    }
 
     /**
      * This class defines the building blocks of a parsed format strings. Each FormatEntry

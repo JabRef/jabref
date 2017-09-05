@@ -2,6 +2,9 @@ package org.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,12 +33,13 @@ import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.gui.filelist.FileListTableModel;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.DOI;
 import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.Eprint;
+import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -47,11 +51,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class JabRefDesktop {
 
-    private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
     private static final Log LOGGER = LogFactory.getLog(JabRefDesktop.class);
+
+    private static final NativeDesktop NATIVE_DESKTOP = getNativeDesktop();
     private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
-    private static final String ARXIV_LOOKUP_PREFIX = "http://arxiv.org/abs/";
+    private JabRefDesktop() {
+    }
 
     /**
      * Open a http/pdf/ps viewer for the given link string.
@@ -64,16 +70,16 @@ public class JabRefDesktop {
             // Find the default directory for this field type:
             List<String> dir = databaseContext.getFileDirectories(fieldName, Globals.prefs.getFileDirectoryPreferences());
 
-            Optional<File> file = FileUtil.expandFilename(link, dir);
+            Optional<Path> file = FileHelper.expandFilename(link, dir);
 
             // Check that the file exists:
-            if (!file.isPresent() || !file.get().exists()) {
+            if (!file.isPresent() || !Files.exists(file.get())) {
                 throw new IOException("File not found (" + fieldName + "): '" + link + "'.");
             }
-            link = file.get().getCanonicalPath();
+            link = file.get().toAbsolutePath().toString();
 
             // Use the correct viewer even if pdf and ps are mixed up:
-            String[] split = file.get().getName().split("\\.");
+            String[] split = file.get().getFileName().toString().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     fieldName = FieldName.PDF;
@@ -83,30 +89,16 @@ public class JabRefDesktop {
                 }
             }
         } else if (FieldName.DOI.equals(fieldName)) {
-            Optional<DOI> doiUrl = DOI.build(link);
-            if (doiUrl.isPresent()) {
-                link = doiUrl.get().getURIAsASCIIString();
-            }
+            openDoi(link);
+            return;
+        } else if (FieldName.EPRINT.equals(fieldName)) {
+            link = Eprint.build(link).map(Eprint::getURIAsASCIIString).orElse(link);
             // should be opened in browser
             fieldName = FieldName.URL;
-        } else if (FieldName.EPRINT.equals(fieldName)) {
-            fieldName = FieldName.URL;
-
-            // Check to see if link field already contains a well formated URL
-            if (!link.startsWith("http://")) {
-                link = ARXIV_LOOKUP_PREFIX + link;
-            }
         }
 
-        if (FieldName.URL.equals(fieldName)) { // html
-            try {
-                openBrowser(link);
-            } catch (IOException e) {
-                LOGGER.error("Error opening file '" + link + "'", e);
-                // TODO: should we rethrow the exception?
-                // In BasePanel.java, the exception is catched and a text output to the frame
-                // throw e;
-            }
+        if (FieldName.URL.equals(fieldName)) {
+            openBrowser(link);
         } else if (FieldName.PS.equals(fieldName)) {
             try {
                 NATIVE_DESKTOP.openFile(link, FieldName.PS);
@@ -122,6 +114,11 @@ public class JabRefDesktop {
         } else {
             LOGGER.info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
+    }
+
+    private static void openDoi(String doi) throws IOException {
+        String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
+        openBrowser(link);
     }
 
     /**
@@ -142,10 +139,9 @@ public class JabRefDesktop {
         }
 
         // For other platforms we'll try to find the file type:
-        File file = new File(link);
-
+        Path file = null;
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link,
+            Optional<Path> tmp = FileHelper.expandFilename(databaseContext, link,
                     Globals.prefs.getFileDirectoryPreferences());
             if (tmp.isPresent()) {
                 file = tmp.get();
@@ -153,15 +149,19 @@ public class JabRefDesktop {
         }
 
         // Check if we have arrived at a file type, and either an http link or an existing file:
-        if ((httpLink || file.exists()) && (type.isPresent())) {
+        if (httpLink || ((file != null) && Files.exists(file) && (type.isPresent()))) {
             // Open the file:
-            String filePath = httpLink ? link : file.getPath();
+            String filePath = httpLink ? link : file.toString();
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
             // No file matched the name, or we did not know the file type.
             return false;
         }
+    }
+
+    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext, final Optional<ExternalFileType> type) throws IOException {
+        return openExternalFileAnyFormat(databaseContext, file.toString(), type);
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
@@ -232,7 +232,7 @@ public class JabRefDesktop {
                 throw new RuntimeException("Could not find the file list entry " + link + " in " + entry);
             }
 
-            FileListEntryEditor editor = new FileListEntryEditor(frame, flEntry, false, true, databaseContext);
+            FileListEntryEditor editor = new FileListEntryEditor(flEntry.toParsedFileField(), false, true, databaseContext);
             editor.setVisible(true, false);
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
@@ -257,7 +257,7 @@ public class JabRefDesktop {
      * @param fileLink the location of the file
      * @throws IOException
      */
-    public static void openFolderAndSelectFile(String fileLink) throws IOException {
+    public static void openFolderAndSelectFile(Path fileLink) throws IOException {
         NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
     }
 
@@ -270,6 +270,10 @@ public class JabRefDesktop {
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
+    }
+
+    public static void openBrowser(URI url) throws IOException {
+        openBrowser(url.toASCIIString());
     }
 
     /**
@@ -288,7 +292,7 @@ public class JabRefDesktop {
             String openManually = Localization.lang("Please open %0 manually.", url);
             String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
             JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
-            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually +"\n"+
+            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually + "\n" +
                     copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
         }
     }

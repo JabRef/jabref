@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import org.jabref.Globals;
 import org.jabref.JabRefGUI;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.keyboard.KeyBindingPreferences;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 
 /**
  * This class provides a super class for all dialogs implemented in JavaFX.
@@ -101,9 +101,9 @@ public class FXDialog extends Alert {
 
         dialogWindow.setOnCloseRequest(evt -> this.close());
 
-        dialogWindow.getScene().setOnKeyPressed(evt -> {
-            KeyBindingPreferences keyPreferences = Globals.getKeyPrefs();
-            if (keyPreferences.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, evt)) {
+        dialogWindow.getScene().setOnKeyPressed(event -> {
+            KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE_DIALOG, event)) {
                 dialogWindow.close();
             }
         });

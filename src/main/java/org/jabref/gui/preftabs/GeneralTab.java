@@ -36,6 +36,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     private final JCheckBox useOwner;
     private final JCheckBox overwriteOwner;
     private final JCheckBox enforceLegalKeys;
+    private final JCheckBox shouldCollectTelemetry;
     private final JCheckBox confirmDelete;
     private final JCheckBox memoryStick;
     private final JCheckBox inspectionWarnDupli;
@@ -93,6 +94,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         timeStampField = new JTextField();
         inspectionWarnDupli = new JCheckBox(Localization.lang("Warn about unresolved duplicates when closing inspection window"));
 
+        shouldCollectTelemetry = new JCheckBox(Localization.lang("Collect and share telemetry data to help improve JabRef."));
+
         encodings = new JComboBox<>();
         encodings.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
 
@@ -139,6 +142,8 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(unmarkAllEntriesBeforeImporting, 13);
         builder.nextLine();
+        builder.append(shouldCollectTelemetry, 13);
+        builder.nextLine();
         JLabel lab;
         lab = new JLabel(Localization.lang("Language") + ':');
         builder.append(lab, 3);
@@ -168,6 +173,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setEnabled(useTimeStamp.isSelected());
         enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
+        shouldCollectTelemetry.setSelected(prefs.shouldCollectTelemetry());
         memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
         confirmDelete.setSelected(prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE));
         defOwnerField.setText(prefs.get(JabRefPreferences.DEFAULT_OWNER));
@@ -176,7 +182,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         inspectionWarnDupli.setSelected(prefs.getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION));
         markImportedEntries.setSelected(prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES));
         unmarkAllEntriesBeforeImporting.setSelected(prefs.getBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING));
-        if(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
             biblatexMode.setSelectedItem(BibDatabaseMode.BIBLATEX);
         } else {
             biblatexMode.setSelectedItem(BibDatabaseMode.BIBTEX);
@@ -206,6 +212,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, overwriteTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
+        prefs.setShouldCollectTelemetry(shouldCollectTelemetry.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."),

@@ -3,9 +3,8 @@ package org.jabref.logic.net;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +23,7 @@ public class URLDownloadTest {
         URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
         Assert.assertTrue("google.com should contain google",
-                dl.asString(JabRefPreferences.getInstance().getDefaultEncoding()).contains("Google"));
+                dl.asString(StandardCharsets.UTF_8).contains("Google"));
     }
 
     @Test

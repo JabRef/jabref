@@ -18,7 +18,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,6 +27,7 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import org.jabref.Globals;
+import org.jabref.gui.JabRefDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XMPUtil;
 import org.jabref.model.entry.BibEntry;
@@ -38,7 +38,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-public class ImportDialog extends JDialog {
+public class ImportDialog extends JabRefDialog {
 
     public static final int NOMETA = 0;
     public static final int XMP = 1;
@@ -55,6 +55,8 @@ public class ImportDialog extends JDialog {
 
 
     public ImportDialog(boolean targetIsARow, String fileName) {
+        super(ImportDialog.class);
+
         Boolean targetIsARow1 = targetIsARow;
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());

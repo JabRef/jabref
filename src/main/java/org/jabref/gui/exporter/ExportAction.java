@@ -33,6 +33,9 @@ public class ExportAction {
 
     private static final Log LOGGER = LogFactory.getLog(ExportAction.class);
 
+    private ExportAction() {
+    }
+
 
     /**
      * Create an AbstractAction for performing an export operation.
@@ -51,7 +54,6 @@ public class ExportAction {
             private final JabRefFrame frame;
 
             private final boolean selectedOnly;
-
 
             public InternalExportAction(JabRefFrame frame, boolean selectedOnly) {
                 this.frame = frame;
@@ -118,7 +120,6 @@ public class ExportAction {
                     AbstractWorker exportWorker = new AbstractWorker() {
 
                         String errorMessage;
-
 
                         @Override
                         public void run() {

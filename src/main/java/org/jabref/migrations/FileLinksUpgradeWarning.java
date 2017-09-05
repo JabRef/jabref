@@ -11,11 +11,14 @@ import javax.swing.JTextField;
 
 import org.jabref.Globals;
 import org.jabref.gui.BasePanel;
-import org.jabref.gui.FileDialog;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
 import org.jabref.gui.entryeditor.EntryEditorTabList;
-import org.jabref.gui.importer.actions.PostOpenAction;
+import org.jabref.gui.importer.actions.GUIPostOpenAction;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -38,7 +41,7 @@ import com.jgoodies.forms.layout.FormLayout;
  * * modify General fields to show "file" instead of "pdf" / "ps"
  * * modify table column settings to show "file" instead of "pdf" / "ps"
  */
-public class FileLinksUpgradeWarning implements PostOpenAction {
+public class FileLinksUpgradeWarning implements GUIPostOpenAction {
 
     private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS};
 
@@ -48,6 +51,29 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
     private boolean offerSetFileDir;
 
+    /**
+     * Collect file links from the given set of fields, and add them to the list contained in the field
+     * GUIGlobals.FILE_FIELD.
+     *
+     * @param database The database to modify.
+     * @param fields   The fields to find links in.
+     * @return A CompoundEdit specifying the undo operation for the whole operation.
+     */
+    private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
+        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
+
+        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup();
+        for (BibEntry entry : database.getEntries()) {
+            List<FieldChange> changes = cleanupJob.cleanup(entry);
+
+            for (FieldChange change : changes) {
+                ce.addEdit(new UndoableFieldChange(change));
+            }
+        }
+
+        ce.end();
+        return ce;
+    }
 
     /**
      * This method should be performed if the major/minor versions recorded in the ParserResult
@@ -68,7 +94,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                         || Globals.prefs.hasKey(FieldName.PS + FileDirectoryPreferences.DIR_SUFFIX));
 
         // First check if this warning is disabled:
-        return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING) && isThereSomethingToBeDone();
+        return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING)
+                && isThereSomethingToBeDone();
     }
 
     /**
@@ -80,16 +107,18 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     @Override
     public void performAction(BasePanel panel, ParserResult parserResult) {
 
-
-        if (!isThereSomethingToBeDone())         {
+        if (!isThereSomethingToBeDone()) {
             return; // Nothing to do, just return.
         }
 
-        JCheckBox changeSettings = new JCheckBox(Localization.lang("Change table column and General fields settings to use the new feature"),
+        JCheckBox changeSettings = new JCheckBox(
+                Localization.lang("Change table column and General fields settings to use the new feature"),
                 offerChangeSettings);
-        JCheckBox changeDatabase = new JCheckBox(Localization.lang("Upgrade old external file links to use the new feature"),
+        JCheckBox changeDatabase = new JCheckBox(
+                Localization.lang("Upgrade old external file links to use the new feature"),
                 offerChangeDatabase);
-        JCheckBox setFileDir = new JCheckBox(Localization.lang("Set main external file directory") + ":", offerSetFileDir);
+        JCheckBox setFileDir = new JCheckBox(Localization.lang("Set main external file directory") + ":",
+                offerSetFileDir);
         JTextField fileDir = new JTextField(30);
         JCheckBox doNotShowDialog = new JCheckBox(Localization.lang("Do not show these options in the future"),
                 false);
@@ -100,7 +129,9 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // See updated JabRef_en.properties modifications by python syncLang.py -s -u
         int row = 1;
         formBuilder.add(new JLabel("<html>" + Localization.lang("This library uses outdated file links.") + "<br><br>"
-                + Localization.lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>") + "<p>"
+                + Localization
+                        .lang("JabRef no longer supports 'ps' or 'pdf' fields.<br>File links are now stored in the 'file' field and files are stored in an external file directory.<br>To make use of this feature, JabRef needs to upgrade file links.<br><br>")
+                + "<p>"
                 + Localization.lang("Do you want JabRef to do the following operations?") + "</html>")).xy(1, row);
 
         if (offerChangeSettings) {
@@ -123,17 +154,21 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             builderPanel.add(setFileDir);
             builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(e ->
-                    new FileDialog(null).showDialogAndGetSelectedFile()
-                            .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
-            );
+
+            FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                    .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+            DialogService ds = new FXDialogService();
+
+            browse.addActionListener(
+                    e -> DefaultTaskExecutor.runInJavaFXThread(() -> ds.showFileOpenDialog(fileDialogConfiguration)
+                            .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))));
             builderPanel.add(browse);
             formBuilder.appendRows("2dlu, p");
             row += 2;
             formBuilder.add(builderPanel).xy(1, row);
         }
         formBuilder.appendRows("6dlu, p");
-        formBuilder.add(doNotShowDialog).xy(1, row+2);
+        formBuilder.add(doNotShowDialog).xy(1, row + 2);
 
         message.add(formBuilder.build());
 
@@ -150,7 +185,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     }
 
     private boolean isThereSomethingToBeDone() {
-        return  offerChangeSettings || offerChangeDatabase || offerSetFileDir;
+        return offerChangeSettings || offerChangeDatabase || offerSetFileDir;
     }
 
     /**
@@ -179,7 +214,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param fileDir The path to the file directory to set, or null if it should not be set.
      */
     private void makeChanges(BasePanel panel, ParserResult pr, boolean upgradePrefs,
-                             boolean upgradeDatabase, String fileDir) {
+            boolean upgradeDatabase, String fileDir) {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
@@ -225,29 +260,5 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             }
         }
         return found;
-    }
-
-    /**
-     * Collect file links from the given set of fields, and add them to the list contained in the field
-     * GUIGlobals.FILE_FIELD.
-     *
-     * @param database The database to modify.
-     * @param fields   The fields to find links in.
-     * @return A CompoundEdit specifying the undo operation for the whole operation.
-     */
-    private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
-        NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
-
-        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup();
-        for (BibEntry entry : database.getEntries()) {
-            List<FieldChange> changes = cleanupJob.cleanup(entry);
-
-            for (FieldChange change : changes) {
-                ce.addEdit(new UndoableFieldChange(change));
-            }
-        }
-
-        ce.end();
-        return ce;
     }
 }

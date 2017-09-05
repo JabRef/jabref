@@ -16,10 +16,10 @@ import org.apache.commons.logging.LogFactory;
 
 public class StyleLoader {
 
-    private static final Log LOGGER = LogFactory.getLog(StyleLoader.class);
-
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
+
+    private static final Log LOGGER = LogFactory.getLog(StyleLoader.class);
 
     // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,

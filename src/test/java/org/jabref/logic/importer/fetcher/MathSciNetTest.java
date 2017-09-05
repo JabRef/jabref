@@ -44,7 +44,7 @@ public class MathSciNetTest {
         ratiuEntry.setField("number", "3");
         ratiuEntry.setField("pages", "571--589");
         ratiuEntry.setField("issn", "1422-6928");
-        ratiuEntry.setField("keywords", "76A15 (35A01 35A02 35K61)");
+        ratiuEntry.setField("keywords", "76A15 (35A01 35A02 35K61 82D30)");
         ratiuEntry.setField("mrnumber", "3537908");
         ratiuEntry.setField("doi", "10.1007/s00021-016-0250-0");
     }

@@ -1,8 +1,19 @@
 package org.jabref.gui.util;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
+
+import org.jabref.gui.externalfiles.FileDownloadTask;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A very simple implementation of the {@link TaskExecutor} interface.
@@ -10,13 +21,43 @@ import javafx.concurrent.Task;
  */
 public class DefaultTaskExecutor implements TaskExecutor {
 
+    private static final Log LOGGER = LogFactory.getLog(DefaultTaskExecutor.class);
+
+    private ExecutorService executor = Executors.newFixedThreadPool(5);
+
+    public static <V> V runInJavaFXThread(Callable<V> callable) {
+        FutureTask<V> task = new FutureTask<>(callable);
+        Platform.runLater(task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error(e);
+            return null;
+        }
+    }
+
+    public static void runInJavaFXThread(Runnable runnable) {
+        Platform.runLater(runnable);
+    }
+
     @Override
     public <V> void execute(BackgroundTask<V> task) {
-        new Thread(getJavaFXTask(task)).start();
+        executor.submit(getJavaFXTask(task));
+    }
+
+    @Override
+    public void execute(FileDownloadTask downloadTask) {
+        executor.submit(downloadTask);
+    }
+
+    @Override
+    public void shutdown() {
+        executor.shutdownNow();
     }
 
     private <V> Task<V> getJavaFXTask(BackgroundTask<V> task) {
         Task<V> javaTask = new Task<V>() {
+
             @Override
             public V call() throws Exception {
                 return task.call();

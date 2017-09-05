@@ -159,7 +159,6 @@ public class BibtexParser implements Parser {
         parserResult = new ParserResult(database, new MetaData(), entryTypes);
     }
 
-
     private void parseDatabaseID() throws IOException {
 
         while (!eof) {
@@ -251,9 +250,6 @@ public class BibtexParser implements Parser {
             boolean duplicateKey = database.insertEntry(entry);
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
-            } else if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {
-                parserResult.addWarning(Localization.lang("Empty BibTeX key") + ": " + entry.getAuthorTitleYear(40)
-                        + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }
         } catch (IOException ex) {
             LOGGER.debug("Could not parse entry", ex);
@@ -514,7 +510,7 @@ public class BibtexParser implements Parser {
 
     private String parsePreamble() throws IOException {
         skipWhitespace();
-        return parseBracketedText().toString();
+        return parseBracketedText();
 
     }
 
@@ -806,8 +802,8 @@ public class BibtexParser implements Parser {
 
     }
 
-    private StringBuffer parseBracketedText() throws IOException {
-        StringBuffer value = new StringBuffer();
+    private String parseBracketedText() throws IOException {
+        StringBuilder value = new StringBuilder();
 
         consume('{', '(');
 
@@ -846,7 +842,7 @@ public class BibtexParser implements Parser {
 
         consume('}', ')');
 
-        return value;
+        return value.toString();
     }
 
     private boolean isClosingBracketNext() {

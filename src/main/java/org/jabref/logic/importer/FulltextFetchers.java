@@ -8,16 +8,15 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ArXiv;
-import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.DoiResolution;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.net.URLDownload;
-import org.jabref.logic.util.DOI;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.identifier.DOI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,10 +49,16 @@ public class FulltextFetchers {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<String> doi = clonedEntry.getField(FieldName.DOI);
+        Optional<DOI> doi = clonedEntry.getField(FieldName.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
-            CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+        if (!doi.isPresent()) {
+            try {
+                WebFetchers.getIdFetcherForIdentifier(DOI.class)
+                        .findIdentifier(clonedEntry)
+                        .ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
+            } catch (FetcherException e) {
+                LOGGER.debug("Failed to find DOI", e);
+            }
         }
 
         for (FulltextFetcher finder : finders) {

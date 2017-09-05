@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
@@ -49,7 +50,7 @@ public class Linux implements NativeDesktop {
     }
 
     @Override
-    public void openFolderAndSelectFile(String filePath) throws IOException {
+    public void openFolderAndSelectFile(Path filePath) throws IOException {
         String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase(Locale.ROOT);
 
         String cmd;
@@ -59,7 +60,7 @@ public class Linux implements NativeDesktop {
         } else if (desktopSession.contains("kde")) {
             cmd = "dolphin --select " + filePath;
         } else {
-            cmd = "xdg-open " + Paths.get(filePath).toAbsolutePath().getParent().toString();
+            cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString();
         }
 
         Runtime.getRuntime().exec(cmd);
@@ -92,7 +93,7 @@ public class Linux implements NativeDesktop {
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
 
         String application;
-        if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))){
+        if (JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))) {
             application = "acroread";
 
             StringJoiner sj = new StringJoiner(" ");
@@ -108,5 +109,10 @@ public class Linux implements NativeDesktop {
     @Override
     public String detectProgramPath(String programName, String directoryName) {
         return programName;
+    }
+
+    @Override
+    public Path getApplicationDirectory() {
+        return Paths.get("/usr/lib/");
     }
 }

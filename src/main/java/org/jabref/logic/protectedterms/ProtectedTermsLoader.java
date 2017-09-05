@@ -19,27 +19,26 @@ import org.apache.commons.logging.LogFactory;
 
 public class ProtectedTermsLoader {
 
+    private static final Map<String, String> INTERNAL_LISTS = new HashMap<>();
+
     private static final Log LOGGER = LogFactory.getLog(ProtectedTermsLoader.class);
 
     private final List<ProtectedTermsList> mainList = new ArrayList<>();
 
-    private static final Map<String, String> internalLists = new HashMap<>();
-
     static {
-        internalLists.put("/protectedterms/months_weekdays.terms", Localization.lang("Months and weekdays in English"));
-        internalLists.put("/protectedterms/countries_territories.terms",
+        INTERNAL_LISTS.put("/protectedterms/months_weekdays.terms", Localization.lang("Months and weekdays in English"));
+        INTERNAL_LISTS.put("/protectedterms/countries_territories.terms",
                 Localization.lang("Countries and territories in English"));
-        internalLists.put("/protectedterms/electrical_engineering.terms",
+        INTERNAL_LISTS.put("/protectedterms/electrical_engineering.terms",
                 Localization.lang("Electrical engineering terms"));
-    }
-
-
-    public static List<String> getInternalLists() {
-        return new ArrayList<>(internalLists.keySet());
     }
 
     public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {
         update(preferences);
+    }
+
+    public static List<String> getInternalLists() {
+        return new ArrayList<>(INTERNAL_LISTS.keySet());
     }
 
     public void update(ProtectedTermsPreferences preferences) {
@@ -47,16 +46,16 @@ public class ProtectedTermsLoader {
 
         // Read internal lists
         for (String filename : preferences.getEnabledInternalTermLists()) {
-            if (internalLists.containsKey(filename)) {
-                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), true));
+            if (INTERNAL_LISTS.containsKey(filename)) {
+                mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename), true));
             } else {
                 LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
             }
         }
         for (String filename : preferences.getDisabledInternalTermLists()) {
-            if (internalLists.containsKey(filename)) {
+            if (INTERNAL_LISTS.containsKey(filename)) {
                 if (!preferences.getEnabledInternalTermLists().contains(filename)) {
-                    mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), false));
+                    mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename), false));
                 }
             } else {
                 LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
@@ -64,11 +63,11 @@ public class ProtectedTermsLoader {
         }
 
         // Check if any new internal lists have emerged
-        for (String filename : internalLists.keySet()) {
+        for (String filename : INTERNAL_LISTS.keySet()) {
             if (!preferences.getEnabledInternalTermLists().contains(filename)
                     && !preferences.getDisabledInternalTermLists().contains(filename)) {
                 // New internal list, add it
-                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), true));
+                mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename), true));
                 LOGGER.warn("New protected terms resource '" + filename + "' is available and enabled by default.");
             }
         }
@@ -107,8 +106,8 @@ public class ProtectedTermsLoader {
         } catch (IOException e) {
             LOGGER.warn("Problem with protected terms file '" + list.getLocation() + "'", e);
         }
-
     }
+
     public List<ProtectedTermsList> getProtectedTermsLists() {
         return mainList;
     }

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -111,6 +110,7 @@ class OOBibBase {
     private static final int AUTHORYEAR_INTEXT = 2;
     private static final int INVISIBLE_CIT = 3;
 
+    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
     private XMultiServiceFactory mxDocFactory;
     private XTextDocument mxDoc;
     private XText text;
@@ -118,23 +118,22 @@ class OOBibBase {
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent xCurrentComponent;
     private XPropertySet propertySet;
-    private XPropertyContainer userProperties;
 
+    private XPropertyContainer userProperties;
     private final boolean atEnd;
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
     private final FieldComparator authComp = new FieldComparator(FieldName.AUTHOR);
     private final FieldComparator yearComp = new FieldComparator(FieldName.YEAR);
-    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
 
+    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
     private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+
     private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
 
     private final Map<String, String> uniquefiers = new HashMap<>();
 
     private List<String> sortedReferenceMarks;
-
-    private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
 
 
     public OOBibBase(String pathToOO, boolean atEnd) throws IOException, IllegalAccessException,
@@ -426,7 +425,6 @@ class OOBibBase {
             throw new ConnectionLostException(ex.getMessage());
         }
     }
-
 
     public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
@@ -1006,8 +1004,7 @@ class OOBibBase {
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation(text, cursor,
-                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true),
-                        EnumSet.noneOf(OOUtil.Formatting.class));
+                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true), Collections.emptyList());
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
@@ -1028,7 +1025,7 @@ class OOBibBase {
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
-            xChildNamed= UnoRuntime.queryInterface(XNamed.class,
+            xChildNamed = UnoRuntime.queryInterface(XNamed.class,
                 mxDocFactory.createInstance("com.sun.star.text.TextSection"));
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
@@ -1282,7 +1279,6 @@ class OOBibBase {
 
     }
 
-
     public static XTextDocument selectComponent(List<XTextDocument> list)
             throws UnknownPropertyException, WrappedTargetException, IndexOutOfBoundsException {
         String[] values = new String[list.size()];
@@ -1302,7 +1298,6 @@ class OOBibBase {
             return null;
         }
     }
-
 
     private static class ComparableMark implements Comparable<ComparableMark> {
 
@@ -1348,7 +1343,6 @@ class OOBibBase {
         }
 
     }
-
 
     public BibDatabase generateDatabase(List<BibDatabase> databases)
             throws NoSuchElementException, WrappedTargetException {

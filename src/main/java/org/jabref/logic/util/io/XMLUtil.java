@@ -28,6 +28,9 @@ import org.w3c.dom.NodeList;
 public class XMLUtil {
     private static final Log LOGGER = LogFactory.getLog(XMLUtil.class);
 
+    private XMLUtil() {
+    }
+
     /**
      * Prints out the document to standard out. Used to generate files for test cases.
      */

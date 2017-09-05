@@ -28,7 +28,7 @@ import org.jabref.model.entry.EntryType;
  * This action checks whether any new custom entry types were loaded from this
  * BIB file. If so, an offer to remember these entry types is given.
  */
-public class CheckForNewEntryTypesAction implements PostOpenAction {
+public class CheckForNewEntryTypesAction implements GUIPostOpenAction {
 
     @Override
     public boolean isActionNecessary(ParserResult parserResult) {
@@ -97,12 +97,12 @@ public class CheckForNewEntryTypesAction implements PostOpenAction {
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.PAGE_AXIS));
 
-        JLabel customFoundLabel = new JLabel(Localization.lang("Custom entry types found in file")+".");
+        JLabel customFoundLabel = new JLabel(Localization.lang("Custom entry types found in file") + ".");
         Font boldStandardFont = new Font(customFoundLabel.getFont().getFontName(), Font.BOLD, customFoundLabel.getFont().getSize());
         customFoundLabel.setFont(boldStandardFont);
         checkboxPanel.add(customFoundLabel);
 
-        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences")+":");
+        JLabel selectLabel = new JLabel(Localization.lang("Select all customized types to be stored in local preferences") + ":");
         selectLabel.setFont(boldStandardFont);
         checkboxPanel.add(selectLabel);
 

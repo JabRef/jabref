@@ -9,6 +9,9 @@ import org.jabref.model.entry.IdGenerator;
 
 public class BibDatabases {
 
+    private BibDatabases() {
+    }
+
     /**
      * Gets a collection of bibentries and sets an ID for every entry. After that
      * all entries will be inserted into a new BibDatabase.

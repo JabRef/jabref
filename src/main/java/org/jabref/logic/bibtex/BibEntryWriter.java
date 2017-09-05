@@ -58,7 +58,7 @@ public class BibEntryWriter {
     private void writeUserComments(BibEntry entry, Writer out) throws IOException {
         String userComments = entry.getUserComments();
 
-        if(!userComments.isEmpty()) {
+        if (!userComments.isEmpty()) {
             out.write(userComments + OS.NEWLINE);
         }
     }
@@ -152,7 +152,7 @@ public class BibEntryWriter {
             try {
                 out.write(fieldFormatter.format(field.get(), name));
                 out.write(',' + OS.NEWLINE);
-            } catch (IOException ex) {
+            } catch (InvalidFieldValueException ex) {
                 throw new IOException("Error in field '" + name + "': " + ex.getMessage());
             }
         }
