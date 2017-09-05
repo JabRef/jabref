@@ -108,7 +108,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             items.set(draggedIdx, originalItem);
             items.set(thisIdx, transferedItem);
 
-
             event.setDropCompleted(success);
             event.consume();
             success = true;
