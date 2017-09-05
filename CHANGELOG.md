@@ -33,6 +33,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where an online file link did not open the browser and created an error [#3165](https://github.com/JabRef/jabref/issues/3165)
 - We fixed an issue where the arrow keys in the search bar did not work as expected [#3081](https://github.com/JabRef/jabref/issues/3081)
 - We fixed wrong hotkey being displayed at "automatically file links" in the entry editor
+- We fixed an issue where metadata syncing with local and shared database were unstable. It will also fix syncing groups and sub-groups in database. [#2284](https://github.com/JabRef/jabref/issues/2284)
 
 ### Removed
 
