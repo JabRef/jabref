@@ -917,7 +917,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         private AutoLinkAction() {
             putValue(Action.SMALL_ICON, IconTheme.JabRefIcon.AUTO_FILE_LINK.getIcon());
             putValue(Action.SHORT_DESCRIPTION,
-                    Localization.lang("Automatically set file links for this entry") + " (Alt-F)");
+                    Localization.lang("Automatically set file links for this entry") +
+                            Globals.getKeyPrefs().get(KeyBinding.AUTOMATICALLY_LINK_FILES).map(b -> " (" + b + ")").orElse(""));
         }
 
         @Override
