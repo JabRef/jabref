@@ -199,8 +199,7 @@ public class LocalizationConsistencyTest {
                 }
 
                 //parse object "properties" to find any spaces
-                //if there is any space replace it with an underscore
-
+                assertEquals("There are invalid characters, space(s), in the localization properties file", properties.replace(" ", ""), properties);
             }
         }
     }
