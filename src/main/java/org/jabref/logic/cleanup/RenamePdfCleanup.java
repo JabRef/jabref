@@ -39,8 +39,8 @@ public class RenamePdfCleanup implements CleanupJob {
     private LinkedFile singleFieldCleanup;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-            LayoutFormatterPreferences layoutPrefs,
-            FileDirectoryPreferences fileDirectoryPreferences) {
+                            LayoutFormatterPreferences layoutPrefs,
+                            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
@@ -49,13 +49,12 @@ public class RenamePdfCleanup implements CleanupJob {
     }
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-            LayoutFormatterPreferences layoutPrefs,
-            FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
+                            LayoutFormatterPreferences layoutPrefs,
+                            FileDirectoryPreferences fileDirectoryPreferences, LinkedFile singleField) {
 
         this(onlyRelativePaths, databaseContext, fileNamePattern, layoutPrefs,
                 fileDirectoryPreferences);
         this.singleFieldCleanup = singleField;
-
     }
 
     @Override
@@ -162,16 +161,16 @@ public class RenamePdfCleanup implements CleanupJob {
     public String getTargetFileName(LinkedFile flEntry, BibEntry entry) {
         String realOldFilename = flEntry.getLink();
 
-        String targetFileName = FileUtil
-                .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs)
-                .trim() + '.' + FileHelper.getFileExtension(realOldFilename).orElse("pdf");
+        String targetFileName = FileUtil.createFileNameFromPattern(
+                databaseContext.getDatabase(), entry, fileNamePattern, layoutPrefs).trim()
+                + '.'
+                + FileHelper.getFileExtension(realOldFilename).orElse("pdf");
 
-        // Only create valid filenames
+        // Only create valid file names
         return FileUtil.getValidFileName(targetFileName);
     }
 
     public int getUnsuccessfulRenames() {
         return unsuccessfulRenames;
     }
-
 }
