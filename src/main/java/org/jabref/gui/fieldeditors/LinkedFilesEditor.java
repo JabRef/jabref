@@ -63,7 +63,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         listView.setCellFactory(cellFactory);
 
-        Bindings.bindContent(listView.itemsProperty().get(), viewModel.filesProperty());
+        Bindings.bindContentBidirectional(listView.itemsProperty().get(), viewModel.filesProperty());
         setUpKeyBindings();
     }
 
@@ -73,7 +73,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         }
     }
 
-    private void handleOnDragDetected(LinkedFileViewModel linkedFile, MouseEvent event) {
+    private void handleOnDragDetected(@SuppressWarnings("unused") LinkedFileViewModel linkedFile, MouseEvent event) {
         LinkedFile selectedItem = listView.getSelectionModel().getSelectedItem().getFile();
         if (selectedItem != null) {
             ClipboardContent content = new ClipboardContent();
@@ -89,7 +89,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Dragboard dragboard = event.getDragboard();
         boolean success = false;
 
-        ObservableList<LinkedFileViewModel> items = listView.getItems();
+        ObservableList<LinkedFileViewModel> items = listView.itemsProperty().get();
 
         if (dragboard.hasContent(DragAndDropDataFormats.LINKED_FILE)) {
 
@@ -108,12 +108,14 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             items.set(draggedIdx, originalItem);
             items.set(thisIdx, transferedItem);
 
+
             event.setDropCompleted(success);
             event.consume();
             success = true;
         }
         event.setDropCompleted(success);
         event.consume();
+
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
