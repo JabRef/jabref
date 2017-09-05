@@ -183,6 +183,28 @@ public class LocalizationConsistencyTest {
         }
     }
 
+    @Test
+    public void localisationTestForInvalidStrings() throws IOException {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            for (String lang : Languages.LANGUAGES.values()) {
+                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
+
+                // read in
+                DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
+                try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
+                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    properties.load(reader);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                //parse object "properties" to find any spaces
+                //if there is any space replace it with an underscore
+
+            }
+        }
+    }
+
     private static class DuplicationDetectionProperties extends Properties {
 
         private static final long serialVersionUID = 1L;
