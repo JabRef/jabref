@@ -14,8 +14,8 @@ import org.jabref.model.util.FileHelper;
 
 /**
  * Represents the link to an external file (e.g. associated PDF file).
+ * This class is {@link Serializable} which is needed for drag and drop in gui
  */
-//Serialiable is required for drag and drop
 public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
@@ -28,6 +28,7 @@ public class LinkedFile implements Serializable {
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
     }
+
     public LinkedFile(String description, URL link, String fileType) {
         this(description, Objects.requireNonNull(link).toString(), fileType);
     }
