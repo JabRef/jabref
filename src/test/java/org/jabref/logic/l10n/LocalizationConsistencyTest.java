@@ -184,7 +184,7 @@ public class LocalizationConsistencyTest {
     }
 
     @Test
-    public void localisationTestForInvalidStrings() throws IOException {
+    public void localisationTestForInvalidStrings() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
             for (String lang : Languages.LANGUAGES.values()) {
                 String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
@@ -194,12 +194,7 @@ public class LocalizationConsistencyTest {
                         .getProperties(propertyFilePath);
                 //parse object "textKeys" to find any spaces
                 for (Map.Entry<Object, Object> entry : textKeys.entrySet()) {
-                    String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
-                    String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(),
-                            entry.getValue().toString().replace(" ", ""));
-
-
-                    assertEquals("Found an invalid character in the "+ lang + "localization of" + bundle + ": The " + entry.getKey().toString() + ":" + expectedKeyEqualsKey + " contains a space!",expectedKeyEqualsKey, actualKeyEqualsValue);
+                    assertTrue("Found an invalid character in the " + lang + " localization of " + bundle + " : The " + entry.getKey().toString() + " : " + entry.getValue().toString() + " contains a space!", entry.getValue().toString().contains(" "));
                 }
             }
         }
