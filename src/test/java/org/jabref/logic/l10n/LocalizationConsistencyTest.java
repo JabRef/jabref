@@ -23,8 +23,7 @@ import com.google.common.collect.Sets;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class LocalizationConsistencyTest {
 
@@ -192,10 +191,11 @@ public class LocalizationConsistencyTest {
                 // read in
                 Properties textKeys = LocalizationParser
                         .getProperties(propertyFilePath);
+
                 //parse object "textKeys" to find any spaces
                 for (Map.Entry<Object, Object> entry : textKeys.entrySet()) {
-                    assertTrue("Found an invalid character in the " + lang + " localization of " + bundle + " : " + entry.getValue().toString() + " At key : " + entry.getKey().toString() + " contains a space!", entry.getValue().toString().contains(" "));
-                    assertTrue("Found an invalid character in the " + lang + " localization of " + bundle + " : The key : " + entry.getKey().toString() + " contains a space!", entry.getKey().toString().contains(" "));
+                    assertFalse("Found an invalid character in the " + lang + " localization of " + bundle + " : " + entry.getValue().toString() + " At key : " + entry.getKey().toString() + " contains a space!", entry.getValue().toString().contains(" "));
+                    assertFalse("Found an invalid character in the " + lang + " localization of " + bundle + " : The key : " + entry.getKey().toString() + " contains a space!", entry.getKey().toString().contains(" "));
                 }
             }
         }
