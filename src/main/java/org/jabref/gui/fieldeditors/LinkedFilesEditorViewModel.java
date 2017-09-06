@@ -95,6 +95,14 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
     }
 
+    public LinkedFileViewModel fromFile(Path file) {
+        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFileDirectoryPreferences());
+
+        LinkedFile linkedFile = fromFile(file, fileDirectories);
+        return new LinkedFileViewModel(linkedFile, entry, databaseContext);
+
+    }
+
     public boolean isFulltextLookupInProgress() {
         return fulltextLookupInProgress.get();
     }
