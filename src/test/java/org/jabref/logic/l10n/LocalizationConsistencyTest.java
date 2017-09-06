@@ -183,6 +183,24 @@ public class LocalizationConsistencyTest {
         }
     }
 
+    @Test
+    public void localizationTestForInvalidStrings() {
+        for (String bundle : Arrays.asList("JabRef", "Menu")) {
+            for (String lang : Languages.LANGUAGES.values()) {
+                String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
+
+                // read in
+                Properties textKeys = LocalizationParser
+                        .getProperties(propertyFilePath);
+                //parse object "textKeys" to find any spaces
+                for (Map.Entry<Object, Object> entry : textKeys.entrySet()) {
+                    assertTrue("Found an invalid character in the " + lang + " localization of " + bundle + " : " + entry.getValue().toString() + " At key : " + entry.getKey().toString() + " contains a space!", entry.getValue().toString().contains(" "));
+                    assertTrue("Found an invalid character in the " + lang + " localization of " + bundle + " : The key : " + entry.getKey().toString() + " contains a space!", entry.getKey().toString().contains(" "));
+                }
+            }
+        }
+    }
+
     private static class DuplicationDetectionProperties extends Properties {
 
         private static final long serialVersionUID = 1L;
