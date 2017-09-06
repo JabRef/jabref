@@ -190,16 +190,17 @@ public class LocalizationConsistencyTest {
                 String propertyFilePath = String.format("/l10n/%s_%s.properties", bundle, lang);
 
                 // read in
-                DuplicationDetectionProperties properties = new DuplicationDetectionProperties();
-                try (InputStream is = LocalizationConsistencyTest.class.getResourceAsStream(propertyFilePath);
-                        InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                    properties.load(reader);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                Properties textKeys = LocalizationParser
+                        .getProperties(propertyFilePath);
+                //parse object "textKeys" to find any spaces
+                for (Map.Entry<Object, Object> entry : textKeys.entrySet()) {
+                    String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
+                    String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(),
+                            entry.getValue().toString().replace(" ", ""));
 
-                //parse object "properties" to find any spaces
-                assertEquals("There are invalid characters, space(s), in the localization properties file", properties.replace(" ", ""), properties);
+
+                    assertEquals("Found an invalid character in the "+ lang + "localization of" + bundle + ": The " + entry.getKey().toString() + ":" + expectedKeyEqualsKey + " contains a space!",expectedKeyEqualsKey, actualKeyEqualsValue);
+                }
             }
         }
     }
