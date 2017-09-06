@@ -27,7 +27,7 @@ public class SuggestionProviders {
     }
 
     public SuggestionProviders(AutoCompletePreferences preferences,
-                               JournalAbbreviationLoader abbreviationLoader) {
+            JournalAbbreviationLoader abbreviationLoader) {
         Objects.requireNonNull(preferences);
 
         List<String> completeFields = preferences.getCompleteNames();
@@ -60,7 +60,7 @@ public class SuggestionProviders {
         if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
             return new PersonNameSuggestionProvider(fieldName);
         } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new BibEntrySuggestionProvider();
+            return new ParsedEntryLinkSuggestionProvider();
         } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
                 || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalsSuggestionProvider(fieldName, preferences, abbreviationLoader);
