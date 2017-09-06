@@ -17,14 +17,11 @@ public class ParsedEntryLinkSuggestionProvider extends SuggestionProvider<Parsed
         }
 
         addPossibleSuggestions(new ParsedEntryLink(entry));
-
     }
 
     @Override
     protected Comparator<ParsedEntryLink> getComparator() {
         return (o1, o2) -> o1.getKey().compareTo(o2.getKey());
-
-
     }
 
     @Override
