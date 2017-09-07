@@ -13,15 +13,15 @@ public class AutoCompletePreferences {
     private AutoCompleteFirstNameMode firstNameMode;
     private boolean onlyCompleteLastFirst;
     private boolean onlyCompleteFirstLast;
-    private List<String> completeNames;
-    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+    private List<String> completeFields;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
     public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeNames, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
         this.onlyCompleteLastFirst = onlyCompleteLastFirst;
         this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-        this.completeNames = completeNames;
+        this.completeFields = completeNames;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
     }
 
@@ -60,20 +60,24 @@ public class AutoCompletePreferences {
         this.onlyCompleteFirstLast = onlyCompleteFirstLast;
     }
 
-    public List<String> getCompleteNames() {
-        return completeNames;
+    /**
+     * Returns the list of fields for which autcomplete is enabled
+     * @return List of field names
+     */
+    public List<String> getCompleteFields() {
+        return completeFields;
     }
 
-    public void setCompleteNames(List<String> completeNames) {
-        this.completeNames = completeNames;
+    public void setCompleteFields(List<String> completeFields) {
+        this.completeFields = completeFields;
     }
 
     public void setCompleteNames(String input) {
-        setCompleteNames(Arrays.asList(input.split(DELIMITER)));
+        setCompleteFields(Arrays.asList(input.split(DELIMITER)));
     }
 
     public String getCompleteNamesAsString() {
-        return completeNames.stream().collect(Collectors.joining(DELIMITER));
+        return completeFields.stream().collect(Collectors.joining(DELIMITER));
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {

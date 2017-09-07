@@ -207,6 +207,13 @@ public class PreferencesMigrations {
 
     }
 
+    public static void addCrossRefFieldToAutocomplete() {
+        JabRefPreferences prefs = Globals.prefs;
+        List<String> keys = prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
+        keys.add("crossref");
+        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, keys);
+    }
+
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)
             throws BackingStoreException {
         LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
