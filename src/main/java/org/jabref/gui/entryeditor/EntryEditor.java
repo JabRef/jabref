@@ -11,7 +11,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -648,8 +652,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
             entry.setField(cleanedEntries);
             panel.entryEditorClosing(EntryEditor.this);
-
-
         }
     }
 
