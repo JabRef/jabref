@@ -81,10 +81,10 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
         Consumer<List<TreeItem<GroupNodeViewModel>>> updateViewModel =
                 (newSelectedGroups) -> {
-                    if (newSelectedGroups == null) {
-                        viewModel.selectedGroupsProperty().clear();
-                    } else {
+                    try {
                         viewModel.selectedGroupsProperty().setAll(newSelectedGroups.stream().map(TreeItem::getValue).collect(Collectors.toList()));
+                    } catch (NullPointerException e) {
+                        viewModel.selectedGroupsProperty().clear();
                     }
                 };
         BindingsHelper.bindContentBidirectional(
