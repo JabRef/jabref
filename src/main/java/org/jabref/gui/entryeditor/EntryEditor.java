@@ -11,10 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -71,6 +69,7 @@ import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.integrity.BracesCorrector;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQueryHighlightListener;
 import org.jabref.logic.util.OS;
@@ -87,6 +86,7 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
+
 
 /**
  * GUI component that allows editing of the fields of a BibEntry (i.e. the
@@ -631,7 +631,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private class CloseAction extends AbstractAction {
-
         private CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Close window"));
@@ -639,7 +638,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Map<String,String> cleanedEntries = entry
+                    .getFieldMap()
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(f -> f.getKey(), f-> BracesCorrector.apply(f.getValue())));
+            if (!cleanedEntries.equals(entry.getFieldMap())) {
+                frame.output(Localization.lang("Added missing braces."));
+            }
+            entry.setField(cleanedEntries);
             panel.entryEditorClosing(EntryEditor.this);
+
+
         }
     }
 
