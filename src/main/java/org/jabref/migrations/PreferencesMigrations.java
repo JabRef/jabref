@@ -1,8 +1,11 @@
 package org.jabref.migrations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -207,11 +210,14 @@ public class PreferencesMigrations {
 
     }
 
-    public static void addCrossRefFieldToAutocomplete() {
+    public static void addCrossRefRelatedFieldsForAutoComplete() {
         JabRefPreferences prefs = Globals.prefs;
-        List<String> keys = prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
+        //LinkedHashSet because we want to retain the order and add new fields to the end
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
         keys.add("crossref");
-        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, keys);
+        keys.add("related");
+        keys.add("entryset");
+        prefs.putStringList(JabRefPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
     }
 
     private static void migrateTypedKeyPrefs(JabRefPreferences prefs, Preferences oldPatternPrefs)

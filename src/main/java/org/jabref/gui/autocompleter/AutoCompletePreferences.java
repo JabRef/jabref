@@ -16,12 +16,12 @@ public class AutoCompletePreferences {
     private List<String> completeFields;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeNames, JournalAbbreviationPreferences journalAbbreviationPreferences) {
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
         this.firstNameMode = firstNameMode;
         this.onlyCompleteLastFirst = onlyCompleteLastFirst;
         this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-        this.completeFields = completeNames;
+        this.completeFields = completeFields;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
     }
 
@@ -61,7 +61,7 @@ public class AutoCompletePreferences {
     }
 
     /**
-     * Returns the list of fields for which autcomplete is enabled
+     * Returns the list of fields for which autocomplete is enabled
      * @return List of field names
      */
     public List<String> getCompleteFields() {
