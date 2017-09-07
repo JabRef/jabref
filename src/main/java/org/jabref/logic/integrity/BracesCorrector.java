@@ -6,19 +6,20 @@ public class BracesCorrector {
         if (s == null) {
             return null;
         } else {
-            String c = s.replaceAll("\\\\\\{", "").replaceAll("\\\\\\}", "");
+            String addedBraces = s;
+            String c = addedBraces.replaceAll("\\\\\\{", "").replaceAll("\\\\\\}", "");
 
             long diff = c.chars().filter(ch -> ch == '{').count() - c.chars().filter(ch -> ch == '}').count();
             while (diff != 0) {
                 if (diff < 0) {
-                    s = "{" + s;
+                    addedBraces = "{" + addedBraces;
                     diff++;
                 } else {
-                    s = s + "}";
+                    addedBraces = addedBraces + "}";
                     diff--;
                 }
             }
-            return s;
+            return addedBraces;
         }
     }
 
