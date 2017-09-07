@@ -613,4 +613,15 @@ public class BibDatabase {
     public DuplicationChecker getDuplicationChecker() {
         return duplicationChecker;
     }
+
+    public List<BibEntry> getEntriesInGroup(String groupName) {
+        List<BibEntry> result = new ArrayList<>();
+        for (BibEntry entry: entries) {
+            Optional<String> groups = entry.getField(FieldName.GROUPS);
+            if (groups.isPresent() && groups.get().contains(groupName)) {
+                result.add(entry);
+            }
+        }
+        return result;
+    }
 }
