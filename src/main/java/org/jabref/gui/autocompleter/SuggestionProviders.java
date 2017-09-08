@@ -60,7 +60,7 @@ public class SuggestionProviders {
         if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
             return new PersonNameSuggestionProvider(fieldName);
         } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new ParsedEntryLinkSuggestionProvider(); //BibTexSuggestionProvider can't be used here, because it would insert the whole entry as string and it can't be used with the ParsedEntyLink type StringConverter together
+            return new BibEntrySuggestionProvider();
         } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
                 || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalsSuggestionProvider(fieldName, preferences, abbreviationLoader);

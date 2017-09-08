@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -11,6 +12,7 @@ import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.EntryLinkList;
 import org.jabref.model.entry.ParsedEntryLink;
 
@@ -36,7 +38,9 @@ public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
     @Override
     @SuppressWarnings("unchecked")
     public Collection<ParsedEntryLink> complete(AutoCompletionBinding.ISuggestionRequest request) {
-        return (Collection<ParsedEntryLink>) super.complete(request);
+        //We have to cast the BibEntries from the BibEntrySuggestionProvider to ParsedEntryLink
+        Collection<BibEntry> bibEntries = (Collection<BibEntry>) super.complete(request);
+        return bibEntries.stream().map(ParsedEntryLink::new).collect(Collectors.toList());
     }
 
     public ListProperty<ParsedEntryLink> linkedEntriesProperty() {
