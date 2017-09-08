@@ -40,7 +40,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Renaming files now truncates the filename to not exceed the limit of 255 chars [#2622](https://github.com/JabRef/jabref/issues/2622)
 
 ### Removed
-
+- We removed support for LatexEditor, as it is not under active development. [#3199](https://github.com/JabRef/jabref/issues/3199)
 
 
 
