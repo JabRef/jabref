@@ -2,6 +2,7 @@ package org.jabref.gui.groups;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -52,15 +53,23 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
 
-    @FXML private TreeTableView<GroupNodeViewModel> groupTree;
-    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
-    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
-    @FXML private CustomTextField searchField;
+    @FXML
+    private TreeTableView<GroupNodeViewModel> groupTree;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
+    @FXML
+    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
+    @FXML
+    private CustomTextField searchField;
 
-    @Inject private StateManager stateManager;
-    @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
+    @Inject
+    private StateManager stateManager;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private TaskExecutor taskExecutor;
 
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
@@ -81,11 +90,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
                 (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
         Consumer<List<TreeItem<GroupNodeViewModel>>> updateViewModel =
                 (newSelectedGroups) -> {
-                    try {
-                        viewModel.selectedGroupsProperty().setAll(newSelectedGroups.stream().map(TreeItem::getValue).collect(Collectors.toList()));
-                    } catch (NullPointerException e) {
-                        viewModel.selectedGroupsProperty().clear();
-                    }
+                    updateSelection(newSelectedGroups);
                 };
         BindingsHelper.bindContentBidirectional(
                 groupTree.getSelectionModel().getSelectedItems(),
@@ -247,6 +252,20 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         setupClearButtonField(searchField);
     }
 
+    private void updateSelection(List<TreeItem<GroupNodeViewModel>> newSelectedGroups) {
+        if (newSelectedGroups == null) {
+            viewModel.selectedGroupsProperty().clear();
+        } else {
+            List<GroupNodeViewModel> list = new ArrayList<>();
+            for (TreeItem<GroupNodeViewModel> model : newSelectedGroups) {
+                if (model != null && model.getValue() != null) {
+                    list.add(model.getValue());
+                }
+            }
+            viewModel.selectedGroupsProperty().setAll(list);
+        }
+    }
+
     private void selectNode(GroupNodeViewModel value) {
         getTreeItemByValue(value)
                 .ifPresent(treeItem -> groupTree.getSelectionModel().select(treeItem));
@@ -257,7 +276,7 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
     }
 
     private Optional<TreeItem<GroupNodeViewModel>> getTreeItemByValue(TreeItem<GroupNodeViewModel> root,
-            GroupNodeViewModel value) {
+                                                                      GroupNodeViewModel value) {
         if (root.getValue().equals(value)) {
             return Optional.of(root);
         }
