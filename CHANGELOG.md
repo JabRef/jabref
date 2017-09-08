@@ -18,6 +18,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We increased the size of the keywords and file text areas in the entry editor
 - When the entry that is currently shown in the entry editor is deleted externally, the editor is now closed automatically [#2946](https://github.com/JabRef/jabref/issues/2946)
 - We added reordering of file and link entries in the `General`-Tab [3165, comment](https://github.com/JabRef/jabref/issues/3165#issuecomment-326269715)
+- We added autcompletion for the `crossref` field on basis of the BibTeX-key. To accept such an autcompleted key as new entry-link, you have to press <kbd>Enter</kbd> two times, otherwise the field data is not stored in the library file.[koppor#257](https://github.com/koppor/jabref/issues/257)
 - We added drag and drop support for adding files directly in the `General`-Tab. The dragged files are currently only linked from their existing directory. For more advanced features use the `Add files` dialog. [#koppor#244](https://github.com/koppor/jabref/issues/244)
 
 ### Fixed

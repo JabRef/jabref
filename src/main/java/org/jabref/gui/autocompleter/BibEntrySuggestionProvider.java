@@ -10,7 +10,7 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 /**
  * Delivers possible completions as a list of {@link BibEntry} based on their cite key.
  */
-class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> implements AutoCompleteSuggestionProvider<BibEntry> {
+public class BibEntrySuggestionProvider extends SuggestionProvider<BibEntry> implements AutoCompleteSuggestionProvider<BibEntry> {
 
     @Override
     public void indexEntry(BibEntry entry) {
