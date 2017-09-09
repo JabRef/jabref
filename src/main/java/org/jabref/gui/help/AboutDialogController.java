@@ -76,8 +76,4 @@ public class AboutDialogController extends AbstractController<AboutDialogViewMod
         viewModel.openDonation();
     }
 
-    public void setTextAreaVersions(TextArea textAreaVersions) {
-        this.textAreaVersions = textAreaVersions;
-    }
-
 }
