@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.scene.control.TextArea;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
@@ -29,6 +30,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
+    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
@@ -38,6 +40,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
+    private final TextArea textAreaVersions = new TextArea();
 
     public AboutDialogViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
@@ -85,6 +88,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return authors.get();
     }
 
+    public String getVersionInfo() {
+        return versionInfo;
+    }
+
     public ReadOnlyStringProperty developersProperty() {
         return developers.getReadOnlyProperty();
     }
@@ -107,6 +114,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public String getLicense() {
         return license.get();
+    }
+
+    public String getEnvironmentInfo() {
+        return environmentInfo.get();
     }
 
     public void copyVersionToClipboard() {
