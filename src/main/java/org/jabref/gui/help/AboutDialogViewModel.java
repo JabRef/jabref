@@ -8,8 +8,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.scene.control.TextArea;
-
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -40,7 +38,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
     private final ClipBoardManager clipBoardManager;
-    private final TextArea textAreaVersions = new TextArea();
 
     public AboutDialogViewModel(DialogService dialogService, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {
         this.dialogService = Objects.requireNonNull(dialogService);
