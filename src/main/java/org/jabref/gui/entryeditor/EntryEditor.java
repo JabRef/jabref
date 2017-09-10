@@ -646,7 +646,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     .getFieldMap()
                     .entrySet()
                     .stream()
-                    .collect(Collectors.toMap(f -> f.getKey(), f-> BracesCorrector.apply(f.getValue())));
+                    .collect(Collectors.toMap(Map.Entry::getKey, f -> BracesCorrector.apply(f.getValue())));
             if (!cleanedEntries.equals(entry.getFieldMap())) {
                 frame.output(Localization.lang("Added missing braces."));
             }
