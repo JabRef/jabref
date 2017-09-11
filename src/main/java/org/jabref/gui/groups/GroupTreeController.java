@@ -52,23 +52,15 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
 
     private static final Log LOGGER = LogFactory.getLog(GroupTreeController.class);
 
-    @FXML
-    private TreeTableView<GroupNodeViewModel> groupTree;
-    @FXML
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
-    @FXML
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
-    @FXML
-    private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
-    @FXML
-    private CustomTextField searchField;
+    @FXML private TreeTableView<GroupNodeViewModel> groupTree;
+    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> mainColumn;
+    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
+    @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> disclosureNodeColumn;
+    @FXML private CustomTextField searchField;
 
-    @Inject
-    private StateManager stateManager;
-    @Inject
-    private DialogService dialogService;
-    @Inject
-    private TaskExecutor taskExecutor;
+    @Inject private StateManager stateManager;
+    @Inject private DialogService dialogService;
+    @Inject private TaskExecutor taskExecutor;
 
     private static void removePseudoClasses(TreeTableRow<GroupNodeViewModel> row, PseudoClass... pseudoClasses) {
         for (PseudoClass pseudoClass : pseudoClasses) {
