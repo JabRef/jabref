@@ -1,7 +1,5 @@
 package org.jabref.gui.help;
 
-
-
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
