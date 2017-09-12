@@ -79,15 +79,12 @@ public class GroupTreeController extends AbstractController<GroupTreeViewModel> 
         // Set-up bindings
         Consumer<ObservableList<GroupNodeViewModel>> updateSelectedGroups =
                 (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode);
-        Consumer<List<TreeItem<GroupNodeViewModel>>> updateViewModel =
-                (newSelectedGroups) -> {
-                    updateSelection(newSelectedGroups);
-                };
+
         BindingsHelper.bindContentBidirectional(
                 groupTree.getSelectionModel().getSelectedItems(),
                 viewModel.selectedGroupsProperty(),
                 updateSelectedGroups,
-                updateViewModel
+                this::updateSelection
         );
 
         viewModel.filterTextProperty().bind(searchField.textProperty());
