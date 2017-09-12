@@ -88,7 +88,6 @@ public class JabRefPreferences implements PreferencesService {
     // Push to application preferences
     public static final String EMACS_PATH = "emacsPath";
     public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    public static final String LATEX_EDITOR_PATH = "latexEditorPath";
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -370,6 +369,15 @@ public class JabRefPreferences implements PreferencesService {
     //KeyBindings - keys - public because needed for pref migration
     public static final String BINDINGS = "bindings";
 
+    //AutcompleteFields - public because needed for pref migration
+    public static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
+
+    // Auto completion
+    private static final String AUTO_COMPLETE = "autoComplete";
+    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
+    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
+    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
+
     private static final String BIND_NAMES = "bindNames";
     // User
     private static final String USER_ID = "userId";
@@ -396,12 +404,6 @@ public class JabRefPreferences implements PreferencesService {
     private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
     private static final String PREVIEW_STYLE = "previewStyle";
     private static final String PREVIEW_ENABLED = "previewEnabled";
-    // Auto completion
-    private static final String AUTO_COMPLETE = "autoComplete";
-    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
-    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
-    private static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
     // Helper string
     private static final String USER_HOME = System.getProperty("user.home");
@@ -448,7 +450,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(LATEX_EDITOR_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
@@ -581,7 +582,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
         defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
         defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords");
+        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref;related;entryset");
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
         defaults.put(AUTO_ASSIGN_GROUP, Boolean.TRUE);
@@ -1639,6 +1640,6 @@ public class JabRefPreferences implements PreferencesService {
         put(AUTOCOMPLETER_FIRSTNAME_MODE, autoCompletePreferences.getFirstNameMode().name());
         putBoolean(AUTOCOMPLETER_LAST_FIRST, autoCompletePreferences.getOnlyCompleteLastFirst());
         putBoolean(AUTOCOMPLETER_FIRST_LAST, autoCompletePreferences.getOnlyCompleteFirstLast());
-        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteNames());
+        putStringList(AUTOCOMPLETER_COMPLETE_FIELDS, autoCompletePreferences.getCompleteFields());
     }
 }
