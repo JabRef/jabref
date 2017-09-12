@@ -5,9 +5,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
@@ -36,6 +38,7 @@ import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTable;
@@ -45,6 +48,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.search.SearchQueryHighlightObservable;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.SearchPreferences;
@@ -61,7 +65,6 @@ public class GlobalSearchBar extends JPanel {
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
-
     private final JabRefFrame frame;
 
     private final TextField searchField = SearchTextField.create();
@@ -70,7 +73,8 @@ public class GlobalSearchBar extends JPanel {
     private final JButton searchModeButton = new JButton();
     private final JLabel currentResults = new JLabel("");
     private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+    private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
+    private final JFXPanel container;
     private SearchWorker searchWorker;
     private GlobalSearchWorker globalSearchWorker;
 
@@ -82,7 +86,6 @@ public class GlobalSearchBar extends JPanel {
      * if this flag is set the searchbar won't be selected after the next search
      */
     private boolean dontSelectSearchBar;
-
 
     public GlobalSearchBar(JabRefFrame frame) {
         super();
@@ -99,6 +102,7 @@ public class GlobalSearchBar extends JPanel {
 
         // default action to be performed for toggling globalSearch
         AbstractAction globalSearchStandardAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 searchPreferences.setGlobalSearch(globalSearch.isSelected());
@@ -108,6 +112,7 @@ public class GlobalSearchBar extends JPanel {
 
         // additional action for global search shortcut
         AbstractAction globalSearchShortCutAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 globalSearch.setSelected(true);
@@ -115,6 +120,35 @@ public class GlobalSearchBar extends JPanel {
                 focus();
             }
         };
+        //TODO: These have to be somehow converted
+        /*
+        String endSearch = "endSearch";
+        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
+        searchField.getActionMap().put(endSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                if (autoCompleteSupport.isVisible()) {
+                    autoCompleteSupport.setVisible(false);
+                } else {
+                    endSearch();
+                }
+            }
+        });
+        */
+
+        /*
+        String acceptSearch = "acceptSearch";
+        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
+        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                autoCompleteSupport.setVisible(false);
+                BasePanel currentBasePanel = frame.getCurrentBasePanel();
+                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+                currentBasePanel.getMainTable().requestFocus();
+            }
+        });
+        */
 
         String searchGlobalByKey = "searchGlobalByKey";
         globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
@@ -154,38 +188,11 @@ public class GlobalSearchBar extends JPanel {
 
         EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
 
-        /*
-        String endSearch = "endSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
-        searchField.getActionMap().put(endSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (autoCompleteSupport.isVisible()) {
-                    autoCompleteSupport.setVisible(false);
-                } else {
-                    endSearch();
-                }
-            }
-        });
-        */
-
-        /*
-        String acceptSearch = "acceptSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
-        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoCompleteSupport.setVisible(false);
-                BasePanel currentBasePanel = frame.getCurrentBasePanel();
-                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-                currentBasePanel.getMainTable().requestFocus();
-            }
-        });
-        */
-
-        JFXPanel container = new JFXPanel();
+        container = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
         DefaultTaskExecutor.runInJavaFXThread(() -> {
             container.setScene(new Scene(searchField));
+            container.addKeyListener(new SearchKeyAdapter());
+
         });
 
         setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -207,7 +214,7 @@ public class GlobalSearchBar extends JPanel {
 
     public void performGlobalSearch() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel == null || validateSearchResultFrame(true)) {
+        if ((currentBasePanel == null) || validateSearchResultFrame(true)) {
             return;
         }
 
@@ -226,7 +233,7 @@ public class GlobalSearchBar extends JPanel {
 
     private void openLocalFindingsInExternalPanel() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel == null || validateSearchResultFrame(false)) {
+        if ((currentBasePanel == null) || validateSearchResultFrame(false)) {
             return;
         }
 
@@ -237,7 +244,7 @@ public class GlobalSearchBar extends JPanel {
 
         SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
                 Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
+                        .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                         this.getSearchQuery().localize()),
                 getSearchQuery(), false);
         List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
@@ -250,7 +257,7 @@ public class GlobalSearchBar extends JPanel {
 
     private boolean validateSearchResultFrame(boolean globalSearch) {
         if (searchResultFrame != null) {
-            if (searchResultFrame.isGlobalSearch() == globalSearch && isStillValidQuery(searchResultFrame.getSearchQuery())) {
+            if ((searchResultFrame.isGlobalSearch() == globalSearch) && isStillValidQuery(searchResultFrame.getSearchQuery())) {
                 searchResultFrame.focus();
                 return true;
             } else {
@@ -291,6 +298,7 @@ public class GlobalSearchBar extends JPanel {
      */
     public void focus() {
         if (!searchField.isFocused()) {
+            container.requestFocus();
             searchField.requestFocus();
         }
         searchField.selectAll();
@@ -358,6 +366,7 @@ public class GlobalSearchBar extends JPanel {
                 searchCompleter,
                 new PersonNameStringConverter(true, true, AutoCompleteFirstNameMode.BOTH),
                 new AppendPersonNamesStrategy());
+
     }
 
     public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
@@ -384,7 +393,7 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        searchField.setTooltip(new Tooltip(description));
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(new Tooltip(description)));
         openCurrentResultsInDialog.setEnabled(true);
     }
 
@@ -398,7 +407,8 @@ public class GlobalSearchBar extends JPanel {
         }
 
         setDontSelectSearchBar();
-        searchField.setText(searchTerm);
+        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
+
     }
 
     public void setDontSelectSearchBar() {
@@ -413,4 +423,37 @@ public class GlobalSearchBar extends JPanel {
         }
     }
 
+    private class SearchKeyAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(java.awt.event.KeyEvent e) {
+            switch (e.getKeyCode()) {
+                //This "hack" prevents that the focus moves out of the field
+                case java.awt.event.KeyEvent.VK_RIGHT:
+                case java.awt.event.KeyEvent.VK_LEFT:
+                case java.awt.event.KeyEvent.VK_UP:
+                case java.awt.event.KeyEvent.VK_DOWN:
+                    e.consume();
+                    break;
+                default:
+                    //do nothing
+            }
+
+            //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
+            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
+            if (keyBinding.isPresent()) {
+                switch (keyBinding.get()) {
+                    case CUT:
+                    case COPY:
+                    case PASTE:
+                    case DELETE_ENTRY:
+                    case SELECT_ALL:
+                        e.consume();
+                        break;
+                    default:
+                        //do nothing
+                }
+            }
+        }
+    }
 }

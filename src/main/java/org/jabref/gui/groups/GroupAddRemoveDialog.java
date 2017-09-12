@@ -32,13 +32,6 @@ import org.jabref.model.groups.GroupTreeNode;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
-/**
- * Created with IntelliJ IDEA.
- * User: alver
- * Date: 1/22/13
- * Time: 6:24 PM
- * To change this template use File | Settings | File Templates.
- */
 public class GroupAddRemoveDialog implements BaseAction {
 
     private final BasePanel panel;
@@ -104,6 +97,7 @@ public class GroupAddRemoveDialog implements BaseAction {
         ok.addActionListener(actionEvent -> {
             if (doAddOrRemove()) {
                 diag.dispose();
+                tree.repaint();
             }
         });
         cancel.addActionListener(actionEvent -> diag.dispose());
@@ -172,8 +166,14 @@ public class GroupAddRemoveDialog implements BaseAction {
             GroupTreeNodeViewModel node = (GroupTreeNodeViewModel) path.getLastPathComponent();
             if (checkGroupEnable(node)) {
 
+                List<BibEntry> entries = Globals.stateManager.getSelectedEntries();
+
+                if (move) {
+                    recuriveRemoveFromNode((GroupTreeNodeViewModel) tree.getModel().getRoot(), entries);
+                }
+
                 if (add) {
-                    node.addEntriesToGroup(Globals.stateManager.getSelectedEntries());
+                    node.addEntriesToGroup(entries);
                 } else {
                     node.removeEntriesFromGroup(Globals.stateManager.getSelectedEntries());
                 }
@@ -182,6 +182,13 @@ public class GroupAddRemoveDialog implements BaseAction {
             } else {
                 return false;
             }
+        }
+    }
+
+    private void recuriveRemoveFromNode(GroupTreeNodeViewModel node, List<BibEntry> entries) {
+        node.removeEntriesFromGroup(entries);
+        for (GroupTreeNodeViewModel child: node.getChildren()) {
+            recuriveRemoveFromNode(child, entries);
         }
     }
 

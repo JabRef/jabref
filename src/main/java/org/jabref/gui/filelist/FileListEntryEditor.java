@@ -123,14 +123,12 @@ public class FileListEntryEditor {
 
     private boolean dontOpenBrowseUntilDisposed;
 
-    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton,
-                               BibDatabaseContext databaseContext, boolean showSaveDialog) {
+    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton, BibDatabaseContext databaseContext, boolean showSaveDialog) {
         this(entry, showProgressBar, showOpenButton, databaseContext);
         this.showSaveDialog = showSaveDialog;
     }
 
-    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton,
-                               BibDatabaseContext databaseContext) {
+    public FileListEntryEditor(LinkedFile entry, boolean showProgressBar, boolean showOpenButton, BibDatabaseContext databaseContext) {
         this.entry = entry;
         this.databaseContext = databaseContext;
 
@@ -385,4 +383,5 @@ public class FileListEntryEditor {
     public boolean okPressed() {
         return okPressed;
     }
+
 }

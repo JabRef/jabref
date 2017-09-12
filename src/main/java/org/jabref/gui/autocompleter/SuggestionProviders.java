@@ -27,10 +27,10 @@ public class SuggestionProviders {
     }
 
     public SuggestionProviders(AutoCompletePreferences preferences,
-                               JournalAbbreviationLoader abbreviationLoader) {
+            JournalAbbreviationLoader abbreviationLoader) {
         Objects.requireNonNull(preferences);
 
-        List<String> completeFields = preferences.getCompleteNames();
+        List<String> completeFields = preferences.getCompleteFields();
         for (String field : completeFields) {
             AutoCompleteSuggestionProvider<?> autoCompleter = initalizeSuggestionProvider(field, preferences, abbreviationLoader);
             providers.put(field, autoCompleter);

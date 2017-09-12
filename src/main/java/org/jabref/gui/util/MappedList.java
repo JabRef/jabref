@@ -9,91 +9,68 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.TransformationList;
 
 /**
- * MappedList implementation based on https://gist.github.com/TomasMikula/8883719
- *
- * @author https://github.com/TomasMikula
+ * MappedList implementation based on https://github.com/corda/corda/blob/master/client/jfx/src/main/kotlin/net/corda/client/jfx/utils/MappedList.kt
  */
 public final class MappedList<A, B> extends TransformationList<A, B> {
 
     private final Function<B, A> mapper;
+    private final List<A> backingList;
 
     public MappedList(ObservableList<? extends B> sourceList, Function<B, A> mapper) {
         super(sourceList);
         this.mapper = mapper;
+        this.backingList = new ArrayList<>(sourceList.size());
+        sourceList.stream().map(mapper::apply).forEach(backingList::add);
     }
 
     @Override
     protected void sourceChanged(ListChangeListener.Change<? extends B> change) {
-        fireChange(new ListChangeListener.Change<A>(this) {
+        beginChange();
+        while (change.next()) {
+            if (change.wasPermutated()) {
+                int from = change.getFrom();
+                int to = change.getTo();
 
-            @Override
-            public boolean wasAdded() {
-                return change.wasAdded();
-            }
-
-            @Override
-            public boolean wasRemoved() {
-                return change.wasRemoved();
-            }
-
-            @Override
-            public boolean wasReplaced() {
-                return change.wasReplaced();
-            }
-
-            @Override
-            public boolean wasUpdated() {
-                return change.wasUpdated();
-            }
-
-            @Override
-            public boolean wasPermutated() {
-                return change.wasPermutated();
-            }
-
-            @Override
-            public int getPermutation(int index) {
-                return change.getPermutation(index);
-            }
-
-            @Override
-            protected int[] getPermutation() {
-                // This method is only called by the superclass methods
-                // wasPermutated() and getPermutation(int), which are
-                // both overridden by this class. There is no other way
-                // this method can be called.
-                throw new AssertionError("Unreachable code");
-            }
-
-            @Override
-            public List<A> getRemoved() {
-                List<A> result = new ArrayList<>(change.getRemovedSize());
-                for (B element : change.getRemoved()) {
-                    result.add(mapper.apply(element));
+                // get permutation array
+                int[] permutation = new int[to - from];
+                for (int i = 0; i < to - from; i++) {
+                    permutation[i] = change.getPermutation(i);
                 }
-                return result;
-            }
 
-            @Override
-            public int getFrom() {
-                return change.getFrom();
-            }
+                // perform permutation
+                Object[] permutedPart = new Object[to - from];
+                for (int i = from; i < to; i++) {
+                    permutedPart[permutation[i]] = backingList.get(i);
+                }
 
-            @Override
-            public int getTo() {
-                return change.getTo();
+                // update backingList
+                for (int i = 0; i < to; i++) {
+                    backingList.set(i + from, (A) permutedPart[i]);
+                }
+                nextPermutation(from, to, permutation);
+            } else if (change.wasUpdated()) {
+                backingList.set(change.getFrom(), mapper.apply(getSource().get(change.getFrom())));
+                nextUpdate(change.getFrom());
+            } else {
+                if (change.wasRemoved()) {
+                    int removePosition = change.getFrom();
+                    List<A> removed = new ArrayList<>(change.getRemovedSize());
+                    for (int i = 0; i < change.getRemovedSize(); i++) {
+                        removed.add(backingList.remove(removePosition));
+                    }
+                    nextRemove(change.getFrom(), removed);
+                }
+                if (change.wasAdded()) {
+                    int addStart = change.getFrom();
+                    int addEnd = change.getTo();
+                    for (int i = addStart; i < addEnd; i++) {
+                        backingList.add(i, mapper.apply(change.getList().get(i)));
+                    }
+                    nextAdd(addStart, addEnd);
+                }
             }
-
-            @Override
-            public boolean next() {
-                return change.next();
-            }
-
-            @Override
-            public void reset() {
-                change.reset();
-            }
-        });
+        }
+        endChange();
     }
 
     @Override
@@ -103,11 +80,11 @@ public final class MappedList<A, B> extends TransformationList<A, B> {
 
     @Override
     public A get(int index) {
-        return mapper.apply(super.getSource().get(index));
+        return backingList.get(index);
     }
 
     @Override
     public int size() {
-        return super.getSource().size();
+        return backingList.size();
     }
 }

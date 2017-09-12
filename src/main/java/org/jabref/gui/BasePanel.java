@@ -127,6 +127,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.DatabaseLocation;
 import org.jabref.model.database.KeyCollisionException;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.database.event.EntryAddedEvent;
 import org.jabref.model.database.event.EntryRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -220,6 +221,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         setupActions();
 
         this.getDatabase().registerListener(new SearchListener());
+        this.getDatabase().registerListener(new EntryRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -264,7 +266,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.markBaseChanged();
+        SwingUtilities.invokeLater(() -> this.markBaseChanged());
+
     }
 
     /**
@@ -1395,7 +1398,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             suggestionProviders = new SuggestionProviders(autoCompletePreferences, Globals.journalAbbreviationLoader);
             suggestionProviders.indexDatabase(getDatabase());
             // Ensure that the suggestion providers are in sync with entries
-            this.getDatabase().registerListener(new AutoCompleteUpdater(suggestionProviders));
+            CoarseChangeFilter changeFilter = new CoarseChangeFilter(bibDatabaseContext);
+            changeFilter.registerListener(new AutoCompleteUpdater(suggestionProviders));
         } else {
             // Create empty suggestion providers if auto completion is deactivated
             suggestionProviders = new SuggestionProviders();
@@ -2094,6 +2098,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    private class EntryRemovedListener {
+
+        @Subscribe
+        public void listen(EntryRemovedEvent entryRemovedEvent) {
+            // if the entry that is displayed in the current entry editor is removed, close the entry editor
+            if (isShowingEditor() && currentEditor.getEntry().equals(entryRemovedEvent.getBibEntry())) {
+                currentEditor.close();
+            }
+
+            if (selectionListener.getPreview().getEntry().equals(entryRemovedEvent.getBibEntry())) {
+                selectionListener.setPreviewActive(false);
+            }
+        }
+    }
+
     /**
      * Ensures that the search auto completer is up to date when entries are changed AKA Let the auto completer, if any,
      * harvest words from the entry
@@ -2143,7 +2162,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     // Check if it is the preamble:
-                    if ((preambleEditor != null) && (focused == preambleEditor.getFieldEditor())) {
+
+                    FieldEditor fieldEditor = (FieldEditor) focused;
+                    if ((preambleEditor != null) && (fieldEditor.equals(preambleEditor.getFieldEditor()))) {
                         preambleEditor.storeCurrentEdit();
                     }
                 }

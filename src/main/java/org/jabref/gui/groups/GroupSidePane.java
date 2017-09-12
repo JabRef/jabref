@@ -13,13 +13,19 @@ import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
+import org.jabref.gui.customjfx.CustomJFXPanel;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OS;
+import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
 import org.jabref.preferences.JabRefPreferences;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * The groups side pane.
@@ -40,6 +46,15 @@ public class GroupSidePane extends SidePaneComponent {
         Globals.stateManager.activeGroupProperty()
                 .addListener((observable, oldValue, newValue) -> updateShownEntriesAccordingToSelectedGroups(newValue));
 
+        // register the panel the current active context
+        Globals.stateManager.activeDatabaseProperty()
+                .addListener((observable, oldValue, newValue) -> {
+            newValue.ifPresent(databaseContext ->
+                    databaseContext.getDatabase().registerListener(this));
+            oldValue.ifPresent(databaseContext ->
+                    databaseContext.getDatabase().unregisterListener(this));
+        });
+
         toggleAction = new ToggleAction(Localization.menuTitle("Toggle groups interface"),
                 Localization.lang("Toggle groups interface"),
                 Globals.getKeyPrefs().getKey(KeyBinding.TOGGLE_GROUPS_INTERFACE),
@@ -49,7 +64,8 @@ public class GroupSidePane extends SidePaneComponent {
 
         this.setTitle(Localization.lang("Groups"));
 
-        JFXPanel groupsPane = new JFXPanel();
+        JFXPanel groupsPane = OS.LINUX ? new CustomJFXPanel() : new JFXPanel();
+
         add(groupsPane);
         // Execute on JavaFX Application Thread
         Platform.runLater(() -> {
@@ -60,8 +76,15 @@ public class GroupSidePane extends SidePaneComponent {
         });
     }
 
+    @Subscribe
+    public synchronized void listen(FieldChangedEvent event) {
+        if (FieldName.GROUPS.equals(event.getFieldName())) {
+            updateShownEntriesAccordingToSelectedGroups(Globals.stateManager.activeGroupProperty());
+        }
+    }
+
     private void updateShownEntriesAccordingToSelectedGroups(List<GroupTreeNode> selectedGroups) {
-        if (selectedGroups == null || selectedGroups.isEmpty()) {
+        if ((selectedGroups == null) || selectedGroups.isEmpty()) {
             // No selected group, nothing to do
             return;
         }

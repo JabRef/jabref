@@ -26,7 +26,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import org.jabref.Globals;
+import org.jabref.gui.importer.ImportInspectionDialog;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.bibtex.DuplicateCheck;
 import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
@@ -305,10 +307,26 @@ public class EntryTypeDialog extends JabRefDialog implements ActionListener {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
                     final BibEntry bibEntry = result.get();
-                    // Regenerate CiteKey of imported BibEntry
-                    BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                    if ((DuplicateCheck.containsDuplicate(frame.getCurrentBasePanel().getDatabase(), bibEntry, frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).isPresent())) {
+                		//If there are duplicates starts ImportInspectionDialog
+                        final BasePanel panel = (BasePanel) frame.getTabbedPane().getSelectedComponent();
 
-                    frame.getCurrentBasePanel().insertEntry(bibEntry);
+                        ImportInspectionDialog diag = new ImportInspectionDialog(frame, panel, Localization.lang("Import"), false);
+                        diag.addEntry(bibEntry);
+                        diag.entryListComplete();
+                        diag.setLocationRelativeTo(frame);
+                        diag.setVisible(true);
+                        diag.toFront();
+                    } else {
+                		// Regenerate CiteKey of imported BibEntry
+                        BibtexKeyPatternUtil.makeAndSetLabel(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern(), frame.getCurrentBasePanel().getDatabase(), bibEntry, Globals.prefs.getBibtexKeyPatternPreferences());
+                        // Update Timestamps
+                        if (Globals.prefs.getTimestampPreferences().includeCreatedTimestamp()) {
+                            bibEntry.setField(Globals.prefs.getTimestampPreferences().getTimestampField(), Globals.prefs.getTimestampPreferences().now());
+                        }
+                        frame.getCurrentBasePanel().insertEntry(bibEntry);
+                    }
+
                     dispose();
                 } else if (searchID.trim().isEmpty()) {
                     JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);

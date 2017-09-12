@@ -81,6 +81,7 @@ public class MetaData {
         groupsRoot = Objects.requireNonNull(root);
         groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
+        postChange();
     }
 
     /**
