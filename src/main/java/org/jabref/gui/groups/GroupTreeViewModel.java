@@ -262,7 +262,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             removeGroupsAndSubGroupsFromEntries(child);
         }
 
-        List<BibEntry> entriesInGroup = this.currentDatabase.get().getDatabase().getEntriesInGroup(group.getDisplayName());
+        List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
         group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
     }
 

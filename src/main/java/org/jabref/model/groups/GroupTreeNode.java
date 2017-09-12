@@ -11,6 +11,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.matchers.MatcherSet;
 import org.jabref.model.search.matchers.MatcherSets;
@@ -179,6 +180,16 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         }
 
         return groups;
+    }
+
+    public List<BibEntry> getEntriesInGroup(List<BibEntry> entries) {
+        List<BibEntry> result = new ArrayList<>();
+        for (BibEntry entry: entries) {
+            if (this.group.contains(entry)) {
+                result.add(entry);
+            }
+        }
+        return result;
     }
 
     public String getName() {
