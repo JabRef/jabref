@@ -128,7 +128,7 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-log4j2', version: '1.0.+'
 
     testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:2.9.0'
+    testCompile 'org.mockito:mockito-core:2.10.0'
     testCompile 'com.github.tomakehurst:wiremock:2.8.0'
     testCompile 'org.assertj:assertj-swing-junit:3.8.0'
     testCompile 'org.reflections:reflections:0.9.11'
