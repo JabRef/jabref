@@ -1,5 +1,8 @@
 package org.jabref.model.entry;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Path;
@@ -9,10 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import javafx.beans.Observable;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -27,11 +26,10 @@ import org.jabref.model.util.FileHelper;
 public class LinkedFile implements Serializable {
 
     private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
-    private final StringProperty description = new SimpleStringProperty();
-    private final StringProperty link = new SimpleStringProperty();
-    private final StringProperty fileType = new SimpleStringProperty();
-    private final DoubleProperty downloadProgress = new SimpleDoubleProperty(-1);
-    private final BooleanProperty isAutomaticallyFound = new SimpleBooleanProperty(false);
+    //We have to mark these properties as transient because they can't be serialized directly
+    private transient StringProperty description = new SimpleStringProperty();
+    private transient StringProperty link = new SimpleStringProperty();
+    private transient StringProperty fileType = new SimpleStringProperty();
 
     public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
@@ -69,7 +67,7 @@ public class LinkedFile implements Serializable {
     }
 
     public Observable[] getObservables() {
-        return new Observable[] {this.downloadProgress, this.isAutomaticallyFound};
+        return new Observable[] {this.link, this.description, this.fileType};
     }
 
     @Override
@@ -78,31 +76,50 @@ public class LinkedFile implements Serializable {
             return true;
         }
         if (o instanceof LinkedFile) {
-
             LinkedFile that = (LinkedFile) o;
-
-            if (!this.description.equals(that.description)) {
-                return false;
-            }
-            if (!this.link.equals(that.link)) {
-                return false;
-            }
-            return this.fileType.equals(that.fileType);
+            return Objects.equals(description.get(), that.description.get())
+                    && Objects.equals(link.get(), that.link.get())
+                    && Objects.equals(fileType.get(), that.fileType.get());
         }
         return false;
     }
 
+    /**
+     * Writes serialized object to ObjectOutputStream, automatically called
+     * @param out {@link ObjectOutputStream}
+     * @throws IOException
+     */
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeUTF(getFileType());
+        out.writeUTF(getLink());
+        out.writeUTF(getDescription());
+        out.flush();
+
+    }
+
+    /**
+     * Reads serialized object from ObjectInputStreamm, automatically called
+     * @param in {@link ObjectInputStream}
+     * @throws IOException
+     */
+    private void readObject(ObjectInputStream in) throws IOException {
+        fileType = new SimpleStringProperty(in.readUTF());
+        link = new SimpleStringProperty(in.readUTF());
+        description = new SimpleStringProperty(in.readUTF());
+
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(description, link, fileType);
+        return Objects.hash(description.get(), link.get(), fileType.get());
     }
 
     @Override
     public String toString() {
         return "ParsedFileField{" +
-                "description='" + description + '\'' +
-                ", link='" + link + '\'' +
-                ", fileType='" + fileType + '\'' +
+                "description='" + description.get() + '\'' +
+                ", link='" + link.get() + '\'' +
+                ", fileType='" + fileType.get() + '\'' +
                 '}';
     }
 
