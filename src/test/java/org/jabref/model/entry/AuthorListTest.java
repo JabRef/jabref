@@ -7,6 +7,10 @@ import org.junit.Test;
 
 public class AuthorListTest {
 
+    public static int size(String bibtex) {
+        return AuthorList.parse(bibtex).getNumberOfAuthors();
+    }
+
     @Test
     public void testFixAuthorNatbib() {
         Assert.assertEquals("", AuthorList.fixAuthorNatbib(""));
@@ -284,10 +288,6 @@ public class AuthorListTest {
                 "Neumann, J. and Smith, J. and Black Brown, Jr., P.",
                 AuthorList
                         .fixAuthorForAlphabetization("John von Neumann and John Smith and de Black Brown, Jr., Peter"));
-    }
-
-    public static int size(String bibtex) {
-        return AuthorList.parse(bibtex).getNumberOfAuthors();
     }
 
     @Test
@@ -623,6 +623,25 @@ public class AuthorListTest {
     public void parseNameWithHyphenInLastName() throws Exception {
         Author expected = new Author("Firstname", "F.", null, "Bailey-Jones", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Firstname Bailey-Jones"));
+    }
+
+    @Test
+    public void parseNameWithHyphenInLastNameWithInitials() throws Exception {
+        Author expected = new Author("E. S.", "E. S.", null, "El-{M}allah", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("E. S. El-{M}allah"));
+    }
+
+    @Test
+    public void parseNameWithHyphenInLastNameWithEscaped() throws Exception {
+        Author expected = new Author("E. S.", "E. S.", null, "{K}ent-{B}oswell", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("E. S. {K}ent-{B}oswell"));
+    }
+
+    @Test
+    public void parseNameWithHyphenInLastNameWhenLastNameGivenFirst() throws Exception {
+        // TODO: Fix abbreviation to be "A."
+        Author expected = new Author("ʿAbdallāh", "ʿ.", null, "al-Ṣāliḥ", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("al-Ṣāliḥ, ʿAbdallāh"));
     }
 
     @Test
