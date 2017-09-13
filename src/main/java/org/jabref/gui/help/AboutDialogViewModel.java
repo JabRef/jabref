@@ -29,6 +29,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final String changelogUrl;
     private final String versionInfo;
+    private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
@@ -85,6 +86,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return authors.get();
     }
 
+    public String getVersionInfo() {
+        return versionInfo;
+    }
+
     public ReadOnlyStringProperty developersProperty() {
         return developers.getReadOnlyProperty();
     }
@@ -107,6 +112,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public String getLicense() {
         return license.get();
+    }
+
+    public String getEnvironmentInfo() {
+        return environmentInfo.get();
     }
 
     public void copyVersionToClipboard() {
