@@ -176,8 +176,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Cancel"));
 
             if (confirm) {
-                Path fileConflictCheck = pdfCleanup.fileAlreadyExists(linkedFile, entry);
-                if (fileConflictCheck == null) {
+                Optional<Path> fileConflictCheck = pdfCleanup.fileAlreadyExists(linkedFile, entry);
+                if (!fileConflictCheck.isPresent()) {
                     pdfCleanup.cleanup(entry);
                 } else {
                     confirm = dialogService.showConfirmationDialogAndWait(
@@ -186,7 +186,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                             Localization.lang("Overwrite"),
                             Localization.lang("Cancel"));
                     if (confirm) {
-                        FileUtil.renameFile(fileConflictCheck, file.get(), true);
+                        FileUtil.renameFile(fileConflictCheck.get(), file.get(), true);
                         pdfCleanup.cleanup(entry);
                     }
                 }
