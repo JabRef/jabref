@@ -107,7 +107,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public Observable[] getObservables() {
-        return new Observable[] {this.downloadProgress, this.isAutomaticallyFound};
+        return linkedFile.getObservables();
     }
 
     public void open() {
