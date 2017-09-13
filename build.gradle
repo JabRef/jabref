@@ -82,7 +82,7 @@ dependencies {
     compile 'org.openoffice:unoil:4.1.2'
 
     compile 'com.github.bkromhout:java-diff-utils:2.1.1'
-    compile 'info.debatty:java-string-similarity:0.24'
+    compile 'info.debatty:java-string-similarity:1.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
     compile 'org.antlr:antlr-runtime:3.5.2'
