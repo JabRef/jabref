@@ -249,7 +249,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             //panel.getUndoManager().addEdit(undo);
 
-            removeGroupsAndSubGroupsFromEntries(group);
+            // only remove explicit groups from the entries, keyword groups should not be deleted
+            if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
+                removeGroupsAndSubGroupsFromEntries(group);
+            }
             group.getGroupNode().removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
