@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 public class EntryLinkListTest {
 
     private static final String key = "test";
-    private static final CrossrefBib crossrefBib = new CrossrefBib();
+    private static final DatabaseFromFile crossrefBib = new DatabaseFromFile("src/test/resources/testbib/crossref.bib");
 
     private BibDatabase database;
     private List<ParsedEntryLink> links;
@@ -76,7 +76,7 @@ public class EntryLinkListTest {
     }
 
     @Test
-    public void givenCrossrefBibWhenImportingCrossBibThenExpectCrossref() throws IOException {
+    public void givenCrossrefBibWhenImportingCrossBibThenSourceCrossrefsTarget() throws IOException {
         target = crossrefBib.getEntryByKeyOrNew("DBLP:conf/wicsa/2015");
         source = crossrefBib.getEntryByKeyOrNew("DBLP:conf/wicsa/ZimmermannWKG15");
         assertSourceCrossrefsTarget();
@@ -135,20 +135,21 @@ class BibEntryBuild {
     }
 }
 
-class CrossrefBib {
+class DatabaseFromFile {
 
     private static final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    private static final Path pathToCrossrefBib = Paths.get("src/test/resources/testbib/crossref.bib");
 
-    private static BibDatabase database;
+    private final Path pathToFile;
+    private BibDatabase database;
 
-    CrossrefBib() {
+    DatabaseFromFile(String pathToFile) {
+        this.pathToFile = Paths.get(pathToFile);
         setDatabaseOrThrowRuntimeException();
     }
 
     private void setDatabaseOrThrowRuntimeException() {
         try {
-            database = readDatabase(pathToCrossrefBib);
+            database = readDatabase(pathToFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
