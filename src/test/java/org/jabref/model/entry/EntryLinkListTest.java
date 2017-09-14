@@ -17,12 +17,23 @@ public class EntryLinkListTest {
     private BibDatabase database;
     private List<ParsedEntryLink> links;
     private ParsedEntryLink link;
+    private BibEntry source;
+    private BibEntry target;
 
     @Before
     public void before() {
         database = new BibDatabase();
         links = EntryLinkList.parse(key, database);
         link = links.get(0);
+        source = create("source");
+        target = create("target");
+    }
+
+    private BibEntry create(String citeKey) {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey(citeKey);
+        database.insertEntry(entry);
+        return entry;
     }
 
     @Test
@@ -54,8 +65,7 @@ public class EntryLinkListTest {
 
     @Test
     public void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
-        BibEntry target = BibEntryBuild.ing().withId("target").withCiteKey("target").now();
-        BibEntry source = BibEntryBuild.ing().withId("source").withCiteKey("source").crossref(target).now();
+        source.setField(FieldName.CROSSREF, "target");
         assertSourceCrossrefsTarget(target, source);
     }
 
@@ -63,44 +73,5 @@ public class EntryLinkListTest {
         Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
         Optional<String> targetCiteKey = target.getCiteKeyOptional();
         assertEquals(sourceCrossref, targetCiteKey);
-    }
-}
-
-class BibEntryBuild {
-
-    private String id;
-    private String citeKey;
-    private String crossref = "";
-
-    static BibEntryBuild ing() {
-        return new BibEntryBuild();
-    }
-
-    BibEntryBuild withId(String id) {
-        this.id = id;
-        return this;
-    }
-
-    BibEntryBuild withCiteKey(String citeKey) {
-        this.citeKey = citeKey;
-        return this;
-    }
-
-    BibEntryBuild crossref(BibEntry target) {
-        this.crossref =  getCitekeyOf(target);
-        return this;
-    }
-
-    private String getCitekeyOf(BibEntry target) {
-        return target.getCiteKeyOptional().orElseThrow(() -> new RuntimeException("No citekey set"));
-    }
-
-    BibEntry now() {
-        assert id != null;
-        BibEntry bibEntry = new BibEntry(id);
-        assert citeKey != null;
-        bibEntry.setCiteKey(citeKey);
-        bibEntry.setField(FieldName.CROSSREF, crossref);
-        return bibEntry;
     }
 }
