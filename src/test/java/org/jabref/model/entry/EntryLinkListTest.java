@@ -83,17 +83,9 @@ public class EntryLinkListTest {
     }
 
     private void assertSourceCrossrefsTarget() {
-        boolean crossrefs = false;
         Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
         Optional<String> targetCiteKey = target.getCiteKeyOptional();
         assertEquals(sourceCrossref, targetCiteKey);
-        if (sourceCrossref.isPresent()
-                && targetCiteKey.isPresent()) {
-            String actualcrossrefValue = sourceCrossref.get();
-            String expectedCrossrefValue = targetCiteKey.get();
-            crossrefs = actualcrossrefValue.contains(expectedCrossrefValue);
-        }
-        assertTrue(crossrefs);
     }
 }
 
