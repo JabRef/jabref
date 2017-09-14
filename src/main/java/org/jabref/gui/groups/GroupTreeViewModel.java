@@ -250,7 +250,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //panel.getUndoManager().addEdit(undo);
 
             removeGroupsAndSubGroupsFromEntries(group);
-            
+
             group.getGroupNode().removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
@@ -258,11 +258,11 @@ public class GroupTreeViewModel extends AbstractViewModel {
         }
     }
 
-    private void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
+    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
         for (GroupNodeViewModel child: group.getChildren()) {
             removeGroupsAndSubGroupsFromEntries(child);
         }
-        
+
         // only remove explicit groups from the entries, keyword groups should not be deleted
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
             List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
