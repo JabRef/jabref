@@ -75,13 +75,6 @@ public class EntryLinkListTest {
         assertSourceCrossrefsTarget();
     }
 
-    @Test
-    public void givenCrossrefBibWhenImportingCrossBibThenSourceCrossrefsTarget() throws IOException {
-        target = crossrefBib.getEntryByKeyOrNew("DBLP:conf/wicsa/2015");
-        source = crossrefBib.getEntryByKeyOrNew("DBLP:conf/wicsa/ZimmermannWKG15");
-        assertSourceCrossrefsTarget();
-    }
-
     private void assertSourceCrossrefsTarget() {
         Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
         Optional<String> targetCiteKey = target.getCiteKeyOptional();
