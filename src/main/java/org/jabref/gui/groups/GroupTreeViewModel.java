@@ -27,6 +27,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
@@ -248,10 +249,24 @@ public class GroupTreeViewModel extends AbstractViewModel {
             //final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
             //panel.getUndoManager().addEdit(undo);
 
+            removeGroupsAndSubGroupsFromEntries(group);
+
             group.getGroupNode().removeFromParent();
 
             dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
             writeGroupChangesToMetaData();
+        }
+    }
+
+    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
+        for (GroupNodeViewModel child: group.getChildren()) {
+            removeGroupsAndSubGroupsFromEntries(child);
+        }
+
+        // only remove explicit groups from the entries, keyword groups should not be deleted
+        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
+            List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+            group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
         }
     }
 

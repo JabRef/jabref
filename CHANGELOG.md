@@ -38,6 +38,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where the arrow keys in the search bar did not work as expected [#3081](https://github.com/JabRef/jabref/issues/3081)
 - We fixed wrong hotkey being displayed at "automatically file links" in the entry editor
 - We fixed an issue where metadata syncing with local and shared database were unstable. It will also fix syncing groups and sub-groups in database. [#2284](https://github.com/JabRef/jabref/issues/2284)
+- We fixed an issue where the "Remove group and subgroups" operation did not remove group information from entries in the group [#3190](https://github.com/JabRef/jabref/issues/3190)
 - We fixed an issue where it was possible to leave the entry editor with an imbalance of braces. [#3167](https://github.com/JabRef/jabref/issues/3167)
 - Renaming files now truncates the filename to not exceed the limit of 255 chars [#2622](https://github.com/JabRef/jabref/issues/2622)
 - We improved the handling of hyphens in names. [#2775](https://github.com/JabRef/jabref/issues/2775)
