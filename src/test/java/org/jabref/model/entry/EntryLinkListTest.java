@@ -1,44 +1,28 @@
 package org.jabref.model.entry;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 public class EntryLinkListTest {
 
     private static final String key = "test";
-    private static final DatabaseFromFile crossrefBib = new DatabaseFromFile("src/test/resources/testbib/crossref.bib");
 
     private BibDatabase database;
     private List<ParsedEntryLink> links;
     private ParsedEntryLink link;
-    private BibEntry target;
-    private BibEntry source;
 
     @Before
     public void before() {
         database = new BibDatabase();
         links = EntryLinkList.parse(key, database);
         link = links.get(0);
-        target = null;
-        source = null;
     }
 
     @Test
@@ -70,12 +54,12 @@ public class EntryLinkListTest {
 
     @Test
     public void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
-        target = BibEntryBuild.ing().withId("target").withCiteKey("target").now();
-        source = BibEntryBuild.ing().withId("source").withCiteKey("source").crossref(target).now();
-        assertSourceCrossrefsTarget();
+        BibEntry target = BibEntryBuild.ing().withId("target").withCiteKey("target").now();
+        BibEntry source = BibEntryBuild.ing().withId("source").withCiteKey("source").crossref(target).now();
+        assertSourceCrossrefsTarget(target, source);
     }
 
-    private void assertSourceCrossrefsTarget() {
+    private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
         Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
         Optional<String> targetCiteKey = target.getCiteKeyOptional();
         assertEquals(sourceCrossref, targetCiteKey);
@@ -118,37 +102,5 @@ class BibEntryBuild {
         bibEntry.setCiteKey(citeKey);
         bibEntry.setField(FieldName.CROSSREF, crossref);
         return bibEntry;
-    }
-}
-
-class DatabaseFromFile {
-
-    private static final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-
-    private final Path pathToFile;
-    private BibDatabase database;
-
-    DatabaseFromFile(String pathToFile) {
-        this.pathToFile = Paths.get(pathToFile);
-        setDatabaseOrThrowRuntimeException();
-    }
-
-    private void setDatabaseOrThrowRuntimeException() {
-        try {
-            database = readDatabase(pathToFile);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private BibDatabase readDatabase(Path path) throws IOException  {
-        Reader readFromPath = Importer.getReader(path, StandardCharsets.UTF_8);
-        ParserResult parsedResult = new BibtexParser(importFormatPreferences).parse(readFromPath);
-        return parsedResult.getDatabase();
-    }
-
-    BibEntry getEntryByKeyOrNew(String key) {
-        Optional<BibEntry> optional = database.getEntryByKey(key);
-        return optional.orElse(new BibEntry());
     }
 }
