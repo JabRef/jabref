@@ -1,10 +1,13 @@
 package org.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
+import org.jabref.Globals;
 import org.jabref.gui.EntryTypeDialog;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.JabRefFrame;
@@ -58,6 +61,8 @@ public class NewEntryAction extends MnemonicAwareAction {
                 return;
             }
             thisType = tp.getName();
+
+            trackNewEntry(tp);
         }
 
         if (jabRefFrame.getBasePanelCount() > 0) {
@@ -67,5 +72,13 @@ public class NewEntryAction extends MnemonicAwareAction {
         } else {
             LOGGER.info("Action 'New entry' must be disabled when no database is open.");
         }
+    }
+
+    private void trackNewEntry(EntryType type) {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("EntryType", type.getName());
+        Map<String, Double> measurements = new HashMap<>();
+
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("NewEntry", properties, measurements));
     }
 }
