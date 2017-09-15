@@ -168,13 +168,13 @@ public class RenamePdfCleanup implements CleanupJob {
     */
     public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry) {
         String targetFileName = getTargetFileName(flEntry, entry);
-        Optional<Path> matchedByDiffCase = null;
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = flEntry.findIn(databaseContext,
                 fileDirectoryPreferences).get().getParent().resolve(targetFileName);
         Path oldFilePath = flEntry.findIn(databaseContext, fileDirectoryPreferences).get();
         //Check if file already exists in directory with different case.
         //This is necessary because other entries may have such a file.
+        Optional<Path> matchedByDiffCase = null;
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream
                     .filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
