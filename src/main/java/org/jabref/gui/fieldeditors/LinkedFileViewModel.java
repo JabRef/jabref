@@ -176,25 +176,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Cancel"));
 
             if (confirm) {
-                Optional<Path> fileConflictCheck = pdfCleanup.fileAlreadyExists(linkedFile, entry);
-                if (!fileConflictCheck.isPresent()) {
-                    pdfCleanup.cleanup(entry);
-                } else {
-                    confirm = dialogService.showConfirmationDialogAndWait(
-                            Localization.lang("File exists"),
-                            Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                            Localization.lang("Overwrite"),
-                            Localization.lang("Cancel"));
-                    if (confirm) {
-                        FileUtil.renameFile(fileConflictCheck.get(), file.get(), true);
-                        pdfCleanup.cleanup(entry);
-                    }
-                }
+                Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
+                performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
             }
         } else {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        }
+    }
+
+    private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
+        boolean confirm;
+        if (!fileConflictCheck.isPresent()) {
+            pdfCleanup.cleanup(entry);
+        } else {
+            confirm = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("File exists"),
+                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Overwrite"),
+                    Localization.lang("Cancel"));
+            if (confirm) {
+                FileUtil.renameFile(fileConflictCheck.get(), file.get(), true);
+                pdfCleanup.cleanup(entry);
+            }
         }
     }
 
