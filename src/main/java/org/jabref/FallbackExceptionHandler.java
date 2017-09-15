@@ -1,16 +1,14 @@
 package org.jabref;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Catch and log any unhandled exceptions.
  */
 public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    private static final Marker UncaughtException_MARKER = MarkerManager.getMarker("UncaughtException");
+    private static final Log LOGGER = LogFactory.getLog(FallbackExceptionHandler.class);
 
     public static void installExceptionHandler() {
         Thread.setDefaultUncaughtExceptionHandler(new FallbackExceptionHandler());
@@ -18,7 +16,6 @@ public class FallbackExceptionHandler implements Thread.UncaughtExceptionHandler
 
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
-        Logger logger = LogManager.getLogger(FallbackExceptionHandler.class);
-        logger.error(UncaughtException_MARKER, "Uncaught exception Occurred in " + thread, exception);
+        LOGGER.error("Uncaught exception occurred in " + thread, exception);
     }
 }
