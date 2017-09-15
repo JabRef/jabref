@@ -174,7 +174,7 @@ public class RenamePdfCleanup implements CleanupJob {
         Path oldFilePath = flEntry.findIn(databaseContext, fileDirectoryPreferences).get();
         //Check if file already exists in directory with different case.
         //This is necessary because other entries may have such a file.
-        Optional<Path> matchedByDiffCase = null;
+        Optional<Path> matchedByDiffCase = Optional.empty();
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream
                     .filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
