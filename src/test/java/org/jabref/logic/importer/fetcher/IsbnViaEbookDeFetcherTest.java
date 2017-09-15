@@ -65,12 +65,12 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField("title", "Fundamentals of Business Process Management");
         bibEntry.setField("publisher", "Springer");
         bibEntry.setField("year", "2015");
-        bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo");
+        bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
         bibEntry.setField("date", "2015-04-12");
         bibEntry.setField("ean", "9783642434730");
         bibEntry.setField("isbn", "3642434738");
         bibEntry.setField("pagetotal", "428");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/23955263/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_reijers_fundamentals_of_business_process_management.html");
+        bibEntry.setField("url", "http://www.ebook.de/de/product/23955263/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3642434738");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
