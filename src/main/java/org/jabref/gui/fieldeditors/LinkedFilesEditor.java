@@ -16,7 +16,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
@@ -149,7 +148,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
-        Text text = new Text(linkedFile.getLink());
+        Text link = new Text(linkedFile.getLink());
         Text desc = new Text(linkedFile.getDescription());
 
         ProgressBar progressIndicator = new ProgressBar();
@@ -164,8 +163,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        Separator separator = new Separator();
-        container.getChildren().addAll(icon, text, separator, desc, progressIndicator, acceptAutoLinkedFile);
+
+        container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile);
+
         return container;
     }
 

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 public class FileFieldWriter {
 
-    FileFieldWriter() {
+    private FileFieldWriter() {
     }
 
     public static String getStringRepresentation(List<LinkedFile> fields) {
