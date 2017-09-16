@@ -28,6 +28,7 @@ import org.jabref.gui.filelist.FileListEntryEditor;
 import org.jabref.logic.cleanup.MoveFilesCleanup;
 import org.jabref.logic.cleanup.RenamePdfCleanup;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -175,12 +176,30 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Cancel"));
 
             if (confirm) {
-                pdfCleanup.cleanup(entry);
+                Optional<Path> fileConflictCheck = pdfCleanup.findExistingFile(linkedFile, entry);
+                performRenameWithConflictCheck(file, pdfCleanup, targetFileName, fileConflictCheck);
             }
         } else {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("File not found"),
                     Localization.lang("Could not find file '%0'.", linkedFile.getLink()));
+        }
+    }
+
+    private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
+        boolean confirm;
+        if (!fileConflictCheck.isPresent()) {
+            pdfCleanup.cleanup(entry);
+        } else {
+            confirm = dialogService.showConfirmationDialogAndWait(
+                    Localization.lang("File exists"),
+                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
+                    Localization.lang("Overwrite"),
+                    Localization.lang("Cancel"));
+            if (confirm) {
+                FileUtil.renameFile(fileConflictCheck.get(), file.get(), true);
+                pdfCleanup.cleanup(entry);
+            }
         }
     }
 
