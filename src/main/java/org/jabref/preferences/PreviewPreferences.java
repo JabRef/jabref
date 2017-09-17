@@ -12,9 +12,9 @@ public class PreviewPreferences {
     private final String previewStyleDefault;
 
 
-    public PreviewPreferences(List<String> previewCycle, int previeCyclePosition, int previewPanelHeight, boolean previewPanelEnabled, String previewStyle, String previewStyleDefault) {
+    public PreviewPreferences(List<String> previewCycle, int previewCyclePosition, int previewPanelHeight, boolean previewPanelEnabled, String previewStyle, String previewStyleDefault) {
         this.previewCycle = previewCycle;
-        this.previewCyclePosition = previeCyclePosition;
+        this.previewCyclePosition = previewCyclePosition;
         this.previewPanelHeight = previewPanelHeight;
         this.previewPanelEnabled = previewPanelEnabled;
         this.previewStyle = previewStyle;
@@ -51,7 +51,7 @@ public class PreviewPreferences {
 
     public static class Builder {
         private List<String> previewCycle;
-        private int previeCyclePosition;
+        private int previewCyclePosition;
         private int previewPanelHeight;
         private boolean previewPanelEnabled;
         private String previewStyle;
@@ -60,7 +60,7 @@ public class PreviewPreferences {
 
         public Builder(PreviewPreferences previewPreferences) {
             this.previewCycle = previewPreferences.getPreviewCycle();
-            this.previeCyclePosition = previewPreferences.getPreviewCyclePosition();
+            this.previewCyclePosition = previewPreferences.getPreviewCyclePosition();
             this.previewPanelHeight = previewPreferences.getPreviewPanelHeight();
             this.previewPanelEnabled = previewPreferences.isPreviewPanelEnabled();
             this.previewStyle = previewPreferences.getPreviewStyle();
@@ -69,15 +69,15 @@ public class PreviewPreferences {
 
         public Builder withPreviewCycle(List<String> previewCycle) {
             this.previewCycle = previewCycle;
-            return withPreviewCyclePosition(previeCyclePosition);
+            return withPreviewCyclePosition(previewCyclePosition);
         }
 
         public Builder withPreviewCyclePosition(int position) {
-            previeCyclePosition = position;
-            while (previeCyclePosition < 0) {
-                previeCyclePosition += previewCycle.size();
+            previewCyclePosition = position;
+            while (previewCyclePosition < 0) {
+                previewCyclePosition += previewCycle.size();
             }
-            previeCyclePosition %= previewCycle.size();
+            previewCyclePosition %= previewCycle.size();
             return this;
         }
 
@@ -97,7 +97,7 @@ public class PreviewPreferences {
         }
 
         public PreviewPreferences build() {
-            return new PreviewPreferences(previewCycle, previeCyclePosition, previewPanelHeight, previewPanelEnabled, previewStyle, previewStyleDefault);
+            return new PreviewPreferences(previewCycle, previewCyclePosition, previewPanelHeight, previewPanelEnabled, previewStyle, previewStyleDefault);
         }
     }
 
