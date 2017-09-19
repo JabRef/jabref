@@ -55,7 +55,6 @@ public class LinkedFile implements Serializable {
 
     public void setDescription(String description) {
         this.description.setValue(description);
-
     }
 
     public String getLink() {
@@ -94,7 +93,6 @@ public class LinkedFile implements Serializable {
         out.writeUTF(getLink());
         out.writeUTF(getDescription());
         out.flush();
-
     }
 
     /**
@@ -106,7 +104,6 @@ public class LinkedFile implements Serializable {
         fileType = new SimpleStringProperty(in.readUTF());
         link = new SimpleStringProperty(in.readUTF());
         description = new SimpleStringProperty(in.readUTF());
-
     }
 
     @Override

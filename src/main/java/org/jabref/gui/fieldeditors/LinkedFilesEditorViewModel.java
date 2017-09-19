@@ -69,7 +69,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 text,
                 LinkedFilesEditorViewModel::getStringRepresentation,
                 this::parseToFileViewModel);
-
     }
 
     private static String getStringRepresentation(List<LinkedFileViewModel> files) {
