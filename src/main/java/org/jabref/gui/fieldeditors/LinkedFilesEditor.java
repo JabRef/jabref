@@ -164,7 +164,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile);
+        if (desc.getText().isEmpty()) {
+            container.getChildren().addAll(icon, link, progressIndicator, acceptAutoLinkedFile);
+        } else {
+            container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile);
+        }
 
         return container;
     }
