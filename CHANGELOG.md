@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added reordering of file and link entries in the `General`-Tab [3165, comment](https://github.com/JabRef/jabref/issues/3165#issuecomment-326269715)
 - We added autcompletion for the `crossref` field on basis of the BibTeX-key. To accept such an autcompleted key as new entry-link, you have to press <kbd>Enter</kbd> two times, otherwise the field data is not stored in the library file.[koppor#257](https://github.com/koppor/jabref/issues/257)
 - We added drag and drop support for adding files directly in the `General`-Tab. The dragged files are currently only linked from their existing directory. For more advanced features use the `Add files` dialog. [#koppor#244](https://github.com/koppor/jabref/issues/244)
+- We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
 
 ### Fixed
 
@@ -43,7 +44,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We fixed an issue where it was possible to leave the entry editor with an imbalance of braces. [#3167](https://github.com/JabRef/jabref/issues/3167)
 - Renaming files now truncates the filename to not exceed the limit of 255 chars [#2622](https://github.com/JabRef/jabref/issues/2622)
 - We improved the handling of hyphens in names. [#2775](https://github.com/JabRef/jabref/issues/2775)
-
+- We fixed an issue where an entered file description was not written to the bib-file [#3208](https://github.com/JabRef/jabref/issues/3208)
 ### Removed
 - We removed support for LatexEditor, as it is not under active development. [#3199](https://github.com/JabRef/jabref/issues/3199)
 

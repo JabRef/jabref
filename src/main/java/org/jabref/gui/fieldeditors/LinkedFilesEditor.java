@@ -148,7 +148,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
         Text icon = MaterialDesignIconFactory.get().createIcon(linkedFile.getTypeIcon());
-        Text text = new Text(linkedFile.getLink());
+        Text link = new Text(linkedFile.getLink());
+        Text desc = new Text(linkedFile.getDescription());
+
         ProgressBar progressIndicator = new ProgressBar();
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
@@ -161,7 +163,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-        container.getChildren().addAll(icon, text, progressIndicator, acceptAutoLinkedFile);
+
+        container.getChildren().addAll(icon, desc, link, progressIndicator, acceptAutoLinkedFile);
+
         return container;
     }
 

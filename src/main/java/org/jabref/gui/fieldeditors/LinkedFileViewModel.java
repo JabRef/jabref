@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,7 +110,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public Observable[] getObservables() {
-        return new Observable[] {this.downloadProgress, this.isAutomaticallyFound};
+        List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
+        observables.add(downloadOngoing);
+        observables.add(downloadProgress);
+        observables.add(isAutomaticallyFound);
+        return observables.toArray(new Observable[observables.size()]);
     }
 
     public void open() {
