@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -157,5 +158,30 @@ public class RenamePdfCleanup implements CleanupJob {
 
     public int getUnsuccessfulRenames() {
         return unsuccessfulRenames;
+    }
+
+    /**
+    * Check to see if a file already exists in the target directory.  Search is not case sensitive.
+    * @param flEntry
+    * @param entry
+    * @return First identified path that matches an existing file.  This name can be used in subsequent calls to override the existing file.
+    */
+    public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry) {
+        String targetFileName = getTargetFileName(flEntry, entry);
+        // The .get() is legal without check because the method will always return a value.
+        Path targetFilePath = flEntry.findIn(databaseContext,
+                fileDirectoryPreferences).get().getParent().resolve(targetFileName);
+        Path oldFilePath = flEntry.findIn(databaseContext, fileDirectoryPreferences).get();
+        //Check if file already exists in directory with different case.
+        //This is necessary because other entries may have such a file.
+        Optional<Path> matchedByDiffCase = Optional.empty();
+        try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
+            matchedByDiffCase = stream
+                    .filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
+                    .findFirst();
+        } catch (IOException e) {
+            LOGGER.error("Could not get the list of files in target directory", e);
+        }
+        return matchedByDiffCase;
     }
 }
