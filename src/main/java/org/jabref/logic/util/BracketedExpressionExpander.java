@@ -13,6 +13,7 @@ import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.cleanup.Formatter;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.FieldName;
@@ -46,6 +47,11 @@ public class BracketedExpressionExpander {
     }
 
     public String expandBrackets(String pattern) {
+        BibDatabase null_database = null;
+        return expandBrackets(pattern, null_database);
+    }
+
+    public String expandBrackets(String pattern, BibDatabase database) {
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
@@ -67,10 +73,10 @@ public class BracketedExpressionExpander {
                     // check whether there is a modifier on the end such as
                     // ":lower":
                     if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(bibentry,token,keywordDelimiter));
+                        sb.append(getFieldValue(bibentry, token, keywordDelimiter, database));
                     } else {
                         // apply modifiers:
-                        String fieldValue = getFieldValue(bibentry,fieldParts.get(0),keywordDelimiter);
+                        String fieldValue = getFieldValue(bibentry, fieldParts.get(0), keywordDelimiter, database);
                         sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                     // Fetch and discard the closing ']'
@@ -87,7 +93,7 @@ public class BracketedExpressionExpander {
         return sb.toString();
     }
 
-    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter) {
+    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
