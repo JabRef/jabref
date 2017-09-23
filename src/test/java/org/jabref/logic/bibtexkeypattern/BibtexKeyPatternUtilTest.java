@@ -595,16 +595,17 @@ public class BibtexKeyPatternUtilTest {
         BibtexKeyPatternUtil.firstPage(null);
     }
 
+    @Test
     public void testPagePrefix() {
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7--27"));
-        assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L--27"));
+        assertEquals("L--", BibtexKeyPatternUtil.pagePrefix("L--27"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L42--111"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L7,L41,L73--97"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L41,L7,L73--97"));
         assertEquals("L", BibtexKeyPatternUtil.pagePrefix("L43+"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("7--27"));
-        assertEquals("", BibtexKeyPatternUtil.pagePrefix("--27"));
+        assertEquals("--", BibtexKeyPatternUtil.pagePrefix("--27"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix(""));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("42--111"));
         assertEquals("", BibtexKeyPatternUtil.pagePrefix("7,41,73--97"));
@@ -674,20 +675,20 @@ public class BibtexKeyPatternUtilTest {
     public void shortTitle() {
         // shortTitle is getTitleWords with "3" as count
         int count = 3;
-        assertEquals("applicationmigrationeffort",
+        assertEquals("application migration effort",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPELconformancein", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("BPEL conformance in", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("ProcessViewingPatterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
-        assertEquals("BPMNConformancein",
+        assertEquals("Process Viewing Patterns", BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED));
+        assertEquals("BPMN Conformance in",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("TheDifferenceBetween", BibtexKeyPatternUtil.getTitleWords(count,
+        assertEquals("The Difference Between", BibtexKeyPatternUtil.getTitleWords(count,
                 TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("CloudComputingThe",
+        assertEquals("Cloud Computing: The",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("TowardsChoreographybased",
+        assertEquals("Towards Choreography based",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("OntheMeasurement",
+        assertEquals("On the Measurement",
                 BibtexKeyPatternUtil.getTitleWords(count, TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
     }
 
@@ -808,7 +809,7 @@ public class BibtexKeyPatternUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField("title", "Green Scheduling of Whatever");
         assertEquals("GSo", BibtexKeyPatternUtil.makeLabel(entry, "shorttitleINI", ',', new BibDatabase()));
-        assertEquals("GreenSchedulingof", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
+        assertEquals("Green Scheduling of", BibtexKeyPatternUtil.makeLabel(entry, "shorttitle",
                 ',', new BibDatabase()));
     }
 

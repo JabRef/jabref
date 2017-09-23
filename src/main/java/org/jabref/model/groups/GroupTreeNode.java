@@ -181,6 +181,16 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return groups;
     }
 
+    public List<BibEntry> getEntriesInGroup(List<BibEntry> entries) {
+        List<BibEntry> result = new ArrayList<>();
+        for (BibEntry entry: entries) {
+            if (this.group.contains(entry)) {
+                result.add(entry);
+            }
+        }
+        return result;
+    }
+
     public String getName() {
         return group.getName();
     }

@@ -6,24 +6,28 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.component.TagBar;
+import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.ParsedEntryLink;
 
 public class LinkedEntriesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private LinkedEntriesEditorViewModel viewModel;
+    @FXML private final LinkedEntriesEditorViewModel viewModel;
     @FXML private TagBar<ParsedEntryLink> linkedEntriesBar;
 
-    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider) {
-        this.viewModel = new LinkedEntriesEditorViewModel(fieldName, suggestionProvider, databaseContext);
+    public LinkedEntriesEditor(String fieldName, BibDatabaseContext databaseContext, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+        this.viewModel = new LinkedEntriesEditorViewModel(fieldName, suggestionProvider, databaseContext, fieldCheckers);
 
         ControlHelper.loadFXMLForControl(this);
 
         linkedEntriesBar.setStringConverter(viewModel.getStringConverter());
         linkedEntriesBar.setOnTagClicked((parsedEntryLink, mouseEvent) -> viewModel.jumpToEntry(parsedEntryLink));
+
+        AutoCompletionTextInputBinding.autoComplete(linkedEntriesBar.getInputTextField(), viewModel::complete, viewModel.getStringConverter());
         Bindings.bindContentBidirectional(linkedEntriesBar.tagsProperty(), viewModel.linkedEntriesProperty());
     }
 

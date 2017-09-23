@@ -10,8 +10,10 @@ import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
+import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
@@ -147,6 +149,20 @@ public class GroupNodeViewModelTest {
         groupAViewModel.draggedOn(groupCViewModel, DroppingMouseLocation.TOP);
 
         assertEquals(Arrays.asList(groupBViewModel, groupAViewModel, groupCViewModel), rootViewModel.getChildren());
+    }
+
+    @Test
+    public void entriesAreAddedCorrectly() {;
+        String groupName = "group";
+        ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT,',');
+        BibEntry entry = new BibEntry();
+        databaseContext.getDatabase().insertEntry(entry);
+
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group);
+        model.addEntriesToGroup(databaseContext.getEntries());
+
+        assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
+        assertEquals(groupName, entry.getField(FieldName.GROUPS).get());
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {

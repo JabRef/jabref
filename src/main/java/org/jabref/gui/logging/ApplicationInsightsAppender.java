@@ -39,6 +39,7 @@ public class ApplicationInsightsAppender extends AbstractAppender {
         Telemetry telemetry;
         if (event.isException()) {
             ExceptionTelemetry exceptionTelemetry = new ExceptionTelemetry(event.getException());
+            exceptionTelemetry.getProperties().put("Message", rawEvent.getMessage().getFormattedMessage());
             exceptionTelemetry.setSeverityLevel(event.getNormalizedSeverityLevel());
             telemetry = exceptionTelemetry;
         } else {
@@ -48,6 +49,6 @@ public class ApplicationInsightsAppender extends AbstractAppender {
         }
         telemetry.getContext().getProperties().putAll(event.getCustomParameters());
 
-        Globals.getTelemetryClient().track(telemetry);
+        Globals.getTelemetryClient().ifPresent(client -> client.track(telemetry));
     }
 }

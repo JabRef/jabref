@@ -6,16 +6,21 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.swing.undo.UndoManager;
+
+import javafx.beans.property.BooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.Globals;
+import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialogService;
 import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.bibtex.LatexFieldFormatter;
@@ -23,13 +28,10 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.model.entry.event.EntryChangedEvent;
 
-import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fxmisc.easybind.EasyBind;
@@ -41,20 +43,33 @@ public class SourceTab extends EntryEditorTab {
     private static final Log LOGGER = LogFactory.getLog(SourceTab.class);
     private final BibDatabaseMode mode;
     private final BibEntry entry;
+    private final BasePanel panel;
     private CodeArea codeArea;
+    private BooleanProperty movingToDifferentEntry;
+    private UndoManager undoManager;
 
-    public SourceTab(BibDatabaseContext context, BibEntry entry) {
-        this.mode = context.getMode();
+    public SourceTab(BasePanel panel, BibEntry entry, BooleanProperty movingToDifferentEntry) {
+        this.mode = panel.getBibDatabaseContext().getMode();
         this.entry = entry;
-        context.getDatabase().registerListener(this);
+        this.panel = panel;
+        this.movingToDifferentEntry = movingToDifferentEntry;
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
+        this.undoManager = panel.getUndoManager();
     }
 
-    @Subscribe
-    public void listen(EntryChangedEvent event) {
-        if (codeArea != null && this.entry.equals(event.getBibEntry())) {
+    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
+        StringWriter stringWriter = new StringWriter(200);
+        LatexFieldFormatter formatter = LatexFieldFormatter
+                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
+        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
+
+        return stringWriter.getBuffer().toString();
+    }
+
+    public void updateSourcePane() {
+        if (codeArea != null) {
             try {
                 codeArea.clear();
                 codeArea.appendText(getSourceString(entry, mode));
@@ -67,22 +82,22 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
-        StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
-
-        return stringWriter.getBuffer().toString();
-    }
-
     private Node createSourceEditor(BibEntry entry, BibDatabaseMode mode) {
         codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        //codeArea.(Font.font("Monospaced", Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        codeArea.lookup(".styled-text-area").setStyle(
+                "-fx-font-size: " + Globals.prefs.getFontSizeFX() + "pt;");
+        // store source if new tab is selected (if this one is not focused anymore)
         EasyBind.subscribe(codeArea.focusedProperty(), focused -> {
             if (!focused) {
                 storeSource();
+            }
+        });
+
+        // store source if new entry is selected in the maintable and the source tab is focused
+        EasyBind.subscribe(movingToDifferentEntry, newEntrySelected -> {
+            if (newEntrySelected && codeArea.focusedProperty().get()) {
+                DefaultTaskExecutor.runInJavaFXThread(() -> storeSource());
             }
         });
 
@@ -95,6 +110,13 @@ public class SourceTab extends EntryEditorTab {
             codeArea.setEditable(false);
             LOGGER.debug("Incorrect entry", ex);
         }
+
+        // set the database to dirty when something is changed in the source tab
+        EasyBind.subscribe(codeArea.beingUpdatedProperty(), updated -> {
+            if (updated) {
+                panel.markBaseChanged();
+            }
+        });
 
         return new VirtualizedScrollPane<>(codeArea);
     }
@@ -135,8 +157,6 @@ public class SourceTab extends EntryEditorTab {
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
-            boolean entryChanged = false;
-            boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
             if (newKey != null) {
                 entry.setCiteKey(newKey);
@@ -153,7 +173,6 @@ public class SourceTab extends EntryEditorTab {
                     compound.addEdit(
                             new UndoableFieldChange(entry, fieldName, fieldValue, null));
                     entry.clearField(fieldName);
-                    entryChanged = true;
                 }
             }
 
@@ -169,7 +188,6 @@ public class SourceTab extends EntryEditorTab {
 
                     compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
                     entry.setField(fieldName, newValue);
-                    entryChanged = true;
                 }
             }
 
@@ -177,23 +195,10 @@ public class SourceTab extends EntryEditorTab {
             if (!Objects.equals(newEntry.getType(), entry.getType())) {
                 compound.addEdit(new UndoableChangeType(entry, entry.getType(), newEntry.getType()));
                 entry.setType(newEntry.getType());
-                entryChanged = true;
             }
             compound.end();
+            undoManager.addEdit(compound);
 
-            // TODO: Add undo
-            //panel.getUndoManager().addEdit(compound);
-
-            // TODO: Warn about duplicate/empty bibtext key
-            /*
-            if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
-                warnDuplicateBibtexkey();
-            } else if (emptyWarning) {
-                warnEmptyBibtexkey();
-            } else {
-                panel.output(Localization.lang("Stored entry") + '.');
-            }
-            */
         } catch (InvalidFieldValueException | IOException ex) {
             // The source couldn't be parsed, so the user is given an
             // error message, and the choice to keep or revert the contents

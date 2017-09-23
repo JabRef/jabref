@@ -32,25 +32,6 @@ public class AuthorListParser {
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = new HashSet<>();
 
-    /** the raw bibtex author/editor field */
-    private String original;
-
-    /** index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2 */
-    private int tokenStart;
-
-    /** index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5 */
-    private int tokenEnd;
-
-    /** end of token abbreviation (always: tokenStart < tokenAbbr <= tokenEnd), only valid if getToken returns TOKEN_WORD */
-    private int tokenAbbr;
-
-
-    /** either space of dash */
-    private char tokenTerm;
-
-    /** true if upper-case token, false if lower-case */
-    private boolean tokenCase;
-
     static {
         TEX_NAMES.add("aa");
         TEX_NAMES.add("ae");
@@ -65,6 +46,32 @@ public class AuthorListParser {
         TEX_NAMES.add("OE");
         TEX_NAMES.add("j");
     }
+
+    /**
+     * the raw bibtex author/editor field
+     */
+    private String original;
+    /**
+     * index of the start in original, for example to point to 'abc' in 'abc xyz', tokenStart=2
+     */
+    private int tokenStart;
+    /**
+     * index of the end in original, for example to point to 'abc' in 'abc xyz', tokenEnd=5
+     */
+    private int tokenEnd;
+    /**
+     * end of token abbreviation (always: tokenStart < tokenAbbrEnd <= tokenEnd), only valid if getToken returns
+     * TOKEN_WORD
+     */
+    private int tokenAbbrEnd;
+    /**
+     * either space of dash
+     */
+    private char tokenTerm;
+    /**
+     * true if upper-case token, false if lower-case
+     */
+    private boolean tokenCase;
 
     /**
      * Parses the String containing person names and returns a list of person information.
@@ -121,7 +128,7 @@ public class AuthorListParser {
                 break;
             case TOKEN_WORD:
                 tokens.add(original.substring(tokenStart, tokenEnd));
-                tokens.add(original.substring(tokenStart, tokenAbbr));
+                tokens.add(original.substring(tokenStart, tokenAbbrEnd));
                 tokens.add(tokenTerm);
                 tokens.add(tokenCase);
                 if (commaFirst >= 0) {
@@ -137,6 +144,13 @@ public class AuthorListParser {
                             // We are in a first name which contained a hyphen
                             break;
                         }
+
+                        int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;
+                        if ((thisTermToken >= 0) && tokens.get(thisTermToken).equals('-')) {
+                            // We are in a name which contained a hyphen
+                            break;
+                        }
+
                         vonStart = tokens.size() - TOKEN_GROUP_LENGTH;
                         break;
                     }
@@ -194,14 +208,16 @@ public class AuthorListParser {
                     firstPartStart = 0;
                 }
             }
-        } else { // commas are present: it affects only 'first part' and
-            // 'junior part'
+        } else {
+            // commas are present: it affects only 'first part' and 'junior part'
             firstPartEnd = tokens.size();
-            if (commaSecond < 0) { // one comma
+            if (commaSecond < 0) {
+                // one comma
                 if (commaFirst < firstPartEnd) {
                     firstPartStart = commaFirst;
                 }
-            } else { // two or more commas
+            } else {
+                // two or more commas
                 if (commaSecond < firstPartEnd) {
                     firstPartStart = commaSecond;
                 }
@@ -342,7 +358,7 @@ public class AuthorListParser {
             tokenEnd++;
             return TOKEN_AND;
         }
-        tokenAbbr = -1;
+        tokenAbbrEnd = -1;
         tokenTerm = ' ';
         tokenCase = true;
         int bracesLevel = 0;
@@ -353,8 +369,9 @@ public class AuthorListParser {
             if (c == '{') {
                 bracesLevel++;
             }
-            if (firstLetterIsFound && (tokenAbbr < 0) && ((bracesLevel == 0) || (c == '{'))) {
-                tokenAbbr = tokenEnd;
+
+            if (firstLetterIsFound && (tokenAbbrEnd < 0) && ((bracesLevel == 0) || (c == '{'))) {
+                tokenAbbrEnd = tokenEnd;
             }
             if ((c == '}') && (bracesLevel > 0)) {
                 bracesLevel--;
@@ -388,8 +405,8 @@ public class AuthorListParser {
             }
             tokenEnd++;
         }
-        if (tokenAbbr < 0) {
-            tokenAbbr = tokenEnd;
+        if (tokenAbbrEnd < 0) {
+            tokenAbbrEnd = tokenEnd;
         }
         if ((tokenEnd < original.length()) && (original.charAt(tokenEnd) == '-')) {
             tokenTerm = '-';

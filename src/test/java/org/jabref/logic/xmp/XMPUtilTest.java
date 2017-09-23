@@ -232,7 +232,8 @@ public class XMPUtilTest {
         pdfFile = tempFolder.newFile("JabRef.pdf");
 
         try (PDDocument pdf = new PDDocument()) {
-            pdf.addPage(new PDPage()); // Need page to open in Acrobat
+            //Need page to open in Acrobat
+            pdf.addPage(new PDPage());
             pdf.save(pdfFile.getAbsolutePath());
         }
 
