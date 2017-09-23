@@ -1,6 +1,7 @@
 package org.jabref.logic.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -8,6 +9,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
@@ -30,7 +33,9 @@ import org.jabref.model.strings.StringUtil;
  */
 public class BracketedExpressionExpander {
 
+    private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
+    private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
     private final BibEntry bibentry;
 
@@ -44,6 +49,319 @@ public class BracketedExpressionExpander {
     @Override
     public String toString() {
         return "BracketedExpressionExpander [bibentry=" + bibentry + "]";
+    }
+
+    private static String normalize(String content) {
+        List<String> tokens = new ArrayList<>();
+        int b = 0;
+        StringBuilder and = new StringBuilder();
+        StringBuilder token = new StringBuilder();
+        for (int p = 0; p < content.length(); p++) {
+            if (b == 0) {
+                String andString = and.toString(); // Avoid lots of calls
+                if (((andString.isEmpty()) && (content.charAt(p) == ' '))
+                        || (" ".equals(andString) && (content.charAt(p) == 'a'))
+                        || (" a".equals(andString) && (content.charAt(p) == 'n'))
+                        || (" an".equals(andString) && (content.charAt(p) == 'd'))) {
+                    and.append(content.charAt(p));
+                } else if (" and".equals(and.toString()) && (content.charAt(p) == ' ')) {
+                    and = new StringBuilder();
+                    tokens.add(token.toString().trim());
+                    token = new StringBuilder();
+                } else {
+                    if (content.charAt(p) == '{') {
+                        b++;
+                    }
+                    if (content.charAt(p) == '}') {
+                        b--;
+                    }
+                    token.append(and);
+                    and = new StringBuilder();
+                    token.append(content.charAt(p));
+                }
+            } else {
+                token.append(content.charAt(p));
+            }
+        }
+        tokens.add(token.toString());
+        StringBuilder normalized = new StringBuilder("");
+
+        for (int i = 0; i < tokens.size(); i++) {
+            if (i > 0) {
+                normalized.append(" and ");
+            }
+
+            normalized.append(isInstitution(tokens.get(i)) ? generateInstitutionKey(tokens.get(i)) : removeDiacritics(
+                    tokens.get(i)));
+        }
+        return normalized.toString();
+    }
+
+    /**
+     * Will remove diacritics from the content.
+     *
+     * Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.
+     * Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.
+     *
+     * @param content The content.
+     * @return The content without diacritics.
+     */
+    private static String removeDiacritics(String content) {
+        if (content.isEmpty()) {
+            return content;
+        }
+
+        String result = content;
+        // Replace umlaut with '?e'
+        result = result.replaceAll("\\{\\\\\"([a-zA-Z])\\}", "$1e");
+        result = result.replaceAll("\\\\\"\\{([a-zA-Z])\\}", "$1e");
+        result = result.replaceAll("\\\\\"([a-zA-Z])", "$1e");
+        // Remove diacritics
+        result = result.replaceAll("\\{\\\\.([a-zA-Z])\\}", "$1");
+        result = result.replaceAll("\\\\.\\{([a-zA-Z])\\}", "$1");
+        result = result.replaceAll("\\\\.([a-zA-Z])", "$1");
+        return result;
+    }
+
+    /**
+     * Unifies umlauts.
+     *
+     * Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}
+     * Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol
+     *
+     * @param content The content.
+     * @return The content with unified diacritics.
+     */
+    private static String unifyDiacritics(String content) {
+        return content.replaceAll(
+                "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
+                "{\\\"$1}").replaceAll(
+                        "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
+                        "{$1$2}");
+    }
+
+    /**
+     * Check if a value is institution.
+     *
+     * This is usable for distinguishing between persons and institutions in
+     * the author or editor fields.
+     *
+     * A person:
+     *   - "John Doe"
+     *   - "Doe, John"
+     *
+     * An institution:
+     *   - "{The Big Company or Institution Inc.}"
+     *   - "{The Big Company or Institution Inc. (BCI)}"
+     *
+     * @param author Author or editor.
+     * @return True if the author or editor is an institution.
+     */
+    private static boolean isInstitution(String author) {
+        return StringUtil.isInCurlyBrackets(author);
+    }
+
+    /**
+     * <p>
+     * An author or editor may be and institution not a person. In that case the
+     * key generator builds very long keys, e.g.: for &ldquo;The Attributed
+     * Graph Grammar System (AGG)&rdquo; ->
+     * &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
+     * </p>
+     *
+     * <p>
+     * An institution name should be inside <code>{}</code> brackets. If the
+     * institution name also includes its abbreviation this abbreviation should
+     * be also in <code>{}</code> brackets. For the previous example the value
+     * should look like:
+     * <code>{The Attributed Graph Grammar System ({AGG})}</code>.
+     * </p>
+     *
+     * <p>
+     * If an institution includes its abbreviation, i.e. "...({XYZ})", first
+     * such abbreviation should be used as the key value part of such author.
+     * </p>
+     *
+     * <p>
+     * If an institution does not include its abbreviation the key should be
+     * generated form its name in the following way:
+     * </p>
+     *
+     * <p>
+     * The institution value can contain: institution name, part of the
+     * institution, address, etc. Those information should be separated by
+     * comma. Name of the institution and possible part of the institution
+     * should be on the beginning, while address and secondary information
+     * should be on the end.
+     * </p>
+     *
+     * Each part is examined separately:
+     * <ol>
+     * <li>We remove all tokens of a part which are one of the defined ignore
+     * words (the, press), which end with a dot (ltd., co., ...) and which first
+     * character is lowercase (of, on, di, ...).</li>
+     * <li>We detect a type of the part: university, technology institute,
+     * department, school, rest
+     * <ul>
+     * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
+     * <li>Department: will be an abbreviation of all words beginning with the
+     * uppercase letter except of words: <code>d[ei]p.*</code>, school,
+     * faculty</li>
+     * <li>School: same as department</li>
+     * <li>Rest: If there are less than 3 tokens in such part than the result
+     * will be by concatenating those tokens, otherwise the result will be build
+     * from the first letters of words starting with and uppercase letter.</li>
+     * </ul>
+     * </ol>
+     *
+     * Parts are concatenated together in the following way:
+     * <ul>
+     * <li>If there is a university part use it otherwise use the rest part.</li>
+     * <li>If there is a school part append it.</li>
+     * <li>If there is a department part and it is not same as school part
+     * append it.</li>
+     * </ul>
+     *
+     * Rest part is only the first part which do not match any other type. All
+     * other parts (address, ...) are ignored.
+     *
+     * @param content the institution to generate a Bibtex key for
+     * @return <ul>
+     *         <li>the institution key</li>
+     *         <li>"" in the case of a failure</li>
+     *         <li>null if content is null</li>
+     *         </ul>
+     */
+    private static String generateInstitutionKey(String content) {
+        if (content.isEmpty()) {
+            return content;
+        }
+
+        String result = content;
+        result = unifyDiacritics(result);
+        result = result.replaceAll("^\\{", "").replaceAll("\\}$", "");
+        Matcher matcher = REGEX_PATTERN.matcher(result);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+
+        result = removeDiacritics(result);
+        String[] parts = result.split(",");
+
+        // Key parts
+        String university = null;
+        String department = null;
+        String school = null;
+        String rest = null;
+
+        List<String> ignore = Arrays.asList("press", "the");
+        for (int index = 0; index < parts.length; index++) {
+            List<String> part = new ArrayList<>();
+
+            // Cleanup: remove unnecessary words.
+            for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
+                if ((!(k.isEmpty()) // remove empty
+                        && !ignore.contains(k.toLowerCase(Locale.ENGLISH)) // remove ignored words
+                        && (k.charAt(k.length() - 1) != '.')
+                        && (String.valueOf(k.charAt(0))).matches("[A-Z]"))
+                        || ((k.length() >= 3) && "uni".equalsIgnoreCase(k.substring(0, 2)))) {
+                    part.add(k);
+                }
+            }
+
+            boolean isUniversity = false; // university
+            boolean isTechnology = false; // technology institute
+            boolean isDepartment = false; // departments
+            boolean isSchool = false; // schools
+
+            // Deciding about a part type...
+            for (String k : part) {
+                if (k.matches("^[Uu][Nn][Ii].*")) { // Starts with "uni" case and locale independent
+                    isUniversity = true;
+                }
+                if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
+                    isTechnology = true;
+                }
+                if (FieldName.SCHOOL.equalsIgnoreCase(k)) {
+                    isSchool = true;
+                }
+                if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
+                    isDepartment = true;
+                }
+            }
+            if (isTechnology) {
+                isUniversity = false; // technology institute isn't university :-)
+            }
+
+            // University part looks like: Uni[NameOfTheUniversity]
+            //
+            // If university is detected than the previous part is suggested
+            // as department
+            if (isUniversity) {
+                StringBuilder universitySB = new StringBuilder();
+                universitySB.append("Uni");
+                for (String k : part) {
+                    if (!k.matches("^[Uu][Nn][Ii].*")) {
+                        universitySB.append(k);
+                    }
+                }
+                university = universitySB.toString();
+                if ((index > 0) && (department == null)) {
+                    department = parts[index - 1];
+                }
+
+                // School is an abbreviation of all the words beginning with a
+                // capital letter excluding: department, school and faculty words.
+                //
+                // Explicitly defined department part is build the same way as
+                // school
+            } else if (isSchool || isDepartment) {
+                StringBuilder schoolSB = new StringBuilder();
+                StringBuilder departmentSB = new StringBuilder();
+                for (String k : part) {
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !FieldName.SCHOOL.equalsIgnoreCase(k)
+                            && !"faculty".equalsIgnoreCase(k)
+                            && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
+                        if (isSchool) {
+                            schoolSB.append(k.replaceAll(STARTING_CAPITAL_PATTERN, ""));
+                        }
+                        if (isDepartment) {
+                            departmentSB.append(k.replaceAll(STARTING_CAPITAL_PATTERN, ""));
+                        }
+                    }
+                }
+                if (isSchool) {
+                    school = schoolSB.toString();
+                }
+                if (isDepartment) {
+                    department = departmentSB.toString();
+                }
+                // A part not matching university, department nor school.
+            } else if (rest == null) {
+                StringBuilder restSB = new StringBuilder();
+                // Less than 3 parts -> concatenate those
+                if (part.size() < 3) {
+                    for (String k : part) {
+                        restSB.append(k);
+                        // More than 3 parts -> use 1st letter abbreviation
+                    }
+                } else {
+                    for (String k : part) {
+                        k = k.replaceAll(STARTING_CAPITAL_PATTERN, "");
+                        if (!(k.isEmpty())) {
+                            restSB.append(k);
+                        }
+                    }
+                }
+                rest = restSB.toString();
+            }
+        }
+
+        // Putting parts together.
+        return (university == null ? rest : university)
+                + (school == null ? "" : school)
+                + ((department == null)
+                        || ((school != null) && department.equals(school)) ? "" : department);
     }
 
     public String expandBrackets(String pattern) {
@@ -109,7 +427,12 @@ public class BracketedExpressionExpander {
                  * substitution of editor.
                  */
                 String authString;
-                authString = entry.getField(FieldName.AUTHOR).orElse("");
+                if (database != null) {
+                    authString = entry.getField(FieldName.AUTHOR)
+                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                } else {
+                    authString = entry.getField(FieldName.AUTHOR).orElse("");
+                }
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
@@ -118,7 +441,12 @@ public class BracketedExpressionExpander {
                 }
 
                 if (authString.isEmpty()) {
-                    authString = entry.getField(FieldName.EDITOR).orElse("");
+                    if (database != null) {
+                        authString = entry.getField(FieldName.EDITOR)
+                                .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
+                    } else {
+                        authString = entry.getField(FieldName.EDITOR).orElse("");
+                    }
                 }
 
                 // Gather all author-related checks, so we don't
