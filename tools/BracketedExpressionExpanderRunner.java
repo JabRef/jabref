@@ -27,7 +27,7 @@ class BracketedExpressionExpanderRunner {
         } else {
             
             bibentry = new BibEntry();
-            bibentry.setField( "author", "A. Kizune" );
+            bibentry.setField( "author", "O. Kitsune" );
             bibentry.setField( "year", "2017" );
             bibentry.setField( "pages", "213--216" );
         }
