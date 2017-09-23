@@ -24,6 +24,9 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.strings.StringUtil;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author saulius
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
@@ -32,6 +35,8 @@ import org.jabref.model.strings.StringUtil;
  * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
  */
 public class BracketedExpressionExpander {
+
+    private static final Log LOGGER = LogFactory.getLog(BracketedExpressionExpander.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
@@ -302,7 +307,7 @@ public class BracketedExpressionExpander {
             }
         }
         catch (NullPointerException ex) {
-            // LOGGER.debug("Problem making label", ex);
+            LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
         }
     }
