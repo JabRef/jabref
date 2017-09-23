@@ -1,6 +1,7 @@
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.util.List;
+// import java.util.Properties;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -8,13 +9,21 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.util.BracketedExpressionExpander;
 import org.jabref.model.entry.BibEntry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 
 class BracketedExpressionExpanderRunner {
     public static void main( String[] args ) throws FileNotFoundException, ParseException {
+        // Properties props = System.getProperties();
+        // props.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+        // props.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Log4JLogger");
+        // Log LOGGER = LogFactory.getLog(BracketedExpressionExpanderRunner.class);
         BibEntry bibentry;
         int start_arg = 0;
+        // LOGGER.warn("HERE!");
         if( args.length > 1 ) {
             start_arg ++;
             ImportFormatPreferences importFormatPreferences;

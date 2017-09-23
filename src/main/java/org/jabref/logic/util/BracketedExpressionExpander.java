@@ -92,10 +92,14 @@ public class BracketedExpressionExpander {
                         sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                     // Fetch and discard the closing ']'
-                    token = st.nextToken();
-                    // if( st.nextToken().equals("]")) {
-                    //     FIXME: raise exception or log? S.G.
-                    // }
+                    if (st.hasMoreTokens()) {
+                        token = st.nextToken();
+                    } else {
+                        token = "";
+                    }
+                    if (!token.equals("]")) {
+                        LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
+                    }
                 } else {
                     sb.append(token);
                 }
