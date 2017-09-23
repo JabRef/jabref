@@ -1,12 +1,13 @@
 package org.jabref.gui.filelist;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -17,15 +18,24 @@ import org.jabref.Globals;
 import org.jabref.gui.AbstractController;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.externalfiletype.ExternalFileType;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class FileListDialogController extends AbstractController<FileListDialogViewModel> {
 
+    private static final Log LOGGER = LogFactory.getLog(FileListDialogController.class);
+    private static final Pattern REMOTE_LINK_PATTERN = Pattern.compile("[a-z]+://.*");
 
     @FXML private TextField tfLink;
     @FXML private Button btnBrowse;
@@ -43,8 +53,9 @@ public class FileListDialogController extends AbstractController<FileListDialogV
 
     @FXML
     private void initialize() {
-        viewModel = new FileListDialogViewModel();
+        viewModel = new FileListDialogViewModel(stateManager.getActiveDatabase().get());
         setBindings();
+
     }
 
     private void setBindings() {
@@ -98,8 +109,49 @@ public class FileListDialogController extends AbstractController<FileListDialogV
 
     }
 
+    private void setValues(LinkedFile entry) {
+        tfDescription.setText(entry.getDescription());
+        tfLink.setText(entry.getLink());
+
+        cmbFileType.getSelectionModel().clearSelection();
+        // See what is a reasonable selection for the type combobox:
+        Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().fromLinkedFile(entry, false);
+        if (fileType.isPresent() && !(fileType.get() instanceof UnknownExternalFileType)) {
+            cmbFileType.getSelectionModel().select(fileType.get());
+        } else if ((entry.getLink() != null) && (!entry.getLink().isEmpty())) {
+            checkExtension();
+        }
+    }
+
+    private void checkExtension() {
+        if (cmbFileType.getSelectionModel().isEmpty() && (!tfLink.getText().trim().isEmpty())) {
+
+            // Check if this looks like a remote link:
+            if (REMOTE_LINK_PATTERN.matcher(tfLink.getText()).matches()) {
+                Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
+                if (type.isPresent()) {
+                    cmbFileType.getSelectionModel().select(type.get());
+                    return;
+                }
+            }
+
+            // Try to guess the file type:
+            String theLink = tfLink.getText().trim();
+            ExternalFileTypes.getInstance().getExternalFileTypeForName(theLink).ifPresent(type -> cmbFileType.getSelectionModel().select(type));
+        }
+
+    }
+
     @FXML
     void openFile(ActionEvent event) {
 
+        ExternalFileType type = cmbFileType.getSelectionModel().getSelectedItem();
+        if (type != null) {
+            try {
+                JabRefDesktop.openExternalFileAnyFormat(stateManager.getActiveDatabase().get(), viewModel.linkProperty().get(), Optional.of(type));
+            } catch (IOException e) {
+                LOGGER.error("File could not be opened", e);
+            }
+        }
     }
 }

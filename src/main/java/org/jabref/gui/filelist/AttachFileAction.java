@@ -31,10 +31,10 @@ public class AttachFileAction implements BaseAction {
         /*   FileListEntryEditor editor = new FileListEntryEditor(flEntry, false, true,
                 panel.getBibDatabaseContext());
         editor.setVisible(true, true);
-        
+
         if (editor.okPressed()) {
             Optional<FieldChange> fieldChange = entry.addFile(flEntry);
-        
+
             if (fieldChange.isPresent()) {
                 UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
                         entry.getField(FieldName.FILE).orElse(null), fieldChange.get().getNewValue());
