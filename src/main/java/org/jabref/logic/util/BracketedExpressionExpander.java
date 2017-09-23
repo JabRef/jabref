@@ -57,12 +57,14 @@ public class BracketedExpressionExpander {
     }
 
     public String expandBrackets(String pattern, BibDatabase database) {
+        Character keywordDelimiter = ';';
+        return expandBrackets(pattern, keywordDelimiter, database);
+    }
+
+    public String expandBrackets(String pattern, Character keywordDelimiter, BibDatabase database) {
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
-        // FIXME: keywordDelimiter should be later fetched from a
-        // database configuration, or passed as a parameter (S.G.):
-        char keywordDelimiter = ';';
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (token.equals("\\")) {
