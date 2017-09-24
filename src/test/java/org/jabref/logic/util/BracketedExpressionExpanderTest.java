@@ -116,7 +116,7 @@ public class BracketedExpressionExpanderTest {
 
     @Test
     public void testFieldAndFormat() {
-        Character separator = new Character(';');
+        Character separator = ';';
         assertEquals("Eric von Hippel and Georg von Krogh",
                 BracketedExpressionExpander.expandBrackets("[author]", separator, dbentry, database));
 
