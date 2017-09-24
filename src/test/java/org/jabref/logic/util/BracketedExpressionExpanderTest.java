@@ -72,4 +72,23 @@ public class BracketedExpressionExpanderTest {
         // assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth_[firstpage]"));
         bex.expandBrackets("[year]_[auth]_[firstpage");
     }
+
+    @Test
+    public void suppliedBibentryBracketExpansionTest() {
+        BibDatabase database = null;
+        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BibEntry another_bibentry = new BibEntry();
+        another_bibentry.setField("author", "Gražulis, Saulius");
+        another_bibentry.setField("year", "2017");
+        another_bibentry.setField("pages", "213--216");
+        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, database));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void nullBibentryBracketExpansionTest() {
+        BibDatabase database = null;
+        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BibEntry another_bibentry = null;
+        bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, database);
+    }
 }

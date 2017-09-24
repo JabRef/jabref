@@ -44,6 +44,10 @@ public class BracketedExpressionExpander {
 
     private final BibEntry bibentry;
 
+    public BracketedExpressionExpander() {
+        this.bibentry = null;
+    }
+
     /**
      * @param bibentry
      */
@@ -67,6 +71,12 @@ public class BracketedExpressionExpander {
     }
 
     public String expandBrackets(String pattern, Character keywordDelimiter, BibDatabase database) {
+        assert this.bibentry != null;
+        return expandBrackets(pattern, keywordDelimiter, this.bibentry, database);
+    }
+
+    public String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        assert entry != null;
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
@@ -85,10 +95,10 @@ public class BracketedExpressionExpander {
                     // check whether there is a modifier on the end such as
                     // ":lower":
                     if (fieldParts.size() <= 1) {
-                        sb.append(getFieldValue(bibentry, token, keywordDelimiter, database));
+                        sb.append(getFieldValue(entry, token, keywordDelimiter, database));
                     } else {
                         // apply modifiers:
-                        String fieldValue = getFieldValue(bibentry, fieldParts.get(0), keywordDelimiter, database);
+                        String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
                         sb.append(applyModifiers(fieldValue, fieldParts, 1));
                     }
                     // Fetch and discard the closing ']'
