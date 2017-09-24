@@ -66,7 +66,7 @@ public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
                     List<String> parts = parseFieldMarker(typeListEntry);
                     //String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
-                    String pattern = "[" + parts.get(0) + "}";
+                    String pattern = "[" + parts.get(0) + "]";
                     String label = expandBrackets(pattern, delimiter, entry, database);
                     // apply modifier if present
                     if (parts.size() > 1) {
