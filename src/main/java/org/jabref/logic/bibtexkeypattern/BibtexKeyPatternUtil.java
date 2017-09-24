@@ -3,6 +3,7 @@ package org.jabref.logic.bibtexkeypattern;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 import org.jabref.logic.util.BracketedExpressionExpander;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
