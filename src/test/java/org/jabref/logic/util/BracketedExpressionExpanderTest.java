@@ -4,6 +4,7 @@ import javafx.embed.swing.JFXPanel;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibtexEntryTypes;
 import org.jabref.model.entry.BibtexString;
 
 import org.junit.Before;
@@ -17,6 +18,8 @@ public class BracketedExpressionExpanderTest {
     // It should be removed when a better solution is found. S.G.
     final JFXPanel javafxPanel = new JFXPanel();
     private BibEntry bibentry;
+    private BibDatabase database;
+    private BibEntry dbentry;
 
     @Before
     public void setUp() throws Exception {
@@ -24,6 +27,25 @@ public class BracketedExpressionExpanderTest {
         bibentry.setField("author", "O. Kitsune");
         bibentry.setField("year", "2017");
         bibentry.setField("pages", "213--216");
+
+        dbentry = new BibEntry();
+        dbentry.setType(BibtexEntryTypes.ARTICLE);
+        dbentry.setCiteKey("HipKro03");
+        dbentry.setField("author", "Eric von Hippel and Georg von Krogh");
+        dbentry.setField("title", "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
+        dbentry.setField("journal", "Organization Science");
+        dbentry.setField("year", "2003");
+        dbentry.setField("volume", "14");
+        dbentry.setField("pages", "209--223");
+        dbentry.setField("number", "2");
+        dbentry.setField("address", "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
+        dbentry.setField("doi", "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
+        dbentry.setField("issn", "1526-5455");
+        dbentry.setField("publisher", "INFORMS");
+
+        database = new BibDatabase();
+        database.insertEntry(dbentry);
+
     }
 
     @Test
@@ -86,9 +108,33 @@ public class BracketedExpressionExpanderTest {
 
     @Test(expected = AssertionError.class)
     public void nullBibentryBracketExpansionTest() {
-        BibDatabase database = null;
+        BibDatabase another_database = null;
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
         BibEntry another_bibentry = null;
-        bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, database);
+        bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, another_database);
     }
+
+    @Test
+    public void testFieldAndFormat() {
+        Character separator = new Character(';');
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                BracketedExpressionExpander.expandBrackets("[author]", separator, dbentry, database));
+
+        // assertEquals("Eric von Hippel and Georg von Krogh",
+        //         BracketedExpressionExpander.expandBrackets("author", separator, dbentry, database));
+
+        assertEquals("", BracketedExpressionExpander.expandBrackets("[unknownkey]", separator, dbentry, database));
+
+        assertEquals("", BracketedExpressionExpander.expandBrackets("[:]", separator, dbentry, database));
+
+        assertEquals("", BracketedExpressionExpander.expandBrackets("[:lower]", separator, dbentry, database));
+
+        assertEquals("eric von hippel and georg von krogh",
+                BracketedExpressionExpander.expandBrackets("[author:lower]", separator, dbentry, database));
+
+        assertEquals("HipKro03", BracketedExpressionExpander.expandBrackets("[bibtexkey]", separator, dbentry, database));
+
+        assertEquals("HipKro03", BracketedExpressionExpander.expandBrackets("[bibtexkey:]", separator, dbentry, database));
+    }
+
 }
