@@ -75,7 +75,7 @@ public class BracketedExpressionExpander {
         return expandBrackets(pattern, keywordDelimiter, this.bibentry, database);
     }
 
-    public String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         assert entry != null;
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);

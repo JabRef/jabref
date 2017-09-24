@@ -46,7 +46,6 @@ public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
     private static String makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase database, BibEntry entry, BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         String key;
         StringBuilder stringBuilder = new StringBuilder();
-        BracketedExpressionExpander expander = new BracketedExpressionExpander(entry);
         try {
             // get the type of entry
             String entryType = entry.getType();
@@ -68,7 +67,7 @@ public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
                     //String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "}";
-                    String label = expander.expandBrackets(pattern, delimiter, database);
+                    String label = expandBrackets(pattern, delimiter, entry, database);
                     // apply modifier if present
                     if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
@@ -129,8 +128,7 @@ public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
     }
 
     public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
-        BracketedExpressionExpander expander = new BracketedExpressionExpander(entry);
-        return expander.expandBrackets("[" + value + "]", keywordDelimiter, database);
+        return expandBrackets("[" + value + "]", keywordDelimiter, entry, database);
     }
 
     /**
