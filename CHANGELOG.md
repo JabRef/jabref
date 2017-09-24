@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added autcompletion for the `crossref` field on basis of the BibTeX-key. To accept such an autcompleted key as new entry-link, you have to press <kbd>Enter</kbd> two times, otherwise the field data is not stored in the library file.[koppor#257](https://github.com/koppor/jabref/issues/257)
 - We added drag and drop support for adding files directly in the `General`-Tab. The dragged files are currently only linked from their existing directory. For more advanced features use the `Add files` dialog. [#koppor#244](https://github.com/koppor/jabref/issues/244)
 - We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
+- Added an error dialog if the file is open in another process and cannot be renamed. [#3229]
 
 ### Fixed
 

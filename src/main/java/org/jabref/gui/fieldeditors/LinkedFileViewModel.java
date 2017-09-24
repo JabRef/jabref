@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -195,7 +196,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
         boolean confirm;
         if (!fileConflictCheck.isPresent()) {
-            pdfCleanup.cleanup(entry);
+            //  check if file is being used by another process
+            File fileToRename = new File(file.get().toString());
+            if (!fileToRename.renameTo(fileToRename)) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Rename failed"),
+                        Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            } else {
+                pdfCleanup.cleanup(entry);
+            }
         } else {
             confirm = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
