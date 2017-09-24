@@ -260,6 +260,8 @@ public class BracketedExpressionExpander {
                 return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("title".equals(val)) {
                 return camelizeSignificantWordsInTitle(entry.getField(FieldName.TITLE).orElse(""));
+            } else if ("fulltitle".equals(val)) {
+                return entry.getField(FieldName.TITLE).orElse("");
             } else if ("shorttitle".equals(val)) {
                 return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
