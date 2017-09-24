@@ -1002,7 +1002,7 @@ public class BracketedExpressionExpander {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    private static List<String> parseFieldMarker(String arg) {
+    protected static List<String> parseFieldMarker(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
@@ -1034,48 +1034,6 @@ public class BracketedExpressionExpander {
         }
         parts.add(current.toString());
         return parts;
-    }
-
-
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key             mayBeNull
-     * @param enforceLegalKey make sure that the key is legal in all respects
-     */
-    public static String checkLegalKey(String key, boolean enforceLegalKey) {
-        if (key == null) {
-            return null;
-        }
-        if (!enforceLegalKey) {
-            // User doesn't want us to enforce legal characters. We must still look
-            // for whitespace and some characters such as commas, since these would
-            // interfere with parsing:
-            StringBuilder newKey = new StringBuilder();
-            for (int i = 0; i < key.length(); i++) {
-                char c = key.charAt(i);
-                if (!Character.isWhitespace(c) && ("{}(),\\\"".indexOf(c) == -1)) {
-                    newKey.append(c);
-                }
-            }
-            return newKey.toString();
-        }
-
-        StringBuilder newKey = new StringBuilder();
-        for (int i = 0; i < key.length(); i++) {
-            char c = key.charAt(i);
-            if (!Character.isWhitespace(c) && ("{}(),\\\"#~^'".indexOf(c) == -1)) {
-                newKey.append(c);
-            }
-        }
-
-        // Replace non-English characters like umlauts etc. with a sensible
-        // letter or letter combination that bibtex can accept.
-
-        return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
     private static String normalize(String content) {
