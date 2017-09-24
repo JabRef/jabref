@@ -378,7 +378,7 @@ public class BracketedExpressionExpander {
      * Determines "number" words out of the "title" field in the given BibTeX entry
      */
     public static String getTitleWords(int number, String title) {
-        return keepLettersAndDigitsOnly(getTitleWordsWithSpaces(number, title));
+        return getTitleWordsWithSpaces(number, title);
     }
 
     /**
