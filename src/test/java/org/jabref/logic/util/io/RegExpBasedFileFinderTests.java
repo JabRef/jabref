@@ -75,7 +75,7 @@ public class RegExpBasedFileFinderTests {
         List<Path> result = fileFinder.findAssociatedFiles(entry, dirs, extensions);
 
         //then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/2003_Hippel_209.pdf")),
+        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
                 result);
     }
 
@@ -97,7 +97,7 @@ public class RegExpBasedFileFinderTests {
         List<Path> result = fileFinder.findAssociatedFiles(localEntry, dirs, extensions);
 
         //then
-        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_.pdf")),
+        assertEquals(Collections.singletonList(Paths.get("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2017_Gražulis_726.pdf")),
                 result);
     }
 
