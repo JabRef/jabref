@@ -136,9 +136,6 @@ public class BracketedExpressionExpanderTest {
         assertEquals("Eric von Hippel and Georg von Krogh",
                 BracketedExpressionExpander.expandBrackets("[author]", separator, dbentry, database));
 
-        // assertEquals("Eric von Hippel and Georg von Krogh",
-        //         BracketedExpressionExpander.expandBrackets("author", separator, dbentry, database));
-
         assertEquals("", BracketedExpressionExpander.expandBrackets("[unknownkey]", separator, dbentry, database));
 
         assertEquals("", BracketedExpressionExpander.expandBrackets("[:]", separator, dbentry, database));
