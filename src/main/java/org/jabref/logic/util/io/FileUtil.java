@@ -36,7 +36,7 @@ public class FileUtil {
     public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
-    private static final DialogService dialogService = new FXDialogService();
+    private static final DialogService DIALOGSERVICE = new FXDialogService();
 
     private FileUtil() {
     }
@@ -202,7 +202,7 @@ public class FileUtil {
                 return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
             }
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(
+            DIALOGSERVICE.showErrorDialogAndWait(
                     Localization.lang("Rename failed"),
                     Localization.lang("JabRef cannot access the file because it is being used by another process."));
             LOGGER.error("Renaming Files failed", e);
