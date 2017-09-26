@@ -71,9 +71,21 @@ public class FileUtilTest {
     }
 
     @Test
-    public void testGetLinkedFileNameDefault() {
+    public void testGetLinkedFileNameDefaultFullTitle() {
         // bibkey - title
-        String fileNamePattern = "[bibtexkey] - [fulltitle:lowercase]";
+        String fileNamePattern = "[bibtexkey] - [fulltitle]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    public void testGetLinkedFileNameDefaultWithLowercaseTitle() {
+        // bibkey - title
+        String fileNamePattern = "[bibtexkey] - [title:lower]";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
