@@ -19,6 +19,9 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.FXDialogService;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
@@ -33,6 +36,7 @@ public class FileUtil {
     public static final boolean IS_POSIX_COMPILANT = FileSystems.getDefault().supportedFileAttributeViews().contains("posix");
     public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
+    private static final DialogService dialogService = new FXDialogService();
 
     private FileUtil() {
     }
@@ -198,6 +202,9 @@ public class FileUtil {
                 return Files.move(fromFile, fromFile.resolveSibling(toFile)) != null;
             }
         } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Rename failed"),
+                    Localization.lang("JabRef cannot access the file because it is being used by another process."));
             LOGGER.error("Renaming Files failed", e);
             return false;
         }
