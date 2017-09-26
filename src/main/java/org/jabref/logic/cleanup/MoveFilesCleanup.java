@@ -96,7 +96,7 @@ public class MoveFilesCleanup implements CleanupJob {
             }
             String targetDirName = "";
             if (!fileDirPattern.isEmpty()) {
-                targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern);
+                targetDirName = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern);
             }
 
             Path newTargetFile = targetDirectory.get().resolve(targetDirName).resolve(oldFile.get().getFileName());
