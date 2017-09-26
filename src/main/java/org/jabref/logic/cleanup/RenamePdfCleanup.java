@@ -148,7 +148,7 @@ public class RenamePdfCleanup implements CleanupJob {
         String realOldFilename = flEntry.getLink();
 
         String targetFileName = FileUtil.createFileNameFromPattern(
-                databaseContext.getDatabase(), entry, fileNamePattern, layoutPreferences).trim()
+                databaseContext.getDatabase(), entry, fileNamePattern).trim()
                 + '.'
                 + FileHelper.getFileExtension(realOldFilename).orElse("pdf");
 
