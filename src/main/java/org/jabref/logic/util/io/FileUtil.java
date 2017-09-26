@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.util.BracketedExpressionExpander;
 import org.jabref.logic.layout.LayoutHelper;
+import org.jabref.logic.util.BracketedExpressionExpander;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
