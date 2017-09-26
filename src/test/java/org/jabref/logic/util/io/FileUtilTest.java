@@ -413,6 +413,20 @@ public class FileUtilTest {
         assertEquals(longestValidFilename, FileUtil.getValidFileName(longerFilename));
     }
 
+    @Test
+    public void testGetLinkedDirNameDefaultFullTitle() {
+        // bibkey - title
+        String fileNamePattern = "PDF/[year]/[auth]/[bibtexkey] - [fulltitle]";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+        entry.setField("year", "1998");
+        entry.setField("author", "A. Åuthör and Author, Bete");
+
+        assertEquals("PDF/1998/Åuthör/1234 - mytitle",
+                FileUtil.createDirNameFromPattern(null, entry, fileNamePattern));
+    }
+
     private Path createTemporaryTestFile(String name) throws IOException {
         File testFile = temporaryFolder.newFile(name);
         Files.write(testFile.toPath(), name.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
