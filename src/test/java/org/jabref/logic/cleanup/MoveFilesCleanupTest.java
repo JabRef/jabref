@@ -149,4 +149,32 @@ public class MoveFilesCleanupTest {
                 .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
                 local_entry.getField("file"));
     }
+
+    @Test
+    public void movesFileFromSubfolderWithDeepSubdirPattern() throws IOException {
+        BibEntry local_entry = (BibEntry) entry.clone();
+        local_entry.setField("year", "1989");
+        local_entry.setField("author", "O. Kitsune");
+        File subfolder = bibFolder.newFolder();
+        File fileBefore = new File(subfolder, "test.pdf");
+
+        assertTrue(fileBefore.createNewFile());
+        assertTrue(new File(subfolder, "test.pdf").exists());
+
+        LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
+        local_entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]/[year]/[auth]", fileDirPrefs,
+                mock(LayoutFormatterPreferences.class));
+        cleanup.cleanup(local_entry);
+
+        assertFalse(fileBefore.exists());
+        Path after = pdfFolder.toPath().resolve("Misc").resolve("1989").resolve("Kitsune").resolve("test.pdf");
+        Path relativefileDir = pdfFolder.toPath().relativize(after);
+        assertTrue(Files.exists(after));
+
+        assertEquals(Optional
+                .of(FileFieldWriter.getStringRepresentation(new LinkedFile("", relativefileDir.toString(), ""))),
+                local_entry.getField("file"));
+    }
 }
