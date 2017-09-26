@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.util.BracketedExpressionExpander;
 import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -250,6 +251,8 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @param prefs           the layout preferences
      * @return a suggested fileName
+     *
+     * @Deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
                                                    LayoutFormatterPreferences prefs) {
@@ -269,6 +272,28 @@ public class FileUtil {
         if ((targetName == null) || targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
         }
+        //Removes illegal characters from filename
+        targetName = FileNameCleaner.cleanFileName(targetName);
+        return targetName;
+    }
+
+    /**
+     * Determines filename provided by an entry in a database
+     *
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @return a suggested fileName
+     */
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = null;
+
+        targetName = BracketedExpressionExpander.expandBrackets(fileNamePattern, ';', entry, database);
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
+        }
+
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
         return targetName;

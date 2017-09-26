@@ -126,6 +126,18 @@ public class FileUtilTest {
     }
 
     @Test
+    public void testGetLinkedFileNameByYearAuthorFirstpage() {
+        // bibkey - title
+        String fileNamePattern = "[year]_[auth]_[firstpage]";
+        BibEntry entry = new BibEntry();
+        entry.setField( "author", "O. Kitsune" );
+        entry.setField( "year", "1868" );
+        entry.setField( "pages", "567-579" );
+
+        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
     public void testGetFileExtensionSimpleFile() {
         assertEquals("pdf", FileHelper.getFileExtension(Paths.get("test.pdf")).get());
     }
