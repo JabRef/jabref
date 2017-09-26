@@ -37,6 +37,8 @@ public class MoveFilesCleanup implements CleanupJob {
 
     private LinkedFile singleFileFieldCleanup;
 
+    // FIXME: remove the unused 'layoutPrefs' parameter later (S.G.); so far, however, it is left to
+    // prevent constructor signature change.
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
