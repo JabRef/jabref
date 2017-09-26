@@ -195,7 +195,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private void performRenameWithConflictCheck(Optional<Path> file, RenamePdfCleanup pdfCleanup, String targetFileName, Optional<Path> fileConflictCheck) {
         boolean confirm;
         if (!fileConflictCheck.isPresent()) {
-            pdfCleanup.cleanup(entry);
+            try {
+                pdfCleanup.cleanupWithException(entry);
+            } catch (IOException e) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Rename failed"),
+                        Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            }
         } else {
             confirm = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("File exists"),
@@ -203,8 +209,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     Localization.lang("Overwrite"),
                     Localization.lang("Cancel"));
             if (confirm) {
-                FileUtil.renameFile(fileConflictCheck.get(), file.get(), true);
-                pdfCleanup.cleanup(entry);
+                try {
+                    FileUtil.renameFileWithException(fileConflictCheck.get(), file.get(), true);
+                    pdfCleanup.cleanupWithException(entry);
+                } catch (IOException e) {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Rename failed"),
+                            Localization.lang("JabRef cannot access the file because it is being used by another process."));
+                }
             }
         }
     }

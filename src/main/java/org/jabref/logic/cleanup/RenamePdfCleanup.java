@@ -59,6 +59,15 @@ public class RenamePdfCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
+        try {
+            return cleanupWithException(entry);
+        } catch (IOException e) {
+            LOGGER.error("Cleanup failed", e);
+            return Collections.emptyList();
+        }
+    }
+
+    public List<FieldChange> cleanupWithException(BibEntry entry) throws IOException {
         List<LinkedFile> newFileList;
         List<LinkedFile> oldFileList;
         if (singleFieldCleanup != null) {
@@ -118,7 +127,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 LOGGER.error("Could not create necessary target directories for renaming", e);
             }
 
-            boolean renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), newPath, true);
+            boolean renameSuccessful = FileUtil.renameFileWithException(Paths.get(expandedOldFilePath), newPath, true);
             if (renameSuccessful) {
                 changed = true;
 
