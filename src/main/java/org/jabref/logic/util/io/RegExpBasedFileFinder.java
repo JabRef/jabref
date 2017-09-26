@@ -65,50 +65,6 @@ class RegExpBasedFileFinder implements FileFinder {
         return s.toString();
     }
 
-    //    /**
-    //     * Accepts a string like [author:lower] or [title:abbr] or [auth], whereas the first part signifies the bibtex-field
-    //     * to get, or the key generator field marker to use, while the others are the modifiers that will be applied.
-    //     */
-    //    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database,
-    //                                           Character keywordDelimiter) {
-    //
-    //        String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
-    //
-    //        int colon = strippedFieldAndFormat.indexOf(':');
-    //
-    //        String beforeColon;
-    //        String afterColon;
-    //        if (colon == -1) {
-    //            beforeColon = strippedFieldAndFormat;
-    //            afterColon = null;
-    //        } else {
-    //            beforeColon = strippedFieldAndFormat.substring(0, colon);
-    //            afterColon = strippedFieldAndFormat.substring(colon + 1);
-    //        }
-    //        beforeColon = beforeColon.trim();
-    //
-    //        if (beforeColon.isEmpty()) {
-    //            return "";
-    //        }
-    //
-    //        // If no field value was found, try to interpret it as a key generator field marker:
-    //        String fieldValue = entry.getResolvedFieldOrAlias(beforeColon, database)
-    //                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon, keywordDelimiter, database));
-    //
-    //        if (fieldValue == null) {
-    //            return "";
-    //        }
-    //
-    //        if ((afterColon == null) || afterColon.isEmpty()) {
-    //            return fieldValue;
-    //        }
-    //
-    //        List<String> parts = Arrays.asList(afterColon.split(":"));
-    //        fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
-    //
-    //        return fieldValue;
-    //    }
-
     @Override
     public Map<BibEntry, List<Path>> findAssociatedFiles(List<BibEntry> entries, List<Path> directories, List<String> extensions) {
         Map<BibEntry, List<Path>> res = new HashMap<>();
