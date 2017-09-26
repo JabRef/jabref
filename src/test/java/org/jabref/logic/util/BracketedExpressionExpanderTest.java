@@ -56,29 +56,32 @@ public class BracketedExpressionExpanderTest {
 
     @Test
     public void nullDatabaseExpansionTest() {
-        BibDatabase database = null;
+        BibDatabase another_database = null;
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
-        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]", database));
+        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+                another_database));
     }
 
     @Test
     public void emptyDatabaseExpansionTest() {
-        BibDatabase database = new BibDatabase();
+        BibDatabase another_database = new BibDatabase();
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
-        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]", database));
+        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+                another_database));
     }
 
     @Test
     public void databaseWithStringsExpansionTest() {
-        BibDatabase database = new BibDatabase();
+        BibDatabase another_database = new BibDatabase();
         BibtexString string = new BibtexString("sgr", "Saulius Gražulis");
-        database.addString(string);
+        another_database.addString(string);
         bibentry = new BibEntry();
         bibentry.setField("author", "#sgr#");
         bibentry.setField("year", "2017");
         bibentry.setField("pages", "213--216");
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
-        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]", database));
+        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+                another_database));
     }
 
     @Test
@@ -97,13 +100,14 @@ public class BracketedExpressionExpanderTest {
 
     @Test
     public void suppliedBibentryBracketExpansionTest() {
-        BibDatabase database = null;
+        BibDatabase another_database = null;
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
         BibEntry another_bibentry = new BibEntry();
         another_bibentry.setField("author", "Gražulis, Saulius");
         another_bibentry.setField("year", "2017");
         another_bibentry.setField("pages", "213--216");
-        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, database));
+        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]", ';',
+                another_bibentry, another_database));
     }
 
     @Test(expected = NullPointerException.class)
