@@ -254,6 +254,7 @@ public class FileUtil {
      *
      * @Deprecated use String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern ) instead.
      */
+    @Deprecated
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
                                                    LayoutFormatterPreferences prefs) {
         String targetName = null;
