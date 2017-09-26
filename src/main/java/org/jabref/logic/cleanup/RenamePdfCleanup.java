@@ -33,18 +33,22 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final String fileNamePattern;
-    private final LayoutFormatterPreferences layoutPreferences;
+    // FIXME: remove unused class member later (S.G.):
+    // private final LayoutFormatterPreferences layoutPreferences;
     private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
     private LinkedFile singleFieldCleanup;
 
+    // FIXME: remove unused constructor argument 'layoutPreferences' later; for now,
+    // however, the argument is retained in order not to change the class interface (S.G.):
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
                             LayoutFormatterPreferences layoutPreferences,
                             FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
-        this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
+        // FIXME: remove unused code later (S.G.):
+        // this.layoutPreferences = Objects.requireNonNull(layoutPreferences);
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
