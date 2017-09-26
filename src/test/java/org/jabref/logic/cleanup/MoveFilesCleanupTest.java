@@ -109,7 +109,7 @@ public class MoveFilesCleanupTest {
         LinkedFile fileField = new LinkedFile("", fileBefore.getAbsolutePath(), "");
         entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
 
-        cleanup = new MoveFilesCleanup(databaseContext, "\\EntryType", fileDirPrefs,
+        cleanup = new MoveFilesCleanup(databaseContext, "[entrytype]", fileDirPrefs,
                 mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 

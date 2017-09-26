@@ -99,6 +99,18 @@ public class BracketedExpressionExpanderTest {
     }
 
     @Test
+    public void entryTypeExpansionTest() {
+        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        assertEquals("Misc:2017_Kitsune_213--216", bex.expandBrackets("[entrytype]:[year]_[auth]_[pages]"));
+    }
+
+    @Test
+    public void entryTypeExpansionLowercaseTest() {
+        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        assertEquals("misc:2017_Kitsune_213", bex.expandBrackets("[entrytype:lower]:[year]_[auth]_[firstpage]"));
+    }
+
+    @Test
     public void suppliedBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);

@@ -286,6 +286,8 @@ public class BracketedExpressionExpander {
                 } else {
                     return yearString;
                 }
+            } else if ("entrytype".equals(val)) {
+                return entry.getResolvedFieldOrAlias(BibEntry.TYPE_HEADER, database).orElse("");
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
