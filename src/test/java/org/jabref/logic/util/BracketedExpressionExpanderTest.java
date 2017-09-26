@@ -106,7 +106,7 @@ public class BracketedExpressionExpanderTest {
         assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, database));
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = NullPointerException.class)
     public void nullBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);

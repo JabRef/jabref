@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
@@ -71,12 +72,12 @@ public class BracketedExpressionExpander {
     }
 
     public String expandBrackets(String pattern, Character keywordDelimiter, BibDatabase database) {
-        assert this.bibentry != null;
+        Objects.requireNonNull(this.bibentry);
         return expandBrackets(pattern, keywordDelimiter, this.bibentry, database);
     }
 
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
-        assert entry != null;
+        Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
 
