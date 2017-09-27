@@ -65,7 +65,6 @@ public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    //String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter(), database);
                     Character delimiter = bibtexKeyPatternPreferences.getKeywordDelimiter();
                     String pattern = "[" + parts.get(0) + "]";
                     String label = expandBrackets(pattern, delimiter, entry, database);
