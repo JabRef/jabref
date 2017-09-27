@@ -87,15 +87,13 @@ public class BracketedExpressionExpanderTest {
     @Test
     public void unbalancedBracketExpansionTest() {
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
-        // assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth_[firstpage]"));
-        bex.expandBrackets("[year]_[auth_[firstpage]");
+        assertNotEquals("", bex.expandBrackets("[year]_[auth_[firstpage]"));
     }
 
     @Test
     public void unbalancedLastBracketExpansionTest() {
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
-        // assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth_[firstpage]"));
-        bex.expandBrackets("[year]_[auth]_[firstpage");
+        assertNotEquals("", bex.expandBrackets("[year]_[auth]_[firstpage"));
     }
 
     @Test
@@ -128,6 +126,8 @@ public class BracketedExpressionExpanderTest {
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
         BibEntry another_bibentry = null;
         bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, another_database);
+        // The control should not reach this point, exception should be triggered:
+        assert(false);
     }
 
     @Test
