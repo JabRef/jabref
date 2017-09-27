@@ -12,7 +12,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-
+- We added bracketed expresion support for file search patterns, import file name patterns and file directory patters, in addition to bibtexkey patterns.
+- We added support for '[entrytype]' bracketed expression.
 - We add a textArea to see versionInfo in the About JabRef Dialog.[#2942](https://github.com/JabRef/jabref/issues/2942)
 - We turned the validation feature in the entry editor off by default, because of a bug in the library we have been using [#3145](https://github.com/JabRef/jabref/issues/3145)
 - Added 'Filter All' and 'Filter None' buttons with corresponding functionality to Quality Check tool.
