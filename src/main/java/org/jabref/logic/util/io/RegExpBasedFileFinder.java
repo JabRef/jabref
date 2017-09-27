@@ -56,7 +56,6 @@ class RegExpBasedFileFinder implements FileFinder {
         Matcher m = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            // String replacement = getFieldAndFormat(m.group(), entry, database, keywordDelimiter);
             String replacement = BracketedExpressionExpander.expandBrackets(m.group(), keywordDelimiter, entry, database);
             m.appendReplacement(s, replacement);
         }
