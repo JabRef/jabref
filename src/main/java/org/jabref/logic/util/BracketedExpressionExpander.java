@@ -83,13 +83,13 @@ public class BracketedExpressionExpander {
 
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
-            if (token.equals("\\")) {
+            if ("\\".equals(token)) {
                 if (st.hasMoreTokens()) {
                     sb.append(st.nextToken());
                 }
                 // FIXME: else -> raise exception or log? (S.G.)
             } else {
-                if (token.equals("[")) {
+                if ("[".equals(token)) {
                     // Fetch the next token after the '[':
                     token = st.nextToken();
                     List<String> fieldParts = parseFieldMarker(token);
@@ -108,7 +108,7 @@ public class BracketedExpressionExpander {
                     } else {
                         token = "";
                     }
-                    if (!token.equals("]")) {
+                    if (!"]".equals(token)) {
                         LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
                     }
                 } else {
