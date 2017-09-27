@@ -16,7 +16,7 @@ public class BracketedExpressionExpanderTest {
     // The javafxPanel instace is only created to suppress the ugly
     // "... java.lang.IllegalStateException: Toolkit not initialized" exception.
     // It should be removed when a better solution is found. S.G.
-    final JFXPanel javafxPanel = new JFXPanel();
+    private final JFXPanel javafxPanel = new JFXPanel();
     private BibEntry bibentry;
     private BibDatabase database;
     private BibEntry dbentry;
