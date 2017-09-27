@@ -140,33 +140,6 @@ public class RegExpBasedFileFinderTests {
         Assert.assertTrue(result.isEmpty());
     }
 
-    //    @Test
-    //    public void testFieldAndFormat() {
-    //        assertEquals("Eric von Hippel and Georg von Krogh",
-    //                RegExpBasedFileFinder.getFieldAndFormat("[author]", entry, database, ','));
-    //
-    //        assertEquals("Eric von Hippel and Georg von Krogh",
-    //                RegExpBasedFileFinder.getFieldAndFormat("author", entry, database, ','));
-    //
-    //        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[unknownkey]", entry, database,
-    //                ','));
-    //
-    //        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[:]", entry, database, ','));
-    //
-    //        assertEquals("", RegExpBasedFileFinder.getFieldAndFormat("[:lower]", entry, database,
-    //                ','));
-    //
-    //        assertEquals("eric von hippel and georg von krogh",
-    //                RegExpBasedFileFinder.getFieldAndFormat("[author:lower]", entry, database,
-    //                        ','));
-    //
-    //        assertEquals("HipKro03", RegExpBasedFileFinder.getFieldAndFormat("[bibtexkey]", entry, database,
-    //                ','));
-    //
-    //        assertEquals("HipKro03", RegExpBasedFileFinder.getFieldAndFormat("[bibtexkey:]", entry, database,
-    //                ','));
-    //    }
-
     @Test
     public void testExpandBrackets() {
 
