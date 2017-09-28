@@ -138,7 +138,15 @@ public class RenamePdfCleanup implements CleanupJob {
                 // We use the file directory (if none is set - then bib file) to create relative file links.
                 // The .get() is legal without check because the method will always return a value.
                 Path settingsDir = databaseContext.getFirstExistingFileDir(fileDirectoryPreferences).get();
-                newFileList.add(new LinkedFile(description, settingsDir.relativize(newPath).toString(), type));
+                try {
+                    newFileList.add(new LinkedFile(description, settingsDir.relativize(newPath).toString(), type));
+                } catch (IllegalArgumentException e) {
+                    if (e.getMessage().equals("'other' has different root")) {
+                        newFileList.add(new LinkedFile(description, newPath.toString(), type));
+                    } else {
+                        LOGGER.error("Cannot add a link to renamed linked file", e);
+                    }
+                }
             } else {
                 unsuccessfulRenames++;
             }
