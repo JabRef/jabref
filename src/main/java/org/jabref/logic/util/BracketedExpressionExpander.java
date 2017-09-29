@@ -29,7 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @author saulius
  * The BracketedExpressionExpander provides methods to expand bracketed expressions,
  * such as [year]_[author]_[firstpage], using information from a provided BibEntry.
  * The above-mentioned expression would yield 2017_Kitsune_123 when expanded using the
