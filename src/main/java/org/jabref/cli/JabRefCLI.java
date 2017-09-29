@@ -155,7 +155,7 @@ public class JabRefCLI {
         options.addOption("b", "blank", false, Localization.lang("Do not open any files at startup"));
         options.addOption(null, "debug", false, Localization.lang("Show debug level messages"));
 
-        // The "-console" argument is handled by the install4j launcher
+        // The "-console" option is handled by the install4j launcher
         options.addOption(null, "console", false, Localization.lang("Show console output (only necessary when the launcher is used)"));
 
         options.addOption(Option.builder("i").
