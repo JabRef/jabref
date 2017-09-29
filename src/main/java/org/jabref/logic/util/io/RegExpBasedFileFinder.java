@@ -53,15 +53,15 @@ class RegExpBasedFileFinder implements FileFinder {
      */
     public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
                                         Character keywordDelimiter) {
-        Matcher m = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
-        StringBuffer s = new StringBuffer();
-        while (m.find()) {
-            String replacement = BracketedExpressionExpander.expandBrackets(m.group(), keywordDelimiter, entry, database);
-            m.appendReplacement(s, replacement);
+        Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
+        StringBuffer expandedStringBuffer = new StringBuffer();
+        while (matcher.find()) {
+            String replacement = BracketedExpressionExpander.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
+            matcher.appendReplacement(expandedStringBuffer, replacement);
         }
-        m.appendTail(s);
+        matcher.appendTail(expandedStringBuffer);
 
-        return s.toString();
+        return expandedStringBuffer.toString();
     }
 
     @Override
