@@ -1,6 +1,3 @@
-# Ignore local Make configuration files:
-Makeconf
-
 # no generated files in version control
 src/main/gen/
 
