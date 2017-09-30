@@ -65,4 +65,25 @@ public class PreferencesMigrationsTest {
         assertEquals(newStylePatterns[1], updatedPrefsFileNamePattern);
         assertEquals(newStylePatterns[1], updatedMainNodeFileNamePattern);
     }
+
+    @Test
+    public void testArbitraryBibtexkeyPattern() {
+        String previousFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+        final Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+        String arbitraryPattern = "[anyUserPrividedString]";
+
+        prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
+        mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, arbitraryPattern);
+
+        PreferencesMigrations.upgradeImportFileAndDirePatterns();
+
+        String updatedPrefsFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+        String updatedMainNodeFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
+
+        prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, previousFileNamePattern);
+        mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, previousFileNamePattern);
+
+        assertEquals(arbitraryPattern, updatedPrefsFileNamePattern);
+        assertEquals(arbitraryPattern, updatedMainNodeFileNamePattern);
+    }
 }
