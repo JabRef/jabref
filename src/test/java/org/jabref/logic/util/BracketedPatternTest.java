@@ -45,14 +45,14 @@ public class BracketedPatternTest {
     @Test
     public void bibentryExpansionTest() {
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]"));
+        assertEquals("2017_Kitsune_213", bex.expand("[year]_[auth]_[firstpage]"));
     }
 
     @Test
     public void nullDatabaseExpansionTest() {
         BibDatabase another_database = null;
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+        assertEquals("2017_Kitsune_213", bex.expand("[year]_[auth]_[firstpage]",
                 another_database));
     }
 
@@ -60,7 +60,7 @@ public class BracketedPatternTest {
     public void emptyDatabaseExpansionTest() {
         BibDatabase another_database = new BibDatabase();
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+        assertEquals("2017_Kitsune_213", bex.expand("[year]_[auth]_[firstpage]",
                 another_database));
     }
 
@@ -74,7 +74,7 @@ public class BracketedPatternTest {
         bibentry.setField("year", "2017");
         bibentry.setField("pages", "213--216");
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
+        assertEquals("2017_Gražulis_213", bex.expand("[year]_[auth]_[firstpage]",
                 another_database));
     }
 
@@ -84,7 +84,7 @@ public class BracketedPatternTest {
         // exception for some reason; the exception should not occur in the application! Should figure
         // out how to suppress it.
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertNotEquals("", bex.expandBrackets("[year]_[auth_[firstpage]"));
+        assertNotEquals("", bex.expand("[year]_[auth_[firstpage]"));
     }
 
     @Test
@@ -93,19 +93,19 @@ public class BracketedPatternTest {
         // exception for some reason; the exception should not occur in the application! Should figure
         // out how to suppress it.
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertNotEquals("", bex.expandBrackets("[year]_[auth]_[firstpage"));
+        assertNotEquals("", bex.expand("[year]_[auth]_[firstpage"));
     }
 
     @Test
     public void entryTypeExpansionTest() {
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("Misc:2017_Kitsune_213--216", bex.expandBrackets("[entrytype]:[year]_[auth]_[pages]"));
+        assertEquals("Misc:2017_Kitsune_213--216", bex.expand("[entrytype]:[year]_[auth]_[pages]"));
     }
 
     @Test
     public void entryTypeExpansionLowercaseTest() {
         BracketedPattern bex = new BracketedPattern(bibentry);
-        assertEquals("misc:2017_Kitsune_213", bex.expandBrackets("[entrytype:lower]:[year]_[auth]_[firstpage]"));
+        assertEquals("misc:2017_Kitsune_213", bex.expand("[entrytype:lower]:[year]_[auth]_[firstpage]"));
     }
 
     @Test

@@ -60,17 +60,17 @@ public class BracketedPattern {
         return "BracketedExpressionExpander [bibentry=" + bibentry + "]";
     }
 
-    public String expandBrackets(String pattern) {
+    public String expand(String pattern) {
         BibDatabase null_database = null;
-        return expandBrackets(pattern, null_database);
+        return expand(pattern, null_database);
     }
 
-    public String expandBrackets(String pattern, BibDatabase database) {
+    public String expand(String pattern, BibDatabase database) {
         Character keywordDelimiter = ';';
-        return expandBrackets(pattern, keywordDelimiter, database);
+        return expand(pattern, keywordDelimiter, database);
     }
 
-    public String expandBrackets(String pattern, Character keywordDelimiter, BibDatabase database) {
+    public String expand(String pattern, Character keywordDelimiter, BibDatabase database) {
         Objects.requireNonNull(this.bibentry);
         return expandBrackets(pattern, keywordDelimiter, this.bibentry, database);
     }
