@@ -193,6 +193,33 @@ public class PreferencesMigrations {
         }
     }
 
+    /**
+     * Migrate Import File Name and Directory name Patterns from versions <=4.0 to new BracketedPatterns
+     */
+    public static void upgradeImportFileAndDirePatterns() {
+        JabRefPreferences prefs = Globals.prefs;
+        LOGGER.info(">>>" + prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+        try {
+            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+            LOGGER.info(">>>" + mainPrefsNode.toString());
+
+            for( String childName : mainPrefsNode.childrenNames()) {
+                LOGGER.info(">>>>> Child: " + childName);
+            }
+            // Migrate Import patterns
+            // Check for prefs node for Version <= 4.0
+            if (mainPrefsNode.nodeExists(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+                LOGGER.info("Found 'importFileNamePattern' preference setting.");
+            }
+            if (mainPrefsNode.nodeExists("jabref/" + JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+                LOGGER.info("Found 'jabref/importFileNamePattern' preference setting.");
+            }
+        } catch (BackingStoreException e) {
+            LOGGER.error("Migrating old Import file name and directory name patterns failed.", e);
+        }
+    }
+
     public static void upgradeKeyBindingsToJavaFX() {
         UnaryOperator<String> replaceKeys = (str) -> {
             String result = str.replace("ctrl ", "ctrl+");
