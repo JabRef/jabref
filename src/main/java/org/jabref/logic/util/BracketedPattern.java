@@ -42,40 +42,41 @@ public class BracketedPattern {
     private static final int CHARS_OF_FIRST = 5;
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
-    private final BibEntry bibentry;
+    private final String pattern;
 
     public BracketedPattern() {
-        this.bibentry = null;
+        this.pattern = null;
     }
 
     /**
      * @param bibentry
      */
-    public BracketedPattern(BibEntry bibentry) {
-        this.bibentry = bibentry;
+    public BracketedPattern(String pattern) {
+        this.pattern = pattern;
     }
 
     @Override
     public String toString() {
-        return "BracketedExpressionExpander [bibentry=" + bibentry + "]";
+        return this.getClass().getName() + "[pattern=" + pattern + "]";
     }
 
-    public String expand(String pattern) {
+    public String expand(BibEntry bibentry) {
         BibDatabase null_database = null;
-        return expand(pattern, null_database);
+        return expand(bibentry, null_database);
     }
 
-    public String expand(String pattern, BibDatabase database) {
+    public String expand(BibEntry bibentry, BibDatabase database) {
         Character keywordDelimiter = ';';
-        return expand(pattern, keywordDelimiter, database);
+        return expand(bibentry, keywordDelimiter, database);
     }
 
-    public String expand(String pattern, Character keywordDelimiter, BibDatabase database) {
-        Objects.requireNonNull(this.bibentry);
-        return expandBrackets(pattern, keywordDelimiter, this.bibentry, database);
+    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
+        Objects.requireNonNull(bibentry);
+        return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(pattern,"\\[]",true);
