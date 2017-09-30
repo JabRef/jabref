@@ -350,10 +350,6 @@ public class DroppedFileHandler {
         moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
-        // FIXME: Remove unused code later S.G.
-        // LayoutFormatterPreferences layoutPrefs = Globals.prefs
-        //        .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
