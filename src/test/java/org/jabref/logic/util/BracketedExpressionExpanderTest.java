@@ -1,7 +1,5 @@
 package org.jabref.logic.util;
 
-import javafx.embed.swing.JFXPanel;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexEntryTypes;
@@ -13,10 +11,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class BracketedExpressionExpanderTest {
-    // The javafxPanel instace is only created to suppress the ugly
-    // "... java.lang.IllegalStateException: Toolkit not initialized" exception.
-    // It should be removed when a better solution is found. S.G.
-    private final JFXPanel javafxPanel = new JFXPanel();
     private BibEntry bibentry;
     private BibDatabase database;
     private BibEntry dbentry;
@@ -86,12 +80,18 @@ public class BracketedExpressionExpanderTest {
 
     @Test
     public void unbalancedBracketExpansionTest() {
+        // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
+        // exception for some reason; the exception should not occur in the application! Should figure
+        // out how to suppress it.
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
         assertNotEquals("", bex.expandBrackets("[year]_[auth_[firstpage]"));
     }
 
     @Test
     public void unbalancedLastBracketExpansionTest() {
+        // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
+        // exception for some reason; the exception should not occur in the application! Should figure
+        // out how to suppress it.
         BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
         assertNotEquals("", bex.expandBrackets("[year]_[auth]_[firstpage"));
     }
