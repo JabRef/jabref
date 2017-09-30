@@ -358,7 +358,7 @@ public class DroppedFileHandler {
 
         String targetDirName = "";
         if (!fileDirPattern.isEmpty()) {
-            targetDirName = FileUtil.createFileNameFromPattern(database, entry, fileDirPattern);
+            targetDirName = FileUtil.createDirNameFromPattern(database, entry, fileDirPattern);
         }
 
         if (targetDirName.isEmpty()) {
