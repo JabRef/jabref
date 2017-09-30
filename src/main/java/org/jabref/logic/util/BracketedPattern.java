@@ -34,9 +34,9 @@ import org.apache.commons.logging.LogFactory;
  * The above-mentioned expression would yield 2017_Kitsune_123 when expanded using the
  * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
  */
-public class BracketedExpressionExpander {
+public class BracketedPattern {
 
-    private static final Log LOGGER = LogFactory.getLog(BracketedExpressionExpander.class);
+    private static final Log LOGGER = LogFactory.getLog(BracketedPattern.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
     private static final int CHARS_OF_FIRST = 5;
@@ -44,14 +44,14 @@ public class BracketedExpressionExpander {
 
     private final BibEntry bibentry;
 
-    public BracketedExpressionExpander() {
+    public BracketedPattern() {
         this.bibentry = null;
     }
 
     /**
      * @param bibentry
      */
-    public BracketedExpressionExpander(BibEntry bibentry) {
+    public BracketedPattern(BibEntry bibentry) {
         this.bibentry = bibentry;
     }
 

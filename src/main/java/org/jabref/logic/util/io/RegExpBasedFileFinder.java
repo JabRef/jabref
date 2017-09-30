@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.util.BracketedExpressionExpander;
+import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -56,7 +56,7 @@ class RegExpBasedFileFinder implements FileFinder {
         Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer expandedStringBuffer = new StringBuffer();
         while (matcher.find()) {
-            String replacement = BracketedExpressionExpander.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
+            String replacement = BracketedPattern.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
             matcher.appendReplacement(expandedStringBuffer, replacement);
         }
         matcher.appendTail(expandedStringBuffer);

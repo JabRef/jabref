@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.util.BracketedExpressionExpander;
+import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This is the utility class of the LabelPattern package.
  */
-public class BibtexKeyPatternUtil extends BracketedExpressionExpander {
+public class BibtexKeyPatternUtil extends BracketedPattern {
     private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     // All single characters that we can use for extending a key to make it unique:

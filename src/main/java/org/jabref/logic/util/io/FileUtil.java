@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.logic.util.BracketedExpressionExpander;
+import org.jabref.logic.util.BracketedPattern;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.OptionalUtil;
@@ -293,7 +293,7 @@ public class FileUtil {
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
         String targetName = null;
 
-        targetName = BracketedExpressionExpander.expandBrackets(fileNamePattern, ';', entry, database);
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
         if ((targetName == null) || targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");
@@ -315,7 +315,7 @@ public class FileUtil {
     public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
         String targetName = null;
 
-        targetName = BracketedExpressionExpander.expandBrackets(fileNamePattern, ';', entry, database);
+        targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
 
         if ((targetName == null) || targetName.isEmpty()) {
             targetName = entry.getCiteKeyOptional().orElse("default");

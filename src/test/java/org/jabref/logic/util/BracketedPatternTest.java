@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class BracketedExpressionExpanderTest {
+public class BracketedPatternTest {
     private BibEntry bibentry;
     private BibDatabase database;
     private BibEntry dbentry;
@@ -44,14 +44,14 @@ public class BracketedExpressionExpanderTest {
 
     @Test
     public void bibentryExpansionTest() {
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]"));
     }
 
     @Test
     public void nullDatabaseExpansionTest() {
         BibDatabase another_database = null;
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
                 another_database));
     }
@@ -59,7 +59,7 @@ public class BracketedExpressionExpanderTest {
     @Test
     public void emptyDatabaseExpansionTest() {
         BibDatabase another_database = new BibDatabase();
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("2017_Kitsune_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
                 another_database));
     }
@@ -73,7 +73,7 @@ public class BracketedExpressionExpanderTest {
         bibentry.setField("author", "#sgr#");
         bibentry.setField("year", "2017");
         bibentry.setField("pages", "213--216");
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("2017_Gražulis_213", bex.expandBrackets("[year]_[auth]_[firstpage]",
                 another_database));
     }
@@ -83,7 +83,7 @@ public class BracketedExpressionExpanderTest {
         // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
         // exception for some reason; the exception should not occur in the application! Should figure
         // out how to suppress it.
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertNotEquals("", bex.expandBrackets("[year]_[auth_[firstpage]"));
     }
 
@@ -92,26 +92,26 @@ public class BracketedExpressionExpanderTest {
         // FIXME: this test throws the ugly 'java.lang.IllegalStateException: Toolkit not initialized'
         // exception for some reason; the exception should not occur in the application! Should figure
         // out how to suppress it.
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertNotEquals("", bex.expandBrackets("[year]_[auth]_[firstpage"));
     }
 
     @Test
     public void entryTypeExpansionTest() {
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("Misc:2017_Kitsune_213--216", bex.expandBrackets("[entrytype]:[year]_[auth]_[pages]"));
     }
 
     @Test
     public void entryTypeExpansionLowercaseTest() {
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         assertEquals("misc:2017_Kitsune_213", bex.expandBrackets("[entrytype:lower]:[year]_[auth]_[firstpage]"));
     }
 
     @Test
     public void suppliedBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         BibEntry another_bibentry = new BibEntry();
         another_bibentry.setField("author", "Gražulis, Saulius");
         another_bibentry.setField("year", "2017");
@@ -123,7 +123,7 @@ public class BracketedExpressionExpanderTest {
     @Test(expected = NullPointerException.class)
     public void nullBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
-        BracketedExpressionExpander bex = new BracketedExpressionExpander(bibentry);
+        BracketedPattern bex = new BracketedPattern(bibentry);
         BibEntry another_bibentry = null;
         bex.expandBrackets("[year]_[auth]_[firstpage]", ';', another_bibentry, another_database);
         // The control should not reach this point, exception should be triggered:
@@ -134,20 +134,20 @@ public class BracketedExpressionExpanderTest {
     public void testFieldAndFormat() {
         Character separator = ';';
         assertEquals("Eric von Hippel and Georg von Krogh",
-                BracketedExpressionExpander.expandBrackets("[author]", separator, dbentry, database));
+                BracketedPattern.expandBrackets("[author]", separator, dbentry, database));
 
-        assertEquals("", BracketedExpressionExpander.expandBrackets("[unknownkey]", separator, dbentry, database));
+        assertEquals("", BracketedPattern.expandBrackets("[unknownkey]", separator, dbentry, database));
 
-        assertEquals("", BracketedExpressionExpander.expandBrackets("[:]", separator, dbentry, database));
+        assertEquals("", BracketedPattern.expandBrackets("[:]", separator, dbentry, database));
 
-        assertEquals("", BracketedExpressionExpander.expandBrackets("[:lower]", separator, dbentry, database));
+        assertEquals("", BracketedPattern.expandBrackets("[:lower]", separator, dbentry, database));
 
         assertEquals("eric von hippel and georg von krogh",
-                BracketedExpressionExpander.expandBrackets("[author:lower]", separator, dbentry, database));
+                BracketedPattern.expandBrackets("[author:lower]", separator, dbentry, database));
 
-        assertEquals("HipKro03", BracketedExpressionExpander.expandBrackets("[bibtexkey]", separator, dbentry, database));
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
 
-        assertEquals("HipKro03", BracketedExpressionExpander.expandBrackets("[bibtexkey:]", separator, dbentry, database));
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", separator, dbentry, database));
     }
 
 }
