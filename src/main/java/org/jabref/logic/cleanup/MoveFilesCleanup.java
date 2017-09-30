@@ -31,21 +31,16 @@ public class MoveFilesCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 
-    // FIXME: remove unused variables later S.G.
-    // private final LayoutFormatterPreferences layoutPrefs;
     private final String fileDirPattern;
 
     private LinkedFile singleFileFieldCleanup;
 
-    // FIXME: remove the unused 'layoutPrefs' parameter later (S.G.); so far, however, it is left to
-    // prevent constructor signature change.
+    // FIXME: remove unused parameter 'layoutPrefs' later S.G.
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
             FileDirectoryPreferences fileDirectoryPreferences, LayoutFormatterPreferences layoutPrefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
-        // FIXME: Remove unused code later S.G.
-        // this.layoutPrefs = Objects.requireNonNull(layoutPrefs);
     }
 
     public MoveFilesCleanup(BibDatabaseContext databaseContext, String fileDirPattern,
