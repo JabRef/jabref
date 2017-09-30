@@ -31,8 +31,6 @@ public class PreferencesMigrationsTest {
         String previousFileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
         final Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
-        //when(mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null)).thenReturn(oldStylePatterns[0]);
-        //when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn(oldStylePatterns[0]);
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[0]);
         mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, oldStylePatterns[0]);
 
@@ -44,10 +42,7 @@ public class PreferencesMigrationsTest {
         prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, previousFileNamePattern);
         mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, previousFileNamePattern);
 
-        //verify(prefs).put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
-        //verify(mainPrefsNode).put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePatterns[0]);
         assertEquals(newStylePatterns[0], updatedPrefsFileNamePattern);
         assertEquals(newStylePatterns[0], updatedMainNodeFileNamePattern);
-        //assertTrue(true);
     }
 }
