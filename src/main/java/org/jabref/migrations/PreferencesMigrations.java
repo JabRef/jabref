@@ -204,8 +204,11 @@ public class PreferencesMigrations {
 
             LOGGER.info(">>>" + mainPrefsNode.toString());
 
+            for (String key : mainPrefsNode.keys()) {
+                LOGGER.info(">>>>> Key: " + key);
+            }
             for( String childName : mainPrefsNode.childrenNames()) {
-                LOGGER.info(">>>>> Child: " + childName);
+                LOGGER.info(">>> Child: " + childName);
             }
             // Migrate Import patterns
             // Check for prefs node for Version <= 4.0
