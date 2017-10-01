@@ -18,7 +18,6 @@
             <AppenderRef ref="CONSOLE"/>
         </Logger>
         <Root level="INFO">
-            <AppenderRef ref="CONSOLE"/>
             <AppenderRef ref="applicationInsightsAppender" level="ERROR"/>
         </Root>
     </Loggers>

@@ -1,6 +1,6 @@
 package org.jabref.cli;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.Globals;
@@ -20,8 +20,8 @@ public class JabRefCLI {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefCLI.class);
     private final CommandLine cl;
+    private final boolean isNativeMessaging;
     private List<String> leftOver;
-
 
     public JabRefCLI(String[] args) {
 
@@ -29,7 +29,17 @@ public class JabRefCLI {
 
         try {
             this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = Arrays.asList(cl.getArgs());
+
+            List<String> rest = cl.getArgList();
+            if (rest.size() == 2 && rest.get(1).equals("jabfox@jabref.org")) {
+                // Firefox passes the path to the manifest as first argument and the native messaging identifier as second argument
+                // So do not handle these arguments
+                this.leftOver = new ArrayList<>();
+                this.isNativeMessaging = true;
+            } else {
+                this.leftOver = rest;
+                this.isNativeMessaging = false;
+            }
         } catch (ParseException e) {
             LOGGER.warn("Problem parsing arguments", e);
 
@@ -261,5 +271,9 @@ public class JabRefCLI {
 
     public List<String> getLeftOver() {
         return leftOver;
+    }
+
+    public boolean isNativeMessaging() {
+        return isNativeMessaging;
     }
 }
