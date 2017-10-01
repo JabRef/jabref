@@ -29,9 +29,9 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
     private final ExecutorService requestExecutor = Executors.newSingleThreadExecutor();
 
     /**
-     * A list of all requests performed in this session.
+     * A list of all (active) requests.
      */
-    private final List<Future<NativeMessagingResponse>> requests = new ArrayList<>();
+    private final List<Future<NativeMessagingResponse>> activeRequests = new ArrayList<>();
 
     private final InputStream in;
     private final PrintStream out;
@@ -75,7 +75,8 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
     }
 
     private boolean allRequestsAreDone() {
-        return requests.stream().anyMatch(request -> !request.isDone());
+        activeRequests.removeIf(Future::isDone);
+        return activeRequests.isEmpty();
     }
 
     private NativeMessagingResponse send(String message) throws IOException {
