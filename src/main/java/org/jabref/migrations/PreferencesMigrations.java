@@ -200,23 +200,22 @@ public class PreferencesMigrations {
             JabRefPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null);
 
-        if (preferenceFileNamePattern != null) {
-            if (oldStylePattern.equals(preferenceFileNamePattern)) {
-                // Upgrade the old-style File Name pattern to new one:
-                mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+        if (preferenceFileNamePattern != null &&
+            oldStylePattern.equals(preferenceFileNamePattern)) {
+            // Upgrade the old-style File Name pattern to new one:
+            mainPrefsNode.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+            LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
                         " value \"" + oldStylePattern + "\" to new value \"" +
                         newStylePattern + "\" in the preference file");
 
-                if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
-                    // Update also the key in the current application settings, if necessary:
-                    String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
-                    if (oldStylePattern.equals(fileNamePattern)) {
-                        prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
-                        LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
+            if (prefs.hasKey(JabRefPreferences.IMPORT_FILENAMEPATTERN)) {
+                // Update also the key in the current application settings, if necessary:
+                String fileNamePattern = prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN);
+                if (oldStylePattern.equals(fileNamePattern)) {
+                    prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
+                    LOGGER.info("migrated old style " + JabRefPreferences.IMPORT_FILENAMEPATTERN +
                                 " value \"" + oldStylePattern + "\" to new value \"" +
                                 newStylePattern + "\" in the running application");
-                    }
                 }
             }
         }
