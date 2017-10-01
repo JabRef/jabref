@@ -240,7 +240,7 @@ public class ImportFormatReader {
                     bestResultCount = entryCount;
                     bestFormatName = imFo.getName();
                 }
-            } catch (IOException | UnsupportedOperationException ex) {
+            } catch (IOException | UnsupportedOperationException | IllegalArgumentException ex) {
                 // The import did not succeed. Go on.
             }
         }

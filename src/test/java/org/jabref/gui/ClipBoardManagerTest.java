@@ -8,13 +8,14 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.ArgumentMatchers;
 
 import static org.junit.Assert.*;
@@ -26,14 +27,11 @@ public class ClipBoardManagerTest {
     private ClipBoardManager clipBoardManager;
     private Clipboard clipboard;
     private Transferable content;
+    private ImportFormatReader importFormatReader;
 
     @Before
     public void setUp() throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        XMPPreferences xmpPreferences = mock(XMPPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        ImportFormatReader importFormatReader = new ImportFormatReader();
-        importFormatReader.resetImportFormats(importFormatPreferences, xmpPreferences);
+        importFormatReader = mock(ImportFormatReader.class);
 
         clipBoardManager = new ClipBoardManager(importFormatReader);
         clipboard = mock(Clipboard.class);
@@ -55,41 +53,30 @@ public class ClipBoardManagerTest {
     }
 
     @Test
-    public void testExtractBibEntriesFromClipboard_parseFromStringFlavor_bibtex() throws Exception {
-        when(content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)).thenReturn(false);
-        when(content.isDataFlavorSupported(DataFlavor.stringFlavor)).thenReturn(true);
-        when(content.getTransferData(DataFlavor.stringFlavor)).thenReturn("@article{canh05,  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n");
-
-        List<BibEntry> actual = clipBoardManager.extractBibEntriesFromClipboard();
-
+    public void extractBibEntriesFromClipboardParsesStringFlavor() throws Exception {
         BibEntry expected = new BibEntry();
         expected.setType("article");
         expected.setCiteKey("canh05");
         expected.setField("author", "Crowston, K. and Annabi, H.");
         expected.setField("title", "Title A");
-        assertEquals(Arrays.asList(expected), actual);
-    }
 
-    @Test
-    public void testExtractBibEntriesFromClipboard_parseFromStringFlavor_ris() throws Exception {
         when(content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)).thenReturn(false);
         when(content.isDataFlavorSupported(DataFlavor.stringFlavor)).thenReturn(true);
-        when(content.getTransferData(DataFlavor.stringFlavor)).thenReturn("TY  - JOUR\nTI  - Title A\nAU  - Crowston, K.\nAU  - Annabi, H.\nER  -");
+        String data = "@article{canh05,  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n";
+        when(content.getTransferData(DataFlavor.stringFlavor)).thenReturn(data);
+        when(importFormatReader.importUnknownFormatFromString(data)).thenReturn(new UnknownFormatImport("abc", new ParserResult(Arrays.asList(expected))));
 
         List<BibEntry> actual = clipBoardManager.extractBibEntriesFromClipboard();
 
-        BibEntry expected = new BibEntry();
-        expected.setType("article");
-        expected.setField("author", "Crowston, K. and Annabi, H.");
-        expected.setField("title", "Title A");
         assertEquals(Arrays.asList(expected), actual);
     }
 
     @Test
-    public void testExtractBibEntriesFromClipboard_parseFromStringFlavor_notAnEntry() throws Exception {
+    public void extractBibEntriesFromClipboardReturnsEmptyIfStringparsingFailed() throws Exception {
         when(content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)).thenReturn(false);
         when(content.isDataFlavorSupported(DataFlavor.stringFlavor)).thenReturn(true);
-        when(content.getTransferData(DataFlavor.stringFlavor)).thenReturn("this is not an entry");
+        when(content.getTransferData(DataFlavor.stringFlavor)).thenReturn("testData");
+        when(importFormatReader.importUnknownFormatFromString("testData")).thenThrow(new ImportException(""));
 
         List<BibEntry> actual = clipBoardManager.extractBibEntriesFromClipboard();
 
