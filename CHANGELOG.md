@@ -24,6 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - We added the file description filed back to the list of files in the `General`-Tab [#2930, comment](https://github.com/JabRef/jabref/issues/2930#issuecomment-328328172)
 - Added an error dialog if the file is open in another process and cannot be renamed. [#3229]
 - On Windows, the `JabRef.exe` executable can now be used to start JabRef from the command line. By default, no output is shown unless the new "-console" option is specified. 
+- We added support for pasting entries in formats other that BibTex [#3143](https://github.com/JabRef/jabref/issues/3143)
 
 ### Fixed
 
