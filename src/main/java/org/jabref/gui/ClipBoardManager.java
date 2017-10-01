@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.jabref.Globals;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
@@ -24,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ClipBoardManager implements ClipboardOwner {
+
     private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -90,7 +92,7 @@ public class ClipBoardManager implements ClipboardOwner {
 
         if (content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)) {
             // We have determined that the clipboard data is a set of entries.
-            try  {
+            try {
                 @SuppressWarnings("unchecked")
                 List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.ENTRY_FLAVOR);
                 result = contents;

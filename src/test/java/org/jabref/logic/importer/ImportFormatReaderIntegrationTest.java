@@ -29,7 +29,6 @@ public class ImportFormatReaderIntegrationTest {
     public final String format;
     private final Path file;
 
-
     public ImportFormatReaderIntegrationTest(String resource, String format, int count) throws URISyntaxException {
         this.format = format;
         this.count = count;
@@ -63,7 +62,7 @@ public class ImportFormatReaderIntegrationTest {
             assertEquals(count, reader.importUnknownFormatFromString(data).parserResult.getDatabase().getEntries().size());
         } catch (ImportException e) {
             // msbib test file does not contain an author
-            if (format.equals("msbib")) {
+            if ("msbib".equals(format)) {
                 return;
             }
             throw e;

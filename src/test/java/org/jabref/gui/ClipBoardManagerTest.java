@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 public class ClipBoardManagerTest {
 
     private ClipBoardManager clipBoardManager;
-    private Clipboard clipboard;
     private Transferable content;
     private ImportFormatReader importFormatReader;
 
@@ -34,7 +33,7 @@ public class ClipBoardManagerTest {
         importFormatReader = mock(ImportFormatReader.class);
 
         clipBoardManager = new ClipBoardManager(importFormatReader);
-        clipboard = mock(Clipboard.class);
+        Clipboard clipboard = mock(Clipboard.class);
         Field field = ClipBoardManager.class.getDeclaredField("CLIPBOARD");
         try {
             field.setAccessible(true);
