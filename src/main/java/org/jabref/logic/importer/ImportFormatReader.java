@@ -1,6 +1,8 @@
 package org.jabref.logic.importer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +33,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.FieldName;
 import org.jabref.model.strings.StringUtil;
 
 public class ImportFormatReader {
@@ -210,6 +213,41 @@ public class ImportFormatReader {
             // we found something
             ParserResult parserResult = new ParserResult(bestResult);
             parserResult.setFile(filePath.toFile());
+            return new UnknownFormatImport(bestFormatName, parserResult);
+        }
+
+        throw new ImportException(Localization.lang("Could not find a suitable import format."));
+    }
+
+    public UnknownFormatImport importUnknownFormatFromString(String data) throws ImportException {
+        // stores ref to best result, gets updated at the next loop
+        List<BibEntry> bestResult = null;
+        long bestResultCount = 0;
+        String bestFormatName = null;
+
+        // Cycle through all importers:
+        for (Importer imFo : getImportFormats()) {
+            try (StringReader in = new StringReader(data); BufferedReader input = new BufferedReader(in)) {
+                ParserResult parserResult = imFo.importDatabase(input);
+                List<BibEntry> entries = parserResult.getDatabase().getEntries();
+
+                BibDatabases.purgeEmptyEntries(entries);
+                // some parsers return non-empty entries even if the string is in a wrong format. While this prevents pasting of databases where all entries have no title or no author, it prevents false positives
+                long entryCount = entries.stream().filter(bibEntry -> bibEntry.getField(FieldName.TITLE).isPresent() && bibEntry.getField(FieldName.AUTHOR).isPresent()).count();
+
+                if (entryCount > bestResultCount) {
+                    bestResult = entries;
+                    bestResultCount = entryCount;
+                    bestFormatName = imFo.getName();
+                }
+            } catch (IOException | UnsupportedOperationException ex) {
+                // The import did not succeed. Go on.
+            }
+        }
+
+        if (bestResult != null) {
+            // we found something
+            ParserResult parserResult = new ParserResult(bestResult);
             return new UnknownFormatImport(bestFormatName, parserResult);
         }
 

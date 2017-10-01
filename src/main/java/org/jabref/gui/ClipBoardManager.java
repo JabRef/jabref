@@ -7,46 +7,19 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import org.jabref.Globals;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ParseException;
-import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.ImportException;
+import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
-import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
-import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
-import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.importer.fileformat.CopacImporter;
-import org.jabref.logic.importer.fileformat.EndnoteImporter;
-import org.jabref.logic.importer.fileformat.FreeCiteImporter;
-import org.jabref.logic.importer.fileformat.GvkParser;
-import org.jabref.logic.importer.fileformat.InspecImporter;
-import org.jabref.logic.importer.fileformat.IsiImporter;
-import org.jabref.logic.importer.fileformat.MedlineImporter;
-import org.jabref.logic.importer.fileformat.MedlinePlainImporter;
-import org.jabref.logic.importer.fileformat.ModsImporter;
-import org.jabref.logic.importer.fileformat.MrDLibImporter;
-import org.jabref.logic.importer.fileformat.MsBibImporter;
-import org.jabref.logic.importer.fileformat.OvidImporter;
-import org.jabref.logic.importer.fileformat.RepecNepImporter;
-import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.identifier.DOI;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,36 +28,14 @@ public class ClipBoardManager implements ClipboardOwner {
 
     private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
 
-    private static final List<Function<ImportFormatPreferences, Parser>> parserSuppliers = Arrays.asList(ifps -> new BibtexParser(ifps), ifps -> new GvkParser());
-
-    private static final List<Function<ImportFormatPreferences, Importer>> importerSuppliers = Arrays.asList(
-            ifps -> new BiblioscapeImporter(),
-            ifps -> new BibTeXMLImporter(),
-            ifps -> new CopacImporter(),
-            ifps -> new EndnoteImporter(ifps),
-            ifps -> new InspecImporter(),
-            ifps -> new IsiImporter(),
-            ifps -> new MedlineImporter(),
-            ifps -> new MedlinePlainImporter(),
-            ifps -> new ModsImporter(),
-            ifps -> new MrDLibImporter(),
-            ifps -> new MsBibImporter(),
-            ifps -> new OvidImporter(),
-            // () -> new PdfContentImporter(Globals.prefs.getImportFormatPreferences()), PdfContentImporter does not support importDatabase(BufferedReader reader)
-            // () -> new PdfXmpImporter(Globals.prefs.getXMPPreferences()), PdfXmpImporter does not support importDatabase(BufferedReader reader)
-            ifps -> new RepecNepImporter(ifps),
-            ifps -> new RisImporter(),
-            ifps -> new SilverPlatterImporter(),
-            ifps -> new FreeCiteImporter(ifps));
-
-    private final ImportFormatPreferences ifps;
+    private final ImportFormatReader importFormatReader;
 
     public ClipBoardManager() {
-        ifps = Globals.prefs.getImportFormatPreferences();
+        this(Globals.IMPORT_FORMAT_READER);
     }
 
-    public ClipBoardManager(ImportFormatPreferences ifps) {
-        this.ifps = ifps;
+    public ClipBoardManager(ImportFormatReader importFormatReader) {
+        this.importFormatReader = importFormatReader;
     }
 
     /**
@@ -157,39 +108,11 @@ public class ClipBoardManager implements ClipboardOwner {
                     Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(new DOI(data).getDOI());
                     entry.ifPresent(result::add);
                 } else {
-                    // try different parsers to import string
-                    for (Function<ImportFormatPreferences, Parser> supplier : parserSuppliers) {
-                        Parser parser = supplier.apply(ifps);
-                        try (InputStream inputStream = IOUtils.toInputStream(data)) {
-                            List<BibEntry> entries = parser.parseEntries(inputStream);
-                            if ((entries != null) && (entries.size() > 0)) {
-                                LOGGER.info("Parsed " + entries.size() + " entries from clipboard text using " + parser.getClass().getSimpleName());
-                                result = entries;
-                                break;
-                            }
-                        } catch (ParseException e) {
-                            // parse failed for this parser, but others might be successful
-                        }
-                    }
-                    if (result.isEmpty()) {
-                        // try different importers to import string
-                        for (Function<ImportFormatPreferences, Importer> supplier : importerSuppliers) {
-                            Importer importer = supplier.apply(ifps);
-                            BibDatabase db = null;
-                            try (StringReader in = new StringReader(data); BufferedReader input = new BufferedReader(in)) {
-                                db = importer.importDatabase(input).getDatabase();
-                                if (db.hasEntries()) {
-                                    BibEntry bibEntry = db.getEntries().get(0);
-                                    if (!bibEntry.getField(FieldName.TITLE).isPresent() || !bibEntry.getField(FieldName.AUTHOR).isPresent()) {
-                                        // this was most likely a false positive (see CopacImporter, IsiImporter)
-                                        continue;
-                                    }
-                                    LOGGER.info("Parsed " + db.getEntries().size() + " entries from clipboard text using " + importer.getClass().getSimpleName());
-                                    result = db.getEntries();
-                                    break;
-                                }
-                            }
-                        }
+                    try {
+                        UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormatFromString(data);
+                        result = unknownFormatImport.parserResult.getDatabase().getEntries();
+                    } catch (ImportException e) {
+                        // import failed and result will be empty
                     }
                 }
             } catch (UnsupportedFlavorException ex) {

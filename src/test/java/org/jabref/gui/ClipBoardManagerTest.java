@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ImportFormatReader;
+import org.jabref.logic.xmp.XMPPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +26,16 @@ public class ClipBoardManagerTest {
     private ClipBoardManager clipBoardManager;
     private Clipboard clipboard;
     private Transferable content;
-    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() throws Exception {
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        XMPPreferences xmpPreferences = mock(XMPPreferences.class);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        clipBoardManager = new ClipBoardManager(importFormatPreferences);
+        ImportFormatReader importFormatReader = new ImportFormatReader();
+        importFormatReader.resetImportFormats(importFormatPreferences, xmpPreferences);
+
+        clipBoardManager = new ClipBoardManager(importFormatReader);
         clipboard = mock(Clipboard.class);
         Field field = ClipBoardManager.class.getDeclaredField("CLIPBOARD");
         try {
