@@ -11,6 +11,8 @@ import javafx.stage.Stage;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.nativemessaging.NativeMessagingClient;
+import org.jabref.gui.nativemessaging.NativeMessagingService;
+import org.jabref.gui.nativemessaging.NativeMessagingServiceImpl;
 import org.jabref.gui.nativemessaging.StreamNativeMessagingClient;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.exporter.ExportFormat;
@@ -169,9 +171,8 @@ public class JabRefMain extends Application {
         }
 
         // Start native messaging
-
         nativeMessagingClient.sendAsync("{\"m\":\"hi\"}");
-
+        NativeMessagingService messagingService = new NativeMessagingServiceImpl(nativeMessagingClient);
 
         // If not, start GUI
         SwingUtilities

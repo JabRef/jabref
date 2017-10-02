@@ -8,19 +8,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.JabRefExecutorService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.fxmisc.easybind.EasyBind;
 import org.json.JSONObject;
 
 public class StreamNativeMessagingClient implements NativeMessagingClient {
 
-    private static final Log LOGGER = LogFactory.getLog(StreamNativeMessagingClient.class);
+    /**
+     * Holds the last message from the client that was not a response to a request from our side (i.e. a push message)
+     */
+    private final ObjectProperty<JSONObject> lastPushMessage = new SimpleObjectProperty<>();
 
     /**
      * Executor which is used to send messages. We use a single thread executor which runs sequentially in order to
@@ -69,6 +79,9 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
             while (true) {
                 if (allRequestsAreDone()) {
                     NativeMessagingResponse response = waitForResponse();
+                    if (response.isSuccessful()) {
+                        lastPushMessage.set(response.getJsonResponse().orElse(new JSONObject()));
+                    }
                 }
             }
         }, "NativeMessaging");
@@ -79,7 +92,8 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
         return activeRequests.isEmpty();
     }
 
-    private NativeMessagingResponse send(String message) throws IOException {
+    @Override
+    public void send(String message) throws IOException {
         // First write the message length (with appended zeros)
         byte[] lengthBytes = getLengthBytes(message);
         out.write(lengthBytes);
@@ -88,8 +102,6 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
         out.write(message.getBytes(StandardCharsets.UTF_8));
 
         out.flush();
-
-        return waitForResponse();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -114,14 +126,24 @@ public class StreamNativeMessagingClient implements NativeMessagingClient {
     }
 
     @Override
-    public Future<JSONObject> sendAsync(String message) {
-        return requestExecutor.submit(() -> {
-            NativeMessagingResponse response = send(message);
-            if (response.isSuccessful()) {
-                return response.getJsonResponse().orElse(null);
-            } else {
-                throw new IOException(response.getErrorMessage().orElse(""), response.getErrorCause().orElse(null));
+    public CompletableFuture<JSONObject> sendAsync(String message) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                send(message);
+                NativeMessagingResponse response = waitForResponse();
+                if (response.isSuccessful()) {
+                    return response.getJsonResponse().orElse(null);
+                } else {
+                    throw new CompletionException(response.getErrorMessage().orElse(""), response.getErrorCause().orElse(null));
+                }
+            } catch (IOException e) {
+                throw new CompletionException(e);
             }
-        });
+        }, requestExecutor);
+    }
+
+    @Override
+    public void addPushListener(Consumer<JSONObject> listener) {
+        EasyBind.subscribe(lastPushMessage, listener);
     }
 }
