@@ -90,7 +90,6 @@ public class BibtexKeyPatternUtilTest {
         String bibtexString = "@ARTICLE{entry2, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         BibEntry entry2 = BibtexParser.singleFromString(bibtexString, importFormatPreferences).get();
         database.insertEntry(entry2);
-        System.out.println(entry1.getResolvedFieldOrAlias(FieldName.AUTHOR, database));
 
         assertEquals("HerlandHaugeHelgeland",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry1, "authors3",
