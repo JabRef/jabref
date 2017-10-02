@@ -51,7 +51,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Removed
 - We removed support for LatexEditor, as it is not under active development. [#3199](https://github.com/JabRef/jabref/issues/3199)
-
+- We fixed renaming files which are not in the main directory. [#3230](https://github.com/JabRef/jabref/issues/3230)
 
 
 
