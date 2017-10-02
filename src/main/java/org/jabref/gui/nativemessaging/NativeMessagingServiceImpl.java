@@ -37,8 +37,12 @@ public class NativeMessagingServiceImpl implements NativeMessagingService {
         switch (type) {
             case "ping":
                 client.send(new JSONObject().put("type", "pong").toString());
+                break;
             case "import":
                 handleImportMessage(message.optString("format"), message.optString("data"));
+                break;
+            default:
+                LOGGER.error("Unknown native message " + type);
         }
         } catch (IOException e) {
             LOGGER.error("Error while handling push message of type " + type, e);
