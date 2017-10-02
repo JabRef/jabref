@@ -687,6 +687,15 @@ public class BibEntry implements Cloneable {
         }
     }
 
+    public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
+        Optional<String> keywordsContent = getResolvedFieldOrAlias(FieldName.KEYWORDS, database);
+        if (keywordsContent.isPresent()) {
+            return KeywordList.parse(keywordsContent.get(), delimiter);
+        } else {
+            return new KeywordList();
+        }
+    }
+
     public Collection<String> getFieldValues() {
         return fields.values();
     }

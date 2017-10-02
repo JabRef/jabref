@@ -886,15 +886,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
-            // Store undo information:
-            panel.getUndoManager().addEdit(
-                    new UndoableKeyChange(entry, oldValue.orElse(null),
-                            entry.getCiteKeyOptional().get())); // Cite key always set here
+            if (entry.hasCiteKey()) {
+                // Store undo information:
+                panel.getUndoManager().addEdit(
+                        new UndoableKeyChange(entry, oldValue.orElse(null),
+                                entry.getCiteKeyOptional().get())); // Cite key always set here
 
-            // here we update the field
-            String bibtexKeyData = entry.getCiteKeyOptional().get();
-            entry.setField(BibEntry.KEY_FIELD, bibtexKeyData);
-            panel.markBaseChanged();
+                // here we update the field
+                String bibtexKeyData = entry.getCiteKeyOptional().get();
+                entry.setField(BibEntry.KEY_FIELD, bibtexKeyData);
+                panel.markBaseChanged();
+            }
         }
     }
 

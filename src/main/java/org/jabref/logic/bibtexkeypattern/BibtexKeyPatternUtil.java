@@ -526,10 +526,10 @@ public class BibtexKeyPatternUtil {
                  */
                 String authString;
                 if (database != null) {
-                    authString = entry.getField(FieldName.AUTHOR)
+                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database)
                             .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 } else {
-                    authString = entry.getField(FieldName.AUTHOR).orElse("");
+                    authString = entry.getResolvedFieldOrAlias(FieldName.AUTHOR, database).orElse("");
                 }
 
                 if (val.startsWith("pure")) {
@@ -540,10 +540,10 @@ public class BibtexKeyPatternUtil {
 
                 if (authString.isEmpty()) {
                     if (database != null) {
-                        authString = entry.getField(FieldName.EDITOR)
+                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database)
                             .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                     } else {
-                        authString = entry.getField(FieldName.EDITOR).orElse("");
+                        authString = entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse("");
                     }
                 }
 
@@ -597,41 +597,41 @@ public class BibtexKeyPatternUtil {
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return entry.getFieldOrAlias(val).orElse("");
+                    return entry.getResolvedFieldOrAlias(val, database).orElse("");
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
+                    return firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
+                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getField(FieldName.EDITOR).orElse(""));
+                    return allAuthors(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getField(FieldName.EDITOR).orElse(""));
+                    return lastAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
+                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR).orElse(""));
+                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    return authIniN(entry.getField(FieldName.EDITOR).orElse(""), num);
+                    return authIniN(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    return authNofMth(entry.getField(FieldName.EDITOR).orElse(""),
+                    return authNofMth(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    return authAuthEa(entry.getField(FieldName.EDITOR).orElse(""));
+                    return authAuthEa(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 } else if ("edtrshort".equals(val)) {
-                    return authshort(entry.getField(FieldName.EDITOR).orElse(""));
+                    return authshort(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
+                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(FieldName.EDITOR, database).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
@@ -643,26 +643,26 @@ public class BibtexKeyPatternUtil {
                     return entry.getFieldOrAlias(val).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getField(FieldName.PAGES).orElse(""));
+                return firstPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
             } else if ("pageprefix".equals(val)) {
-                return pagePrefix(entry.getField(FieldName.PAGES).orElse(""));
+                return pagePrefix(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getField(FieldName.PAGES).orElse(""));
+                return lastPage(entry.getResolvedFieldOrAlias(FieldName.PAGES, database).orElse(""));
             } else if ("title".equals(val)) {
-                return camelizeSignificantWordsInTitle(entry.getField(FieldName.TITLE).orElse(""));
+                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
+                return getTitleWords(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
-                        applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE).orElse("")),
+                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")),
                                 Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1,
-                        removeSmallWords(entry.getField(FieldName.TITLE).orElse("")));
+                        removeSmallWords(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse("")));
             } else if ("camel".equals(val)) {
-                return getCamelizedTitle(entry.getField(FieldName.TITLE).orElse(""));
+                return getCamelizedTitle(entry.getResolvedFieldOrAlias(FieldName.TITLE, database).orElse(""));
             } else if ("shortyear".equals(val)) {
-                String yearString = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
+                String yearString = entry.getResolvedFieldOrAlias(FieldName.YEAR, database).orElse("");
                 if (yearString.isEmpty()) {
                     return yearString;
                     // In press/in preparation/submitted
@@ -676,7 +676,7 @@ public class BibtexKeyPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
+                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
@@ -692,7 +692,7 @@ public class BibtexKeyPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
+                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
                 for (Keyword keyword : separatedKeywords) {
@@ -707,7 +707,7 @@ public class BibtexKeyPatternUtil {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return entry.getFieldOrAlias(val).orElse("");
+                return entry.getResolvedFieldOrAlias(val, database).orElse("");
             }
         } catch (NullPointerException ex) {
             LOGGER.debug("Problem making label", ex);
