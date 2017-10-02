@@ -31,14 +31,14 @@ public class ImportFormatReaderTestParameterless {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullImportUnknownFormat() throws Exception {
-        reader.importUnknownFormat(null);
+    public void testNullImportUnknownFormatPath() throws Exception {
+        reader.importUnknownFormat((Path) null);
         fail();
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullImportUnknownFormatFromString() throws Exception {
-        reader.importUnknownFormatFromString(null);
+    public void testNullImportUnknownFormatString() throws Exception {
+        reader.importUnknownFormat((String) null);
         fail();
     }
 

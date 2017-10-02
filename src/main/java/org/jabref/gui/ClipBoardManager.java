@@ -28,15 +28,16 @@ public class ClipBoardManager implements ClipboardOwner {
 
     private static final Log LOGGER = LogFactory.getLog(ClipBoardManager.class);
 
-    private static final Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private final Clipboard clipboard;
 
     private final ImportFormatReader importFormatReader;
 
     public ClipBoardManager() {
-        this(Globals.IMPORT_FORMAT_READER);
+        this(Toolkit.getDefaultToolkit().getSystemClipboard(), Globals.IMPORT_FORMAT_READER);
     }
 
-    public ClipBoardManager(ImportFormatReader importFormatReader) {
+    public ClipBoardManager(Clipboard clipboard, ImportFormatReader importFormatReader) {
+        this.clipboard = clipboard;
         this.importFormatReader = importFormatReader;
     }
 
@@ -52,7 +53,7 @@ public class ClipBoardManager implements ClipboardOwner {
      * Places the string into the clipboard using a {@link Transferable}.
      */
     public void setTransferableClipboardContents(Transferable transferable) {
-        CLIPBOARD.setContents(transferable, this);
+        clipboard.setContents(transferable, this);
     }
 
     /**
@@ -64,7 +65,7 @@ public class ClipBoardManager implements ClipboardOwner {
     public String getClipboardContents() {
         String result = "";
         //odd: the Object param of getContents is not currently used
-        Transferable contents = CLIPBOARD.getContents(null);
+        Transferable contents = clipboard.getContents(null);
         if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
@@ -82,12 +83,12 @@ public class ClipBoardManager implements ClipboardOwner {
      */
     public void setClipboardContents(String aString) {
         StringSelection stringSelection = new StringSelection(aString);
-        CLIPBOARD.setContents(stringSelection, this);
+        clipboard.setContents(stringSelection, this);
     }
 
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
-        Transferable content = CLIPBOARD.getContents(null);
+        Transferable content = clipboard.getContents(null);
         List<BibEntry> result = new ArrayList<>();
 
         if (content.isDataFlavorSupported(TransferableBibtexEntry.ENTRY_FLAVOR)) {
@@ -111,7 +112,7 @@ public class ClipBoardManager implements ClipboardOwner {
                     entry.ifPresent(result::add);
                 } else {
                     try {
-                        UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormatFromString(data);
+                        UnknownFormatImport unknownFormatImport = importFormatReader.importUnknownFormat(data);
                         result = unknownFormatImport.parserResult.getDatabase().getEntries();
                     } catch (ImportException e) {
                         // import failed and result will be empty

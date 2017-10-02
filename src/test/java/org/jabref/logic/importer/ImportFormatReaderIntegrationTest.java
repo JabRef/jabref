@@ -58,15 +58,7 @@ public class ImportFormatReaderIntegrationTest {
     @Test
     public void testImportUnknownFormatFromString() throws Exception {
         String data = new String(Files.readAllBytes(file), StandardCharsets.UTF_8);
-        try {
-            assertEquals(count, reader.importUnknownFormatFromString(data).parserResult.getDatabase().getEntries().size());
-        } catch (ImportException e) {
-            // msbib test file does not contain an author
-            if ("msbib".equals(format)) {
-                return;
-            }
-            throw e;
-        }
+        assertEquals(count, reader.importUnknownFormat(data).parserResult.getDatabase().getEntries().size());
     }
 
     @Parameterized.Parameters(name = "{index}: {1}")
