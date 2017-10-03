@@ -74,7 +74,7 @@ public class KeywordList implements Iterable<Keyword> {
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(Optional<String> keywordString, Character delimiter) {
-        return keywordString.map(keyword -> KeywordList.parse(keywordString.get(), delimiter)).orElse(new KeywordList());
+        return keywordString.map(keyword -> KeywordList.parse(keyword, delimiter)).orElse(new KeywordList());
     }
 
     public KeywordList createClone() {
